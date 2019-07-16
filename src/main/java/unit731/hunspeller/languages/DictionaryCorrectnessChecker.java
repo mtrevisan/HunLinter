@@ -8,7 +8,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.enums.AffixTag;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
+import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 
 
 public class DictionaryCorrectnessChecker{

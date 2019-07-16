@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation.dtos;
+package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.Collections;
 import java.util.HashMap;

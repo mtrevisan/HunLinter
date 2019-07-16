@@ -12,7 +12,7 @@ import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
+import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
 public class ThesaurusMeaningsDialog extends JDialog{

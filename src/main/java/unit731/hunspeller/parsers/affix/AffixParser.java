@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.handlers.AffixHandler;
 import unit731.hunspeller.parsers.affix.handlers.AliasesHandler;
 import unit731.hunspeller.parsers.affix.handlers.CompoundRuleHandler;

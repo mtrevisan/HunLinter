@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.enums.AffixTag;
-import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
+import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.vos.RuleEntry;

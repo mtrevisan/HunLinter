@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.vos;
+package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Closeable;
 import java.nio.charset.Charset;
@@ -12,9 +12,8 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 
 
 /**

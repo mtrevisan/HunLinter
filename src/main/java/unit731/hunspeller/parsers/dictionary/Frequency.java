@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.vos;
+package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Iterator;

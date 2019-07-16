@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation.hyphenators;
+package unit731.hunspeller.parsers.hyphenation;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,9 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 import unit731.hunspeller.services.PatternHelper;
 
 

@@ -15,11 +15,11 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
+import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
+import unit731.hunspeller.parsers.hyphenation.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 
 
 public class StatisticsWorker extends WorkerDictionaryBase{

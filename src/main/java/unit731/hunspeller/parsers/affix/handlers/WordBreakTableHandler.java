@@ -10,7 +10,7 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.enums.AffixTag;
-import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
+import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ParserHelper;

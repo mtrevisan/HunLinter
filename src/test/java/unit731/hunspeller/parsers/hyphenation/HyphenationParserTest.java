@@ -1,8 +1,7 @@
 package unit731.hunspeller.parsers.hyphenation;
 
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,8 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
-import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.PatternHelper;
 
 

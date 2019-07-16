@@ -23,8 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
-import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.memento.CaretakerInterface;

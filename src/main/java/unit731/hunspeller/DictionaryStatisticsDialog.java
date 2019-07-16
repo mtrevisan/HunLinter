@@ -34,10 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
-import unit731.hunspeller.parsers.dictionary.vos.Frequency;
+import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
+import unit731.hunspeller.parsers.dictionary.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 
 
 public class DictionaryStatisticsDialog extends JDialog{

@@ -13,7 +13,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
+import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunspeller.services.PatternHelper;
 
 

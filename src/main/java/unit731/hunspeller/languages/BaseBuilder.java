@@ -13,7 +13,7 @@ import unit731.hunspeller.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.OrthographyVEC;
 import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
+import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 
 
 public class BaseBuilder{

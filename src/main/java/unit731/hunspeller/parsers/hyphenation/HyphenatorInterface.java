@@ -1,8 +1,6 @@
-package unit731.hunspeller.parsers.hyphenation.hyphenators;
+package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.List;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
 public interface HyphenatorInterface{
