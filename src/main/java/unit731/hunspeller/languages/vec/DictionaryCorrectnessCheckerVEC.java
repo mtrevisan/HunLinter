@@ -111,7 +111,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		incompatibilityCheck(production);
 
-		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB))
+		if(production.hasNonTerminalContinuationFlags(affixData::isTerminalAffix) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB))
 			northernPluralCheck(production);
 
 		finalSonorizationCheck(production);

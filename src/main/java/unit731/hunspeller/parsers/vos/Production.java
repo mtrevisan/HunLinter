@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 
 
@@ -92,7 +93,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(final AffixEntry.Type type){
+	public AffixEntry getLastAppliedRule(final AffixType type){
 		AffixEntry lastAppliedRule = null;
 		if(hasProductionRules())
 			lastAppliedRule = appliedRules.stream()

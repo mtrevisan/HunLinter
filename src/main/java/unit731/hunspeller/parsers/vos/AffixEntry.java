@@ -15,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -35,36 +35,7 @@ public class AffixEntry{
 	private static final String ZERO = "0";
 
 
-	public enum Type{
-		SUFFIX(AffixTag.SUFFIX),
-		PREFIX(AffixTag.PREFIX);
-
-
-		private final AffixTag tag;
-
-		Type(final AffixTag tag){
-			this.tag = tag;
-		}
-
-		public static Type createFromCode(final String code){
-			return Arrays.stream(values())
-				.filter(t -> t.tag.getCode().equals(code))
-				.findFirst()
-				.orElse(null);
-		}
-
-		public boolean is(final String flag){
-			return this.tag.getCode().equals(flag);
-		}
-
-		public AffixTag getTag(){
-			return tag;
-		}
-
-	}
-
-
-	private final Type type;
+	private final AffixType affixType;
 	/** ID used to represent the affix */
 	private final String flag;
 	final String[] continuationFlags;
@@ -102,10 +73,10 @@ public class AffixEntry{
 		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
-		type = Type.createFromCode(ruleType);
+		affixType = AffixType.createFromCode(ruleType);
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
-		condition = new AffixCondition(cond, type);
+		condition = new AffixCondition(cond, affixType);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		removingLength = removing.length();
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
@@ -137,8 +108,8 @@ public class AffixEntry{
 		}
 	}
 
-	public Type getType(){
-		return type;
+	public AffixType getType(){
+		return affixType;
 	}
 
 	public String getFlag(){
@@ -241,15 +212,15 @@ public class AffixEntry{
 	}
 
 	public final boolean isSuffix(){
-		return (type == Type.SUFFIX);
+		return (affixType == AffixType.SUFFIX);
 	}
 
 	public boolean canApplyTo(final String word){
-		return condition.match(word, type);
+		return condition.match(word, affixType);
 	}
 
 	public boolean canInverseApplyTo(final String word){
-		return (type == AffixEntry.Type.PREFIX? word.startsWith(appending): word.endsWith(appending));
+		return (affixType == AffixType.PREFIX? word.startsWith(appending): word.endsWith(appending));
 	}
 
 	public String applyRule(final String word, final boolean isFullstrip) throws IllegalArgumentException{
@@ -295,7 +266,7 @@ public class AffixEntry{
 
 		final AffixEntry rhs = (AffixEntry)obj;
 		return new EqualsBuilder()
-			.append(type, rhs.type)
+			.append(affixType, rhs.affixType)
 			.append(flag, rhs.flag)
 			.append(continuationFlags, rhs.continuationFlags)
 			.append(condition, rhs.condition)
@@ -308,7 +279,7 @@ public class AffixEntry{
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(type)
+			.append(affixType)
 			.append(flag)
 			.append(continuationFlags)
 			.append(condition)

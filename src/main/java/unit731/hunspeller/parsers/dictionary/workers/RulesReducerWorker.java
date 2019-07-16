@@ -12,8 +12,8 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.LineEntry;
 import unit731.hunspeller.parsers.dictionary.RulesReducer;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.vos.RuleEntry;
-import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -41,7 +41,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		if(ruleToBeReduced == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		final AffixEntry.Type type = ruleToBeReduced.getType();
+		final AffixType type = ruleToBeReduced.getType();
 
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> originalRules = new ArrayList<>();

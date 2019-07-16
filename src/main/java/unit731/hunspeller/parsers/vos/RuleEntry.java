@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.vos;
 
+import unit731.hunspeller.parsers.enums.AffixType;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -50,8 +52,8 @@ public class RuleEntry{
 		return (isCombinable()? COMBINABLE: NOT_COMBINABLE);
 	}
 
-	public AffixEntry.Type getType(){
-		return (isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+	public AffixType getType(){
+		return (isSuffix()? AffixType.SUFFIX: AffixType.PREFIX);
 	}
 
 	public List<AffixEntry> getEntries(){

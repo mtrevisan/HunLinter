@@ -10,6 +10,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.ParserHelper;
@@ -21,7 +22,7 @@ public class AffixHandler implements Handler{
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixTag, List<String>> getData){
 		try{
-			final boolean isSuffix = AffixEntry.Type.SUFFIX.is(context.getRuleType());
+			final boolean isSuffix = AffixType.SUFFIX.is(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
@@ -43,7 +44,7 @@ public class AffixHandler implements Handler{
 			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 		final BufferedReader br = context.getReader();
-		final AffixEntry.Type ruleType = AffixEntry.Type.createFromCode(context.getRuleType());
+		final AffixType ruleType = AffixType.createFromCode(context.getRuleType());
 		final String ruleFlag = context.getFirstParameter();
 
 		//List<AffixEntry> prefixEntries = new ArrayList<>();
@@ -83,7 +84,7 @@ public class AffixHandler implements Handler{
 		return entries;
 	}
 
-	private void checkValidity(final AffixEntry entry, final AffixEntry.Type ruleType, final String ruleFlag) throws IllegalArgumentException{
+	private void checkValidity(final AffixEntry entry, final AffixType ruleType, final String ruleFlag) throws IllegalArgumentException{
 		if(entry.getType() != ruleType)
 			throw new IllegalArgumentException("mismatched rule type (expected " + ruleType + ")");
 		if(!ruleFlag.equals(entry.getFlag()))

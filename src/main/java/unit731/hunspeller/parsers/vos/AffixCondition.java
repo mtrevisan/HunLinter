@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -17,15 +18,15 @@ public class AffixCondition{
 	private final String[] condition;
 
 
-	public AffixCondition(final String condition, final AffixEntry.Type affixType){
+	public AffixCondition(final String condition, final AffixType affixType){
 		this.condition = PatternHelper.split(condition, PATTERN_CONDITION_SPLITTER);
 
-		if(affixType == AffixEntry.Type.SUFFIX)
+		if(affixType == AffixType.SUFFIX)
 			//invert condition
 			Collections.reverse(Arrays.asList(this.condition));
 	}
 
-	public boolean match(final String word, final AffixEntry.Type type){
+	public boolean match(final String word, final AffixType type){
 		boolean match = false;
 
 		final int size = word.length();
@@ -33,7 +34,7 @@ public class AffixCondition{
 		if(condition.length <= size){
 			match = true;
 
-			int idxWord = (type == AffixEntry.Type.PREFIX? 0: size - 1);
+			int idxWord = (type == AffixType.PREFIX? 0: size - 1);
 			for(String conditionPart : condition){
 				if(idxWord < 0 || idxWord >= size){
 					match = false;
@@ -55,7 +56,7 @@ public class AffixCondition{
 						break;
 				}
 
-				idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
+				idxWord += (type == AffixType.PREFIX? 1: -1);
 			}
 		}
 

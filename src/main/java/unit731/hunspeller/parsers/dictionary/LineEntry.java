@@ -17,7 +17,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.parsers.vos.AffixEntry;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
@@ -156,7 +156,7 @@ public class LineEntry implements Serializable{
 		}
 	}
 
-	public static String toHunspellHeader(final AffixEntry.Type type, final String flag, final char combinableChar, final int size){
+	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getTag().getCode())
 			.add(flag)
@@ -165,7 +165,7 @@ public class LineEntry implements Serializable{
 			.toString();
 	}
 
-	public String toHunspellRule(final AffixEntry.Type type, final String flag){
+	public String toHunspellRule(final AffixType type, final String flag){
 		String anAddition = anAddition();
 		String morphologicalRules = StringUtils.EMPTY;
 		final int idx = anAddition.indexOf(TAB);

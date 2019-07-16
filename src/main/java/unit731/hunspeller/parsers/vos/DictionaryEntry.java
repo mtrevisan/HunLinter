@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -141,13 +142,13 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * @param affixData	The Affix Data used to determine if a flag is a terminal
+	 * @param isTerminalAffix	The method used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasNonTerminalContinuationFlags(final AffixData affixData){
+	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
 		if(continuationFlags != null)
 			for(final String flag : continuationFlags)
-				if(!affixData.isTerminalAffix(flag))
+				if(!isTerminalAffix.apply(flag))
 					return true;
 		return false;
 	}
@@ -174,7 +175,7 @@ public class DictionaryEntry{
 	 * @param type	The type used to filter the last applied rule
 	 * @return	The last applied rule of the specified type
 	 */
-	public AffixEntry getLastAppliedRule(final AffixEntry.Type type){
+	public AffixEntry getLastAppliedRule(final AffixType type){
 		return null;
 	}
 

@@ -25,6 +25,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.vos.AffixEntry;
@@ -70,7 +71,7 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
+	public List<LineEntry> collectProductionsByFlag(final List<Production> productions, final String flag, final AffixType type){
 		//remove base production
 		productions.remove(0);
 		//collect all productions that generates from the given flag
@@ -86,9 +87,9 @@ public class RulesReducer{
 		return compactProductions(filteredRules);
 	}
 
-	private LineEntry createAffixEntry(final Production production, String word, final AffixEntry.Type type){
+	private LineEntry createAffixEntry(final Production production, String word, final AffixType type){
 		String producedWord = production.getWord();
-		if(type == AffixEntry.Type.PREFIX){
+		if(type ==AffixType.PREFIX){
 			producedWord = StringUtils.reverse(producedWord);
 			word = StringUtils.reverse(word);
 		}
@@ -620,13 +621,13 @@ public class RulesReducer{
 		if(ruleToBeReduced == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		final AffixEntry.Type type = ruleToBeReduced.getType();
+		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
 
-	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,
+	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
 		Stream<LineEntry> stream = entries.stream()
@@ -636,7 +637,7 @@ public class RulesReducer{
 					final String removal = rule.removal.substring(lcp);
 					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
 				}));
-		if(type == AffixEntry.Type.PREFIX)
+		if(type == AffixType.PREFIX)
 			stream = stream.map(LineEntry::createReverse);
 		final List<LineEntry> restoredRules = stream
 			.collect(Collectors.toList());
@@ -655,7 +656,7 @@ public class RulesReducer{
 			.collect(Collectors.toList());
 	}
 
-	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){
+	private List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
 		return entries.stream()
 			.map(entry -> entry.toHunspellRule(type, flag))
 			.collect(Collectors.toList());
@@ -671,8 +672,8 @@ public class RulesReducer{
 			.skip(1)
 			.map(line -> new AffixEntry(line, strategy, null, null))
 			.collect(Collectors.toList());
-		final AffixEntry.Type type = ruleToBeReduced.getType();
-		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combinableChar(), entries);
+		final AffixType type = ruleToBeReduced.getType();
+		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
 			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
