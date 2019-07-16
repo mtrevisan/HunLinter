@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.services.ParserHelper;
 
 
 public class AliasesHandler implements Handler{
@@ -30,7 +29,7 @@ public class AliasesHandler implements Handler{
 
 			final List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = extractLine(br);
+				final String line = ParserHelper.extractLine(br);
 
 				final String[] parts = StringUtils.split(line);
 
@@ -55,12 +54,4 @@ public class AliasesHandler implements Handler{
 				+ ": Bad tag, it must be " + context.getRuleType());
 	}
 
-	private String extractLine(final BufferedReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
-	}
-	
 }

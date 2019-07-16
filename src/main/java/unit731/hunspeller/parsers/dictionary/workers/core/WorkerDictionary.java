@@ -1,9 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.File;
-import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
@@ -20,9 +18,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.ParserHelper;
 
 
 class WorkerDictionary extends WorkerBase<String, Integer>{
@@ -87,7 +85,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		final Charset charset = getCharset();
 		final long totalSize = dicFile.length();
 		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
-			String line = extractLine(br);
+			String line = ParserHelper.extractLine(br);
 			
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 			
@@ -97,7 +95,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;
 				
-				line = DictionaryParser.cleanLine(line);
+				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty())
 					lines.add(Pair.of(br.getLineNumber(), line));
 				
@@ -108,14 +106,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			cancelWorker(e);
 		}
 		return lines;
-	}
-
-	private String extractLine(final LineNumberReader br) throws IOException{
-		String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
 	}
 
 	private void readProcess(final List<Pair<Integer, String>> lines){

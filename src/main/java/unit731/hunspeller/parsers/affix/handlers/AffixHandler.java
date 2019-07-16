@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +10,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.services.ParserHelper;
 
 
 public class AffixHandler implements Handler{
@@ -55,7 +54,7 @@ public class AffixHandler implements Handler{
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		try{
 			for(int i = 0; i < numEntries; i ++){
-				line = extractLine(br);
+				line = ParserHelper.extractLine(br);
 
 				final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
@@ -82,14 +81,6 @@ public class AffixHandler implements Handler{
 			throw new IllegalArgumentException("Reading error: " + e.getMessage());
 		}
 		return entries;
-	}
-
-	private String extractLine(final BufferedReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
 	}
 
 	private void checkValidity(final AffixEntry entry, final AffixEntry.Type ruleType, final String ruleFlag) throws IllegalArgumentException{

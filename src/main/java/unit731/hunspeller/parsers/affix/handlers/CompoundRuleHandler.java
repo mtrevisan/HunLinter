@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +12,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.services.ParserHelper;
 
 
 public class CompoundRuleHandler implements Handler{
@@ -29,7 +28,7 @@ public class CompoundRuleHandler implements Handler{
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			final Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = extractLine(br);
+				final String line = ParserHelper.extractLine(br);
 
 				final String[] lineParts = StringUtils.split(line);
 
@@ -61,14 +60,6 @@ public class CompoundRuleHandler implements Handler{
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
 			throw new IllegalArgumentException("Error reading line '" + context + "': Bad number of entries, it must be a positive integer");
-	}
-
-	private String extractLine(final BufferedReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-	
-		return DictionaryParser.cleanLine(line);
 	}
 
 	private void checkRuleValidity(final String rule, final String line, final int i, final FlagParsingStrategy strategy)

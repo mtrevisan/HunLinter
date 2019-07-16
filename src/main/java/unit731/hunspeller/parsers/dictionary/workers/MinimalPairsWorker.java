@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -32,6 +31,7 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
+import unit731.hunspeller.services.ParserHelper;
 import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
@@ -84,7 +84,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset());
 					final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
-				String line = extractLine(br);
+				String line = ParserHelper.extractLine(br);
 
 				long readSoFar = line.getBytes(charset).length + 2;
 
@@ -97,7 +97,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					lineIndex ++;
 					readSoFar += line.getBytes(charset).length + 2;
 
-					line = DictionaryParser.cleanLine(line);
+					line = ParserHelper.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
 							final List<Production> productions = wordGenerator.applyAffixRules(line);
@@ -246,14 +246,6 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		}
 
 		return null;
-	}
-
-	private String extractLine(final LineNumberReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
 	}
 
 	private int getProgress(final double index, final double total){

@@ -16,20 +16,17 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.ParserHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
 
 public class DictionaryParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryParser.class);
-
-	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("(^\\s*|\\s+)[#\\/].*$");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
@@ -127,7 +124,7 @@ public class DictionaryParser{
 				int startSection = -1;
 				boolean needSorting = false;
 				while((line = br.readLine()) != null){
-					if(isComment(line) || StringUtils.isBlank(line)){
+					if(ParserHelper.isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){
 							//filter out single word that doesn't need to be sorted
 							if(lineIndex - startSection > 2 && needSorting)
@@ -159,26 +156,8 @@ public class DictionaryParser{
 	}
 
 
-	private boolean isComment(final String line){
-		return PatternHelper.find(line, PATTERN_COMMENT);
-	}
-
 	public final void clear(){
 		boundaries.clear();
-	}
-
-	/**
-	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
-	 * 
-	 * @param line	The line to be cleaned
-	 * @return	The cleaned line (without comments or spaces at the beginning or at the end)
-	 */
-	public static String cleanLine(String line){
-		//remove comments
-		line = PatternHelper.clear(line, PATTERN_COMMENT);
-		//trim the entire string
-		line = StringUtils.strip(line);
-		return line;
 	}
 
 }

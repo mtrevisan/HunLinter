@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.affix;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.services.ParserHelper;
 
 
 public class ConversionTable{
@@ -60,7 +59,7 @@ public class ConversionTable{
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = extractLine(br);
+				final String line = ParserHelper.extractLine(br);
 
 				final String[] parts = StringUtils.split(line);
 
@@ -74,14 +73,6 @@ public class ConversionTable{
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
-	}
-
-	private String extractLine(final BufferedReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
 	}
 
 	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{

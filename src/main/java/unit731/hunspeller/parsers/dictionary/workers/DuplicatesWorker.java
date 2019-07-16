@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -32,6 +31,7 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.ParserHelper;
 import unit731.hunspeller.services.TimeWatch;
 
 
@@ -151,7 +151,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = getCharset();
 		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset())){
-			String line = extractLine(br);
+			String line = ParserHelper.extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + 2;
 
@@ -163,7 +163,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.getBytes(charset).length + 2;
-				line = DictionaryParser.cleanLine(line);
+				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
 						final List<Production> productions = wordGenerator.applyAffixRules(line);
@@ -198,14 +198,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		return duplicatesBloomFilter;
 	}
 
-	private String extractLine(final LineNumberReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-		return DictionaryParser.cleanLine(line);
-	}
-
 	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
 		final List<Duplicate> result = new ArrayList<>();
 
@@ -225,7 +217,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.getBytes(charset).length + 2;
-					line = DictionaryParser.cleanLine(line);
+					line = ParserHelper.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
 							final List<Production> productions = wordGenerator.applyAffixRules(line);
