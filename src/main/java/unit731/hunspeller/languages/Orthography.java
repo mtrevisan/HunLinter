@@ -2,6 +2,8 @@ package unit731.hunspeller.languages;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternHelper;
@@ -33,6 +35,31 @@ public class Orthography{
 
 	public boolean[] getSyllabationErrors(final List<String> syllabes){
 		return new boolean[syllabes.size()];
+	}
+
+	public boolean hasSyllabationErrors(final List<String> syllabes){
+		final boolean[] errors = getSyllabationErrors(syllabes);
+
+		boolean result = false;
+		for(boolean error : errors)
+			if(error){
+				result = true;
+				break;
+			}
+		return result;
+	}
+
+	public StringJoiner formatHyphenation(final List<String> syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
+		final boolean[] errors = getSyllabationErrors(syllabes);
+		for(int i = 0; i < syllabes.size(); i ++){
+			final Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
+			sj.add(fun.apply(syllabes.get(i)));
+		}
+		return sj;
+	}
+
+	public StringJoiner formatHyphenation(final List<String> syllabes){
+		return formatHyphenation(syllabes, new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity());
 	}
 
 	/**

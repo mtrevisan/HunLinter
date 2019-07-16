@@ -87,6 +87,10 @@ public class Production extends DictionaryEntry{
 		return appliedRules;
 	}
 
+	public AffixEntry getAppliedRule(int index){
+		return (appliedRules != null && index < appliedRules.size()? appliedRules.get(index): null);
+	}
+
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixEntry.Type type){
 		AffixEntry lastAppliedRule = null;

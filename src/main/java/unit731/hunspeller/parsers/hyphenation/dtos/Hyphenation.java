@@ -2,11 +2,8 @@ package unit731.hunspeller.parsers.hyphenation.dtos;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.function.Function;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 public class Hyphenation{
@@ -14,21 +11,18 @@ public class Hyphenation{
 	private final List<String> syllabes;
 	private final List<String> compounds;
 	private final List<String> rules;
-	private final boolean[] errors;
 	private final String breakCharacter;
 
 
-	public Hyphenation(List<String> syllabes, List<String> compounds, List<String> rules, boolean[] errors, String breakCharacter){
+	public Hyphenation(List<String> syllabes, List<String> compounds, List<String> rules, String breakCharacter){
 		Objects.requireNonNull(syllabes);
 		Objects.requireNonNull(compounds);
 		Objects.requireNonNull(rules);
-		Objects.requireNonNull(errors);
 		Objects.requireNonNull(breakCharacter);
 
 		this.syllabes = syllabes;
 		this.compounds = compounds;
 		this.rules = rules;
-		this.errors = errors;
 		this.breakCharacter = breakCharacter;
 	}
 
@@ -94,33 +88,8 @@ public class Hyphenation{
 		return !rules.isEmpty();
 	}
 
-	public boolean hasErrors(){
-		boolean result = false;
-		for(boolean error : errors)
-			if(error){
-				result = true;
-				break;
-			}
-		return result;
-	}
-
 	public boolean isCompound(){
 		return (compounds.size() > 1);
-	}
-
-	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
-		int size = countSyllabes();
-		for(int i = 0; i < size; i ++){
-			Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
-			sj.add(fun.apply(syllabes.get(i)));
-		}
-		return sj;
-	}
-
-	@Override
-	public String toString(){
-		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
-			.toString();
 	}
 
 	@Override

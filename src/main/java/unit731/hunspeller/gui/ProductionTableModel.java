@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
@@ -43,8 +42,6 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 			return null;
 
 		Production production = productions.get(rowIndex);
-		List<AffixEntry> rules = production.getAppliedRules();
-		int rulesSize = (rules != null? rules.size(): 0);
 		switch(columnIndex){
 			case 0:
 				return production.getWord();
@@ -53,13 +50,13 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 				return production.getMorphologicalFields();
 
 			case 2:
-				return (rules != null && rulesSize > 0? rules.get(0): null);
+				return production.getAppliedRule(0);
 
 			case 3:
-				return (rules != null && rulesSize > 1? rules.get(1): null);
+				return production.getAppliedRule(1);
 
 			case 4:
-				return (rules != null && rulesSize > 2? rules.get(2): null);
+				return production.getAppliedRule(2);
 
 			default:
 				return null;

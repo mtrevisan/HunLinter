@@ -95,9 +95,7 @@ public class Hyphenator implements HyphenatorInterface{
 		//enforce no-hyphens
 		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptParser().getNoHyphen());
 
-		final boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
-
-		return new Hyphenation(syllabes, compounds, rules, errors, breakCharacter);
+		return new Hyphenation(syllabes, compounds, rules, breakCharacter);
 	}
 
 	/**

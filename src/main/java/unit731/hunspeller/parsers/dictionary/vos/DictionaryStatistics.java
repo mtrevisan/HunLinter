@@ -110,7 +110,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized void addData(final String word, final Hyphenation hyphenation){
-		if(hyphenation != null && !hyphenation.hasErrors()){
+		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
 			final List<String> syllabes = hyphenation.getSyllabes();
 
 			final List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);

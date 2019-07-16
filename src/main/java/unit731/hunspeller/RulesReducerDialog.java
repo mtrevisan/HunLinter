@@ -22,7 +22,6 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -232,7 +231,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		};
 		Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		Runnable notRunningTask = this::dispose;
-		GUIUtils.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask, notRunningTask);
+		rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask, notRunningTask);
 	}
 
 	@Override

@@ -106,7 +106,6 @@ public class HyphenationParser{
 	}
 
 	private final Comparator<String> comparator;
-	private final Orthography orthography;
 
 	private boolean secondLevelPresent;
 	public Pattern patternNoHyphen;
@@ -120,10 +119,8 @@ public class HyphenationParser{
 		Objects.requireNonNull(language);
 
 		comparator = BaseBuilder.getComparator(language);
-		orthography = BaseBuilder.getOrthography(language);
 
 		Objects.requireNonNull(comparator);
-		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
 			rules.put(level, new HashMap<>());
@@ -138,10 +135,8 @@ public class HyphenationParser{
 		Objects.requireNonNull(patterns);
 
 		comparator = BaseBuilder.getComparator(language);
-		orthography = BaseBuilder.getOrthography(language);
 
 		Objects.requireNonNull(comparator);
-		Objects.requireNonNull(orthography);
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(Level level : Level.values())
@@ -152,10 +147,6 @@ public class HyphenationParser{
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
-	}
-
-	public Orthography getOrthography(){
-		return orthography;
 	}
 
 	public boolean isSecondLevelPresent(){

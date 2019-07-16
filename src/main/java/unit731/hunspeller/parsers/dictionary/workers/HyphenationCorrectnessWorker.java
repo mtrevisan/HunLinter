@@ -2,6 +2,9 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+
+import unit731.hunspeller.languages.BaseBuilder;
+import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +37,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
+		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final RulesLoader rulesLoader = new RulesLoader(language, null);
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
@@ -44,9 +48,10 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
-					if(hyphenation.hasErrors()){
+					final List<String> syllabes = hyphenation.getSyllabes();
+					if(orthography.hasSyllabationErrors(syllabes)){
 						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
-							hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), row});
+							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), row});
 						final StringBuffer sb = new StringBuffer(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");

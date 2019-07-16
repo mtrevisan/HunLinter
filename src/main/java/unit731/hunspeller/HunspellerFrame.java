@@ -93,7 +93,6 @@ import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
@@ -1510,22 +1509,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
 			Runnable cancelTaskDuplicates = () -> dicCheckCorrectnessMenuItem.setEnabled(true);
-			GUIUtils.askUserToAbort(dicCorrectnessWorker, this, cancelTaskDuplicates, resumeTask, null);
+			dicCorrectnessWorker.askUserToAbort(this, cancelTaskDuplicates, resumeTask, null);
 
 			Runnable cancelTaskWordCount = () -> dicWordCountMenuItem.setEnabled(true);
-			GUIUtils.askUserToAbort(dicWordCountWorker, this, cancelTaskWordCount, resumeTask, null);
+			dicWordCountWorker.askUserToAbort(this, cancelTaskWordCount, resumeTask, null);
 
 			Runnable cancelTaskStatistics = () -> {
 				dicStatisticsMenuItem.setEnabled(true);
 				hypStatisticsMenuItem.setEnabled(true);
 			};
-			GUIUtils.askUserToAbort(dicStatisticsWorker, this, cancelTaskStatistics, resumeTask, null);
+			dicStatisticsWorker.askUserToAbort(this, cancelTaskStatistics, resumeTask, null);
 
 			Runnable cancelTaskWordlist = () -> {
 				dicExtractWordlistMenuItem.setEnabled(true);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 			};
-			GUIUtils.askUserToAbort(dicWordlistWorker, this, cancelTaskWordlist, resumeTask, null);
+			dicWordlistWorker.askUserToAbort(this, cancelTaskWordlist, resumeTask, null);
 
 			Runnable cancelTaskRulesExtractor = () -> {
 				cmpInputComboBox.setEnabled(true);
@@ -1533,10 +1532,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				cmpInputTextArea.setEnabled(true);
 				cmpLoadInputButton.setEnabled(true);
 			};
-			GUIUtils.askUserToAbort(compoundRulesExtractorWorker, this, cancelTaskRulesExtractor, resumeTask, null);
+			compoundRulesExtractorWorker.askUserToAbort(this, cancelTaskRulesExtractor, resumeTask, null);
 
 			Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
-			GUIUtils.askUserToAbort(hypCorrectnessWorker, this, cancelTaskCorrectness, resumeTask, null);
+			hypCorrectnessWorker.askUserToAbort(this, cancelTaskCorrectness, resumeTask, null);
 		}
 	}
 
@@ -1751,7 +1750,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-			text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
+			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 				.toString();
 			count = Long.toString(hyphenation.countSyllabes());
 			rules = hyphenation.getRules();
@@ -1796,14 +1795,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-					String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
+					String text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 						.toString();
-					addedRuleText = addedRuleHyphenation.formatHyphenation(sj.get(), errorFormatter)
+					addedRuleText = orthography.formatHyphenation(addedRuleHyphenation.getSyllabes(), sj.get(), errorFormatter)
 						.toString();
 					addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
 
 					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = !addedRuleHyphenation.hasErrors();
+					correctHyphenation = !orthography.hasSyllabationErrors(addedRuleHyphenation.getSyllabes());
 				}
 			}
 

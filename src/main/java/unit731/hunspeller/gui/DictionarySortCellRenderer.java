@@ -10,7 +10,6 @@ import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import unit731.hunspeller.parsers.dictionary.dtos.Watercolors;
 
 
 public class DictionarySortCellRenderer extends JLabel implements ListCellRenderer<String>{
