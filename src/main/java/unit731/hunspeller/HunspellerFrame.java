@@ -1379,7 +1379,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
          List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
-         if(duplicationResult.isForcedInsertion() || duplicates.isEmpty()){
+         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter...
             ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
             dm.fireTableDataChanged();
@@ -1402,8 +1402,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				String duplicatedWords = duplicates.stream()
 					.map(ThesaurusEntry::getSynonym)
 					.collect(Collectors.joining(", "));
-				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, null, null);
+				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
+					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
       catch(IllegalArgumentException e){

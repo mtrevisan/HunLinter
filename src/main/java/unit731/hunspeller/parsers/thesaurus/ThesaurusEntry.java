@@ -31,8 +31,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	private List<MeaningEntry> meanings;
 
 
-	private ThesaurusEntry(){}
-
 	public ThesaurusEntry(final String synonym, final List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(meanings);
@@ -63,10 +61,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonym;
 	}
 
-//	public List<MeaningEntry> getMeanings(){
-//		return meanings;
-//	}
-
 	public String joinMeanings(String separator){
 		return StringUtils.join(meanings, separator);
 
@@ -82,7 +76,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		meanings.add(meaningEntry);
 	}
 
-	public int getMeaningsCount(){
+	public int getMeaningsEntries(){
 		return meanings.size();
 	}
 
@@ -102,8 +96,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public int saveToData(BufferedWriter dataWriter, Charset charset) throws IOException{
-		final int meaningsCount = getMeaningsCount();
-		saveToIndex(dataWriter, meaningsCount);
+		final int meaningsEntries = getMeaningsEntries();
+		saveToIndex(dataWriter, meaningsEntries);
 		int meaningsLength = 1;
 		for(final MeaningEntry meaning : meanings){
 			final String m = meaning.toString();
@@ -112,7 +106,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 			meaningsLength += m.getBytes(charset).length;
 		}
-		return meaningsLength + StringUtils.LF.length() * meaningsCount;
+		return meaningsLength + StringUtils.LF.length() * meaningsEntries;
 	}
 
 	@Override

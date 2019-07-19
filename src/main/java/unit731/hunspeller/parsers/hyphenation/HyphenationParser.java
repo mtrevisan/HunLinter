@@ -213,7 +213,7 @@ public class HyphenationParser{
 							String key = getKeyFromData(line);
 							boolean duplicatedRule = isRuleDuplicated(key, line, level);
 							if(duplicatedRule)
-								throw new IllegalArgumentException("Duplication found: '" + line + "'");
+								throw new IllegalArgumentException("Duplicate found: '" + line + "'");
 							else
 								//insert current pattern into the radix tree (remove all numbers)
 								rules.get(level)

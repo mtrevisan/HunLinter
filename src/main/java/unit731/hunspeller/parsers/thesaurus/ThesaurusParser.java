@@ -33,6 +33,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
+	private static final String PART_OF_SPEECH_START = "(";
+	private static final String PART_OF_SPEECH_END = ")";
+
 	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
 
 	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)\\|?|^\\||\\|$|\\/.*$");
@@ -171,11 +174,11 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		final StringBuffer sb = new StringBuffer();
-		if(!partOfSpeech.startsWith("("))
-			sb.append('(');
+		if(!partOfSpeech.startsWith(PART_OF_SPEECH_START))
+			sb.append(PART_OF_SPEECH_START);
 		sb.append(partOfSpeech);
-		if(!partOfSpeech.endsWith(")"))
-			sb.append(')');
+		if(!partOfSpeech.endsWith(PART_OF_SPEECH_END))
+			sb.append(PART_OF_SPEECH_END);
 		partOfSpeech = sb.toString();
 
 		final String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
@@ -187,16 +190,17 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(meanings.size() < 2)
 			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
 
-		final DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
+		boolean forceInsertion = false;
+		final List<ThesaurusEntry> duplicates = extractDuplicates(meanings, partOfSpeech);
+		if(!duplicates.isEmpty()){
+			forceInsertion = duplicatesDiscriminator.get();
+			if(!forceInsertion)
+				throw new IllegalArgumentException("Duplicate detected for '" + duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", ")) + "'");
+		}
 
-		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
+		if(duplicates.isEmpty() || forceInsertion){
 			try{
-				//FIXME
-//				undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
-				undoCaretaker.pushMemento(createMemento());
-
-				if(undoable != null)
-					undoable.onUndoChange(true);
+				storeMemento();
 			}
 			catch(final IOException e){
 				LOGGER.warn("Error while storing a memento", e);
@@ -205,42 +209,28 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			dictionary.add(partOfSpeech, meanings);
 		}
 
-		return duplicationResult;
+		return new DuplicationResult(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private DuplicationResult extractDuplicates(final List<String> means, final String partOfSpeech,
-			final Supplier<Boolean> duplicatesDiscriminator) throws IllegalArgumentException{
-		boolean forcedInsertion = false;
+	private List<ThesaurusEntry> extractDuplicates(final List<String> means, final String partOfSpeech) throws IllegalArgumentException{
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
-		try{
-			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(final String meaning : means){
-				final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-				for(final ThesaurusEntry synonym : synonyms)
-					if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
-						throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
-			}
+		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+		for(final String meaning : means){
+			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
+			for(final ThesaurusEntry synonym : synonyms)
+				if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
+					duplicates.add(synonym);
+				throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
 		}
-		catch(final IllegalArgumentException e){
-			if(!duplicatesDiscriminator.get())
-				throw e;
-
-			forcedInsertion = true;
-		}
-		return new DuplicationResult(duplicates, forcedInsertion);
+		return duplicates;
 	}
 
 	public void setMeanings(final int index, final String text){
 		try{
-			//FIXME
-//			undoCaretaker.pushMemento(createMemento(index, text));
-			undoCaretaker.pushMemento(createMemento());
+			storeMemento();
 
 			dictionary.setMeanings(index, text);
-
-			if(undoable != null)
-				undoable.onUndoChange(true);
 		}
 		catch(final IOException e){
 			try{
@@ -268,11 +258,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		final int count = selectedRowIDs.length;
 		if(count > 0){
 			try{
-//				undoCaretaker.pushMemento(createMemento(selectedRowIDs));
-				undoCaretaker.pushMemento(createMemento());
-
-				if(undoable != null)
-					undoable.onUndoChange(true);
+				storeMemento();
 			}
 			catch(final IOException e){
 				LOGGER.warn("Error while storing a memento", e);
@@ -339,6 +325,15 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private void clearInternal(){
 		dictionary.clear(false);
+	}
+
+	private void storeMemento() throws IOException{
+		//FIXME
+//		undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
+		undoCaretaker.pushMemento(createMemento());
+
+		if(undoable != null)
+			undoable.onUndoChange(true);
 	}
 
 	public boolean canUndo(){

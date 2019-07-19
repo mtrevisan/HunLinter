@@ -20,8 +20,6 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	private List<String> meanings;
 
 
-	private MeaningEntry(){}
-
 	public MeaningEntry(final String partOfSpeech, final List<String> meanings){
 		Objects.requireNonNull(partOfSpeech);
 		Objects.requireNonNull(meanings);

@@ -36,7 +36,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
 			throw new IllegalArgumentException("Max compounds cannot be non-positive");
 
-		final boolean forbidDuplications = affixData.isForbidDuplicationsInCompound();
+		final boolean forbidDuplicates = affixData.isForbidDuplicatesInCompound();
 
 		loadDictionaryForInclusionTest();
 
@@ -47,7 +47,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		if(inputs.isEmpty())
 			return Collections.emptyList();
 
-		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
+		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
 		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);

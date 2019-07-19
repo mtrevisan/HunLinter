@@ -135,6 +135,7 @@
 					</transformers>
 				</configuration>
 			</plugin>
+			<!-- Maven Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -200,7 +201,7 @@
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
 
 		<!-- JUnit -->
-		<org.junit.jupiter.version>5.4.2</org.junit.jupiter.version>
+		<org.junit.jupiter.version>5.5.0</org.junit.jupiter.version>
 	</properties>
 
 	<dependencies>

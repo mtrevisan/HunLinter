@@ -19,7 +19,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	private final int n;
 	private final int k;
-	private final boolean forbidDuplications;
+	private final boolean forbidDuplicates;
 
 	private long currentIndex;
 	private long maximumIndex;
@@ -28,9 +28,9 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	/**
 	 * @param n	the number of elements
 	 * @param k	taken at most k at a time
-	 * @param forbidDuplications	Forbid duplications
+	 * @param forbidDuplicates	Forbid duplicates
 	 */
-	public PermutationsWithRepetitions(int n, int k, boolean forbidDuplications){
+	public PermutationsWithRepetitions(int n, int k, boolean forbidDuplicates){
 		if(n < 1)
 			throw new IllegalArgumentException("At least one element needed");
 		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
@@ -38,11 +38,11 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 		this.n = n;
 		this.k = k;
-		this.forbidDuplications = forbidDuplications;
+		this.forbidDuplicates = forbidDuplicates;
 
 		currentIndex = 0l;
 		maximumIndex = (long)Math.pow(n, k);
-		if(forbidDuplications){
+		if(forbidDuplicates){
 			currentIndex ++;
 			maximumIndex --;
 		}
@@ -63,7 +63,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	}
 
 	private List<int[]> extractAllKPermutations(int kk, int currentCount, int limit){
-		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplications);
+		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplicates);
 
 		List<int[]> all = new ArrayList<>();
 		while(pr.hasNext() && all.size() + currentCount < limit)
@@ -83,7 +83,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	
 		int[] result = convertBase(currentIndex, n);
 
-		if(forbidDuplications){
+		if(forbidDuplicates){
 			boolean consecutiveDuplicates = true;
 			while(consecutiveDuplicates && currentIndex < maximumIndex)
 				//if next does not contains consecutive duplicates, break

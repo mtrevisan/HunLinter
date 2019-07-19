@@ -39,7 +39,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 
 		final String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(singleFlags);
+		checkForDuplicates(singleFlags);
 
 		checkValidity(singleFlags);
 
@@ -50,7 +50,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		return StringUtils.split(flags, COMMA);
 	}
 
-	private void checkForDuplication(final String[] flags) throws IllegalArgumentException{
+	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));

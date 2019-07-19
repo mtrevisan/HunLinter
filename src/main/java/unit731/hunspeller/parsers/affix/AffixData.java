@@ -276,8 +276,8 @@ public class AffixData{
 		return getData(AffixTag.COMPOUND_MAX_WORD_COUNT);
 	}
 
-	public boolean isForbidDuplicationsInCompound(){
-		return containsData(AffixTag.FORBID_DUPLICATIONS_IN_COMPOUND);
+	public boolean isForbidDuplicatesInCompound(){
+		return containsData(AffixTag.FORBID_DUPLICATES_IN_COMPOUND);
 	}
 
 	public boolean isCheckCompoundReplacement(){

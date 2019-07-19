@@ -28,7 +28,7 @@ public class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					final File file = File.createTempFile("hunspeller-duplications-bitarray", ".bits");
+					final File file = File.createTempFile("hunspeller-duplicates-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}

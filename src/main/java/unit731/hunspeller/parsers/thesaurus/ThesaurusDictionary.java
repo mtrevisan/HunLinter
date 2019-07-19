@@ -53,11 +53,11 @@ public class ThesaurusDictionary{
 
 	public boolean add(final String partOfSpeech, final List<String> meanings){
 		boolean result = false;
-		for(final String meaning : meanings){
+		for(String meaning : meanings){
 			final MeaningEntry meaningEntry = extractPartOfSpeechAndMeanings(partOfSpeech, meanings, meaning);
 
-			final String mean = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			final ThesaurusEntry foundSynonym = findByMeaning(mean);
+			meaning = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
+			final ThesaurusEntry foundSynonym = findByMeaning(meaning);
 			if(foundSynonym != null)
 				//add to meanings if synonym does exists
 				foundSynonym.addMeaning(meaningEntry);
@@ -65,7 +65,7 @@ public class ThesaurusDictionary{
 				//add to list if synonym does not exists
 				final List<MeaningEntry> entries = new ArrayList<>();
 				entries.add(meaningEntry);
-				final ThesaurusEntry entry = new ThesaurusEntry(mean, entries);
+				final ThesaurusEntry entry = new ThesaurusEntry(meaning, entries);
 				synonyms.add(entry);
 				dictionary.put(entry.getSynonym(), entry);
 

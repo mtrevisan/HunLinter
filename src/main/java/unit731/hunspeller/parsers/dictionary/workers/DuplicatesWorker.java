@@ -70,7 +70,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	}
 
-	public static final String WORKER_NAME = "Duplications extraction";
+	public static final String WORKER_NAME = "Duplicates extraction";
 
 
 	private final DictionaryParser dicParser;
@@ -101,7 +101,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		try{
 			exception = null;
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplicates extraction (pass 1/3)");
 
 			watch = TimeWatch.start();
 

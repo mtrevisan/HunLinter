@@ -7,22 +7,22 @@ import java.util.Objects;
 public class DuplicationResult{
 
 	private final List<ThesaurusEntry> duplicates;
-	private final boolean forcedInsertion;
+	private final boolean forceInsertion;
 
 
-	public DuplicationResult(final List<ThesaurusEntry> duplicates, final boolean forcedInsertion){
+	public DuplicationResult(final List<ThesaurusEntry> duplicates, final boolean forceInsertion){
 		Objects.requireNonNull(duplicates);
 
 		this.duplicates = duplicates;
-		this.forcedInsertion = forcedInsertion;
+		this.forceInsertion = forceInsertion;
 	}
 
 	public List<ThesaurusEntry> getDuplicates(){
 		return duplicates;
 	}
 
-	public boolean isForcedInsertion(){
-		return forcedInsertion;
+	public boolean isForceInsertion(){
+		return forceInsertion;
 	}
 
 }
