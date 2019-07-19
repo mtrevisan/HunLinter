@@ -150,6 +150,9 @@ public class DictionarySortDialog extends JDialog{
 
 	public void setListData(String[] listData){
 		list.setListData(listData);
+
+		//initialize dictionary
+		dicParser.calculateDictionaryBoundaries();
 	}
 
 	public int getSelectedIndex(){

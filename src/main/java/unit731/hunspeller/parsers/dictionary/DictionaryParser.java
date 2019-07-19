@@ -85,9 +85,8 @@ public class DictionaryParser{
 			.orElse(null);
 	}
 
+	/** FIXME {@link #calculateDictionaryBoundaries()} must be called beforehand!! */
 	public final int getBoundaryIndex(final int lineIndex){
-		calculateDictionaryBoundaries();
-
 		return searchBoundary(lineIndex)
 			.map(e -> boundaries.headMap(lineIndex, true).size() - 1)
 			.orElse(-1);
@@ -116,42 +115,42 @@ public class DictionaryParser{
 	}
 
 	public final void calculateDictionaryBoundaries(){
-		if(boundaries.isEmpty()){
-			int lineIndex = 0;
-			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
-				String prevLine = null;
-				String line;
-				int startSection = -1;
-				boolean needSorting = false;
-				while((line = br.readLine()) != null){
-					if(ParserHelper.isComment(line) || StringUtils.isBlank(line)){
-						if(startSection >= 0){
-							//filter out single word that doesn't need to be sorted
-							if(lineIndex - startSection > 2 && needSorting)
-								boundaries.put(startSection, lineIndex - 1);
-							prevLine = null;
-							startSection = -1;
-							needSorting = false;
-						}
-					}
-					else{
-						if(startSection < 0)
-							startSection = lineIndex;
+		boundaries.clear();
 
-						if(!needSorting && StringUtils.isNotBlank(prevLine))
-							needSorting = (comparator.compare(line, prevLine) < 0);
-						prevLine = line;
+		int lineIndex = 0;
+		try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
+			String prevLine = null;
+			String line;
+			int startSection = -1;
+			boolean needSorting = false;
+			while((line = br.readLine()) != null){
+				if(ParserHelper.isComment(line) || StringUtils.isBlank(line)){
+					if(startSection >= 0){
+						//filter out single word that doesn't need to be sorted
+						if(lineIndex - startSection > 2 && needSorting)
+							boundaries.put(startSection, lineIndex - 1);
+						prevLine = null;
+						startSection = -1;
+						needSorting = false;
 					}
-
-					lineIndex ++;
 				}
-				//filter out single word that doesn't need to be sorted
-				if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
-					boundaries.put(startSection, lineIndex - 1);
+				else{
+					if(startSection < 0)
+						startSection = lineIndex;
+
+					if(!needSorting && StringUtils.isNotBlank(prevLine))
+						needSorting = (comparator.compare(line, prevLine) < 0);
+					prevLine = line;
+				}
+
+				lineIndex ++;
 			}
-			catch(final IOException e){
-				LOGGER.error(null, e);
-			}
+			//filter out single word that doesn't need to be sorted
+			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
+				boundaries.put(startSection, lineIndex - 1);
+		}
+		catch(final IOException e){
+			LOGGER.error(null, e);
 		}
 	}
 
