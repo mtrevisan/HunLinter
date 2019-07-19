@@ -132,7 +132,7 @@ public enum AffixTag{
 	/** Define output conversion table */
 	OUTPUT_CONVERSION_TABLE("OCONV"),
 	/**
-	 * Signs virtual stems in the dictionary, words are valid only when affixed, except if the dictionary word has a homonym or a zero affix
+	 * Signs virtual stems in the dictionary, words are accepted only when affixed, except if the dictionary word has a homonym or a zero affix
 	 * (it works also with prefixes and prefix + suffix combinations)
 	 */
 	NEED_AFFIX_FLAG("NEEDAFFIX");

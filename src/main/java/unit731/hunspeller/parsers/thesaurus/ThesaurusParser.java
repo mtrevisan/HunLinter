@@ -221,7 +221,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			for(final ThesaurusEntry synonym : synonyms)
 				if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
 					duplicates.add(synonym);
-				throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
 		}
 		return duplicates;
 	}
