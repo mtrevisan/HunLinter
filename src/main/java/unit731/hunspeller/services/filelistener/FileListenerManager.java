@@ -106,6 +106,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			else{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);
+
 				dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
 					.add(listener);
 			}

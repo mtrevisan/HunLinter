@@ -437,7 +437,8 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush, final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush,
+			final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
