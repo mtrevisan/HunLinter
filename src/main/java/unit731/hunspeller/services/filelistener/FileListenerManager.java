@@ -88,35 +88,36 @@ public class FileListenerManager implements FileListener, Runnable{
 	public void register(FileChangeListener listener, String... patterns){
 		Objects.requireNonNull(listener);
 
-		for(String pattern : patterns){
-			Path dir = (new File(pattern)).getParentFile().toPath();
-			File fil = dir.toFile();
+		for(final String pattern : patterns){
+			final Path dir = (new File(pattern)).getParentFile().toPath();
+			final File fil = dir.toFile();
 			//create directory if it doesn't exists
-			if(!fil.exists() && !fil.mkdirs()){
+			if(!fil.exists() && !fil.mkdirs())
 				LOGGER.error("Exception while creating directory {}", dir);
-
-				continue;
+			else{
+				if(!dirPathToListeners.containsKey(dir))
+					addWatchKeyToDir(dir);
+				dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
+					.add(listener);
 			}
-
-			if(!dirPathToListeners.containsKey(dir)){
-				try{
-					WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
-
-					watchKeyToDirPath.put(key, dir);
-				}
-				catch(IOException e){
-					LOGGER.error("Exception while watching {}", dir, e);
-				}
-			}
-			dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
-				.add(listener);
 		}
 
 		addFilePatterns(listener, patterns);
 	}
 
+	private void addWatchKeyToDir(final Path dir){
+		try{
+			final WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
+
+			watchKeyToDirPath.put(key, dir);
+		}
+		catch(final IOException e){
+			LOGGER.error("Exception while watching {}", dir, e);
+		}
+	}
+
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){
-		Set<PathMatcher> filePatterns = newConcurrentSet();
+		final Set<PathMatcher> filePatterns = newConcurrentSet();
 		Arrays.stream(patterns)
 			.map(this::matcherForExpression)
 			.forEach(filePatterns::add);
@@ -135,36 +136,21 @@ public class FileListenerManager implements FileListener, Runnable{
 	public void run(){
 		while(!Thread.interrupted()){
 			try{
-				WatchKey key = watcher.take();
+				final WatchKey key = watcher.take();
 
-				//prevent receiving two separate ENTRY_MODIFY events: file modified and timestamp updated. Instead, receive one ENTRY_MODIFY event
-				//with two counts
-				try{ Thread.sleep(50); }
-				catch(InterruptedException e){
-					Thread.currentThread().interrupt();
-				}
+				preventMultipleEvents();
 
-				Path dir = getDirPath(key);
-				if(dir == null){
+				final Path dir = getDirPath(key);
+				if(dir == null)
 					LOGGER.warn("Watch key not recognized");
+				else{
+					notifyListeners(key);
 
-					continue;
-				}
-
-				notifyListeners(key);
-
-				//reset key to allow further events for this key to be processed
-				boolean valid = key.reset();
-				if(!valid){
-					watchKeyToDirPath.remove(key);
-
-					LOGGER.warn("'{}' is inaccessible, stopping watch", dir);
-
-					if(watchKeyToDirPath.isEmpty())
+					if(resetKey(key, dir))
 						break;
 				}
 			}
-			catch(InterruptedException e){
+			catch(final InterruptedException e){
 				Thread.currentThread().interrupt();
 			}
 		}
@@ -172,16 +158,42 @@ public class FileListenerManager implements FileListener, Runnable{
 		LOGGER.info("Stopping file watcher service");
 	}
 
+	/**
+	 * Prevent receiving two separate ENTRY_MODIFY events: file modified and timestamp updated.
+	 * Instead, receive one ENTRY_MODIFY event with two counts
+	 */
+	private void preventMultipleEvents(){
+		try{ Thread.sleep(50); }
+		catch(final InterruptedException e){
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private boolean resetKey(WatchKey key, Path dir){
+		boolean stopWatching = false;
+		//reset key to allow further events for this key to be processed
+		final boolean valid = key.reset();
+		if(!valid){
+			watchKeyToDirPath.remove(key);
+
+			LOGGER.warn("'{}' is inaccessible, stop watching", dir);
+
+			if(watchKeyToDirPath.isEmpty())
+				stopWatching = true;
+		}
+		return stopWatching;
+	}
+
 	private WatchService createWatcher() throws RuntimeException{
 		try{
 			return FILE_SYSTEM_DEFAULT.newWatchService();
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			throw new RuntimeException("Exception while creating watch service", e);
 		}
 	}
 
-	private Path getDirPath(WatchKey key){
+	private Path getDirPath(final WatchKey key){
 		return watchKeyToDirPath.get(key);
 	}
 
@@ -193,49 +205,48 @@ public class FileListenerManager implements FileListener, Runnable{
 		return Collections.newSetFromMap(newConcurrentMap());
 	}
 
-	private void notifyListeners(WatchKey key){
-		List<WatchEvent<?>> pollEvents = key.pollEvents();
-		for(WatchEvent<?> event : pollEvents){
-			WatchEvent.Kind<?> eventKind = event.kind();
-			if(eventKind.equals(StandardWatchEventKinds.OVERFLOW)){
-				//overflow occurs when the watch event queue is overflown with events
+	private void notifyListeners(final WatchKey key){
+		final List<WatchEvent<?>> pollEvents = key.pollEvents();
+		for(final WatchEvent<?> event : pollEvents){
+			final WatchEvent.Kind<?> eventKind = event.kind();
 
+			//overflow occurs when the watch event queue is overflown with events
+			if(eventKind.equals(StandardWatchEventKinds.OVERFLOW))
 				break;
-			}
-
-			@SuppressWarnings("unchecked")
-			Path file = ((WatchEvent<Path>)event).context();
-
-			Path dir = getDirPath(key);
-			Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
 			final BiConsumer<FileChangeListener, Path> listenerMethod = FILE_CHANGE_LISTENER_BY_EVENT.get(eventKind);
-			if(listenerMethod != null)
-				for(final FileChangeListener listener : listeners)
-					listenerMethod.accept(listener, file);
+			if(listenerMethod != null){
+				@SuppressWarnings("unchecked")
+				final Path file = ((WatchEvent<Path>)event).context();
+
+				final Path dir = getDirPath(key);
+				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
+
+				listeners.forEach(listener -> listenerMethod.accept(listener, file));
+			}
 		}
 	}
 
-	private Set<FileChangeListener> matchedListeners(Path dir, Path file){
+	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
 		return getListeners(dir).stream()
 			.filter(list -> matchesAny(file, getPatterns(list)))
 			.collect(Collectors.toSet());
 	}
 
-	private Set<FileChangeListener> getListeners(Path dir){
+	private Set<FileChangeListener> getListeners(final Path dir){
 		return dirPathToListeners.get(dir);
 	}
 
-	public boolean matchesAny(Path input, Set<PathMatcher> patterns){
+	public boolean matchesAny(final Path input, final Set<PathMatcher> patterns){
 		return patterns.stream()
 			.anyMatch(pattern -> matches(input, pattern));
 	}
 
-	public boolean matches(Path input, PathMatcher pattern){
+	public boolean matches(final Path input, final PathMatcher pattern){
 		return pattern.matches(input);
 	}
 
-	private Set<PathMatcher> getPatterns(FileChangeListener listener){
+	private Set<PathMatcher> getPatterns(final FileChangeListener listener){
 		return listenerToFilePatterns.get(listener);
 	}
 
