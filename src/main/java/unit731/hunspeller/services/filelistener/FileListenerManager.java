@@ -63,9 +63,18 @@ public class FileListenerManager implements FileListener, Runnable{
 	public FileListenerManager(){
 		watcher = createWatcher();
 		running = new AtomicBoolean(false);
-		watchKeyToDirPath = newConcurrentMap();
-		dirPathToListeners = newConcurrentMap();
-		listenerToFilePatterns = newConcurrentMap();
+		watchKeyToDirPath = new ConcurrentHashMap<>();
+		dirPathToListeners = new ConcurrentHashMap<>();
+		listenerToFilePatterns = new ConcurrentHashMap<>();
+	}
+
+	private WatchService createWatcher() throws RuntimeException{
+		try{
+			return FILE_SYSTEM_DEFAULT.newWatchService();
+		}
+		catch(final IOException e){
+			throw new RuntimeException("Exception while creating watch service", e);
+		}
 	}
 
 	@Override
@@ -128,6 +137,10 @@ public class FileListenerManager implements FileListener, Runnable{
 		listenerToFilePatterns.put(listener, filePatterns);
 	}
 
+	private <T> Set<T> newConcurrentSet(){
+		return Collections.newSetFromMap(new ConcurrentHashMap<>());
+	}
+
 	private PathMatcher matcherForExpression(String pattern){
 		return FILE_SYSTEM_DEFAULT.getPathMatcher("glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1));
 	}
@@ -140,15 +153,8 @@ public class FileListenerManager implements FileListener, Runnable{
 
 				preventMultipleEvents();
 
-				final Path dir = getDirPath(key);
-				if(dir == null)
-					LOGGER.warn("Watch key not recognized");
-				else{
-					notifyListeners(key);
-
-					if(resetKey(key, dir))
-						break;
-				}
+				if(manageKey(key))
+					break;
 			}
 			catch(final InterruptedException e){
 				Thread.currentThread().interrupt();
@@ -169,9 +175,22 @@ public class FileListenerManager implements FileListener, Runnable{
 		}
 	}
 
+	private boolean manageKey(WatchKey key){
+		boolean stopWatching = false;
+		final Path dir = getDirPath(key);
+		if(dir == null)
+			LOGGER.warn("Watch key not recognized");
+		else{
+			notifyListeners(key);
+
+			stopWatching = resetKey(key, dir);
+		}
+		return stopWatching;
+	}
+
+	/** Reset key to allow further events for this key to be processed */
 	private boolean resetKey(WatchKey key, Path dir){
 		boolean stopWatching = false;
-		//reset key to allow further events for this key to be processed
 		final boolean valid = key.reset();
 		if(!valid){
 			watchKeyToDirPath.remove(key);
@@ -184,25 +203,8 @@ public class FileListenerManager implements FileListener, Runnable{
 		return stopWatching;
 	}
 
-	private WatchService createWatcher() throws RuntimeException{
-		try{
-			return FILE_SYSTEM_DEFAULT.newWatchService();
-		}
-		catch(final IOException e){
-			throw new RuntimeException("Exception while creating watch service", e);
-		}
-	}
-
 	private Path getDirPath(final WatchKey key){
 		return watchKeyToDirPath.get(key);
-	}
-
-	private <K, V> ConcurrentMap<K, V> newConcurrentMap(){
-		return new ConcurrentHashMap<>();
-	}
-
-	private <T> Set<T> newConcurrentSet(){
-		return Collections.newSetFromMap(newConcurrentMap());
 	}
 
 	private void notifyListeners(final WatchKey key){
