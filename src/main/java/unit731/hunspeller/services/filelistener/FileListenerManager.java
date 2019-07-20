@@ -12,7 +12,9 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +42,14 @@ public class FileListenerManager implements FileListener, Runnable{
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 	private static final FileSystem FILE_SYSTEM_DEFAULT = FileSystems.getDefault();
+
+	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT
+		= new HashMap<>(3);
+	static{
+		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_CREATE, FileChangeListener::fileCreated);
+		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified);
+		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);
+	}
 
 
 	private final WatchService watcher;
@@ -198,12 +209,10 @@ public class FileListenerManager implements FileListener, Runnable{
 			Path dir = getDirPath(key);
 			Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
-			if(eventKind.equals(StandardWatchEventKinds.ENTRY_CREATE))
-				listeners.forEach(listener -> listener.fileCreated(file));
-			else if(eventKind.equals(StandardWatchEventKinds.ENTRY_MODIFY))
-				listeners.forEach(listener -> listener.fileModified(file));
-			else if(eventKind.equals(StandardWatchEventKinds.ENTRY_DELETE))
-				listeners.forEach(listener -> listener.fileDeleted(file));
+			final BiConsumer<FileChangeListener, Path> listenerMethod = FILE_CHANGE_LISTENER_BY_EVENT.get(eventKind);
+			if(listenerMethod != null)
+				for(final FileChangeListener listener : listeners)
+					listenerMethod.accept(listener, file);
 		}
 	}
 

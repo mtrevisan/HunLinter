@@ -11,5 +11,5 @@ public interface FileChangeListener{
 	default void fileModified(Path file){}
 
 	default void fileDeleted(Path file){}
-	
+
 }
