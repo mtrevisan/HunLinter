@@ -75,6 +75,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
@@ -1506,48 +1507,28 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 			}
 
+			checkAbortion(dicCorrectnessWorker, dicCheckCorrectnessMenuItem);
+
+			checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
+
+			checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
+
+			checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
+
+			checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, limitComboBox, cmpInputTextArea, cmpLoadInputButton);
+
+			checkAbortion(hypCorrectnessWorker, hypCheckCorrectnessMenuItem);
+		}
+	}
+
+	private void checkAbortion(WorkerDictionaryBase worker, JComponent ... componentsToEnable){
+		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
-			if(dicCorrectnessWorker != null){
-				Runnable cancelTaskDuplicates = () -> dicCheckCorrectnessMenuItem.setEnabled(true);
-				dicCorrectnessWorker.askUserToAbort(this, cancelTaskDuplicates, resumeTask, null);
-			}
-
-			if(dicWordCountWorker != null){
-				Runnable cancelTaskWordCount = () -> dicWordCountMenuItem.setEnabled(true);
-				dicWordCountWorker.askUserToAbort(this, cancelTaskWordCount, resumeTask, null);
-			}
-
-			if(dicStatisticsWorker != null){
-				Runnable cancelTaskStatistics = () -> {
-					dicStatisticsMenuItem.setEnabled(true);
-					hypStatisticsMenuItem.setEnabled(true);
-				};
-				dicStatisticsWorker.askUserToAbort(this, cancelTaskStatistics, resumeTask, null);
-			}
-
-			if(dicWordlistWorker != null){
-				Runnable cancelTaskWordlist = () -> {
-					dicExtractWordlistMenuItem.setEnabled(true);
-					dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-				};
-				dicWordlistWorker.askUserToAbort(this, cancelTaskWordlist, resumeTask, null);
-			}
-
-			if(compoundRulesExtractorWorker != null){
-				Runnable cancelTaskRulesExtractor = () -> {
-					cmpInputComboBox.setEnabled(true);
-					limitComboBox.setEnabled(true);
-					cmpInputTextArea.setEnabled(true);
-					cmpLoadInputButton.setEnabled(true);
-				};
-				compoundRulesExtractorWorker.askUserToAbort(this, cancelTaskRulesExtractor, resumeTask, null);
-			}
-
-			if(hypCorrectnessWorker != null){
-				Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
-				hypCorrectnessWorker.askUserToAbort(this, cancelTaskCorrectness, resumeTask, null);
-			}
+			Runnable cancelTask = () -> {
+				for(final JComponent component : componentsToEnable)
+					component.setEnabled(true);
+			};
+			worker.askUserToAbort(this, cancelTask, resumeTask);
 		}
 	}
 

@@ -75,32 +75,28 @@ public abstract class WorkerDictionaryBase{
 		return worker.isDone();
 	}
 
-	public void askUserToAbort(Component parentComponent, Runnable cancelTask, Runnable resumeTask, Runnable notRunningTask){
-		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-			Objects.requireNonNull(parentComponent);
-			Objects.requireNonNull(cancelTask);
-			Objects.requireNonNull(resumeTask);
+	public void askUserToAbort(Component parentComponent, Runnable cancelTask, Runnable resumeTask){
+		Objects.requireNonNull(parentComponent);
+		Objects.requireNonNull(cancelTask);
+		Objects.requireNonNull(resumeTask);
 
-			worker.pause();
+		worker.pause();
 
-			Object[] options = {"Abort", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				worker.cancel(true);
+		Object[] options = {"Abort", "Cancel"};
+		int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
+			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		if(answer == JOptionPane.YES_OPTION){
+			worker.cancel(true);
 
-				cancelTask.run();
+			cancelTask.run();
 
-				LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				worker.resume();
-
-				resumeTask.run();
-			}
+			LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
 		}
-		else if(notRunningTask != null)
-			notRunningTask.run();
+		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+			worker.resume();
+
+			resumeTask.run();
+		}
 	}
 
 }

@@ -225,13 +225,16 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		Runnable cancelTask = () -> {
-			ruleComboBox.setEnabled(true);
-			optimizeClosedGroupCheckBox.setEnabled(true);
-		};
-		Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		Runnable notRunningTask = this::dispose;
-		rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask, notRunningTask);
+		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
+			Runnable cancelTask = () -> {
+				ruleComboBox.setEnabled(true);
+				optimizeClosedGroupCheckBox.setEnabled(true);
+			};
+			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask);
+		}
+		else
+			dispose();
 	}
 
 	@Override
