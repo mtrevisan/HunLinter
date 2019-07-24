@@ -1467,8 +1467,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
 				prjLoaderWorker.pause();
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the project loader task?", "Warning!",
+				final Object[] options = {"Abort", "Cancel"};
+				final int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the project loader task?", "Warning!",
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					prjLoaderWorker.cancel();
@@ -1489,8 +1489,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 //				dicDuplicatesWorker.pause();
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary duplicates task?", "Warning!",
+				final Object[] options = {"Abort", "Cancel"};
+				final int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary duplicates task?", "Warning!",
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicDuplicatesWorker.cancel(true);
@@ -1521,18 +1521,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void checkAbortion(WorkerDictionaryBase worker, JComponent ... componentsToEnable){
+	private void checkAbortion(final WorkerDictionaryBase worker, final JComponent ... componentsToEnable){
 		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-			Runnable cancelTask = () -> {
+			final Runnable cancelTask = () -> {
 				for(final JComponent component : componentsToEnable)
 					component.setEnabled(true);
 			};
-			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			worker.askUserToAbort(this, cancelTask, resumeTask);
 		}
 	}
 
-	private void loadFile(String filePath){
+	private void loadFile(final String filePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		clearResultTextArea();
@@ -1543,7 +1543,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	@Override
-	public void loadFileInternal(String filePath){
+	public void loadFileInternal(final String filePath){
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
@@ -1574,12 +1574,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//affix file:
-			AffixData affixData = backbone.getAffixData();
-			Set<String> compoundRules = affixData.getCompoundRules();
+			final AffixData affixData = backbone.getAffixData();
+			final Set<String> compoundRules = affixData.getCompoundRules();
 			if(!compoundRules.isEmpty()){
 				cmpInputComboBox.removeAllItems();
 				compoundRules.forEach(cmpInputComboBox::addItem);
-				String compoundFlag = affixData.getCompoundFlag();
+				final String compoundFlag = affixData.getCompoundFlag();
 				if(compoundFlag != null)
 					cmpInputComboBox.addItem(compoundFlag);
 				cmpInputComboBox.setEnabled(true);
@@ -1600,7 +1600,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicSortDialog.setLocationRelativeTo(this);
 			dicSortDialog.addListSelectionListener(e -> {
 				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					int selectedRow = dicSortDialog.getSelectedIndex();
+					final int selectedRow = dicSortDialog.getSelectedIndex();
 					if(backbone.getDicParser().isInBoundary(selectedRow)){
 						dicSortDialog.setVisible(false);
 
@@ -1616,7 +1616,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			filCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
-			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			final int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 			mainTabbedPane.setSelectedIndex(index);
 
@@ -1637,8 +1637,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//aid file:
-			List<String> lines = backbone.getAidParser().getLines();
-			boolean aidLinesPresent = !lines.isEmpty();
+			final List<String> lines = backbone.getAidParser().getLines();
+			final boolean aidLinesPresent = !lines.isEmpty();
 			clearAidParser();
 			if(aidLinesPresent){
 				lines.forEach(dicRuleTagsAidComboBox::addItem);
@@ -1650,23 +1650,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//thesaurus file:
-			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
 			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 		}
-		catch(IllegalArgumentException e){
+		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));
 
 			LOGGER.error("A bad error occurred", e);
 		}
 	}
 
-	private void addSorterToTable(JTable table, Comparator<String> comparator, Comparator<AffixEntry> comparatorAffix){
+	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
@@ -1678,7 +1678,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		table.setRowSorter(dicSorter);
 	}
 
-	private void loadFileCancelled(Exception exc){
+	private void loadFileCancelled(final Exception exc){
 		if(exc instanceof ProjectFileNotFoundException)
 			//remove the file from the recent files menu
 			recentFilesMenu.removeEntry(((ProjectFileNotFoundException)exc).getPath());
@@ -1721,16 +1721,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
 	}
 
-	private int setTabbedPaneEnable(JTabbedPane tabbedPane, Component component, boolean enabled){
-		int index = tabbedPane.indexOfComponent(component);
+	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
+		final int index = tabbedPane.indexOfComponent(component);
 		tabbedPane.setEnabledAt(index, enabled);
 		return index;
 	}
 
 
-	private void hyphenate(HunspellerFrame frame){
-		String language = frame.backbone.getAffixData().getLanguage();
-		Orthography orthography = BaseBuilder.getOrthography(language);
+	private void hyphenate(final HunspellerFrame frame){
+		final String language = frame.backbone.getAffixData().getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
@@ -1739,10 +1739,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		String count = null;
 		List<String> rules = Collections.emptyList();
 		if(StringUtils.isNotBlank(text)){
-			Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
+			final Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
 
-			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
-			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+			final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 				.toString();
 			count = Long.toString(hyphenation.countSyllabes());
@@ -1767,15 +1767,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
-	private void hyphenateAddRule(HunspellerFrame frame){
-		String language = frame.backbone.getAffixData().getLanguage();
-		Orthography orthography = BaseBuilder.getOrthography(language);
+	private void hyphenateAddRule(final HunspellerFrame frame){
+		final String language = frame.backbone.getAffixData().getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
-		String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
+		final String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		final HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
-			boolean alreadyHasRule = frame.backbone.hasHyphenationRule(addedRule, level);
+			final boolean alreadyHasRule = frame.backbone.hasHyphenationRule(addedRule, level);
 			boolean ruleMatchesText = false;
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
@@ -1783,12 +1783,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule, PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
-					Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);
-					Hyphenation addedRuleHyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText, addedRule, level);
+					final Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);
+					final Hyphenation addedRuleHyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText, addedRule, level);
 
-					Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
-					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-					String text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
+					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+					final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+					final String text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 						.toString();
 					addedRuleText = orthography.formatHyphenation(addedRuleHyphenation.getSyllabes(), sj.get(), errorFormatter)
 						.toString();
@@ -1831,11 +1831,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryDuplicates(){
 		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
-			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
 
-				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
 					backbone.getWordGenerator(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
@@ -1854,7 +1854,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void extractDictionaryStatistics(boolean performHyphenationStatistics){
+	private void extractDictionaryStatistics(final boolean performHyphenationStatistics){
 		if(dicStatisticsWorker == null || dicStatisticsWorker.isDone()){
 			if(performHyphenationStatistics)
 				hypStatisticsMenuItem.setEnabled(false);
@@ -1868,14 +1868,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void extractDictionaryWordlist(boolean plainWords){
+	private void extractDictionaryWordlist(final boolean plainWords){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
-				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), plainWords, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
@@ -1885,11 +1885,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractMinimalPairs(){
 		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
-			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
 
-				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
 					backbone.getWordGenerator(), outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
@@ -1907,17 +1907,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			cmpInputTextArea.setText(null);
 
-			AffixParser affParser = backbone.getAffParser();
-			AffixData affixData = affParser.getAffixData();
-			FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-			String compoundFlag = affixData.getCompoundFlag();
-			List<Production> compounds = new ArrayList<>();
-			BiConsumer<Production, Integer> productionReader = (production, row) -> {
+			final AffixParser affParser = backbone.getAffParser();
+			final AffixData affixData = affParser.getAffixData();
+			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+			final String compoundFlag = affixData.getCompoundFlag();
+			final List<Production> compounds = new ArrayList<>();
+			final BiConsumer<Production, Integer> productionReader = (production, row) -> {
 				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
-			Runnable completed = () -> {
-				StringJoiner sj = new StringJoiner("\n");
+			final Runnable completed = () -> {
+				final StringJoiner sj = new StringJoiner("\n");
 				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
@@ -1947,7 +1947,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private void updateSynonyms(){
-		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.fireTableDataChanged();
 	}
 
@@ -2016,7 +2016,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	public void clearOutputTable(JTable table){
-		HunspellerTableModel<?> dm = (HunspellerTableModel<?>)table.getModel();
+		final HunspellerTableModel<?> dm = (HunspellerTableModel<?>)table.getModel();
 		dm.clear();
 	}
 
@@ -2028,7 +2028,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearThesaurusParser(){
-		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.setSynonyms(null);
 
 		theMenu.setEnabled(false);
@@ -2054,14 +2054,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public void propertyChange(PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case "progress":
-				int progress = (int)evt.getNewValue();
+				final int progress = (int)evt.getNewValue();
 				mainProgressBar.setValue(progress);
 				break;
 
 			case "state":
-				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
+				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
+					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}
@@ -2082,7 +2082,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	public static void main(String[] args){
 		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
+			final String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
