@@ -1523,11 +1523,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void checkAbortion(WorkerDictionaryBase worker, JComponent ... componentsToEnable){
 		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			Runnable cancelTask = () -> {
 				for(final JComponent component : componentsToEnable)
 					component.setEnabled(true);
 			};
+			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			worker.askUserToAbort(this, cancelTask, resumeTask);
 		}
 	}
