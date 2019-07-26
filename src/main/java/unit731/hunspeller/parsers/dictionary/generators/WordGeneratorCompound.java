@@ -165,8 +165,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			//add boundary affixes
 			final List<Production> prods = applyAffixRules(p, false, null);
 			
-			//remove twofold because they're not allowed in compounds
 			if(!allowTwofoldAffixesInCompound)
+				//remove twofold because they're not allowed in compounds
 				removeTwofolds(prods);
 			
 			productions.addAll(prods);
@@ -223,24 +223,18 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private boolean containsTriple(final StringBuffer sb, final String compound){
-		int count = 0;
+		boolean repeated = false;
 		final int size = sb.length() - 1;
 		if(size > 1){
-			final String interCompounds = sb.substring(Math.max(size - 1, 0), size + 1).concat(compound.substring(0, Math.min(compound.length(), 2)));
-
-			char lastChar = 0;
+			final String interCompounds = sb.substring(Math.max(size - 1, 0), size + 1) + compound.substring(0, Math.min(compound.length(), 2));
 			final int len = interCompounds.length();
-			for(int i = 0; count < 3 && i < len; i ++){
-				final char chr = interCompounds.charAt(i);
-				if(chr != lastChar){
-					lastChar = chr;
-					count = 1;
-				}
-				else
-					count ++;
-			}
+			if(len == 3)
+				repeated = (interCompounds.charAt(0) == interCompounds.charAt(1) && interCompounds.charAt(0) == interCompounds.charAt(2));
+			else if(len == 4)
+				repeated = (interCompounds.charAt(0) == interCompounds.charAt(1) && interCompounds.charAt(0) == interCompounds.charAt(2)
+					|| interCompounds.charAt(1) == interCompounds.charAt(2) && interCompounds.charAt(1) == interCompounds.charAt(3));
 		}
-		return (count >= 3);
+		return repeated;
 	}
 
 	private String enforceNextCompoundCase(final char lastChar, String nextCompound, final StringHelper.Casing lastWordCasing,
@@ -304,17 +298,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	private boolean getNextTuple(final int[] indexes, final List<List<Production>> entry){
 		//obtain next tuple
-		boolean completed = false;
-		for(int i = indexes.length - 1; !completed && i >= 0; i --){
+		int i = indexes.length - 1;
+		while(i >= 0){
 			indexes[i] ++;
 			if(indexes[i] < entry.get(i).size())
 				break;
-			
-			indexes[i] = 0;
-			if(i == 0)
-				completed = true;
+
+			indexes[i --] = 0;
 		}
-		return completed;
+		return (i == -1);
 	}
 
 	/** Merge the distribution with the others */
