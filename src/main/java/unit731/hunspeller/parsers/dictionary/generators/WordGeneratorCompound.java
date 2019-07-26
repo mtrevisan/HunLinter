@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,15 +116,13 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					if(forbiddenWordFlag == null || !ArrayUtils.contains(continuationFlags.get(0), forbiddenWordFlag)
 							&& !ArrayUtils.contains(continuationFlags.get(1), forbiddenWordFlag) && !ArrayUtils.contains(continuationFlags.get(2), forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
-						addToProductions(compoundWord, compoundEntries, continuationFlags, productions);
-
-						if(productions.size() >= limit)
-							break;
+						final List<Production> newProductions = generateProductions(compoundWord, compoundEntries, continuationFlags);
+						productions.addAll(newProductions.subList(0, Math.min(limit - productions.size(), newProductions.size())));
 					}
 				}
 
 
-				completed = getNextTuple(indexes, entry);
+				completed = (productions.size() == limit || getNextTuple(indexes, entry));
 			}
 		}
 
@@ -153,27 +152,27 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return response;
 	}
 
-	private void addToProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags,
-			final Set<Production> productions) throws IllegalArgumentException{
+	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags)
+			throws IllegalArgumentException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
+		final List<Production> productions;
 		final String flags = (!continuationFlags.isEmpty()? StringUtils.join(continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new), StringUtils.EMPTY): null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-			productions.add(p);
+			productions = Collections.singletonList(p);
 		else{
 			//add boundary affixes
-			final List<Production> prods = applyAffixRules(p, false, null);
+			productions = applyAffixRules(p, false, null);
 			
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
-				removeTwofolds(prods);
-			
-			productions.addAll(prods);
+				removeTwofolds(productions);
 		}
+		return productions;
 	}
 
 	private List<DictionaryEntry> composeCompound(final int[] indexes, final List<List<Production>> entry, final StringBuffer sb){
