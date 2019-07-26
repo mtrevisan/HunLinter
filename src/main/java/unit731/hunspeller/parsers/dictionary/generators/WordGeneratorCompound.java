@@ -270,16 +270,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				itr.remove();
 	}
 
-	//is word a non compound with a REP substitution (see checkcompoundrep)?
+	//is word a non-compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = false;
-
-		for(final String cr : compoundAsReplacement)
-			if(word.contains(cr)){
-				exists = true;
-				break;
-			}
-
+		boolean exists = compoundAsReplacement.stream()
+			.anyMatch(word::contains);
 		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)
@@ -290,7 +284,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					break;
 				}
 		}
-
 		return exists;
 	}
 
