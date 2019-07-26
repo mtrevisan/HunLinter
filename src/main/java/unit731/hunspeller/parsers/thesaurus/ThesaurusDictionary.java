@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.thesaurus;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,9 +23,6 @@ public class ThesaurusDictionary{
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 
-	@JsonIgnore
-	private boolean modified;
-
 	//internal variable for fast inclusion test
 	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
 
@@ -38,17 +34,13 @@ public class ThesaurusDictionary{
 
 	@JsonProperty
 	private void setSynonyms(final List<ThesaurusEntry> synonyms){
-		clear(true);
+		clear();
 
 		this.synonyms.addAll(synonyms);
 
 		this.dictionary.clear();
 		for(final ThesaurusEntry synonym : synonyms)
 			dictionary.put(synonym.getSynonym(), synonym);
-	}
-
-	public boolean isModified(){
-		return modified;
 	}
 
 	public boolean add(final String partOfSpeech, final List<String> meanings){
@@ -73,8 +65,6 @@ public class ThesaurusDictionary{
 			}
 		}
 
-		modified = true;
-
 		return result;
 	}
 
@@ -95,7 +85,6 @@ public class ThesaurusDictionary{
 			dictionary.put(synonym, entry);
 
 			result = true;
-			modified = true;
 		}
 		return result;
 	}
@@ -104,8 +93,6 @@ public class ThesaurusDictionary{
 		final ThesaurusEntry previousValue = synonyms.remove(index);
 		dictionary.remove(previousValue.getSynonym());
 
-		modified = true;
-
 		return previousValue;
 	}
 
@@ -113,18 +100,11 @@ public class ThesaurusDictionary{
 		setSynonyms(dictionary.synonyms);
 	}
 
-	public void clear(final boolean setModifiedFlag){
+	public void clear(){
 		if(!synonyms.isEmpty()){
 			synonyms.clear();
 			dictionary.clear();
-
-			if(setModifiedFlag)
-				modified = true;
 		}
-	}
-
-	public void resetModified(){
-		modified = false;
 	}
 
 	public int size(){
@@ -139,8 +119,6 @@ public class ThesaurusDictionary{
 		if(StringUtils.isNotBlank(text)){
 			final String[] lines = StringUtils.split(text, StringUtils.LF);
 			synonyms.get(index).setMeanings(lines);
-
-			modified = true;
 		}
 	}
 

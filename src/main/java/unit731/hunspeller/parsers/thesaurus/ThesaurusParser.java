@@ -118,7 +118,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @throws IOException	If an I/O error occurs
 	 */
 	public void parse(final File theFile) throws IOException{
-		clearInternal();
+		clear();
 
 		final Path path = theFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
@@ -135,8 +135,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				if(!line.isEmpty())
 					dictionary.add(new ThesaurusEntry(line, br));
 		}
-
-		dictionary.resetModified();
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
@@ -151,10 +149,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public int getSynonymsCounter(){
 		return dictionary.size();
-	}
-
-	public boolean isDictionaryModified(){
-		return dictionary.isModified();
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
@@ -313,17 +307,11 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
 			}
-
-			dictionary.resetModified();
 		}
 	}
 
 	public void clear(){
-		clearInternal();
-	}
-
-	private void clearInternal(){
-		dictionary.clear(false);
+		dictionary.clear();
 	}
 
 	private void storeMemento() throws IOException{

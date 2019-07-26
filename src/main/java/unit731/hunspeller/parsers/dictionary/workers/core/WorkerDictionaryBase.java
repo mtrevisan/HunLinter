@@ -75,27 +75,27 @@ public abstract class WorkerDictionaryBase{
 		return worker.isDone();
 	}
 
-	public void askUserToAbort(Component parentComponent, Runnable cancelTask, Runnable resumeTask){
+	public void askUserToAbort(final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
-		Objects.requireNonNull(cancelTask);
-		Objects.requireNonNull(resumeTask);
 
 		worker.pause();
 
-		Object[] options = {"Abort", "Cancel"};
-		int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
+		final Object[] options = {"Abort", "Cancel"};
+		final int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
 			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel(true);
 
-			cancelTask.run();
+			if(cancelTask != null)
+				cancelTask.run();
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
 		}
 		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 			worker.resume();
 
-			resumeTask.run();
+			if(resumeTask != null)
+				resumeTask.run();
 		}
 	}
 

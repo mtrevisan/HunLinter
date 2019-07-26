@@ -1073,18 +1073,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_filExitMenuItemActionPerformed
 
 	private void exit(){
-		if(backbone.getTheParser().isDictionaryModified()){
-			//there are unsaved synonyms, ask the user if he really want to quit
-			Object[] options ={"Quit", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?",
-				"Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION)
-				dispose();
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
-				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		}
-		else
-			dispose();
+		dispose();
 	}
 
    private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
@@ -1502,8 +1491,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 //					dicDuplicatesWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
 			}
 
@@ -1527,8 +1514,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				for(final JComponent component : componentsToEnable)
 					component.setEnabled(true);
 			};
-			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			worker.askUserToAbort(this, cancelTask, resumeTask);
+//			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			worker.askUserToAbort(this, cancelTask, null);
 		}
 	}
 
