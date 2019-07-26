@@ -25,13 +25,13 @@ public class StringHelper{
 
 	private StringHelper(){}
 
-	public static Casing classifyCasing(String text){
+	public static Casing classifyCasing(final String text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
 		int lower = 0;
 		int upper = 0;
-		for(char chr : text.toCharArray())
+		for(final char chr : text.toCharArray())
 			if(Character.isAlphabetic(chr)){
 				if(Character.isLowerCase(chr))
 					lower ++;
@@ -41,7 +41,7 @@ public class StringHelper{
 		if(upper == 0)
 			return Casing.LOWER_CASE;
 
-		boolean fistCapital = (Character.isUpperCase(text.charAt(0)));
+		final boolean fistCapital = (Character.isUpperCase(text.charAt(0)));
 		if(fistCapital && upper == 1)
 			return Casing.TITLE_CASE;
 
@@ -59,17 +59,17 @@ public class StringHelper{
 	 * @return	The indexes of keyA and keyB of the start of the longest common substring between <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
-	public static Pair<Integer, Integer> longestCommonSubstring(String keyA, String keyB){
-		int m = keyA.length();
-		int n = keyB.length();
+	public static Pair<Integer, Integer> longestCommonSubstring(final String keyA, final String keyB){
+		final int m = keyA.length();
+		final int n = keyB.length();
 
 		if(m < n){
-			Pair<Integer, Integer> indexes = longestCommonSubstring(keyB, keyA);
+			final Pair<Integer, Integer> indexes = longestCommonSubstring(keyB, keyA);
 			return Pair.of(indexes.getRight(), indexes.getLeft());
 		}
 
 		//matrix to store result of two consecutive rows at a time
-		int[][] len = new int[2][n];
+		final int[][] len = new int[2][n];
 		int currentRow = 0;
 
 		//for a particular value of i and j, len[currRow][j] stores length of LCS in string X[0..i] and Y[0..j]
@@ -78,7 +78,7 @@ public class StringHelper{
 		int lcsIndexB = -1;
 		for(int i = 0; i < m; i ++){
 			for(int j = 0; j < n; j ++){
-				int cost;
+				final int cost;
 				if(keyA.charAt(i) != keyB.charAt(j))
 					cost = 0;
 				else if(i == 0 || j == 0)
