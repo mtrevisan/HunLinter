@@ -140,22 +140,27 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				constructOutput(depthOneNode);
 			}
 
-			//the second step is to create a failure table for the node with depth > 1, which is a BFS
-			while(!queue.isEmpty()){
-				final RadixTrieNode currentNode = queue.remove();
+			//the second step is to create the failure table
+			constructFailureTable(queue);
+		}
+	}
 
-				for(final Character transition : currentNode.getTransitions()){
-					final RadixTrieNode targetNode = currentNode.nextNode(transition);
-					queue.add(targetNode);
+	/** Create a failure table for the node with depth > 1 (this is a BFS) */
+	private void constructFailureTable(final Queue<RadixTrieNode> queue){
+		while(!queue.isEmpty()){
+			final RadixTrieNode currentNode = queue.remove();
 
-					RadixTrieNode traceFailureNode = currentNode.failure();
-					while(traceFailureNode.nextNode(transition) == null)
-						traceFailureNode = traceFailureNode.failure();
-					final RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
-					targetNode.setFailure(newFailureNode, trie.next);
-					targetNode.addChildrenIds(newFailureNode.getChildrenIds());
-					constructOutput(targetNode);
-				}
+			for(final Character transition : currentNode.getTransitions()){
+				final RadixTrieNode targetNode = currentNode.nextNode(transition);
+				queue.add(targetNode);
+
+				RadixTrieNode traceFailureNode = currentNode.failure();
+				while(traceFailureNode.nextNode(transition) == null)
+					traceFailureNode = traceFailureNode.failure();
+				final RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
+				targetNode.setFailure(newFailureNode, trie.next);
+				targetNode.addChildrenIds(newFailureNode.getChildrenIds());
+				constructOutput(targetNode);
 			}
 		}
 	}
