@@ -2,7 +2,10 @@ package unit731.hunspeller.parsers.affix;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +25,10 @@ import unit731.hunspeller.services.Memoizer;
 public class AffixData{
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY = Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
+
+	private static final List<AffixTag> SINGLE_FLAG_TAGS = Arrays.asList(AffixTag.NO_SUGGEST_FLAG, AffixTag.COMPOUND_FLAG, AffixTag.COMPOUND_BEGIN_FLAG,
+		AffixTag.COMPOUND_MIDDLE_FLAG, AffixTag.COMPOUND_END_FLAG, AffixTag.ONLY_IN_COMPOUND_FLAG, AffixTag.PERMIT_COMPOUND_FLAG, AffixTag.FORBID_COMPOUND_FLAG,
+		/*AffixTag.COMPOUND_ROOT,*/ AffixTag.CIRCUMFIX_FLAG, AffixTag.FORBIDDEN_WORD_FLAG, AffixTag.KEEP_CASE_FLAG, AffixTag.NEED_AFFIX_FLAG/*, AffixTag.SUB_STANDARD_FLAG*/);
 
 
 	private final Map<String, Object> data = new HashMap<>();
@@ -46,6 +53,25 @@ public class AffixData{
 		data.clear();
 		terminalAffixes.clear();
 		closed = false;
+	}
+
+	/** Check that the same flag does not belongs to different tags */
+	void verify(){
+		final Map<AffixTag, Object> extractSingleFlags = extractSingleFlags();
+		final Collection<Object> flaggedData = extractSingleFlags.values();
+		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
+		if(uniqueValues.size() != flaggedData.size())
+			throw new IllegalArgumentException("Repeated flags in multiple tags");
+	}
+
+	private Map<AffixTag, Object> extractSingleFlags(){
+		final Map<AffixTag, Object> singleFlags = new EnumMap<>(AffixTag.class);
+		for(final AffixTag tag : SINGLE_FLAG_TAGS){
+			final Object entry = getData(tag);
+			if(entry != null)
+				singleFlags.put(tag, entry);
+		}
+		return singleFlags;
 	}
 
 	boolean containsData(final AffixTag key){
@@ -89,11 +115,11 @@ public class AffixData{
 	<T> void addData(final String key, final T value){
 		if(closed)
 			throw new IllegalArgumentException("Cannot add data, container is closed");
-
-		final T prevValue = (T)data.put(key, value);
-
-		if(prevValue != null)
+		if(data.containsKey(key))
 			throw new IllegalArgumentException("Duplicated flag: " + key);
+
+		if(value != null)
+			data.put(key, value);
 	}
 
 

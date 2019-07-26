@@ -34,7 +34,8 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(flags))
 			return null;
 
-		checkValidity(flags);
+		if(flags.length() % 2 != 0)
+			throw new IllegalArgumentException("Flag must be of length multiple of two: '" + flags + "'");
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -43,9 +44,10 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private void checkValidity(final String flags) throws IllegalArgumentException{
-		if(flags.length() % 2 != 0)
-			throw new IllegalArgumentException("Flag must be of length multiple of two: " + flags);
+	@Override
+	public void validate(final String flag) throws IllegalArgumentException{
+		if(flag == null || flag.length() != 2)
+			throw new IllegalArgumentException("Flag must be of length two: '" + flag + "'");
 	}
 
 	private String[] extractFlags(final String flags){
@@ -55,7 +57,7 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if((notDuplicatedFlags.size() << 1) < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
+			throw new IllegalArgumentException("Flags must not be duplicated: '" + Arrays.toString(flags) + "'");
 	}
 
 	@Override
@@ -63,16 +65,10 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		final String originalFlags = Arrays.toString(flags);
-		checkValidity(flags, originalFlags);
+		for(final String flag : flags)
+			validate(flag);
 
 		return String.join(StringUtils.EMPTY, flags);
-	}
-
-	private void checkValidity(final String[] flags, final String originalFlags) throws IllegalArgumentException{
-		for(final String flag : flags)
-			if(flag == null || flag.length() != 2)
-				throw new IllegalArgumentException("Flag must be of length two: " + flag + " from " + originalFlags);
 	}
 
 	@Override

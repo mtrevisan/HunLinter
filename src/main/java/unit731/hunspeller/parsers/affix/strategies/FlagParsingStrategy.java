@@ -4,6 +4,8 @@ package unit731.hunspeller.parsers.affix.strategies;
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
 
+	void validate(final String flag) throws IllegalArgumentException;
+
 	/**
 	 * Parses the given String into multiple flags
 	 *

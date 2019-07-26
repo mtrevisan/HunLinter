@@ -91,8 +91,8 @@ class RegExpRadixTreeTest{
 
 		Assertions.assertEquals(4, tree.size());
 		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values(RadixTree.PrefixType.PREFIXED_BY)));
-		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
-		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
+		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(Integer[]::new));
+		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(Integer[]::new));
 		Assertions.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
 	}
 
@@ -812,8 +812,8 @@ class RegExpRadixTreeTest{
 		tree.put("cd", 4);
 		tree.put("aec", 5);
 
-		Assertions.assertArrayEquals(new Integer[]{1, 2}, tree.getValuesPrefixedTo("abcd").toArray(new Integer[2]));
-		Assertions.assertArrayEquals(new Integer[]{3}, tree.getValuesPrefixedTo("ec").toArray(new Integer[1]));
+		Assertions.assertArrayEquals(new Integer[]{1, 2}, tree.getValuesPrefixedTo("abcd").toArray(Integer[]::new));
+		Assertions.assertArrayEquals(new Integer[]{3}, tree.getValuesPrefixedTo("ec").toArray(Integer[]::new));
 	}
 
 }

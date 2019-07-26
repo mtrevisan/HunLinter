@@ -179,6 +179,8 @@ public class AffixParser{
 
 		data.close();
 
+		data.verify();
+
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B
 	}

@@ -139,7 +139,7 @@ public class AffixEntry{
 		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(Arrays.asList(otherContinuationFlags));
 		final int size = flags.size();
-		return (size > 0? flags.toArray(new String[size]): null);
+		return (size > 0? flags.toArray(String[]::new): null);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class AffixEntry{
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
 
-		return mf.toArray(new String[0]);
+		return mf.toArray(String[]::new);
 	}
 
 	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){

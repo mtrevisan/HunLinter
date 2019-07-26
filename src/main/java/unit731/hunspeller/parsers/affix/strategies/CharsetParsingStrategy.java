@@ -39,7 +39,8 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(flags))
 			return null;
 
-		checkValidity(flags);
+		if(!canEncode(flags))
+			throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: '" + flags + "'");
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -48,9 +49,10 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private void checkValidity(final String flags) throws IllegalArgumentException{
-		if(!canEncode(flags))
-			throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flags);
+	@Override
+	public void validate(final String flag) throws IllegalArgumentException{
+		if(flag == null || flag.length() != 1 || !canEncode(flag))
+			throw new IllegalArgumentException("Flag must be of length 1 and in " + charset.displayName() + " encoding: '" + flag + "'");
 	}
 
 	private String[] extractFlags(final String flags){
@@ -64,7 +66,7 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
+			throw new IllegalArgumentException("Flags must not be duplicated: '" + Arrays.toString(flags) + "'");
 	}
 
 	@Override
@@ -72,19 +74,10 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkValidity(flags);
+		for(final String flag : flags)
+			validate(flag);
 
 		return String.join(StringUtils.EMPTY, flags);
-	}
-
-	private void checkValidity(final String[] flags) throws IllegalArgumentException{
-		for(final String flag : flags){
-			if(flag == null || flag.length() != 1)
-				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag
-					+ (flags.length > 1? " in " + Arrays.toString(flags): StringUtils.EMPTY));
-		}
 	}
 
 	@Override
@@ -101,7 +94,7 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 
 	private void checkCompoundValidity(final String compoundRule) throws IllegalArgumentException{
 		if(!canEncode(compoundRule))
-			throw new IllegalArgumentException("Compound rule must be in " + charset.displayName() + " encoding: " + compoundRule);
+			throw new IllegalArgumentException("Compound rule must be in " + charset.displayName() + " encoding: '" + compoundRule + "'");
 	}
 
 	public boolean canEncode(final String cs){

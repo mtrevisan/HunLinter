@@ -227,6 +227,9 @@ public class DictionaryEntry{
 		continuationFlags = affixes.getTerminalAffixes();
 	}
 
+	/**
+	 * @param reverse	Whether the complex prefixes is used
+	 */
 	public List<String[]> extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);

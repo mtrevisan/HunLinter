@@ -13,9 +13,9 @@ public class Affixes{
 
 
 	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminalAffixes){
-		this.prefixes = prefixes.toArray(new String[0]);
-		this.suffixes = suffixes.toArray(new String[0]);
-		this.terminalAffixes = terminalAffixes.toArray(new String[0]);
+		this.prefixes = prefixes.toArray(String[]::new);
+		this.suffixes = suffixes.toArray(String[]::new);
+		this.terminalAffixes = terminalAffixes.toArray(String[]::new);
 	}
 
 	public String[] getTerminalAffixes(){

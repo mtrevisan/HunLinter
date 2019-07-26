@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,8 +111,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final List<DictionaryEntry> compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					final List<String> continuationFlags = extractCompoundFlagsByComponents(compoundEntries, compoundFlag);
-					if(!continuationFlags.contains(forbiddenWordFlag)){
+					final List<String[]> continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					if(forbiddenWordFlag == null || !ArrayUtils.contains(continuationFlags.get(0), forbiddenWordFlag)
+							&& !ArrayUtils.contains(continuationFlags.get(1), forbiddenWordFlag) && !ArrayUtils.contains(continuationFlags.get(2), forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
 						addToProductions(compoundWord, compoundEntries, continuationFlags, productions);
 
@@ -150,14 +153,14 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return response;
 	}
 
-	private void addToProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String> continuationFlags,
+	private void addToProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags,
 			final Set<Production> productions) throws IllegalArgumentException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
-		final String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
+		final String flags = (!continuationFlags.isEmpty()? StringUtils.join(continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new), StringUtils.EMPTY): null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			productions.add(p);
@@ -251,18 +254,14 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	private List<String> extractCompoundFlagsByComponents(final List<DictionaryEntry> compoundEntries, final String compoundFlag){
+	private List<String[]> extractCompoundFlagsByComponent(final List<DictionaryEntry> compoundEntries, final String compoundFlag){
 		final List<String[]> prefixes = compoundEntries.get(0).extractAllAffixes(affixData, false);
 		final List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAllAffixes(affixData, false);
-
 		final Set<String> terminals = SetHelper.setOf(prefixes.get(2));
 		terminals.addAll(Arrays.asList(suffixes.get(2)));
 		terminals.remove(compoundFlag);
 
-		final String compoundPrefixes = String.join(StringUtils.EMPTY, prefixes.get(0));
-		final String compoundSuffixes = String.join(StringUtils.EMPTY, suffixes.get(1));
-		final String compoundTerminals = String.join(StringUtils.EMPTY, terminals);
-		return Arrays.asList(compoundPrefixes, compoundSuffixes, compoundTerminals);
+		return Arrays.asList(prefixes.get(0), suffixes.get(1), terminals.toArray(String[]::new));
 	}
 
 	private void removeTwofolds(final List<Production> prods){

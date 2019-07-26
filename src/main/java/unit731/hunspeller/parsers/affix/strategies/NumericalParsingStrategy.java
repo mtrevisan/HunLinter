@@ -41,9 +41,22 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 
 		checkForDuplicates(singleFlags);
 
-		checkValidity(singleFlags);
+		for(final String flag : singleFlags)
+			validate(flag);
 
 		return singleFlags;
+	}
+
+	@Override
+	public void validate(final String flag) throws IllegalArgumentException{
+		try{
+			final int numericalFlag = Integer.parseInt(flag);
+			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
+				throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: '" + flag + "'");
+		}
+		catch(final NumberFormatException e){
+			throw new IllegalArgumentException("Flag must be an integer number: '" + flag + "'");
+		}
 	}
 
 	private String[] extractFlags(final String flags){
@@ -53,7 +66,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
+			throw new IllegalArgumentException("Flags must not be duplicated: '" + Arrays.toString(flags) + "'");
 	}
 
 	@Override
@@ -61,26 +74,10 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkValidity(flags);
+		for(final String flag : flags)
+			validate(flag);
 
 		return String.join(COMMA, flags);
-	}
-
-	private void checkValidity(final String[] flags) throws IllegalArgumentException{
-		final String originalFlags = Arrays.toString(flags);
-		for(final String flag : flags)
-			checkValidity(flag, originalFlags);
-	}
-
-	private void checkValidity(final String flag, final String originalFlags) throws IllegalArgumentException{
-		try{
-			final int numericalFlag = Integer.parseInt(flag);
-			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + originalFlags);
-		}
-		catch(final NumberFormatException e){
-			throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + originalFlags);
-		}
 	}
 
 	@Override

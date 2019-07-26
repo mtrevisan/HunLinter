@@ -47,7 +47,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length 1 and in UTF-8 encoding: 'aŧ'", exception.getMessage());
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"\\x{FFFD}"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length 1 and in UTF-8 encoding: '\\x{FFFD}'", exception.getMessage());
 	}
 
 	@Test
@@ -65,7 +65,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length 1 and in UTF-8 encoding: ''", exception.getMessage());
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"ŧ", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length 1 and in UTF-8 encoding: 'null'", exception.getMessage());
 	}
 
 	@Test
