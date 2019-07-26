@@ -140,6 +140,13 @@ public class RadixTrieNode{
 		return nextNode(character, false);
 	}
 
+	public RadixTrieNode getFailureNode(final Character transition){
+		RadixTrieNode traceFailureNode = failure;
+		while(traceFailureNode.nextNode(transition) == null)
+			traceFailureNode = traceFailureNode.failure;
+		return traceFailureNode.nextNode(transition);
+	}
+
 	/**
 	 * According to character transfer, any node transfer failure will return null
 	 * 

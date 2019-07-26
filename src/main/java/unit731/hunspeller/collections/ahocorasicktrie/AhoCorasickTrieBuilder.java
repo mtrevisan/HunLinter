@@ -154,10 +154,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				final RadixTrieNode targetNode = currentNode.nextNode(transition);
 				queue.add(targetNode);
 
-				RadixTrieNode traceFailureNode = currentNode.failure();
-				while(traceFailureNode.nextNode(transition) == null)
-					traceFailureNode = traceFailureNode.failure();
-				final RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
+				final RadixTrieNode newFailureNode = currentNode.getFailureNode(transition);
 				targetNode.setFailure(newFailureNode, trie.next);
 				targetNode.addChildrenIds(newFailureNode.getChildrenIds());
 				constructOutput(targetNode);
