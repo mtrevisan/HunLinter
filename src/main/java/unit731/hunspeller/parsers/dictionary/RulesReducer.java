@@ -389,12 +389,14 @@ public class RulesReducer{
 			groupsIntersection);
 		final Set<Character> overallLastGroup = overallLastGroups.get(parentConditionLength);
 		final Set<Character> baseGroup = (chooseRatifyingOverNegated? parentGroup: childrenGroup);
-		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated? PatternHelper::makeGroup:
+		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated?
+			PatternHelper::makeGroup:
 			PatternHelper::makeNotGroup);
-		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated? PatternHelper::makeNotGroup:
+		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated?
+			PatternHelper::makeNotGroup:
 			PatternHelper::makeGroup);
 
-		String preCondition;
+		final String preCondition;
 		if(overallLastGroup != null){
 			final Set<Character> group = new HashSet<>(overallLastGroup);
 			group.removeAll(baseGroup);
@@ -437,8 +439,7 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush,
-			final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
