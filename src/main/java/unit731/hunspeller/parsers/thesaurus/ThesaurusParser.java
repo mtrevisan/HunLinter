@@ -29,6 +29,12 @@ import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
+/**
+ * for storing mementoes:
+ * https://github.com/dnaumenko/java-diff-utils
+ * https://www.adictosaltrabajo.com/2012/06/05/comparar-ficheros-java-diff-utils/
+ * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
+ */
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
