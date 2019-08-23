@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
-import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.services.Memoizer;
 
 
@@ -26,9 +26,9 @@ public class AffixData{
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY = Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
 
-	private static final List<AffixTag> SINGLE_FLAG_TAGS = Arrays.asList(AffixTag.NO_SUGGEST_FLAG, AffixTag.COMPOUND_FLAG, AffixTag.COMPOUND_BEGIN_FLAG,
-		AffixTag.COMPOUND_MIDDLE_FLAG, AffixTag.COMPOUND_END_FLAG, AffixTag.ONLY_IN_COMPOUND_FLAG, AffixTag.PERMIT_COMPOUND_FLAG, AffixTag.FORBID_COMPOUND_FLAG,
-		/*AffixTag.COMPOUND_ROOT,*/ AffixTag.CIRCUMFIX_FLAG, AffixTag.FORBIDDEN_WORD_FLAG, AffixTag.KEEP_CASE_FLAG, AffixTag.NEED_AFFIX_FLAG/*, AffixTag.SUB_STANDARD_FLAG*/);
+	private static final List<AffixOption> SINGLE_FLAG_TAGS = Arrays.asList(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.COMPOUND_BEGIN_FLAG,
+		AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
+		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
 
 
 	private final Map<String, Object> data = new HashMap<>();
@@ -37,10 +37,10 @@ public class AffixData{
 
 
 	void close(){
-		terminalAffixes.addAll(getStringData(AffixTag.NO_SUGGEST_FLAG, AffixTag.COMPOUND_FLAG, AffixTag.FORBIDDEN_WORD_FLAG,
-			AffixTag.COMPOUND_BEGIN_FLAG, AffixTag.COMPOUND_MIDDLE_FLAG, AffixTag.COMPOUND_END_FLAG, AffixTag.ONLY_IN_COMPOUND_FLAG,
-			AffixTag.PERMIT_COMPOUND_FLAG, AffixTag.FORBID_COMPOUND_FLAG, AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, AffixTag.CIRCUMFIX_FLAG,
-			AffixTag.KEEP_CASE_FLAG, AffixTag.NEED_AFFIX_FLAG));
+		terminalAffixes.addAll(getStringData(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
+			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG,
+			AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG, AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG,
+			AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG));
 
 		closed = true;
 	}
@@ -57,24 +57,24 @@ public class AffixData{
 
 	/** Check that the same flag does not belongs to different tags */
 	void verify(){
-		final Map<AffixTag, Object> extractSingleFlags = extractSingleFlags();
+		final Map<AffixOption, Object> extractSingleFlags = extractSingleFlags();
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new IllegalArgumentException("Repeated flags in multiple tags");
+			throw new IllegalArgumentException("Repeated flags in multiple options");
 	}
 
-	private Map<AffixTag, Object> extractSingleFlags(){
-		final Map<AffixTag, Object> singleFlags = new EnumMap<>(AffixTag.class);
-		for(final AffixTag tag : SINGLE_FLAG_TAGS){
-			final Object entry = getData(tag);
+	private Map<AffixOption, Object> extractSingleFlags(){
+		final Map<AffixOption, Object> singleFlags = new EnumMap<>(AffixOption.class);
+		for(final AffixOption option : SINGLE_FLAG_TAGS){
+			final Object entry = getData(option);
 			if(entry != null)
-				singleFlags.put(tag, entry);
+				singleFlags.put(option, entry);
 		}
 		return singleFlags;
 	}
 
-	boolean containsData(final AffixTag key){
+	boolean containsData(final AffixOption key){
 		return containsData(key.getCode());
 	}
 
@@ -82,11 +82,11 @@ public class AffixData{
 		return data.containsKey(key);
 	}
 
-	public <T> T getData(final AffixTag key){
+	public <T> T getData(final AffixOption key){
 		return getData(key.getCode());
 	}
 
-	public <T> T getDataOrDefault(final AffixTag key, final T defaultValue){
+	public <T> T getDataOrDefault(final AffixOption key, final T defaultValue){
 		return getDataOrDefault(key.getCode(), defaultValue);
 	}
 
@@ -100,14 +100,14 @@ public class AffixData{
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(final AffixTag... keys){
+	private List<String> getStringData(final AffixOption... keys){
 		final List<String> result = new ArrayList<>(keys.length);
-		for(final AffixTag key : keys)
+		for(final AffixOption key : keys)
 			result.add(getData(key));
 		return result;
 	}
 
-	<T> void addData(final AffixTag key, final T value){
+	<T> void addData(final AffixOption key, final T value){
 		addData(key.getCode(), value);
 	}
 
@@ -124,7 +124,7 @@ public class AffixData{
 
 
 	public String getLanguage(){
-		return getData(AffixTag.LANGUAGE);
+		return getData(AffixOption.LANGUAGE);
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
@@ -133,11 +133,11 @@ public class AffixData{
 	}
 
 	public String getKeepCaseFlag(){
-		return getData(AffixTag.KEEP_CASE_FLAG);
+		return getData(AffixOption.KEEP_CASE_FLAG);
 	}
 
 	public String getNeedAffixFlag(){
-		return getData(AffixTag.NEED_AFFIX_FLAG);
+		return getData(AffixOption.NEED_AFFIX_FLAG);
 	}
 
 	public boolean isTerminalAffix(final String flag){
@@ -145,7 +145,7 @@ public class AffixData{
 	}
 
 	public Set<String> getCompoundRules(){
-		return getDataOrDefault(AffixTag.COMPOUND_RULE, Collections.emptySet());
+		return getDataOrDefault(AffixOption.COMPOUND_RULE, Collections.emptySet());
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
@@ -163,11 +163,11 @@ public class AffixData{
 	}
 
 	public Charset getCharset(){
-		return Charset.forName(getData(AffixTag.CHARACTER_SET));
+		return Charset.forName(getData(AffixOption.CHARACTER_SET));
 	}
 
 	public boolean isFullstrip(){
-		return containsData(AffixTag.FULLSTRIP);
+		return containsData(AffixOption.FULLSTRIP);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class AffixData{
 	 * @return Whether the prefix is complex
 	 */
 	public boolean isComplexPrefixes(){
-		return containsData(AffixTag.COMPLEX_PREFIXES);
+		return containsData(AffixOption.COMPLEX_PREFIXES);
 	}
 
 	public Boolean isSuffix(final String affixCode){
@@ -188,15 +188,15 @@ public class AffixData{
 	}
 
 	public boolean isForbidDifferentCasesInCompound(){
-		return containsData(AffixTag.FORBID_DIFFERENT_CASES_IN_COMPOUND);
+		return containsData(AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND);
 	}
 
 	public boolean isForbidTriplesInCompound(){
-		return containsData(AffixTag.FORBID_TRIPLES_IN_COMPOUND);
+		return containsData(AffixOption.FORBID_TRIPLES_IN_COMPOUND);
 	}
 
 	public boolean isSimplifyTriplesInCompound(){
-		return containsData(AffixTag.SIMPLIFIED_TRIPLES_IN_COMPOUND);
+		return containsData(AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND);
 	}
 
 	public Set<String> getAffixes(){
@@ -212,7 +212,7 @@ public class AffixData{
 	}
 
 	public String getFlag(){
-		return getData(AffixTag.FLAG);
+		return getData(AffixOption.FLAG);
 	}
 
 	public boolean isAffixProductive(final String word, final String affix){
@@ -236,21 +236,21 @@ public class AffixData{
 	}
 
 	public String getNoSuggestFlag(){
-		return getData(AffixTag.NO_SUGGEST_FLAG);
+		return getData(AffixOption.NO_SUGGEST_FLAG);
 	}
 
 	public List<String> applyReplacementTable(final String word){
-		final ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
+		final ConversionTable table = getData(AffixOption.REPLACEMENT_TABLE);
 		return (table != null? table.applyConversionTable(word): Collections.emptyList());
 	}
 
 	public String applyInputConversionTable(final String word){
-		final ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
+		final ConversionTable table = getData(AffixOption.INPUT_CONVERSION_TABLE);
 		return applyConversionTable(word, table, "input");
 	}
 
 	public String applyOutputConversionTable(final String word){
-		final ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		final ConversionTable table = getData(AffixOption.OUTPUT_CONVERSION_TABLE);
 		return applyConversionTable(word, table, "output");
 	}
 
@@ -267,67 +267,67 @@ public class AffixData{
 	}
 
 	public Set<String> getWordBreakCharacters(){
-		return getData(AffixTag.WORD_BREAK_CHARACTERS);
+		return getData(AffixOption.WORD_BREAK_CHARACTERS);
 	}
 
 	public String getCompoundBeginFlag(){
-		return getData(AffixTag.COMPOUND_BEGIN_FLAG);
+		return getData(AffixOption.COMPOUND_BEGIN_FLAG);
 	}
 
 	public String getCompoundMiddleFlag(){
-		return getData(AffixTag.COMPOUND_MIDDLE_FLAG);
+		return getData(AffixOption.COMPOUND_MIDDLE_FLAG);
 	}
 
 	public String getCompoundEndFlag(){
-		return getData(AffixTag.COMPOUND_END_FLAG);
+		return getData(AffixOption.COMPOUND_END_FLAG);
 	}
 
 	public String getOnlyInCompoundFlag(){
-		return getData(AffixTag.ONLY_IN_COMPOUND_FLAG);
+		return getData(AffixOption.ONLY_IN_COMPOUND_FLAG);
 	}
 
 	public boolean allowTwofoldAffixesInCompound(){
-		return containsData(AffixTag.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND);
+		return containsData(AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND);
 	}
 
 	public String getPermitCompoundFlag(){
-		return getData(AffixTag.PERMIT_COMPOUND_FLAG);
+		return getData(AffixOption.PERMIT_COMPOUND_FLAG);
 	}
 
 	public String getForbidCompoundFlag(){
-		return getData(AffixTag.FORBID_COMPOUND_FLAG);
+		return getData(AffixOption.FORBID_COMPOUND_FLAG);
 	}
 
 	public int getCompoundMaxWordCount(){
-		return getData(AffixTag.COMPOUND_MAX_WORD_COUNT);
+		return getData(AffixOption.COMPOUND_MAX_WORD_COUNT);
 	}
 
 	public boolean isForbidDuplicatesInCompound(){
-		return containsData(AffixTag.FORBID_DUPLICATES_IN_COMPOUND);
+		return containsData(AffixOption.FORBID_DUPLICATES_IN_COMPOUND);
 	}
 
 	public boolean isCheckCompoundReplacement(){
-		return containsData(AffixTag.CHECK_COMPOUND_REPLACEMENT);
+		return containsData(AffixOption.CHECK_COMPOUND_REPLACEMENT);
 	}
 
 	public int getCompoundMinimumLength(){
-		return getData(AffixTag.COMPOUND_MINIMUM_LENGTH);
+		return getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
 	}
 
 	public String getCompoundFlag(){
-		return getData(AffixTag.COMPOUND_FLAG);
+		return getData(AffixOption.COMPOUND_FLAG);
 	}
 
 	public String getCircumfixFlag(){
-		return getData(AffixTag.CIRCUMFIX_FLAG);
+		return getData(AffixOption.CIRCUMFIX_FLAG);
 	}
 
 	public String getForbiddenWordFlag(){
-		return getData(AffixTag.FORBIDDEN_WORD_FLAG);
+		return getData(AffixOption.FORBIDDEN_WORD_FLAG);
 	}
 
 	public String getForceCompoundUppercaseFlag(){
-		return getData(AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG);
+		return getData(AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG);
 	}
 
 	public List<RuleEntry> getRuleEntries(){

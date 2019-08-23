@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.enums;
 import java.util.Arrays;
 
 
-public enum AffixTag{
+public enum AffixOption{
 
 	//General options
 	/**
@@ -152,13 +152,13 @@ public enum AffixTag{
 	private final String code;
 
 
-	AffixTag(final String code){
+	AffixOption(final String code){
 		this.code = code;
 	}
 
-	public static AffixTag createFromCode(final String code){
+	public static AffixOption createFromCode(final String code){
 		return Arrays.stream(values())
-			.filter(tag -> tag.code.equals(code))
+			.filter(option -> option.code.equals(code))
 			.findFirst()
 			.orElse(null);
 	}

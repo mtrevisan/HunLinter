@@ -20,8 +20,8 @@ import unit731.hunspeller.parsers.affix.handlers.CopyOverAsNumberHandler;
 import unit731.hunspeller.parsers.affix.handlers.CopyOverHandler;
 import unit731.hunspeller.parsers.affix.handlers.Handler;
 import unit731.hunspeller.parsers.affix.handlers.WordBreakTableHandler;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
-import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
@@ -58,79 +58,79 @@ public class AffixParser{
 	private static final Handler AFFIX = new AffixHandler();
 	private static final Handler WORD_BREAK_TABLE = new WordBreakTableHandler();
 	private static final Handler ALIASES = new AliasesHandler();
-	private static final Handler REPLACEMENT_TABLE = new ConversionTableHandler(AffixTag.REPLACEMENT_TABLE);
-	private static final Handler INPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixTag.INPUT_CONVERSION_TABLE);
-	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixTag.OUTPUT_CONVERSION_TABLE);
+	private static final Handler REPLACEMENT_TABLE = new ConversionTableHandler(AffixOption.REPLACEMENT_TABLE);
+	private static final Handler INPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.INPUT_CONVERSION_TABLE);
+	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.OUTPUT_CONVERSION_TABLE);
 
-	private static final Map<AffixTag, Handler> PARSING_HANDLERS = new HashMap<>();
+	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new HashMap<>();
 	static{
 		//General options
 //		PARSING_HANDLERS.put("NAME", COPY_OVER);
 //		PARSING_HANDLERS.put("VERSION", COPY_OVER);
 //		PARSING_HANDLERS.put("HOME", COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.CHARACTER_SET, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPLEX_PREFIXES, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.LANGUAGE, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.IGNORE, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.ALIASES_FLAG, ALIASES);
-		PARSING_HANDLERS.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, ALIASES);
+		PARSING_HANDLERS.put(AffixOption.CHARACTER_SET, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.COMPLEX_PREFIXES, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.LANGUAGE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.IGNORE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.ALIASES_FLAG, ALIASES);
+		PARSING_HANDLERS.put(AffixOption.ALIASES_MORPHOLOGICAL_FIELD, ALIASES);
 
 		//Options for suggestions
-//		PARSING_HANDLERS.put(AffixTag.KEY, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.TRY, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.NO_SUGGEST_FLAG, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.MAX_COMPOUND_SUGGEST, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SUGGEST, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.NO_SPLIT_SUGGEST, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.NO_NGRAM_SUGGEST, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.SUGGESTIONS_WITH_DOTS, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.REPLACEMENT_TABLE, REPLACEMENT_TABLE);
-//		PARSING_HANDLERS.put(AffixTag.MAP_TABLE, MAP);
-//		PARSING_HANDLERS.put(AffixTag.PHONE_TABLE, MAP);
-//		PARSING_HANDLERS.put(AffixTag.WARN, MAP);
-//		PARSING_HANDLERS.put(AffixTag.FORBID_WARN, MAP);
+//		PARSING_HANDLERS.put(AffixOption.KEY, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.TRY, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.NO_SUGGEST_FLAG, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.MAX_COMPOUND_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.MAX_NGRAM_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.NO_SPLIT_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.NO_NGRAM_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.SUGGESTIONS_WITH_DOTS, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.REPLACEMENT_TABLE, REPLACEMENT_TABLE);
+//		PARSING_HANDLERS.put(AffixOption.MAP_TABLE, MAP);
+//		PARSING_HANDLERS.put(AffixOption.PHONE_TABLE, MAP);
+//		PARSING_HANDLERS.put(AffixOption.WARN, MAP);
+//		PARSING_HANDLERS.put(AffixOption.FORBID_WARN, MAP);
 
 		//Options for compounding
-		PARSING_HANDLERS.put(AffixTag.WORD_BREAK_CHARACTERS, WORD_BREAK_TABLE);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_RULE, COMPOUND_RULE);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MINIMUM_LENGTH, COPY_OVER_AS_NUMBER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_BEGIN_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIDDLE_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_END_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.ONLY_IN_COMPOUND_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.PERMIT_COMPOUND_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBID_COMPOUND_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.COMPOUND_ROOT, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MAX_WORD_COUNT, COPY_OVER_AS_NUMBER);
-		PARSING_HANDLERS.put(AffixTag.FORBID_DUPLICATES_IN_COMPOUND, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBID_DIFFERENT_CASES_IN_COMPOUND, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBID_TRIPLES_IN_COMPOUND, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.SIMPLIFIED_TRIPLES_IN_COMPOUND, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_PATTERN, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.COMPOUND_SYLLABLE, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.SYLLABLE_NUMBER, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.WORD_BREAK_CHARACTERS, WORD_BREAK_TABLE);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_RULE, COMPOUND_RULE);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_MINIMUM_LENGTH, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_BEGIN_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_MIDDLE_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_END_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.ONLY_IN_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.PERMIT_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FORBID_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.COMPOUND_ROOT, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.COMPOUND_MAX_WORD_COUNT, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixOption.FORBID_DUPLICATES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.CHECK_COMPOUND_REPLACEMENT, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FORBID_TRIPLES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.CHECK_COMPOUND_PATTERN, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.COMPOUND_SYLLABLE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.SYLLABLE_NUMBER, COPY_OVER);
 
 		//Options for affix creation
-		PARSING_HANDLERS.put(AffixTag.PREFIX, AFFIX);
-		PARSING_HANDLERS.put(AffixTag.SUFFIX, AFFIX);
+		PARSING_HANDLERS.put(AffixOption.PREFIX, AFFIX);
+		PARSING_HANDLERS.put(AffixOption.SUFFIX, AFFIX);
 
 		//Other options
-		PARSING_HANDLERS.put(AffixTag.CIRCUMFIX_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBIDDEN_WORD_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FULLSTRIP, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.KEEP_CASE_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.INPUT_CONVERSION_TABLE, INPUT_CONVERSION_TABLE);
-		PARSING_HANDLERS.put(AffixTag.OUTPUT_CONVERSION_TABLE, OUTPUT_CONVERSION_TABLE);
-		PARSING_HANDLERS.put(AffixTag.NEED_AFFIX_FLAG, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.WORD_CHARS, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixTag.CHECK_SHARPS, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.CIRCUMFIX_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FORBIDDEN_WORD_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.FULLSTRIP, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.KEEP_CASE_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.INPUT_CONVERSION_TABLE, INPUT_CONVERSION_TABLE);
+		PARSING_HANDLERS.put(AffixOption.OUTPUT_CONVERSION_TABLE, OUTPUT_CONVERSION_TABLE);
+		PARSING_HANDLERS.put(AffixOption.NEED_AFFIX_FLAG, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.WORD_CHARS, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixOption.CHECK_SHARPS, COPY_OVER);
 	}
 
 
@@ -156,13 +156,13 @@ public class AffixParser{
 				if(line.isEmpty())
 					continue;
 
-				if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET.getCode() + StringUtils.SPACE))
+				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
 					throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
 				else
 					encodingRead = true;
 
 				final ParsingContext context = new ParsingContext(line, br);
-				final AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
+				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
@@ -186,51 +186,51 @@ public class AffixParser{
 	}
 
 	private void postProcessData(final File affFile){
-		if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
-			data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
+		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
+			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
-			int compoundMin = data.getData(AffixTag.COMPOUND_MINIMUM_LENGTH);
+			int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
 			if(compoundMin < 1)
-				data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 1);
+				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
 		}
 		//apply default charset
-		if(!data.containsData(AffixTag.CHARACTER_SET))
-			data.addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
-		if(!data.containsData(AffixTag.LANGUAGE)){
+		if(!data.containsData(AffixOption.CHARACTER_SET))
+			data.addData(AffixOption.CHARACTER_SET, StandardCharsets.ISO_8859_1);
+		if(!data.containsData(AffixOption.LANGUAGE)){
 			//try to infer language from filename
 			final String filename = FilenameUtils.removeExtension(affFile.getName());
 			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
 			if(languages.length == 0)
 				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
 			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
-			data.addData(AffixTag.LANGUAGE, language);
+			data.addData(AffixOption.LANGUAGE, language);
 		}
-		if(!data.containsData(AffixTag.WORD_BREAK_CHARACTERS)){
+		if(!data.containsData(AffixOption.WORD_BREAK_CHARACTERS)){
 			final Set<String> wordBreakCharacters = new HashSet<>(3);
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
 			wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
-			data.addData(AffixTag.WORD_BREAK_CHARACTERS, wordBreakCharacters);
+			data.addData(AffixOption.WORD_BREAK_CHARACTERS, wordBreakCharacters);
 		}
-		//swap tags:
+		//swap options:
 		if(data.isComplexPrefixes()){
-			final String compoundBegin = data.getData(AffixTag.COMPOUND_BEGIN_FLAG);
-			final String compoundEnd = data.getData(AffixTag.COMPOUND_END_FLAG);
-			data.addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
-			data.addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
+			final String compoundBegin = data.getData(AffixOption.COMPOUND_BEGIN_FLAG);
+			final String compoundEnd = data.getData(AffixOption.COMPOUND_END_FLAG);
+			data.addData(AffixOption.COMPOUND_BEGIN_FLAG, compoundEnd);
+			data.addData(AffixOption.COMPOUND_END_FLAG, compoundBegin);
 
-			final RuleEntry prefixes = data.getData(AffixTag.PREFIX);
-			final RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
-			data.addData(AffixTag.PREFIX, suffixes);
-			data.addData(AffixTag.SUFFIX, prefixes);
+			final RuleEntry prefixes = data.getData(AffixOption.PREFIX);
+			final RuleEntry suffixes = data.getData(AffixOption.SUFFIX);
+			data.addData(AffixOption.PREFIX, suffixes);
+			data.addData(AffixOption.SUFFIX, prefixes);
 		}
-//		if(!containsData(AffixTag.KEY))
-//			data.addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
-//		if(!containsData(AffixTag.WORD_CHARS))
-//			data.addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
+//		if(!containsData(AffixOption.KEY))
+//			data.addData(AffixOption.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+//		if(!containsData(AffixOption.WORD_CHARS))
+//			data.addData(AffixOption.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 	}
 
-	private Handler lookupHandlerByRuleType(final AffixTag ruleType){
+	private Handler lookupHandlerByRuleType(final AffixOption ruleType){
 		return PARSING_HANDLERS.get(ruleType);
 	}
 

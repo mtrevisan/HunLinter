@@ -5,29 +5,29 @@ import java.util.Arrays;
 
 public enum AffixType{
 
-	SUFFIX(AffixTag.SUFFIX),
-	PREFIX(AffixTag.PREFIX);
+	SUFFIX(AffixOption.SUFFIX),
+	PREFIX(AffixOption.PREFIX);
 
 
-	private final AffixTag tag;
+	private final AffixOption option;
 
-	AffixType(final AffixTag tag){
-		this.tag = tag;
+	AffixType(final AffixOption option){
+		this.option = option;
 	}
 
 	public static AffixType createFromCode(final String code){
 		return Arrays.stream(values())
-			.filter(t -> t.tag.getCode().equals(code))
+			.filter(t -> t.option.getCode().equals(code))
 			.findFirst()
 			.orElse(null);
 	}
 
-	public boolean is(final String flag){
-		return this.tag.getCode().equals(flag);
+	public boolean is(final String code){
+		return this.option.getCode().equals(code);
 	}
 
-	public AffixTag getTag(){
-		return tag;
+	public AffixOption getOption(){
+		return option;
 	}
 
 }

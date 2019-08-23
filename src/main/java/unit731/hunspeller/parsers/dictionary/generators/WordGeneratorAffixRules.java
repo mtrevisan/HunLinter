@@ -5,7 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
@@ -23,8 +23,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	List<Production> applyOnefoldAffixRule(final String line, final RuleEntry overriddenRule){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
-		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
@@ -59,8 +59,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	List<Production> applyAffixRules(final String line, final RuleEntry overriddenRule){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
-		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);

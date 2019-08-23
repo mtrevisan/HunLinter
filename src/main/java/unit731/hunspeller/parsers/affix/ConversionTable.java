@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.services.ParserHelper;
 
 
@@ -34,16 +34,16 @@ public class ConversionTable{
 	}
 
 
-	private final AffixTag affixTag;
+	private final AffixOption affixOption;
 	private Map<String, List<Pair<String, String>>> table;
 
 
-	public ConversionTable(final AffixTag affixTag){
-		this.affixTag = affixTag;
+	public ConversionTable(final AffixOption affixOption){
+		this.affixOption = affixOption;
 	}
 
-	public AffixTag getAffixTag(){
-		return affixTag;
+	public AffixOption getAffixOption(){
+		return affixOption;
 	}
 
 	public void parseConversionTable(final ParsingContext context){
@@ -78,10 +78,10 @@ public class ConversionTable{
 	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 3)
 			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
-		if(!affixTag.getCode().equals(parts[0]))
+				+ ": Bad number of entries, it must be <option> <pattern-from> <pattern-to>");
+		if(!affixOption.getCode().equals(parts[0]))
 			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad tag, it must be " + affixTag.getCode());
+				+ ": Bad option, it must be " + affixOption.getCode());
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class ConversionTable{
 
 	@Override
 	public String toString(){
-		return "[affixTag=" + affixTag + ',' + "table=" + table + ']';
+		return "[affixOption=" + affixOption + ',' + "table=" + table + ']';
 	}
 
 }

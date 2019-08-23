@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ParserHelper;
@@ -19,7 +19,7 @@ public class CompoundRuleHandler implements Handler{
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixTag, List<String>> getData){
+			final Function<AffixOption, List<String>> getData){
 		try{
 			checkValidity(context);
 
@@ -32,10 +32,10 @@ public class CompoundRuleHandler implements Handler{
 
 				final String[] lineParts = StringUtils.split(line);
 
-				final AffixTag tag = AffixTag.createFromCode(lineParts[0]);
-				if(tag != AffixTag.COMPOUND_RULE)
+				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
+				if(option != AffixOption.COMPOUND_RULE)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
-						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
+						+ ": mismatched compound rule type (expected " + AffixOption.COMPOUND_RULE + ")");
 
 				final String rule = lineParts[1];
 
@@ -47,7 +47,7 @@ public class CompoundRuleHandler implements Handler{
 						+ ": duplicated line");
 			}
 
-			addData.accept(AffixTag.COMPOUND_RULE.getCode(), compoundRules);
+			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

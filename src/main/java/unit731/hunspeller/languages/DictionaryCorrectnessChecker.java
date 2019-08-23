@@ -5,9 +5,9 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 
 
@@ -48,7 +48,7 @@ public class DictionaryCorrectnessChecker{
 	public void checkProduction(final Production production) throws IllegalArgumentException{
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-			throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
+			throw new IllegalArgumentException("Non-affix entry contains " + AffixOption.FORBID_COMPOUND_FLAG.getCode());
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
 			morphologicalFieldCheck(production);

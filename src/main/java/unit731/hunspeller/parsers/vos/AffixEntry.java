@@ -225,7 +225,7 @@ public class AffixEntry{
 
 	public String applyRule(final String word, final boolean isFullstrip) throws IllegalArgumentException{
 		if(!isFullstrip && word.length() == removingLength)
-			throw new IllegalArgumentException("Cannot strip full words without the FULLSTRIP tag");
+			throw new IllegalArgumentException("Cannot strip full words without the FULLSTRIP option");
 
 		return (isSuffix()?
 			word.substring(0, word.length() - removingLength) + appending:

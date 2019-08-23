@@ -214,8 +214,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicLayeredPane = new javax.swing.JLayeredPane();
       dicInputLabel = new javax.swing.JLabel();
       dicInputTextField = new javax.swing.JTextField();
-      dicRuleTagsAidLabel = new javax.swing.JLabel();
-      dicRuleTagsAidComboBox = new javax.swing.JComboBox<>();
+      dicRuleFlagsAidLabel = new javax.swing.JLabel();
+		dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new javax.swing.JTable();
       totalProductionsLabel = new javax.swing.JLabel();
@@ -225,8 +225,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpInputComboBox = new javax.swing.JComboBox<>();
       limitLabel = new javax.swing.JLabel();
       limitComboBox = new javax.swing.JComboBox<>();
-      cmpRuleTagsAidLabel = new javax.swing.JLabel();
-      cmpRuleTagsAidComboBox = new javax.swing.JComboBox<>();
+      cmpRuleFlagsAidLabel = new javax.swing.JLabel();
+      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       cmpScrollPane = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
       cmpInputScrollPane = new javax.swing.JScrollPane();
@@ -310,8 +310,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
-      dicRuleTagsAidLabel.setText("Rule tags aid:");
+      dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
+      dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
@@ -326,8 +326,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(totalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(totalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -342,10 +342,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dicLayeredPaneLayout.createSequentialGroup()
                   .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                      .addComponent(dicInputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicRuleTagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                     .addComponent(dicRuleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(dicRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                      .addComponent(dicInputTextField)))
                .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE)
                .addGroup(dicLayeredPaneLayout.createSequentialGroup()
@@ -364,8 +364,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(dicInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(dicRuleTagsAidLabel))
+               .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(dicRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -404,8 +404,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      cmpRuleTagsAidLabel.setLabelFor(cmpRuleTagsAidComboBox);
-      cmpRuleTagsAidLabel.setText("Rule tags aid:");
+      cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
+      cmpRuleFlagsAidLabel.setText("Rule flags aid:");
 
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
@@ -431,8 +431,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpInputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -447,10 +447,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
                   .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(cmpInputLabel)
-                     .addComponent(cmpRuleTagsAidLabel))
+                     .addComponent(cmpRuleFlagsAidLabel))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addComponent(cmpRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                      .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
                         .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -478,8 +478,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(limitLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpRuleTagsAidLabel))
+               .addComponent(cmpRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(cmpRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
@@ -1628,12 +1628,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final boolean aidLinesPresent = !lines.isEmpty();
 			clearAidParser();
 			if(aidLinesPresent){
-				lines.forEach(dicRuleTagsAidComboBox::addItem);
-				lines.forEach(cmpRuleTagsAidComboBox::addItem);
+				lines.forEach(dicRuleFlagsAidComboBox::addItem);
+				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
 			}
 			//enable combo-box only if an AID file exists
-			dicRuleTagsAidComboBox.setEnabled(aidLinesPresent);
-			cmpRuleTagsAidComboBox.setEnabled(aidLinesPresent);
+			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
 
 
 			//thesaurus file:
@@ -1695,8 +1695,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//aid file:
 		clearAidParser();
 		//enable combo-box only if an AID file exists
-		dicRuleTagsAidComboBox.setEnabled(false);
-		cmpRuleTagsAidComboBox.setEnabled(false);
+		dicRuleFlagsAidComboBox.setEnabled(false);
+		cmpRuleFlagsAidComboBox.setEnabled(false);
 
 
 		//thesaurus file:
@@ -2009,8 +2009,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearAidParser(){
-		dicRuleTagsAidComboBox.removeAllItems();
-		cmpRuleTagsAidComboBox.removeAllItems();
+		dicRuleFlagsAidComboBox.removeAllItems();
+		cmpRuleFlagsAidComboBox.removeAllItems();
 	}
 
 	@Override
@@ -2087,8 +2087,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextArea cmpInputTextArea;
    private javax.swing.JLayeredPane cmpLayeredPane;
    private javax.swing.JButton cmpLoadInputButton;
-   private javax.swing.JComboBox<String> cmpRuleTagsAidComboBox;
-   private javax.swing.JLabel cmpRuleTagsAidLabel;
+   private javax.swing.JComboBox<String> cmpRuleFlagsAidComboBox;
+   private javax.swing.JLabel cmpRuleFlagsAidLabel;
    private javax.swing.JScrollPane cmpScrollPane;
    private javax.swing.JTable cmpTable;
    private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
@@ -2101,8 +2101,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenu dicMenu;
-   private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
-   private javax.swing.JLabel dicRuleTagsAidLabel;
+   private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
+   private javax.swing.JLabel dicRuleFlagsAidLabel;
    private javax.swing.JMenuItem dicRulesReducerMenuItem;
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;

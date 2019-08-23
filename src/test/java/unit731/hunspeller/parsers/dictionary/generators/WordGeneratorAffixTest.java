@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
@@ -50,8 +50,8 @@ class WordGeneratorAffixTest{
 			"	 # tab+space");
 		loadData(affFile.getAbsolutePath());
 
-		ConversionTable table = backbone.getAffixData().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
-		Assertions.assertEquals("[affixTag=OUTPUT_CONVERSION_TABLE,table={  =[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]}]", table.toString());
+		ConversionTable table = backbone.getAffixData().getData(AffixOption.OUTPUT_CONVERSION_TABLE);
+		Assertions.assertEquals("[affixOption=OUTPUT_CONVERSION_TABLE,table={  =[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]}]", table.toString());
 	}
 
 
@@ -379,7 +379,7 @@ class WordGeneratorAffixTest{
 			String line = "a/A";
 			backbone.getWordGenerator().applyAffixRules(line);
 		});
-		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP tag", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP option", exception.getMessage());
 	}
 
 	@Test

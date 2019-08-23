@@ -21,7 +21,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	}
 
 	/**
-	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_FLAG
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_FLAG
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param limit	Limit result count

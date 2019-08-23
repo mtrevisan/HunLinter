@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
@@ -20,7 +20,7 @@ public class AffixHandler implements Handler{
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixTag, List<String>> getData){
+			final Function<AffixOption, List<String>> getData){
 		try{
 			final boolean isSuffix = AffixType.SUFFIX.is(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
@@ -38,7 +38,7 @@ public class AffixHandler implements Handler{
 	}
 
 	private List<AffixEntry> readEntries(final ParsingContext context, final FlagParsingStrategy strategy,
-			final Function<AffixTag, List<String>> getData) throws IOException, IllegalArgumentException{
+			final Function<AffixOption, List<String>> getData) throws IOException, IllegalArgumentException{
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
 			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
@@ -49,8 +49,8 @@ public class AffixHandler implements Handler{
 
 		//List<AffixEntry> prefixEntries = new ArrayList<>();
 		//List<AffixEntry> suffixEntries = new ArrayList<>();
-		final List<String> aliasesFlag = getData.apply(AffixTag.ALIASES_FLAG);
-		final List<String> aliasesMorphologicalField = getData.apply(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		final List<String> aliasesFlag = getData.apply(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = getData.apply(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		try{

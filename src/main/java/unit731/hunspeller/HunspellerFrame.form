@@ -367,11 +367,11 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="dicInputLabel" max="32767" attributes="0"/>
-                                  <Component id="dicRuleTagsAidLabel" min="-2" pref="81" max="-2" attributes="0"/>
+                                  <Component id="dicRuleFlagsAidLabel" min="-2" pref="81" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="dicRuleTagsAidComboBox" max="32767" attributes="0"/>
+                                  <Component id="dicRuleFlagsAidComboBox" max="32767" attributes="0"/>
                                   <Component id="dicInputTextField" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -397,8 +397,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="dicRuleTagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="dicRuleTagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicRuleFlagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="dicScrollPane" pref="150" max="32767" attributes="0"/>
@@ -426,22 +426,22 @@
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="dicInputTextFieldKeyReleased"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JLabel" name="dicRuleTagsAidLabel">
+            <Component class="javax.swing.JLabel" name="dicRuleFlagsAidLabel">
               <Properties>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="dicRuleTagsAidComboBox"/>
+                  <ComponentRef name="dicRuleFlagsAidComboBox"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Rule tags aid:"/>
+                <Property name="text" type="java.lang.String" value="Rule flags aid:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="dicRuleTagsAidComboBox">
+            <Component class="javax.swing.JComboBox" name="dicRuleFlagsAidComboBox">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
                 </Property>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleTagsAidComboBox"/>
+                <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleFlagsAidComboBox"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
@@ -505,11 +505,11 @@
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="cmpInputLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="cmpRuleTagsAidLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="cmpRuleFlagsAidLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="cmpRuleTagsAidComboBox" max="32767" attributes="0"/>
+                                  <Component id="cmpRuleFlagsAidComboBox" max="32767" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="cmpInputComboBox" min="-2" pref="728" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -547,8 +547,8 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="cmpRuleTagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="cmpRuleTagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmpRuleFlagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmpRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -607,15 +607,15 @@
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JLabel" name="cmpRuleTagsAidLabel">
+            <Component class="javax.swing.JLabel" name="cmpRuleFlagsAidLabel">
               <Properties>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="cmpRuleTagsAidComboBox"/>
+                  <ComponentRef name="cmpRuleFlagsAidComboBox"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Rule tags aid:"/>
+                <Property name="text" type="java.lang.String" value="Rule flags aid:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="cmpRuleTagsAidComboBox">
+            <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>

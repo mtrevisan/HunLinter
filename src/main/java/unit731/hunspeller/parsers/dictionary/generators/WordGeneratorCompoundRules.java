@@ -21,7 +21,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	}
 
 	/**
-	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
+	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixOption.COMPOUND_RULE
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for

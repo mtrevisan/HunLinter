@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.workers.RulesReducerWorker;
@@ -181,7 +181,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		AffixData affixData = backbone.getAffixData();
 		List<RuleEntry> affixes = affixData.getRuleEntries();
 		List<String> affixEntries = affixes.stream()
-			.map(affix -> (affix.isSuffix()? AffixTag.SUFFIX: AffixTag.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
+			.map(affix -> (affix.isSuffix()? AffixOption.SUFFIX: AffixOption.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
 			.sorted()
 			.collect(Collectors.toList());
 
@@ -196,7 +196,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		if(flag != null){
 			RuleEntry rule = backbone.getAffixData().getData(flag);
 			StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-			String header = sj.add(rule.getType().getTag().getCode())
+			String header = sj.add(rule.getType().getOption().getCode())
 				.add(flag)
 				.add(Character.toString(rule.combinableChar()))
 				.add(Integer.toString(rule.getEntries().size()))

@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.services.FileHelper;
 
@@ -29,8 +29,8 @@ class DictionaryParserTest{
 			"REP alot a_lot");
 		affParser.parse(affFile);
 
-		ConversionTable table = affParser.getAffixData().getData(AffixTag.REPLACEMENT_TABLE);
-		Assertions.assertEquals("[affixTag=REPLACEMENT_TABLE,table={  =[(ij,IJ), (alot,a lot)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
+		ConversionTable table = affParser.getAffixData().getData(AffixOption.REPLACEMENT_TABLE);
+		Assertions.assertEquals("[affixOption=REPLACEMENT_TABLE,table={  =[(ij,IJ), (alot,a lot)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
 
 		List<String> replaced = affParser.getAffixData().applyReplacementTable("clea");
 		Assertions.assertTrue(replaced.isEmpty());

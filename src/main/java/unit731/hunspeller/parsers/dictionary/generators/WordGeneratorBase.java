@@ -233,7 +233,7 @@ class WordGeneratorBase{
 		final String word = dicEntry.getWord();
 		final List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 		if(applicableAffixes.isEmpty())
-			throw new NoApplicableRuleException("No applicable rules found for tag '" + affix + "' and word '" + word + "'");
+			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' and word '" + word + "'");
 
 		final List<Production> productions = new ArrayList<>();
 		for(final AffixEntry entry : applicableAffixes)

@@ -20,8 +20,8 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	}
 
 	/**
-	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_BEGIN, AffixTag.COMPOUND_MIDDLE,
-	 * and AffixTag.COMPOUND_END
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_BEGIN, AffixOption.COMPOUND_MIDDLE,
+	 * and AffixOption.COMPOUND_END
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param limit	Limit result count

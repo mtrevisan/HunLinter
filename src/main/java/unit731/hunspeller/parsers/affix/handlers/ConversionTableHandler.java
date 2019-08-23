@@ -3,7 +3,8 @@ package unit731.hunspeller.parsers.affix.handlers;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import unit731.hunspeller.parsers.enums.AffixTag;
+
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -11,20 +12,20 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
 public class ConversionTableHandler implements Handler{
 
-	private final AffixTag affixTag;
+	private final AffixOption affixOption;
 
 
-	public ConversionTableHandler(final AffixTag affixTag){
-		this.affixTag = affixTag;
+	public ConversionTableHandler(final AffixOption affixOption){
+		this.affixOption = affixOption;
 	}
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixTag, List<String>> getData){
-		final ConversionTable table = new ConversionTable(affixTag);
+			final Function<AffixOption, List<String>> getData){
+		final ConversionTable table = new ConversionTable(affixOption);
 		table.parseConversionTable(context);
 
-		addData.accept(affixTag.getCode(), table);
+		addData.accept(affixOption.getCode(), table);
 	}
 	
 }

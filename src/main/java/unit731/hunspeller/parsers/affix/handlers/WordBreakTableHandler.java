@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -23,7 +23,7 @@ public class WordBreakTableHandler implements Handler{
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixTag, List<String>> getData){
+			final Function<AffixOption, List<String>> getData){
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -37,10 +37,10 @@ public class WordBreakTableHandler implements Handler{
 				final String line = ParserHelper.extractLine(br);
 
 				final String[] lineParts = StringUtils.split(line);
-				final AffixTag tag = AffixTag.createFromCode(lineParts[0]);
-				if(tag != AffixTag.WORD_BREAK_CHARACTERS)
+				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
+				if(option != AffixOption.WORD_BREAK_CHARACTERS)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": mismatched type (expected "
-						+ AffixTag.WORD_BREAK_CHARACTERS + ")");
+						+ AffixOption.WORD_BREAK_CHARACTERS + ")");
 
 				String breakCharacter = lineParts[1];
 				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
@@ -54,7 +54,7 @@ public class WordBreakTableHandler implements Handler{
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": duplicated line");
 			}
 
-			addData.accept(AffixTag.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
+			addData.accept(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

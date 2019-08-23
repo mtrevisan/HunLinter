@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.enums.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ParserHelper;
@@ -18,7 +18,7 @@ public class AliasesHandler implements Handler{
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixTag, List<String>> getData){
+			final Function<AffixOption, List<String>> getData){
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -48,10 +48,10 @@ public class AliasesHandler implements Handler{
 	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 2)
 			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
+				+ ": Bad number of entries, it must be <option> <flag/morphological field>");
 		if(!context.getRuleType().equals(parts[0]))
 			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad tag, it must be " + context.getRuleType());
+				+ ": Bad option, it must be " + context.getRuleType());
 	}
 
 }

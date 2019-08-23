@@ -158,7 +158,7 @@ public class LineEntry implements Serializable{
 
 	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		return sj.add(type.getTag().getCode())
+		return sj.add(type.getOption().getCode())
 			.add(flag)
 			.add(Character.toString(combinableChar))
 			.add(Integer.toString(size))
@@ -173,7 +173,7 @@ public class LineEntry implements Serializable{
 			morphologicalRules = anAddition.substring(idx);
 			anAddition = anAddition.substring(0, idx);
 		}
-		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + removal + StringUtils.SPACE
+		final String line = type.getOption().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + removal + StringUtils.SPACE
 			+ anAddition + StringUtils.SPACE + (condition.isEmpty()? DOT: condition);
 		return (idx >= 0? line + morphologicalRules: line);
 	}
