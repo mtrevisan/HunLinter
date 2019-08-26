@@ -26,7 +26,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	}
 
 
-	public static synchronized NumericalParsingStrategy getInstance(){
+	public static NumericalParsingStrategy getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

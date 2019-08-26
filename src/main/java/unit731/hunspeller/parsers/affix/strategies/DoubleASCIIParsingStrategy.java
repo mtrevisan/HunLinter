@@ -23,7 +23,7 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 
-	public static synchronized DoubleASCIIParsingStrategy getInstance(){
+	public static DoubleASCIIParsingStrategy getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

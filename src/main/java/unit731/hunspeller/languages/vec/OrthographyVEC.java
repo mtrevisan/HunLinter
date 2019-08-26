@@ -49,7 +49,7 @@ public class OrthographyVEC extends Orthography{
 
 	private OrthographyVEC(){}
 
-	public static synchronized Orthography getInstance(){
+	public static Orthography getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

@@ -15,7 +15,7 @@ public class DictionaryBaseDataVEC extends BloomFilterParameters{
 	}
 
 
-	public static synchronized DictionaryBaseDataVEC getInstance(){
+	public static DictionaryBaseDataVEC getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

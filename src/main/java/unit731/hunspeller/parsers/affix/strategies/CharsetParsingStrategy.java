@@ -22,11 +22,11 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		private static final CharsetParsingStrategy INSTANCE = new CharsetParsingStrategy(StandardCharsets.UTF_8);
 	}
 
-	public static synchronized CharsetParsingStrategy getASCIIInstance(){
+	public static CharsetParsingStrategy getASCIIInstance(){
 		return SingletonHelperASCII.INSTANCE;
 	}
 
-	public static synchronized CharsetParsingStrategy getUTF8Instance(){
+	public static CharsetParsingStrategy getUTF8Instance(){
 		return SingletonHelperUTF8.INSTANCE;
 	}
 

@@ -15,7 +15,7 @@ public class DictionaryBaseData extends BloomFilterParameters{
 	}
 
 
-	public static synchronized DictionaryBaseData getInstance(){
+	public static DictionaryBaseData getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

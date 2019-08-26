@@ -47,7 +47,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		}
 
 
-		public static synchronized DuplicatesDictionaryBaseData getInstance(){
+		public static DuplicatesDictionaryBaseData getInstance(){
 			return SingletonHelper.INSTANCE;
 		}
 
