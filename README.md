@@ -15,7 +15,7 @@ I created this project in order to help me construct my hunspell language files 
 **The name I give to the project is kind of temporary...**
 
 
-## Whant the application can do
+## What the application can do
 This application is able to do many correctness checks about the files structure and its content. It is able to tell you if some rule is missing or redundant. You can test rules and compound rules. You can also test hyphenation and eventually add rules. It is also able to manage and build the thesaurus.
 
 This application can also sort the dictionary, counting words (unique and total count), gives some statistics, duplicate extraction, wordlist extraction, minimal pairs extraction, and package creation in order to build an `.oxt` or `.xpi` for deploy.
