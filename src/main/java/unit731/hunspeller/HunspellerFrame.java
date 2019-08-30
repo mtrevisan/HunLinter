@@ -1186,9 +1186,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
 			return;
 
+		//TODO if text to be inserted is already contained into the thesaurus, do nothing
+
 		formerFilterThesaurusText = text;
 
-		theAddButton.setEnabled(text != null && !text.isEmpty());
+		theAddButton.setEnabled(StringUtils.isNotBlank(text));
 
 		@SuppressWarnings("unchecked")
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
