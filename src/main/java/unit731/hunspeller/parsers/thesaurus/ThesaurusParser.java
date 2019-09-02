@@ -44,8 +44,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
 
-	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)\\|?|^\\||\\|$|\\/.*$");
-	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("\\|{2,}");
+	private static final Pattern PATTERN_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
+	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
+	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("((?<!\\\\)\\|){2,}");
 
 	//NOTE: All members are private and accessible only by Originator
 	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -273,14 +274,54 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public static String prepareTextForThesaurusFilter(String text){
-		if(text != null){
-			text = StringUtils.strip(text);
-			text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
-			text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
-			text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
-			text = "(?iu)(" + text + ")";
+		//extract part of speech if present
+		final String pos = extractPartOfSpeechFromThesaurusFilter(text);
+		text = clearThesaurusFilter(text);
+
+		text = StringUtils.strip(text);
+		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
+		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
+		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
+
+		//compose filter regexp
+		return "(?iu)" + (pos != null? "^[^|)]*" + pos + "[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
+	}
+
+	private static String extractPartOfSpeechFromThesaurusFilter(String text){
+		text = StringUtils.strip(text);
+
+		//remove part of speech and format the search string
+		int idx = text.indexOf(':');
+		if(idx < 0)
+			idx = text.indexOf(")|");
+		if(idx >= 0){
+			text = text.substring(0, idx);
+			//escape points
+			text = StringUtils.replace(text, ".", "\\.");
 		}
+		else
+			text = null;
 		return text;
+	}
+
+	private static String clearThesaurusFilter(String text){
+		text = StringUtils.strip(text);
+
+		//remove part of speech and format the search string
+		int idx = text.indexOf(':');
+		if(idx >= 0){
+			text = text.substring(idx + 1);
+			text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
+		}
+		else{
+			idx = text.indexOf(")|");
+			if(idx >= 0)
+				text = text.substring(idx + 2);
+		}
+		//escape points
+		text = StringUtils.replace(text, ".", "\\.");
+		//remove all \s+([^)]+)
+		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}
 
 	public void save(final File theIndexFile, final File theDataFile) throws IOException{

@@ -121,7 +121,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
-	private static final Pattern THESAURUS_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -512,8 +511,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setShowHorizontalLines(false);
+		theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
+		theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
@@ -1180,8 +1179,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void filterThesaurus(HunspellerFrame frame){
-		String text = frame.theMeaningsTextField.getText();
-		text = clearThesaurusFilter(text);
+		final String text = ThesaurusParser.prepareTextForThesaurusFilter(frame.theMeaningsTextField.getText());
 
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
 			return;
@@ -1195,28 +1193,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		@SuppressWarnings("unchecked")
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
-			EventQueue.invokeLater(() -> {
-				String filterText = ThesaurusParser.prepareTextForThesaurusFilter(formerFilterThesaurusText);
-				sorter.setRowFilter(RowFilter.regexFilter(filterText));
-			});
+			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(formerFilterThesaurusText)));
 		else
 			sorter.setRowFilter(null);
-	}
-
-	private String clearThesaurusFilter(String text){
-		text = StringUtils.strip(text);
-		//remove part of speech and format the search string
-		if(text.contains(":")){
-			text = text.substring(text.indexOf(':') + 1);
-			text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
-		}
-		else{
-			int idx = text.indexOf(")|");
-			if(idx >= 0)
-				text = text.substring(idx + 2);
-		}
-		//remove all \s+([^)]+)
-		return PatternHelper.clear(text, THESAURUS_CLEAR_SEARCH);
 	}
 
 	public void removeSelectedRowsFromThesaurus(){
