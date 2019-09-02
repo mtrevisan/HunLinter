@@ -12,7 +12,7 @@ public class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> ext
 
 
 	public AscendingDescendingUnsortedTableRowSorter(final M model){
-		setModel(model);
+		super(model);
 	}
 
 	@Override
