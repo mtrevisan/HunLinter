@@ -58,7 +58,7 @@ Entries can be inserted in two ways:
 1. (pos)|word1|word2|word3
 2. pos:word1,word2,word3
 
-Once something is written, an automatic filtering is executed to find all the words (and part-of-speech) that are already contained into the thesaurus.
+Once something is written, an automatic filtering is executed to find all the words (and part-of-speech if given) that are already contained into the thesaurus.
 
 ![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
 
