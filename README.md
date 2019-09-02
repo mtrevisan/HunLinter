@@ -45,18 +45,21 @@ CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 
 
 ## Screenshots
-### Production
+### Productions
+Entries can be a single word followed by a slash and all the flags that have to be applied, followed optionally by one or more morphological fields.
+
 ![alt text](https://i.postimg.cc/25DLks6s/Production.png "Production")
 
 ### Dictionary correctness checking
-Entries can be a single word followed by a slash and all the flags that have to be applied, followed optionally by one or more morphological fields.
 ![alt text](https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking")
 
 ### Thesaurus
 Entries can be inserted in two ways:
 1. (sost.)|sost1|sost2|sost3
 2. sost.:sost1,sost2,sost3
+
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech) that are already contained into the thesaurus.
+
 ![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
 
 ### Hyphenation
