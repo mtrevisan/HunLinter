@@ -55,8 +55,8 @@ Entries can be a single word followed by a slash and all the flags that have to 
 
 ### Thesaurus
 Entries can be inserted in two ways:
-1. (noun.)|word1|word2|word3
-2. noun.:word1,word2,word3
+1. (pos)|word1|word2|word3
+2. pos:word1,word2,word3
 
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech) that are already contained into the thesaurus.
 
