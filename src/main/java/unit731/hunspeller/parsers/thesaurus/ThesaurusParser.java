@@ -177,7 +177,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		final StringBuffer sb = new StringBuffer();
 		if(!partOfSpeech.startsWith(PART_OF_SPEECH_START))
 			sb.append(PART_OF_SPEECH_START);
-		sb.append(partOfSpeech);
+		final String[] partOfSpeeches = partOfSpeech.split(",");
+		sb.append(Arrays.stream(partOfSpeeches)
+			.collect(Collectors.joining(", ")));
 		if(!partOfSpeech.endsWith(PART_OF_SPEECH_END))
 			sb.append(PART_OF_SPEECH_END);
 		partOfSpeech = sb.toString();
@@ -275,7 +277,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public static String prepareTextForThesaurusFilter(String text){
 		//extract part of speech if present
-		final String pos = extractPartOfSpeechFromThesaurusFilter(text);
+		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
 		text = clearThesaurusFilter(text);
 
 		text = StringUtils.strip(text);
@@ -284,12 +286,13 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return "(?iu)" + (pos != null? "^[^|)]*" + pos + "[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
+		return "(?iu)" + (pos != null? "^[^|)]*(" + String.join("|", Arrays.asList(pos)) + ")[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
 	}
 
-	private static String extractPartOfSpeechFromThesaurusFilter(String text){
+	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
 		text = StringUtils.strip(text);
 
+		String[] pos = null;
 		//remove part of speech and format the search string
 		int idx = text.indexOf(':');
 		if(idx < 0)
@@ -297,11 +300,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(idx >= 0){
 			text = text.substring(0, idx);
 			//escape points
-			text = StringUtils.replace(text, ".", "\\.");
+			pos = StringUtils.replace(text, ".", "\\.")
+				.split(", *");
 		}
-		else
-			text = null;
-		return text;
+		return pos;
 	}
 
 	private static String clearThesaurusFilter(String text){
