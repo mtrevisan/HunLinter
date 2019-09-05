@@ -1,6 +1,5 @@
 package unit731.hunspeller.languages;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -44,7 +44,7 @@ public class RulesLoader{
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
 
-	public RulesLoader(final String language, final FlagParsingStrategy strategy) throws IOException{
+	public RulesLoader(final String language, final FlagParsingStrategy strategy){
 		Objects.requireNonNull(language);
 
 		rulesProperties = BaseBuilder.getRulesProperties(language);
