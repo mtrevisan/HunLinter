@@ -54,43 +54,44 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public String correctOrthography(String word){
+	public String correctOrthography(final String word){
 		//correct stress
-		word = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
 
 		//correct h occurrences after d, j, l, n, t
-		word = StringUtils.replaceEach(word, EXTENDED_CHARS, TRUE_CHARS);
+		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
 
 		//remove other occurrences of h not into fhV
-		if(!GraphemeVEC.GRAPHEME_H.equals(word))
-			word = PatternHelper.replaceAll(word, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
+		if(!GraphemeVEC.GRAPHEME_H.equals(correctedWord))
+			correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
-		word = StringUtils.replaceEach(word, MB_MP, NB_NP);
+		correctedWord = StringUtils.replaceEach(correctedWord, MB_MP, NB_NP);
 
-		word = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
+		correctedWord = GraphemeVEC.handleJHJWIUmlautPhonemes(correctedWord);
 
-		word = correctIJOccurrences(word);
+		correctedWord = correctIJOccurrences(correctedWord);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = PatternHelper.replaceAll(word, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
-		word = PatternHelper.replaceAll(word, PATTERN_LH_INSIDE_INTO_L, "$1l");
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_LH_INSIDE_INTO_L, "$1l");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
-		word = PatternHelper.replaceAll(word, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
-		word = PatternHelper.replaceAll(word, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//correct morphological errors
-		word = PatternHelper.replaceAll(word, PATTERN_MORPHOLOGICAL, "$1$2");
+		if(!GraphemeVEC.containsNonEterophonicSequence(word))
+			correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");
 
-		word = GraphemeVEC.rollbackJHJWIUmlautPhonemes(word);
+		correctedWord = GraphemeVEC.rollbackJHJWIUmlautPhonemes(correctedWord);
 
 		//eliminate consonant geminates
-		word = PatternHelper.replaceAll(word, PATTERN_CONSONANT_GEMINATES, "$1");
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_CONSONANT_GEMINATES, "$1");
 
-		word = correctApostrophes(word);
+		correctedWord = correctApostrophes(correctedWord);
 
-		return word;
+		return correctedWord;
 	}
 
 	private String correctIJOccurrences(String word){
