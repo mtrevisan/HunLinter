@@ -33,7 +33,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 
 
 	public HyphenationCorrectnessWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator) throws IOException{
+			final WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 

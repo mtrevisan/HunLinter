@@ -21,6 +21,8 @@ public class WordVEC{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
+	private static final String PIPE = "|";
+
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.PHONEME_I_UMLAUT;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
@@ -65,7 +67,7 @@ public class WordVEC{
 	private static final String NO_STRESS_WORDS = "^(síngui|spiràkui|títui|triàngui|vínkui)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
-		StringJoiner sj = (new StringJoiner("|"))
+		StringJoiner sj = (new StringJoiner(PIPE))
 			.add(NO_STRESS_AVER)
 			.add(NO_STRESS_ESER)
 			.add(NO_STRESS_DAR_FAR_STAR)

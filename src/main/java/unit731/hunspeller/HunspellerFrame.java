@@ -1899,17 +1899,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void checkHyphenationCorrectness(){
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
-			try{
-				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
-					backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
-				hypCorrectnessWorker.addPropertyChangeListener(this);
-				hypCorrectnessWorker.execute();
+			hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
+				backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
+			hypCorrectnessWorker.addPropertyChangeListener(this);
+			hypCorrectnessWorker.execute();
 
-				hypCheckCorrectnessMenuItem.setEnabled(false);
-			}
-			catch(IOException e){
-				LOGGER.warn("Cannot instantiate Hyphenation correctness worker", e);
-			}
+			hypCheckCorrectnessMenuItem.setEnabled(false);
 		}
 	}
 

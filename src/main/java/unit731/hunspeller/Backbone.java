@@ -216,7 +216,7 @@ public class Backbone implements FileChangeListener{
 			hypParser.clear();
 	}
 
-	public void getCorrectnessChecker() throws IOException{
+	public void getCorrectnessChecker(){
 		Objects.requireNonNull(affParser);
 
 		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);

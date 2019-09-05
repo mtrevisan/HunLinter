@@ -61,8 +61,7 @@ public class BaseBuilder{
 			.dictionaryBaseData;
 	}
 
-	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator)
-			throws IOException{
+	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator){
 		final DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
 			.checker.apply(affixData, hyphenator);
 		checker.loadRules();
@@ -74,7 +73,7 @@ public class BaseBuilder{
 			.orthography;
 	}
 
-	public static Properties getRulesProperties(final String language) throws IOException{
+	public static Properties getRulesProperties(final String language){
 		final Properties rulesProperties = new Properties();
 		final Class<? extends DictionaryCorrectnessChecker> cl = DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
@@ -82,6 +81,7 @@ public class BaseBuilder{
 			if(is != null)
 				rulesProperties.load(is);
 		}
+		catch(final IOException ignored){}
 		return rulesProperties;
 	}
 

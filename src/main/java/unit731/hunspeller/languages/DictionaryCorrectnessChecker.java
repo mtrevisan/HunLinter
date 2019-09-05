@@ -36,7 +36,7 @@ public class DictionaryCorrectnessChecker{
 		this.hyphenator = hyphenator;
 	}
 
-	public void loadRules() throws IOException{
+	public void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 

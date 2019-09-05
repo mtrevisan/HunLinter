@@ -1,6 +1,5 @@
 package unit731.hunspeller.languages.vec;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
@@ -77,7 +76,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	public void loadRules() throws IOException{
+	public void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 
 		final String pluralFlagsValue = rulesLoader.readProperty("pluralFlags");

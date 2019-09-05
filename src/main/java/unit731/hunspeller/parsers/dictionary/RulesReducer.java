@@ -39,6 +39,8 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
+	private static final String PIPE = "|";
+
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
 	private static final String DOT = ".";
@@ -474,7 +476,7 @@ public class RulesReducer{
 				else if(!growNewBush(queue, parent))
 					continue;
 				else
-					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join(PIPE, newEntry.addition),
 						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
 				final int maxConditionLength = queue.stream()

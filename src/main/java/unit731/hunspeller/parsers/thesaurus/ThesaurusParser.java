@@ -39,6 +39,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
+	private static final String PIPE = "|";
+
 	private static final String PART_OF_SPEECH_START = "(";
 	private static final String PART_OF_SPEECH_END = ")";
 
@@ -282,11 +284,11 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		text = StringUtils.strip(text);
 		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
-		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
+		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return "(?iu)" + (pos != null? "^[^|)]*(" + String.join("|", Arrays.asList(pos)) + ")[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
+		return "(?iu)" + (pos != null? "^[^|)]*(" + String.join(PIPE, Arrays.asList(pos)) + ")[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
 	}
 
 	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
