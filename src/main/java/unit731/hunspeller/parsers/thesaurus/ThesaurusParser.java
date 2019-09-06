@@ -294,13 +294,16 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
 		text = StringUtils.strip(text);
 
+		int start = 0;
 		String[] pos = null;
 		//remove part of speech and format the search string
 		int idx = text.indexOf(':');
-		if(idx < 0)
+		if(idx < 0){
 			idx = text.indexOf(")|");
+			start = 1;
+		}
 		if(idx >= 0){
-			text = text.substring(0, idx);
+			text = text.substring(start, idx);
 			//escape points
 			pos = StringUtils.replace(text, ".", "\\.")
 				.split(", *");
