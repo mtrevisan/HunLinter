@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.thesaurus;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,8 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	@JsonProperty
 	private List<String> meanings;
 
+
+	private MeaningEntry(){}
 
 	public MeaningEntry(final String partOfSpeech, final List<String> meanings){
 		Objects.requireNonNull(partOfSpeech);
