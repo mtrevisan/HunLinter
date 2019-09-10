@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.thesaurus;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,9 +33,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	private List<MeaningEntry> meanings;
 
 
-	private ThesaurusEntry(){}
-
-	public ThesaurusEntry(final String synonym, final List<MeaningEntry> meanings){
+	@JsonCreator
+	public ThesaurusEntry(@JsonProperty("synonym") final String synonym,
+			@JsonProperty("meanings") final List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(meanings);
 
