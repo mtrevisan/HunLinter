@@ -48,7 +48,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private static final Pattern PATTERN_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
 	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
-	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("((?<!\\\\)\\|){2,}");
+	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
 
 	//NOTE: All members are private and accessible only by Originator
 	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
