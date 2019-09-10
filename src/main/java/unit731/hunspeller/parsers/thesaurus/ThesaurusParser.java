@@ -288,7 +288,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return "(?iu)" + (pos != null? "^[^|)]*(" + String.join(PIPE, Arrays.asList(pos)) + ")[^|)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
+		return "(?iu)" + (pos != null? "(" + String.join(PIPE, Arrays.asList(pos)) + ")[^)]*\\)\\|.*": StringUtils.EMPTY) + "(" + text + ")";
 	}
 
 	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
