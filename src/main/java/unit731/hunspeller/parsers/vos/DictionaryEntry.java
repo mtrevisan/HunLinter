@@ -229,6 +229,8 @@ public class DictionaryEntry{
 
 	/**
 	 * @param reverse	Whether the complex prefixes is used
+	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
+	 * 			COMPLEXPREFIXES is defined)
 	 */
 	public List<String[]> extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
