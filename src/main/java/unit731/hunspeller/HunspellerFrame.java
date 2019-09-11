@@ -1179,21 +1179,24 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void filterThesaurus(HunspellerFrame frame){
-		final String text = ThesaurusParser.prepareTextForThesaurusFilter(frame.theMeaningsTextField.getText());
+		final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(frame.theMeaningsTextField.getText());
 
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
+		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(searchText[1]))
 			return;
 
 		//TODO if text to be inserted is already contained into the thesaurus, do nothing
 
-		formerFilterThesaurusText = text;
+		formerFilterThesaurusText = searchText[1];
 
-		theAddButton.setEnabled(StringUtils.isNotBlank(text));
+		theAddButton.setEnabled(StringUtils.isNotBlank(searchText[1]));
 
 		@SuppressWarnings("unchecked")
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
-		if(StringUtils.isNotBlank(text))
-			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(formerFilterThesaurusText)));
+		if(StringUtils.isNotBlank(searchText[1]))
+			EventQueue.invokeLater(() -> {
+				List<RowFilter<Object, Object>> filters = Arrays.asList(RowFilter.regexFilter(searchText[0], 0), RowFilter.regexFilter(searchText[1], 1));
+				sorter.setRowFilter(RowFilter.orFilter(filters));
+			});
 		else
 			sorter.setRowFilter(null);
 	}
