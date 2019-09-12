@@ -1,6 +1,5 @@
 package unit731.hunspeller.languages;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
@@ -13,9 +12,6 @@ import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 
 public class DictionaryCorrectnessChecker{
 
-	protected static final String SYLLABE_SEPARATOR = "/";
-	protected static final String NON_SYLLABE_MARK = "*";
-
 	private static final MessageFormat WORD_HAS_NOT_MORPHOLOGICAL_FIELD = new MessageFormat("{0} does not have any morphological fields");
 	private static final MessageFormat WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an invalid morphological field prefix: {1}");
 	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an unknown morphological field prefix: {1}");
@@ -24,7 +20,6 @@ public class DictionaryCorrectnessChecker{
 
 	protected final AffixData affixData;
 	protected final HyphenatorInterface hyphenator;
-	protected Orthography orthography;
 
 	protected RulesLoader rulesLoader;
 
@@ -44,7 +39,7 @@ public class DictionaryCorrectnessChecker{
 		return hyphenator;
 	}
 
-	//used by the correctness worker:
+	//used by the correctness worker after calling {@link #loadRules()}:
 	public void checkProduction(final Production production) throws IllegalArgumentException{
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
