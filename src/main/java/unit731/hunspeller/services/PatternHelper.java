@@ -21,11 +21,11 @@ public class PatternHelper{
 
 	private PatternHelper(){}
 
-	public static Pattern pattern(String pattern){
+	public static Pattern pattern(final String pattern){
 		return Pattern.compile(pattern);
 	}
 
-	public static Pattern pattern(String pattern, int flags){
+	public static Pattern pattern(final String pattern, final int flags){
 		return Pattern.compile(pattern, flags);
 	}
 
@@ -47,32 +47,46 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static String[] extract(String text, Pattern pattern){
-		List<String> result = new ArrayList<>();
-		Matcher m = pattern.matcher(text);
-		while(m.find()){
+	public static Matcher getMatcher(final String text, final Pattern pattern){
+		return pattern.matcher(text);
+	}
+
+	public static String[] extract(final String text, final Pattern pattern){
+		return extract(getMatcher(text, pattern));
+	}
+
+	public static String[] extract(final Matcher matcher){
+		final List<String> result = new ArrayList<>();
+		while(matcher.find()){
 			String component = null;
 			int i = 1;
-			int size = m.groupCount();
+			final int size = matcher.groupCount();
 			while(component == null && i < size)
-				component = m.group(i ++);
-			result.add(component != null? component: m.group());
+				component = matcher.group(i ++);
+			result.add(component != null? component: matcher.group());
 		}
 		return result.toArray(String[]::new);
 	}
 
-	public static boolean find(String text, Pattern pattern){
-		return pattern.matcher(text)
-			.find();
+	public static boolean find(final String text, final Pattern pattern){
+		return find(getMatcher(text, pattern));
+	}
+
+	public static boolean find(final Matcher matcher){
+		return matcher.find();
+	}
+
+	public static boolean matches(final Matcher matcher){
+		return matcher.matches();
 	}
 
 //FIXME is there a way to optimize this PatternService.replaceAll?
-	public static String replaceAll(String text, Pattern pattern, String replacement){
+	public static String replaceAll(final String text, final Pattern pattern, final String replacement){
 		return pattern.matcher(text)
 			.replaceAll(replacement);
 	}
 
-	public static String clear(String text, Pattern pattern){
+	public static String clear(final String text, final Pattern pattern){
 		return replaceAll(text, pattern, StringUtils.EMPTY);
 	}
 
