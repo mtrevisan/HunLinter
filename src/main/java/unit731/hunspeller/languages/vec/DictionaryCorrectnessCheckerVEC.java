@@ -91,7 +91,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			Pattern.CASE_INSENSITIVE);
 		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"), Pattern.CASE_INSENSITIVE);
 		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(rulesLoader.readProperty("patternNorthernPlural"), Pattern.CASE_INSENSITIVE);
-		
+
 		PLURAL_NOUN_MASCULINE_RULE = rulesLoader.readProperty("masculinePluralNoun");
 		VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = rulesLoader.readProperty("variantTransformationAtEndVanishingEl");
 		NORTHERN_PLURAL_RULE = rulesLoader.readProperty("northernPlural");
@@ -131,7 +131,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void vanishingElCheck(final Production production) throws IllegalArgumentException{
 		final String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-			if(PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY), PATTERN_NON_VANISHING_EL))
+			if(!derivedWord.toLowerCase(Locale.ROOT).startsWith(GraphemeVEC.GRAPHEME_L)
+					&& PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY), PATTERN_NON_VANISHING_EL))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
