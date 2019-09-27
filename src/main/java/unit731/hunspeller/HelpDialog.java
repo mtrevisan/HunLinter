@@ -44,8 +44,8 @@ public class HelpDialog extends JDialog{
 		String artifactID = null;
 		String version = null;
 		LocalDate buildTimestamp = null;
-		try(InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
-			Properties prop = new Properties();
+		try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
+			final Properties prop = new Properties();
 			prop.load(versionInfoStream);
 
 			artifactID = prop.getProperty("artifactId");

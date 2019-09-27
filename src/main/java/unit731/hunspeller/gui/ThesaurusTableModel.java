@@ -1,9 +1,11 @@
 package unit731.hunspeller.gui;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
@@ -16,9 +18,11 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String[] COLUMN_NAMES = new String[]{"Synonym", "Meanings"};
 
-	private static final String TAG_START = "<html><body style='white-space:nowrap'>";
+	private static final String TAG_START = "\";>";
 	private static final String TAG_END = "</body></html>";
 	private static final String TAG_NEW_LINE = "<br>";
+	private static final MessageFormat TAG = new MessageFormat(
+		"<html><body style=\"'white-space:nowrap'; font-family:{0}; font-size:{1}" + TAG_START + "{2}" + TAG_END);
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -51,7 +55,8 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				return thesaurus.getSynonym();
 
 			case 1:
-				return TAG_START + thesaurus.joinMeanings(TAG_NEW_LINE) + TAG_END;
+				final Font defaultFont = GUIUtils.getDefaultFont();
+				return TAG.format(new Object[]{defaultFont.getName(), defaultFont.getSize(), thesaurus.joinMeanings(TAG_NEW_LINE)});
 
 			default:
 				return null;
@@ -67,8 +72,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	public void setValueAt(Object value, int rowIndex, int columnIndex){
 		if(synonyms != null){
 			try{
-				String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
-				text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
+				final int tagEndIndex = ((String)value).indexOf(TAG_END);
+				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
+				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
 
 				String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
 				synonyms.get(rowIndex)

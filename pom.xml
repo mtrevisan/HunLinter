@@ -4,7 +4,7 @@
 
 	<groupId>unit731</groupId>
 	<artifactId>Hunspeller</artifactId>
-	<version>1.7.2-SNAPSHOT</version>
+	<version>1.8.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -182,6 +182,9 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 
+		<!-- FontChooser -->
+		<org.drjekyll.fontchooser.version>2.4</org.drjekyll.fontchooser.version>
+
 		<!-- Apache -->
 		<org.apache.commons.lang3.version>3.9</org.apache.commons.lang3.version>
 		<org.apache.commons.text.version>1.8</org.apache.commons.text.version>
@@ -205,6 +208,13 @@
 	</properties>
 
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.drjekyll/fontchooser -->
+		<dependency>
+			<groupId>org.drjekyll</groupId>
+			<artifactId>fontchooser</artifactId>
+			<version>${org.drjekyll.fontchooser.version}</version>
+		</dependency>
+
 		<!-- Apache -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>

@@ -1,8 +1,6 @@
 package unit731.hunspeller.gui;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -23,12 +21,45 @@ public class GUIUtils{
 
 	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
+	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
+
+	private static Font defaultFont = DEFAULT_FONT;
+
 
 	private GUIUtils(){}
 
+	public static Font getDefaultFont(){
+		return defaultFont;
+	}
+
+	public static void setDefaultFont(final Font font, final Component parentFrame){
+		updateComponent(parentFrame, font);
+
+		defaultFont = font;
+	}
+
+	private static void updateComponent(final Component c, final Font font){
+		if(c != null){
+			if(c instanceof JComponent)
+				((JComponent)c).updateUI();
+			if(c instanceof Container){
+				final Component[] children = ((Container)c).getComponents();
+				if(children != null)
+					for(final Component child : children)
+						if(child instanceof Component)
+							updateComponent(child, font);
+			}
+			if(c instanceof JEditorPane)
+				((JEditorPane)c).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+
+			if(c instanceof JTextArea || c instanceof JTextField || c instanceof JTable || c instanceof JWordLabel)
+				c.setFont(font);
+		}
+	}
+
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.
-	 * 
+	 *
 	 * @param dialog	Dialog to attach the escape key to
 	 */
 	public static void addCancelByEscapeKey(JDialog dialog){

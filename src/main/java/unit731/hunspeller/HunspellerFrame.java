@@ -1,12 +1,12 @@
 package unit731.hunspeller;
 
-import java.awt.Component;
+import java.awt.*;
 
+import org.drjekyll.fontchooser.FontDialog;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
+import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.interfaces.Hunspellable;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -15,7 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent; 
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -53,6 +53,7 @@ import javax.swing.RowFilter;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -107,7 +108,7 @@ import unit731.hunspeller.services.RecentItems;
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
  * @see <a href="https://github.com/nuspell/nuspell">Nuspell on github</a>
  * @see <a href="https://github.com/hunspell/hyphen">Hyphen on github</a>
- * 
+ *
  * @see <a href="https://www.shareicon.net/">Share icon</a>
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
  * @see <a href="https://compresspng.com/">PNG compresser</a>
@@ -245,23 +246,25 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
       hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new javax.swing.JLabel();
+      hypSyllabationOutputLabel = new JWordLabel();
       hypSyllabesCountLabel = new javax.swing.JLabel();
       hypSyllabesCountOutputLabel = new javax.swing.JLabel();
       hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new javax.swing.JLabel();
+      hypRulesOutputLabel = new JWordLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
       hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
       hypAddRuleButton = new javax.swing.JButton();
       hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
+      hypAddRuleSyllabationOutputLabel = new JWordLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
       filCreatePackageMenuItem = new javax.swing.JMenuItem();
+      filFontSeparator = new javax.swing.JPopupMenu.Separator();
+      filFontMenuItem = new javax.swing.JMenuItem();
       filRecentFilesSeparator = new javax.swing.JPopupMenu.Separator();
       filEmptyRecentFilesMenuItem = new javax.swing.JMenuItem();
       filSeparator = new javax.swing.JPopupMenu.Separator();
@@ -294,7 +297,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setFont(new java.awt.Font("Arial Unicode MS", 0, 13)); // NOI18N
+      parsingResultTextArea.setFont(GUIUtils.getDefaultFont());
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
@@ -304,6 +307,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
+      dicInputTextField.setFont(GUIUtils.getDefaultFont());
       dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             dicInputTextFieldKeyReleased(evt);
@@ -313,6 +317,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
+      dicRuleFlagsAidComboBox.setFont(GUIUtils.getDefaultFont());
+
+      dicTable.setFont(GUIUtils.getDefaultFont());
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
@@ -381,6 +388,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
+      cmpInputComboBox.setFont(GUIUtils.getDefaultFont());
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
@@ -407,6 +415,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
       cmpRuleFlagsAidLabel.setText("Rule flags aid:");
 
+      cmpRuleFlagsAidComboBox.setFont(GUIUtils.getDefaultFont());
+
+      cmpTable.setFont(GUIUtils.getDefaultFont());
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
       cmpTable.setShowVerticalLines(false);
@@ -417,6 +428,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpScrollPane.setViewportView(cmpTable);
 
       cmpInputTextArea.setColumns(20);
+      cmpInputTextArea.setFont(GUIUtils.getDefaultFont());
       cmpInputTextArea.setRows(1);
       cmpInputScrollPane.setViewportView(cmpInputTextArea);
 
@@ -494,6 +506,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theMeaningsLabel.setLabelFor(theMeaningsTextField);
       theMeaningsLabel.setText("New synonym:");
 
+      theMeaningsTextField.setFont(GUIUtils.getDefaultFont());
       theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             theMeaningsTextFieldKeyReleased(evt);
@@ -510,6 +523,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      theTable.setFont(GUIUtils.getDefaultFont());
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
@@ -635,6 +649,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel.setLabelFor(hypWordTextField);
       hypWordLabel.setText("Word:");
 
+      hypWordTextField.setFont(GUIUtils.getDefaultFont());
       hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             hypWordTextFieldKeyReleased(evt);
@@ -644,6 +659,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
       hypSyllabationLabel.setText("Syllabation:");
 
+      hypSyllabationOutputLabel.setFont(GUIUtils.getDefaultFont());
       hypSyllabationOutputLabel.setText("...");
 
       hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
@@ -659,6 +675,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
 
+      hypAddRuleTextField.setFont(GUIUtils.getDefaultFont());
       hypAddRuleTextField.setEnabled(false);
       hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -686,11 +703,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
       hypAddRuleSyllabationLabel.setText("New syllabation:");
 
+      hypAddRuleSyllabationOutputLabel.setFont(GUIUtils.getDefaultFont());
       hypAddRuleSyllabationOutputLabel.setText("...");
 
       hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
       hypAddRuleSyllabesCountLabel.setText("New syllabes:");
 
+      hypAddRuleSyllabesCountOutputLabel.setFont(GUIUtils.getDefaultFont());
       hypAddRuleSyllabesCountOutputLabel.setText("...");
 
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -820,7 +839,24 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       filMenu.add(filCreatePackageMenuItem);
+      filMenu.add(filFontSeparator);
+
+      filFontMenuItem.setMnemonic('f');
+      filFontMenuItem.setText("Select font...");
+      filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            filFontMenuItemActionPerformed(evt);
+         }
+      });
+      filMenu.add(filFontMenuItem);
       filMenu.add(filRecentFilesSeparator);
+
+		Preferences preferences = Preferences.userNodeForPackage(getClass());
+		RecentItems recentItems = new RecentItems(5, preferences);
+		recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
+		recentFilesMenu.setText("Recent files");
+		recentFilesMenu.setMnemonic('R');
+		filMenu.add(recentFilesMenu);
 
       filEmptyRecentFilesMenuItem.setMnemonic('e');
       filEmptyRecentFilesMenuItem.setText("Empty Recent Files list");
@@ -844,12 +880,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
-      Preferences preferences = Preferences.userNodeForPackage(getClass());
-      RecentItems recentItems = new RecentItems(5, preferences);
-      recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-      recentFilesMenu.setText("Recent files");
-      recentFilesMenu.setMnemonic('R');
-      filMenu.add(recentFilesMenu, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
@@ -1430,6 +1460,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
       productionDebouncer.call(this);
    }//GEN-LAST:event_dicInputTextFieldKeyReleased
+
+   private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
+		final FontDialog dialog = new FontDialog((Frame)null, "Select Font", true);
+		GUIUtils.addCancelByEscapeKey(dialog);
+		dialog.setSelectedFont(GUIUtils.getDefaultFont());
+		dialog.setLocationRelativeTo(null);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
+
+		if(!dialog.isCancelSelected())
+			GUIUtils.setDefaultFont(dialog.getSelectedFont(), this);
+   }//GEN-LAST:event_filFontMenuItemActionPerformed
 
 
 	@Override
@@ -2093,6 +2135,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JMenuItem filCreatePackageMenuItem;
    private javax.swing.JMenuItem filEmptyRecentFilesMenuItem;
    private javax.swing.JMenuItem filExitMenuItem;
+   private javax.swing.JMenuItem filFontMenuItem;
+   private javax.swing.JPopupMenu.Separator filFontSeparator;
    private javax.swing.JMenu filMenu;
    private javax.swing.JMenuItem filOpenAFFMenuItem;
    private javax.swing.JPopupMenu.Separator filRecentFilesSeparator;
