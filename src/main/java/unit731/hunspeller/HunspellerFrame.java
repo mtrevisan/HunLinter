@@ -214,7 +214,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicInputLabel = new javax.swing.JLabel();
       dicInputTextField = new javax.swing.JTextField();
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
-		dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new javax.swing.JTable();
       totalProductionsLabel = new javax.swing.JLabel();
@@ -294,6 +294,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
+      parsingResultTextArea.setFont(new java.awt.Font("Arial Unicode MS", 0, 13)); // NOI18N
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
@@ -511,8 +512,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-		theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-		theTable.setShowHorizontalLines(false);
+      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
+      theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
