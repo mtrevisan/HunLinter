@@ -16,7 +16,6 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.enums.AffixType;
-import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.SetHelper;
 
@@ -102,7 +101,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -160,7 +159,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -263,7 +262,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -343,7 +342,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -562,7 +561,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -607,7 +606,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -661,7 +660,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -722,7 +721,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -830,7 +829,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -885,7 +884,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -949,7 +948,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -997,7 +996,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -1094,7 +1093,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1180,7 +1179,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1222,7 +1221,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1279,7 +1278,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1353,7 +1352,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	/**
@@ -1561,7 +1560,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1631,7 +1630,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1697,7 +1696,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 
@@ -1761,7 +1760,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1847,7 +1846,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1886,7 +1885,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1931,7 +1930,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -1973,7 +1972,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 	@Test
@@ -2015,7 +2014,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
 

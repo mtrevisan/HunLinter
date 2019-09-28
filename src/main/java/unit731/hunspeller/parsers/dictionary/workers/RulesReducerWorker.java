@@ -29,8 +29,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 	private final RulesReducer rulesReducer;
 
 
-	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData, final DictionaryParser dicParser,
-			final WordGenerator wordGenerator){
+	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
+			final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
@@ -60,7 +60,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 				final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
-				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalRules, originalLines);
+				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines);
 
 				for(final String rule : reducedRules)
 					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
