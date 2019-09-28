@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
+import unit731.hunspeller.JFontChooserDialog;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -21,21 +22,21 @@ public class GUIUtils{
 
 	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
-	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
-
-	private static Font defaultFont = DEFAULT_FONT;
+	private static Font currentFont = JFontChooserDialog.getDefaultFont();
 
 
 	private GUIUtils(){}
 
-	public static Font getDefaultFont(){
-		return defaultFont;
+	public static Font getCurrentFont(){
+		return currentFont;
 	}
 
-	public static void setDefaultFont(final Font font, final Component parentFrame){
-		updateComponent(parentFrame, font);
+	public static void setCurrentFont(final Font font, final Component parentFrame){
+		if(!font.equals(currentFont)){
+			updateComponent(parentFrame, font);
 
-		defaultFont = font;
+			currentFont = font;
+		}
 	}
 
 	private static void updateComponent(final Component c, final Font font){
