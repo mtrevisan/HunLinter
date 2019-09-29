@@ -23,6 +23,7 @@ Hunspeller
     2. [Rule flags aid](#how-to-aid)
     3. [Ordering table columns](#how-to-ordering)
     4. [Copying text](#how-to-copy)
+    5. [Rule/dictionary insertion](#how-to-insertion)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
@@ -103,6 +104,11 @@ It is possible to sort certain columns of the tables, just click on the header o
 ### Copying text
 Is it possible to copy content of tables and words in the statistics section.
 
+<a name="how-to-insertion"></a>
+### Rule/dictionary insertion
+This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, add hyphenation rules, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
+
+<sup>1</sup>: Even if in case of hyphenation files a new rule can actually be added...
 
 <a name="screenshots"></a>
 ## Screenshots
