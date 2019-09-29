@@ -65,3 +65,7 @@ Once something is written, an automatic filtering is executed to find all the wo
 ### Hyphenation
 ![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
 
+
+## Changelog
+### version 1.8.0
+- introduced the possibility to choose the font (you can select it whenever you've loaded an .aff file, it will give you a list of all the fonts that can render the loaded language -- once selected the font, it will be used that for all the .aff files in that language)
