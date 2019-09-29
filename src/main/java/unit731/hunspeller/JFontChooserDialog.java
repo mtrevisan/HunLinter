@@ -103,6 +103,8 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private Font selectedFont;
 	private final Consumer<Font> onSelection;
 
+	private Font previousFont;
+
 
 	public JFontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
 			final java.awt.Frame parent){
@@ -117,6 +119,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 
 		selectedFont = (initialFont == null? DEFAULT_FONT: initialFont);
 		this.onSelection = onSelection;
+		previousFont = selectedFont;
 		setSelectedFont();
 	}
 
@@ -336,8 +339,8 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_familyNameTextFieldKeyReleased
 
 	private void familyNameListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
-		createSelectedFont();
-		setSelectedFont();
+		if(createSelectedFont())
+			setSelectedFont();
 	}//GEN-LAST:event_familyNameListValueChanged
 
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
@@ -348,15 +351,15 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_monospacedCheckBoxActionPerformed
 
    private void sizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
-		createSelectedFont();
-		setSelectedFont();
+		if(!sizeTextField.getText().isEmpty() && createSelectedFont())
+			setSelectedFont();
    }//GEN-LAST:event_sizeTextFieldKeyReleased
 
 	private void sizeListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_sizeListValueChanged
 		sizeTextField.setText(sizeList.getSelectedValue().toString());
 
-		createSelectedFont();
-		setSelectedFont();
+		if(createSelectedFont())
+			setSelectedFont();
 	}//GEN-LAST:event_sizeListValueChanged
 
    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
@@ -374,7 +377,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	}
 
 	/** Create a new Font object to return as the selected font */
-	private void createSelectedFont(){
+	private boolean createSelectedFont(){
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		final String sizeIndex = sizeTextField.getText();
 		if(familyNameIndex >= 0 && StringUtils.isNotEmpty(sizeIndex)){
@@ -382,6 +385,11 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 			final int fontSize = Integer.parseInt(sizeTextField.getText());
 			selectedFont = new Font(fontFamily, Font.PLAIN, fontSize);
 		}
+
+		final boolean fontChanged = !selectedFont.equals(previousFont);
+		if(fontChanged)
+			previousFont = selectedFont;
+		return fontChanged;
 	}
 
 	/** Set the controls to display the initial font */
