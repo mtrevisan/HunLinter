@@ -192,7 +192,7 @@
 		<org.knowm.xchart.version>3.5.4</org.knowm.xchart.version>
 
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.9.9.3</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.9.10</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
@@ -201,7 +201,7 @@
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
 
 		<!-- JUnit -->
-		<org.junit.jupiter.version>5.5.1</org.junit.jupiter.version>
+		<org.junit.jupiter.version>5.5.2</org.junit.jupiter.version>
 	</properties>
 
 	<dependencies>
