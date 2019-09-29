@@ -32,7 +32,7 @@ Hunspeller
 
 <a name="motivation"></a>
 ## Motivation
-I created this project in order to help me construct my hunspell language files (particularly for the Venetan language, you can find some tools [here](http://parnodexmentegar.orgfree.com/)). I mean `.aff` and `.dic` files, along with hyphenation and thesaurus.
+I created this project in order to help me construct my hunspell language files (particularly for the Venetan language, you can find some tools [here](http://parnodexmentegar.orgfree.com/), and the language pack [here (for the LibreOffice tools)](https://extensions.libreoffice.org/extensions/spelling-dictionary-and-hyphenator-for-the-venetan-language) and [here (for the Mozilla tools)](https://addons.mozilla.org/en-US/firefox/addon/dithionario-de-lengua-v%C3%A8neta/)). I mean `.aff` and `.dic` files, along with hyphenation and thesaurus.
 
 **The name I give to the project is kind of temporary...**
 
