@@ -23,8 +23,9 @@ Hunspeller
     2. [Dictionary correctness checking](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
     4. [Hyphenation](#screenshots-hyphenation)
-    5. [Rule reducer](#screenshots-reducer)
-    6. [Font selection](#screenshots-font)
+    5. [Dictionary sorter](#screenshots-sorter)
+    6. [Rule reducer](#screenshots-reducer)
+    7. [Font selection](#screenshots-font)
 6. [Changelog](#changelog)
     1. [version 1.8.0](#changelog-1.8.0)
 
@@ -98,6 +99,10 @@ Once something is written, an automatic filtering is executed to find all the wo
 <a name="screenshots-hyphenation"></a>
 ### Hyphenation
 ![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
+
+<a name="screenshots-sorter"></a>
+### Dictionary sorter
+![alt text](https://i.postimg.cc/fTyL5Jww/dictionary-Sorter.png "Dictionary sorter")
 
 <a name="screenshots-reducer"></a>
 ### Rule reducer
