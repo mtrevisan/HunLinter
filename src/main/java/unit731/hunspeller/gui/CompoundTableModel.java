@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import unit731.hunspeller.DictionarySortDialog;
 import unit731.hunspeller.parsers.vos.Production;
 
 
@@ -66,11 +65,11 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(DictionarySortDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(DictionarySortDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

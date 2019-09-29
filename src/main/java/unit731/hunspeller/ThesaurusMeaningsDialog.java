@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
@@ -54,6 +55,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
       meaningsTextArea.setColumns(20);
+      meaningsTextArea.setFont(GUIUtils.getCurrentFont());
       meaningsTextArea.setLineWrap(true);
       meaningsTextArea.setRows(1);
       meaningsTextArea.setWrapStyleWord(true);
@@ -140,11 +142,11 @@ public class ThesaurusMeaningsDialog extends JDialog{
    }//GEN-LAST:event_btnCancelActionPerformed
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 

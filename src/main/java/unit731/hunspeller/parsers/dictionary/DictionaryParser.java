@@ -117,8 +117,11 @@ public class DictionaryParser{
 	public final void calculateDictionaryBoundaries(){
 		boundaries.clear();
 
-		int lineIndex = 0;
 		try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
+			//skip line count
+			br.readLine();
+			int lineIndex = 1;
+
 			String prevLine = null;
 			String line;
 			int startSection = -1;

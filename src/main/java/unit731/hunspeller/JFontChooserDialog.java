@@ -417,11 +417,11 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 

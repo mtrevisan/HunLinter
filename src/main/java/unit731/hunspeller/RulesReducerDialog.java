@@ -22,6 +22,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
@@ -107,6 +108,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetTextArea.setEditable(false);
       currentSetTextArea.setColumns(20);
+      currentSetTextArea.setFont(GUIUtils.getCurrentFont());
       currentSetTextArea.setRows(1);
       currentSetTextArea.setTabSize(3);
       currentSetScrollPane.setViewportView(currentSetTextArea);
@@ -115,6 +117,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       reducedSetTextArea.setEditable(false);
       reducedSetTextArea.setColumns(20);
+      reducedSetTextArea.setFont(GUIUtils.getCurrentFont());
       reducedSetTextArea.setRows(1);
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);
@@ -283,11 +286,11 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(RulesReducerDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(RulesReducerDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 

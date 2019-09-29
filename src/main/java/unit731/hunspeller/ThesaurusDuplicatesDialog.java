@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.gui.GUIUtils;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
@@ -35,6 +36,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       duplicatesTextArea.setEditable(false);
       duplicatesTextArea.setColumns(20);
+      duplicatesTextArea.setFont(GUIUtils.getCurrentFont());
       duplicatesTextArea.setLineWrap(true);
       duplicatesTextArea.setRows(1);
       duplicatesTextArea.setWrapStyleWord(true);

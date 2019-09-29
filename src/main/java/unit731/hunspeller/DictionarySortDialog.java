@@ -1,33 +1,24 @@
 package unit731.hunspeller;
 
-import java.awt.Frame;
+import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
-import javax.swing.BorderFactory;
-import javax.swing.JDialog;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class DictionarySortDialog extends JDialog{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DictionarySortDialog.class);
-
 	private static final long serialVersionUID = -4815599935456195094L;
 
 
 	private final DictionaryParser dicParser;
-
-	private final JList<String> list = new JList<>();
 
 
 	public DictionarySortDialog(DictionaryParser dicParser, String message, Frame parent){
@@ -37,7 +28,6 @@ public class DictionarySortDialog extends JDialog{
 		Objects.requireNonNull(message);
 
 		this.dicParser = dicParser;
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		initComponents();
 
@@ -48,7 +38,8 @@ public class DictionarySortDialog extends JDialog{
    private void initComponents() {
 
       lblMessage = new javax.swing.JLabel();
-      mainScrollPane = new javax.swing.JScrollPane(list);
+      mainScrollPane = new javax.swing.JScrollPane();
+      entriesList = new javax.swing.JList<>();
       btnNextUnsortedArea = new javax.swing.JButton();
       btnPreviousUnsortedArea = new javax.swing.JButton();
 
@@ -59,11 +50,14 @@ public class DictionarySortDialog extends JDialog{
       mainScrollPane.setBackground(java.awt.Color.white);
       mainScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
+      entriesList.setFont(GUIUtils.getCurrentFont());
+      entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+      mainScrollPane.setViewportView(entriesList);
+
       btnNextUnsortedArea.setText("▼");
       btnNextUnsortedArea.setToolTipText("Next unsorted area");
       btnNextUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnNextUnsortedAreaActionPerformed(evt);
          }
       });
@@ -71,8 +65,7 @@ public class DictionarySortDialog extends JDialog{
       btnPreviousUnsortedArea.setText("▲");
       btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
       btnPreviousUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnPreviousUnsortedAreaActionPerformed(evt);
          }
       });
@@ -117,60 +110,62 @@ public class DictionarySortDialog extends JDialog{
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
-		int lineIndex = list.getFirstVisibleIndex();
+		int lineIndex = entriesList.getFirstVisibleIndex();
 		int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
 		if(boundaryIndex >= 0){
-			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize() - 1);
+			int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
 		}
 		else
 			boundaryIndex = 0;
-		list.ensureIndexIsVisible(boundaryIndex);
+		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
-		int lineIndex = list.getFirstVisibleIndex();
+		int lineIndex = entriesList.getFirstVisibleIndex();
 		int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
 		if(boundaryIndex < 0){
-			boundaryIndex = dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
-			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize() - 1);
+			boundaryIndex = dicParser.getPreviousBoundaryIndex(entriesList.getModel().getSize());
+			int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
 		}
-		list.ensureIndexIsVisible(boundaryIndex);
+		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
 	public void setCellRenderer(ListCellRenderer<String> renderer){
-		list.setCellRenderer(renderer);
+		entriesList.setCellRenderer(renderer);
 	}
 
 	public void addListSelectionListener(ListSelectionListener listener){
-		list.addListSelectionListener(listener);
+		entriesList.addListSelectionListener(listener);
 	}
 
 	public void setListData(String[] listData){
-		list.setListData(listData);
+		entriesList.setListData(listData);
 
 		//initialize dictionary
 		dicParser.calculateDictionaryBoundaries();
 	}
 
 	public int getSelectedIndex(){
-		return list.getSelectedIndex();
+		return entriesList.getSelectedIndex();
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(DictionarySortDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(DictionarySortDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton btnNextUnsortedArea;
    private javax.swing.JButton btnPreviousUnsortedArea;
+   private javax.swing.JList<String> entriesList;
    private javax.swing.JLabel lblMessage;
    private javax.swing.JScrollPane mainScrollPane;
    // End of variables declaration//GEN-END:variables
+
 }

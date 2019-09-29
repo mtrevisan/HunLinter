@@ -85,11 +85,11 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(ThesaurusTableModel.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(ThesaurusTableModel.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

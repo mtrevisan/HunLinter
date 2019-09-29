@@ -415,7 +415,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		syllabeLengthsModeOutputLabel.setText(StringUtils.EMPTY);
 		mostCommonSyllabesOutputLabel.setText(StringUtils.EMPTY);
 		longestWordSyllabesOutputLabel.setText(StringUtils.EMPTY);
-		
+
 		compoundWordsLabel.setEnabled(false);
 		compoundWordsOutputLabel.setEnabled(false);
 		syllabeLengthsModeLabel.setEnabled(false);
@@ -523,11 +523,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 

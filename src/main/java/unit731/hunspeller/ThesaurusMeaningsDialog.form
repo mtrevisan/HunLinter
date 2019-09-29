@@ -56,6 +56,9 @@
         <Component class="javax.swing.JTextArea" name="meaningsTextArea">
           <Properties>
             <Property name="columns" type="int" value="20"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="GUIUtils.getCurrentFont()" type="code"/>
+            </Property>
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="1"/>
             <Property name="wrapStyleWord" type="boolean" value="true"/>

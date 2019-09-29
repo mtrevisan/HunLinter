@@ -31,29 +31,31 @@ public class GUIUtils{
 		return currentFont;
 	}
 
-	public static void setCurrentFont(final Font font, final Component parentFrame){
+	public static void setCurrentFont(final Font font, final Component... parentFrames){
 		if(!font.equals(currentFont)){
-			updateComponent(parentFrame, font);
+			for(final Component parentFrame : parentFrames)
+				updateComponent(parentFrame, font);
 
 			currentFont = font;
 		}
 	}
 
-	private static void updateComponent(final Component c, final Font font){
-		if(c != null){
-			if(c instanceof JComponent)
-				((JComponent)c).updateUI();
-			if(c instanceof Container){
-				final Component[] children = ((Container)c).getComponents();
+	private static void updateComponent(final Component component, final Font font){
+		if(component != null){
+			if(component instanceof JComponent)
+				((JComponent)component).updateUI();
+			if(component instanceof Container){
+				final Component[] children = ((Container)component).getComponents();
 				if(children != null)
 					for(final Component child : children)
 						updateComponent(child, font);
 			}
-			if(c instanceof JEditorPane)
-				((JEditorPane)c).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+			if(component instanceof JEditorPane)
+				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-			if(c instanceof JTextArea || c instanceof JTextField || c instanceof JTable || c instanceof JWordLabel)
-				c.setFont(font);
+			if(component instanceof JTextArea || component instanceof JTextField || component instanceof JTable
+					|| component instanceof JWordLabel)
+				component.setFont(font);
 		}
 	}
 

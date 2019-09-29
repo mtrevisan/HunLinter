@@ -344,7 +344,7 @@
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+              <Connection code="GUIUtils.getCurrentFont()" type="code"/>
             </Property>
             <Property name="rows" type="int" value="1"/>
             <Property name="tabSize" type="int" value="3"/>
@@ -439,7 +439,7 @@
             <Component class="javax.swing.JTextField" name="dicInputTextField">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
               </Properties>
               <Events>
@@ -457,7 +457,7 @@
             <Component class="javax.swing.JComboBox" name="dicRuleFlagsAidComboBox">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
@@ -478,7 +478,7 @@
                 <Component class="javax.swing.JTable" name="dicTable">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                     </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new ProductionTableModel()" type="code"/>
@@ -601,7 +601,7 @@
               <Properties>
                 <Property name="editable" type="boolean" value="true"/>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
               </Properties>
               <AuxValues>
@@ -647,7 +647,7 @@
             <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
               </Properties>
               <AuxValues>
@@ -664,7 +664,7 @@
                 <Component class="javax.swing.JTable" name="cmpTable">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                     </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new CompoundTableModel()" type="code"/>
@@ -695,7 +695,7 @@
                   <Properties>
                     <Property name="columns" type="int" value="20"/>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                     </Property>
                     <Property name="rows" type="int" value="1"/>
                   </Properties>
@@ -784,7 +784,7 @@
             <Component class="javax.swing.JTextField" name="theMeaningsTextField">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
               </Properties>
               <Events>
@@ -812,7 +812,7 @@
                 <Component class="javax.swing.JTable" name="theTable">
                   <Properties>
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                     </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new ThesaurusTableModel()" type="code"/>
@@ -984,7 +984,7 @@
             <Component class="javax.swing.JTextField" name="hypWordTextField">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
               </Properties>
               <Events>
@@ -1002,7 +1002,7 @@
             <Component class="javax.swing.JLabel" name="hypSyllabationOutputLabel">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
@@ -1044,7 +1044,7 @@
             <Component class="javax.swing.JTextField" name="hypAddRuleTextField">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -1090,7 +1090,7 @@
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationOutputLabel">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
@@ -1106,7 +1106,7 @@
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountOutputLabel">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getDefaultFont()" type="code"/>
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>

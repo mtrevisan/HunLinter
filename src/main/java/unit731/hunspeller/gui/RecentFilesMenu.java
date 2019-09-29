@@ -82,11 +82,11 @@ public class RecentFilesMenu extends JMenu{
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(RecentFilesMenu.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(RecentFilesMenu.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -258,17 +258,19 @@ public class RulesReducer{
 
 	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
-		try{
-			final Set<String> overallFrom = plainRules.stream()
-				.flatMap(entry -> entry.from.stream())
-				.collect(Collectors.toSet());
-			//noinspection InfiniteLoopStatement
-			for(int index = 0; ; index ++){
-				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
-				overallLastGroups.put(index, overallLastGroup);
+		if(!plainRules.isEmpty()){
+			try{
+				final Set<String> overallFrom = plainRules.stream()
+					.flatMap(entry -> entry.from.stream())
+					.collect(Collectors.toSet());
+				//noinspection InfiniteLoopStatement
+				for(int index = 0; ; index ++){
+					final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
+					overallLastGroups.put(index, overallLastGroup);
+				}
 			}
+			catch(final IllegalArgumentException ignored){}
 		}
-		catch(final IllegalArgumentException ignored){}
 		return overallLastGroups;
 	}
 

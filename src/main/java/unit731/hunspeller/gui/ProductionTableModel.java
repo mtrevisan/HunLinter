@@ -69,11 +69,11 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(ProductionTableModel.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(ProductionTableModel.class.getName());
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }
