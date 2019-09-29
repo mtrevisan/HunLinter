@@ -1,6 +1,7 @@
 package unit731.hunspeller.gui;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -21,20 +22,23 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 
 
 	private final Function<Integer, Integer> boundaryIndex;
+	private final Font font;
 
 
-	public DictionarySortCellRenderer(Function<Integer, Integer> boundaryIndex){
+	public DictionarySortCellRenderer(final Function<Integer, Integer> boundaryIndex, final Font font){
 		Objects.requireNonNull(boundaryIndex);
+		Objects.requireNonNull(font);
 
 		this.boundaryIndex = boundaryIndex;
+		this.font = font;
 	}
 
 	@Override
 	public Component getListCellRendererComponent(JList<? extends String> list, String value, int lineIndex, boolean isSelected,
 			boolean cellHasFocus){
-		int index = boundaryIndex.apply(lineIndex);
+		final int index = boundaryIndex.apply(lineIndex);
 		if(index >= 0){
-			Watercolors watercolor = COLORS[index % COLORS_SIZE];
+			final Watercolors watercolor = COLORS[index % COLORS_SIZE];
 
 			setOpaque(true);
 			setBackground(watercolor.getColor());
@@ -43,6 +47,7 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 			setOpaque(false);
 
 		setText(value);
+		setFont(font);
 
 		return this;
 	}

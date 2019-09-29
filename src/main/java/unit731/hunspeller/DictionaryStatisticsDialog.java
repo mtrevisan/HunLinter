@@ -149,16 +149,19 @@ public class DictionaryStatisticsDialog extends JDialog{
       mostCommonSyllabesLabel.setLabelFor(mostCommonSyllabesOutputLabel);
       mostCommonSyllabesLabel.setText("Most common syllabes:");
 
+      mostCommonSyllabesOutputLabel.setFont(GUIUtils.getCurrentFont());
       mostCommonSyllabesOutputLabel.setText("...");
 
       longestWordCharactersLabel.setLabelFor(longestWordCharactersOutputLabel);
       longestWordCharactersLabel.setText("Longest word(s) (by characters):");
 
+      longestWordCharactersOutputLabel.setFont(GUIUtils.getCurrentFont());
       longestWordCharactersOutputLabel.setText("...");
 
       longestWordSyllabesLabel.setLabelFor(longestWordSyllabesOutputLabel);
       longestWordSyllabesLabel.setText("Longest word(s) (by syllabes):");
 
+      longestWordSyllabesOutputLabel.setFont(GUIUtils.getCurrentFont());
       longestWordSyllabesOutputLabel.setText("...");
 
       javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);

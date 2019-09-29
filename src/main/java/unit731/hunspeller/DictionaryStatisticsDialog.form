@@ -225,6 +225,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
@@ -238,6 +241,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
@@ -251,6 +257,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>

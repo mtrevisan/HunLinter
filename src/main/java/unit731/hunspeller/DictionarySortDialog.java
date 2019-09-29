@@ -50,7 +50,6 @@ public class DictionarySortDialog extends JDialog{
       mainScrollPane.setBackground(java.awt.Color.white);
       mainScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
-      entriesList.setFont(GUIUtils.getCurrentFont());
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       mainScrollPane.setViewportView(entriesList);
 
@@ -103,7 +102,8 @@ public class DictionarySortDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
 	private void init(String message){
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex);
+		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex,
+			GUIUtils.getCurrentFont());
 		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
