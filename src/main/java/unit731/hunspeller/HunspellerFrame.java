@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -116,6 +117,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final long serialVersionUID = 6772959670167531135L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunspellerFrame.class);
+
+	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/Hunspeller";
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
@@ -289,6 +292,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
+      hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1027,6 +1031,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
+      hlpOnlineHelpMenuItem.setMnemonic('h');
+      hlpOnlineHelpMenuItem.setText("Online help");
+      hlpOnlineHelpMenuItem.setToolTipText("");
+      hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hlpOnlineHelpMenuItemActionPerformed(evt);
+         }
+      });
+      hlpMenu.add(hlpOnlineHelpMenuItem);
+
       hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
@@ -1478,6 +1492,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_filFontMenuItemActionPerformed
+
+   private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
+		if(Desktop.isDesktopSupported()){
+			final Desktop desktop = Desktop.getDesktop();
+			try{
+				desktop.browse(new URI(URL_ONLINE_HELP));
+			}
+			catch(final Exception e){
+				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser: {}", e.getMessage());
+			}
+		}
+		else
+			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
+   }//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
 
 
 	@Override
@@ -2160,6 +2188,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JMenu hlpMenu;
+   private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
    private javax.swing.JButton hypAddRuleButton;
    private javax.swing.JLabel hypAddRuleLabel;
    private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;

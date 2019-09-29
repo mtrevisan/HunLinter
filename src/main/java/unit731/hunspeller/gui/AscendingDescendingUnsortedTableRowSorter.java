@@ -8,9 +8,6 @@ import java.util.List;
 
 public class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends TableRowSorter<M>{
 
-	private SortOrder[] sortOrderCycle;
-
-
 	public AscendingDescendingUnsortedTableRowSorter(final M model){
 		super(model);
 	}
