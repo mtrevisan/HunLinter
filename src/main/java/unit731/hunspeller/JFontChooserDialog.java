@@ -1,6 +1,7 @@
 package unit731.hunspeller;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -12,10 +13,11 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -46,12 +48,6 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private static final Integer[] SIZES = {10, 12, 14, 16, 18, 20, 22};
 
 	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
-
-	private static final String SAMPLE_TEXT =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
-			+ "abcdefghijklmnopqrstuvwxyz\n"
-			+ "0123456789\n"
-			+ "The quick brown fox jumped over the lazy dog";
 
 
 	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{
@@ -104,6 +100,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private final Consumer<Font> onSelection;
 
 	private Font previousFont;
+	private String sampleText;
 
 
 	public JFontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
@@ -124,28 +121,25 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	}
 
 	private void retrieveFamilyNames(final AffixData affixData){
-		final String sample = affixData.getSampleText();
-		familyNamesAll = extractFonts(sample);
-		familyNamesMonospaced = extractMonospacedFonts(sample);
+		sampleText = affixData.getSampleText();
+
+		final Pair<List<String>, List<String>> sets = extractFonts(sampleText);
+		familyNamesAll = sets.getLeft();
+		familyNamesMonospaced = sets.getRight();
 	}
 
-	private static java.util.List<String> extractFonts(final String languageSample){
-		return FAMILY_NAMES.stream()
-			.filter(familyName -> {
-				final Font font = new Font(familyName, Font.PLAIN, 20);
-				return (font.canDisplayUpTo(languageSample) < 0);
-			})
-			.collect(Collectors.toList());
-	}
-
-	private static java.util.List<String> extractMonospacedFonts(final String languageSample){
-		return FAMILY_NAMES.stream()
-			.filter(familyName -> {
-				final Font font = new Font(familyName, Font.PLAIN, 20);
-				final boolean canDisplayLanguage = (font.canDisplayUpTo(languageSample) < 0);
-				return (canDisplayLanguage && isMonospaced(font));
-			})
-			.collect(Collectors.toList());
+	private static Pair<List<String>, List<String>> extractFonts(final String languageSample){
+		final List<String> all = new ArrayList<>();
+		final List<String> monospacedOnly = new ArrayList<>();
+		for(final String familyName : FAMILY_NAMES){
+			final Font font = new Font(familyName, Font.PLAIN, 20);
+			if(font.canDisplayUpTo(languageSample) < 0){
+				all.add(familyName);
+				if(isMonospaced(font))
+					monospacedOnly.add(familyName);
+			}
+		}
+		return Pair.of(all, monospacedOnly);
 	}
 
 	private static boolean isMonospaced(final Font font){
@@ -239,9 +233,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 
       sampleTextArea.setColumns(20);
       sampleTextArea.setLineWrap(true);
-      sampleTextArea.setRows(StringUtils.countMatches(SAMPLE_TEXT, '\n'));
-      sampleTextArea.setText(SAMPLE_TEXT);
-      sampleTextArea.setWrapStyleWord(true);
+      sampleTextArea.setText(sampleText);
       sampleScrollPane.setViewportView(sampleTextArea);
 
       okButton.setText("OK");
@@ -269,7 +261,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
                .addComponent(sampleScrollPane)
                .addGroup(layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(familyNameScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                     .addComponent(familyNameScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                      .addComponent(familyNameTextField)
                      .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

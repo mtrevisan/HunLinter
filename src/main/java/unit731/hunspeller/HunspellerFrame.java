@@ -1379,7 +1379,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          String synonyms = theMeaningsTextField.getText();
          Supplier<Boolean> duplicatesDiscriminator = () -> {
             int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
-               "Please select one", JOptionPane.YES_NO_OPTION);
+               "Select one", JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);
          };
          DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
@@ -1623,7 +1623,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Please select a section from the list:", this);
+			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Select a section from the list:", this);
 			GUIUtils.addCancelByEscapeKey(dicSortDialog);
 			dicSortDialog.setLocationRelativeTo(this);
 			dicSortDialog.addListSelectionListener(e -> {

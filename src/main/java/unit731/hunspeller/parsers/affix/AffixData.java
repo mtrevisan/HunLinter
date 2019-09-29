@@ -278,15 +278,20 @@ public class AffixData{
 
 	/** Extracts all the characters from each rule */
 	public String getSampleText(){
+		final List<String> sortedSample;
 		String sample = getData(AffixOption.TRY);
-		if(sample == null){
+		if(sample != null)
+			sortedSample = Arrays.asList(sample.split(StringUtils.EMPTY));
+		else{
 			final Set<String> sampleSet = getRuleEntries().parallelStream()
 				.flatMap(entry -> entry.getEntries().stream())
 				.flatMap(entry -> Arrays.stream(entry.getAppending().split(StringUtils.EMPTY)))
 				.collect(Collectors.toSet());
-			sample = String.join(StringUtils.EMPTY, sampleSet);
+			sortedSample = new ArrayList<>(sampleSet);
 		}
-		return sample;
+		Collections.sort(sortedSample);
+		//NOTE: a space should be used because of the presence of characters that are only modifiers
+		return String.join(StringUtils.SPACE, sortedSample);
 	}
 
 	public Set<String> getWordBreakCharacters(){

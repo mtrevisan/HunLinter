@@ -30,7 +30,7 @@
                   <Component id="sampleScrollPane" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="familyNameScrollPane" pref="360" max="32767" attributes="0"/>
+                          <Component id="familyNameScrollPane" pref="260" max="32767" attributes="0"/>
                           <Component id="familyNameTextField" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -218,13 +218,9 @@
           <Properties>
             <Property name="columns" type="int" value="20"/>
             <Property name="lineWrap" type="boolean" value="true"/>
-            <Property name="rows" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="StringUtils.countMatches(SAMPLE_TEXT, &apos;\n&apos;)" type="code"/>
-            </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="SAMPLE_TEXT" type="code"/>
+              <Connection code="sampleText" type="code"/>
             </Property>
-            <Property name="wrapStyleWord" type="boolean" value="true"/>
           </Properties>
         </Component>
       </SubComponents>
