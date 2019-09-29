@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * A builder to build the AhoCorasickTrie
- * 
+ *
  * @param <V>	The type of values stored in the tree
  */
 public class AhoCorasickTrieBuilder<V extends Serializable>{
@@ -240,7 +240,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				begin = pos - siblings.get(0).getKey();
 				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
 					//prevent progress from generating zero divide errors
-					double l = (1.05 > (double)keySize / (memoryGrowthSpeed + 1)? 1.05: (double)keySize / (memoryGrowthSpeed + 1));
+					final double l = Math.max(1.05, (double) keySize / (memoryGrowthSpeed + 1));
 					resize((int)(allocSize * l));
 				}
 

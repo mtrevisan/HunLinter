@@ -13,13 +13,13 @@ import org.apache.commons.lang3.tuple.Pair;
  * Smith-Waterman local alignment algorithm with gap penalty
  * Runtime complexity: O(n^2 * m), assuming n &gt; m
  * Space complexity: O(n * m)
- * 
+ *
  * @see <a href="http://www.cs.bgu.ac.il/~michaluz/seminar/Gotoh.pdf">Gotoh</a>
  * @see <a href="http://www.akira.ruc.dk/~keld/teaching/algoritmedesign_f03/Artikler/05/Hirschberg75.pdf">Hirschberg75</a>
- * 
+ *
  * https://github.com/mkleen/SmithWaterman/blob/master/SmithWaterman.java
  * https://github.com/eshamusi/Smith-Waterman-Local-Alignment/blob/master/SmithWaterman.java
- * 
+ *
  * Affine Gap algorithm taken from: http://en.wikipedia.org/wiki/Gap_penalty#Affine_gap_penalty
  */
 public class SmithWatermanAlignment{
@@ -38,7 +38,7 @@ public class SmithWatermanAlignment{
 
 
 	//TODO introduce getters
-	public class Trace{
+	public static class Trace{
 		private int firstIndexA;
 		private int firstIndexB;
 		private int lastIndexA;
@@ -57,7 +57,7 @@ public class SmithWatermanAlignment{
 	public SmithWatermanAlignment(String a, String b){
 		x = PatternHelper.split(a, UNICODE_SPLITTER);
 		y = PatternHelper.split(b, UNICODE_SPLITTER);
-		
+
 		n = x.length;
 		m = y.length;
 

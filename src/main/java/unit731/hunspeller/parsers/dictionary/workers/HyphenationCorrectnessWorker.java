@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 
 import unit731.hunspeller.languages.BaseBuilder;

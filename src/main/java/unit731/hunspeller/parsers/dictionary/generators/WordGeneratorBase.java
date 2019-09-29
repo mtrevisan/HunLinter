@@ -29,7 +29,7 @@ class WordGeneratorBase{
 
 	/**
 	 * Generates a list of stems for the provided word
-	 * 
+	 *
 	 * @param dicEntry	{@link DictionaryEntry dictionary entry} used to generate the productions for
 	 * @param isCompound	Whether the word is-a or belongs-to a compound word
 	 * @param overriddenRule	Overridden set of rule entries, optional
@@ -238,7 +238,7 @@ class WordGeneratorBase{
 		final List<Production> productions = new ArrayList<>();
 		for(final AffixEntry entry : applicableAffixes)
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
-				//if entry has circumfix contraint and production has the same contraint then remove it from postponedAffixes
+				//if entry has circumfix constraint and production has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);

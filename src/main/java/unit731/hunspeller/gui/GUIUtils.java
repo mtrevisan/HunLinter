@@ -47,8 +47,7 @@ public class GUIUtils{
 				final Component[] children = ((Container)c).getComponents();
 				if(children != null)
 					for(final Component child : children)
-						if(child instanceof Component)
-							updateComponent(child, font);
+						updateComponent(child, font);
 			}
 			if(c instanceof JEditorPane)
 				((JEditorPane)c).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);

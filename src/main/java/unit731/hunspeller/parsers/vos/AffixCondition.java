@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.vos;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -15,15 +16,18 @@ public class AffixCondition{
 	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 
-	private final String[] condition;
+	private String[] condition;
 
 
 	public AffixCondition(final String condition, final AffixType affixType){
 		this.condition = PatternHelper.split(condition, PATTERN_CONDITION_SPLITTER);
 
-		if(affixType == AffixType.SUFFIX)
+		if(affixType == AffixType.SUFFIX){
 			//invert condition
-			Collections.reverse(Arrays.asList(this.condition));
+			final List<String> cond = Arrays.asList(this.condition);
+			Collections.reverse(cond);
+			this.condition = cond.toArray(new String[0]);
+		}
 	}
 
 	public boolean match(final String word, final AffixType type){

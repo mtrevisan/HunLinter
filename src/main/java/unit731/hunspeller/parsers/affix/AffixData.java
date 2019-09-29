@@ -9,11 +9,14 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.enums.AffixOption;
@@ -24,11 +27,14 @@ import unit731.hunspeller.services.Memoizer;
 
 public class AffixData{
 
-	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY = Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
+	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
+		= Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
 
-	private static final List<AffixOption> SINGLE_FLAG_TAGS = Arrays.asList(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.COMPOUND_BEGIN_FLAG,
-		AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
-		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
+	private static final List<AffixOption> SINGLE_FLAG_TAGS = Arrays.asList(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG,
+		AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
+		AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
+		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG,
+		AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
 
 
 	private final Map<String, Object> data = new HashMap<>();
@@ -38,9 +44,10 @@ public class AffixData{
 
 	void close(){
 		terminalAffixes.addAll(getStringData(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
-			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG,
-			AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG, AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG,
-			AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG));
+			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
+			AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
+			AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG, AffixOption.KEEP_CASE_FLAG,
+			AffixOption.NEED_AFFIX_FLAG));
 
 		closed = true;
 	}
@@ -111,7 +118,6 @@ public class AffixData{
 		addData(key.getCode(), value);
 	}
 
-	@SuppressWarnings("unchecked")
 	<T> void addData(final String key, final T value){
 		if(closed)
 			throw new IllegalArgumentException("Cannot add data, container is closed");
@@ -125,6 +131,10 @@ public class AffixData{
 
 	public String getLanguage(){
 		return getData(AffixOption.LANGUAGE);
+	}
+
+	public Locale getLocale(){
+		return new Locale(getLanguage());
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
@@ -172,7 +182,7 @@ public class AffixData{
 
 	/**
 	 * 2-stage prefix plus 1-stage suffix instead of 2-stage suffix plus 1-stage prefix
-	 * 
+	 *
 	 * @return Whether the prefix is complex
 	 */
 	public boolean isComplexPrefixes(){
@@ -264,6 +274,19 @@ public class AffixData{
 			}
 		}
 		return word;
+	}
+
+	/** Extracts all the characters from each rule */
+	public String getSampleText(){
+		String sample = getData(AffixOption.TRY);
+		if(sample == null){
+			final Set<String> sampleSet = getRuleEntries().parallelStream()
+				.flatMap(entry -> entry.getEntries().stream())
+				.flatMap(entry -> Arrays.stream(entry.getAppending().split(StringUtils.EMPTY)))
+				.collect(Collectors.toSet());
+			sample = String.join(StringUtils.EMPTY, sampleSet);
+		}
+		return sample;
 	}
 
 	public Set<String> getWordBreakCharacters(){

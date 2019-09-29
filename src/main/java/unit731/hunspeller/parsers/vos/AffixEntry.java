@@ -120,6 +120,10 @@ public class AffixEntry{
 		return condition;
 	}
 
+	public String getAppending(){
+		return appending;
+	}
+
 	private String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
@@ -144,12 +148,12 @@ public class AffixEntry{
 
 	/**
 	 * FIXME is this documentation updated/true?
-	 * 
+	 *
 	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 	 * Terminal Suffix: inflectional suffix fields removed by additional (not terminal) suffixes, useful for zero morphemes and affixes
 	 * 	removed by splitting rules
-	 * 
+	 *
 	 * @param dicEntry	The dictionary entry to combine from
 	 * @return	The list of new morphological fields
 	 */

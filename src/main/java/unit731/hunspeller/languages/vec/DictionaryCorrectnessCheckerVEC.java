@@ -65,7 +65,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final MessageFormat WORD_CANNOT_HAVE_CIJJHNHIV = new MessageFormat("{0} cannot have [cijɉñ]iV");
 
 
-	private Orthography orthography;
+	private final Orthography orthography;
 
 	private String[] pluralFlags;
 

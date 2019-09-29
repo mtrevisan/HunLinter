@@ -78,7 +78,7 @@ public class AffixParser{
 
 		//Options for suggestions
 //		PARSING_HANDLERS.put(AffixOption.KEY, COPY_OVER);
-//		PARSING_HANDLERS.put(AffixOption.TRY, COPY_OVER);
+		PARSING_HANDLERS.put(AffixOption.TRY, COPY_OVER);
 		PARSING_HANDLERS.put(AffixOption.NO_SUGGEST_FLAG, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixOption.MAX_COMPOUND_SUGGEST, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixOption.MAX_NGRAM_SUGGEST, COPY_OVER);

@@ -262,6 +262,7 @@ public class RulesReducer{
 			final Set<String> overallFrom = plainRules.stream()
 				.flatMap(entry -> entry.from.stream())
 				.collect(Collectors.toSet());
+			//noinspection InfiniteLoopStatement
 			for(int index = 0; ; index ++){
 				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
 				overallLastGroups.put(index, overallLastGroup);
@@ -494,15 +495,12 @@ public class RulesReducer{
 
 					finalRules.addAll(bubbles);
 				}
-				else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
-					final List<LineEntry> bushes = new ArrayList<>(queue);
-					bushes.add(parent);
+				else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1))
 					for(final Character chr : childrenGroup){
 						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 						if(!queue.contains(newEntry))
 							queue.add(newEntry);
 					}
-				}
 				else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
 					//expand intersection
 					for(final Character chr : groupsIntersection){

@@ -180,8 +180,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(!partOfSpeech.startsWith(PART_OF_SPEECH_START))
 			sb.append(PART_OF_SPEECH_START);
 		final String[] partOfSpeeches = partOfSpeech.split(",");
-		sb.append(Arrays.stream(partOfSpeeches)
-			.collect(Collectors.joining(", ")));
+		sb.append(String.join(", ", partOfSpeeches));
 		if(!partOfSpeech.endsWith(PART_OF_SPEECH_END))
 			sb.append(PART_OF_SPEECH_END);
 		partOfSpeech = sb.toString();

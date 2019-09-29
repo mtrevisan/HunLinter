@@ -3,7 +3,6 @@ package unit731.hunspeller;
 import java.awt.*;
 
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
-import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.interfaces.Hunspellable;
 
 import java.awt.event.ActionEvent;
@@ -118,8 +117,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunspellerFrame.class);
 
-	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName";
-	private final static String FONT_SIZE_PREFIX = "font.size";
+	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
+	private final static String FONT_SIZE_PREFIX = "font.size.";
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
@@ -158,13 +157,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	public HunspellerFrame(){
 		backbone = new Backbone(this, this);
-
-		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX, null);
-		final String fontSize = preferences.get(FONT_SIZE_PREFIX, null);
-		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-			JFontChooserDialog.getDefaultFont());
-		GUIUtils.setCurrentFont(lastUsedFont, this);
 
 		initComponents();
 
@@ -255,17 +247,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
       hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new JWordLabel();
+      hypSyllabationOutputLabel = new javax.swing.JLabel();
       hypSyllabesCountLabel = new javax.swing.JLabel();
       hypSyllabesCountOutputLabel = new javax.swing.JLabel();
       hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new JWordLabel();
+      hypRulesOutputLabel = new javax.swing.JLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
       hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
       hypAddRuleButton = new javax.swing.JButton();
       hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new JWordLabel();
+      hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
@@ -852,6 +844,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font...");
+      filFontMenuItem.setEnabled(false);
       filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             filFontMenuItemActionPerformed(evt);
@@ -859,12 +852,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       filMenu.add(filFontMenuItem);
       filMenu.add(filRecentFilesSeparator);
-
-		RecentItems recentItems = new RecentItems(5, preferences);
-		recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-		recentFilesMenu.setText("Recent files");
-		recentFilesMenu.setMnemonic('R');
-		filMenu.add(recentFilesMenu);
 
       filEmptyRecentFilesMenuItem.setMnemonic('e');
       filEmptyRecentFilesMenuItem.setText("Empty Recent Files list");
@@ -888,6 +875,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
+      Preferences preferences = Preferences.userNodeForPackage(getClass());
+      RecentItems recentItems = new RecentItems(5, preferences);
+      recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
+      recentFilesMenu.setText("Recent files");
+      recentFilesMenu.setMnemonic('R');
+      filMenu.add(recentFilesMenu, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
@@ -1472,14 +1465,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		Font initialFont = GUIUtils.getCurrentFont();
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, this);
 
-			preferences.put(FONT_FAMILY_NAME_PREFIX, font.getFamily());
-			preferences.put(FONT_SIZE_PREFIX, Integer.toString(font.getSize()));
+			final String language = backbone.getAffixData().getLanguage();
+			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
+			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
-		JFontChooserDialog dialog = new JFontChooserDialog(initialFont, onSelection, this);
+		JFontChooserDialog dialog = new JFontChooserDialog(backbone.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
+			this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1585,10 +1579,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		backbone.registerFileListener();
 		backbone.startFileListener();
 
+		final String language = backbone.getAffixData().getLanguage();
+		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
+		final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
+		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
+			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
+			JFontChooserDialog.getDefaultFont());
+		GUIUtils.setCurrentFont(lastUsedFont, this);
+
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
-			.thenComparing(BaseBuilder.getComparator(backbone.getAffixData().getLanguage()));
+			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
-			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(backbone.getAffixData().getLanguage()).compare(entry0.toString(), entry1.toString()));
+			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
 		addSorterToTable(dicTable, comparator, comparatorAffix);
 		addSorterToTable(theTable, comparator, null);
 
@@ -1641,6 +1643,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			});
 
 			filCreatePackageMenuItem.setEnabled(true);
+			filFontMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			final int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
@@ -1727,6 +1730,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		filCreatePackageMenuItem.setEnabled(false);
+		filFontMenuItem.setEnabled(false);
 		dicMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
 
@@ -2017,6 +2021,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//disable menu
 		dicMenu.setEnabled(false);
 		filCreatePackageMenuItem.setEnabled(false);
+		filFontMenuItem.setEnabled(false);
 		dicInputTextField.requestFocusInWindow();
 	}
 
