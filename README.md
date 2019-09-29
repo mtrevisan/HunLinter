@@ -18,7 +18,13 @@ Hunspeller
     3. [Compounding](#recognized-flags-compounding)
     4. [Affix creation](#recognized-flags-affix)
     5. [Others](#recognized-flags-others)
-5. [Screenshots](#screenshots)
+5. [How to](#how-to)
+    1. [Create an extension](#how-to-extension)
+    2. [Rule flags aid](#how-to-aid)
+    3. [Ordering table columns](#how-to-ordering)
+    4. [Copying text](#how-to-copy)
+    5. [Rule/dictionary insertion](#how-to-insertion)
+6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
@@ -26,7 +32,7 @@ Hunspeller
     5. [Dictionary sorter](#screenshots-sorter)
     6. [Rule reducer](#screenshots-reducer)
     7. [Font selection](#screenshots-font)
-6. [Changelog](#changelog)
+7. [Changelog](#changelog)
     1. [version 1.8.0](#changelog-1.8.0)
 
 
@@ -73,6 +79,36 @@ PFX, SFX
 ### Others
 CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 
+
+<a name="how-to"></a>
+## How to
+<a name="how-to-extension"></a>
+### Create an extension
+In order to create an extension (eg. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
+
+Remember that the package will have the same name of the directory.
+
+<a name="how-to-aid"></a>
+### Rule flags aid
+An external text file can be put int the directory `aids` (on the same level of the executable jar) whose content will be displayed in the drop-down element in the Dictionary tab (blank lines are ignored).
+
+This file could be used as a reminder of all the flag that can be added to a word and their meaning.
+
+The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `.aid` (eg. for Venetan: `vec.aid`).
+
+<a name="how-to-ordering"></a>
+### Ordering table columns
+It is possible to sort certain columns of the tables, just click on the header of the column. The sort order will cycle between ascending, descending, and unsorted.
+
+<a name="how-to-copy"></a>
+### Copying text
+Is it possible to copy content of tables and words in the statistics section.
+
+<a name="how-to-insertion"></a>
+### Rule/dictionary insertion
+This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, add hyphenation rules, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
+
+<sup>1</sup>: Even if in case of hyphenation files a new rule can actually be added...
 
 <a name="screenshots"></a>
 ## Screenshots
