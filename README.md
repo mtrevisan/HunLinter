@@ -21,6 +21,7 @@ Hunspeller
 5. [How to](#how-to)
     1. [Create an extension](#how-to-extension)
     2. [Rule flags aid](#how-to-aid)
+    3. [Copying text](#how-to-copy)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
@@ -92,6 +93,10 @@ An external text file can be put int the directory `aids` (on the same level of 
 This file could be used as a reminder of all the flag that can be added to a word and their meaning.
 
 The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `.aid` (eg. for Venetan: `vec.aid`).
+
+<a name="how-to-copy"></a>
+### Copying text
+Is it possible to copy content of tables and words in the statistics section.
 
 
 <a name="screenshots"></a>
