@@ -23,6 +23,7 @@ Hunspeller
     2. [Dictionary correctness checking](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
     4. [Hyphenation](#screenshots-hyphenation)
+    5. [Font selection](#screenshots-font)
 6. [Changelog](#changelog)
     1. [version 1.8.0](#changelog-1.8.0)
 
@@ -96,6 +97,10 @@ Once something is written, an automatic filtering is executed to find all the wo
 <a name="screenshots-hyphenation"></a>
 ### Hyphenation
 ![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
+
+<a name="screenshots-font"></a>
+### Font selection
+![alt text](https://i.postimg.cc/CKFs6GdZ/font.png "Font selection")
 
 
 <a name="changelog"></a>
