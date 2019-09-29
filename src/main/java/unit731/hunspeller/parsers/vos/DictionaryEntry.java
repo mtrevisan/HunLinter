@@ -171,7 +171,7 @@ public class DictionaryEntry{
 
 	/**
 	 * Get last applied rule of type {@code type}
-	 * 
+	 *
 	 * @param type	The type used to filter the last applied rule
 	 * @return	The last applied rule of the specified type
 	 */
@@ -228,6 +228,7 @@ public class DictionaryEntry{
 	}
 
 	/**
+	 * @param affixData	Affix data
 	 * @param reverse	Whether the complex prefixes is used
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
@@ -239,7 +240,7 @@ public class DictionaryEntry{
 
 	/**
 	 * Separate the prefixes from the suffixes and from the terminals
-	 * 
+	 *
 	 * @param affixData	The {@link AffixData}
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
