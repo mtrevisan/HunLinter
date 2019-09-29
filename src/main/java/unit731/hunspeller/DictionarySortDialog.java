@@ -30,11 +30,10 @@ public class DictionarySortDialog extends JDialog{
 	private final JList<String> list = new JList<>();
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, String title, String message, Frame parent){
-		super(parent, title, true);
+	public DictionarySortDialog(DictionaryParser dicParser, String message, Frame parent){
+		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(title);
 		Objects.requireNonNull(message);
 
 		this.dicParser = dicParser;

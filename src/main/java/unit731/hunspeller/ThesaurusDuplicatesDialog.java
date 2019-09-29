@@ -13,7 +13,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 
 	public ThesaurusDuplicatesDialog(List<String> duplicates, Frame parent){
-		super(parent, "Duplicates", true);
+		super(parent, "Thesaurus duplicates", true);
 
 		Objects.requireNonNull(duplicates);
 		Objects.requireNonNull(parent);

@@ -1623,7 +1623,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
+			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Please select a section from the list:", this);
 			GUIUtils.addCancelByEscapeKey(dicSortDialog);
 			dicSortDialog.setLocationRelativeTo(this);
 			dicSortDialog.addListSelectionListener(e -> {
