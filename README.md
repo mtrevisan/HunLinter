@@ -151,6 +151,12 @@ Once something is written, an automatic filtering is executed to find all the wo
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-1.8.1"></a>
+### version 1.8.1 - 20190930
+- added the link to the online help
+- corrected the font size on the dictionary sorter dialog
+- bugfix: scroll on dictionary sorter dialog
+
 <a name="changelog-1.8.0"></a>
-### version 1.8.0
+### version 1.8.0 - 20190928
 - introduced the possibility to choose the font (you can select it whenever you've loaded an .aff file, it will give you a list of all the fonts that can render the loaded language -- once selected the font, it will be used that for all the .aff files in that language)
