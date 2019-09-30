@@ -33,7 +33,8 @@ Hunspeller
     6. [Rule reducer](#screenshots-reducer)
     7. [Font selection](#screenshots-font)
 7. [Changelog](#changelog)
-    1. [version 1.8.0](#changelog-1.8.0)
+    1. [version 1.8.1](#changelog-1.8.1)
+    2. [version 1.8.0](#changelog-1.8.0)
 
 
 <a name="motivation"></a>
