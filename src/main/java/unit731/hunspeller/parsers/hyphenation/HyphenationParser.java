@@ -33,7 +33,7 @@ import unit731.hunspeller.services.PatternHelper;
 
 /**
  * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non–standard hyphenation extension.
- * 
+ *
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
  * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non–standard readme</a>
@@ -307,7 +307,7 @@ public class HyphenationParser{
 
 	/**
 	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
-	 * 
+	 *
 	 * @param rule	The rule to add
 	 * @param level	Level to add the rule to
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
@@ -329,7 +329,7 @@ public class HyphenationParser{
 
 	/**
 	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
-	 * 
+	 *
 	 * @param rule	The rule to remove
 	 * @param level	Level to remove the rule from
 	 * @return <code>true</code> if the removal has completed successfully
@@ -352,7 +352,7 @@ public class HyphenationParser{
 
 	/**
 	 * Line must contains exactly one hyphenation point
-	 * 
+	 *
 	 * @param rule	Rule to be validated
 	 * @param level	Level to add the rule to
 	 */
@@ -389,7 +389,7 @@ public class HyphenationParser{
 		String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
 			int index = getIndexOfBreakpoint(rule);
-			
+
 			int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
@@ -469,7 +469,7 @@ public class HyphenationParser{
 
 	/**
 	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
-	 * 
+	 *
 	 * @param rule	The rule to be checked
 	 * @param level	The level to check the rule for
 	 * @return	Whether the hyphenator has the given rule

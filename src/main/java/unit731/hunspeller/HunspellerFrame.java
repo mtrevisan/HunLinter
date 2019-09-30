@@ -1626,13 +1626,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
 		addSorterToTable(dicTable, comparator, comparatorAffix);
-		addSorterToTable(theTable, comparator, null);
 
 		try{
 			filOpenAFFMenuItem.setEnabled(true);
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
-			hypCheckCorrectnessMenuItem.setEnabled(true);
 
 
 			//affix file:
@@ -1651,9 +1649,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//hyphenation file:
-			hypMenu.setEnabled(true);
-			hypStatisticsMenuItem.setEnabled(true);
-			setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
+			if(backbone.getHyphenator() != null){
+				hypCheckCorrectnessMenuItem.setEnabled(true);
+
+				hypMenu.setEnabled(true);
+				hypStatisticsMenuItem.setEnabled(true);
+				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
+			}
 
 
 			//dictionary file:
@@ -1714,11 +1716,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//thesaurus file:
-			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
-			updateSynonymsCounter();
-			theMenu.setEnabled(true);
-			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+			if(backbone.getTheParser().getSynonymsCounter() > 0){
+				addSorterToTable(theTable, comparator, null);
+
+				final ThesaurusTableModel dm = (ThesaurusTableModel) theTable.getModel();
+				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
+				updateSynonymsCounter();
+				theMenu.setEnabled(true);
+				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+			}
 		}
 		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
