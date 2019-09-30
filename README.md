@@ -32,6 +32,7 @@ Hunspeller
     5. [Dictionary sorter](#screenshots-sorter)
     6. [Rule reducer](#screenshots-reducer)
     7. [Font selection](#screenshots-font)
+    8. [Statistics](#screenshots-statistics)
 7. [Changelog](#changelog)
     1. [version 1.8.1](#changelog-1.8.1)
     2. [version 1.8.0](#changelog-1.8.0)
@@ -103,7 +104,7 @@ It is possible to sort certain columns of the tables, just click on the header o
 
 <a name="how-to-copy"></a>
 ### Copying text
-Is it possible to copy content of tables and words in the statistics section.
+Is it possible to copy content of tables and words in the statistics section. Also the graph in the statistics section can be exported into images.
 
 <a name="how-to-insertion"></a>
 ### Rule/dictionary insertion
@@ -148,6 +149,12 @@ Once something is written, an automatic filtering is executed to find all the wo
 <a name="screenshots-font"></a>
 ### Font selection
 ![alt text](https://i.postimg.cc/CKFs6GdZ/font.png "Font selection")
+
+<a name="screenshots-statistics"></a>
+### Statistics
+![alt text](https://i.postimg.cc/c1PRTr5Q/statistics-lengths.png "Statistics - word lengths")
+![alt text](https://i.postimg.cc/T3th7sYZ/statistics-syllabes.png "Statistics - word syllabes")
+![alt text](https://i.postimg.cc/NfpgBHqX/statistics-stresses.png "Statistics - word stresses")
 
 
 <a name="changelog"></a>
