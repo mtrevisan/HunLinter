@@ -17,6 +17,8 @@ public class DictionarySortDialog extends JDialog{
 
 	private static final long serialVersionUID = -4815599935456195094L;
 
+	private static final double FONT_SIZE_REDUCTION = 0.85;
+
 
 	private final DictionaryParser dicParser;
 
@@ -38,7 +40,7 @@ public class DictionarySortDialog extends JDialog{
    private void initComponents() {
 
       lblMessage = new javax.swing.JLabel();
-      mainScrollPane = new javax.swing.JScrollPane();
+      entriesScrollPane = new javax.swing.JScrollPane();
       entriesList = new javax.swing.JList<>();
       btnNextUnsortedArea = new javax.swing.JButton();
       btnPreviousUnsortedArea = new javax.swing.JButton();
@@ -47,11 +49,11 @@ public class DictionarySortDialog extends JDialog{
 
       lblMessage.setText("...");
 
-      mainScrollPane.setBackground(java.awt.Color.white);
-      mainScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
+      entriesScrollPane.setBackground(java.awt.Color.white);
+      entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      mainScrollPane.setViewportView(entriesList);
+      entriesScrollPane.setViewportView(entriesList);
 
       btnNextUnsortedArea.setText("▼");
       btnNextUnsortedArea.setToolTipText("Next unsorted area");
@@ -76,7 +78,7 @@ public class DictionarySortDialog extends JDialog{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(mainScrollPane)
+               .addComponent(entriesScrollPane)
                .addGroup(layout.createSequentialGroup()
                   .addComponent(lblMessage)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 422, Short.MAX_VALUE)
@@ -94,7 +96,7 @@ public class DictionarySortDialog extends JDialog{
                .addComponent(btnPreviousUnsortedArea)
                .addComponent(lblMessage))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+            .addComponent(entriesScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -102,33 +104,42 @@ public class DictionarySortDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
 	private void init(String message){
-		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex,
-			GUIUtils.getCurrentFont());
+		final Font font = GUIUtils.getCurrentFont().deriveFont(Math.round(GUIUtils.getCurrentFont().getSize() * FONT_SIZE_REDUCTION));
+		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
-		int lineIndex = entriesList.getFirstVisibleIndex();
+		final int lineIndex = entriesList.getFirstVisibleIndex();
+		//make line completely visible
+		entriesList.ensureIndexIsVisible(lineIndex);
+
 		int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
-		if(boundaryIndex >= 0){
-			int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
-		}
-		else
-			boundaryIndex = 0;
+		if(boundaryIndex < 0)
+			boundaryIndex = dicParser.getNextBoundaryIndex(0);
+		final int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
+		final int newIndex = Math.min(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
+		entriesList.ensureIndexIsVisible(newIndex);
+
+		//correct first item
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
-		int lineIndex = entriesList.getFirstVisibleIndex();
+		final int lineIndex = entriesList.getFirstVisibleIndex();
+		//make line completely visible
+		entriesList.ensureIndexIsVisible(lineIndex);
+
 		int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
-		if(boundaryIndex < 0){
-			boundaryIndex = dicParser.getPreviousBoundaryIndex(entriesList.getModel().getSize());
-			int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
-		}
+		if(boundaryIndex < 0)
+			boundaryIndex = dicParser.getPreviousBoundaryIndex(entriesList.getModel().getSize() - 1);
+		final int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
+		final int newIndex = Math.max(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
+		entriesList.ensureIndexIsVisible(newIndex);
+
+		//correct first item
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
@@ -164,8 +175,8 @@ public class DictionarySortDialog extends JDialog{
    private javax.swing.JButton btnNextUnsortedArea;
    private javax.swing.JButton btnPreviousUnsortedArea;
    private javax.swing.JList<String> entriesList;
+   private javax.swing.JScrollPane entriesScrollPane;
    private javax.swing.JLabel lblMessage;
-   private javax.swing.JScrollPane mainScrollPane;
    // End of variables declaration//GEN-END:variables
 
 }

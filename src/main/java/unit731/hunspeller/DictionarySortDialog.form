@@ -26,7 +26,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="mainScrollPane" max="32767" attributes="0"/>
+                  <Component id="entriesScrollPane" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="422" max="32767" attributes="0"/>
@@ -49,7 +49,7 @@
                   <Component id="lblMessage" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="mainScrollPane" pref="327" max="32767" attributes="0"/>
+              <Component id="entriesScrollPane" pref="327" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -61,7 +61,7 @@
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="mainScrollPane">
+    <Container class="javax.swing.JScrollPane" name="entriesScrollPane">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="ff" id="white" palette="1" red="ff" type="palette"/>

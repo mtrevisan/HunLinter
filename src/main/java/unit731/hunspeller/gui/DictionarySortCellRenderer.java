@@ -17,8 +17,6 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 
 	private static final long serialVersionUID = -6904206237491328151L;
 
-	private static final double FONT_SIZE_REDUCTION = 0.85;
-
 	private static final Watercolors[] COLORS = Watercolors.values();
 	private static final int COLORS_SIZE = COLORS.length;
 
@@ -32,7 +30,7 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 		Objects.requireNonNull(font);
 
 		this.boundaryIndex = boundaryIndex;
-		this.font = font.deriveFont(Math.round(font.getSize() * FONT_SIZE_REDUCTION));
+		this.font = font;
 	}
 
 	@Override
