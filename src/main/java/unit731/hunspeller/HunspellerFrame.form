@@ -946,9 +946,9 @@
                           <Component id="hypWordTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="hypSyllabationLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="hypSyllabationOutputLabel" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="hypSyllabationLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="hypSyllabationOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -977,7 +977,7 @@
                           <Component id="hypAddRuleSyllabesCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="hypAddRuleSyllabesCountOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="67" max="32767" attributes="0"/>
+                      <EmptySpace pref="69" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1040,6 +1040,9 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>

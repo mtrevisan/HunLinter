@@ -675,6 +675,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypRulesLabel.setLabelFor(hypRulesOutputLabel);
       hypRulesLabel.setText("Rules:");
 
+      hypRulesOutputLabel.setFont(GUIUtils.getCurrentFont());
       hypRulesOutputLabel.setText("...");
 
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
@@ -784,7 +785,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(hypWordLabel)
                .addComponent(hypWordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypSyllabationLabel)
                .addComponent(hypSyllabationOutputLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -809,7 +810,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addContainerGap(67, Short.MAX_VALUE))
+            .addContainerGap(69, Short.MAX_VALUE))
       );
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
