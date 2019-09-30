@@ -222,7 +222,7 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(totalWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(mainTabbedPane)
                   .addGap(0, 0, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
                   .addComponent(lengthsModeLabel)
