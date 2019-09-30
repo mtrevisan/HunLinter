@@ -55,7 +55,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
       meaningsTextArea.setColumns(20);
-      meaningsTextArea.setFont(GUIUtils.getCurrentFont());
       meaningsTextArea.setLineWrap(true);
       meaningsTextArea.setRows(1);
       meaningsTextArea.setWrapStyleWord(true);
@@ -124,6 +123,10 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	public void setCurrentFont(){
+		meaningsTextArea.setFont(GUIUtils.getCurrentFont());
+	}
 
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{

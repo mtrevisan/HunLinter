@@ -302,7 +302,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setFont(GUIUtils.getCurrentFont());
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
@@ -312,7 +311,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
-      dicInputTextField.setFont(GUIUtils.getCurrentFont());
       dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             dicInputTextFieldKeyReleased(evt);
@@ -322,9 +320,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      dicRuleFlagsAidComboBox.setFont(GUIUtils.getCurrentFont());
-
-      dicTable.setFont(GUIUtils.getCurrentFont());
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
@@ -393,7 +388,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.setFont(GUIUtils.getCurrentFont());
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
@@ -420,9 +414,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
       cmpRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      cmpRuleFlagsAidComboBox.setFont(GUIUtils.getCurrentFont());
-
-      cmpTable.setFont(GUIUtils.getCurrentFont());
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
       cmpTable.setShowVerticalLines(false);
@@ -433,7 +424,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpScrollPane.setViewportView(cmpTable);
 
       cmpInputTextArea.setColumns(20);
-      cmpInputTextArea.setFont(GUIUtils.getCurrentFont());
       cmpInputTextArea.setRows(1);
       cmpInputScrollPane.setViewportView(cmpInputTextArea);
 
@@ -511,7 +501,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theMeaningsLabel.setLabelFor(theMeaningsTextField);
       theMeaningsLabel.setText("New synonym:");
 
-      theMeaningsTextField.setFont(GUIUtils.getCurrentFont());
       theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             theMeaningsTextFieldKeyReleased(evt);
@@ -528,7 +517,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      theTable.setFont(GUIUtils.getCurrentFont());
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
@@ -654,7 +642,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel.setLabelFor(hypWordTextField);
       hypWordLabel.setText("Word:");
 
-      hypWordTextField.setFont(GUIUtils.getCurrentFont());
       hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             hypWordTextFieldKeyReleased(evt);
@@ -664,7 +651,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
       hypSyllabationLabel.setText("Syllabation:");
 
-      hypSyllabationOutputLabel.setFont(GUIUtils.getCurrentFont());
       hypSyllabationOutputLabel.setText("...");
 
       hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
@@ -675,13 +661,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypRulesLabel.setLabelFor(hypRulesOutputLabel);
       hypRulesLabel.setText("Rules:");
 
-      hypRulesOutputLabel.setFont(GUIUtils.getCurrentFont());
       hypRulesOutputLabel.setText("...");
 
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
 
-      hypAddRuleTextField.setFont(GUIUtils.getCurrentFont());
       hypAddRuleTextField.setEnabled(false);
       hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -709,13 +693,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
       hypAddRuleSyllabationLabel.setText("New syllabation:");
 
-      hypAddRuleSyllabationOutputLabel.setFont(GUIUtils.getCurrentFont());
       hypAddRuleSyllabationOutputLabel.setText("...");
 
       hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
       hypAddRuleSyllabesCountLabel.setText("New syllabes:");
 
-      hypAddRuleSyllabesCountOutputLabel.setFont(GUIUtils.getCurrentFont());
       hypAddRuleSyllabesCountOutputLabel.setText("...");
 
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1091,6 +1073,28 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
+	public void setCurrentFont(){
+		final Font font = GUIUtils.getCurrentFont();
+		parsingResultTextArea.setFont(font);
+		dicInputTextField.setFont(font);
+		dicRuleFlagsAidComboBox.setFont(font);
+		dicTable.setFont(font);
+
+		cmpInputComboBox.setFont(font);
+		cmpRuleFlagsAidComboBox.setFont(font);
+		cmpInputTextArea.setFont(font);
+		cmpTable.setFont(font);
+
+		theMeaningsTextField.setFont(font);
+		theTable.setFont(font);
+
+		hypWordTextField.setFont(font);
+		hypSyllabationOutputLabel.setFont(font);
+		hypRulesOutputLabel.setFont(font);
+		hypAddRuleTextField.setFont(font);
+		hypAddRuleSyllabationOutputLabel.setFont(font);
+	}
+
    private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
@@ -1220,6 +1224,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
+		dialog.setCurrentFont();
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1692,6 +1697,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			else
 				rulesReducerDialog.reload();
+			rulesReducerDialog.setCurrentFont();
 
 
 			//aid file:

@@ -33,7 +33,8 @@ public class DictionarySortDialog extends JDialog{
 
 		initComponents();
 
-		init(message);
+		setCurrentFont();
+		lblMessage.setText(message);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -103,12 +104,11 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void init(String message){
-		final Font font = GUIUtils.getCurrentFont().deriveFont(Math.round(GUIUtils.getCurrentFont().getSize() * FONT_SIZE_REDUCTION));
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
-
-		lblMessage.setText(message);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed

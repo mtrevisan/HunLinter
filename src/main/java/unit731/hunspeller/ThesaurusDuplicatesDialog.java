@@ -36,7 +36,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       duplicatesTextArea.setEditable(false);
       duplicatesTextArea.setColumns(20);
-      duplicatesTextArea.setFont(GUIUtils.getCurrentFont());
       duplicatesTextArea.setLineWrap(true);
       duplicatesTextArea.setRows(1);
       duplicatesTextArea.setWrapStyleWord(true);
@@ -61,6 +60,10 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	public void setCurrentFont(){
+		duplicatesTextArea.setFont(GUIUtils.getCurrentFont());
+	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JTextArea duplicatesTextArea;

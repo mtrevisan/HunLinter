@@ -1,6 +1,6 @@
 package unit731.hunspeller;
 
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -108,7 +108,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetTextArea.setEditable(false);
       currentSetTextArea.setColumns(20);
-      currentSetTextArea.setFont(GUIUtils.getCurrentFont());
       currentSetTextArea.setRows(1);
       currentSetTextArea.setTabSize(3);
       currentSetScrollPane.setViewportView(currentSetTextArea);
@@ -117,7 +116,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       reducedSetTextArea.setEditable(false);
       reducedSetTextArea.setColumns(20);
-      reducedSetTextArea.setFont(GUIUtils.getCurrentFont());
       reducedSetTextArea.setRows(1);
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);
@@ -171,6 +169,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	public void setCurrentFont(){
+		final Font font = GUIUtils.getCurrentFont();
+		currentSetTextArea.setFont(font);
+		reducedSetTextArea.setFont(font);
+	}
 
 	private void init(){
 		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);

@@ -31,10 +31,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="totalWordsOutputLabel" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="mainTabbedPane" max="32767" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="mainTabbedPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="lengthsModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -225,9 +222,6 @@
     </Component>
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
       <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
@@ -241,9 +235,6 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
       <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
@@ -257,9 +248,6 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
       <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>

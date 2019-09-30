@@ -353,9 +353,6 @@
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-            </Property>
             <Property name="rows" type="int" value="1"/>
             <Property name="tabSize" type="int" value="3"/>
           </Properties>
@@ -447,11 +444,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="dicInputTextField">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
-              </Properties>
               <Events>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="dicInputTextFieldKeyReleased"/>
               </Events>
@@ -466,9 +458,6 @@
             </Component>
             <Component class="javax.swing.JComboBox" name="dicRuleFlagsAidComboBox">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
                 </Property>
@@ -487,9 +476,6 @@
               <SubComponents>
                 <Component class="javax.swing.JTable" name="dicTable">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                    </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new ProductionTableModel()" type="code"/>
                     </Property>
@@ -610,9 +596,6 @@
             <Component class="javax.swing.JComboBox" name="cmpInputComboBox">
               <Properties>
                 <Property name="editable" type="boolean" value="true"/>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
@@ -655,11 +638,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
-              </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
@@ -673,9 +651,6 @@
               <SubComponents>
                 <Component class="javax.swing.JTable" name="cmpTable">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                    </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new CompoundTableModel()" type="code"/>
                     </Property>
@@ -704,9 +679,6 @@
                 <Component class="javax.swing.JTextArea" name="cmpInputTextArea">
                   <Properties>
                     <Property name="columns" type="int" value="20"/>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                    </Property>
                     <Property name="rows" type="int" value="1"/>
                   </Properties>
                 </Component>
@@ -792,11 +764,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="theMeaningsTextField">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
-              </Properties>
               <Events>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="theMeaningsTextFieldKeyReleased"/>
               </Events>
@@ -821,9 +788,6 @@
               <SubComponents>
                 <Component class="javax.swing.JTable" name="theTable">
                   <Properties>
-                    <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                    </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new ThesaurusTableModel()" type="code"/>
                     </Property>
@@ -992,11 +956,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="hypWordTextField">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
-              </Properties>
               <Events>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="hypWordTextFieldKeyReleased"/>
               </Events>
@@ -1011,9 +970,6 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabationOutputLabel">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>
@@ -1040,9 +996,6 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>
@@ -1056,9 +1009,6 @@
             </Component>
             <Component class="javax.swing.JTextField" name="hypAddRuleTextField">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -1102,9 +1052,6 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationOutputLabel">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>
@@ -1118,9 +1065,6 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountOutputLabel">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="GUIUtils.getCurrentFont()" type="code"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>

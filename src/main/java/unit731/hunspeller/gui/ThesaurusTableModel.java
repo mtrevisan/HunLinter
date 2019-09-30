@@ -55,8 +55,8 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				return thesaurus.getSynonym();
 
 			case 1:
-				final Font defaultFont = GUIUtils.getCurrentFont();
-				return TAG.format(new Object[]{defaultFont.getName(), defaultFont.getSize(), thesaurus.joinMeanings(TAG_NEW_LINE)});
+				final Font font = GUIUtils.getCurrentFont();
+				return TAG.format(new Object[]{font.getName(), font.getSize(), thesaurus.joinMeanings(TAG_NEW_LINE)});
 
 			default:
 				return null;

@@ -1,7 +1,6 @@
 package unit731.hunspeller;
 
-import java.awt.Component;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -149,19 +148,16 @@ public class DictionaryStatisticsDialog extends JDialog{
       mostCommonSyllabesLabel.setLabelFor(mostCommonSyllabesOutputLabel);
       mostCommonSyllabesLabel.setText("Most common syllabes:");
 
-      mostCommonSyllabesOutputLabel.setFont(GUIUtils.getCurrentFont());
       mostCommonSyllabesOutputLabel.setText("...");
 
       longestWordCharactersLabel.setLabelFor(longestWordCharactersOutputLabel);
       longestWordCharactersLabel.setText("Longest word(s) (by characters):");
 
-      longestWordCharactersOutputLabel.setFont(GUIUtils.getCurrentFont());
       longestWordCharactersOutputLabel.setText("...");
 
       longestWordSyllabesLabel.setLabelFor(longestWordSyllabesOutputLabel);
       longestWordSyllabesLabel.setText("Longest word(s) (by syllabes):");
 
-      longestWordSyllabesOutputLabel.setFont(GUIUtils.getCurrentFont());
       longestWordSyllabesOutputLabel.setText("...");
 
       javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
@@ -221,9 +217,7 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addComponent(totalWordsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(totalWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(layout.createSequentialGroup()
-                  .addComponent(mainTabbedPane)
-                  .addGap(0, 0, Short.MAX_VALUE))
+               .addComponent(mainTabbedPane)
                .addGroup(layout.createSequentialGroup()
                   .addComponent(lengthsModeLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -310,6 +304,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	public void setCurrentFont(){
+		final Font font = GUIUtils.getCurrentFont();
+		mostCommonSyllabesOutputLabel.setFont(font);
+		longestWordCharactersOutputLabel.setFont(font);
+		longestWordSyllabesOutputLabel.setFont(font);
+	}
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 		int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
