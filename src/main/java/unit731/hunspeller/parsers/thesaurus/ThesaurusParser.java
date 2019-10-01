@@ -279,7 +279,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public static String[] prepareTextForThesaurusFilter(String text){
 		//extract part of speech if present
 		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
-		final String posFilter = (pos != null? "(" + String.join(PIPE, Arrays.asList(pos)) + ")[^)]*\\)\\|.*?": StringUtils.EMPTY);
+		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.asList(pos)) + ")[^)]*\\)": ".+");
 
 		text = clearThesaurusFilter(text);
 
@@ -289,10 +289,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return new String[]{
-			"(?iu)(" + text + ")",
-			"(?iu)" + posFilter + "(" + text + ")"
-		};
+		return new String[]{posFilter, "(" + text + ")"};
 	}
 
 	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){

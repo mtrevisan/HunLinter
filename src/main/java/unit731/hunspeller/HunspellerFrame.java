@@ -1232,24 +1232,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void filterThesaurus(HunspellerFrame frame){
-		final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(frame.theMeaningsTextField.getText());
-
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(searchText[1]))
+		final String unmodifiedSearchText = StringUtils.strip(frame.theMeaningsTextField.getText());
+		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
 			return;
+
+		formerFilterThesaurusText = unmodifiedSearchText;
+
+		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
 		//TODO if text to be inserted is already contained into the thesaurus, do nothing
 
-		formerFilterThesaurusText = searchText[1];
-
-		theAddButton.setEnabled(StringUtils.isNotBlank(searchText[1]));
-
-		@SuppressWarnings("unchecked")
-		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
-		if(StringUtils.isNotBlank(searchText[1]))
+		@SuppressWarnings("unchecked") TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>) frame.theTable.getRowSorter();
+		if(theAddButton.isEnabled()){
+			final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(unmodifiedSearchText);
 			EventQueue.invokeLater(() -> {
-				List<RowFilter<Object, Object>> filters = Arrays.asList(RowFilter.regexFilter(searchText[0], 0), RowFilter.regexFilter(searchText[1], 1));
-				sorter.setRowFilter(RowFilter.orFilter(filters));
+				final RowFilter<Object, Object> andFilter = RowFilter.andFilter(Arrays.asList(
+					//POS in meanings should be exactly what was given in the search string (or anything if not given)
+					RowFilter.regexFilter(searchText[0], 1),
+					//word in meanings should contain what was given in the search string
+					RowFilter.regexFilter(searchText[1], 1)));
+				final RowFilter<Object, Object> orFilter = RowFilter.orFilter(Arrays.asList(
+					//the synonym should contain what was given in the search string
+					RowFilter.regexFilter(searchText[1], 0),
+					andFilter));
+				sorter.setRowFilter(orFilter);
 			});
+		}
 		else
 			sorter.setRowFilter(null);
 	}
