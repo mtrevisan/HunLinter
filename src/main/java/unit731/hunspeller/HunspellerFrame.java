@@ -407,7 +407,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
       cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLimitComboBoxActionPerformed(evt);
+            limitComboBoxActionPerformed(evt);
          }
       });
 
@@ -430,7 +430,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLoadInputButton.setText("Load input from dictionary");
       cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLoadInputButtonActionPerformed(evt);
+            loadInputButtonActionPerformed(evt);
          }
       });
 
@@ -1076,6 +1076,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public void setCurrentFont(){
 		final Font font = GUIUtils.getCurrentFont();
 		parsingResultTextArea.setFont(font);
+
 		dicInputTextField.setFont(font);
 		dicRuleFlagsAidComboBox.setFont(font);
 		dicTable.setFont(font);
@@ -1445,11 +1446,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theFilterDebouncer.call(this);
    }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
-   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+   private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
       extractCompoundRulesInputs();
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
-   private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
+   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
       String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
       int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
       String inputCompounds = cmpInputTextArea.getText();
