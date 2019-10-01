@@ -399,9 +399,9 @@
                           </Group>
                           <Component id="dicScrollPane" alignment="0" pref="904" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="totalProductionsLabel" min="-2" max="-2" attributes="0"/>
+                              <Component id="dicTotalProductionsLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="totalProductionsOutputLabel" min="-2" max="-2" attributes="0"/>
+                              <Component id="dicTotalProductionsOutputLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -426,8 +426,8 @@
                       <Component id="dicScrollPane" pref="150" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="totalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="totalProductionsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicTotalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicTotalProductionsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -494,15 +494,15 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JLabel" name="totalProductionsLabel">
+            <Component class="javax.swing.JLabel" name="dicTotalProductionsLabel">
               <Properties>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="totalProductionsOutputLabel"/>
+                  <ComponentRef name="dicTotalProductionsOutputLabel"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Total productions:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="totalProductionsOutputLabel">
+            <Component class="javax.swing.JLabel" name="dicTotalProductionsOutputLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
@@ -535,9 +535,9 @@
                                   <Group type="102" attributes="0">
                                       <Component id="cmpInputComboBox" min="-2" pref="728" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="limitLabel" min="-2" max="-2" attributes="0"/>
+                                      <Component id="cmpLimitLabel" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="limitComboBox" min="-2" max="-2" attributes="0"/>
+                                      <Component id="cmpLimitComboBox" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -564,8 +564,8 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="cmpInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="cmpInputComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="limitComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="limitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmpLimitComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmpLimitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -602,15 +602,15 @@
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JLabel" name="limitLabel">
+            <Component class="javax.swing.JLabel" name="cmpLimitLabel">
               <Properties>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="limitComboBox"/>
+                  <ComponentRef name="cmpLimitComboBox"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Limit:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JComboBox" name="limitComboBox">
+            <Component class="javax.swing.JComboBox" name="cmpLimitComboBox">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="5">
@@ -623,7 +623,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="limitComboBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmpLimitComboBoxActionPerformed"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
