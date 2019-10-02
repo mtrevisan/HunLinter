@@ -1094,8 +1094,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		hypRulesOutputLabel.setFont(font);
 		hypAddRuleTextField.setFont(font);
 		hypAddRuleSyllabationOutputLabel.setFont(font);
-
-		rulesReducerDialog.setFont(font);
 	}
 
    private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
@@ -1340,6 +1338,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		dicRulesReducerMenuItem.setEnabled(false);
+
+		rulesReducerDialog = new RulesReducerDialog(backbone, this);
+		rulesReducerDialog.setFont(GUIUtils.getCurrentFont());
+		rulesReducerDialog.setLocationRelativeTo(this);
+		rulesReducerDialog.addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosed(WindowEvent e){
+				dicRulesReducerMenuItem.setEnabled(true);
+			}
+		});
 		rulesReducerDialog.setVisible(true);
    }//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
@@ -1689,21 +1697,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 			mainTabbedPane.setSelectedIndex(index);
-
-
-			//update rule reduced dialog:
-			if(rulesReducerDialog == null){
-				rulesReducerDialog = new RulesReducerDialog(backbone, this);
-				rulesReducerDialog.setLocationRelativeTo(this);
-				rulesReducerDialog.addWindowListener(new WindowAdapter(){
-					@Override
-					public void windowClosed(WindowEvent e){
-						dicRulesReducerMenuItem.setEnabled(true);
-					}
-				});
-			}
-			else
-				rulesReducerDialog.reload();
 
 
 			//aid file:
