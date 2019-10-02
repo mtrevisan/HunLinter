@@ -22,7 +22,6 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
@@ -170,8 +169,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(){
-		final Font font = GUIUtils.getCurrentFont();
+	public void setFont(final Font font){
 		currentSetTextArea.setFont(font);
 		reducedSetTextArea.setFont(font);
 	}

@@ -9,7 +9,6 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -23,18 +22,16 @@ public class DictionarySortDialog extends JDialog{
 	private final DictionaryParser dicParser;
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, String message, Frame parent){
+	public DictionarySortDialog(DictionaryParser dicParser, Frame parent){
 		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(message);
 
 		this.dicParser = dicParser;
 
 		initComponents();
 
-		setCurrentFont();
-		lblMessage.setText(message);
+		lblMessage.setText("Select a section from the list:");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -104,8 +101,7 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
+	public void setFont(final Font currentFont){
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);

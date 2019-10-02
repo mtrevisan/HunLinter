@@ -1080,6 +1080,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dicInputTextField.setFont(font);
 		dicRuleFlagsAidComboBox.setFont(font);
 		dicTable.setFont(font);
+		dicSortDialog.setFont(font);
 
 		cmpInputComboBox.setFont(font);
 		cmpRuleFlagsAidComboBox.setFont(font);
@@ -1094,6 +1095,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		hypRulesOutputLabel.setFont(font);
 		hypAddRuleTextField.setFont(font);
 		hypAddRuleSyllabationOutputLabel.setFont(font);
+
+		rulesReducerDialog.setFont(font);
 	}
 
    private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
@@ -1224,8 +1227,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
-		dialog.setCurrentFont();
+		final ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
+		dialog.setFont(GUIUtils.getCurrentFont());
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1496,6 +1499,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, this);
+			setCurrentFont();
 
 			final String language = backbone.getAffixData().getLanguage();
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
@@ -1623,12 +1627,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		backbone.startFileListener();
 
 		final String language = backbone.getAffixData().getLanguage();
-		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
-		final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-			JFontChooserDialog.getDefaultFont());
-		GUIUtils.setCurrentFont(lastUsedFont, this);
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
@@ -1668,7 +1666,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Select a section from the list:", this);
+			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), this);
 			GUIUtils.addCancelByEscapeKey(dicSortDialog);
 			dicSortDialog.setLocationRelativeTo(this);
 			dicSortDialog.addListSelectionListener(e -> {
@@ -1708,7 +1706,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			else
 				rulesReducerDialog.reload();
-			rulesReducerDialog.setCurrentFont();
 
 
 			//aid file:
@@ -1735,6 +1732,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
+
+			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
+			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
+			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
+				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
+				JFontChooserDialog.getDefaultFont());
+			GUIUtils.setCurrentFont(lastUsedFont, this);
 			setCurrentFont();
 		}
 		catch(final IllegalArgumentException e){

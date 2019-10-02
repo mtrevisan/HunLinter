@@ -1,11 +1,10 @@
 package unit731.hunspeller;
 
-import java.awt.Frame;
+import java.awt.*;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.gui.GUIUtils;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
@@ -61,8 +60,8 @@ public class ThesaurusDuplicatesDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(){
-		duplicatesTextArea.setFont(GUIUtils.getCurrentFont());
+	public void setFont(final Font font){
+		duplicatesTextArea.setFont(font);
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
