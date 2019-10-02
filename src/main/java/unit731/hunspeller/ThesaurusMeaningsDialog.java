@@ -1,7 +1,6 @@
 package unit731.hunspeller;
 
-import java.awt.FlowLayout;
-import java.awt.Frame;
+import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -12,7 +11,6 @@ import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
@@ -124,8 +122,8 @@ public class ThesaurusMeaningsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(){
-		meaningsTextArea.setFont(GUIUtils.getCurrentFont());
+	public void setFont(final Font font){
+		meaningsTextArea.setFont(font);
 	}
 
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed

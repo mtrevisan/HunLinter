@@ -132,7 +132,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
-	private DictionarySortDialog dicSortDialog;
 	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -549,6 +548,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
+						dialog.setFont(GUIUtils.getCurrentFont());
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
@@ -1080,7 +1080,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dicInputTextField.setFont(font);
 		dicRuleFlagsAidComboBox.setFont(font);
 		dicTable.setFont(font);
-		dicSortDialog.setFont(font);
 
 		cmpInputComboBox.setFont(font);
 		cmpRuleFlagsAidComboBox.setFont(font);
@@ -1193,9 +1192,28 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
+			DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), this);
+			dialog.setFont(GUIUtils.getCurrentFont());
+			GUIUtils.addCancelByEscapeKey(dialog);
+			dialog.setLocationRelativeTo(this);
+			dialog.addListSelectionListener(e -> {
+				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
+					final int selectedRow = dialog.getSelectedIndex();
+					if(backbone.getDicParser().isInBoundary(selectedRow)){
+						dialog.setVisible(false);
+
+						dicSortDictionaryMenuItem.setEnabled(false);
+
+
+						dicSorterWorker = new SorterWorker(backbone, selectedRow);
+						dicSorterWorker.addPropertyChangeListener(this);
+						dicSorterWorker.execute();
+					}
+				}
+			});
 			String[] lines = backbone.getDictionaryLines();
-			dicSortDialog.setListData(lines);
-			dicSortDialog.setVisible(true);
+			dialog.setListData(lines);
+			dialog.setVisible(true);
 		}
 		catch(IOException e){
 			LOGGER.error("Something very bad happend while sorting the dictionary", e);
@@ -1664,26 +1682,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
 
-
-			//dictionary file:
-			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), this);
-			GUIUtils.addCancelByEscapeKey(dicSortDialog);
-			dicSortDialog.setLocationRelativeTo(this);
-			dicSortDialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					final int selectedRow = dicSortDialog.getSelectedIndex();
-					if(backbone.getDicParser().isInBoundary(selectedRow)){
-						dicSortDialog.setVisible(false);
-
-						dicSortDictionaryMenuItem.setEnabled(false);
-
-
-						dicSorterWorker = new SorterWorker(backbone, selectedRow);
-						dicSorterWorker.addPropertyChangeListener(this);
-						dicSorterWorker.execute();
-					}
-				}
-			});
 
 			filCreatePackageMenuItem.setEnabled(true);
 			filFontMenuItem.setEnabled(true);
