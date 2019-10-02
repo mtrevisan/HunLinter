@@ -88,7 +88,7 @@ CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 ### Create an extension
 In order to create an extension (eg. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
 
-Remember that the package will have the same name of the directory.
+Remember that the package will have the same name of the directory, but the directory itself is not included, just the content.
 
 <a name="how-to-aid"></a>
 ### Rule flags aid
