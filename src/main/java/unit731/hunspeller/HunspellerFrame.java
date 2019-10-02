@@ -548,7 +548,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
-						dialog.setFont(GUIUtils.getCurrentFont());
+						dialog.setCurrentFont(GUIUtils.getCurrentFont());
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
@@ -1191,7 +1191,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		try{
 			DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), this);
-			dialog.setFont(GUIUtils.getCurrentFont());
+			dialog.setCurrentFont(GUIUtils.getCurrentFont());
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.addListSelectionListener(e -> {
@@ -1244,7 +1244,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
-		dialog.setFont(GUIUtils.getCurrentFont());
+		dialog.setCurrentFont(GUIUtils.getCurrentFont());
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1340,7 +1340,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dicRulesReducerMenuItem.setEnabled(false);
 
 		rulesReducerDialog = new RulesReducerDialog(backbone, this);
-		rulesReducerDialog.setFont(GUIUtils.getCurrentFont());
+		rulesReducerDialog.setCurrentFont(GUIUtils.getCurrentFont());
 		rulesReducerDialog.setLocationRelativeTo(this);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){
 			@Override

@@ -122,7 +122,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setFont(final Font font){
+	public void setCurrentFont(final Font font){
 		meaningsTextArea.setFont(font);
 	}
 

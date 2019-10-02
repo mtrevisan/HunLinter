@@ -305,7 +305,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setFont(final Font font){
+	public void setCurrentFont(final Font font){
 		mostCommonSyllabesOutputLabel.setFont(font);
 		longestWordCharactersOutputLabel.setFont(font);
 		longestWordSyllabesOutputLabel.setFont(font);

@@ -60,7 +60,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setFont(final Font font){
+	public void setCurrentFont(final Font font){
 		duplicatesTextArea.setFont(font);
 	}
 

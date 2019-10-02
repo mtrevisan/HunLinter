@@ -169,7 +169,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setFont(final Font font){
+	public void setCurrentFont(final Font font){
 		currentSetTextArea.setFont(font);
 		reducedSetTextArea.setFont(font);
 	}
