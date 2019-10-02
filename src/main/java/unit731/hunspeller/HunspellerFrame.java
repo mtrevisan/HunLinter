@@ -1734,6 +1734,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				theMenu.setEnabled(true);
 				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
+
+			setCurrentFont();
 		}
 		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
