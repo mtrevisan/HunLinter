@@ -1214,7 +1214,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dialog.setVisible(true);
 		}
 		catch(IOException e){
-			LOGGER.error("Something very bad happend while sorting the dictionary", e);
+			LOGGER.error("Something very bad happened while sorting the dictionary", e);
 		}
    }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
@@ -1383,7 +1383,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             hypAddRuleSyllabesCountOutputLabel.setText(null);
          }
          catch(IOException e){
-            LOGGER.error("Something very bad happend while adding a rule to the hyphenation file", e);
+            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
          }
       }
       else{
@@ -1414,7 +1414,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       }
       catch(IOException e){
-         LOGGER.error("Something very bad happend while redoing changes to the thesaurus file", e);
+         LOGGER.error("Something very bad happened while redoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theRedoButtonActionPerformed
 
@@ -1427,7 +1427,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       }
       catch(IOException e){
-         LOGGER.error("Something very bad happend while undoing changes to the thesaurus file", e);
+         LOGGER.error("Something very bad happened while undoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theUndoButtonActionPerformed
 

@@ -17,11 +17,11 @@ public class ExternalSorterOptions{
 	/** Whether to make a parallel sort */
 	private final boolean sortInParallel;
 	/** Maximum number of temporary files allowed */
-	private int maxTemporaryFiles;
+	private final int maxTemporaryFiles;
 	/** Whether to use ZIP for temporary files */
 	private final boolean useZip;
 	/** ZIP buffer size */
-	private int zipBufferSize;
+	private final int zipBufferSize;
 
 
 	private ExternalSorterOptions(Charset charset, Comparator<String> comparator, boolean removeDuplicates, int skipHeaderLines,

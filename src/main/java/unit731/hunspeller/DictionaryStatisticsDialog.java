@@ -79,7 +79,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
 
-		fillStatisticDatas();
+		fillStatisticData();
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		});
 	}
 
-	private void fillStatisticDatas(){
+	private void fillStatisticData(){
 		long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){
 			fillBaseStatistics();
