@@ -28,8 +28,8 @@ public class Production extends DictionaryEntry{
 	private final List<DictionaryEntry> compoundEntries;
 
 
-	public static Production createFromCompound(final String word, final String continuationFlags, final List<DictionaryEntry> compoundEntries,
-			final FlagParsingStrategy strategy){
+	public static Production createFromCompound(final String word, final String continuationFlags,
+			final List<DictionaryEntry> compoundEntries, final FlagParsingStrategy strategy){
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
@@ -131,7 +131,7 @@ public class Production extends DictionaryEntry{
 //	public boolean hasProductionRule(final String continuationFlag){
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
 //	}
-//
+
 //	public boolean hasProductionRule(final AffixEntry.Type type){
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
