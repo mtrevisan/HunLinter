@@ -16,7 +16,7 @@ import java.util.List;
 class WordMuncherTest{
 
 	@Test
-	void affFormat() throws IOException{
+	void simpleOriginator() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
@@ -34,7 +34,49 @@ class WordMuncherTest{
 
 		Assertions.assertEquals(1, originators.size());
 		final Production originator = originators.get(0);
-		Assertions.assertEquals("a\tfrom\tb", originator.toString());
+		Assertions.assertEquals("a	from	b", originator.toString());
+	}
+
+//	@Test
+	void simpleOriginatorWithCompatiblePartOfSpeech() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 a .	po:noun",
+			"SFX b Y 1",
+			"SFX b 0 b .	po:noun"
+		);
+		String line = "ab\tpo:noun";
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile);
+		AffixData affixData = affParser.getAffixData();
+		WordMuncher muncher = new WordMuncher(affixData, null);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertEquals(1, originators.size());
+		final Production originator = originators.get(0);
+		Assertions.assertEquals("a	po:noun	from	b", originator.toString());
+	}
+
+	@Test
+	void simpleOriginatorWithNonCompatiblePartOfSpeech() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 a .	po:adjective",
+			"SFX b Y 1",
+			"SFX b 0 b .	po:adjective"
+		);
+		String line = "ab\tpo:noun";
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile);
+		AffixData affixData = affParser.getAffixData();
+		WordMuncher muncher = new WordMuncher(affixData, null);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertEquals(0, originators.size());
 	}
 
 }

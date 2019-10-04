@@ -229,9 +229,9 @@ public class DictionaryEntry{
 			.collect(Collectors.toList());
 	}
 
-	public String getMorphologicalFieldPartOfSpeech(){
+	public List<String> getMorphologicalFieldPartOfSpeech(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		return (!filteredFields.isEmpty()? filteredFields.get(0): null);
+		return (!filteredFields.isEmpty()? filteredFields: null);
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

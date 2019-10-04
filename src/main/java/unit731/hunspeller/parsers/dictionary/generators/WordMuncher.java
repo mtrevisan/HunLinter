@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
@@ -15,9 +16,11 @@ import unit731.hunspeller.services.SetHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 //https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
@@ -100,10 +103,11 @@ public class WordMuncher{
 	}
 
 	List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
-		final List<Production> originators = new ArrayList<>();
-
-		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final String word = dicEntry.getWord();
+		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
+
+		final List<Production> originators = new ArrayList<>();
+		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
 		for(final RuleEntry ruleEntry : ruleEntries)
 			//for each affix entry in rule
@@ -112,12 +116,26 @@ public class WordMuncher{
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
 						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
-						originators.add(originatingRule);
+
+						//TODO undo morphological rules application
+						final AffixEntry appliedRule = originatingRule.getAppliedRule(0);
+						final List<String> originatingPartOfSpeech = getMorphologicalFieldPartOfSpeech(affixEntry.uncombineMorphologicalFields(dicEntry));
+						if(originatingPartOfSpeech == null && partOfSpeech == null
+								|| originatingPartOfSpeech != null && partOfSpeech != null && originatingPartOfSpeech.equals(partOfSpeech))
+							originators.add(originatingRule);
 					}
 				}
-				//TODO
 
 		return originators;
+	}
+
+	public List<String> getMorphologicalFieldPartOfSpeech(final String[] morphologicalFields){
+		final String tag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
+		final int purgeTag = tag.length();
+		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
+			.filter(df -> df.startsWith(tag))
+			.map(df -> df.substring(purgeTag))
+			.collect(Collectors.toList());
 	}
 
 	public static void main(String[] args) throws IOException{
@@ -134,7 +152,6 @@ public class WordMuncher{
 		AffixData affixData = affParser.getAffixData();
 		WordMuncher muncher = new WordMuncher(affixData, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final String partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 		muncher.extractAllAffixes(dicEntry);
 	}
 
