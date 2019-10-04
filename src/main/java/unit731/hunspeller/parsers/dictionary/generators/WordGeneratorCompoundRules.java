@@ -57,14 +57,13 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
 	/** Extract a map of flag > dictionary entry from input compounds */
 	private Map<String, Set<DictionaryEntry>> extractCompoundRules(final String[] inputCompounds){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 			dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 			final Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);

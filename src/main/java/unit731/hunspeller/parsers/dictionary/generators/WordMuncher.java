@@ -106,8 +106,7 @@ public class WordMuncher{
 
 	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
 		final List<Production> originatingRules = new ArrayList<>();
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, strategy);
+		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, affixData);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
 			final List<Production> originatingRulesFromEntry = new ArrayList<>();

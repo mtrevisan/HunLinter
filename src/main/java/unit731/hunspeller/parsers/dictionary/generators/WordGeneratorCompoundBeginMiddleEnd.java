@@ -59,14 +59,13 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 			dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 			final List<Production> productions = applyAffixRules(dicEntry, false, null);

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
@@ -45,12 +46,11 @@ public class DictionaryEntry{
 	private final boolean combinable;
 
 
-	public static DictionaryEntry createFromDictionaryLine(final String line, final FlagParsingStrategy strategy){
-		return createFromDictionaryLineWithAliases(line, strategy, null, null);
-	}
+	public static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData){
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 
-	public static DictionaryEntry createFromDictionaryLineWithAliases(final String line, final FlagParsingStrategy strategy,
-			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
