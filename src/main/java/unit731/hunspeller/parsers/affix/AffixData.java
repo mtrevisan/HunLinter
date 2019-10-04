@@ -9,7 +9,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -50,10 +49,6 @@ public class AffixData{
 			AffixOption.NEED_AFFIX_FLAG));
 
 		closed = true;
-	}
-
-	public boolean isClosed(){
-		return closed;
 	}
 
 	void clear(){
@@ -133,17 +128,9 @@ public class AffixData{
 		return getData(AffixOption.LANGUAGE);
 	}
 
-	public Locale getLocale(){
-		return new Locale(getLanguage());
-	}
-
 	public FlagParsingStrategy getFlagParsingStrategy(){
 		final String flag = getFlag();
 		return (flag != null? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
-	}
-
-	public String getKeepCaseFlag(){
-		return getData(AffixOption.KEEP_CASE_FLAG);
 	}
 
 	public String getNeedAffixFlag(){
@@ -189,14 +176,6 @@ public class AffixData{
 		return containsData(AffixOption.COMPLEX_PREFIXES);
 	}
 
-	public Boolean isSuffix(final String affixCode){
-		Boolean isSuffix = null;
-		final Object data = getData(affixCode);
-		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
-			isSuffix = ((RuleEntry)data).isSuffix();
-		return isSuffix;
-	}
-
 	public boolean isForbidDifferentCasesInCompound(){
 		return containsData(AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND);
 	}
@@ -207,18 +186,6 @@ public class AffixData{
 
 	public boolean isSimplifyTriplesInCompound(){
 		return containsData(AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND);
-	}
-
-	public Set<String> getAffixes(){
-		//keeps only items with RuleEntry as value
-		final Set<String> affixes = new HashSet<>();
-		final Set<String> keys = data.keySet();
-		for(final String key : keys){
-			final Object data = getData(key);
-			if(RuleEntry.class.isAssignableFrom(data.getClass()))
-				affixes.add(key);
-		}
-		return affixes;
 	}
 
 	public String getFlag(){
@@ -243,10 +210,6 @@ public class AffixData{
 		return entries.stream()
 			.filter(entry -> entry.canApplyTo(word))
 			.collect(Collectors.toList());
-	}
-
-	public String getNoSuggestFlag(){
-		return getData(AffixOption.NO_SUGGEST_FLAG);
 	}
 
 	public List<String> applyReplacementTable(final String word){
@@ -291,10 +254,6 @@ public class AffixData{
 		Collections.sort(sortedSample);
 		//NOTE: a space should be used because of the presence of characters that are only modifiers
 		return String.join(StringUtils.SPACE, sortedSample);
-	}
-
-	public Set<String> getWordBreakCharacters(){
-		return getData(AffixOption.WORD_BREAK_CHARACTERS);
 	}
 
 	public String getCompoundBeginFlag(){

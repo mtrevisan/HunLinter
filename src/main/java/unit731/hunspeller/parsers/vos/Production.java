@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;

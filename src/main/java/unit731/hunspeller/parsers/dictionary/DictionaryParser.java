@@ -74,10 +74,6 @@ public class DictionaryParser{
 		return sorter;
 	}
 
-	public NavigableMap<Integer, Integer> getBoundaries(){
-		return boundaries;
-	}
-
 	//sorter worker
 	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))

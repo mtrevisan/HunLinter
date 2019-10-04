@@ -270,10 +270,6 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	private static int breakpointIndex(final String rule){
-		return StringUtils.indexOfAny(rule, '1', '3', '5', '7', '9');
-	}
-
 
 	//FIXME method signature is awful
 	protected Map<Integer, Pair<Integer, String>> extractSyllabe(final String rule, final int startingIndex, final String word,

@@ -42,10 +42,6 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public AffixOption getAffixOption(){
-		return affixOption;
-	}
-
 	public void parseConversionTable(final ParsingContext context){
 		try{
 			final BufferedReader br = context.getReader();

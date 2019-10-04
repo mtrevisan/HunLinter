@@ -30,14 +30,12 @@ public class HyphenationBreak{
 
 
 	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
-	private final int size;
 
 
 	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules, final int size){
 		Objects.requireNonNull(indexesAndRules);
 
 		this.indexesAndRules = indexesAndRules;
-		this.size = size;
 	}
 
 
