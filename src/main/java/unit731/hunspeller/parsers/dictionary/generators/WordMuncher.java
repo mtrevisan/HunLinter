@@ -3,13 +3,17 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.vos.RuleEntry;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.SetHelper;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -95,16 +99,15 @@ public class WordMuncher{
 		return originators;
 	}
 
-	private List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
+	List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
 		final List<Production> originators = new ArrayList<>();
 
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final String word = dicEntry.getWord();
 		//for each rule
-		for(final RuleEntry ruleEntry : ruleEntries){
+		for(final RuleEntry ruleEntry : ruleEntries)
 			//for each affix entry in rule
-			final List<AffixEntry> originatingEntries = new ArrayList<>();
-			for(final AffixEntry affixEntry : ruleEntry.getEntries()){
+			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
@@ -113,18 +116,22 @@ public class WordMuncher{
 					}
 				}
 				//TODO
-			}
-			if(!originatingEntries.isEmpty()){
-				//TODO
-			}
-		}
 
 		return originators;
 	}
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 a .",
+			"SFX b Y 1",
+			"SFX b 0 b ."
+		);
 		String line = "a\tpo:noun";
-		AffixData affixData = new AffixData();
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile);
+		AffixData affixData = affParser.getAffixData();
 		WordMuncher muncher = new WordMuncher(affixData, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final String partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
