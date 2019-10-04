@@ -66,7 +66,6 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
-			dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 			final List<Production> productions = applyAffixRules(dicEntry, false, null);
 			for(final Production production : productions){

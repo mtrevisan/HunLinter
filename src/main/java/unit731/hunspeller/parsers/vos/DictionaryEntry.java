@@ -65,7 +65,11 @@ public class DictionaryEntry{
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
 		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
-		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
+		final DictionaryEntry dicEntry = new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
+
+		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
+
+		return dicEntry;
 	}
 
 	public static DictionaryEntry clone(final DictionaryEntry dicEntry){

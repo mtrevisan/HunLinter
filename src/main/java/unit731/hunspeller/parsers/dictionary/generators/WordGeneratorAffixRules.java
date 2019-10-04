@@ -21,7 +21,6 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	List<Production> applyOnefoldAffixRule(final String line, final RuleEntry overriddenRule){
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
@@ -53,7 +52,6 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	List<Production> applyAffixRules(final String line, final RuleEntry overriddenRule){
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 
