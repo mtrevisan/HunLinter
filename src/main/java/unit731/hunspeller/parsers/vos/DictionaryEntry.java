@@ -220,14 +220,18 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
-	public String getPartOfSpeechMorphologicalField(){
-		if(morphologicalFields != null){
-			final String partOfSpeechTag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
-			for(final String field : morphologicalFields)
-				if(field.startsWith(partOfSpeechTag))
-					return field.substring(partOfSpeechTag.length());
-		}
-		return null;
+	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		final String tag = morphologicalTag.getCode();
+		final int purgeTag = tag.length();
+		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
+			.filter(df -> df.startsWith(tag))
+			.map(df -> df.substring(purgeTag))
+			.collect(Collectors.toList());
+	}
+
+	public String getMorphologicalFieldPartOfSpeech(){
+		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+		return (!filteredFields.isEmpty()? filteredFields.get(0): null);
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

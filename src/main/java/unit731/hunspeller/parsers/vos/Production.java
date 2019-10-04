@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
@@ -167,14 +166,6 @@ public class Production extends DictionaryEntry{
 		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 	}
 
-	public List<String> getMorphologicalFields(final String morphologicalTag){
-		final int purgeTag = morphologicalTag.length();
-		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
-			.filter(df -> df.startsWith(morphologicalTag))
-			.map(df -> df.substring(purgeTag))
-			.collect(Collectors.toList());
-	}
-
 	@Override
 	public boolean isCompound(){
 		return (compoundEntries != null && !compoundEntries.isEmpty());
@@ -183,7 +174,7 @@ public class Production extends DictionaryEntry{
 	public String toStringWithPartOfSpeechFields(){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH.getCode());
+		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(!fields.isEmpty())
 			sj.add(POS_OPEN_BRACKET + String.join(StringUtils.SPACE, fields) + POS_CLOSE_BRACKET);
 		return sj.toString();
