@@ -99,11 +99,19 @@ public class WordMuncher{
 		final List<Production> originators = new ArrayList<>();
 
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
+		final String word = dicEntry.getWord();
 		//for each rule
 		for(final RuleEntry ruleEntry : ruleEntries){
 			//for each affix entry in rule
 			final List<AffixEntry> originatingEntries = new ArrayList<>();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries()){
+				if(affixEntry.canInverseApplyTo(word)){
+					final String originatingWord = affixEntry.undoRule(word);
+					if(originatingWord != null){
+						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
+						originators.add(originatingRule);
+					}
+				}
 				//TODO
 			}
 			if(!originatingEntries.isEmpty()){

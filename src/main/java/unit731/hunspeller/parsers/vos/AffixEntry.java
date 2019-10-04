@@ -236,11 +236,11 @@ public class AffixEntry{
 			appending + word.substring(removingLength));
 	}
 
+	//NOTE: {#canInverseApplyTo} should be called to verify applicability
 	public String undoRule(final String word) throws IllegalArgumentException{
-		final String originatingWord = (isSuffix()?
+		return (isSuffix()?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));
-		return (canApplyTo(originatingWord)? originatingWord: null);
 	}
 
 	public String toStringWithMorphologicalFields(final FlagParsingStrategy strategy){
