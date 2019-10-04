@@ -100,8 +100,14 @@ public class WordMuncher{
 	}
 
 	private List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
-		//TODO
-		return null;
+		final List<Production> originators = new ArrayList<>();
+
+		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
+		for(final RuleEntry ruleEntry : ruleEntries){
+			//TODO
+		}
+
+		return originators;
 	}
 
 	public static void main(String[] args){

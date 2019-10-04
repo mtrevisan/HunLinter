@@ -191,9 +191,9 @@ public class AffixData{
 
 	public Boolean isSuffix(final String affixCode){
 		Boolean isSuffix = null;
-		final Object affix = getData(affixCode);
-		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
-			isSuffix = ((RuleEntry)affix).isSuffix();
+		final Object data = getData(affixCode);
+		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
+			isSuffix = ((RuleEntry)data).isSuffix();
 		return isSuffix;
 	}
 
@@ -214,8 +214,8 @@ public class AffixData{
 		final Set<String> affixes = new HashSet<>();
 		final Set<String> keys = data.keySet();
 		for(final String key : keys){
-			final Object affix = getData(key);
-			if(RuleEntry.class.isAssignableFrom(affix.getClass()))
+			final Object data = getData(key);
+			if(RuleEntry.class.isAssignableFrom(data.getClass()))
 				affixes.add(key);
 		}
 		return affixes;
@@ -229,9 +229,9 @@ public class AffixData{
 		final String convertedWord = applyInputConversionTable(word);
 
 		boolean productive;
-		final RuleEntry rule = getData(affix);
-		if(rule != null)
-			productive = rule.getEntries().stream()
+		final Object data = getData(affix);
+		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
+			productive = ((RuleEntry)data).getEntries().stream()
 				.anyMatch(entry -> entry.canApplyTo(convertedWord));
 		else
 			productive = isManagedByCompoundRule(affix);
