@@ -24,8 +24,6 @@ public class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
-	private static final String BOM_MARKER = "\uFEFF";
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
 	static{

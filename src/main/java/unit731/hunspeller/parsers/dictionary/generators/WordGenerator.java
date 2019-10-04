@@ -22,14 +22,6 @@ public class WordGenerator{
 		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, this);
 	}
 
-	public List<Production> applyOnefoldAffixRule(final String line){
-		return wordGeneratorAffixRules.applyOnefoldAffixRule(line, null);
-	}
-
-	public List<Production> applyOnefoldAffixRule(final String line, final RuleEntry overriddenRule){
-		return wordGeneratorAffixRules.applyOnefoldAffixRule(line, overriddenRule);
-	}
-
 	public List<Production> applyAffixRules(final String line){
 		return wordGeneratorAffixRules.applyAffixRules(line);
 	}

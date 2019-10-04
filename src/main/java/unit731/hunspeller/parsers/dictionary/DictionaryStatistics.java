@@ -76,10 +76,6 @@ public class DictionaryStatistics implements Closeable{
 		return lengthsFrequencies;
 	}
 
-	public synchronized Frequency<String> getSyllabesFrequencies(){
-		return syllabesFrequencies;
-	}
-
 	public synchronized Frequency<Integer> getSyllabeLengthsFrequencies(){
 		return syllabeLengthsFrequencies;
 	}

@@ -34,11 +34,6 @@ public class Production extends DictionaryEntry{
 		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
 	}
 
-	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final boolean combinable){
-		return new Production(word, appliedEntry.continuationFlags, appliedEntry.morphologicalFields, combinable,
-			Collections.singletonList(appliedEntry), null);
-	}
-
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
 			final String[] remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
@@ -100,10 +95,6 @@ public class Production extends DictionaryEntry{
 				.reduce((first, second) -> second)
 				.orElse(null);
 		return lastAppliedRule;
-	}
-
-	public List<DictionaryEntry> getCompoundEntries(){
-		return compoundEntries;
 	}
 
 	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){

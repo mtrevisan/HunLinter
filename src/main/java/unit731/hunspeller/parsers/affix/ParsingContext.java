@@ -46,11 +46,6 @@ public class ParsingContext{
 		return String.join(StringUtils.SPACE, Arrays.asList(definitionParts).subList(1, definitionParts.length));
 	}
 
-	public int getRuleSize(){
-		String part = getFirstParameter();
-		return (StringUtils.isNumeric(part)? Integer.parseInt(part): 0);
-	}
-
 	@Override
 	public String toString(){
 		return line;

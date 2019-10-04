@@ -1,6 +1,10 @@
 package unit731.hunspeller;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JDialog;
@@ -62,6 +66,16 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 	public void setCurrentFont(final Font font){
 		duplicatesTextArea.setFont(font);
+	}
+
+	@SuppressWarnings("unused")
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

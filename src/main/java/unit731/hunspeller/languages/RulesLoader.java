@@ -120,10 +120,6 @@ public class RulesLoader{
 	}
 
 
-	public Properties getRulesProperties(){
-		return rulesProperties;
-	}
-
 	public boolean isMorphologicalFieldsCheck(){
 		return morphologicalFieldsCheck;
 	}

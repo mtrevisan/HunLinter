@@ -45,20 +45,20 @@ public class HyphenationParser{
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
-	public static final String HYPHEN = "\u2010";
-	public static final String HYPHEN_MINUS = "\u002D";
+//	private static final String HYPHEN = "\u2010";
+//	private static final String HYPHEN_MINUS = "\u002D";
 	public static final String MINUS_SIGN = "-";
 	public static final String HYPHEN_EQUALS = "=";
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
-	public static final String EM_DASH = "\u2014";
+//	private static final String EM_DASH = "\u2014";
 	public static final String APOSTROPHE = "ʼ";
 	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
 	 */
-	public static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
+//	private static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
 
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 

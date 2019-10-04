@@ -270,20 +270,6 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	public static int getAugmentedRuleAddLength(final String rule){
-		int length = 0;
-		final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(rule);
-		if(m.find()){
-			final String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
-			final String basicRule = m.group(HyphenationParser.PARAM_RULE);
-			String start = m.group(HyphenationParser.PARAM_START);
-			if(start == null)
-				start = Integer.toString(1);
-			length = addBefore.length() - Integer.parseInt(start) + breakpointIndex(basicRule) - 1;
-		}
-		return length;
-	}
-
 	private static int breakpointIndex(final String rule){
 		return StringUtils.indexOfAny(rule, '1', '3', '5', '7', '9');
 	}
