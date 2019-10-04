@@ -222,10 +222,10 @@ public class DictionaryEntry{
 
 	public String getPartOfSpeechMorphologicalField(){
 		if(morphologicalFields != null){
-			final String posTag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
+			final String partOfSpeechTag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
 			for(final String field : morphologicalFields)
-				if(field.startsWith(posTag))
-					return field.substring(posTag.length());
+				if(field.startsWith(partOfSpeechTag))
+					return field.substring(partOfSpeechTag.length());
 		}
 		return null;
 	}

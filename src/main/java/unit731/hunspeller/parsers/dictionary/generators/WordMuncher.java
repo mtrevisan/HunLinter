@@ -109,7 +109,7 @@ public class WordMuncher{
 		AffixData affixData = new AffixData();
 		WordMuncher muncher = new WordMuncher(affixData, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final String pos = dicEntry.getPartOfSpeechMorphologicalField();
+		final String partOfSpeech = dicEntry.getPartOfSpeechMorphologicalField();
 		muncher.extractAllAffixes(dicEntry);
 	}
 
