@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -101,6 +102,14 @@ public class WordMuncher{
 	private List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
 		//TODO
 		return null;
+	}
+
+	public static void main(String[] args){
+		String line = "a";
+		AffixData affixData = new AffixData();
+		WordMuncher muncher = new WordMuncher(affixData, null);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		muncher.extractAllAffixes(dicEntry);
 	}
 
 	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
