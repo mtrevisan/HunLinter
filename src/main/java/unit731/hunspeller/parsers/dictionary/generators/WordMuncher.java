@@ -38,14 +38,8 @@ public class WordMuncher{
 //		this.dicParser = dicParser;
 	}
 
-	public List<Production> inferAffixRules(final String line){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-
-		final String[] parts = StringUtils.split(line);
-		final String word = parts[0];
-		final String morphologicalField = (parts.length == 2 && parts[1].startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())
-			&& !StringUtils.containsWhitespace(parts[1])? parts[1].substring(MorphologicalTag.TAG_PART_OF_SPEECH.getCode().length()): null);
-		final List<Production> originators = extractAllAffixes(word, morphologicalField);
+	public List<Production> inferAffixRules(final DictionaryEntry dicEntry){
+		final List<Production> originators = extractAllAffixes(dicEntry);
 		originators.size();
 
 		//TODO from the original word extract all the suffixes
@@ -102,6 +96,11 @@ public class WordMuncher{
 		if(LOGGER.isTraceEnabled())
 			originators.forEach(production -> LOGGER.trace("Inferred word: {}", production));
 		return originators;
+	}
+
+	private List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
+		//TODO
+		return null;
 	}
 
 	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
