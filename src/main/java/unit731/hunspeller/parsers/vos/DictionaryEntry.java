@@ -220,6 +220,16 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
+	public String getPartOfSpeechMorphologicalField(){
+		if(morphologicalFields != null){
+			final String posTag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
+			for(final String field : morphologicalFields)
+				if(field.startsWith(posTag))
+					return field.substring(posTag.length());
+		}
+		return null;
+	}
+
 	public void forEachMorphologicalField(final Consumer<String> fun){
 		if(morphologicalFields != null)
 			for(final String morphologicalField : morphologicalFields)

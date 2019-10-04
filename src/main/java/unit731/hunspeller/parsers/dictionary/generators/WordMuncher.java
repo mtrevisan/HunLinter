@@ -105,10 +105,11 @@ public class WordMuncher{
 	}
 
 	public static void main(String[] args){
-		String line = "a";
+		String line = "a\tpo:noun";
 		AffixData affixData = new AffixData();
 		WordMuncher muncher = new WordMuncher(affixData, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final String pos = dicEntry.getPartOfSpeechMorphologicalField();
 		muncher.extractAllAffixes(dicEntry);
 	}
 
