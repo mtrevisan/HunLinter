@@ -99,8 +99,16 @@ public class WordMuncher{
 		final List<Production> originators = new ArrayList<>();
 
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
+		//for each rule
 		for(final RuleEntry ruleEntry : ruleEntries){
-			//TODO
+			//for each affix entry in rule
+			final List<AffixEntry> originatingEntries = new ArrayList<>();
+			for(final AffixEntry affixEntry : ruleEntry.getEntries()){
+				//TODO
+			}
+			if(!originatingEntries.isEmpty()){
+				//TODO
+			}
 		}
 
 		return originators;
