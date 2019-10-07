@@ -76,6 +76,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
@@ -1146,7 +1147,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(inputText);
+				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText, frame.backbone.getAffixData());
+				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);

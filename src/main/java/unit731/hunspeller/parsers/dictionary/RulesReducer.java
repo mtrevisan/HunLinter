@@ -26,6 +26,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.vos.AffixEntry;
@@ -687,8 +688,9 @@ public class RulesReducer{
 		final AffixType type = ruleToBeReduced.getType();
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
-			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
-			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final List<Production> originalProductions = wordGenerator.applyAffixRules(dicEntry);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);

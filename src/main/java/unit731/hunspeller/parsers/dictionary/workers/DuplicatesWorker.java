@@ -26,6 +26,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.Duplicate;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
@@ -166,7 +167,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						final List<Production> productions = wordGenerator.applyAffixRules(line);
+						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 						productions.stream()
 							.map(Production::toStringWithPartOfSpeechFields)
@@ -220,7 +222,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					line = ParserHelper.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							final List<Production> productions = wordGenerator.applyAffixRules(line);
+							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 							final String word = productions.get(0).getWord();
 							for(final Production production : productions){
 								final String text = production.toStringWithPartOfSpeechFields();

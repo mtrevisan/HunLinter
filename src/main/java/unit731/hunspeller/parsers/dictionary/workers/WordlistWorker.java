@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -34,7 +35,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 		final Function<Production, String> toString = (plainWords? Production::getWord: Production::toString);
 		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line.getValue());
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			try{
 				for(final Production production : productions){

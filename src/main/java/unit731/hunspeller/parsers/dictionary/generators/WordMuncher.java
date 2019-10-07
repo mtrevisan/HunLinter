@@ -31,15 +31,17 @@ public class WordMuncher{
 
 
 	private final AffixData affixData;
-	//	private final DictionaryParser dicParser;
+//	private final DictionaryParser dicParser;
+	private final WordGenerator wordGenerator;
 
 
-	public WordMuncher(final AffixData affixData, final DictionaryParser dicParser){
+	public WordMuncher(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		Objects.requireNonNull(affixData);
-		//		Objects.requireNonNull(dicParser);
+//		Objects.requireNonNull(dicParser);
 
 		this.affixData = affixData;
-		//		this.dicParser = dicParser;
+//		this.dicParser = dicParser;
+		this.wordGenerator = wordGenerator;
 	}
 
 	public List<Production> inferAffixRules(final DictionaryEntry dicEntry){
@@ -117,12 +119,14 @@ public class WordMuncher{
 					if(originatingWord != null){
 						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
 
+						List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+
 						//TODO undo morphological rules application
-						final AffixEntry appliedRule = originatingRule.getAppliedRule(0);
-						final List<String> originatingPartOfSpeech = getMorphologicalFieldPartOfSpeech(affixEntry.uncombineMorphologicalFields(dicEntry));
-						if(originatingPartOfSpeech == null && partOfSpeech == null
-							|| originatingPartOfSpeech != null && partOfSpeech != null && originatingPartOfSpeech.equals(partOfSpeech))
-							originators.add(originatingRule);
+//						final AffixEntry appliedRule = originatingRule.getAppliedRule(0);
+//						final List<String> originatingPartOfSpeech = getMorphologicalFieldPartOfSpeech(affixEntry.uncombineMorphologicalFields(dicEntry));
+//						if(originatingPartOfSpeech == null && partOfSpeech == null
+//							|| originatingPartOfSpeech != null && partOfSpeech != null && originatingPartOfSpeech.equals(partOfSpeech))
+//							originators.add(originatingRule);
 					}
 				}
 
@@ -150,7 +154,7 @@ public class WordMuncher{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);
 		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null);
+		WordMuncher muncher = new WordMuncher(affixData, null, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		muncher.extractAllAffixes(dicEntry);
 	}

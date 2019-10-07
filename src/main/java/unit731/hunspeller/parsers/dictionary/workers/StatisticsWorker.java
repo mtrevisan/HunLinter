@@ -16,6 +16,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
@@ -45,7 +46,8 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Production production : productions){
 				//collect statistics

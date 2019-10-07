@@ -13,6 +13,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -36,7 +37,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			productions.forEach(production -> dictionary.add(production.getWord()));
 		};

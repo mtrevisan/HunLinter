@@ -13,6 +13,7 @@ import unit731.hunspeller.parsers.dictionary.LineEntry;
 import unit731.hunspeller.parsers.dictionary.RulesReducer;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
@@ -46,7 +47,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> originalRules = new ArrayList<>();
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(!filteredRules.isEmpty()){

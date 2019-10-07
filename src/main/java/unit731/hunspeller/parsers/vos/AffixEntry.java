@@ -178,28 +178,6 @@ public class AffixEntry{
 		return mf.toArray(String[]::new);
 	}
 
-	//TODO
-	public String[] uncombineMorphologicalFields(final DictionaryEntry dicEntry){
-		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
-		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
-
-		//NOTE: part of speech seems to be preserved, both in simple application of an affix rule and of a compound rule
-		//        final boolean overwritePartOfSpeech = (dicEntry.getMorphologicalFieldPartOfSpeech() != null && amf.stream().anyMatch(f -> f.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())));
-		final boolean containsTerminalSuffixes = amf.stream()
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
-		//remove inflectional and terminal suffixes
-		mf = mf.stream()
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode()))
-			//            .filter(field -> !overwritePartOfSpeech || !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
-			.collect(Collectors.toList());
-
-		//add morphological fields from the applied affix
-		mf.addAll((isSuffix()? mf.size(): 0), amf);
-
-		return mf.toArray(String[]::new);
-	}
-
 	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		final List<String[]> mf = new ArrayList<>();
 		if(compoundEntries != null)

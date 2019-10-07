@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
@@ -40,7 +41,8 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 		final RulesLoader rulesLoader = new RulesLoader(language, null);
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			productions.forEach(production -> {
 				final String word = production.getWord();
