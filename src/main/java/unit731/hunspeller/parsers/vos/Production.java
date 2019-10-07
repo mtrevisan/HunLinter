@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
@@ -31,6 +32,11 @@ public class Production extends DictionaryEntry{
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
+	}
+
+	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final boolean combinable){
+		return new Production(word, appliedEntry.continuationFlags, appliedEntry.morphologicalFields, combinable,
+			Collections.singletonList(appliedEntry), null);
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
