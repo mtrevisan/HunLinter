@@ -28,7 +28,7 @@ class WordMuncherTest{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);
 		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null);
+		WordMuncher muncher = new WordMuncher(affixData, null, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
@@ -50,7 +50,7 @@ class WordMuncherTest{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);
 		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null);
+		WordMuncher muncher = new WordMuncher(affixData, null, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
@@ -72,7 +72,7 @@ class WordMuncherTest{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);
 		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null);
+		WordMuncher muncher = new WordMuncher(affixData, null, null);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
