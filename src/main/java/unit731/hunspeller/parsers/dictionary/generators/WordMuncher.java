@@ -123,6 +123,13 @@ public class WordMuncher{
 
 						final List<Production> productions = wordGenerator.applyAffixRules(originatingDictionaryEntry, ruleEntry);
 
+						//remove base production
+						productions.remove(0);
+
+						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
+						if(productions.size() != 1)
+							continue;
+
 						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
 						if(baseProductionPartOfSpeech == null && partOfSpeech == null
 								|| baseProductionPartOfSpeech != null && partOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
