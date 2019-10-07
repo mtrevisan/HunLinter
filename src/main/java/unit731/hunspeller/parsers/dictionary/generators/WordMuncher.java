@@ -148,7 +148,7 @@ public class WordMuncher{
 				}
 			if(!originatingRulesFromEntry.isEmpty()){
 				//originatingRulesFromEntry should not have productions from identical word
-				final Map<String, List<Production>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, rule -> rule.getWord());
+				final Map<String, List<Production>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, DictionaryEntry::getWord);
 				final boolean identicalOriginatingWord = wordBucket.values().stream().anyMatch(prods -> prods.size() > 1);
 				if(!identicalOriginatingWord)
 					originatingRules.addAll(originatingRulesFromEntry);

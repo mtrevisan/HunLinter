@@ -116,10 +116,6 @@ public class AffixEntry{
 		return flag;
 	}
 
-	public AffixCondition getCondition(){
-		return condition;
-	}
-
 	public String getAppending(){
 		return appending;
 	}

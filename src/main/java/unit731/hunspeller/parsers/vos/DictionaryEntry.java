@@ -72,10 +72,6 @@ public class DictionaryEntry{
 		return dicEntry;
 	}
 
-	public static DictionaryEntry clone(final DictionaryEntry dicEntry){
-		return new DictionaryEntry(dicEntry);
-	}
-
 	protected DictionaryEntry(final DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry);
 
@@ -109,15 +105,15 @@ public class DictionaryEntry{
 		return containsStem;
 	}
 
-	public static String extractWord(final String line){
-		Objects.requireNonNull(line);
-
-		final Matcher m = PATTERN_ENTRY.matcher(line);
-		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
-
-		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-	}
+//	public static String extractWord(final String line){
+//		Objects.requireNonNull(line);
+//
+//		final Matcher m = PATTERN_ENTRY.matcher(line);
+//		if(!m.find())
+//			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
+//
+//		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+//	}
 
 	public String getWord(){
 		return word;
@@ -176,8 +172,8 @@ public class DictionaryEntry{
 	/**
 	 * Get last applied rule of type {@code type}
 	 *
-	 * @param type	The type used to filter the last applied rule
-	 * @return	The last applied rule of the specified type
+	 * @param type    The type used to filter the last applied rule
+	 * @return    The last applied rule of the specified type
 	 */
 	public AffixEntry getLastAppliedRule(final AffixType type){
 		return null;
@@ -238,11 +234,6 @@ public class DictionaryEntry{
 		if(morphologicalFields != null)
 			for(final String morphologicalField : morphologicalFields)
 				fun.accept(morphologicalField);
-	}
-
-	public void removeAffixes(final AffixData affixData){
-		final Affixes affixes = separateAffixes(affixData);
-		continuationFlags = affixes.getTerminalAffixes();
 	}
 
 	/**

@@ -35,10 +35,6 @@ public class DictionaryCorrectnessChecker{
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 
-	public HyphenatorInterface getHyphenator(){
-		return hyphenator;
-	}
-
 	//used by the correctness worker after calling {@link #loadRules()}:
 	public void checkProduction(final Production production) throws IllegalArgumentException{
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
