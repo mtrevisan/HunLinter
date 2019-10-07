@@ -26,7 +26,7 @@ class WordMuncherTest{
 			"SFX b Y 1",
 			"SFX b 0 b ."
 		);
-		String line = "ab\tpo:noun";
+		String line = "ab";
 		Pair<AffixData, WordGenerator> things = createThings(affFile);
 		AffixData affixData = things.getLeft();
 		WordGenerator wordGenerator = things.getRight();
@@ -36,10 +36,10 @@ class WordMuncherTest{
 
 		Assertions.assertEquals(1, originators.size());
 		final DictionaryEntry originator = originators.get(0);
-		Assertions.assertEquals("a	from	b", originator.toString());
+		Assertions.assertEquals("a/b	st:a", originator.toString());
 	}
 
-	//	@Test
+	@Test
 	void simpleOriginatorWithCompatiblePartOfSpeech() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -48,7 +48,7 @@ class WordMuncherTest{
 			"SFX b Y 1",
 			"SFX b 0 b .	po:noun"
 		);
-		String line = "ab\tpo:noun";
+		String line = "ab	po:noun";
 		Pair<AffixData, WordGenerator> things = createThings(affFile);
 		AffixData affixData = things.getLeft();
 		WordGenerator wordGenerator = things.getRight();
@@ -58,7 +58,7 @@ class WordMuncherTest{
 
 		Assertions.assertEquals(1, originators.size());
 		final DictionaryEntry originator = originators.get(0);
-		Assertions.assertEquals("a	po:noun	from	b", originator.toString());
+		Assertions.assertEquals("a/b	st:a", originator.toString());
 	}
 
 	@Test
@@ -70,7 +70,7 @@ class WordMuncherTest{
 			"SFX b Y 1",
 			"SFX b 0 b .	po:adjective"
 		);
-		String line = "ab\tpo:noun";
+		String line = "ab	po:noun";
 		Pair<AffixData, WordGenerator> things = createThings(affFile);
 		AffixData affixData = things.getLeft();
 		WordGenerator wordGenerator = things.getRight();
