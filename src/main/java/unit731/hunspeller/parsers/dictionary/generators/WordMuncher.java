@@ -2,12 +2,15 @@ package unit731.hunspeller.parsers.dictionary.generators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.vos.RuleEntry;
+import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.SetHelper;
 
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ public class WordMuncher{
 //	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 
+	private DictionaryInclusionTestWorker dicInclusionTestWorker;
+
 
 	public WordMuncher(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		Objects.requireNonNull(affixData);
@@ -37,10 +42,28 @@ public class WordMuncher{
 		this.affixData = affixData;
 //		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
+
+		loadDictionaryForInclusionTest(dicParser);
+	}
+
+	private void loadDictionaryForInclusionTest(final DictionaryParser dicParser){
+		if(dicInclusionTestWorker == null && affixData.isCheckCompoundReplacement()){
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
+
+			try{
+				dicInclusionTestWorker.executeInline();
+			}
+			catch(final Exception e){
+				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				LOGGER.error("Cannot read dictionary", e);
+			}
+		}
 	}
 
 	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
+
+		originators.removeIf(originator -> !dicInclusionTestWorker.isInDictionary(originator.getWord()));
 
 		//TODO from the original word extract all the suffixes
 
