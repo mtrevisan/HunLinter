@@ -119,14 +119,12 @@ public class WordMuncher{
 					if(originatingWord != null){
 						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
 
-						List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
-						//TODO undo morphological rules application
-//						final AffixEntry appliedRule = originatingRule.getAppliedRule(0);
-//						final List<String> originatingPartOfSpeech = getMorphologicalFieldPartOfSpeech(affixEntry.uncombineMorphologicalFields(dicEntry));
-//						if(originatingPartOfSpeech == null && partOfSpeech == null
-//							|| originatingPartOfSpeech != null && partOfSpeech != null && originatingPartOfSpeech.equals(partOfSpeech))
-//							originators.add(originatingRule);
+						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
+						if(baseProductionPartOfSpeech == null && partOfSpeech == null
+								|| baseProductionPartOfSpeech != null && partOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
+							originators.add(originatingRule);
 					}
 				}
 
