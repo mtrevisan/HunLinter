@@ -38,28 +38,6 @@ class WordMuncherTest{
 	}
 
 	@Test
-	void multipleOriginator() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
-			"SET UTF-8",
-			"SFX a Y 1",
-			"SFX a 0 b .",
-			"SFX b Y 1",
-			"SFX b 0 b ."
-		);
-		String line = "ab";
-		Pair<AffixData, WordGenerator> things = createThings(affFile);
-		AffixData affixData = things.getLeft();
-		WordGenerator wordGenerator = things.getRight();
-		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
-		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
-
-		Assertions.assertEquals(2, originators.size());
-		Assertions.assertEquals("a/a", originators.get(0).toString());
-		Assertions.assertEquals("a/b", originators.get(1).toString());
-	}
-
-	@Test
 	void simpleOriginatorWithCompatiblePartOfSpeech() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -98,7 +76,70 @@ class WordMuncherTest{
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
 
-		Assertions.assertEquals(0, originators.size());
+		Assertions.assertTrue(originators.isEmpty());
+	}
+
+	@Test
+	void multipleOriginator() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 b .",
+			"SFX b Y 1",
+			"SFX b 0 b ."
+		);
+		String line = "ab";
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertEquals(2, originators.size());
+		Assertions.assertEquals("a/a", originators.get(0).toString());
+		Assertions.assertEquals("a/b", originators.get(1).toString());
+	}
+
+	@Test
+	void multipleOriginatorPrefixAndSuffix() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 b .",
+			"PFX b Y 1",
+			"PFX b 0 b ."
+		);
+		String line = "bab";
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertEquals(2, originators.size());
+		Assertions.assertEquals("ba/a", originators.get(0).toString());
+		Assertions.assertEquals("ab/b", originators.get(1).toString());
+	}
+
+	@Test
+	void multipleOriginators() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 2",
+			"SFX a 0 b .",
+			"SFX a 0 bb ."
+		);
+		String line = "abb";
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertTrue(originators.isEmpty());
 	}
 
 
