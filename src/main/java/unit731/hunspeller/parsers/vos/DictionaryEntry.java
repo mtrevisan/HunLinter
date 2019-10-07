@@ -47,6 +47,14 @@ public class DictionaryEntry{
 
 
 	public static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData){
+		return createFromDictionaryLine(line, affixData, true);
+	}
+
+	public static DictionaryEntry createFromDictionaryLineNoStemTag(final String line, final AffixData affixData){
+		return createFromDictionaryLine(line, affixData, false);
+	}
+
+	private static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData, final boolean addStemTag){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
@@ -59,11 +67,10 @@ public class DictionaryEntry{
 			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
 
 		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-		final String dicFlags = m.group(PARAM_FLAGS);
-		final String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
+		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
+		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
 		final DictionaryEntry dicEntry = new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 

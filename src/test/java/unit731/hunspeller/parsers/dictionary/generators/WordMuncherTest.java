@@ -35,8 +35,29 @@ class WordMuncherTest{
 		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
 
 		Assertions.assertEquals(1, originators.size());
-		final DictionaryEntry originator = originators.get(0);
-		Assertions.assertEquals("a/b	st:a", originator.toString());
+		Assertions.assertEquals("a/b", originators.get(0).toString());
+	}
+
+	@Test
+	void multipleOriginator() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX a Y 1",
+			"SFX a 0 b .",
+			"SFX b Y 1",
+			"SFX b 0 b ."
+		);
+		String line = "ab";
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
+
+		Assertions.assertEquals(2, originators.size());
+		Assertions.assertEquals("a/a", originators.get(0).toString());
+		Assertions.assertEquals("a/b", originators.get(1).toString());
 	}
 
 	@Test
@@ -58,7 +79,7 @@ class WordMuncherTest{
 
 		Assertions.assertEquals(1, originators.size());
 		final DictionaryEntry originator = originators.get(0);
-		Assertions.assertEquals("a/b	st:a", originator.toString());
+		Assertions.assertEquals("a/b", originator.toString());
 	}
 
 	@Test

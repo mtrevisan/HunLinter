@@ -29,6 +29,10 @@ public class WordGenerator{
 		return DictionaryEntry.createFromDictionaryLine(line, wordGeneratorAffixRules.affixData);
 	}
 
+	public DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
+		return DictionaryEntry.createFromDictionaryLineNoStemTag(line, wordGeneratorAffixRules.affixData);
+	}
+
 	public List<Production> applyAffixRules(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry);
 	}

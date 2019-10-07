@@ -111,7 +111,7 @@ public class WordMuncher{
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
-						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLine(originatingWord + SLASH + affixEntry.getFlag());
+						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
 						final List<Production> productions = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
 						//remove base production
