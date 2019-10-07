@@ -1,9 +1,11 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
@@ -25,10 +27,10 @@ class WordMuncherTest{
 			"SFX b 0 b ."
 		);
 		String line = "ab\tpo:noun";
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
-		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null, null);
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
@@ -47,10 +49,10 @@ class WordMuncherTest{
 			"SFX b 0 b .	po:noun"
 		);
 		String line = "ab\tpo:noun";
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
-		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null, null);
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
@@ -69,14 +71,25 @@ class WordMuncherTest{
 			"SFX b 0 b .	po:adjective"
 		);
 		String line = "ab\tpo:noun";
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
-		AffixData affixData = affParser.getAffixData();
-		WordMuncher muncher = new WordMuncher(affixData, null, null);
+		Pair<AffixData, WordGenerator> things = createThings(affFile);
+		AffixData affixData = things.getLeft();
+		WordGenerator wordGenerator = things.getRight();
+		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
 
 		Assertions.assertEquals(0, originators.size());
+	}
+
+	private Pair<AffixData, WordGenerator> createThings(File affFile) throws IOException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile);
+		AffixData affixData = affParser.getAffixData();
+		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+			"0");
+		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);
+		return Pair.of(affixData, wordGenerator);
 	}
 
 }
