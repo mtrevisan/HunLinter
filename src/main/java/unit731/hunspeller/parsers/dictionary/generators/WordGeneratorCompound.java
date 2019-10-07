@@ -264,10 +264,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private void removeTwofolds(final List<Production> prods){
-		final Iterator<Production> itr = prods.iterator();
-		while(itr.hasNext())
-			if(itr.next().isTwofolded())
-				itr.remove();
+		prods.removeIf(Production::isTwofolded);
 	}
 
 	//is word a non-compound with a REP substitution (see checkcompoundrep)?
