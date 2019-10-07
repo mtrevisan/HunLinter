@@ -29,6 +29,8 @@ public class WordMuncher{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordMuncher.class);
 
+	private static final String SLASH = "/";
+
 
 	private final AffixData affixData;
 //	private final DictionaryParser dicParser;
@@ -44,8 +46,8 @@ public class WordMuncher{
 		this.wordGenerator = wordGenerator;
 	}
 
-	public List<Production> inferAffixRules(final DictionaryEntry dicEntry){
-		final List<Production> originators = extractAllAffixes(dicEntry);
+	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
+		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
 		originators.size();
 
 		//TODO from the original word extract all the suffixes
@@ -104,11 +106,11 @@ public class WordMuncher{
 		return originators;
 	}
 
-	List<Production> extractAllAffixes(final DictionaryEntry dicEntry){
+	List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
 		final String word = dicEntry.getWord();
 		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
-		final List<Production> originators = new ArrayList<>();
+		final List<DictionaryEntry> originators = new ArrayList<>();
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
 		for(final RuleEntry ruleEntry : ruleEntries)
@@ -117,14 +119,14 @@ public class WordMuncher{
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
-						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
+						final DictionaryEntry originatingDictionaryEntry = wordGenerator.createFromDictionaryLine(originatingWord + SLASH + affixEntry.getFlag());
 
-						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+						final List<Production> productions = wordGenerator.applyAffixRules(originatingDictionaryEntry, ruleEntry);
 
 						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
 						if(baseProductionPartOfSpeech == null && partOfSpeech == null
 								|| baseProductionPartOfSpeech != null && partOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
-							originators.add(originatingRule);
+							originators.add(originatingDictionaryEntry);
 					}
 				}
 

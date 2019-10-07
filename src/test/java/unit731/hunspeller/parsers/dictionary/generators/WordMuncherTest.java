@@ -32,10 +32,10 @@ class WordMuncherTest{
 		WordGenerator wordGenerator = things.getRight();
 		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
 
 		Assertions.assertEquals(1, originators.size());
-		final Production originator = originators.get(0);
+		final DictionaryEntry originator = originators.get(0);
 		Assertions.assertEquals("a	from	b", originator.toString());
 	}
 
@@ -54,10 +54,10 @@ class WordMuncherTest{
 		WordGenerator wordGenerator = things.getRight();
 		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
 
 		Assertions.assertEquals(1, originators.size());
-		final Production originator = originators.get(0);
+		final DictionaryEntry originator = originators.get(0);
 		Assertions.assertEquals("a	po:noun	from	b", originator.toString());
 	}
 
@@ -76,7 +76,7 @@ class WordMuncherTest{
 		WordGenerator wordGenerator = things.getRight();
 		WordMuncher muncher = new WordMuncher(affixData, null, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-		final List<Production> originators = muncher.extractAllAffixes(dicEntry);
+		final List<DictionaryEntry> originators = muncher.extractAllAffixes(dicEntry);
 
 		Assertions.assertEquals(0, originators.size());
 	}
