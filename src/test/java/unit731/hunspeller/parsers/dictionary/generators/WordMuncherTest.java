@@ -81,6 +81,7 @@ class WordMuncherTest{
 		Assertions.assertEquals(0, originators.size());
 	}
 
+
 	private Pair<AffixData, WordGenerator> createThings(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);

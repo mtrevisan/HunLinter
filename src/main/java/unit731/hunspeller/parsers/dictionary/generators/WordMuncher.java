@@ -48,7 +48,6 @@ public class WordMuncher{
 
 	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
-		originators.size();
 
 		//TODO from the original word extract all the suffixes
 
@@ -119,12 +118,11 @@ public class WordMuncher{
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
-						final DictionaryEntry originatingDictionaryEntry = wordGenerator.createFromDictionaryLine(originatingWord + SLASH + affixEntry.getFlag());
+						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLine(originatingWord + SLASH + affixEntry.getFlag());
 
-						final List<Production> productions = wordGenerator.applyAffixRules(originatingDictionaryEntry, ruleEntry);
-
+						final List<Production> productions = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
 						//remove base production
-						productions.remove(0);
+						productions.remove(WordGenerator.BASE_PRODUCTION_INDEX);
 
 						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
 						if(productions.size() != 1)
@@ -133,7 +131,7 @@ public class WordMuncher{
 						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
 						if(baseProductionPartOfSpeech == null && partOfSpeech == null
 								|| baseProductionPartOfSpeech != null && partOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
-							originators.add(originatingDictionaryEntry);
+							originators.add(originatorEntry);
 					}
 				}
 

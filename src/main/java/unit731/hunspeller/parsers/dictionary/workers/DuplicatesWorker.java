@@ -224,7 +224,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						try{
 							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
-							final String word = productions.get(0).getWord();
+							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
 							for(final Production production : productions){
 								final String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))

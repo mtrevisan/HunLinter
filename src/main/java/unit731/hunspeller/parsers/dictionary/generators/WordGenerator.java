@@ -10,6 +10,8 @@ import unit731.hunspeller.parsers.vos.Production;
 
 public class WordGenerator{
 
+	public static final int BASE_PRODUCTION_INDEX = 0;
+
 	private final WordGeneratorAffixRules wordGeneratorAffixRules;
 	private final WordGeneratorCompoundRules wordGeneratorCompoundRules;
 	private final WordGeneratorCompoundFlag wordGeneratorCompoundFlag;
