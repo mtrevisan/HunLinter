@@ -151,7 +151,8 @@ public class DictionarySortDialog extends JDialog{
 
 	public void setListData(final String[] listData){
 		entriesList.setListData(listData);
-		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+		if(firstVisibleItemIndex > 0 && firstVisibleItemIndex < entriesList.getModel().getSize())
+			entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 
 		//initialize dictionary
 		dicParser.calculateDictionaryBoundaries();
