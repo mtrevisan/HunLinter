@@ -1262,7 +1262,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForThesaurusFilter(unmodifiedSearchText);
-		final List<String> partOfSpeeches = Arrays.asList(pair.getLeft());
+		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
 		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
@@ -1270,16 +1270,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(theAddButton.isEnabled() || alreadyContained){
-			final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(unmodifiedSearchText);
+			final Pair<String, String> searchText = ThesaurusParser.prepareTextForThesaurusFilter(partOfSpeeches, meanings);
 			EventQueue.invokeLater(() -> {
 				final RowFilter<Object, Object> andFilter = RowFilter.andFilter(Arrays.asList(
 					//POS in meanings should be exactly what was given in the search string (or anything if not given)
-					RowFilter.regexFilter(searchText[0], 1),
+					RowFilter.regexFilter(searchText.getLeft(), 1),
 					//word in meanings should contain what was given in the search string
-					RowFilter.regexFilter(searchText[1], 1)));
+					RowFilter.regexFilter(searchText.getRight(), 1)));
 				final RowFilter<Object, Object> orFilter = RowFilter.orFilter(Arrays.asList(
 					//the synonym should contain what was given in the search string
-					RowFilter.regexFilter(searchText[1], 0),
+					RowFilter.regexFilter(searchText.getRight(), 0),
 					andFilter));
 				sorter.setRowFilter(orFilter);
 			});

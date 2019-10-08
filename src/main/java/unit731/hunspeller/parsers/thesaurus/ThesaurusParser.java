@@ -317,17 +317,15 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		return pos;
 	}
 
-	public static String[] prepareTextForThesaurusFilter(String text){
-		final Pair<String[], String[]> pair = extractComponentsForThesaurusFilter(text);
-		final String[] pos = pair.getLeft();
-		final String[] meanings = pair.getRight();
-
+	public static Pair<String, String> prepareTextForThesaurusFilter(final List<String> partOfSpeeches, List<String> meanings){
 		//extract part of speech if present
-		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.stream(pos).map(p -> StringUtils.replace(text, ".", "\\.")).collect(Collectors.toList())) + ")[\\),]": ".+");
-		final String meaningsFilter = (meanings != null? "(" + String.join(PIPE, Arrays.asList(meanings)) + ")": ".+");
+		final String posFilter = (!partOfSpeeches.isEmpty()?
+			partOfSpeeches.stream().map(p -> StringUtils.replace(p, ".", "\\.")).collect(Collectors.joining(PIPE, "[\\(\\s](", ")[\\),]")):
+			".+");
+		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
 
 		//compose filter regexp
-		return new String[]{posFilter, meaningsFilter};
+		return Pair.of(posFilter, meaningsFilter);
 	}
 
 	private static String clearThesaurusFilter(String text){
