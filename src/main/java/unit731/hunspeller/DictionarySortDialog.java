@@ -20,14 +20,16 @@ public class DictionarySortDialog extends JDialog{
 
 
 	private final DictionaryParser dicParser;
+	private final int firstVisibleItemIndex;
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, Frame parent){
+	public DictionarySortDialog(final DictionaryParser dicParser, final int firstVisibleItemIndex, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
 
 		this.dicParser = dicParser;
+		this.firstVisibleItemIndex = firstVisibleItemIndex;
 
 		initComponents();
 
@@ -147,11 +149,16 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.addListSelectionListener(listener);
 	}
 
-	public void setListData(String[] listData){
+	public void setListData(final String[] listData){
 		entriesList.setListData(listData);
+		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 
 		//initialize dictionary
 		dicParser.calculateDictionaryBoundaries();
+	}
+
+	public int getFirstVisibleIndex(){
+		return entriesList.getFirstVisibleIndex();
 	}
 
 	public int getSelectedIndex(){

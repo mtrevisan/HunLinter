@@ -138,6 +138,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final Backbone backbone;
+	private int lastDictionarySortVisibleIndex;
 
 	private RecentFilesMenu recentFilesMenu;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
@@ -1193,7 +1194,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
-			DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), this);
+			final DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), lastDictionarySortVisibleIndex, this);
 			dialog.setCurrentFont(GUIUtils.getCurrentFont());
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
@@ -1212,7 +1213,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					}
 				}
 			});
-			String[] lines = backbone.getDictionaryLines();
+			dialog.addWindowListener(new WindowAdapter(){
+				@Override
+				public void windowClosing(final WindowEvent e){
+					lastDictionarySortVisibleIndex = dialog.getFirstVisibleIndex();
+				}
+			});
+			final String[] lines = backbone.getDictionaryLines();
 			dialog.setListData(lines);
 			dialog.setVisible(true);
 		}
