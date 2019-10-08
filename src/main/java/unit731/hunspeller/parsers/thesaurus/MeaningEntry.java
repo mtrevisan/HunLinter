@@ -17,18 +17,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class MeaningEntry implements Comparable<MeaningEntry>{
 
 	@JsonProperty
-	private String partOfSpeech;
+	private String[] partOfSpeeches;
 	@JsonProperty
 	private List<String> meanings;
 
 
 	@JsonCreator
-	public MeaningEntry(@JsonProperty("partOfSpeech") final String partOfSpeech,
-			@JsonProperty("meanings") final List<String> meanings){
-		Objects.requireNonNull(partOfSpeech);
+	public MeaningEntry(@JsonProperty("partOfSpeeches") final String[] partOfSpeeches, @JsonProperty("meanings") final List<String> meanings){
+		Objects.requireNonNull(partOfSpeeches);
 		Objects.requireNonNull(meanings);
 
-		this.partOfSpeech = partOfSpeech;
+		this.partOfSpeeches = partOfSpeeches;
 		this.meanings = meanings;
 	}
 
@@ -38,10 +37,12 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		try{
 			final String[] components = StringUtils.split(partOfSpeechAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 
-			partOfSpeech = StringUtils.strip(components[0]);
+			final String partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
 				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + partOfSpeechAndMeanings);
 
+			partOfSpeeches = partOfSpeech.substring(1, partOfSpeech.length() - 1)
+				.split(",\\s*");
 			meanings = Arrays.stream(StringUtils.split(components[1], ThesaurusEntry.POS_AND_MEANS))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
@@ -55,14 +56,18 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		}
 	}
 
-	public String getPartOfSpeech(){
-		return partOfSpeech;
+	public String[] getPartOfSpeeches(){
+		return partOfSpeeches;
+	}
+
+	public boolean containsAllMeanings(final List<String> meanings){
+		return this.meanings.containsAll(meanings);
 	}
 
 	@Override
 	public String toString(){
 		return (new StringJoiner(ThesaurusEntry.PIPE))
-			.add(partOfSpeech)
+			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
 			.add(StringUtils.join(meanings, ThesaurusEntry.PIPE))
 			.toString();
 	}
@@ -70,7 +75,8 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	@Override
 	public int compareTo(final MeaningEntry other){
 		return new CompareToBuilder()
-			.append(partOfSpeech, other.partOfSpeech)
+			.append(partOfSpeeches, other.partOfSpeeches)
+			.append(meanings, other.meanings)
 			.toComparison();
 	}
 
@@ -83,14 +89,16 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 		final MeaningEntry rhs = (MeaningEntry)obj;
 		return new EqualsBuilder()
-			.append(partOfSpeech, rhs.partOfSpeech)
+			.append(partOfSpeeches, rhs.partOfSpeeches)
+			.append(meanings, rhs.meanings)
 			.isEquals();
 	}
 
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(partOfSpeech)
+			.append(partOfSpeeches)
+			.append(meanings)
 			.toHashCode();
 	}
 

@@ -1259,11 +1259,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		formerFilterThesaurusText = unmodifiedSearchText;
 
+//		backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+
+		//TODO if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
-		//TODO if text to be inserted is already contained into the thesaurus, do nothing
 
-		@SuppressWarnings("unchecked") TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>) frame.theTable.getRowSorter();
+		@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(theAddButton.isEnabled()){
 			final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(unmodifiedSearchText);
 			EventQueue.invokeLater(() -> {
@@ -1436,18 +1438,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
       try{
          //try adding the meanings
-         String synonyms = theMeaningsTextField.getText();
-         Supplier<Boolean> duplicatesDiscriminator = () -> {
+			final String synonyms = theMeaningsTextField.getText();
+			final Supplier<Boolean> duplicatesDiscriminator = () -> {
             int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
                "Select one", JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);
          };
-         DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
-         List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+			final DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
+         final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
          if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter...
-            ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
             dm.fireTableDataChanged();
 
             formerFilterThesaurusText = null;
@@ -1465,17 +1467,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          else{
 				theMeaningsTextField.requestFocusInWindow();
 
-				String duplicatedWords = duplicates.stream()
+				final String duplicatedWords = duplicates.stream()
 					.map(ThesaurusEntry::getSynonym)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
 					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
-      catch(IllegalArgumentException e){
+      catch(final IllegalArgumentException e){
          LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
-      catch(Exception t){
+      catch(final Exception t){
          String message = ExceptionHelper.getMessage(t);
          LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
       }

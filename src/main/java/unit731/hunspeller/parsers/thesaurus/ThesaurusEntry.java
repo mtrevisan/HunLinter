@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -85,12 +86,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return meanings.size();
 	}
 
-	public long countSamePartOfSpeech(String partOfSpeech){
-		return (long)meanings.stream()
-			.map(MeaningEntry::getPartOfSpeech)
-			.filter(pos -> pos.equals(partOfSpeech))
-			.map(m -> 1)
-			.reduce(0, (accumulator, m) -> accumulator + 1);
+	public long countSamePartOfSpeech(final String partOfSpeech){
+		return meanings.stream()
+			.map(MeaningEntry::getPartOfSpeeches)
+			.filter(partOfSpeech::equals)
+			.count();
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
@@ -112,6 +112,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 			meaningsLength += m.getBytes(charset).length;
 		}
 		return meaningsLength + StringUtils.LF.length() * meaningsEntries;
+	}
+
+	public boolean contains(final String[] partOfSpeeches, final List<String> meanings){
+		return (meanings.contains(synonym) && this.meanings.stream()
+			.anyMatch(meaning -> Arrays.asList(meaning.getPartOfSpeeches()).containsAll(Arrays.asList(partOfSpeeches)) && meaning.containsAllMeanings(meanings)));
 	}
 
 	@Override

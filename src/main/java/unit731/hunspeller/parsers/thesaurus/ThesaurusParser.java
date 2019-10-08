@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
@@ -196,7 +197,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
 
 		boolean forceInsertion = false;
-		final List<ThesaurusEntry> duplicates = extractDuplicates(meanings, partOfSpeech);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeech, meanings);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
@@ -218,16 +219,23 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final List<String> means, final String partOfSpeech) throws IllegalArgumentException{
+	private List<ThesaurusEntry> extractDuplicates(final String partOfSpeech, final List<String> meanings) throws IllegalArgumentException{
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-		for(final String meaning : means){
+		for(final String meaning : meanings){
 			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			for(final ThesaurusEntry synonym : synonyms)
 				if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
 					duplicates.add(synonym);
 		}
 		return duplicates;
+	}
+
+	/** Find if there is a duplicate with the same part of speech and same meanings */
+	public boolean isAlreadyContained(final String[] partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
+		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+		return synonyms.stream()
+			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
 	}
 
 	public void setMeanings(final int index, final String text){
@@ -277,10 +285,9 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		return dictionary.extractDuplicates();
 	}
 
-	public static String[] prepareTextForThesaurusFilter(String text){
+	public static Pair<String[], String[]> extractComponentsForThesaurusFilter(String text){
 		//extract part of speech if present
 		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
-		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.asList(pos)) + ")[^)]*\\)": ".+");
 
 		text = clearThesaurusFilter(text);
 
@@ -290,7 +297,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return new String[]{posFilter, "(" + text + ")"};
+		return Pair.of(pos, StringUtils.split(text, PIPE));
 	}
 
 	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
@@ -311,6 +318,19 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 				.split(", *");
 		}
 		return pos;
+	}
+
+	public static String[] prepareTextForThesaurusFilter(String text){
+		final Pair<String[], String[]> pair = extractComponentsForThesaurusFilter(text);
+		final String[] pos = pair.getLeft();
+		final String[] meanings = pair.getRight();
+
+		//extract part of speech if present
+		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.asList(pos)) + ")[\\),]": ".+");
+		final String meaningsFilter = (meanings != null? "(" + String.join(PIPE, Arrays.asList(meanings)) + ")": ".+");
+
+		//compose filter regexp
+		return new String[]{posFilter, meaningsFilter};
 	}
 
 	private static String clearThesaurusFilter(String text){
