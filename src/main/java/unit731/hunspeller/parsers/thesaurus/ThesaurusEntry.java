@@ -114,9 +114,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return meaningsLength + StringUtils.LF.length() * meaningsEntries;
 	}
 
-	public boolean contains(final String[] partOfSpeeches, final List<String> meanings){
-		return (meanings.contains(synonym) && this.meanings.stream()
-			.anyMatch(meaning -> Arrays.asList(meaning.getPartOfSpeeches()).containsAll(Arrays.asList(partOfSpeeches)) && meaning.containsAllMeanings(meanings)));
+	public boolean contains(final List<String> partOfSpeeches, final List<String> meanings){
+		final List<String> mm = new ArrayList<>(meanings);
+		return (mm.remove(synonym) && meanings.contains(synonym) && this.meanings.stream().anyMatch(meaning -> meaning.containsAllMeanings(partOfSpeeches, mm)));
 	}
 
 	@Override

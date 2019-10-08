@@ -60,8 +60,8 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		return partOfSpeeches;
 	}
 
-	public boolean containsAllMeanings(final List<String> meanings){
-		return this.meanings.containsAll(meanings);
+	public boolean containsAllMeanings(final List<String> partOfSpeeches, final List<String> meanings){
+		return (Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches) && this.meanings.containsAll(meanings));
 	}
 
 	@Override

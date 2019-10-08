@@ -2,6 +2,7 @@ package unit731.hunspeller;
 
 import java.awt.*;
 
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.interfaces.Hunspellable;
 
@@ -1259,14 +1260,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		formerFilterThesaurusText = unmodifiedSearchText;
 
-//		backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
-
-		//TODO if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForThesaurusFilter(unmodifiedSearchText);
+		final List<String> partOfSpeeches = Arrays.asList(pair.getLeft());
+		final List<String> meanings = Arrays.asList(pair.getRight());
+		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
 
 
 		@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
-		if(theAddButton.isEnabled()){
+		if(theAddButton.isEnabled() || alreadyContained){
 			final String[] searchText = ThesaurusParser.prepareTextForThesaurusFilter(unmodifiedSearchText);
 			EventQueue.invokeLater(() -> {
 				final RowFilter<Object, Object> andFilter = RowFilter.andFilter(Arrays.asList(

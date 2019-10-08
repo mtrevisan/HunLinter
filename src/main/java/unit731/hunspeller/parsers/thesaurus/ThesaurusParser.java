@@ -232,7 +232,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean isAlreadyContained(final String[] partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
+	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		return synonyms.stream()
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
@@ -311,12 +311,9 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			idx = text.indexOf(")|");
 			start = 1;
 		}
-		if(idx >= 0){
-			text = text.substring(start, idx);
-			//escape points
-			pos = StringUtils.replace(text, ".", "\\.")
+		if(idx >= 0)
+			pos = text.substring(start, idx)
 				.split(", *");
-		}
 		return pos;
 	}
 
@@ -326,7 +323,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		final String[] meanings = pair.getRight();
 
 		//extract part of speech if present
-		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.asList(pos)) + ")[\\),]": ".+");
+		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.stream(pos).map(p -> StringUtils.replace(text, ".", "\\.")).collect(Collectors.toList())) + ")[\\),]": ".+");
 		final String meaningsFilter = (meanings != null? "(" + String.join(PIPE, Arrays.asList(meanings)) + ")": ".+");
 
 		//compose filter regexp
