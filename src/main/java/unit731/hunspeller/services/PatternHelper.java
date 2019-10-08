@@ -68,6 +68,7 @@ public class PatternHelper{
 		return result.toArray(String[]::new);
 	}
 
+	//FIXME is there a way to optimize this find?
 	public static boolean find(final String text, final Pattern pattern){
 		return find(getMatcher(text, pattern));
 	}
@@ -80,7 +81,7 @@ public class PatternHelper{
 		return matcher.matches();
 	}
 
-//FIXME is there a way to optimize this PatternService.replaceAll?
+	//FIXME is there a way to optimize this replaceAll?
 	public static String replaceAll(final String text, final Pattern pattern, final String replacement){
 		return pattern.matcher(text)
 			.replaceAll(replacement);

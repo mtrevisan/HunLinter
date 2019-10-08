@@ -388,7 +388,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	private void storeMemento() throws IOException{
-		//FIXME
+		//FIXME reduce size of data saved
 //		undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
 		undoCaretaker.pushMemento(createMemento());
 
@@ -407,7 +407,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	public boolean restorePreviousSnapshot() throws IOException{
 		boolean restored = false;
 		if(canUndo()){
-			//FIXME
+			//FIXME reduce size of data saved
 			redoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = undoCaretaker.popMemento();
@@ -426,7 +426,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	public boolean restoreNextSnapshot() throws IOException{
 		boolean restored = false;
 		if(canRedo()){
-			//FIXME
+			//FIXME reduce size of data saved
 			undoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = redoCaretaker.popMemento();

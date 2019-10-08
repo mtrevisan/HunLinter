@@ -22,15 +22,15 @@ public class DictionaryReducerWorker extends WorkerDictionaryBase{
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 
-			//TODO
-			//			for(final Production production : productions){
-			//				try{
-			//					checker.checkProduction(production);
-			//				}
-			//				catch(final Exception e){
-			//					throw wrapException(e, production);
-			//				}
-			//			}
+//TODO
+//			for(final Production production : productions){
+//				try{
+//					checker.checkProduction(production);
+//				}
+//				catch(final Exception e){
+//					throw wrapException(e, production);
+//				}
+//			}
 		};
 		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);

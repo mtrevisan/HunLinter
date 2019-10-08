@@ -142,8 +142,8 @@ public class AffixEntry{
 		return (size > 0? flags.toArray(String[]::new): null);
 	}
 
+	//FIXME is this documentation updated/true?
 	/**
-	 * FIXME is this documentation updated/true?
 	 *
 	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
