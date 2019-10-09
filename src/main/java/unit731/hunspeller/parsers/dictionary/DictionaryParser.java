@@ -81,38 +81,16 @@ public class DictionaryParser{
 			.orElse(null);
 	}
 
-	/** FIXME {@link #calculateDictionaryBoundaries()} must be called beforehand!! */
 	public final int getBoundaryIndex(final int lineIndex){
+		if(boundaries.isEmpty())
+			calculateDictionaryBoundaries();
+
 		return searchBoundary(lineIndex)
 			.map(e -> boundaries.headMap(lineIndex, true).size() - 1)
 			.orElse(-1);
 	}
 
-	public final int getNextBoundaryIndex(final int lineIndex){
-		return Optional.ofNullable(boundaries.higherEntry(lineIndex))
-			.map(Map.Entry::getKey)
-			.orElse(-1);
-	}
-
-	public final int getPreviousBoundaryIndex(final int lineIndex){
-		return Optional.ofNullable(boundaries.lowerEntry(lineIndex))
-			.map(Map.Entry::getKey)
-			.orElse(-1);
-	}
-
-	public final boolean isInBoundary(final int lineIndex){
-		return searchBoundary(lineIndex)
-			.isPresent();
-	}
-
-	private Optional<Map.Entry<Integer, Integer>> searchBoundary(final int lineIndex){
-		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
-			.filter(e -> lineIndex <= e.getValue());
-	}
-
-	public final void calculateDictionaryBoundaries(){
-		boundaries.clear();
-
+	private final void calculateDictionaryBoundaries(){
 		try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
 			//skip line count
 			br.readLine();
@@ -151,6 +129,28 @@ public class DictionaryParser{
 		catch(final IOException e){
 			LOGGER.error(null, e);
 		}
+	}
+
+	public final int getNextBoundaryIndex(final int lineIndex){
+		return Optional.ofNullable(boundaries.higherEntry(lineIndex))
+			.map(Map.Entry::getKey)
+			.orElse(-1);
+	}
+
+	public final int getPreviousBoundaryIndex(final int lineIndex){
+		return Optional.ofNullable(boundaries.lowerEntry(lineIndex))
+			.map(Map.Entry::getKey)
+			.orElse(-1);
+	}
+
+	public final boolean isInBoundary(final int lineIndex){
+		return searchBoundary(lineIndex)
+			.isPresent();
+	}
+
+	private Optional<Map.Entry<Integer, Integer>> searchBoundary(final int lineIndex){
+		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
+			.filter(e -> lineIndex <= e.getValue());
 	}
 
 

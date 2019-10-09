@@ -34,9 +34,6 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.setListData(listData);
 		scrollToVisibleIndex(firstVisibleItemIndex);
 
-		//initialize dictionary
-		dicParser.calculateDictionaryBoundaries();
-
 		lblMessage.setText("Select a section from the list:");
 	}
 

@@ -55,11 +55,6 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
 			setProgress(0);
 
-			//extract boundaries from the file (from comment to comment, or blank line)
-			dicParser.calculateDictionaryBoundaries();
-
-			setProgress(20);
-
 			final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 			if(boundary != null){
 				backbone.stopFileListener();
@@ -67,16 +62,16 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 				//split dictionary isolating the sorted section
 				final List<File> chunks = splitDictionary(boundary);
 
-				setProgress(40);
+				setProgress(25);
 
 				sortSection(chunks);
 
-				setProgress(60);
+				setProgress(50);
 
 				//re-merge sections
 				backbone.mergeSectionsToDictionary(chunks);
 
-				setProgress(80);
+				setProgress(75);
 
 				//remove temporary files
 				chunks.forEach(File::delete);
