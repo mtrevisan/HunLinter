@@ -47,12 +47,8 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static Matcher getMatcher(final String text, final Pattern pattern){
-		return pattern.matcher(text);
-	}
-
 	public static String[] extract(final String text, final Pattern pattern){
-		return extract(getMatcher(text, pattern));
+		return extract(pattern.matcher(text));
 	}
 
 	public static String[] extract(final Matcher matcher){
@@ -70,7 +66,7 @@ public class PatternHelper{
 
 	//FIXME is there a way to optimize this find?
 	public static boolean find(final String text, final Pattern pattern){
-		return find(getMatcher(text, pattern));
+		return find(pattern.matcher(text));
 	}
 
 	public static boolean find(final Matcher matcher){
