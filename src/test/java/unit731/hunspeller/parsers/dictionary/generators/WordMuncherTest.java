@@ -27,7 +27,7 @@ class WordMuncherTest{
 		);
 		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
 			"1",
-			"a/b");
+			"a");
 		String line = "ab";
 		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
 		WordMuncher muncher = pair.getLeft();

@@ -62,59 +62,11 @@ public class WordMuncher{
 
 	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
+		originators.add(0, dicEntry);
 
 		originators.removeIf(originator -> !dicInclusionTestWorker.isInDictionary(originator.getWord()));
 
-		//TODO from the original word extract all the suffixes
-
-		//TODO from the original word extract all the prefixes
-
-		if(affixData.isComplexPrefixes()){
-			//twofold prefixes and onefold suffixes at most
-			//TODO from the original word extract all the suffixes
-			//TODO from each prefix extract all the prefixes
-
-			//TODO from the original word extract all the prefixes
-			//TODO from each suffix extract all the prefixes
-
-			//TODO from the original word extract all the prefixes
-			//TODO from each suffix extract all the suffixes
-
-			//TODO from the original word extract all the suffixes
-			//TODO from each prefix extract all the prefixes
-			//TODO from each suffix extract all the prefixes
-
-			//TODO from the original word extract all the prefixes
-			//TODO from each suffix extract all the prefixes
-			//TODO from each suffix extract all the suffixes
-
-			//TODO from the original word extract all the prefixes
-			//TODO from each suffix extract all the suffixes
-			//TODO from each suffix extract all the prefixes
-		}
-		else{
-			//twofold suffixes and onefold prefixes at most
-			//TODO from the original word extract all the prefixes
-			//TODO from each prefix extract all the suffixes
-
-			//TODO from the original word extract all the suffixes
-			//TODO from each suffix extract all the suffixes
-
-			//TODO from the original word extract all the suffixes
-			//TODO from each suffix extract all the prefixes
-
-			//TODO from the original word extract all the prefixes
-			//TODO from each prefix extract all the suffixes
-			//TODO from each suffix extract all the suffixes
-
-			//TODO from the original word extract all the suffixes
-			//TODO from each suffix extract all the suffixes
-			//TODO from each suffix extract all the prefixes
-
-			//TODO from the original word extract all the suffixes
-			//TODO from each suffix extract all the prefixes
-			//TODO from each suffix extract all the suffixes
-		}
+		//TODO
 
 		if(LOGGER.isTraceEnabled())
 			originators.forEach(production -> LOGGER.trace("Inferred word: {}", production));
