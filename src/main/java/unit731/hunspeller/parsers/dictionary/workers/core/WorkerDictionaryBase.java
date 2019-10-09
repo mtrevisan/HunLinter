@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.vos.Production;
 
 
 public abstract class WorkerDictionaryBase{
@@ -97,6 +98,13 @@ public abstract class WorkerDictionaryBase{
 			if(resumeTask != null)
 				resumeTask.run();
 		}
+	}
+
+	protected IllegalArgumentException wrapException(final Exception e, final Production production){
+		final StringBuffer sb = new StringBuffer(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		return new IllegalArgumentException(sb.toString());
 	}
 
 }

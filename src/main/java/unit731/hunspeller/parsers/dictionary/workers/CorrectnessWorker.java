@@ -38,13 +38,6 @@ public class CorrectnessWorker extends WorkerDictionaryBase{
 		createReadWorker(data, lineProcessor);
 	}
 
-	private IllegalArgumentException wrapException(final Exception e, final Production production){
-		final StringBuffer sb = new StringBuffer(e.getMessage());
-		if(production.hasProductionRules())
-			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		return new IllegalArgumentException(sb.toString());
-	}
-
 	@Override
 	public String getWorkerName(){
 		return WORKER_NAME;
