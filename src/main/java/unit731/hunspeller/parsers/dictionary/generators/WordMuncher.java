@@ -47,7 +47,7 @@ public class WordMuncher{
 	}
 
 	private void loadDictionaryForInclusionTest(final DictionaryParser dicParser){
-		if(dicInclusionTestWorker == null && affixData.isCheckCompoundReplacement()){
+		if(dicInclusionTestWorker == null){
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
 
 			try{
@@ -121,7 +121,7 @@ public class WordMuncher{
 		return originators;
 	}
 
-	List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
+	private List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
 		final String word = dicEntry.getWord();
 		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
