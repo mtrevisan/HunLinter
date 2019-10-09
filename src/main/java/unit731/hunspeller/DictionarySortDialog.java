@@ -20,7 +20,6 @@ public class DictionarySortDialog extends JDialog{
 
 
 	private final DictionaryParser dicParser;
-	private final int firstVisibleItemIndex;
 
 
 	public DictionarySortDialog(final DictionaryParser dicParser, final String[] listData, final int firstVisibleItemIndex, final Frame parent){
@@ -29,12 +28,11 @@ public class DictionarySortDialog extends JDialog{
 		Objects.requireNonNull(dicParser);
 
 		this.dicParser = dicParser;
-		this.firstVisibleItemIndex = firstVisibleItemIndex;
 
 		initComponents();
 
 		entriesList.setListData(listData);
-		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+		scrollToVisibleIndex(firstVisibleItemIndex);
 
 		//initialize dictionary
 		dicParser.calculateDictionaryBoundaries();
@@ -113,6 +111,15 @@ public class DictionarySortDialog extends JDialog{
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
+	}
+
+	private void scrollToVisibleIndex(final int index){
+		final int visibleLines = entriesList.getLastVisibleIndex();
+		final int newIndex = Math.min(index + visibleLines, entriesList.getModel().getSize() - 1);
+		entriesList.ensureIndexIsVisible(newIndex);
+
+		//correct first item
+		entriesList.ensureIndexIsVisible(index);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
