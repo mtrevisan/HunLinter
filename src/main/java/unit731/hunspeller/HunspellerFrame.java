@@ -1194,7 +1194,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
-			final DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), lastDictionarySortVisibleIndex, this);
+			final String[] lines = backbone.getDictionaryLines();
+			final DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), lines, lastDictionarySortVisibleIndex, this);
 			dialog.setCurrentFont(GUIUtils.getCurrentFont());
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
@@ -1219,8 +1220,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					lastDictionarySortVisibleIndex = dialog.getFirstVisibleIndex();
 				}
 			});
-			final String[] lines = backbone.getDictionaryLines();
-			dialog.setListData(lines);
 			dialog.setVisible(true);
 		}
 		catch(IOException e){

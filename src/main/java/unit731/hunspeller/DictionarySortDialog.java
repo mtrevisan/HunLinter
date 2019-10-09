@@ -23,7 +23,7 @@ public class DictionarySortDialog extends JDialog{
 	private final int firstVisibleItemIndex;
 
 
-	public DictionarySortDialog(final DictionaryParser dicParser, final int firstVisibleItemIndex, final Frame parent){
+	public DictionarySortDialog(final DictionaryParser dicParser, final String[] listData, final int firstVisibleItemIndex, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
@@ -32,6 +32,12 @@ public class DictionarySortDialog extends JDialog{
 		this.firstVisibleItemIndex = firstVisibleItemIndex;
 
 		initComponents();
+
+		entriesList.setListData(listData);
+		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+
+		//initialize dictionary
+		dicParser.calculateDictionaryBoundaries();
 
 		lblMessage.setText("Select a section from the list:");
 	}
@@ -147,15 +153,6 @@ public class DictionarySortDialog extends JDialog{
 
 	public void addListSelectionListener(ListSelectionListener listener){
 		entriesList.addListSelectionListener(listener);
-	}
-
-	public void setListData(final String[] listData){
-		entriesList.setListData(listData);
-		if(firstVisibleItemIndex > 0 && firstVisibleItemIndex < entriesList.getModel().getSize())
-			entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
-
-		//initialize dictionary
-		dicParser.calculateDictionaryBoundaries();
 	}
 
 	public int getFirstVisibleIndex(){
