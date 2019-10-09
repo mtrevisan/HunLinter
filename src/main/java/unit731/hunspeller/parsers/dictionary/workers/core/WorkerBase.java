@@ -19,7 +19,7 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 
 	protected Exception exception;
 
-	protected TimeWatch watch = TimeWatch.start();
+	protected final TimeWatch watch = TimeWatch.start();
 
 
 	public String getWorkerName(){

@@ -33,7 +33,6 @@ import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.ParserHelper;
-import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -76,7 +75,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
-			watch = TimeWatch.start();
+			watch.reset();
 
 			setProgress(0);
 			final Charset charset = getCharset();

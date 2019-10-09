@@ -13,7 +13,6 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
-import unit731.hunspeller.services.TimeWatch;
 
 
 public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
@@ -50,7 +49,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening project");
 			setProgress(0);
 
-			watch = TimeWatch.start();
+			watch.reset();
 
 			backbone.clear();
 

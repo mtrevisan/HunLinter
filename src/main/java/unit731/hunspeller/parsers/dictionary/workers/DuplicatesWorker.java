@@ -33,7 +33,6 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
-import unit731.hunspeller.services.TimeWatch;
 
 
 public class DuplicatesWorker extends WorkerBase<Void, Void>{
@@ -104,7 +103,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplicates extraction (pass 1/3)");
 
-			watch = TimeWatch.start();
+			watch.reset();
 
 			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
