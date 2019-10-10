@@ -1216,7 +1216,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			});
 			dialog.addWindowListener(new WindowAdapter(){
 				@Override
-				public void windowClosing(final WindowEvent e){
+				public void windowDeactivated(final WindowEvent e){
 					lastDictionarySortVisibleIndex = dialog.getFirstVisibleIndex();
 				}
 			});
