@@ -1729,7 +1729,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getTheParser().getSynonymsCounter() > 0){
 				addSorterToTable(theTable, comparator, null);
 
-				final ThesaurusTableModel dm = (ThesaurusTableModel) theTable.getModel();
+				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
 				theMenu.setEnabled(true);
