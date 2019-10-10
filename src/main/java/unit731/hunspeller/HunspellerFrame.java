@@ -802,7 +802,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       addWindowListener(new WindowAdapter(){
          @Override
-         public void windowClosing(WindowEvent e){
+         public void windowDeactivated(final WindowEvent e){
             exit();
          }
       });
@@ -1357,7 +1357,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		rulesReducerDialog.setLocationRelativeTo(this);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){
 			@Override
-			public void windowClosed(WindowEvent e){
+			public void windowDeactivated(final WindowEvent e){
 				dicRulesReducerMenuItem.setEnabled(true);
 			}
 		});

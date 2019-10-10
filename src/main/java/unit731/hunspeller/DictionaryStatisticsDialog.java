@@ -331,7 +331,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void addListenerOnClose(){
 		addWindowListener(new WindowAdapter(){
 			@Override
-			public void windowClosed(WindowEvent e){
+			public void windowDeactivated(final WindowEvent e){
 				statistics.clear();
 			}
 		});
