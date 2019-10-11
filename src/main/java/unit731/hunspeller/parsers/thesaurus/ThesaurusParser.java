@@ -177,27 +177,22 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		if(partOfSpeechAndMeanings.length != 2)
 			throw new IllegalArgumentException("Wrong format: '" + synonymAndMeanings + "'");
 
-		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		final StringBuffer sb = new StringBuffer();
-		if(!partOfSpeech.startsWith(PART_OF_SPEECH_START))
-			sb.append(PART_OF_SPEECH_START);
-		final String[] partOfSpeeches = partOfSpeech.split(",");
-		sb.append(String.join(", ", partOfSpeeches));
-		if(!partOfSpeech.endsWith(PART_OF_SPEECH_END))
-			sb.append(PART_OF_SPEECH_END);
-		partOfSpeech = sb.toString();
+		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
+		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
+			.split("\\s*,\\s*");
 
-		final String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
-		final List<String> meanings = Arrays.stream(means)
-			.filter(StringUtils::isNotBlank)
+		final List<String> meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS))
 			.map(String::trim)
+			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
 			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
 
 		boolean forceInsertion = false;
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeech, meanings);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
@@ -219,13 +214,13 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final String partOfSpeech, final List<String> meanings) throws IllegalArgumentException{
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		for(final String meaning : meanings){
 			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			for(final ThesaurusEntry synonym : synonyms)
-				if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
+				if(synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
 					duplicates.add(synonym);
 		}
 		return duplicates;

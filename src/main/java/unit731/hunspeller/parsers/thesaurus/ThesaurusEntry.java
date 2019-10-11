@@ -86,11 +86,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return meanings.size();
 	}
 
-	public long countSamePartOfSpeech(final String partOfSpeech){
+	public boolean hasSamePartOfSpeech(final String[] partOfSpeeches){
 		return meanings.stream()
 			.map(MeaningEntry::getPartOfSpeeches)
-			.filter(partOfSpeech::equals)
-			.count();
+			.anyMatch(pos -> Arrays.equals(pos, partOfSpeeches));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
