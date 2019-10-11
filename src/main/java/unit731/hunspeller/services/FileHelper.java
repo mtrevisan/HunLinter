@@ -35,7 +35,7 @@ public class FileHelper{
 				try{
 					cs = Charset.forName(name);
 				}
-				catch(Exception ignored){}
+				catch(final Exception ignored){}
 				return cs;
 			})
 			.filter(Objects::nonNull)
@@ -45,45 +45,45 @@ public class FileHelper{
 
 	private FileHelper(){}
 
-	public static Charset determineCharset(Path path){
-		for(Charset cs : HUNSPELL_CHARSETS){
+	public static Charset determineCharset(final Path path){
+		for(final Charset cs : HUNSPELL_CHARSETS){
 			try{
-				BufferedReader reader = Files.newBufferedReader(path, cs);
+				final BufferedReader reader = Files.newBufferedReader(path, cs);
 				reader.read();
 				return cs;
 			}
-			catch(IOException ignored){}
+			catch(final IOException ignored){}
 		}
 
 		throw new IllegalArgumentException("The file is not in an allowable charset ("
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
 	}
 
-	public static File getTemporaryUTF8File(String prefix, String extension, String... lines){
-		StringJoiner sj = new StringJoiner("\n");
-		for(String line : lines)
+	public static File getTemporaryUTF8File(final String prefix, final String extension, final String... lines){
+		final StringJoiner sj = new StringJoiner("\n");
+		for(final String line : lines)
 			sj.add(line);
-		String content = sj.toString();
+		final String content = sj.toString();
 
 		try{
-			File tmpFile = File.createTempFile((prefix != null? prefix: "test"), extension);
+			final File tmpFile = File.createTempFile((prefix != null? prefix: "test"), extension);
 			Files.writeString(tmpFile.toPath(), content);
 			tmpFile.deleteOnExit();
 			return tmpFile;
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			throw new RuntimeException("Failed creating temporary file for content '" + content + "'", e);
 		}
 	}
 
-	public static LineNumberReader createReader(Path path, Charset charset) throws IOException{
+	public static LineNumberReader createReader(final Path path, final Charset charset) throws IOException{
 		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE,
 			ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
-	public static void openFileWithChosenEditor(File file) throws InterruptedException, IOException{
+	public static void openFileWithChosenEditor(final File file) throws InterruptedException, IOException{
 		ProcessBuilder builder = null;
 		if(SystemUtils.IS_OS_WINDOWS)
 			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());

@@ -46,7 +46,7 @@ public class WordVEC{
 		try{
 			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
 		}
-		catch(ParseException e){
+		catch(final ParseException e){
 			//cannot happen
 			LOGGER.error(e.getMessage());
 		}

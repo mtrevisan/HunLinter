@@ -360,14 +360,14 @@ public class Backbone implements FileChangeListener{
 
 
 	public void createPackage(){
-		Path basePath = getPackageBaseDirectory();
+		final Path basePath = getPackageBaseDirectory();
 
 		//package entire folder with ZIP
 		if(basePath != null){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
 
 			try{
-				String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
+				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
 				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
@@ -376,7 +376,7 @@ public class Backbone implements FileChangeListener{
 				if(Desktop.isDesktopSupported())
 					Desktop.getDesktop().open(new File(basePath.toString()));
 			}
-			catch(IOException e){
+			catch(final IOException e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
 				LOGGER.error("Something very bad happened while creating package", e);

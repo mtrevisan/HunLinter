@@ -168,14 +168,14 @@ public class HyphenationParser{
 	 * @param hypFile	The content of the hyphenation file
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
-	public void parse(File hypFile) throws IllegalArgumentException{
+	public void parse(final File hypFile) throws IllegalArgumentException{
 		try{
 			clearInternal();
 
 			Level level = Level.NON_COMPOUND;
 
-			Path path = hypFile.toPath();
-			Charset charset = FileHelper.determineCharset(path);
+			final Path path = hypFile.toPath();
+			final Charset charset = FileHelper.determineCharset(path);
 			try(LineNumberReader br = FileHelper.createReader(path, charset)){
 				String line = extractLine(br);
 
@@ -189,7 +189,7 @@ public class HyphenationParser{
 					if(line.isEmpty())
 						continue;
 
-					boolean parsedLine = optParser.parseLine(line);
+					final boolean parsedLine = optParser.parseLine(line);
 					if(!parsedLine){
 						if(line.startsWith(NEXT_LEVEL)){
 							if(level == Level.COMPOUND)
@@ -201,7 +201,7 @@ public class HyphenationParser{
 							REDUCED_PATTERNS.get(level).clear();
 						}
 						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-							String key = PatternHelper.clear(line, PATTERN_EQUALS);
+							final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 							if(customHyphenations.get(level).containsKey(key))
 								throw new IllegalArgumentException("Custom hyphenation '" + line + "' is already present");
 
@@ -210,8 +210,8 @@ public class HyphenationParser{
 						else{
 							validateRule(line, level);
 
-							String key = getKeyFromData(line);
-							boolean duplicatedRule = isRuleDuplicated(key, line, level);
+							final String key = getKeyFromData(line);
+							final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 							if(duplicatedRule)
 								throw new IllegalArgumentException("Duplicate found: '" + line + "'");
 							else
@@ -224,7 +224,7 @@ public class HyphenationParser{
 
 				if(level == Level.NON_COMPOUND){
 					//dash and apostrophe are added by default (retro-compatibility)
-					List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
+					final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 					if(charset == StandardCharsets.UTF_8)
 						retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
@@ -232,7 +232,7 @@ public class HyphenationParser{
 
 					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
-					for(String noHyphen : retroCompatibilityNoHyphen){
+					for(final String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
 						if(!isRuleDuplicated(noHyphen, line, level))
 							rules.get(level)
@@ -242,18 +242,18 @@ public class HyphenationParser{
 			}
 
 			//build tries
-			for(Level l : Level.values())
+			for(final Level l : Level.values())
 				buildTrie(l, rules.get(l));
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
 		}
-		catch(Exception t){
-			String message = ExceptionHelper.getMessage(t);
+		catch(final Exception t){
+			final String message = ExceptionHelper.getMessage(t);
 			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
 		}
 		finally{
-			for(Level level : Level.values())
+			for(final Level level : Level.values())
 				REDUCED_PATTERNS.get(level).clear();
 		}
 	}

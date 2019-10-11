@@ -149,7 +149,7 @@ public class LineEntry implements Serializable{
 			try{
 				group.addAll(extractGroup(lcs.length()));
 			}
-			catch(IllegalArgumentException ignored){}
+			catch(final IllegalArgumentException ignored){}
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
 				condition = PatternHelper.makeGroup(group, comparator) + lcs;

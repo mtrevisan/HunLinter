@@ -169,15 +169,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		filEmptyRecentFilesMenuItem.setEnabled(recentFilesMenu.hasEntries());
 
 		try{
-			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
+			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 		}
-		catch(IOException ignored){}
+		catch(final IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 
 
-		File currentDir = new File(".");
+		final File currentDir = new File(".");
 		openAffixFileFileChooser = new JFileChooser();
 		openAffixFileFileChooser.setFileFilter(new FileNameExtensionFilter("AFF files", "aff"));
 		openAffixFileFileChooser.setCurrentDirectory(currentDir);
@@ -534,10 +534,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
-               JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
+					final JTable target = (JTable)e.getSource();
+					final int col = target.getSelectedColumn();
                if(col == 1){
-                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
+						final int row = theTable.convertRowIndexToModel(target.getSelectedRow());
                   Consumer<String> okButtonAction = (text) -> {
                      try{
                         backbone.getTheParser().setMeanings(row, text);
@@ -545,12 +545,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeThesaurusFiles();
                      }
-                     catch(IllegalArgumentException | IOException ex){
+                     catch(final IllegalArgumentException | IOException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
-                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
+						final ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
+						final ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
 						dialog.setCurrentFont(GUIUtils.getCurrentFont());
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(parent);
@@ -1140,8 +1140,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
-	private void calculateProductions(HunspellerFrame frame){
-		String inputText = StringUtils.strip(frame.dicInputTextField.getText());
+	private void calculateProductions(final HunspellerFrame frame){
+		final String inputText = StringUtils.strip(frame.dicInputTextField.getText());
 
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
@@ -1150,18 +1150,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText, frame.backbone.getAffixData());
-				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(dicEntry);
+				final List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(dicEntry);
 
-				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
+				final ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
 
 				//show first row
-				Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
+				final Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
 				frame.dicTable.scrollRectToVisible(cellRect);
 
 				frame.dicTotalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
-			catch(IllegalArgumentException e){
+			catch(final IllegalArgumentException e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
@@ -1171,8 +1171,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void calculateCompoundProductions(HunspellerFrame frame){
-		String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
+	private void calculateCompoundProductions(final HunspellerFrame frame){
+		final String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
 
 		cmpLimitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
@@ -1222,7 +1222,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			});
 			dialog.setVisible(true);
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			LOGGER.error("Something very bad happened while sorting the dictionary", e);
 		}
    }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
@@ -1296,12 +1296,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	public void removeSelectedRowsFromThesaurus(){
 		try{
-			int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
+			final int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
 				.map(theTable::convertRowIndexToModel)
 				.toArray();
 			backbone.getTheParser().deleteMeanings(selectedRows);
 
-			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.fireTableDataChanged();
 
 			updateSynonymsCounter();
@@ -1309,8 +1309,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//... and save the files
 			backbone.storeThesaurusFiles();
 		}
-		catch(Exception e){
-			String message = ExceptionHelper.getMessage(e);
+		catch(final Exception e){
+			final String message = ExceptionHelper.getMessage(e);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
 		}
 	}
@@ -1328,7 +1328,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		try{
 			extractWordCount();
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
@@ -1377,9 +1377,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
-      String newRule = hypAddRuleTextField.getText();
-      HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-      String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
+		final  String newRule = hypAddRuleTextField.getText();
+		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
+		final String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
       if(foundRule == null){
          try{
             backbone.storeHyphenationFile();
@@ -1395,7 +1395,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             hypAddRuleSyllabationOutputLabel.setText(null);
             hypAddRuleSyllabesCountOutputLabel.setText(null);
          }
-         catch(IOException e){
+         catch(final IOException e){
             LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
          }
       }
@@ -1426,7 +1426,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             updateSynonymsCounter();
          }
       }
-      catch(IOException e){
+      catch(final IOException e){
          LOGGER.error("Something very bad happened while redoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theRedoButtonActionPerformed
@@ -1439,7 +1439,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             updateSynonymsCounter();
          }
       }
-      catch(IOException e){
+      catch(final IOException e){
          LOGGER.error("Something very bad happened while undoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theUndoButtonActionPerformed
@@ -1501,16 +1501,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
-      String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
-      int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
-      String inputCompounds = cmpInputTextArea.getText();
+		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
+		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
+		final String inputCompounds = cmpInputTextArea.getText();
 
       if(StringUtils.isNotBlank(inputText)){
          try{
          	//FIXME transfer into backbone
             final List<Production> words;
 				final WordGenerator wordGenerator = backbone.getWordGenerator();
-            AffixData affixData = backbone.getAffixData();
+				final AffixData affixData = backbone.getAffixData();
 				if(affixData.getCompoundFlag().equals(inputText)){
                int maxCompounds = affixData.getCompoundMaxWordCount();
                words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
@@ -1518,15 +1518,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             else
             	words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
 
-            CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
+				final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
             dm.setProductions(words);
          }
-         catch(IllegalArgumentException e){
+         catch(final IllegalArgumentException e){
             LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
          }
       }
       else
-      clearOutputTable(cmpTable);
+      	clearOutputTable(cmpTable);
    }//GEN-LAST:event_cmpLimitComboBoxActionPerformed
 
    private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
@@ -2173,7 +2173,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
+		catch(final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
 			LOGGER.error(null, e);
 		}
 

@@ -209,14 +209,14 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the given key or value is <code>null</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	public V put(S key, V value) throws DuplicateKeyException{
+	public V put(final S key, final V value) throws DuplicateKeyException{
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
 		try{
 			return put(key, value, root);
 		}
-		catch(DuplicateKeyException e){
+		catch(final DuplicateKeyException e){
 			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'");
 		}
 	}
@@ -230,13 +230,13 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	private V put(S key, V value, RadixTreeNode<S, V> node) throws DuplicateKeyException{
+	private V put(final S key, final V value, final RadixTreeNode<S, V> node) throws DuplicateKeyException{
 		V ret = null;
 
-		S nodeKey = node.getKey();
-		int lcpLength = longestCommonPrefixLength(key, nodeKey);
-		int keyLength = sequencer.length(key);
-		int nodeKeyLength = sequencer.length(nodeKey);
+		final S nodeKey = node.getKey();
+		final int lcpLength = longestCommonPrefixLength(key, nodeKey);
+		final int keyLength = sequencer.length(key);
+		final int nodeKeyLength = sequencer.length(nodeKey);
 		if(lcpLength == nodeKeyLength && lcpLength == keyLength)
 			ret = putExactMatch(node, value);
 		else if(lcpLength == 0 || lcpLength < keyLength && lcpLength >= nodeKeyLength)

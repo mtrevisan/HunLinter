@@ -128,10 +128,10 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{
-			String text = meaningsTextArea.getText();
+			final String text = meaningsTextArea.getText();
 			okButtonAction.accept(text);
 		}
-		catch(IllegalArgumentException e){
+		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
 		}
 

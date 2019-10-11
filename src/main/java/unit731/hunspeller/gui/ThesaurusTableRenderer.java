@@ -12,14 +12,14 @@ public class ThesaurusTableRenderer extends JLabel implements TableCellRenderer{
 
 
 	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
-		String text = String.valueOf(value);
+	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column){
+		final String text = String.valueOf(value);
 		setText(text);
 
 		try{
 			table.setRowHeight(row, getPreferredSize().height + 4);
 		}
-		catch(ArrayIndexOutOfBoundsException ignored){}
+		catch(final ArrayIndexOutOfBoundsException ignored){}
 
 		return this;
 	}

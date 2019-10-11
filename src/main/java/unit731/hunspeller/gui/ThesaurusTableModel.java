@@ -28,7 +28,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private List<ThesaurusEntry> synonyms;
 
 
-	public void setSynonyms(List<ThesaurusEntry> synonyms){
+	public void setSynonyms(final List<ThesaurusEntry> synonyms){
 		this.synonyms = synonyms;
 
 		fireTableDataChanged();
@@ -45,11 +45,11 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex){
+	public Object getValueAt(final int rowIndex, final int columnIndex){
 		if(synonyms == null || synonyms.size() <= rowIndex)
 			return null;
 
-		ThesaurusEntry thesaurus = synonyms.get(rowIndex);
+		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		switch(columnIndex){
 			case 0:
 				return thesaurus.getSynonym();
@@ -64,23 +64,23 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public String getColumnName(int column){
+	public String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 
 	@Override
-	public void setValueAt(Object value, int rowIndex, int columnIndex){
+	public void setValueAt(final Object value, final int rowIndex, final int columnIndex){
 		if(synonyms != null){
 			try{
 				final int tagEndIndex = ((String)value).indexOf(TAG_END);
 				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
 				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
 
-				String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
+				final String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
 				synonyms.get(rowIndex)
 					.setMeanings(lines);
 			}
-			catch(IllegalArgumentException ignored){}
+			catch(final IllegalArgumentException ignored){}
 		}
 	}
 

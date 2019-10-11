@@ -262,14 +262,14 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			mainProgressBar.setValue(0);
 
 			try{
-				String flag = getSelectedFlag();
-				boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
+				final String flag = getSelectedFlag();
+				final boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
 				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
 					backbone.getWordGenerator());
 				rulesReducerWorker.addPropertyChangeListener(this);
 				rulesReducerWorker.execute();
 			}
-			catch(Exception e){
+			catch(final Exception e){
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 
