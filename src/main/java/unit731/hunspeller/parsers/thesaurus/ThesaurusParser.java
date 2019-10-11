@@ -207,7 +207,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
-			dictionary.add(partOfSpeech, meanings);
+			dictionary.add(PART_OF_SPEECH_START + partOfSpeech + PART_OF_SPEECH_END, meanings);
 		}
 
 		return new DuplicationResult(duplicates, forceInsertion);
