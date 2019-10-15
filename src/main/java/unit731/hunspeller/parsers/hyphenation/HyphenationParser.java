@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +42,12 @@ import unit731.hunspeller.services.PatternHelper;
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
 public class HyphenationParser{
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Hyphenation data file malformed, the first line is not ''{0}''");
+	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
+	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
+	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
+	private static final MessageFormat GENERAL_EXCEPTION = new MessageFormat("{0}: {1}");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -180,7 +187,7 @@ public class HyphenationParser{
 				String line = extractLine(br);
 
 				if(Charset.forName(line) != charset)
-					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
+					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charset.name()}));
 
 				REDUCED_PATTERNS.get(level).clear();
 
@@ -193,7 +200,7 @@ public class HyphenationParser{
 					if(!parsedLine){
 						if(line.startsWith(NEXT_LEVEL)){
 							if(level == Level.COMPOUND)
-								throw new IllegalArgumentException("Cannot have more than two levels");
+								throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
 
 							//start with non–compound level
 							level = Level.COMPOUND;
@@ -203,7 +210,7 @@ public class HyphenationParser{
 						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
 							final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 							if(customHyphenations.get(level).containsKey(key))
-								throw new IllegalArgumentException("Custom hyphenation '" + line + "' is already present");
+								throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
 							customHyphenations.get(level).put(key, line);
 						}
@@ -213,7 +220,7 @@ public class HyphenationParser{
 							final String key = getKeyFromData(line);
 							final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 							if(duplicatedRule)
-								throw new IllegalArgumentException("Duplicate found: '" + line + "'");
+								throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
 							else
 								//insert current pattern into the radix tree (remove all numbers)
 								rules.get(level)
@@ -250,7 +257,7 @@ public class HyphenationParser{
 		}
 		catch(final Exception t){
 			final String message = ExceptionHelper.getMessage(t);
-			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
+			throw new IllegalArgumentException(GENERAL_EXCEPTION.format(new Object[]{t.getClass().getSimpleName(), message}));
 		}
 		finally{
 			for(final Level level : Level.values())
