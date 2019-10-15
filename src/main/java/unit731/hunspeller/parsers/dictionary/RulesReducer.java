@@ -42,6 +42,7 @@ public class RulesReducer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
+	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from ''{0}'', expected {1}, obtained {1}");
 
 	private static final String PIPE = "|";
 
@@ -698,8 +699,7 @@ public class RulesReducer{
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
-				throw new IllegalArgumentException("Something very bad occurs while producing from '" + line + "', expected "
-					+ filteredOriginalRules + ", obtained " + filteredRules);
+				throw new IllegalArgumentException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
 		}
 	}
 
