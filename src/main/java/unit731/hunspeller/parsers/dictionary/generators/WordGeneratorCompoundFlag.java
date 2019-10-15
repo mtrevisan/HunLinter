@@ -26,7 +26,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @param limit	Limit result count
 	 * @param maxCompounds	Maximum compound count
 	 * @return	The list of productions
-	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
+	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
 	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds) throws IllegalArgumentException{
 		Objects.requireNonNull(inputCompounds);
