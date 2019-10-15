@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.thesaurus;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 public class MeaningEntry implements Comparable<MeaningEntry>{
+
+	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
+	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): ''{0}''");
+	private static final MessageFormat AIOOB_EXCEPTION = new MessageFormat("{0} with input ''{1}''");
+
 
 	@JsonProperty
 	private String[] partOfSpeeches;
@@ -39,7 +45,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 			final String partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
-				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + partOfSpeechAndMeanings);
+				throw new IllegalArgumentException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndMeanings}));
 
 			partOfSpeeches = partOfSpeech.substring(1, partOfSpeech.length() - 1)
 				.split(",\\s*");
@@ -49,10 +55,10 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 				.distinct()
 				.collect(Collectors.toList());
 			if(meanings.size() < 1)
-				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + partOfSpeechAndMeanings);
+				throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{partOfSpeechAndMeanings}));
 		}
 		catch(final ArrayIndexOutOfBoundsException e){
-			throw new IllegalArgumentException(e.getMessage() + " with input \"" + partOfSpeechAndMeanings + "\"");
+			throw new IllegalArgumentException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndMeanings}));
 		}
 	}
 

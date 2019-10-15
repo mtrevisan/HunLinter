@@ -8,6 +8,7 @@ import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -23,6 +24,8 @@ import org.slf4j.LoggerFactory;
 public class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("The file is not in an allowable charset ({0})");
 
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
@@ -55,8 +58,7 @@ public class FileHelper{
 			catch(final IOException ignored){}
 		}
 
-		throw new IllegalArgumentException("The file is not in an allowable charset ("
-			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
+		throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", "))}));
 	}
 
 	public static File getTemporaryUTF8File(final String prefix, final String extension, final String... lines){

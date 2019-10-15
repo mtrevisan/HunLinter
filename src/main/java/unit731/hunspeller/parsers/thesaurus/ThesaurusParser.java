@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,11 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
  */public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Thesaurus file malformed, the first line is not a charset, was ''{0}''");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, ...>)|meaning1|meaning2|...' or 'pos1, pos2, ...:meaning1,meaning2,...': was ''{0}''");
+	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): was ''{0}''");
+	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String PIPE = "|";
 
@@ -139,7 +145,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			//line should be a charset
 			try{ Charsets.toCharset(line); }
 			catch(final UnsupportedCharsetException e){
-				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
+				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 			}
 
 			while((line = br.readLine()) != null)
@@ -175,7 +181,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	public DuplicationResult insertMeanings(final String synonymAndMeanings, final Supplier<Boolean> duplicatesDiscriminator){
 		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException("Wrong format: '" + synonymAndMeanings + "'");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
 
 		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
@@ -189,14 +195,14 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
-			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
+			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
 
 		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new IllegalArgumentException("Duplicate detected for '" + duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", ")) + "'");
+				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion){
@@ -214,7 +220,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		for(final String meaning : meanings){
@@ -227,7 +233,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings) throws IllegalArgumentException{
+	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		return synonyms.stream()
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));

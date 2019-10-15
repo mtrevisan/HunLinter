@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +40,8 @@ import unit731.hunspeller.services.ParserHelper;
 public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 
 	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
@@ -157,7 +160,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			long readSoFar = line.getBytes(charset).length + 2;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();

@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
+
 	public static final String WORKER_NAME = "Rules reducer";
 
 
@@ -40,7 +43,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 
