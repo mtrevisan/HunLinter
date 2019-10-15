@@ -48,6 +48,10 @@ public class HyphenationParser{
 	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
 	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
 	private static final MessageFormat GENERAL_EXCEPTION = new MessageFormat("{0}: {1}");
+	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule {0} has an invalid format");
+	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule {0} has no hyphenation point(s)");
+	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule {0} is invalid, the hyphenation point should not be adjacent to a dot");
+	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule {0} has not exactly one hyphenation point");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -381,17 +385,17 @@ public class HyphenationParser{
 
 	private static void validateBasicRules(String rule) throws IllegalArgumentException{
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
-			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
+			throw new IllegalArgumentException(INVALID_RULE.format(new Object[]{rule}));
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
+			throw new IllegalArgumentException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
 		if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
-			throw new IllegalArgumentException("Rule " + rule + " is invalid, the hyphenation point should not be adjacent to a dot");
+			throw new IllegalArgumentException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
 	}
 
 	private static void validateAugmentedRule(String cleanedRule, String rule) throws IllegalArgumentException{
 		int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
-			throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
+			throw new IllegalArgumentException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
 
 		String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
