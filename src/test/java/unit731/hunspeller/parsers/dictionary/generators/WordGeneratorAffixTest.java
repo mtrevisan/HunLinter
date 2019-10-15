@@ -391,7 +391,7 @@ class WordGeneratorAffixTest{
 			final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
 			backbone.getWordGenerator().applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word 'a' without the FULLSTRIP option", exception.getMessage());
 	}
 
 	@Test
