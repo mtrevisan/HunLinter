@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -10,6 +11,9 @@ import org.apache.commons.lang3.tuple.Pair;
  * @see <a href="http://en.wikipedia.org/wiki/Hamming_distance">Hamming distance</a>
  */
 public class HammingDistance{
+
+	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings must have the same length");
+
 
 	private HammingDistance(){}
 
@@ -39,7 +43,7 @@ public class HammingDistance{
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);
 		if(left.length() != right.length())
-			throw new IllegalArgumentException("Strings must have the same length");
+			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[0]));
 
 		int distance = 0;
 		for(int i = 0; i < left.length(); i ++)
@@ -56,7 +60,7 @@ public class HammingDistance{
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);
 		if(left.length() != right.length())
-			throw new IllegalArgumentException("Strings must have the same length");
+			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[0]));
 
 		boolean found = false;
 		char chrLeft = 0;

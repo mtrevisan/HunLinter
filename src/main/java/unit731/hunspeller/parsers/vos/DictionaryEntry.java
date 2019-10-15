@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +29,9 @@ import unit731.hunspeller.services.PatternHelper;
 
 
 public class DictionaryEntry{
+
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line ''{0}''");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
@@ -64,7 +68,7 @@ public class DictionaryEntry{
 
 		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{line}));
 
 		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
@@ -97,7 +101,7 @@ public class DictionaryEntry{
 		this.combinable = combinable;
 	}
 
-	private static String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
+	private static String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
@@ -278,8 +282,7 @@ public class DictionaryEntry{
 
 					final List<AffixEntry> appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
-						StringUtils.EMPTY));
+					throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
 				if(rule instanceof RuleEntry){

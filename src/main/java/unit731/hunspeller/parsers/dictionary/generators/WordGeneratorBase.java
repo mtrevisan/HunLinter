@@ -21,7 +21,7 @@ class WordGeneratorBase{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
 	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}'' found{1}");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
 
 
 	protected final AffixData affixData;

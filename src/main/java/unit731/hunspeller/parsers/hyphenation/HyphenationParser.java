@@ -55,6 +55,7 @@ public class HyphenationParser{
 	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the index number not less than the hyphenation point");
 	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the length number not less than the hyphenation point");
 	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule {0} has the length number that exceeds the length of the rule");
+	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern {0} already present as {1}");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -435,7 +436,7 @@ public class HyphenationParser{
 				break;
 			}
 		if(alreadyPresentRule != null)
-			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
+			throw new IllegalArgumentException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
 	}
 
 	public static int getIndexOfBreakpoint(String rule){
