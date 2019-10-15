@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,10 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
+
+	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
+	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule ''{0}'' in compound begin-middle-end");
+
 
 	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		super(affixData, dicParser, wordGenerator);
@@ -30,7 +35,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
-			throw new IllegalArgumentException("Limit cannot be non-positive");
+			throw new IllegalArgumentException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
 		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
@@ -79,7 +84,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
-				throw new IllegalArgumentException("Missing word(s) for rule " + entry.getKey() + " in compound begin-middle-end");
+				throw new IllegalArgumentException(MISSING_WORD.format(new Object[]{entry.getKey()}));
 	}
 
 }

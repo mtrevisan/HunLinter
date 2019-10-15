@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.affix;
 
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +26,12 @@ import unit731.hunspeller.services.Memoizer;
 
 
 public class AffixData{
+
+	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Repeated flags in multiple options");
+	private static final MessageFormat CONTAINER_CLOSED = new MessageFormat("Cannot add data, container is closed");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Duplicated flag: ''{0}''");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
+
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
 		= Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
@@ -63,7 +70,7 @@ public class AffixData{
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new IllegalArgumentException("Repeated flags in multiple options");
+			throw new IllegalArgumentException(REPEATED_FLAG.format(new Object[0]));
 	}
 
 	private Map<AffixOption, Object> extractSingleFlags(){
@@ -115,9 +122,9 @@ public class AffixData{
 
 	<T> void addData(final String key, final T value){
 		if(closed)
-			throw new IllegalArgumentException("Cannot add data, container is closed");
+			throw new IllegalArgumentException(CONTAINER_CLOSED.format(new Object[0]));
 		if(data.containsKey(key))
-			throw new IllegalArgumentException("Duplicated flag: " + key);
+			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{key}));
 
 		if(value != null)
 			data.put(key, value);
@@ -233,7 +240,7 @@ public class AffixData{
 				word = table.applySingleConversionTable(word);
 			}
 			catch(final IllegalArgumentException e){
-				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too many applicable rules");
+				throw new IllegalArgumentException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
 			}
 		}
 		return word;

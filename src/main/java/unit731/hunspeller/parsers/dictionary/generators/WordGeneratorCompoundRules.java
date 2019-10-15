@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
+
+	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
+
 
 	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		super(affixData, dicParser, wordGenerator);
@@ -33,7 +37,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)
-			throw new IllegalArgumentException("Limit cannot be non-positive");
+			throw new IllegalArgumentException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 

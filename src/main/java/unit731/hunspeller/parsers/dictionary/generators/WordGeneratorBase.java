@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,9 @@ import unit731.hunspeller.parsers.vos.Production;
 class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
+
+	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}'' found{1}");
 
 
 	protected final AffixData affixData;
@@ -127,8 +131,7 @@ class WordGeneratorBase{
 			final String[] aff = affixes.get(complexPrefixes? 1: 0);
 			if(aff.length > 0){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new IllegalArgumentException("Twofold rule violated for '" + prod + " from " + prod.getRulesSequence()
-					+ "' (" + prod.getRulesSequence() + " still has rules " + overabundantAffixes + ")");
+				throw new IllegalArgumentException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
 	}
@@ -221,8 +224,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-			throw new IllegalArgumentException("Non–existent rule " + affix + " found"
-				+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
 
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
