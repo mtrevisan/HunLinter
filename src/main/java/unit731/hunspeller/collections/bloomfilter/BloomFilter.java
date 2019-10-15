@@ -2,6 +2,7 @@ package unit731.hunspeller.collections.bloomfilter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.Objects;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
 public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BloomFilter.class);
+
+	private static final MessageFormat WRONG_NUMBER_OF_ELEMENTS = new MessageFormat("Number of elements must be strict positive");
+	private static final MessageFormat WRONG_FALSE_POSITIVE_PROBABILITY = new MessageFormat("False positive probability must be in ]0, 1[ interval");
 
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
@@ -111,9 +115,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(bitArrayType);
 		if(expectedNumberOfElements <= 0)
-			throw new IllegalArgumentException("Number of elements must be strict positive");
+			throw new IllegalArgumentException(WRONG_NUMBER_OF_ELEMENTS.format(new Object[0]));
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
-			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
+			throw new IllegalArgumentException(WRONG_FALSE_POSITIVE_PROBABILITY.format(new Object[0]));
 
 		this.charset = charset;
 		expectedElements = expectedNumberOfElements;
