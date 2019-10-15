@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,8 @@ import unit731.hunspeller.services.StringHelper;
 public class LineEntry implements Serializable{
 
 	private static final long serialVersionUID = 8374397415767767436L;
+
+	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word ''{2}'' that is too short");
 
 	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
 
@@ -134,8 +137,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",") + "] at index " + indexFromLast
-					+ " from last because of the presence of the word '" + word + "' that is too short");
+				throw new IllegalArgumentException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","), indexFromLast, word}));
 
 			group.add(word.charAt(index));
 		}
