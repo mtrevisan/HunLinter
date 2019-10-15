@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,10 @@ import java.util.NoSuchElementException;
  * @see <a href="https://stackoverflow.com/questions/51946590/sequence-of-numbers-without-repeating-subsequent-digits">Sequence of numbers without repeating adjacent digits</a>
  */
 public class PermutationsWithRepetitions implements Iterator<int[]>{
+
+	private static final MessageFormat ONE_ELEMENT_MINIMUM = new MessageFormat("At least one element needed");
+	private static final MessageFormat MORE_THAN_ONE_MAX_COMPOUND_MINIMUM = new MessageFormat("Number of maximum compounds must be greater than one or -1 (infinity)");
+	private static final MessageFormat ONE_OUTPUT_MINIMUM = new MessageFormat("Output count must be greater than one");
 
 	public static final int MAX_COMPOUNDS_INFINITY = -1;
 
@@ -32,9 +37,9 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 */
 	public PermutationsWithRepetitions(int n, int k, boolean forbidDuplicates){
 		if(n < 1)
-			throw new IllegalArgumentException("At least one element needed");
+			throw new IllegalArgumentException(ONE_ELEMENT_MINIMUM.format(new Object[0]));
 		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
-			throw new IllegalArgumentException("Number of maximum compounds must be greater than one or -1 (infinity)");
+			throw new IllegalArgumentException(MORE_THAN_ONE_MAX_COMPOUND_MINIMUM.format(new Object[0]));
 
 		this.n = n;
 		this.k = k;
@@ -54,7 +59,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 */
 	public List<int[]> permutations(int limit){
 		if(limit < 1)
-			throw new IllegalArgumentException("Output count must be greater than one");
+			throw new IllegalArgumentException(ONE_OUTPUT_MINIMUM.format(new Object[0]));
 
 		List<int[]> all = new ArrayList<>();
 		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++)
@@ -102,7 +107,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param radix	the desired new number base
 	 * @return	The array of integers representing decimal number on new base
 	 */
-	private int[] convertBase(long decimalNumber, int radix) throws IllegalArgumentException{
+	private int[] convertBase(long decimalNumber, int radix){
 		int[] result = new int[k];
 		for(int i = k - 1; decimalNumber != 0l; i --){
 			result[i] = (int)(decimalNumber % radix);
