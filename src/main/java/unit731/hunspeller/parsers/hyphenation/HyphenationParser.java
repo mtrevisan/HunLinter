@@ -52,6 +52,9 @@ public class HyphenationParser{
 	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule {0} has no hyphenation point(s)");
 	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule {0} is invalid, the hyphenation point should not be adjacent to a dot");
 	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule {0} has not exactly one hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the index number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the length number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule {0} has the length number that exceeds the length of the rule");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -403,12 +406,12 @@ public class HyphenationParser{
 
 			int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
+				throw new IllegalArgumentException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
 			int length = extractLength(parts);
 			if(length < 0 || startIndex + length < index)
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
+				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
 			if(startIndex + length >= parts[0].length())
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
+				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
 		}
 	}
 
