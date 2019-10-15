@@ -40,10 +40,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
-	private static final String POS_DELIMITER = ", ";
-	private static final String POS_PREFIX = " [";
-	private static final String POS_SUFFIX = "]";
-
 
 	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
 
@@ -56,7 +52,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			return SingletonHelper.INSTANCE;
 		}
 
-		DuplicatesDictionaryBaseData(){}
+		protected DuplicatesDictionaryBaseData(){}
 
 		@Override
 		public int getExpectedNumberOfElements(){
@@ -176,7 +172,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 						productions.stream()
 							.map(Production::toStringWithPartOfSpeechFields)
-							.flatMap(List::stream)
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
@@ -231,10 +226,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
 							for(final Production production : productions){
-								final List<String> textes = production.toStringWithPartOfSpeechFields();
-								for(final String text : textes)
-									if(duplicatesBloomFilter.contains(text))
-										result.add(new Duplicate(production, word, lineIndex));
+								final String text = production.toStringWithPartOfSpeechFields();
+								if(duplicatesBloomFilter.contains(text))
+									result.add(new Duplicate(production, word, lineIndex));
 							}
 						}
 						catch(final IllegalArgumentException e){
@@ -275,10 +269,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
-					final String origin = prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
-						.collect(Collectors.joining(POS_DELIMITER, prod.getWord() + POS_PREFIX, POS_SUFFIX));
+					final String origin = prod.getWord() + prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
+						.collect(Collectors.joining(", ", " (", "): "));
 					writer.write(origin);
-					writer.write(": ");
 					writer.write(entries.stream()
 						.map(duplicate -> 
 							String.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
@@ -303,12 +296,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(
-				duplicate -> {
-					final Production prod = duplicate.getProduction();
-					return prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
-						.collect(Collectors.joining(POS_DELIMITER, prod.getWord() + POS_PREFIX, POS_SUFFIX));
-				},
+			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
 				duplicate -> {
 					final List<Duplicate> list = new ArrayList<>();
 					list.add(duplicate);

@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
@@ -166,15 +167,24 @@ public class Production extends DictionaryEntry{
 		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public List<String> toStringWithPartOfSpeechFields(){
+	public String toStringWithPartOfSpeechFields(){
 		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		if(!fields.isEmpty())
-			return fields.stream()
-				.map(field -> word + POS_FIELD_PREFIX + field)
-				.collect(Collectors.toList());
-		else
-			return Collections.singletonList(word);
+		if(!fields.isEmpty()){
+			fields.sort(Comparator.naturalOrder());
+			return word + POS_FIELD_PREFIX + String.join(StringUtils.SPACE, fields);
+		}
+		return word;
 	}
+
+//	public List<String> toStringWithPartOfSpeechFields(){
+//		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+//		if(!fields.isEmpty())
+//			return fields.stream()
+//				.map(field -> word + POS_FIELD_PREFIX + field)
+//				.collect(Collectors.toList());
+//		else
+//			return Collections.singletonList(word);
+//	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){
 		word = outputConversionTable.apply(word);
