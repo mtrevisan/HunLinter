@@ -18,8 +18,7 @@ public class Production extends DictionaryEntry{
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
 	private static final String LEADS_TO = " > ";
-	private static final String POS_OPEN_BRACKET = "[";
-	private static final String POS_CLOSE_BRACKET = "]";
+	private static final String POS_FIELD_PREFIX = ":";
 
 
 	private List<AffixEntry> appliedRules;
@@ -167,13 +166,14 @@ public class Production extends DictionaryEntry{
 		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public String toStringWithPartOfSpeechFields(){
-		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		sj.add(word);
+	public List<String> toStringWithPartOfSpeechFields(){
 		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(!fields.isEmpty())
-			sj.add(POS_OPEN_BRACKET + String.join(StringUtils.SPACE, fields) + POS_CLOSE_BRACKET);
-		return sj.toString();
+			return fields.stream()
+				.map(field -> word + POS_FIELD_PREFIX + field)
+				.collect(Collectors.toList());
+		else
+			return Collections.singletonList(word);
 	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){

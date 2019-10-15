@@ -26,6 +26,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.Duplicate;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
@@ -39,6 +40,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
+	private static final String POS_DELIMITER = ", ";
+	private static final String POS_PREFIX = " [";
+	private static final String POS_SUFFIX = "]";
+
 
 	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
 
@@ -51,7 +56,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			return SingletonHelper.INSTANCE;
 		}
 
-		protected DuplicatesDictionaryBaseData(){}
+		DuplicatesDictionaryBaseData(){}
 
 		@Override
 		public int getExpectedNumberOfElements(){
@@ -171,6 +176,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 						productions.stream()
 							.map(Production::toStringWithPartOfSpeechFields)
+							.flatMap(List::stream)
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
@@ -225,9 +231,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
 							for(final Production production : productions){
-								final String text = production.toStringWithPartOfSpeechFields();
-								if(duplicatesBloomFilter.contains(text))
-									result.add(new Duplicate(production, word, lineIndex));
+								final List<String> textes = production.toStringWithPartOfSpeechFields();
+								for(final String text : textes)
+									if(duplicatesBloomFilter.contains(text))
+										result.add(new Duplicate(production, word, lineIndex));
 							}
 						}
 						catch(final IllegalArgumentException e){
@@ -267,7 +274,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			setProgress(getProgress(1., totalSize + 1));
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
-					writer.write(entries.get(0).getProduction().toStringWithPartOfSpeechFields());
+					final Production prod = entries.get(0).getProduction();
+					final String origin = prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
+						.collect(Collectors.joining(POS_DELIMITER, prod.getWord() + POS_PREFIX, POS_SUFFIX));
+					writer.write(origin);
 					writer.write(": ");
 					writer.write(entries.stream()
 						.map(duplicate -> 
@@ -293,7 +303,12 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
+			.collect(Collectors.toMap(
+				duplicate -> {
+					final Production prod = duplicate.getProduction();
+					return prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
+						.collect(Collectors.joining(POS_DELIMITER, prod.getWord() + POS_PREFIX, POS_SUFFIX));
+				},
 				duplicate -> {
 					final List<Duplicate> list = new ArrayList<>();
 					list.add(duplicate);
