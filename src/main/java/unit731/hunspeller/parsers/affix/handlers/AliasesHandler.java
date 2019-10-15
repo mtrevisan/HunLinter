@@ -17,10 +17,10 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class AliasesHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line '{0}': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line '{0}': Bad number of entries, '{1}' must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line '{0}' at row {1}: Bad number of entries, it must be '<option> <flag/morphological field>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line '{0}' at row {1}: Bad option, it must be {2}");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': Bad number of entries, it must be '<option> <flag/morphological field>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': Bad option, it must be {1}");
 
 
 	@Override
@@ -40,7 +40,7 @@ public class AliasesHandler implements Handler{
 
 				final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context, i);
+				checkValidity(parts, context);
 
 				aliases.add(parts[1]);
 			}
@@ -52,11 +52,11 @@ public class AliasesHandler implements Handler{
 		}
 	}
 
-	private void checkValidity(final String[] parts, final ParsingContext context, final int rowIndex) throws IllegalArgumentException{
+	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 2)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context, rowIndex}));
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!context.getRuleType().equals(parts[0]))
-			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, rowIndex, context.getRuleType()}));
+			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, context.getRuleType()}));
 	}
 
 }

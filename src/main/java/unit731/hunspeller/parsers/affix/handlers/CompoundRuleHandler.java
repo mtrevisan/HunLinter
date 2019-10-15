@@ -18,12 +18,12 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class CompoundRuleHandler implements Handler{
 
-	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line '{0}' at row {1}: mismatched compound rule type (expected {2})");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line '{0}' at row {1}: duplicated line");
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line '{0}': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line '{0}': Bad number of entries, '{1}' must be a positive integer");
-	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line '{0}' at row {1}: compound rule type cannot be empty");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line '{0}' at row {1}: compound rule is bad formatted");
+	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': mismatched compound rule type (expected {1})");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line ''{0}'': duplicated line");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': compound rule type cannot be empty");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line ''{0}'': compound rule is bad formatted");
 
 
 	@Override
@@ -43,15 +43,15 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new IllegalArgumentException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, i, AffixOption.COMPOUND_RULE}));
+					throw new IllegalArgumentException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
 				final String rule = lineParts[1];
 
-				checkRuleValidity(rule, line, i, strategy);
+				checkRuleValidity(rule, line, strategy);
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line, i}));
+					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
@@ -69,13 +69,13 @@ public class CompoundRuleHandler implements Handler{
 			throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 	}
 
-	private void checkRuleValidity(final String rule, final String line, final int i, final FlagParsingStrategy strategy)
+	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy)
 			throws IllegalArgumentException{
 		if(StringUtils.isBlank(rule))
-			throw new IllegalArgumentException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line, i}));
+			throw new IllegalArgumentException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{line, i}));
+			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{line}));
 	}
 	
 }

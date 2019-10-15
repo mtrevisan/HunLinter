@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -14,6 +15,12 @@ import unit731.hunspeller.services.SetHelper;
  * of multiple flags, each number is separated by a comma.
  */
 class NumericalParsingStrategy implements FlagParsingStrategy{
+
+	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was ''{1}''");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was ''{0}''");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: ''{0}''");
+	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was ''{0}''");
+
 
 	private static final int MAX_NUMERICAL_FLAG = 65_000;
 
@@ -52,10 +59,10 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: '" + flag + "'");
+				throw new IllegalArgumentException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
 		}
 		catch(final NumberFormatException e){
-			throw new IllegalArgumentException("Flag must be an integer number: '" + flag + "'");
+			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{flag}));
 		}
 	}
 
@@ -66,7 +73,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: '" + Arrays.toString(flags) + "'");
+			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
 	}
 
 	@Override
@@ -97,8 +104,7 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	private void checkCompoundValidity(final String part, final String compoundRule) throws IllegalArgumentException{
 		final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 		if(isNumber && !NumberUtils.isCreatable(part))
-			throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': "
-				+ compoundRule);
+			throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 	}
 
 }

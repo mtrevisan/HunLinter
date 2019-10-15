@@ -19,11 +19,11 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class AffixHandler implements Handler{
 
-	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line '{0}': The third parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line '{0}': Bad number of entries, '{1}' must be a positive integer");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line at row {0}");
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type at row {0} (expected {1})");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag at row {0} (expected {1})");
+	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line ''{0}'': The third parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line");
+	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
+	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
 
 
 	@Override
@@ -66,10 +66,10 @@ public class AffixHandler implements Handler{
 
 			final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
-			checkValidity(entry, i, ruleType, ruleFlag);
+			checkValidity(entry, ruleType, ruleFlag);
 
 			if(entries.contains(entry))
-				throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{i}));
+				throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[0]));
 
 			final boolean inserted = entries.add(entry);
 
@@ -87,11 +87,11 @@ public class AffixHandler implements Handler{
 		return entries;
 	}
 
-	private void checkValidity(final AffixEntry entry, final int rowIndex, final AffixType ruleType, final String ruleFlag) throws IllegalArgumentException{
+	private void checkValidity(final AffixEntry entry, final AffixType ruleType, final String ruleFlag) throws IllegalArgumentException{
 		if(entry.getType() != ruleType)
-			throw new IllegalArgumentException(MISMATCHED_RULE_TYPE.format(new Object[]{rowIndex, ruleType}));
+			throw new IllegalArgumentException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
 		if(!ruleFlag.equals(entry.getFlag()))
-			throw new IllegalArgumentException(MISMATCHED_RULE_FLAG.format(new Object[]{rowIndex, ruleFlag}));
+			throw new IllegalArgumentException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
 	}
 	
 }

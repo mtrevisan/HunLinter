@@ -16,11 +16,11 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class ConversionTable{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line '{0}': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line '{0}': Bad number of entries, '{1}' must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line '{0}' at row {1}: Bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line '{0}' at row {1}: Bad option, it must be {2}");
-	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word '{0}', too many applicable rules");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': Bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': Bad option, it must be {1}");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word ''{0}'', too many applicable rules");
 
 
 	@FunctionalInterface
@@ -65,7 +65,7 @@ public class ConversionTable{
 
 				final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context, i);
+				checkValidity(parts, context);
 
 				final String key = reduceKey(parts[1]);
 				table.computeIfAbsent(key, k -> new ArrayList<>())
@@ -77,11 +77,11 @@ public class ConversionTable{
 		}
 	}
 
-	private void checkValidity(final String[] parts, final ParsingContext context, final int rowIndex) throws IllegalArgumentException{
+	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 3)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context, rowIndex}));
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!affixOption.getCode().equals(parts[0]))
-			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, rowIndex, affixOption.getCode()}));
+			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**

@@ -12,7 +12,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
 public class CopyOverAsNumberHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line '{0}': The first parameter is not a number");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
 
 
 	@Override

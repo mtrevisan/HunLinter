@@ -19,11 +19,11 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class WordBreakTableHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line '{0}': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line '{0}': Bad number of entries, '{1}' must be a positive integer");
-	private static final MessageFormat MISMATCHED_TYPE = new MessageFormat("Error reading line '{0}' at row {1}: mismatched type (expected {2})");
-	private static final MessageFormat EMPTY_BREAK_CHARACTER = new MessageFormat("Error reading line '{0}' at row {1}: break character cannot be empty");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line '{0}' at row {1}: duplicated line");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat MISMATCHED_TYPE = new MessageFormat("Error reading line ''{0}'': mismatched type (expected {1})");
+	private static final MessageFormat EMPTY_BREAK_CHARACTER = new MessageFormat("Error reading line ''{0}'': break character cannot be empty");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line ''{0}'': duplicated line");
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
@@ -46,18 +46,18 @@ public class WordBreakTableHandler implements Handler{
 				final String[] lineParts = StringUtils.split(line);
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.WORD_BREAK_CHARACTERS)
-					throw new IllegalArgumentException(MISMATCHED_TYPE.format(new Object[]{line, i, AffixOption.WORD_BREAK_CHARACTERS}));
+					throw new IllegalArgumentException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
 
 				String breakCharacter = lineParts[1];
 				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
 					breakCharacter = HyphenationParser.EN_DASH;
 
 				if(StringUtils.isBlank(breakCharacter))
-					throw new IllegalArgumentException(EMPTY_BREAK_CHARACTER.format(new Object[]{line, i}));
+					throw new IllegalArgumentException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
 
 				final boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)
-					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line, i}));
+					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
