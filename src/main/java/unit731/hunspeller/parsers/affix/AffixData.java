@@ -27,9 +27,9 @@ import unit731.hunspeller.services.Memoizer;
 
 public class AffixData{
 
-	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Repeated flags in multiple options");
+	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Same flags present in multiple options");
 	private static final MessageFormat CONTAINER_CLOSED = new MessageFormat("Cannot add data, container is closed");
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Duplicated flag: ''{0}''");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
 	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
 
 

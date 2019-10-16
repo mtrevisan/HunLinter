@@ -266,7 +266,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		prods.removeIf(Production::isTwofolded);
 	}
 
-	//is word a non-compound with a REP substitution (see checkcompoundrep)?
+	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
 		boolean exists = compoundAsReplacement.stream()
 			.anyMatch(word::contains);

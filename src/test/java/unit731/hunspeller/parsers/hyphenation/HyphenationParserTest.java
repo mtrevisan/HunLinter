@@ -468,7 +468,7 @@ class HyphenationParserTest{
 	}
 
 	/**
-	 * Norwegian: non-standard hyphenation at compound boundary (kilowattime -> kilowatt-time)
+	 * Norwegian: non–standard hyphenation at compound boundary (kilowattime -> kilowatt-time)
 	 * and recursive compound hyphenation (kilowatt->kilo-watt)
 	 */
 	@Test

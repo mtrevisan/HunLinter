@@ -25,7 +25,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}'', cannot reduce");
 
 	public static final String WORKER_NAME = "Rules reducer";
 

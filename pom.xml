@@ -164,7 +164,7 @@
 				</includes>
 				<filtering>true</filtering>
 			</resource>
-			<!-- include non-java src files in the same place in the output jar -->
+			<!-- include non–java src files in the same place in the output jar -->
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>

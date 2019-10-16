@@ -34,7 +34,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BloomFilter.class);
 
-	private static final MessageFormat WRONG_NUMBER_OF_ELEMENTS = new MessageFormat("Number of elements must be strict positive");
+	private static final MessageFormat WRONG_NUMBER_OF_ELEMENTS = new MessageFormat("Number of elements must be strictly positive");
 	private static final MessageFormat WRONG_FALSE_POSITIVE_PROBABILITY = new MessageFormat("False positive probability must be in ]0, 1[ interval");
 
 	private static final double LN2 = Math.log(2);

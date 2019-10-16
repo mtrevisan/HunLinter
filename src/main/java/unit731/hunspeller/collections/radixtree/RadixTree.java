@@ -64,7 +64,7 @@ public class RadixTree<S, V extends Serializable>{
 	}
 
 	public void prepare(){
-		throw new UnsupportedOperationException("Cannot prepare tree in a non-Aho-Corasick tree");
+		throw new UnsupportedOperationException("Cannot prepare tree in a non–Aho-Corasick tree");
 	}
 
 	public void clear(){
@@ -89,7 +89,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
 	public Iterator<SearchResult<S, V>> searchPrefixedBy(S text){
-		throw new UnsupportedOperationException("Cannot perform search in a non-Aho-Corasick tree");
+		throw new UnsupportedOperationException("Cannot perform search in a non–Aho-Corasick tree");
 	}
 
 	/**
