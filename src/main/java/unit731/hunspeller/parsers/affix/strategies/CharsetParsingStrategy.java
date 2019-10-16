@@ -4,18 +4,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.SetHelper;
 
 
-class CharsetParsingStrategy implements FlagParsingStrategy{
+class CharsetParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag must be in {0} encoding: was ''{1}''");
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be in {0} encoding: was ''{1}''");
 	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_ONE = new MessageFormat("Flag must be of length one and in {0} encoding: was ''{1}''");
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: ''{0}''");
 
 
 	private final Charset charset;
@@ -56,12 +52,6 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	@Override
-	public void validate(final String flag) throws IllegalArgumentException{
-		if(flag == null || flag.length() != 1 || !canEncode(flag))
-			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
-	}
-
 	private String[] extractFlags(final String flags){
 		final int size = flags.length();
 		final String[] singleFlags = new String[size];
@@ -70,10 +60,10 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
-		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+	@Override
+	public void validate(final String flag) throws IllegalArgumentException{
+		if(flag == null || flag.length() != 1 || !canEncode(flag))
+			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
 	}
 
 	@Override

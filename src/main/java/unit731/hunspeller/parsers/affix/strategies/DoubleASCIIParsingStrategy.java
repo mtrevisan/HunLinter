@@ -1,23 +1,19 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.SetHelper;
 
 
 /**
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded as two ASCII characters whose codes
  * must be combined into a single character.
  */
-class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
+class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat FLAG_MUST_BE_EVEN_IN_LENGTH = new MessageFormat("Flag must be of length multiple of two: ''{0}''");
 	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_TWO = new MessageFormat("Flag must be of length two: ''{0}''");
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: ''{0}''");
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by double-characters flags, or the optional operators '*' or '?: was ''{0}''");
 
 	private static final Pattern PATTERN = PatternHelper.pattern("(?<=\\G.{2})");
@@ -50,20 +46,14 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	@Override
-	public void validate(final String flag) throws IllegalArgumentException{
-		if(flag == null || flag.length() != 2)
-			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_TWO.format(new Object[]{flag}));
-	}
-
 	private String[] extractFlags(final String flags){
 		return PatternHelper.split(flags, PATTERN);
 	}
 
-	private void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
-		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if((notDuplicatedFlags.size() << 1) < flags.length)
-			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+	@Override
+	public void validate(final String flag) throws IllegalArgumentException{
+		if(flag == null || flag.length() != 2)
+			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_TWO.format(new Object[]{flag}));
 	}
 
 	@Override
@@ -87,15 +77,12 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkCompoundValidity(final String[] parts, final String compoundRule) throws IllegalArgumentException{
-		for(final String part : parts)
-			checkCompoundValidity(part, compoundRule);
-	}
-
-	private void checkCompoundValidity(final String part, final String compoundRule) throws IllegalArgumentException{
-		final int size = part.length();
-		final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
-		if(size != 2 && isFlag)
-			throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+		for(final String part : parts){
+			final int size = part.length();
+			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+			if(size != 2 && isFlag)
+				throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+		}
 	}
 
 }
