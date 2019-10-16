@@ -9,11 +9,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.Deflater;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,9 @@ public class Backbone implements FileChangeListener{
 
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
+
+	public static final String FILENAME_DESCRIPTION_XML = "description.xml";
+	public static final String FILENAME_INSTALL_RDF = "install.rdf";
 
 
 	private File affFile;
@@ -315,21 +319,21 @@ public class Backbone implements FileChangeListener{
 
 
 	@Override
-	public void fileDeleted(Path path){
+	public void fileDeleted(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
-		String absolutePath = affFile.getParent() + File.separator + path.toString();
+		final String absolutePath = affFile.getParent() + File.separator + path.toString();
 		if(hasAFFExtension(absolutePath)){
 			affParser.clear();
 
-			if(hunspellable != null)
-				hunspellable.clearAffixParser();
+			Optional.ofNullable(hunspellable)
+				.ifPresent(Hunspellable::clearAffixParser);
 		}
 		else if(hasAIDExtension(absolutePath)){
 			aidParser.clear();
 
-			if(hunspellable != null)
-				hunspellable.clearAidParser();
+			Optional.ofNullable(hunspellable)
+				.ifPresent(Hunspellable::clearAidParser);
 		}
 	}
 
@@ -386,22 +390,14 @@ public class Backbone implements FileChangeListener{
 
 	/** Go up directories until description.xml or install.rdf is found */
 	private Path getPackageBaseDirectory(){
-		boolean found = false;
 		Path parentPath = affFile.toPath().getParent();
-		while(true){
-			File[] files = parentPath.toFile().listFiles();
-			if(files == null)
-				break;
-
-			found = Arrays.stream(files)
-				.map(File::getName)
-				.anyMatch(name -> "description.xml".equals(name) || "install.rdf".equals(name));
-			if(found)
-				break;
-
+		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML) && !existFile(parentPath, FILENAME_INSTALL_RDF))
 			parentPath = parentPath.getParent();
-		}
-		return (found? parentPath: null);
+		return parentPath;
+	}
+
+	private boolean existFile(final Path path, final String filename){
+		return Files.isRegularFile(Paths.get(path.toString(), filename));
 	}
 
 

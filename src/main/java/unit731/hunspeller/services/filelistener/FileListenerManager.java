@@ -102,7 +102,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			final File fil = dir.toFile();
 			//create directory if it doesn't exists
 			if(!fil.exists() && !fil.mkdirs())
-				LOGGER.error("Exception while creating directory {}", dir);
+				LOGGER.error("Cannot create directory: {}", dir);
 			else{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);

@@ -10,7 +10,7 @@ import java.util.Set;
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public abstract class FlagParsingStrategy{
 
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: ''{0}''");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: {0}");
 
 
 	public abstract void validate(final String flag) throws IllegalArgumentException;
