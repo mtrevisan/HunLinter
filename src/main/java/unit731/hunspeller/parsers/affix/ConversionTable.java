@@ -16,10 +16,10 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class ConversionTable{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': Bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': Bad option, it must be {1}");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': bad option, it must be {1}");
 	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word ''{0}'', too many applicable rules");
 
 

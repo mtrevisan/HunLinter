@@ -19,8 +19,8 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class WordBreakTableHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': Bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
 	private static final MessageFormat MISMATCHED_TYPE = new MessageFormat("Error reading line ''{0}'': mismatched type (expected {1})");
 	private static final MessageFormat EMPTY_BREAK_CHARACTER = new MessageFormat("Error reading line ''{0}'': break character cannot be empty");
 	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line ''{0}'': duplicated line");
