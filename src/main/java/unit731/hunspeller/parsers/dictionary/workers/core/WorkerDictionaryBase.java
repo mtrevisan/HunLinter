@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import javax.swing.*;
 
@@ -87,16 +88,16 @@ public abstract class WorkerDictionaryBase{
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel(true);
 
-			if(cancelTask != null)
-				cancelTask.run();
+			Optional.ofNullable(cancelTask)
+				.ifPresent(Runnable::run);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
 		}
 		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 			worker.resume();
 
-			if(resumeTask != null)
-				resumeTask.run();
+			Optional.ofNullable(resumeTask)
+				.ifPresent(Runnable::run);
 		}
 	}
 
