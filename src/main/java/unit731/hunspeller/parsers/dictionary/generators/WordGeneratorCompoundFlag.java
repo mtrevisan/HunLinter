@@ -88,11 +88,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	private List<List<Production>> generateCompound(final int[] permutation, final Map<Integer, List<Production>> dicEntries, final List<DictionaryEntry> inputs){
 		final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 		for(final int index : permutation){
-			if(!dicEntries.containsKey(index)){
-				final DictionaryEntry input = inputs.get(index);
-				dicEntries.put(index, applyAffixRules(input, true, null));
-			}
-			final List<Production> de = dicEntries.get(index);
+			final List<Production> de = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
 			if(!de.isEmpty())
 				expandedPermutationEntries.add(de);
 		}
