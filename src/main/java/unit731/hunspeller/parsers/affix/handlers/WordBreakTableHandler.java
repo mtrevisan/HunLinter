@@ -48,10 +48,7 @@ public class WordBreakTableHandler implements Handler{
 				if(option != AffixOption.WORD_BREAK_CHARACTERS)
 					throw new IllegalArgumentException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
 
-				String breakCharacter = lineParts[1];
-				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
-					breakCharacter = HyphenationParser.EN_DASH;
-
+				final String breakCharacter = (DOUBLE_MINUS_SIGN.equals(lineParts[1])? HyphenationParser.EN_DASH: lineParts[1]);
 				if(StringUtils.isBlank(breakCharacter))
 					throw new IllegalArgumentException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
 

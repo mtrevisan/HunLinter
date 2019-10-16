@@ -14,7 +14,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -41,8 +40,6 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private static final FontRenderContext FRC = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT,
 		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 
-	private static final java.util.List<String> FAMILY_NAMES = Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment()
-		.getAvailableFontFamilyNames());
 	private static java.util.List<String> familyNamesAll;
 	private static java.util.List<String> familyNamesMonospaced;
 	private static final Integer[] SIZES = {10, 12, 14, 16, 18, 20, 22};
@@ -73,24 +70,22 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 		}
 
 		private void update(final DocumentEvent event){
-			String newValue = StringUtils.EMPTY;
 			try{
 				final Document doc = event.getDocument();
-				newValue = doc.getText(0, doc.getLength());
+				final String newValue = doc.getText(0, doc.getLength());
+				if(!newValue.isEmpty() && targetList.getModel().getSize() > 0){
+					final int index = targetList.getNextMatch(newValue, 0, Position.Bias.Forward);
+					final int foundIndex = Math.max(index, 0);
+
+					targetList.ensureIndexIsVisible(foundIndex);
+
+					final String matchedName = targetList.getModel().getElementAt(foundIndex);
+					if(newValue.equalsIgnoreCase(matchedName) && foundIndex != targetList.getSelectedIndex())
+						SwingUtilities.invokeLater(() -> targetList.setSelectedIndex(foundIndex));
+				}
 			}
 			catch(final BadLocationException e){
 				LOGGER.error("Error while retrieving selection from list", e);
-			}
-
-			if(!newValue.isEmpty() && targetList.getModel().getSize() > 0){
-				final int index = targetList.getNextMatch(newValue, 0, Position.Bias.Forward);
-				final int foundIndex = Math.max(index, 0);
-
-				targetList.ensureIndexIsVisible(foundIndex);
-
-				final String matchedName = targetList.getModel().getElementAt(foundIndex);
-				if(newValue.equalsIgnoreCase(matchedName) && foundIndex != targetList.getSelectedIndex())
-					SwingUtilities.invokeLater(() -> targetList.setSelectedIndex(foundIndex));
 			}
 		}
 	}
@@ -131,7 +126,9 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private static Pair<List<String>, List<String>> extractFonts(final String languageSample){
 		final List<String> all = new ArrayList<>();
 		final List<String> monospacedOnly = new ArrayList<>();
-		for(final String familyName : FAMILY_NAMES){
+		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getAvailableFontFamilyNames();
+		for(final String familyName : familyNames){
 			final Font font = new Font(familyName, Font.PLAIN, 20);
 			if(font.canDisplayUpTo(languageSample) < 0){
 				all.add(familyName);
