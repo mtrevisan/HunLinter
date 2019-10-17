@@ -289,7 +289,7 @@ public class Backbone implements FileChangeListener{
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
 
-	//FIXME should be private!?
+	//FIXME should this be private?!
 	public File getDictionaryFile(){
 		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
 	}
