@@ -1277,18 +1277,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(theAddButton.isEnabled() || alreadyContained){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForThesaurusFilter(partOfSpeeches, meanings);
-			EventQueue.invokeLater(() -> {
-				final RowFilter<Object, Object> andFilter = RowFilter.andFilter(Arrays.asList(
-					//POS in meanings should be exactly what was given in the search string (or anything if not given)
-					RowFilter.regexFilter(searchText.getLeft(), 1),
-					//word in meanings should contain what was given in the search string
-					RowFilter.regexFilter(searchText.getRight(), 1)));
-				final RowFilter<Object, Object> orFilter = RowFilter.orFilter(Arrays.asList(
-					//the synonym should contain what was given in the search string
-					RowFilter.regexFilter(searchText.getRight(), 0),
-					andFilter));
-				sorter.setRowFilter(orFilter);
-			});
+			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
 			sorter.setRowFilter(null);
