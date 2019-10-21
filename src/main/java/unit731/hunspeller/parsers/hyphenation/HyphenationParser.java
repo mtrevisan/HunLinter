@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -102,7 +101,7 @@ public class HyphenationParser{
 	public static final Pattern PATTERN_WORD_BOUNDARIES = PatternHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_EQUALS = PatternHelper.pattern(HYPHEN_EQUALS);
-	private static final Pattern PATTERN_KEY = PatternHelper.pattern("\\d|/.+$");
+	private static final Pattern PATTERN_KEY = PatternHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = PatternHelper.pattern("[^13579]|/.+$");
 
 	public static final Pattern PATTERN_REDUCE = PatternHelper.pattern("/.+$");
@@ -149,9 +148,9 @@ public class HyphenationParser{
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(final Level level : Level.values())
 			this.patterns.put(level, patterns.get(level));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.emptyMap());
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new HashMap<>(0));
 		for(final Level level : Level.values()){
-			final Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.emptyMap());
+			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
@@ -215,7 +214,7 @@ public class HyphenationParser{
 							secondLevelPresent = true;
 							REDUCED_PATTERNS.get(level).clear();
 						}
-						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
+						else if(isCustomRule(line)){
 							final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 							if(customHyphenations.get(level).containsKey(key))
 								throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
@@ -285,6 +284,10 @@ public class HyphenationParser{
 		return line.contains(AUGMENTED_RULE);
 	}
 
+	public static boolean isCustomRule(final String line){
+		return (!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS));
+	}
+
 	private boolean isRuleDuplicated(final String key, final String line, final Level level){
 		boolean duplicatedRule = false;
 		final String foundNodeValue = rules.get(level)
@@ -330,15 +333,23 @@ public class HyphenationParser{
 	public String addRule(final String rule, final Level level){
 		validateRule(rule, level);
 
-		final String key = getKeyFromData(rule);
-		final Map<String, String> rulesByLevel = rules.get(level);
-		final String oldRule = rulesByLevel.get(key);
-		if(oldRule == null){
-			rulesByLevel.put(key, rule);
-
-			buildTrie(level, rulesByLevel);
+		final String oldRule;
+		if(isCustomRule(rule)){
+			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			oldRule = customHyphenations.get(level).get(key);
+			if(oldRule == null)
+				customHyphenations.get(level).put(key, rule);
 		}
+		else{
+			final String key = getKeyFromData(rule);
+			final Map<String, String> rulesByLevel = rules.get(level);
+			oldRule = rulesByLevel.get(key);
+			if(oldRule == null){
+				rulesByLevel.put(key, rule);
 
+				buildTrie(level, rulesByLevel);
+			}
+		}
 		return oldRule;
 	}
 
@@ -350,11 +361,20 @@ public class HyphenationParser{
 	 * @return <code>true</code> if the removal has completed successfully
 	 */
 	public boolean removeRule(final String rule, final Level level){
-		final String key = getKeyFromData(rule);
-		final Map<String, String> rulesByLevel = rules.get(level);
-		final String oldRule = rulesByLevel.get(key);
-		if(oldRule != null)
-			buildTrie(level, rulesByLevel);
+		final String oldRule;
+		if(isCustomRule(rule)){
+			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			oldRule = customHyphenations.get(level).get(key);
+			if(oldRule != null)
+				customHyphenations.get(level).remove(key);
+		}
+		else{
+			final String key = getKeyFromData(rule);
+			final Map<String, String> rulesByLevel = rules.get(level);
+			oldRule = rulesByLevel.get(key);
+			if(oldRule != null)
+				buildTrie(level, rulesByLevel);
+		}
 		return (oldRule != null);
 	}
 
@@ -383,17 +403,17 @@ public class HyphenationParser{
 
 		final Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
 		ensureUniqueness(reducedPatterns, cleanedRule, rule);
-
-		reducedPatterns.add(cleanedRule);
 	}
 
 	private static void validateBasicRules(final String rule) throws IllegalArgumentException{
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
 			throw new IllegalArgumentException(INVALID_RULE.format(new Object[]{rule}));
-		if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-			throw new IllegalArgumentException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
-		if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
-			throw new IllegalArgumentException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
+		if(!rule.contains(HYPHEN_EQUALS)){
+			if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
+				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
+			if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
+				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
+		}
 	}
 
 	private static void validateAugmentedRule(final String cleanedRule, final String rule) throws IllegalArgumentException{
@@ -491,7 +511,7 @@ public class HyphenationParser{
 	 */
 	public boolean hasRule(final String rule, final Level level){
 		final String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsKey(key) || rules.get(level).get(key) != null);
+		return (customHyphenations.get(level).containsValue(rule) || rules.get(level).get(key) != null);
 	}
 
 	public static String getKeyFromData(final String rule){

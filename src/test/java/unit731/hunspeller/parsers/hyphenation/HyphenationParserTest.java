@@ -262,6 +262,24 @@ class HyphenationParserTest{
 	}
 
 	@Test
+	void hyphenationOkWithAddedCustomHyphenation(){
+		Map<String, String> hyphenations = new HashMap<>();
+		addRule(hyphenations, "ab1cd");
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
+		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
+		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
+
+		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
+		Hyphenation hyphenation = hyphenator.hyphenate("abcd", "a=bcd", HyphenationParser.Level.NON_COMPOUND);
+
+		Assertions.assertEquals(Arrays.asList("a", "bcd"), hyphenation.getSyllabes());
+	}
+
+	@Test
 	void competingRules(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
