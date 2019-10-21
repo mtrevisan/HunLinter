@@ -1840,8 +1840,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		frame.hypRulesOutputLabel.setText(String.join(StringUtils.SPACE, rules));
 
 		frame.hypAddRuleTextField.setText(null);
-		frame.hypAddRuleLevelComboBox.setEnabled(false);
-		frame.hypAddRuleButton.setEnabled(false);
 		frame.hypAddRuleSyllabationOutputLabel.setText(null);
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}

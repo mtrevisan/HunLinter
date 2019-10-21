@@ -117,16 +117,16 @@ public class Hyphenator implements HyphenatorInterface{
 			final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){
-				final String customRule = hyphenations[i - 1] + "1" + hyphenations[i];
+				final String customRule = hyphenations[i - 1] + HyphenationParser.HYPHEN_EQUALS + hyphenations[i];
 				indexesAndRules.put(charCount, Pair.of(1, customRule));
 
 				charCount += getNormalizedLength(hyphenations[i]);
 			}
-			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
+			hyphBreak = new HyphenationBreak(indexesAndRules);
 		}
 		else if(getNormalizedLength(word) < options.getMinimumLength())
 			//ignore short words (early out):
-			hyphBreak = new HyphenationBreak(Collections.emptyMap(), wordSize);
+			hyphBreak = new HyphenationBreak(Collections.emptyMap());
 		else
 			hyphBreak = calculateBreakpoints(word, patterns.get(level), options);
 
@@ -173,7 +173,7 @@ public class Hyphenator implements HyphenatorInterface{
 			}
 		}
 
-		return new HyphenationBreak(indexesAndRules, wordSize);
+		return new HyphenationBreak(indexesAndRules);
 	}
 
 	@Override

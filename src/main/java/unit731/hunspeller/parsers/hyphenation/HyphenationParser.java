@@ -510,8 +510,9 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(final String rule, final Level level){
-		final String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsValue(rule) || rules.get(level).get(key) != null);
+		return (isCustomRule(rule)?
+			customHyphenations.get(level).containsValue(rule):
+			rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
 	public static String getKeyFromData(final String rule){

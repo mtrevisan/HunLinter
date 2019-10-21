@@ -32,7 +32,7 @@ public class HyphenationBreak{
 	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
 
 
-	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules, final int size){
+	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules){
 		Objects.requireNonNull(indexesAndRules);
 
 		this.indexesAndRules = indexesAndRules;
