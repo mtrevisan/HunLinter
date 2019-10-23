@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 
 
@@ -98,13 +100,23 @@ public class Packager{
 					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
 					if(pathsNode != null){
 						final Map<String, String[]> folders = getFolders(pathsNode);
+						final Set<String> uniqueFolders = folders.values().stream()
+							.map(folder -> String.join(File.separator, folder))
+							.collect(Collectors.toSet());
+						if(folders.size() != uniqueFolders.size())
+							throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+								+ StringUtils.join(folders));
+						if(uniqueFolders.stream().anyMatch(String::isEmpty))
+							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+
 						final String[] autoCorrectFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
 						final String[] autoTextFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 						if(autoCorrectFolder != null){
 							final Path autoCorrectPath = Paths.get(manifestPath.getParent().toString(), autoCorrectFolder);
 
 							//zip directory into .dat
-							final String autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator + FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
+							final String autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator
+								+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
 							autoCorrectOutputPath = Path.of(new File(autoCorrectOutputFilename).getCanonicalPath());
 							ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
 						}
@@ -112,18 +124,20 @@ public class Packager{
 							final Path autoTextPath = Paths.get(manifestPath.getParent().toString(), autoTextFolder);
 
 							//zip directory into .bau
-							final String autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
+							final String autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
+								+ language + EXTENSION_BAU;
 							autoTextOutputPath = Path.of(new File(autoTextOutputFilename).getCanonicalPath());
 							ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
 						}
 					}
 				}
 
-				//TODO
+				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1)
+					+ EXTENSION_ZIP;
 				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 				//that are not autoCorrectOutputFilename or autoTextOutputFilename
-				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + EXTENSION_ZIP;
-				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename, autoCorrectOutputPath, autoTextOutputPath);
+				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename,
+					autoCorrectOutputPath, autoTextOutputPath);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
@@ -160,7 +174,8 @@ public class Packager{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!MANIFEST_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new IllegalArgumentException("Invalid root element, expected '" + MANIFEST_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+			throw new IllegalArgumentException("Invalid root element, expected '" + MANIFEST_ROOT_ELEMENT + "', was "
+				+ rootElement.getNodeName());
 
 		final List<String> fullPaths = new ArrayList<>();
 		final NodeList entries = rootElement.getChildNodes();
@@ -177,13 +192,15 @@ public class Packager{
 
 	private Node findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
 		for(final String configurationFile : configurationFiles){
-			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(), configurationFile.split(FOLDER_SPLITTER));
+			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(),
+				configurationFile.split(FOLDER_SPLITTER));
 
 			final Document doc = parseXMLDocument(configurationPath);
 
 			final Element rootElement = doc.getDocumentElement();
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was "
+					+ rootElement.getNodeName());
 
 			final Node foundNode = onNodeNameApply(rootElement, CONFIGURATION_NODE_NAME_PATHS, Function.identity());
 			if(foundNode != null)
