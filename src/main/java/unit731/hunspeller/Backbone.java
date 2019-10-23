@@ -25,6 +25,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
+import unit731.hunspeller.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -68,6 +69,8 @@ public class Backbone implements FileChangeListener{
 	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
 
+	private AutoCorrectParser acoParser;
+
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
 
@@ -105,6 +108,10 @@ public class Backbone implements FileChangeListener{
 		return hyphenator;
 	}
 
+	public AutoCorrectParser getAcoParser(){
+		return acoParser;
+	}
+
 	public DictionaryCorrectnessChecker getChecker(){
 		return checker;
 	}
@@ -131,6 +138,9 @@ public class Backbone implements FileChangeListener{
 
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
+
+		File acoDataFile = getAutoCorrectDataFile();
+		openAutoCorrectFile(acoDataFile);
 	}
 
 	/* NOTE: used for testing purposes */
@@ -150,6 +160,9 @@ public class Backbone implements FileChangeListener{
 
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
+
+		File acoDataFile = getAutoCorrectDataFile();
+		openAutoCorrectFile(acoDataFile);
 	}
 
 	public void clear(){
@@ -261,6 +274,18 @@ public class Backbone implements FileChangeListener{
 		}
 		else
 			theParser.clear();
+	}
+
+	public void openAutoCorrectFile(File acoDataFile) throws IOException{
+		if(acoDataFile.exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoDataFile.getName());
+
+			acoParser.parse(acoDataFile);
+
+			LOGGER.info(MARKER_APPLICATION, "Finished reading AutoCorrect file");
+		}
+		else
+			acoParser.clear();
 	}
 
 

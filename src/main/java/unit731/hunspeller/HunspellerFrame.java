@@ -4,6 +4,7 @@ import java.awt.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
+import unit731.hunspeller.gui.AutoCorrectTableModel;
 import unit731.hunspeller.interfaces.Hunspellable;
 
 import java.awt.event.ActionEvent;
@@ -268,6 +269,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
+      acoLayeredPane = new javax.swing.JLayeredPane();
+      acoIncorrectLabel = new javax.swing.JLabel();
+      acoIncorrectTextField = new javax.swing.JTextField();
+      acoToLabel = new javax.swing.JLabel();
+      acoCorrectLabel = new javax.swing.JLabel();
+      acoCorrectTextField = new javax.swing.JTextField();
+      acoAddButton = new javax.swing.JButton();
+      acoScrollPane = new javax.swing.JScrollPane();
+      acoTable = new javax.swing.JTable();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -412,7 +422,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
       cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            limitComboBoxActionPerformed(evt);
+            cmpLimitComboBoxActionPerformed(evt);
          }
       });
 
@@ -435,7 +445,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLoadInputButton.setText("Load input from dictionary");
       cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            loadInputButtonActionPerformed(evt);
+            cmpLoadInputButtonActionPerformed(evt);
          }
       });
 
@@ -533,14 +543,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
-      JFrame parent = this;
+      JFrame theParent = this;
       theTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
-					final JTable target = (JTable)e.getSource();
-					final int col = target.getSelectedColumn();
+               JTable target = (JTable)e.getSource();
+               int col = target.getSelectedColumn();
                if(col == 1){
-						final int row = theTable.convertRowIndexToModel(target.getSelectedRow());
+                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
                   Consumer<String> okButtonAction = (text) -> {
                      try{
                         backbone.getTheParser().setMeanings(row, text);
@@ -548,15 +558,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeThesaurusFiles();
                      }
-                     catch(final IllegalArgumentException | IOException ex){
+                     catch(IllegalArgumentException | IOException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
-						final ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-						final ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
-						dialog.setCurrentFont(GUIUtils.getCurrentFont());
+                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
+                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
                   GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.setLocationRelativeTo(parent);
+                  dialog.setLocationRelativeTo(theParent);
                   dialog.setVisible(true);
                }
             }
@@ -803,9 +812,108 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
 
+      acoIncorrectLabel.setText("Incorrect form:");
+
+      acoToLabel.setText("→");
+
+      acoCorrectLabel.setText("Correct form:");
+
+      acoAddButton.setText("Add");
+
+      acoTable.setModel(new AutoCorrectTableModel());
+      acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
+      acoTable.setShowHorizontalLines(false);
+      acoTable.setShowVerticalLines(false);
+      acoTable.setRowSelectionAllowed(true);
+      acoTable.getColumnModel().getColumn(0).setMinWidth(200);
+      acoTable.getColumnModel().getColumn(0).setMaxWidth(500);
+
+      acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
+      JFrame acoParent = this;
+      acoTable.addMouseListener(new MouseAdapter(){
+         public void mouseClicked(MouseEvent e){
+            if(e.getClickCount() == 1){
+               JTable target = (JTable)e.getSource();
+               int col = target.getSelectedColumn();
+               if(col == 1){
+                  int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
+                  Consumer<String> okButtonAction = (text) -> {
+                     try{
+                        backbone.getAcoParser().setMeanings(row, text);
+
+                        // ... and save the files
+                        backbone.storeAutoCorrectFiles();
+                     }
+                     catch(IllegalArgumentException | IOException ex){
+                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                     }
+                  };
+                  AutoCorrectEntry synonym = backbone.getAcoParser().getAutoCorrectDictionary().get(row);
+                  AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
+                  GUIUtils.addCancelByEscapeKey(dialog);
+                  dialog.setLocationRelativeTo(acoParent);
+                  dialog.setVisible(true);
+               }
+            }
+         }
+      });
+
+      AutoCorrectTableRenderer cellRenderer = new AutoCorrectTableRenderer();
+      acoTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
+      acoScrollPane.setViewportView(acoTable);
+
+      acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoCorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+      javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
+      acoLayeredPane.setLayout(acoLayeredPaneLayout);
+      acoLayeredPaneLayout.setHorizontalGroup(
+         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(acoScrollPane)
+               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(acoIncorrectLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                  .addComponent(acoToLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(acoCorrectLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addGap(18, 18, 18)
+                  .addComponent(acoAddButton)))
+            .addContainerGap())
+      );
+      acoLayeredPaneLayout.setVerticalGroup(
+         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(acoIncorrectLabel)
+               .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(acoAddButton)
+               .addComponent(acoToLabel)
+               .addComponent(acoCorrectLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+            .addContainerGap())
+      );
+
+      mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
+
       addWindowListener(new WindowAdapter(){
          @Override
-         public void windowClosed(final WindowEvent e){
+         public void windowDeactivated(final WindowEvent e){
             exit();
          }
       });
@@ -1184,7 +1292,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			return;
 		formerCompoundInputText = inputText;
 
-		frame.limitComboBoxActionPerformed(null);
+		frame.cmpLimitComboBoxActionPerformed(null);
 	}
 
 
@@ -1489,11 +1597,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theFilterDebouncer.call(this);
    }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
-   private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
       extractCompoundRulesInputs();
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
-   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
+   private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
 		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
 		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
 		final String inputCompounds = cmpInputTextArea.getText();
@@ -2174,6 +2282,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JButton acoAddButton;
+   private javax.swing.JLabel acoCorrectLabel;
+   private javax.swing.JTextField acoCorrectTextField;
+   private javax.swing.JLabel acoIncorrectLabel;
+   private javax.swing.JTextField acoIncorrectTextField;
+   private javax.swing.JLayeredPane acoLayeredPane;
+   private javax.swing.JScrollPane acoScrollPane;
+   private javax.swing.JTable acoTable;
+   private javax.swing.JLabel acoToLabel;
    private javax.swing.JComboBox<String> cmpInputComboBox;
    private javax.swing.JLabel cmpInputLabel;
    private javax.swing.JScrollPane cmpInputScrollPane;

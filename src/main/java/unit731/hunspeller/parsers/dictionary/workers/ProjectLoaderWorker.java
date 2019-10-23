@@ -58,7 +58,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 			backbone.openAffixFile(affixFilePath);
 
-			setProgress(17);
+			setProgress(14);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -66,14 +66,14 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File hypFile = backbone.getHyphenationFile();
 			backbone.openHyphenationFile(hypFile);
 
-			setProgress(33);
+			setProgress(29);
 
 			while(paused.get())
 				Thread.sleep(500l);
 
 			backbone.getCorrectnessChecker();
 
-			setProgress(50);
+			setProgress(43);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -81,7 +81,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File dicFile = backbone.getDictionaryFile();
 			backbone.prepareDictionaryFile(dicFile);
 
-			setProgress(67);
+			setProgress(57);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -89,13 +89,21 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File aidFile = backbone.getAidFile();
 			backbone.openAidFile(aidFile);
 
-			setProgress(83);
+			setProgress(71);
 
 			while(paused.get())
 				Thread.sleep(500l);
 
 			final File theDataFile = backbone.getThesaurusDataFile();
 			backbone.openThesaurusFile(theDataFile);
+
+			setProgress(86);
+
+			while(paused.get())
+				Thread.sleep(500l);
+
+			final File acoDataFile = backbone.getAutoCorrectDataFile();
+			backbone.openAutoCorrectFile(acoDataFile);
 
 			setProgress(100);
 
