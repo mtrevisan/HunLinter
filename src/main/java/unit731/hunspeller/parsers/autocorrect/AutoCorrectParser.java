@@ -1,21 +1,14 @@
 package unit731.hunspeller.parsers.autocorrect;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusCaretaker;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.memento.CaretakerInterface;
-import unit731.hunspeller.services.memento.OriginatorInterface;
 
 import java.io.BufferedWriter;
 import java.io.EOFException;
@@ -36,14 +29,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-/**
- * for storing mementoes:
- * https://github.com/dnaumenko/java-diff-utils
- * https://www.adictosaltrabajo.com/2012/06/05/comparar-ficheros-java-diff-utils/
- * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
- * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
- * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
- */
 public class AutoCorrectParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
@@ -53,21 +38,13 @@ public class AutoCorrectParser{
 	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): was ''{0}''");
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
-	private static final String PIPE = "|";
-
 	private static final String PART_OF_SPEECH_START = "(";
 	private static final String PART_OF_SPEECH_END = ")";
 
-	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
-
-	private static final Pattern PATTERN_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
-	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
-	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
-
-	private final AutoCorrectDictionary dictionary = new AutoCorrectDictionary();
+	private final List<CorrectionEntry> dictionary = new ArrayList<>();
 
 
-	public AutoCorrectDictionary getDictionary(){
+	public List<CorrectionEntry> getDictionary(){
 		return dictionary;
 	}
 
@@ -93,7 +70,7 @@ public class AutoCorrectParser{
 
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty())
-					dictionary.add(new ThesaurusEntry(line, br));
+					dictionary.add(new CorrectionEntry(line, br));
 		}
 	}
 
@@ -109,16 +86,29 @@ public class AutoCorrectParser{
 		return dictionary.size();
 	}
 
+	public List<CorrectionEntry> getCorrectionsDictionary(){
+		return dictionary;
+	}
+
+	public void setCorrection(final int index, final String incorrect, final String correct){
+		dictionary.set(index, new CorrectionEntry(incorrect, correct));
+	}
+
+	public void deleteCorrections(final int[] selectedRowIDs){
+		final int count = selectedRowIDs.length;
+		for(int i = 0; i < count; i ++)
+			dictionary.remove(selectedRowIDs[i] - i);
+	}
 	/**
-	 * @param synonymAndMeanings			The line representing all the synonyms of a word along with their part of speech
+	 * @param correction			The line representing all the synonyms of a word along with their part of speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
 	 *												insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult insertMeanings(final String synonymAndMeanings, final Supplier<Boolean> duplicatesDiscriminator){
-		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
+	public DuplicationResult insertCorrection(final CorrectionEntry correction, final Supplier<Boolean> duplicatesDiscriminator){
+		final String[] partOfSpeechAndMeanings = StringUtils.split(correction, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{correction}));
 
 		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
@@ -132,7 +122,7 @@ public class AutoCorrectParser{
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
-			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
+			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{correction}));
 
 		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
@@ -142,16 +132,8 @@ public class AutoCorrectParser{
 				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 
-		if(duplicates.isEmpty() || forceInsertion){
-			try{
-				storeMemento();
-			}
-			catch(final IOException e){
-				LOGGER.warn("Error while storing a memento", e);
-			}
-
+		if(duplicates.isEmpty() || forceInsertion)
 			dictionary.add(partOfSpeeches, meanings);
-		}
 
 		return new DuplicationResult(duplicates, forceInsertion);
 	}
@@ -159,11 +141,11 @@ public class AutoCorrectParser{
 	/** Find if there is a duplicate with the same part of speech */
 	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
-		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+		final List<CorrectionEntry> synonyms = dictionary;
 		for(final String meaning : meanings){
 			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			for(final ThesaurusEntry synonym : synonyms)
-				if(synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
+			for(final CorrectionEntry synonym : synonyms)
+				if(synonym.equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
 					duplicates.add(synonym);
 		}
 		return duplicates;

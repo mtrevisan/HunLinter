@@ -68,12 +68,13 @@ import unit731.hunspeller.gui.HunspellerTableModel;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFilesMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
-import unit731.hunspeller.gui.ThesaurusTableRenderer;
+import unit731.hunspeller.gui.TableRenderer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -278,6 +279,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoAddButton = new javax.swing.JButton();
       acoScrollPane = new javax.swing.JScrollPane();
       acoTable = new javax.swing.JTable();
+      acoCorrectionsRecordedLabel = new javax.swing.JLabel();
+      acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -572,8 +575,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      ThesaurusTableRenderer cellRenderer = new ThesaurusTableRenderer();
-      theTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
+      TableRenderer theCellRenderer = new TableRenderer();
+      theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
       theScrollPane.setViewportView(theTable);
 
       theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
@@ -812,10 +815,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
 
+      acoIncorrectLabel.setLabelFor(acoIncorrectTextField);
       acoIncorrectLabel.setText("Incorrect form:");
 
       acoToLabel.setText("→");
 
+      acoCorrectLabel.setLabelFor(acoCorrectTextField);
       acoCorrectLabel.setText("Correct form:");
 
       acoAddButton.setText("Add");
@@ -838,9 +843,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                int col = target.getSelectedColumn();
                if(col == 1){
                   int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
-                  Consumer<String> okButtonAction = (text) -> {
+                  BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
                      try{
-                        backbone.getAcoParser().setCorrection(row, text);
+                        backbone.getAcoParser().setCorrection(row, incorrect, correct);
 
                         // ... and save the files
                         backbone.storeAutoCorrectFile();
@@ -849,8 +854,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
-                  AutoCorrectEntry synonym = backbone.getAcoParser().getAutoCorrectDictionary().get(row);
+                  CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
                   AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
+						dialog.setCurrentFont(GUIUtils.getCurrentFont());
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(acoParent);
                   dialog.setVisible(true);
@@ -859,9 +865,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      AutoCorrectTableRenderer cellRenderer = new AutoCorrectTableRenderer();
-      acoTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
+      TableRenderer acoCellRenderer = new TableRenderer();
+      acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
       acoScrollPane.setViewportView(acoTable);
+
+      acoCorrectionsRecordedLabel.setLabelFor(acoCorrectionsRecordedOutputLabel);
+      acoCorrectionsRecordedLabel.setText("Corrections recorded:");
+
+      acoCorrectionsRecordedOutputLabel.setText("...");
 
       acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -870,6 +881,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoLayeredPane.setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
       acoLayeredPane.setLayout(acoLayeredPaneLayout);
@@ -890,7 +903,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
-                  .addComponent(acoAddButton)))
+                  .addComponent(acoAddButton))
+               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(acoCorrectionsRecordedLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)))
             .addContainerGap())
       );
       acoLayeredPaneLayout.setVerticalGroup(
@@ -905,7 +922,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(acoToLabel)
                .addComponent(acoCorrectLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(acoCorrectionsRecordedLabel)
+               .addComponent(acoCorrectionsRecordedOutputLabel))
             .addContainerGap())
       );
 
@@ -1416,6 +1437,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
+	public void removeSelectedRowsFromAutoCorrect(){
+		try{
+			final int[] selectedRows = Arrays.stream(acoTable.getSelectedRows())
+				.map(acoTable::convertRowIndexToModel)
+				.toArray();
+			backbone.getAcoParser().deleteCorrections(selectedRows);
+
+			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+			dm.fireTableDataChanged();
+
+			updateAutoCorrectionsCounter();
+
+			//... and save the files
+			backbone.storeAutoCorrectFile();
+		}
+		catch(final Exception e){
+			final String message = ExceptionHelper.getMessage(e);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
+		}
+	}
+
 
    private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1671,6 +1713,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public void actionPerformed(ActionEvent event){
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
+		else if(event.getSource() == acoTable)
+			removeSelectedRowsFromAutoCorrect();
 		else{
 			//FIXME introduce a checkAbortion case?
 			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
@@ -1910,6 +1954,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void updateSynonymsCounter(){
 		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
+	}
+
+	private void updateAutoCorrectionsCounter(){
+		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getAcoParser().getAutoCorrectCounter()));
 	}
 
 	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
@@ -2285,6 +2333,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JButton acoAddButton;
    private javax.swing.JLabel acoCorrectLabel;
    private javax.swing.JTextField acoCorrectTextField;
+   private javax.swing.JLabel acoCorrectionsRecordedLabel;
+   private javax.swing.JLabel acoCorrectionsRecordedOutputLabel;
    private javax.swing.JLabel acoIncorrectLabel;
    private javax.swing.JTextField acoIncorrectTextField;
    private javax.swing.JLayeredPane acoLayeredPane;

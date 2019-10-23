@@ -799,7 +799,7 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.setRowSelectionAllowed(true);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(IllegalArgumentException | IOException ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;ThesaurusTableRenderer cellRenderer = new ThesaurusTableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.setRowSelectionAllowed(true);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(IllegalArgumentException | IOException ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1082,7 +1082,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="acoScrollPane" max="32767" attributes="0"/>
@@ -1098,6 +1098,11 @@
                               <Component id="acoCorrectTextField" min="-2" pref="330" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="acoAddButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="acoCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="acoCorrectionsRecordedOutputLabel" pref="798" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1117,7 +1122,12 @@
                           <Component id="acoCorrectLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="acoScrollPane" pref="200" max="32767" attributes="0"/>
+                      <Component id="acoScrollPane" pref="175" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="acoCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="acoCorrectionsRecordedOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1126,6 +1136,9 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="acoIncorrectLabel">
               <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="acoIncorrectTextField"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Incorrect form:"/>
               </Properties>
             </Component>
@@ -1138,6 +1151,9 @@
             </Component>
             <Component class="javax.swing.JLabel" name="acoCorrectLabel">
               <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="acoCorrectTextField"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Correct form:"/>
               </Properties>
             </Component>
@@ -1164,11 +1180,24 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="acoTable.setRowSelectionAllowed(true);&#xd;&#xa;acoTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;acoTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(IllegalArgumentException | IOException ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;AutoCorrectEntry synonym = backbone.getAcoParser().getAutoCorrectDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;AutoCorrectTableRenderer cellRenderer = new AutoCorrectTableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="acoTable.setRowSelectionAllowed(true);&#xd;&#xa;acoTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;acoTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;BiConsumer&lt;String, String&gt; okButtonAction = (incorrect, correct) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setCorrection(row, incorrect, correct);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(IllegalArgumentException | IOException ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionEntry synonym = backbone.getAcoParser().getAutoCorrectDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer acoCellRenderer = new TableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JLabel" name="acoCorrectionsRecordedLabel">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="acoCorrectionsRecordedOutputLabel"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Corrections recorded:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="acoCorrectionsRecordedOutputLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="..."/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

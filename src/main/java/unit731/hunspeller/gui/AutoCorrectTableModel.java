@@ -1,7 +1,7 @@
 package unit731.hunspeller.gui;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
@@ -26,10 +26,10 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 		"<html><body style=\"'white-space:nowrap'; font-family:{0}" + TAG_START + "{1}" + TAG_END);
 
 
-	private List<Pair<String, String>> corrections;
+	private List<CorrectionEntry> corrections;
 
 
-	public void setCorrections(final List<Pair<String, String>> corrections){
+	public void setCorrections(final List<CorrectionEntry> corrections){
 		this.corrections = corrections;
 
 		fireTableDataChanged();
@@ -51,13 +51,13 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 			return null;
 
 		final Font font = GUIUtils.getCurrentFont();
-		final Pair<String, String> correction = corrections.get(rowIndex);
+		final CorrectionEntry correction = corrections.get(rowIndex);
 		switch(columnIndex){
 			case 0:
-				return TAG.format(new Object[]{font.getName(), correction.getLeft()});
+				return TAG.format(new Object[]{font.getName(), correction.getIncorrectForm()});
 
 			case 1:
-				return TAG.format(new Object[]{font.getName(), correction.getRight()});
+				return TAG.format(new Object[]{font.getName(), correction.getCorrectForm()});
 
 			default:
 				return null;
@@ -75,12 +75,13 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 			try{
 				final int tagEndIndex = ((String)value).indexOf(TAG_END);
 				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
-				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
-
 				//TODO
-				final String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-				corrections.get(rowIndex)
-					.setValue(lines);
+				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
+				String incorrectForm;
+				String correctForm;
+
+				final CorrectionEntry correction = new CorrectionEntry(incorrectForm, correctForm);
+				corrections.set(rowIndex, correction);
 			}
 			catch(final IllegalArgumentException ignored){}
 		}
