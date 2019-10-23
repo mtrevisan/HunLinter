@@ -22,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.zip.Deflater;
 
@@ -87,9 +89,9 @@ public class Packager{
 					//extract only the Paths configuration file
 					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
 					if(pathsNode != null){
-						final Function<Node, String> folderExtractor = entry -> onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-						final String autoCorrectFolder = onNodeNameApply(pathsNode, CONFIGURATION_NODE_NAME_AUTO_CORRECT, folderExtractor);
-						final String autoTextFolder = onNodeNameApply(pathsNode, CONFIGURATION_NODE_NAME_AUTO_TEXT, folderExtractor);
+						final Map<String, String> folders = getChildren(pathsNode);
+						final String autoCorrectFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+						final String autoTextFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 						//TODO
 						//for each sub-node
 							//search for node oor:name=CONFIGURATION_NODE_NAME_AUTO_CORRECT
@@ -183,6 +185,24 @@ public class Packager{
 			}
 		}
 		return null;
+	}
+
+	private Map<String, String> getChildren(final Node parentNode){
+		final Map<String, String> children = new HashMap<>();
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node entry = nodes.item(i);
+			if(isNode(entry)){
+				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+				if(node != null){
+					//extract folder
+					final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+
+					children.put(node.getNodeValue(), folder);
+				}
+			}
+		}
+		return children;
 	}
 
 	private String extractFolder(final Node parentNode){
