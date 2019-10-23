@@ -59,7 +59,9 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 	private static final String FOLDER_ORIGIN = "%origin%";
-	public static final String FOLDER_SPLITTER = "[/\\\\]";
+	private static final String FOLDER_SPLITTER = "[/\\\\]";
+	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
+	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
 
 	private static DocumentBuilder DOCUMENT_BUILDER;
@@ -77,7 +79,7 @@ public class Packager{
 	}
 
 
-	public void createPackage(final File affFile){
+	public void createPackage(final File affFile, final String language){
 		final Path basePath = getPackageBaseDirectory(affFile);
 
 		//package entire folder with ZIP
@@ -85,6 +87,8 @@ public class Packager{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on folder {}", basePath.toString());
 
 			try{
+				String autoCorrectOutputFilename;
+				String autoTextOutputFilename;
 				final Path manifestPath = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 				if(existFile(manifestPath)){
 					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
@@ -100,22 +104,22 @@ public class Packager{
 							final Path autoCorrectPath = Paths.get(manifestPath.getParent().toString(), autoCorrectFolder);
 
 							//zip directory into .dat
-							final String outputFilename = autoCorrectPath.toString() + File.separator + "acor_vec-IT" + EXTENSION_DAT;
-							ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
+							autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator + FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
+							ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
 						}
 						if(autoTextFolder != null){
 							final Path autoTextPath = Paths.get(manifestPath.getParent().toString(), autoTextFolder);
 
 							//zip directory into .bau
-							final String outputFilename = autoTextPath.toString() + File.separator + "mytext" + EXTENSION_BAU;
-							ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
+							autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
+							ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
 						}
 					}
 				}
 
 				//TODO
 				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
-				//that does not ends in EXTENSION_DAT or EXTENSION_BAU respectively
+				//that are not autoCorrectOutputFilename or autoTextOutputFilename
 				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + EXTENSION_ZIP;
 				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 

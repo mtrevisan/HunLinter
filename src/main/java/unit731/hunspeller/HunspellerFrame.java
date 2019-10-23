@@ -1120,7 +1120,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		packager.createPackage(backbone.getAffFile());
+		//FIXME
+		packager.createPackage(backbone.getAffFile(), "vec-IT");
    }//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
    private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
