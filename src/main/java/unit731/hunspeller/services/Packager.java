@@ -1,15 +1,28 @@
 package unit731.hunspeller.services;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 
-import java.awt.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.Deflater;
 
 
@@ -19,11 +32,39 @@ public class Packager{
 
 	private static final ZipManager ZIPPER = new ZipManager();
 
-	public static final String FOLDER_META_INF = "META-INF";
-	public static final String FILENAME_DESCRIPTION_XML = "description.xml";
-	public static final String FILENAME_MANIFEST_XML = "manifest.xml";
-	public static final String FILENAME_MANIFEST_JSON = "manifest.json";
-	public static final String EXTENSION_ZIP = ".zip";
+	private static final String FOLDER_META_INF = "META-INF";
+	private static final String FILENAME_DESCRIPTION_XML = "description.xml";
+	private static final String FILENAME_MANIFEST_XML = "manifest.xml";
+	private static final String FILENAME_MANIFEST_JSON = "manifest.json";
+	private static final String EXTENSION_ZIP = ".zip";
+
+	private static final String MANIFEST_ROOT_ELEMENT = "manifest:manifest";
+	private static final String MANIFEST_FILE_ENTRY = "manifest:file-entry";
+	private static final String MANIFEST_FILE_ENTRY_MEDIA_TYPE = "manifest:media-type";
+	private static final String MANIFEST_FILE_ENTRY_FULL_PATH = "manifest:full-path";
+	private static final String MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA = "application/vnd.sun.star.configuration-data";
+	private static final String CONFIGURATION_ROOT_ELEMENT = "oor:component-data";
+	private static final String CONFIGURATION_NODE = "node";
+	private static final String CONFIGURATION_NODE_NAME = "oor:name";
+	//dictionaries configuration file
+	private static final String CONFIGURATION_NODE_NAME_SERVICE_MANAGER = "ServiceManager";
+	//autocorrect/autotext configuration file
+	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
+
+
+	private static DocumentBuilder DOCUMENT_BUILDER;
+	static{
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		factory.setValidating(true);
+		try{
+			DOCUMENT_BUILDER = factory.newDocumentBuilder();
+			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
+		}
+		catch(ParserConfigurationException e){
+			LOGGER.error("Bad error while creating the XML parser, cannot create package", e);
+		}
+	}
 
 
 	public void createPackage(final File affFile){
@@ -36,17 +77,21 @@ public class Packager{
 			try{
 				final Path manifestPath = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 				if(existFile(manifestPath)){
-					//TODO
-					//read FILENAME_MANIFEST_XML into META-INF
-					System.out.println("manifest file found");
-					//collect all manifest:file-entry
-					//for each file
-						//search for node oor:name="Paths"
+					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
+					final List<String> fullPaths = extractFileEntries(manifestPath);
+
+					//extract only the Paths configuration file
+					final Document pathsDoc = findPathsConfiguration(manifestPath, fullPaths);
+					if(pathsDoc != null){
+						//TODO
 						//for each sub-node
 							//search for node oor:name="AutoCorrect"
 								//zip directory into .dat
 							//search for node oor:name="AutoText"
 								//zip directory into .bau
+
+						System.out.println();
+					}
 				}
 
 				//TODO exclude all content inside AutoCorrect and AutoText folders that does not ends in .dat or .bau
@@ -59,7 +104,7 @@ public class Packager{
 				if(Desktop.isDesktopSupported())
 					Desktop.getDesktop().open(new File(basePath.toString()));
 			}
-			catch(final IOException e){
+			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
 				LOGGER.error("Something very bad happened while creating package", e);
@@ -81,6 +126,55 @@ public class Packager{
 
 	private boolean existFile(final Path path, final String filename){
 		return Files.isRegularFile(Paths.get(path.toString(), filename));
+	}
+
+	private List<String> extractFileEntries(final Path manifestPath) throws IOException, SAXException{
+		final Document doc = parseXMLDocument(manifestPath);
+
+		final Element rootElement = doc.getDocumentElement();
+		if(!MANIFEST_ROOT_ELEMENT.equals(rootElement.getNodeName()))
+			throw new IllegalArgumentException("Invalid root element, expected '" + MANIFEST_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+
+		final List<String> fullPaths = new ArrayList<>();
+		final NodeList entries = rootElement.getChildNodes();
+		for(int i = 0; i < entries.getLength(); i ++){
+			final Node entry = entries.item(i);
+			if(entry.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(entry.getNodeName())){
+				final Node mediaType = entry.getAttributes().getNamedItem(MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+				if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
+					fullPaths.add(entry.getAttributes().getNamedItem(MANIFEST_FILE_ENTRY_FULL_PATH).getNodeValue());
+			}
+		}
+		return fullPaths;
+	}
+
+	private Document findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
+		for(final String configurationFile : configurationFiles){
+			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(), configurationFile.split("[/\\\\]"));
+
+			final Document doc = parseXMLDocument(configurationPath);
+
+			final Element rootElement = doc.getDocumentElement();
+			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
+				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+
+			final NodeList entries = rootElement.getChildNodes();
+			for(int i = 0; i < entries.getLength(); i ++){
+				final Node entry = entries.item(i);
+				if(entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName())){
+					final Node nodeName = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+					if(nodeName != null && CONFIGURATION_NODE_NAME_PATHS.equals(nodeName.getNodeValue()))
+						return doc;
+				}
+			}
+		}
+		return null;
+	}
+
+	private Document parseXMLDocument(Path manifestPath) throws SAXException, IOException{
+		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
+		doc.getDocumentElement().normalize();
+		return doc;
 	}
 
 }
