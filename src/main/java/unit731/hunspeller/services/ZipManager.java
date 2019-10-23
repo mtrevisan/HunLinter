@@ -1,6 +1,7 @@
 package unit731.hunspeller.services;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -10,8 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -19,11 +24,19 @@ import java.util.zip.ZipOutputStream;
 public class ZipManager{
 
 	public void zipDirectory(final File dir, final int compressionLevel, final String zipFilename) throws IOException{
+		zipDirectory(dir, compressionLevel, zipFilename, new Path[0]);
+	}
+
+	public void zipDirectory(final File dir, final int compressionLevel, final String zipFilename, Path... excludeFolderBut) throws IOException{
 		Files.deleteIfExists((new File(zipFilename)).toPath());
 
-		final List<String> filesListInDir = extractFilesList(dir);
+		final List<String> folders = extractFilesList(dir);
+		excludeFolderBut = Arrays.stream(excludeFolderBut)
+			.filter(Objects::nonNull)
+			.toArray(Path[]::new);
+		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
 
-		//now zip files one by one
+		//zip files one by one
 		final int startIndex = dir.getAbsolutePath().length() + 1;
 		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
 			zos.setLevel(compressionLevel);
@@ -41,6 +54,26 @@ public class ZipManager{
 				}
 			}
 		}
+	}
+
+	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
+		return folders.stream()
+			.filter(folder -> {
+				folder = Path.of(folder)
+					.toString();
+				if(ArrayUtils.contains(excludeFolderBut, Path.of(folder)))
+					return true;
+
+				final String[] includeFolders = Arrays.stream(excludeFolderBut)
+					.map(Path::getParent)
+					.map(Path::toString)
+					.toArray(String[]::new);
+				for(final String includeFolder : includeFolders)
+					if(folder.startsWith(includeFolder))
+						return false;
+				return true;
+			})
+			.collect(Collectors.toList());
 	}
 
 	private List<String> extractFilesList(final File dir){
