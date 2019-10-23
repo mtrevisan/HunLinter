@@ -1,6 +1,5 @@
 package unit731.hunspeller;
 
-import java.awt.Desktop;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,13 +8,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.zip.Deflater;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,7 +31,6 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
-import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -45,8 +41,6 @@ public class Backbone implements FileChangeListener{
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
-
-	private static final ZipManager ZIPPER = new ZipManager();
 
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
@@ -60,9 +54,6 @@ public class Backbone implements FileChangeListener{
 
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
-
-	public static final String FILENAME_DESCRIPTION_XML = "description.xml";
-	public static final String FILENAME_INSTALL_RDF = "install.rdf";
 
 
 	private File affFile;
@@ -289,6 +280,10 @@ public class Backbone implements FileChangeListener{
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
 
+	public File getAffFile(){
+		return affFile;
+	}
+
 	//FIXME should this be private?!
 	public File getDictionaryFile(){
 		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
@@ -360,44 +355,6 @@ public class Backbone implements FileChangeListener{
 
 	private boolean hasAIDExtension(String path){
 		return path.endsWith(EXTENSION_AID);
-	}
-
-
-	public void createPackage(){
-		final Path basePath = getPackageBaseDirectory();
-
-		//package entire folder with ZIP
-		if(basePath != null){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
-
-			try{
-				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
-				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
-
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
-
-				//open directory
-				if(Desktop.isDesktopSupported())
-					Desktop.getDesktop().open(new File(basePath.toString()));
-			}
-			catch(final IOException e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
-
-				LOGGER.error("Something very bad happened while creating package", e);
-			}
-		}
-	}
-
-	/** Go up directories until description.xml or install.rdf is found */
-	private Path getPackageBaseDirectory(){
-		Path parentPath = affFile.toPath().getParent();
-		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML) && !existFile(parentPath, FILENAME_INSTALL_RDF))
-			parentPath = parentPath.getParent();
-		return parentPath;
-	}
-
-	private boolean existFile(final Path path, final String filename){
-		return Files.isRegularFile(Paths.get(path.toString(), filename));
 	}
 
 
