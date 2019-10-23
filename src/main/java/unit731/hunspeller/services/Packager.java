@@ -40,6 +40,8 @@ public class Packager{
 	private static final String FILENAME_MANIFEST_XML = "manifest.xml";
 	private static final String FILENAME_MANIFEST_JSON = "manifest.json";
 	private static final String EXTENSION_ZIP = ".zip";
+	private static final String EXTENSION_DAT = ".dat";
+	private static final String EXTENSION_BAU = ".bau";
 
 	private static final String MANIFEST_ROOT_ELEMENT = "manifest:manifest";
 	private static final String MANIFEST_FILE_ENTRY = "manifest:file-entry";
@@ -56,6 +58,8 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
+	private static final String FOLDER_ORIGIN = "%origin%";
+	public static final String FOLDER_SPLITTER = "[/\\\\]";
 
 
 	private static DocumentBuilder DOCUMENT_BUILDER;
@@ -89,21 +93,29 @@ public class Packager{
 					//extract only the Paths configuration file
 					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
 					if(pathsNode != null){
-						final Map<String, String> folders = getChildren(pathsNode);
-						final String autoCorrectFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
-						final String autoTextFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-						//TODO
-						//for each sub-node
-							//search for node oor:name=CONFIGURATION_NODE_NAME_AUTO_CORRECT
-								//zip directory into .dat
-							//search for node oor:name=CONFIGURATION_NODE_NAME_AUTO_TEXT
-								//zip directory into .bau
+						final Map<String, String[]> folders = getFolders(pathsNode);
+						final String[] autoCorrectFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+						final String[] autoTextFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+						if(autoCorrectFolder != null){
+							final Path autoCorrectPath = Paths.get(manifestPath.getParent().toString(), autoCorrectFolder);
 
-						System.out.println();
+							//zip directory into .dat
+							final String outputFilename = autoCorrectPath.toString() + File.separator + "acor_vec-IT" + EXTENSION_DAT;
+							ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
+						}
+						if(autoTextFolder != null){
+							final Path autoTextPath = Paths.get(manifestPath.getParent().toString(), autoTextFolder);
+
+							//zip directory into .bau
+							final String outputFilename = autoTextPath.toString() + File.separator + "mytext" + EXTENSION_BAU;
+							ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
+						}
 					}
 				}
 
-				//TODO exclude all content inside AutoCorrect and AutoText folders that does not ends in .dat or .bau
+				//TODO
+				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
+				//that does not ends in EXTENSION_DAT or EXTENSION_BAU respectively
 				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + EXTENSION_ZIP;
 				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
@@ -159,7 +171,7 @@ public class Packager{
 
 	private Node findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
 		for(final String configurationFile : configurationFiles){
-			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(), configurationFile.split("[/\\\\]"));
+			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(), configurationFile.split(FOLDER_SPLITTER));
 
 			final Document doc = parseXMLDocument(configurationPath);
 
@@ -172,6 +184,27 @@ public class Packager{
 				return foundNode;
 		}
 		return null;
+	}
+
+	private Map<String, String[]> getFolders(final Node parentNode){
+		final Map<String, String[]> children = new HashMap<>();
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node entry = nodes.item(i);
+			if(isNode(entry)){
+				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+				if(node != null){
+					//extract folder
+					String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+					if(folder.startsWith(FOLDER_ORIGIN))
+						folder = folder.substring(FOLDER_ORIGIN.length());
+					final String[] folders = folder.split(FOLDER_SPLITTER);
+
+					children.put(node.getNodeValue(), folders);
+				}
+			}
+		}
+		return children;
 	}
 
 	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
@@ -187,24 +220,6 @@ public class Packager{
 		return null;
 	}
 
-	private Map<String, String> getChildren(final Node parentNode){
-		final Map<String, String> children = new HashMap<>();
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(isNode(entry)){
-				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
-				if(node != null){
-					//extract folder
-					final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-
-					children.put(node.getNodeValue(), folder);
-				}
-			}
-		}
-		return children;
-	}
-
 	private String extractFolder(final Node parentNode){
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
@@ -215,14 +230,14 @@ public class Packager{
 		return null;
 	}
 
+	private boolean isNode(final Node entry){
+		return (entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName()));
+	}
+
 	private Document parseXMLDocument(Path manifestPath) throws SAXException, IOException{
 		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
 		doc.getDocumentElement().normalize();
 		return doc;
-	}
-
-	private boolean isNode(final Node entry){
-		return (entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName()));
 	}
 
 }
