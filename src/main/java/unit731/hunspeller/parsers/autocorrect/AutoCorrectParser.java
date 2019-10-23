@@ -43,7 +43,8 @@ import java.util.stream.Collectors;
  * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
  * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
  * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
- */public class AutoCorrectParser implements OriginatorInterface<AutoCorrectParser.Memento>{
+ */
+public class AutoCorrectParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
 
@@ -63,86 +64,23 @@ import java.util.stream.Collectors;
 	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
 
-	//NOTE: All members are private and accessible only by Originator
-	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	protected static class Memento{
-
-		private ThesaurusDictionary dictionary;
-
-//		private String partOfSpeech;
-//		private List<String> meanings;
-//
-//		private ThesaurusEntry updatedSynonym;
-//		private List<MeaningEntry> meaningEntries;
-//		private String text;
-//
-//		private List<ThesaurusEntry> removedSynonyms;
+	private final AutoCorrectDictionary dictionary = new AutoCorrectDictionary();
 
 
-		Memento(){}
-
-		//create
-//		Memento(String partOfSpeech, List<String> meanings){
-//			this.partOfSpeech = partOfSpeech;
-//			this.meanings = meanings;
-//		}
-
-		//update
-//		Memento(ThesaurusEntry updatedSynonym, List<MeaningEntry> meaningEntries, String text){
-//			this.updatedSynonym = updatedSynonym;
-//			this.meaningEntries = meaningEntries;
-//			this.text = text;
-//		}
-
-		//delete
-//		Memento(List<ThesaurusEntry> removedSynonyms){
-//			this.removedSynonyms = removedSynonyms;
-//		}
-
-		Memento(final ThesaurusDictionary dictionary){
-			this.dictionary = dictionary;
-		}
-
-	}
-
-	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
-
-	private final Undoable undoable;
-	private final CaretakerInterface<Memento> undoCaretaker = new ThesaurusCaretaker();
-	private final CaretakerInterface<Memento> redoCaretaker = new ThesaurusCaretaker();
-
-
-	public AutoCorrectParser(final Undoable undoable){
-		this.undoable = undoable;
-	}
-
-	public ThesaurusDictionary getDictionary(){
+	public AutoCorrectDictionary getDictionary(){
 		return dictionary;
 	}
 
-	public Undoable getUndoable(){
-		return undoable;
-	}
-
-	public CaretakerInterface<Memento> getUndoCaretaker(){
-		return undoCaretaker;
-	}
-
-	public CaretakerInterface<Memento> getRedoCaretaker(){
-		return redoCaretaker;
-	}
-
 	/**
-	 * Parse the rows out from a .aid file.
+	 * Parse the rows out from a DocumentList.xml file.
 	 *
-	 * @param theFile	The content of the thesaurus file
+	 * @param acoFile	The content of the thesaurus file
 	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(final File theFile) throws IOException{
+	public void parse(final File acoFile) throws IOException{
 		clear();
 
-		final Path path = theFile.toPath();
+		final Path path = acoFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
@@ -157,8 +95,6 @@ import java.util.stream.Collectors;
 				if(!line.isEmpty())
 					dictionary.add(new ThesaurusEntry(line, br));
 		}
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
-//6 035 792 B
 	}
 
 	private String extractLine(final LineNumberReader br) throws IOException{
@@ -169,12 +105,8 @@ import java.util.stream.Collectors;
 		return line;
 	}
 
-	public int getSynonymsCounter(){
+	public int getAutoCorrectCounter(){
 		return dictionary.size();
-	}
-
-	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return dictionary.getSynonyms();
 	}
 
 	/**
@@ -244,135 +176,26 @@ import java.util.stream.Collectors;
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
 	}
 
-	public void setMeanings(final int index, final String text){
-		try{
-			storeMemento();
-
-			dictionary.setMeanings(index, text);
-		}
-		catch(final IOException e){
-			try{
-				undoCaretaker.popMemento();
-			}
-			catch(final IOException ioe){
-				LOGGER.warn("Error while removing a memento", ioe);
-			}
-
-			LOGGER.warn("Error while storing a memento", e);
-		}
-		catch(final Exception e){
-			try{
-				undoCaretaker.popMemento();
-			}
-			catch(final IOException ioe){
-				LOGGER.warn("Error while removing a memento", ioe);
-			}
-
-			LOGGER.warn("Error while modifying the meanings", e);
-		}
+	public void setCorrection(final int index, final String text){
+		dictionary.setMeanings(index, text);
 	}
 
 	public void deleteMeanings(final int[] selectedRowIDs){
 		final int count = selectedRowIDs.length;
-		if(count > 0){
-			try{
-				storeMemento();
-			}
-			catch(final IOException e){
-				LOGGER.warn("Error while storing a memento", e);
-			}
-
-			for(int i = 0; i < count; i ++)
-				dictionary.remove(selectedRowIDs[i] - i);
-		}
+		for(int i = 0; i < count; i ++)
+			dictionary.remove(selectedRowIDs[i] - i);
 	}
 
-	public List<String> extractDuplicates(){
-		return dictionary.extractDuplicates();
-	}
-
-	public static Pair<String[], String[]> extractComponentsForThesaurusFilter(String text){
-		//extract part of speech if present
-		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
-
-		text = clearThesaurusFilter(text);
-
-		text = StringUtils.strip(text);
-		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
-		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
-		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
-
-		//compose filter regexp
-		return Pair.of(pos, StringUtils.split(text, PIPE));
-	}
-
-	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
-		text = StringUtils.strip(text);
-
-		int start = 0;
-		String[] pos = null;
-		//remove part of speech and format the search string
-		int idx = text.indexOf(':');
-		if(idx < 0){
-			idx = text.indexOf(")|");
-			start = 1;
-		}
-		if(idx >= 0)
-			pos = text.substring(start, idx)
-				.split(", *");
-		return pos;
-	}
-
-	public static Pair<String, String> prepareTextForThesaurusFilter(final List<String> partOfSpeeches, List<String> meanings){
-		//extract part of speech if present
-		final String posFilter = (!partOfSpeeches.isEmpty()?
-			partOfSpeeches.stream().map(p -> StringUtils.replace(p, ".", "\\.")).collect(Collectors.joining(PIPE, "[\\(\\s](", ")[\\),]")):
-			".+");
-		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
-
-		//compose filter regexp
-		return Pair.of(posFilter, meaningsFilter);
-	}
-
-	private static String clearThesaurusFilter(String text){
-		text = StringUtils.strip(text);
-
-		//remove part of speech and format the search string
-		int idx = text.indexOf(':');
-		if(idx >= 0){
-			text = text.substring(idx + 1);
-			text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
-		}
-		else{
-			idx = text.indexOf(")|");
-			if(idx >= 0)
-				text = text.substring(idx + 2);
-		}
-		//escape points
-		text = StringUtils.replace(text, ".", "\\.");
-		//remove all \s+([^)]+)
-		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
-	}
-
-	public void save(final File theIndexFile, final File theDataFile) throws IOException{
+	public void save(final File acoFile) throws IOException{
 		//sort the synonyms
 		dictionary.sort();
 
 		//save index and data files
 		final Charset charset = StandardCharsets.UTF_8;
-		try(
-				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
-				){
+		try(final BufferedWriter writer = Files.newBufferedWriter(acoFile.toPath(), charset)){
 			//save charset
-			indexWriter.write(charset.name());
-			indexWriter.write(StringUtils.LF);
-			//save counter
-			indexWriter.write(Integer.toString(dictionary.size()));
-			indexWriter.write(StringUtils.LF);
-			//save charset
-			dataWriter.write(charset.name());
-			dataWriter.write(StringUtils.LF);
+			writer.write(charset.name());
+			writer.write(StringUtils.LF);
 			//save data
 			int idx = charset.name().length() + 1;
 			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
@@ -380,7 +203,7 @@ import java.util.stream.Collectors;
 			for(ThesaurusEntry synonym : synonyms){
 				synonym.saveToIndex(indexWriter, idx);
 
-				int meaningsLength = synonym.saveToData(dataWriter, charset);
+				int meaningsLength = synonym.saveToData(writer, charset);
 
 				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
 			}
@@ -389,71 +212,6 @@ import java.util.stream.Collectors;
 
 	public void clear(){
 		dictionary.clear();
-	}
-
-	private void storeMemento() throws IOException{
-		//FIXME reduce size of data saved
-//		undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
-		undoCaretaker.pushMemento(createMemento());
-
-		if(undoable != null)
-			undoable.onUndoChange(true);
-	}
-
-	public boolean canUndo(){
-		return undoCaretaker.canUndo();
-	}
-
-	public boolean canRedo(){
-		return redoCaretaker.canUndo();
-	}
-
-	public boolean restorePreviousSnapshot() throws IOException{
-		boolean restored = false;
-		if(canUndo()){
-			//FIXME reduce size of data saved
-			redoCaretaker.pushMemento(createMemento());
-
-			final Memento memento = undoCaretaker.popMemento();
-			if(undoable != null){
-				undoable.onUndoChange(canUndo());
-				undoable.onRedoChange(true);
-			}
-
-			restoreMemento(memento);
-
-			restored = true;
-		}
-		return restored;
-	}
-
-	public boolean restoreNextSnapshot() throws IOException{
-		boolean restored = false;
-		if(canRedo()){
-			//FIXME reduce size of data saved
-			undoCaretaker.pushMemento(createMemento());
-
-			final Memento memento = redoCaretaker.popMemento();
-			if(undoable != null){
-				undoable.onUndoChange(true);
-				undoable.onRedoChange(canRedo());
-			}
-
-			restoreMemento(memento);
-
-			restored = true;
-		}
-		return restored;
-	}
-
-	@Override
-	public Memento createMemento(){
-		return new Memento(dictionary);
-	}
-
-	@Override
-	public void restoreMemento(final Memento memento){
-		dictionary.restore(memento.dictionary);
 	}
 
 }

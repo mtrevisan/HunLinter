@@ -139,7 +139,7 @@ public class Backbone implements FileChangeListener{
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		File acoDataFile = getAutoCorrectDataFile();
+		File acoDataFile = getAutoCorrectFile();
 		openAutoCorrectFile(acoDataFile);
 	}
 
@@ -161,7 +161,7 @@ public class Backbone implements FileChangeListener{
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		File acoDataFile = getAutoCorrectDataFile();
+		File acoDataFile = getAutoCorrectFile();
 		openAutoCorrectFile(acoDataFile);
 	}
 
@@ -295,9 +295,14 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void storeThesaurusFiles() throws IOException{
-		File thesIndexFile = getThesaurusIndexFile();
-		File thesDataFile = getThesaurusDataFile();
-		theParser.save(thesIndexFile, thesDataFile);
+		File theIndexFile = getThesaurusIndexFile();
+		File theDataFile = getThesaurusDataFile();
+		theParser.save(theIndexFile, theDataFile);
+	}
+
+	public void storeAutoCorrectFile() throws IOException{
+		File acoFile = getAutoCorrectFile();
+		acoParser.save(acoFile);
 	}
 
 
@@ -335,6 +340,11 @@ public class Backbone implements FileChangeListener{
 
 	public File getHyphenationFile(){
 		return getFile(PREFIX_HYPHENATION + affParser.getAffixData().getLanguage() + EXTENSION_DIC);
+	}
+
+	public File getAutoCorrectFile(){
+		//FIXME extract directory
+		return getFile("DocumentList.xml");
 	}
 
 

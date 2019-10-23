@@ -840,10 +840,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
                   Consumer<String> okButtonAction = (text) -> {
                      try{
-                        backbone.getAcoParser().setMeanings(row, text);
+                        backbone.getAcoParser().setCorrection(row, text);
 
                         // ... and save the files
-                        backbone.storeAutoCorrectFiles();
+                        backbone.storeAutoCorrectFile();
                      }
                      catch(IllegalArgumentException | IOException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));

@@ -38,7 +38,8 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
  * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
  * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
  * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
- */public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+ */
+public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
@@ -129,7 +130,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/**
-	 * Parse the rows out from a .aid file.
+	 * Parse the rows out from a .dic file.
 	 *
 	 * @param theFile	The content of the thesaurus file
 	 * @throws IOException	If an I/O error occurs

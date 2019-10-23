@@ -79,8 +79,8 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 
 				//TODO
 				final String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-//				corrections.get(rowIndex)
-//					.setValue(lines);
+				corrections.get(rowIndex)
+					.setValue(lines);
 			}
 			catch(final IllegalArgumentException ignored){}
 		}

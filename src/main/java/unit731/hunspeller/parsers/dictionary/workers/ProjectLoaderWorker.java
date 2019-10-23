@@ -102,7 +102,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			final File acoDataFile = backbone.getAutoCorrectDataFile();
+			final File acoDataFile = backbone.getAutoCorrectFile();
 			backbone.openAutoCorrectFile(acoDataFile);
 
 			setProgress(100);
