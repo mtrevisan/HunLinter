@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.zip.Deflater;
 
 
@@ -50,6 +51,9 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_SERVICE_MANAGER = "ServiceManager";
 	//autocorrect/autotext configuration file
 	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
+	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
+	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
+	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 
 
 	private static DocumentBuilder DOCUMENT_BUILDER;
@@ -81,13 +85,16 @@ public class Packager{
 					final List<String> fullPaths = extractFileEntries(manifestPath);
 
 					//extract only the Paths configuration file
-					final Document pathsDoc = findPathsConfiguration(manifestPath, fullPaths);
-					if(pathsDoc != null){
+					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
+					if(pathsNode != null){
+						final Function<Node, String> folderExtractor = entry -> onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+						final String autoCorrectFolder = onNodeNameApply(pathsNode, CONFIGURATION_NODE_NAME_AUTO_CORRECT, folderExtractor);
+						final String autoTextFolder = onNodeNameApply(pathsNode, CONFIGURATION_NODE_NAME_AUTO_TEXT, folderExtractor);
 						//TODO
 						//for each sub-node
-							//search for node oor:name="AutoCorrect"
+							//search for node oor:name=CONFIGURATION_NODE_NAME_AUTO_CORRECT
 								//zip directory into .dat
-							//search for node oor:name="AutoText"
+							//search for node oor:name=CONFIGURATION_NODE_NAME_AUTO_TEXT
 								//zip directory into .bau
 
 						System.out.println();
@@ -148,7 +155,7 @@ public class Packager{
 		return fullPaths;
 	}
 
-	private Document findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
+	private Node findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
 		for(final String configurationFile : configurationFiles){
 			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(), configurationFile.split("[/\\\\]"));
 
@@ -158,15 +165,32 @@ public class Packager{
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
-			final NodeList entries = rootElement.getChildNodes();
-			for(int i = 0; i < entries.getLength(); i ++){
-				final Node entry = entries.item(i);
-				if(entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName())){
-					final Node nodeName = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
-					if(nodeName != null && CONFIGURATION_NODE_NAME_PATHS.equals(nodeName.getNodeValue()))
-						return doc;
-				}
+			final Node foundNode = onNodeNameApply(rootElement, CONFIGURATION_NODE_NAME_PATHS, Function.identity());
+			if(foundNode != null)
+				return foundNode;
+		}
+		return null;
+	}
+
+	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node entry = nodes.item(i);
+			if(isNode(entry)){
+				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+				if(node != null && nodeName.equals(node.getNodeValue()))
+					return fun.apply(entry);
 			}
+		}
+		return null;
+	}
+
+	private String extractFolder(final Node parentNode){
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node entry = nodes.item(i);
+			if(isNode(entry))
+				return entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME).getNodeValue();
 		}
 		return null;
 	}
@@ -175,6 +199,10 @@ public class Packager{
 		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
 		doc.getDocumentElement().normalize();
 		return doc;
+	}
+
+	private boolean isNode(final Node entry){
+		return (entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName()));
 	}
 
 }
