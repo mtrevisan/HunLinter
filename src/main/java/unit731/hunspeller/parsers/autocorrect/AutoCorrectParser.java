@@ -31,7 +31,7 @@ public class AutoCorrectParser{
 
 
 	/**
-	 * Parse the rows out from a DocumentList.xml file.
+	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
 	 * @param acoPath	The content of the auto-correct file
 	 * @throws IOException	If an I/O error occurs
@@ -46,14 +46,13 @@ public class AutoCorrectParser{
 			throw new IllegalArgumentException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
-		final List<CorrectionEntry> corrections = new ArrayList<>();
 		final NodeList entries = rootElement.getChildNodes();
 		for(int i = 0; i < entries.getLength(); i ++){
 			final Node entry = entries.item(i);
 			if(XMLParser.isElement(entry, AUTO_CORRECT_BLOCK)){
 				final Node mediaType = XMLParser.extractAttribute(entry, AUTO_CORRECT_INCORRECT_FORM);
 				if(mediaType != null)
-					corrections.add(new CorrectionEntry(mediaType.getNodeValue(), XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
+					dictionary.add(new CorrectionEntry(mediaType.getNodeValue(), XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
 			}
 		}
 	}

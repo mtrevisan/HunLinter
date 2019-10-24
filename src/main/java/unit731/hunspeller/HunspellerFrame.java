@@ -853,7 +853,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   };
                   CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
                   AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
-						dialog.setCurrentFont(GUIUtils.getCurrentFont());
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(acoParent);
                   dialog.setVisible(true);
@@ -1198,6 +1197,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainTabbedPane.setEnabledAt(1, false);
       mainTabbedPane.setEnabledAt(2, false);
       mainTabbedPane.setEnabledAt(3, false);
+      mainTabbedPane.setEnabledAt(4, false);
       KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -1964,6 +1964,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//thesaurus file:
 		theMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+
+
+		//auto-correct file:
+		//FIXME
+//		acoMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
 	private void updateSynonymsCounter(){
@@ -2281,6 +2287,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		theMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+	}
+
+	@Override
+	public void clearAutoCorrectParser(){
+		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+		dm.setCorrections(null);
+
+		//FIXME
+//		acoMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
 

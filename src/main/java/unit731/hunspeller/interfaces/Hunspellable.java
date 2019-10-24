@@ -15,4 +15,6 @@ public interface Hunspellable{
 
 	void clearThesaurusParser();
 
+	void clearAutoCorrectParser();
+
 }

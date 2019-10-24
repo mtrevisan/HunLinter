@@ -289,6 +289,9 @@ public class Backbone implements FileChangeListener{
 
 			acoParser.parse(acoPath);
 
+			if(hunspellable != null)
+				hunspellable.clearAutoCorrectParser();
+
 			LOGGER.info(MARKER_APPLICATION, "Finished reading AutoCorrect file");
 		}
 		else
