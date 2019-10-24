@@ -176,12 +176,13 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	/**
-	 * @param synonymAndMeanings			The line representing all the synonyms of a word along with their part of speech
+	 * @param synonymAndMeanings			The object representing all the synonyms of a word along with their part of speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
 	 *												insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult insertMeanings(final String synonymAndMeanings, final Supplier<Boolean> duplicatesDiscriminator){
+	public DuplicationResult<ThesaurusEntry> insertMeanings(final String synonymAndMeanings,
+			final Supplier<Boolean> duplicatesDiscriminator){
 		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
 			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
@@ -219,7 +220,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			dictionary.add(partOfSpeeches, meanings);
 		}
 
-		return new DuplicationResult(duplicates, forceInsertion);
+		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same part of speech */

@@ -136,8 +136,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
-	private String formerFilterAutoCorrectIncorrectText;
-	private String formerFilterAutoCorrectCorrectText;
+	private String formerFilterIncorrectText;
+	private String formerFilterCorrectText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
@@ -841,6 +841,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       acoAddButton.setText("Add");
+      acoAddButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            acoAddButtonActionPerformed(evt);
+         }
+      });
 
       acoTable.setModel(new AutoCorrectTableModel());
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
@@ -1432,12 +1437,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void filterAutoCorrect(HunspellerFrame frame){
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
-		if(formerFilterAutoCorrectIncorrectText != null && formerFilterAutoCorrectIncorrectText.equals(unmodifiedIncorrectText)
-				&& formerFilterAutoCorrectCorrectText != null && formerFilterAutoCorrectCorrectText.equals(unmodifiedCorrectText))
+		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
+				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
-		formerFilterAutoCorrectIncorrectText = unmodifiedIncorrectText;
-		formerFilterAutoCorrectCorrectText = unmodifiedCorrectText;
+		formerFilterIncorrectText = unmodifiedIncorrectText;
+		formerFilterCorrectText = unmodifiedCorrectText;
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText, unmodifiedCorrectText);
@@ -1614,11 +1619,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          //try adding the meanings
 			final String synonyms = theMeaningsTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
-            int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
-               "Select one", JOptionPane.YES_NO_OPTION);
-            return (responseOption == JOptionPane.YES_OPTION);
-         };
-			final DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
+				final int responseOption = JOptionPane.showConfirmDialog(this,
+					"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
+					JOptionPane.YES_NO_OPTION);
+				return (responseOption == JOptionPane.YES_OPTION);
+			};
+			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
          final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
          if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
@@ -1736,6 +1742,60 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
    }//GEN-LAST:event_acoCorrectTextFieldKeyReleased
+
+   private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
+      try{
+         //try adding the correction
+			final String incorrect = acoIncorrectTextField.getText();
+			final String correct = acoCorrectTextField.getText();
+			final Supplier<Boolean> duplicatesDiscriminator = () -> {
+				final int responseOption = JOptionPane.showConfirmDialog(this,
+					"There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Select one",
+					JOptionPane.YES_NO_OPTION);
+				return (responseOption == JOptionPane.YES_OPTION);
+			};
+			final DuplicationResult<CorrectionEntry> duplicationResult = backbone.getAcoParser().insertCorrection(incorrect, correct,
+				duplicatesDiscriminator);
+         final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
+
+         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+            //if everything's ok update the table and the sorter...
+				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+            dm.fireTableDataChanged();
+
+            formerFilterIncorrectText = null;
+            formerFilterCorrectText = null;
+            acoIncorrectTextField.setText(null);
+            acoCorrectTextField.setText(null);
+            acoIncorrectTextField.requestFocusInWindow();
+            @SuppressWarnings("unchecked")
+            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
+            sorter.setRowFilter(null);
+
+            updateSynonymsCounter();
+
+            //... and save the files
+            backbone.storeAutoCorrectFile();
+         }
+         else{
+				acoIncorrectTextField.requestFocusInWindow();
+
+				final String duplicatedWords = duplicates.stream()
+					.map(CorrectionEntry::toString)
+					.collect(Collectors.joining(", "));
+				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   "
+					+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE, null, null, null);
+         }
+      }
+      catch(final IllegalArgumentException e){
+         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      }
+      catch(final Exception t){
+         String message = ExceptionHelper.getMessage(t);
+         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
+      }
+   }//GEN-LAST:event_acoAddButtonActionPerformed
 
 
 	@Override

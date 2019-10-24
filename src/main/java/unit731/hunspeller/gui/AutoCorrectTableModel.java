@@ -63,9 +63,10 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 	public void setValueAt(final Object value, final int rowIndex, final int columnIndex){
 		if(corrections != null){
 			try{
+				//FIXME
 //				final int tagEndIndex = ((String)value).indexOf(TAG_END);
 //				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
-				//TODO
+//
 //				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
 //				String incorrectForm;
 //				String correctForm;

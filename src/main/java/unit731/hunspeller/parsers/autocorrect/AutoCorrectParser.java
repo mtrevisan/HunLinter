@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
+import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.XMLParser;
 
 import java.io.IOException;
@@ -56,7 +57,8 @@ public class AutoCorrectParser{
 			if(XMLParser.isElement(entry, AUTO_CORRECT_BLOCK)){
 				final Node mediaType = XMLParser.extractAttribute(entry, AUTO_CORRECT_INCORRECT_FORM);
 				if(mediaType != null)
-					dictionary.add(new CorrectionEntry(mediaType.getNodeValue(), XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
+					dictionary.add(new CorrectionEntry(mediaType.getNodeValue(),
+						XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
 			}
 		}
 	}
@@ -74,12 +76,15 @@ public class AutoCorrectParser{
 	}
 
 	/**
-	 * @param correction			The line representing all the synonyms of a word along with their part of speech
+	 * @param incorrect	The incorrect form
+	 * @param correct	The correct form
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
 	 *												insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult insertCorrection(final CorrectionEntry correction, final Supplier<Boolean> duplicatesDiscriminator){
+	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
+			final Supplier<Boolean> duplicatesDiscriminator){
+		//FIXME
 //		final String[] partOfSpeechAndMeanings = StringUtils.split(correction, ThesaurusEntry.POS_AND_MEANS, 2);
 //		if(partOfSpeechAndMeanings.length != 2)
 //			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{correction}));
@@ -121,6 +126,7 @@ public class AutoCorrectParser{
 
 	/** Find if there is a duplicate with the same part of speech */
 //	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
+	//FIXME
 //		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 //		final List<CorrectionEntry> synonyms = dictionary;
 //		for(final String meaning : meanings){
@@ -134,10 +140,8 @@ public class AutoCorrectParser{
 
 	/** Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean isAlreadyContained(final String incorrect, final String correct){
-//		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-//		return synonyms.stream()
-//			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
-		return false;
+		return dictionary.stream()
+			.anyMatch(elem -> elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){
@@ -159,16 +163,19 @@ public class AutoCorrectParser{
 	}
 
 //	public void setCorrection(final int index, final String text){
+	//FIXME
 //		dictionary.setMeanings(index, text);
 //	}
 
 //	public void deleteMeanings(final int[] selectedRowIDs){
+	//FIXME
 //		final int count = selectedRowIDs.length;
 //		for(int i = 0; i < count; i ++)
 //			dictionary.remove(selectedRowIDs[i] - i);
 //	}
 
 	public void save(final Path acoPath) throws IOException{
+		//FIXME
 //		//sort the synonyms
 //		dictionary.sort();
 //
