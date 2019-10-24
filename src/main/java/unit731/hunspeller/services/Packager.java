@@ -80,6 +80,58 @@ public class Packager{
 		}
 	}
 
+	private final Map<String, Path> configurationFolders = new HashMap<>();
+
+
+	public Packager(final File affFile){
+		extractConfigurationFolders(affFile);
+	}
+
+	private void extractConfigurationFolders(final File affFile){
+		final Path basePath = getPackageBaseDirectory(affFile);
+
+		if(basePath != null){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on folder {}", basePath.toString());
+
+			try{
+				final Path manifestPath = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
+				if(existFile(manifestPath)){
+					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
+					final List<String> fullPaths = extractFileEntries(manifestPath);
+
+					//extract only the Paths configuration file
+					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
+					if(pathsNode != null){
+						final Map<String, String[]> relativeFolders = getFolders(pathsNode);
+						final Set<String> uniqueFolders = relativeFolders.values().stream()
+							.map(folder -> String.join(File.separator, folder))
+							.collect(Collectors.toSet());
+						if(relativeFolders.size() != uniqueFolders.size())
+							throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+								+ StringUtils.join(relativeFolders));
+						if(uniqueFolders.stream().anyMatch(String::isEmpty))
+							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+
+						configurationFolders.putAll(relativeFolders.entrySet().stream()
+							.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+								final Path path = Paths.get(manifestPath.getParent().toString(), entry.getValue());
+								try{
+									return Path.of(path.toFile().getCanonicalPath());
+								}
+								catch(final IOException e){
+									return null;
+								}
+							})));
+					}
+				}
+			}
+			catch(final Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
+
+				LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
+			}
+		}
+	}
 
 	public void createPackage(final File affFile, final String language){
 		final Path basePath = getPackageBaseDirectory(affFile);
@@ -90,46 +142,22 @@ public class Packager{
 
 			try{
 				Path autoCorrectOutputPath = null;
+				final Path autoCorrectPath = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+				if(autoCorrectPath != null){
+					//zip directory into .dat
+					final String autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator
+						+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
+					autoCorrectOutputPath = Path.of(autoCorrectOutputFilename);
+					ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
+				}
 				Path autoTextOutputPath = null;
-				final Path manifestPath = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
-				if(existFile(manifestPath)){
-					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
-					final List<String> fullPaths = extractFileEntries(manifestPath);
-
-					//extract only the Paths configuration file
-					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
-					if(pathsNode != null){
-						final Map<String, String[]> folders = getFolders(pathsNode);
-						final Set<String> uniqueFolders = folders.values().stream()
-							.map(folder -> String.join(File.separator, folder))
-							.collect(Collectors.toSet());
-						if(folders.size() != uniqueFolders.size())
-							throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-								+ StringUtils.join(folders));
-						if(uniqueFolders.stream().anyMatch(String::isEmpty))
-							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-
-						final String[] autoCorrectFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
-						final String[] autoTextFolder = folders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-						if(autoCorrectFolder != null){
-							final Path autoCorrectPath = Paths.get(manifestPath.getParent().toString(), autoCorrectFolder);
-
-							//zip directory into .dat
-							final String autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator
-								+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
-							autoCorrectOutputPath = Path.of(new File(autoCorrectOutputFilename).getCanonicalPath());
-							ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
-						}
-						if(autoTextFolder != null){
-							final Path autoTextPath = Paths.get(manifestPath.getParent().toString(), autoTextFolder);
-
-							//zip directory into .bau
-							final String autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
-								+ language + EXTENSION_BAU;
-							autoTextOutputPath = Path.of(new File(autoTextOutputFilename).getCanonicalPath());
-							ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
-						}
-					}
+				final Path autoTextPath = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+				if(autoTextPath != null){
+					//zip directory into .bau
+					final String autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
+						+ language + EXTENSION_BAU;
+					autoTextOutputPath = Path.of(autoTextOutputFilename);
+					ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
 				}
 
 				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1)
@@ -151,6 +179,16 @@ public class Packager{
 				LOGGER.error("Something very bad happened while creating package", e);
 			}
 		}
+	}
+
+	public Path getAutoCorrectPath(final File affFile){
+		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+		return (path != null? Path.of(path.toString(), "DocumentList.xml"): null);
+	}
+
+	public Path getAutoTextPath(final File affFile){
+		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		return (path != null? Path.of(path.toString(), "BlockList.xml"): null);
 	}
 
 	/** Go up directories until description.xml or manifest.json is found */

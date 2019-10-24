@@ -4,6 +4,7 @@ import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFo
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -102,8 +103,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			final File acoDataFile = backbone.getAutoCorrectFile();
-			backbone.openAutoCorrectFile(acoDataFile);
+			final Path acoPath = backbone.getAutoCorrectPath();
+			backbone.openAutoCorrectFile(acoPath);
 
 			setProgress(100);
 

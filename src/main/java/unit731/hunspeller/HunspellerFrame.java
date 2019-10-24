@@ -101,7 +101,6 @@ import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionHelper;
-import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.RecentItems;
 
@@ -141,7 +140,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final Backbone backbone;
-	private final Packager packager;
 	private int lastDictionarySortVisibleIndex;
 
 	private RecentFilesMenu recentFilesMenu;
@@ -166,7 +164,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	public HunspellerFrame(){
 		backbone = new Backbone(this, this);
-		packager = new Packager();
 
 		initComponents();
 
@@ -1249,8 +1246,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		//FIXME
-		packager.createPackage(backbone.getAffFile(), "vec-IT");
+		backbone.createPackage();
    }//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
    private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed

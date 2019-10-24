@@ -32,6 +32,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
+import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -70,6 +71,8 @@ public class Backbone implements FileChangeListener{
 	private WordGenerator wordGenerator;
 
 	private AutoCorrectParser acoParser;
+
+	private Packager packager;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -140,8 +143,8 @@ public class Backbone implements FileChangeListener{
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		File acoDataFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoDataFile);
+		Path acoPath = getAutoCorrectPath();
+		openAutoCorrectFile(acoPath);
 	}
 
 	/* NOTE: used for testing purposes */
@@ -162,8 +165,8 @@ public class Backbone implements FileChangeListener{
 		File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		File acoDataFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoDataFile);
+		Path acoPath = getAutoCorrectPath();
+		openAutoCorrectFile(acoPath);
 	}
 
 	public void clear(){
@@ -201,6 +204,8 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());
 
 		affParser.parse(affFile);
+
+		packager = new Packager(affFile);
 
 		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
@@ -277,11 +282,11 @@ public class Backbone implements FileChangeListener{
 			theParser.clear();
 	}
 
-	public void openAutoCorrectFile(File acoDataFile) throws IOException{
-		if(acoDataFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoDataFile.getName());
+	public void openAutoCorrectFile(final Path acoPath) throws IOException{
+		if(acoPath.toFile().exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoPath.toFile().getName());
 
-			acoParser.parse(acoDataFile);
+			acoParser.parse(acoPath);
 
 			LOGGER.info(MARKER_APPLICATION, "Finished reading AutoCorrect file");
 		}
@@ -302,8 +307,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void storeAutoCorrectFile() throws IOException{
-		File acoFile = getAutoCorrectFile();
-		acoParser.save(acoFile);
+		Path acoPath = getAutoCorrectPath();
+		acoParser.save(acoPath);
 	}
 
 
@@ -343,9 +348,8 @@ public class Backbone implements FileChangeListener{
 		return getFile(PREFIX_HYPHENATION + affParser.getAffixData().getLanguage() + EXTENSION_DIC);
 	}
 
-	public File getAutoCorrectFile(){
-		//FIXME extract directory
-		return getFile("DocumentList.xml");
+	public Path getAutoCorrectPath(){
+		return packager.getAutoCorrectPath(affFile);
 	}
 
 
@@ -432,6 +436,11 @@ public class Backbone implements FileChangeListener{
 			storeThesaurusFiles();
 
 		return restored;
+	}
+
+	public void createPackage(){
+		//FIXME extract language
+		packager.createPackage(affFile, "vec-IT");
 	}
 
 }

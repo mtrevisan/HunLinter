@@ -1,32 +1,21 @@
 package unit731.hunspeller.parsers.autocorrect;
 
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusDictionary;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.FileHelper;
-import unit731.hunspeller.services.PatternHelper;
 
-import java.io.BufferedWriter;
 import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 public class AutoCorrectParser{
@@ -51,15 +40,14 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a DocumentList.xml file.
 	 *
-	 * @param acoFile	The content of the thesaurus file
+	 * @param acoPath	The content of the auto-correct file
 	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(final File acoFile) throws IOException{
+	public void parse(final Path acoPath) throws IOException{
 		clear();
 
-		final Path path = acoFile.toPath();
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
+		final Charset charset = FileHelper.determineCharset(acoPath);
+		try(final LineNumberReader br = FileHelper.createReader(acoPath, charset)){
 			String line = extractLine(br);
 
 			//line should be a charset
@@ -169,7 +157,7 @@ public class AutoCorrectParser{
 //			dictionary.remove(selectedRowIDs[i] - i);
 //	}
 
-	public void save(final File acoFile) throws IOException{
+	public void save(final Path acoPath) throws IOException{
 //		//sort the synonyms
 //		dictionary.sort();
 //
