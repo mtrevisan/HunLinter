@@ -59,25 +59,6 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 		return COLUMN_NAMES[column];
 	}
 
-	@Override
-	public void setValueAt(final Object value, final int rowIndex, final int columnIndex){
-		if(corrections != null){
-			try{
-				//FIXME
-//				final int tagEndIndex = ((String)value).indexOf(TAG_END);
-//				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
-//
-//				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
-//				String incorrectForm;
-//				String correctForm;
-//
-//				final CorrectionEntry correction = new CorrectionEntry(incorrectForm, correctForm);
-//				corrections.set(rowIndex, correction);
-			}
-			catch(final IllegalArgumentException ignored){}
-		}
-	}
-
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

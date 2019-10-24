@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
@@ -63,22 +62,6 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	@Override
 	public String getColumnName(final int column){
 		return COLUMN_NAMES[column];
-	}
-
-	@Override
-	public void setValueAt(final Object value, final int rowIndex, final int columnIndex){
-		if(synonyms != null){
-			try{
-				final int tagEndIndex = ((String)value).indexOf(TAG_END);
-				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
-				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
-
-				final String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-				synonyms.get(rowIndex)
-					.setMeanings(lines);
-			}
-			catch(final IllegalArgumentException ignored){}
-		}
 	}
 
 	@SuppressWarnings("unused")

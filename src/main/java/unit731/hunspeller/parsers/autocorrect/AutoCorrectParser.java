@@ -2,8 +2,6 @@ package unit731.hunspeller.parsers.autocorrect;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -23,8 +21,6 @@ import java.util.stream.Collectors;
 
 
 public class AutoCorrectParser{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
 
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
@@ -139,23 +135,17 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
-//	public void setCorrection(final int index, final String text){
-	//FIXME
-//		dictionary.setMeanings(index, text);
-//	}
-
 	public void save(final Path acoPath) throws IOException{
+		/*
+<?xml version="1.0" encoding="UTF-8" ?>
+<block-list:block-list xmlns:block-list="http://openoffice.org/2001/block-list">
+	<block-list:block block-list:abbreviated-name="--" block-list:name="&#x2013;" />
+	...
+</block-list:block-list>
+*/
 		//FIXME
-//		//sort the synonyms
-//		dictionary.sort();
-//
-//		//save index and data files
 //		final Charset charset = StandardCharsets.UTF_8;
 //		try(final BufferedWriter writer = Files.newBufferedWriter(acoFile.toPath(), charset)){
-//			//save charset
-//			writer.write(charset.name());
-//			writer.write(StringUtils.LF);
-//			//save data
 //			int idx = charset.name().length() + 1;
 //			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
 //			final List<CorrectionEntry> synonyms = dictionary.getSynonyms();
