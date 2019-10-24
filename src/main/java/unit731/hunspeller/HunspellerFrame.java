@@ -537,37 +537,37 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
-      theTable.setRowSelectionAllowed(true);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
-
-      theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame theParent = this;
       theTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
                JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-                  Consumer<String> okButtonAction = (text) -> {
-                     try{
-                        backbone.getTheParser().setMeanings(row, text);
+               int row = theTable.convertRowIndexToModel(target.getSelectedRow());
+               Consumer<String> okButtonAction = (text) -> {
+                  try{
+                     backbone.getTheParser().setMeanings(row, text);
 
-                        // ... and save the files
-                        backbone.storeThesaurusFiles();
-                     }
-                     catch(IllegalArgumentException | IOException ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
-                     }
-                  };
-                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.setLocationRelativeTo(theParent);
-                  dialog.setVisible(true);
-               }
+                     // ... and save the files
+                     backbone.storeThesaurusFiles();
+                  }
+                  catch(IllegalArgumentException | IOException ex){
+                     LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                  }
+               };
+               ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
+               ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
+               GUIUtils.addCancelByEscapeKey(dialog);
+               dialog.addWindowListener(new WindowAdapter(){
+                  @Override
+                  public void windowClosed(WindowEvent e){
+                     theTable.clearSelection();
+                  }
+               });
+               dialog.setLocationRelativeTo(theParent);
+               dialog.setVisible(true);
             }
          }
       });
@@ -826,12 +826,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
-      acoTable.setRowSelectionAllowed(true);
-      acoTable.getColumnModel().getColumn(0).setMinWidth(200);
-      acoTable.getColumnModel().getColumn(0).setMaxWidth(500);
-
-      acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
@@ -852,6 +846,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
                AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
                GUIUtils.addCancelByEscapeKey(dialog);
+               dialog.addWindowListener(new WindowAdapter(){
+                  @Override
+                  public void windowClosed(WindowEvent e){
+                     acoTable.clearSelection();
+                  }
+               });
                dialog.setLocationRelativeTo(acoParent);
                dialog.setVisible(true);
             }

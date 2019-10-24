@@ -33,8 +33,9 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoPath	The content of the auto-correct file
+	 * @param acoPath	The reference to the auto-correct file
 	 * @throws IOException	If an I/O error occurs
+	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
 	public void parse(final Path acoPath) throws IOException, SAXException{
 		clear();

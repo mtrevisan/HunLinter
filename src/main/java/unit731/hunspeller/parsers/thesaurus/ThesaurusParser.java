@@ -132,7 +132,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	/**
 	 * Parse the rows out from a .dic file.
 	 *
-	 * @param theFile	The content of the thesaurus file
+	 * @param theFile	The reference to the thesaurus file
 	 * @throws IOException	If an I/O error occurs
 	 */
 	public void parse(final File theFile) throws IOException{
