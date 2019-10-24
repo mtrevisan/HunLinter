@@ -68,9 +68,9 @@ public class AutoCorrectParser{
 				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 			}
 
-			while((line = br.readLine()) != null)
-				if(!line.isEmpty())
-					dictionary.add(new CorrectionEntry(line, br));
+//			while((line = br.readLine()) != null)
+//				if(!line.isEmpty())
+//					dictionary.add(new CorrectionEntry(line, br));
 		}
 	}
 
@@ -106,90 +106,91 @@ public class AutoCorrectParser{
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertCorrection(final CorrectionEntry correction, final Supplier<Boolean> duplicatesDiscriminator){
-		final String[] partOfSpeechAndMeanings = StringUtils.split(correction, ThesaurusEntry.POS_AND_MEANS, 2);
-		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{correction}));
-
-		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
-		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
-		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
-			.split("\\s*,\\s*");
-
-		final List<String> meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS))
-			.map(String::trim)
-			.filter(StringUtils::isNotBlank)
-			.distinct()
-			.collect(Collectors.toList());
-		if(meanings.size() < 2)
-			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{correction}));
-
-		boolean forceInsertion = false;
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
-		if(!duplicates.isEmpty()){
-			forceInsertion = duplicatesDiscriminator.get();
-			if(!forceInsertion)
-				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
-		}
-
-		if(duplicates.isEmpty() || forceInsertion)
-			dictionary.add(partOfSpeeches, meanings);
-
-		return new DuplicationResult(duplicates, forceInsertion);
+//		final String[] partOfSpeechAndMeanings = StringUtils.split(correction, ThesaurusEntry.POS_AND_MEANS, 2);
+//		if(partOfSpeechAndMeanings.length != 2)
+//			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{correction}));
+//
+//		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+//		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
+//		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
+//		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
+//			.split("\\s*,\\s*");
+//
+//		final List<String> meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS))
+//			.map(String::trim)
+//			.filter(StringUtils::isNotBlank)
+//			.distinct()
+//			.collect(Collectors.toList());
+//		if(meanings.size() < 2)
+//			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{correction}));
+//
+//		boolean forceInsertion = false;
+//		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
+//		if(!duplicates.isEmpty()){
+//			forceInsertion = duplicatesDiscriminator.get();
+//			if(!forceInsertion)
+//				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
+//		}
+//
+//		if(duplicates.isEmpty() || forceInsertion)
+//			dictionary.add(partOfSpeeches, meanings);
+//
+//		return new DuplicationResult(duplicates, forceInsertion);
+		return null;
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
-		final List<ThesaurusEntry> duplicates = new ArrayList<>();
-		final List<CorrectionEntry> synonyms = dictionary;
-		for(final String meaning : meanings){
-			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			for(final CorrectionEntry synonym : synonyms)
-				if(synonym.equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
-					duplicates.add(synonym);
-		}
-		return duplicates;
-	}
+//	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
+//		final List<ThesaurusEntry> duplicates = new ArrayList<>();
+//		final List<CorrectionEntry> synonyms = dictionary;
+//		for(final String meaning : meanings){
+//			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
+//			for(final CorrectionEntry synonym : synonyms)
+//				if(synonym.equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
+//					duplicates.add(synonym);
+//		}
+//		return duplicates;
+//	}
 
 	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
-		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-		return synonyms.stream()
-			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
-	}
+//	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
+//		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+//		return synonyms.stream()
+//			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
+//	}
 
-	public void setCorrection(final int index, final String text){
-		dictionary.setMeanings(index, text);
-	}
+//	public void setCorrection(final int index, final String text){
+//		dictionary.setMeanings(index, text);
+//	}
 
-	public void deleteMeanings(final int[] selectedRowIDs){
-		final int count = selectedRowIDs.length;
-		for(int i = 0; i < count; i ++)
-			dictionary.remove(selectedRowIDs[i] - i);
-	}
+//	public void deleteMeanings(final int[] selectedRowIDs){
+//		final int count = selectedRowIDs.length;
+//		for(int i = 0; i < count; i ++)
+//			dictionary.remove(selectedRowIDs[i] - i);
+//	}
 
 	public void save(final File acoFile) throws IOException{
-		//sort the synonyms
-		dictionary.sort();
-
-		//save index and data files
-		final Charset charset = StandardCharsets.UTF_8;
-		try(final BufferedWriter writer = Files.newBufferedWriter(acoFile.toPath(), charset)){
-			//save charset
-			writer.write(charset.name());
-			writer.write(StringUtils.LF);
-			//save data
-			int idx = charset.name().length() + 1;
-			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
-			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(ThesaurusEntry synonym : synonyms){
-				synonym.saveToIndex(indexWriter, idx);
-
-				int meaningsLength = synonym.saveToData(writer, charset);
-
-				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
-			}
-		}
+//		//sort the synonyms
+//		dictionary.sort();
+//
+//		//save index and data files
+//		final Charset charset = StandardCharsets.UTF_8;
+//		try(final BufferedWriter writer = Files.newBufferedWriter(acoFile.toPath(), charset)){
+//			//save charset
+//			writer.write(charset.name());
+//			writer.write(StringUtils.LF);
+//			//save data
+//			int idx = charset.name().length() + 1;
+//			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
+//			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+//			for(ThesaurusEntry synonym : synonyms){
+//				synonym.saveToIndex(indexWriter, idx);
+//
+//				int meaningsLength = synonym.saveToData(writer, charset);
+//
+//				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
+//			}
+//		}
 	}
 
 	public void clear(){

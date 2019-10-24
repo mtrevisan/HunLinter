@@ -4,7 +4,7 @@
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="mainMenuBar">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowDeactivated(final WindowEvent e){&#xa;&#x9;&#x9;exit();&#xa;&#x9;}&#xa;});&#xa;"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowClosed(final WindowEvent e){&#xa;&#x9;&#x9;exit();&#xa;&#x9;}&#xa;});&#xa;"/>
       </AuxValues>
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="filMenu">

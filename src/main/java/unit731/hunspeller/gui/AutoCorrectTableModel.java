@@ -77,11 +77,11 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 				final int tagStartIndex = ((String)value).lastIndexOf(TAG_START, tagEndIndex);
 				//TODO
 				final String text = ((String)value).substring(tagStartIndex + TAG_START.length(), tagEndIndex);
-				String incorrectForm;
-				String correctForm;
-
-				final CorrectionEntry correction = new CorrectionEntry(incorrectForm, correctForm);
-				corrections.set(rowIndex, correction);
+//				String incorrectForm;
+//				String correctForm;
+//
+//				final CorrectionEntry correction = new CorrectionEntry(incorrectForm, correctForm);
+//				corrections.set(rowIndex, correction);
 			}
 			catch(final IllegalArgumentException ignored){}
 		}

@@ -79,6 +79,7 @@ public class Backbone implements FileChangeListener{
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
+		acoParser = new AutoCorrectParser();
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();

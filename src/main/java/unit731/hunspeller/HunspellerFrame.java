@@ -934,7 +934,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       addWindowListener(new WindowAdapter(){
          @Override
-         public void windowDeactivated(final WindowEvent e){
+         public void windowClosed(final WindowEvent e){
             exit();
          }
       });
