@@ -177,8 +177,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	/**
 	 * @param synonymAndMeanings			The object representing all the synonyms of a word along with their part of speech
-	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
-	 *												insertion)
+	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
+	 * 	(return <code>true</code> to force insertion)
 	 * @return The duplication result
 	 */
 	public DuplicationResult<ThesaurusEntry> insertMeanings(final String synonymAndMeanings,
@@ -206,7 +206,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
+				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(
+					new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion){

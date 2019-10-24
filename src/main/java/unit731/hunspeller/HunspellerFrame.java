@@ -529,7 +529,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theAddButton.setMnemonic('A');
       theAddButton.setText("Add");
-      theAddButton.setToolTipText("");
       theAddButton.setEnabled(false);
       theAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -591,7 +590,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theUndoButton.setMnemonic('U');
       theUndoButton.setText("Undo");
-      theUndoButton.setToolTipText("");
       theUndoButton.setEnabled(false);
       theUndoButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -840,7 +838,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      acoAddButton.setMnemonic('A');
       acoAddButton.setText("Add");
+      acoAddButton.setToolTipText("");
+      acoAddButton.setEnabled(false);
       acoAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             acoAddButtonActionPerformed(evt);
@@ -1449,7 +1450,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
 		final boolean alreadyContained = backbone.getAcoParser().isAlreadyContained(incorrect, correct);
-		acoAddButton.setEnabled((StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText))
+		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !alreadyContained);
 
 
