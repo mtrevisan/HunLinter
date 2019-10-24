@@ -546,29 +546,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
                JTable target = (JTable)e.getSource();
-               int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-               Consumer<String> okButtonAction = (text) -> {
-                  try{
-                     backbone.getTheParser().setMeanings(row, text);
+               int col = target.getSelectedColumn();
+               if(col == 1){
+                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
+                  Consumer<String> okButtonAction = (text) -> {
+                     try{
+                        backbone.getTheParser().setMeanings(row, text);
 
-                     // ... and save the files
-                     backbone.storeThesaurusFiles();
-                  }
-                  catch(IllegalArgumentException | IOException ex){
-                     LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
-                  }
-               };
-               ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-               ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
-               GUIUtils.addCancelByEscapeKey(dialog);
-               dialog.addWindowListener(new WindowAdapter(){
-                  @Override
-                  public void windowClosed(WindowEvent e){
-                     theTable.clearSelection();
-                  }
-               });
-               dialog.setLocationRelativeTo(theParent);
-               dialog.setVisible(true);
+                        // ... and save the files
+                        backbone.storeThesaurusFiles();
+                     }
+                     catch(IllegalArgumentException | IOException ex){
+                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                     }
+                  };
+                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
+                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
+                  GUIUtils.addCancelByEscapeKey(dialog);
+                  dialog.addWindowListener(new WindowAdapter(){
+                     @Override
+                     public void windowClosed(WindowEvent e){
+                        theTable.clearSelection();
+                     }
+                  });
+                  dialog.setLocationRelativeTo(theParent);
+                  dialog.setVisible(true);
+               }
             }
          }
       });
@@ -832,29 +835,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
                JTable target = (JTable)e.getSource();
-               int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
-               BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
-                  try{
-                     backbone.getAcoParser().setCorrection(row, incorrect, correct);
+               int col = target.getSelectedColumn();
+               if(col == 1){
+                  int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
+                  BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
+                     try{
+                        backbone.getAcoParser().setCorrection(row, incorrect, correct);
 
-                     // ... and save the files
-                     backbone.storeAutoCorrectFile();
-                  }
-                  catch(IllegalArgumentException | IOException ex){
-                     LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
-                  }
-               };
-               CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-               CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
-               GUIUtils.addCancelByEscapeKey(dialog);
-               dialog.addWindowListener(new WindowAdapter(){
-                  @Override
-                  public void windowClosed(WindowEvent e){
-                     acoTable.clearSelection();
-                  }
-               });
-               dialog.setLocationRelativeTo(acoParent);
-               dialog.setVisible(true);
+                        // ... and save the files
+                        backbone.storeAutoCorrectFile();
+                     }
+                     catch(IllegalArgumentException | IOException ex){
+                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                     }
+                  };
+                  CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+                  CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
+                  GUIUtils.addCancelByEscapeKey(dialog);
+                  dialog.addWindowListener(new WindowAdapter(){
+                     @Override
+                     public void windowClosed(WindowEvent e){
+                        acoTable.clearSelection();
+                     }
+                  });
+                  dialog.setLocationRelativeTo(acoParent);
+                  dialog.setVisible(true);
+               }
             }
          }
       });
