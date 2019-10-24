@@ -1861,8 +1861,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//auto-correct file:
 			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
-				//FIXME
-//				addSorterToTable(acoTable, comparator, null);
+				addSorterToTable(acoTable, comparator, null);
 
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
