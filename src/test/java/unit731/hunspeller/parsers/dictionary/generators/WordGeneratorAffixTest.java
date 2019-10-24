@@ -810,9 +810,10 @@ class WordGeneratorAffixTest{
 		Assertions.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words.get(3));
 		//twofold productions
-		Assertions.assertEquals(createProduction("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
+		Assertions.assertEquals(createProduction("undrinkable", "S", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
 			words.get(4));
-		Assertions.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"), words.get(5));
+		Assertions.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
+			words.get(5));
 	}
 
 

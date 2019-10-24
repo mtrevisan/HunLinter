@@ -190,6 +190,15 @@ public class DictionaryEntry{
 		return null;
 	}
 
+	/**
+	 * Get last applied rule
+	 *
+	 * @return    The last applied rule of the specified type
+	 */
+	public AffixEntry getLastAppliedRule(){
+		return null;
+	}
+
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affixData::isManagedByCompoundRule)

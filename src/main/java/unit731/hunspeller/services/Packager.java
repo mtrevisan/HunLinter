@@ -7,17 +7,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,20 +60,6 @@ public class Packager{
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
-
-	private static DocumentBuilder DOCUMENT_BUILDER;
-	static{
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		factory.setValidating(false);
-		try{
-			DOCUMENT_BUILDER = factory.newDocumentBuilder();
-			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
-		}
-		catch(ParserConfigurationException e){
-			LOGGER.error("Bad error while creating the XML parser, cannot create package", e);
-		}
-	}
 
 	private final Map<String, Path> configurationFolders = new HashMap<>();
 

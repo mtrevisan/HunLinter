@@ -87,7 +87,7 @@ public class Production extends DictionaryEntry{
 		return appliedRules;
 	}
 
-	public AffixEntry getAppliedRule(int index){
+	public AffixEntry getAppliedRule(final int index){
 		return (appliedRules != null && index < appliedRules.size()? appliedRules.get(index): null);
 	}
 
@@ -97,6 +97,16 @@ public class Production extends DictionaryEntry{
 		if(hasProductionRules())
 			lastAppliedRule = appliedRules.stream()
 				.filter(rule -> rule.getType() == type)
+				.reduce((first, second) -> second)
+				.orElse(null);
+		return lastAppliedRule;
+	}
+
+	@Override
+	public AffixEntry getLastAppliedRule(){
+		AffixEntry lastAppliedRule = null;
+		if(hasProductionRules())
+			lastAppliedRule = appliedRules.stream()
 				.reduce((first, second) -> second)
 				.orElse(null);
 		return lastAppliedRule;

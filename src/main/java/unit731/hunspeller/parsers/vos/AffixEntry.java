@@ -171,7 +171,8 @@ public class AffixEntry{
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode()))
+			.filter(field -> (dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().affixType != affixType
+				|| !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())))
 //			.filter(field -> !overwritePartOfSpeech || !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());

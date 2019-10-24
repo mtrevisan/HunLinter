@@ -1,22 +1,16 @@
 package unit731.hunspeller.parsers.autocorrect;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
 import unit731.hunspeller.services.XMLParser;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,26 +26,9 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_INCORRECT_FORM = "block-list:abbreviated-name";
 	private static final String AUTO_CORRECT_CORRECT_FORM = "block-list:name";
 
-	private static DocumentBuilder DOCUMENT_BUILDER;
-	static{
-		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		factory.setValidating(false);
-		try{
-			DOCUMENT_BUILDER = factory.newDocumentBuilder();
-			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
-		}
-		catch(ParserConfigurationException e){
-			LOGGER.error("Bad error while creating the XML parser, cannot create package", e);
-		}
-	}
 
 	private final List<CorrectionEntry> dictionary = new ArrayList<>();
 
-
-	public List<CorrectionEntry> getDictionary(){
-		return dictionary;
-	}
 
 	/**
 	 * Parse the rows out from a DocumentList.xml file.
@@ -81,23 +58,18 @@ public class AutoCorrectParser{
 		}
 	}
 
-	public int getAutoCorrectCounter(){
-		return dictionary.size();
-	}
-
 	public List<CorrectionEntry> getCorrectionsDictionary(){
 		return dictionary;
+	}
+
+	public int getCorrectionsCounter(){
+		return dictionary.size();
 	}
 
 	public void setCorrection(final int index, final String incorrect, final String correct){
 		dictionary.set(index, new CorrectionEntry(incorrect, correct));
 	}
 
-	public void deleteCorrections(final int[] selectedRowIDs){
-		final int count = selectedRowIDs.length;
-		for(int i = 0; i < count; i ++)
-			dictionary.remove(selectedRowIDs[i] - i);
-	}
 	/**
 	 * @param correction			The line representing all the synonyms of a word along with their part of speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
@@ -136,6 +108,12 @@ public class AutoCorrectParser{
 //
 //		return new DuplicationResult(duplicates, forceInsertion);
 		return null;
+	}
+
+	public void deleteCorrections(final int[] selectedRowIDs){
+		final int count = selectedRowIDs.length;
+		for(int i = 0; i < count; i ++)
+			dictionary.remove(selectedRowIDs[i] - i);
 	}
 
 	/** Find if there is a duplicate with the same part of speech */

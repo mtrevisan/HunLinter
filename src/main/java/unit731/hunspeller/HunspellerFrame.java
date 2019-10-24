@@ -1226,6 +1226,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		hypRulesOutputLabel.setFont(font);
 		hypAddRuleTextField.setFont(font);
 		hypAddRuleSyllabationOutputLabel.setFont(font);
+
+		acoIncorrectTextField.setFont(font);
+		acoCorrectTextField.setFont(font);
+		acoTable.setFont(font);
 	}
 
    private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
@@ -1443,7 +1447,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 			dm.fireTableDataChanged();
 
-			updateAutoCorrectionsCounter();
+			updateCorrectionsCounter();
 
 			//... and save the files
 			backbone.storeAutoCorrectFile();
@@ -1878,6 +1882,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 
 
+			//auto-correct file:
+			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
+				//FIXME
+//				addSorterToTable(acoTable, comparator, null);
+
+				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
+				updateCorrectionsCounter();
+				//FIXME
+//				acoMenu.setEnabled(true);
+				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
+			}
+
+
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
@@ -1952,8 +1970,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
 	}
 
-	private void updateAutoCorrectionsCounter(){
-		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getAcoParser().getAutoCorrectCounter()));
+	private void updateCorrectionsCounter(){
+		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getAcoParser().getCorrectionsCounter()));
 	}
 
 	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
