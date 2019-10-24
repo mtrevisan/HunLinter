@@ -540,6 +540,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
+      //listen for row removal
+		theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame theParent = this;
       theTable.addMouseListener(new MouseAdapter(){
@@ -830,6 +832,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
+		//listen for row removal
+		acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
