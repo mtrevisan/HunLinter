@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.autocorrect;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -15,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 
 
 public class AutoCorrectParser{
@@ -129,12 +132,31 @@ public class AutoCorrectParser{
 //		return duplicates;
 //	}
 
-	/** Find if there is a duplicate with the same part of speech and same meanings */
-//	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
+	/** Find if there is a duplicate with the same incorrect and correct forms */
+	public boolean isAlreadyContained(final String incorrect, final String correct){
 //		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 //		return synonyms.stream()
 //			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
-//	}
+		return false;
+	}
+
+	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){
+		return Pair.of(clearFilter(incorrect), clearFilter(correct));
+	}
+
+	private static String clearFilter(final String text){
+		//escape special characters
+		return Matcher.quoteReplacement(StringUtils.strip(text));
+	}
+
+	public static Pair<String, String> prepareTextForFilter(final String incorrect, String correct){
+		//extract part of speech if present
+		final String incorrectFilter = (!incorrect.isEmpty()? incorrect: ".+");
+		final String correctFilter = (!correct.isEmpty()? correct: ".+");
+
+		//compose filter regexp
+		return Pair.of(incorrectFilter, correctFilter);
+	}
 
 //	public void setCorrection(final int index, final String text){
 //		dictionary.setMeanings(index, text);

@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -287,13 +289,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return dictionary.extractDuplicates();
 	}
 
-	public static Pair<String[], String[]> extractComponentsForThesaurusFilter(String text){
+	public static Pair<String[], String[]> extractComponentsForFilter(String text){
 		//extract part of speech if present
-		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
+		final String[] pos = extractPartOfSpeechFromFilter(text);
 
-		text = clearThesaurusFilter(text);
+		text = clearFilter(text);
 
-		text = StringUtils.strip(text);
 		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
 		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
@@ -302,7 +303,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return Pair.of(pos, StringUtils.split(text, PIPE));
 	}
 
-	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
+	private static String[] extractPartOfSpeechFromFilter(String text){
 		text = StringUtils.strip(text);
 
 		int start = 0;
@@ -319,10 +320,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForThesaurusFilter(final List<String> partOfSpeeches, List<String> meanings){
+	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> meanings){
 		//extract part of speech if present
 		final String posFilter = (!partOfSpeeches.isEmpty()?
-			partOfSpeeches.stream().map(p -> StringUtils.replace(p, ".", "\\.")).collect(Collectors.joining(PIPE, "[\\(\\s](", ")[\\),]")):
+			"[\\(\\s](" + String.join(PIPE, partOfSpeeches) + ")[\\),]":
 			".+");
 		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
 
@@ -330,7 +331,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return Pair.of(posFilter, meaningsFilter);
 	}
 
-	private static String clearThesaurusFilter(String text){
+	private static String clearFilter(String text){
 		text = StringUtils.strip(text);
 
 		//remove part of speech and format the search string
@@ -344,8 +345,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			if(idx >= 0)
 				text = text.substring(idx + 2);
 		}
-		//escape points
-		text = StringUtils.replace(text, ".", "\\.");
+		//escape special characters
+		text = Matcher.quoteReplacement(text);
 		//remove all \s+([^)]+)
 		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}

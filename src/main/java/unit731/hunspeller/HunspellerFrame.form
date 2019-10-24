@@ -1152,6 +1152,9 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="acoIncorrectTextField">
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="acoIncorrectTextFieldKeyReleased"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="acoToLabel">
               <Properties>
@@ -1167,6 +1170,9 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="acoCorrectTextField">
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="acoCorrectTextFieldKeyReleased"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="acoAddButton">
               <Properties>

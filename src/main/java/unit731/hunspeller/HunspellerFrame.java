@@ -75,6 +75,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -135,6 +136,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
+	private String formerFilterAutoCorrectIncorrectText;
+	private String formerFilterAutoCorrectCorrectText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
@@ -149,6 +152,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private CorrectnessWorker dicCorrectnessWorker;
@@ -540,8 +544,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
-      //listen for row removal
-		theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame theParent = this;
       theTable.addMouseListener(new MouseAdapter(){
@@ -821,10 +823,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoIncorrectLabel.setLabelFor(acoIncorrectTextField);
       acoIncorrectLabel.setText("Incorrect form:");
 
+      acoIncorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            acoIncorrectTextFieldKeyReleased(evt);
+         }
+      });
+
       acoToLabel.setText("→");
 
       acoCorrectLabel.setLabelFor(acoCorrectTextField);
       acoCorrectLabel.setText("Correct form:");
+
+      acoCorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            acoCorrectTextFieldKeyReleased(evt);
+         }
+      });
 
       acoAddButton.setText("Add");
 
@@ -832,8 +846,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
-		//listen for row removal
-		acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
@@ -1379,16 +1391,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		formerFilterThesaurusText = unmodifiedSearchText;
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForThesaurusFilter(unmodifiedSearchText);
+		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
 		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
 
 
-		@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
+		@SuppressWarnings("unchecked")
+		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(theAddButton.isEnabled() || alreadyContained){
-			final Pair<String, String> searchText = ThesaurusParser.prepareTextForThesaurusFilter(partOfSpeeches, meanings);
+			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, meanings);
 			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
@@ -1414,6 +1427,37 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final String message = ExceptionHelper.getMessage(e);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
 		}
+	}
+
+	private void filterAutoCorrect(HunspellerFrame frame){
+		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
+		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
+		if(formerFilterAutoCorrectIncorrectText != null && formerFilterAutoCorrectIncorrectText.equals(unmodifiedIncorrectText)
+				&& formerFilterAutoCorrectCorrectText != null && formerFilterAutoCorrectCorrectText.equals(unmodifiedCorrectText))
+			return;
+
+		formerFilterAutoCorrectIncorrectText = unmodifiedIncorrectText;
+		formerFilterAutoCorrectCorrectText = unmodifiedCorrectText;
+
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText, unmodifiedCorrectText);
+		final String incorrect = pair.getLeft();
+		final String correct = pair.getRight();
+		final boolean alreadyContained = backbone.getAcoParser().isAlreadyContained(incorrect, correct);
+		acoAddButton.setEnabled((StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText))
+			&& !alreadyContained);
+
+
+		@SuppressWarnings("unchecked")
+		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)frame.acoTable.getRowSorter();
+		if(acoAddButton.isEnabled() || alreadyContained){
+			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
+			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
+			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
+			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
+		}
+		else
+			sorter.setRowFilter(null);
 	}
 
 	public void removeSelectedRowsFromAutoCorrect(){
@@ -1684,6 +1728,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		else
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
    }//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
+
+   private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
+		acoFilterDebouncer.call(this);
+   }//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
+
+   private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
+		acoFilterDebouncer.call(this);
+   }//GEN-LAST:event_acoCorrectTextFieldKeyReleased
 
 
 	@Override
