@@ -132,6 +132,8 @@ Entries can be inserted in two ways:
 
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech if given) that are already contained into the thesaurus.
 
+It is possible to click on the first column to select the row (for cancelling it, for example), or the second column (to enter the edit mode).
+
 ![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
 
 <a name="screenshots-hyphenation"></a>
