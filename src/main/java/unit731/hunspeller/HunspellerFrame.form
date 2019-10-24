@@ -972,6 +972,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabesCountLabel">
               <Properties>
@@ -998,6 +1001,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleLabel">
               <Properties>
@@ -1054,6 +1060,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountLabel">
               <Properties>

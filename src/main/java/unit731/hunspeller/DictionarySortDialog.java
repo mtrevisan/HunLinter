@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -30,6 +31,8 @@ public class DictionarySortDialog extends JDialog{
 		this.dicParser = dicParser;
 
 		initComponents();
+
+		setCurrentFont();
 
 		entriesList.setListData(listData);
 		scrollToVisibleIndex(firstVisibleItemIndex);
@@ -104,7 +107,8 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(final Font currentFont){
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);

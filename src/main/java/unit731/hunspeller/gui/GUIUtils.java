@@ -53,8 +53,8 @@ public class GUIUtils{
 			if(component instanceof JEditorPane)
 				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-			if(component instanceof JTextArea || component instanceof JTextField || component instanceof JTable
-					|| component instanceof JWordLabel)
+			if(component instanceof JTextArea || component instanceof JComboBox || component instanceof JTextField
+					|| component instanceof JTable || component instanceof JWordLabel)
 				component.setFont(font);
 		}
 	}

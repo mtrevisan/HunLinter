@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.gui.GUIUtils;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
@@ -24,6 +25,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		initComponents();
 
+		duplicatesTextArea.setFont(GUIUtils.getCurrentFont());
 
 		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);
@@ -63,10 +65,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
-
-	public void setCurrentFont(final Font font){
-		duplicatesTextArea.setFont(font);
-	}
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

@@ -67,7 +67,6 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 			//show statistics window
 			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-			dialog.setCurrentFont(GUIUtils.getCurrentFont());
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);

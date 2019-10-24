@@ -32,6 +32,7 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.Frequency;
@@ -63,6 +64,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 		this.statistics = statistics;
 
 		initComponents();
+
+		final Font currentFont = GUIUtils.getCurrentFont();
+		mostCommonSyllabesOutputLabel.setFont(currentFont);
+		longestWordCharactersOutputLabel.setFont(currentFont);
+		longestWordSyllabesOutputLabel.setFont(currentFont);
 
 		try{
 			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(compoundWordsOutputLabel.getHeight());
@@ -304,12 +310,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
-
-	public void setCurrentFont(final Font font){
-		mostCommonSyllabesOutputLabel.setFont(font);
-		longestWordCharactersOutputLabel.setFont(font);
-		longestWordSyllabesOutputLabel.setFont(font);
-	}
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);

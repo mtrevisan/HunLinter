@@ -152,11 +152,6 @@ public class AutoCorrectDialog extends JDialog{
       dispose();
    }//GEN-LAST:event_btnOkActionPerformed
 
-	public void setCurrentFont(final Font font){
-		incorrectTextField.setFont(font);
-		correctTextField.setFont(font);
-	}
-
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

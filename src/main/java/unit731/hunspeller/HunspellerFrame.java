@@ -5,6 +5,7 @@ import java.awt.*;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
+import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.interfaces.Hunspellable;
 
 import java.awt.event.ActionEvent;
@@ -254,17 +255,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
       hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new javax.swing.JLabel();
+      hypSyllabationOutputLabel = new JWordLabel();
       hypSyllabesCountLabel = new javax.swing.JLabel();
       hypSyllabesCountOutputLabel = new javax.swing.JLabel();
       hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new javax.swing.JLabel();
+      hypRulesOutputLabel = new JWordLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
       hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
       hypAddRuleButton = new javax.swing.JButton();
       hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
+      hypAddRuleSyllabationOutputLabel = new JWordLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       acoLayeredPane = new javax.swing.JLayeredPane();
@@ -1202,33 +1203,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(){
-		final Font font = GUIUtils.getCurrentFont();
-		parsingResultTextArea.setFont(font);
-
-		dicInputTextField.setFont(font);
-		dicRuleFlagsAidComboBox.setFont(font);
-		dicTable.setFont(font);
-
-		cmpInputComboBox.setFont(font);
-		cmpRuleFlagsAidComboBox.setFont(font);
-		cmpInputTextArea.setFont(font);
-		cmpTable.setFont(font);
-
-		theMeaningsTextField.setFont(font);
-		theTable.setFont(font);
-
-		hypWordTextField.setFont(font);
-		hypSyllabationOutputLabel.setFont(font);
-		hypRulesOutputLabel.setFont(font);
-		hypAddRuleTextField.setFont(font);
-		hypAddRuleSyllabationOutputLabel.setFont(font);
-
-		acoIncorrectTextField.setFont(font);
-		acoCorrectTextField.setFont(font);
-		acoTable.setFont(font);
-	}
-
    private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
@@ -1326,7 +1300,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		try{
 			final String[] lines = backbone.getDictionaryLines();
 			final DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), lines, lastDictionarySortVisibleIndex, this);
-			dialog.setCurrentFont(GUIUtils.getCurrentFont());
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.addListSelectionListener(e -> {
@@ -1383,7 +1356,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
-		dialog.setCurrentFont(GUIUtils.getCurrentFont());
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1493,7 +1465,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dicRulesReducerMenuItem.setEnabled(false);
 
 		rulesReducerDialog = new RulesReducerDialog(backbone, this);
-		rulesReducerDialog.setCurrentFont(GUIUtils.getCurrentFont());
 		rulesReducerDialog.setLocationRelativeTo(this);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){
 			@Override
@@ -1678,7 +1649,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, this);
-			setCurrentFont();
 
 			final String language = backbone.getAffixData().getLanguage();
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
@@ -1899,7 +1869,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
 				JFontChooserDialog.getDefaultFont());
 			GUIUtils.setCurrentFont(lastUsedFont, this);
-			setCurrentFont();
 		}
 		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());

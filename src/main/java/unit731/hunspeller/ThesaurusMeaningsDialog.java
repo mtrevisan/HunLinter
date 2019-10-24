@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
@@ -34,6 +35,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
+		meaningsTextArea.setFont(GUIUtils.getCurrentFont());
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
@@ -121,10 +123,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
-
-	public void setCurrentFont(final Font font){
-		meaningsTextArea.setFont(font);
-	}
 
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{
