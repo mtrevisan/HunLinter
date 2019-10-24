@@ -845,7 +845,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   }
                };
                CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-               AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
+               CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
                GUIUtils.addCancelByEscapeKey(dialog);
                dialog.addWindowListener(new WindowAdapter(){
                   @Override

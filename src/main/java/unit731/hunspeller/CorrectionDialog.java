@@ -14,18 +14,18 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 
 
-public class AutoCorrectDialog extends JDialog{
+public class CorrectionDialog extends JDialog{
 
 	private static final long serialVersionUID = 7630665680331864500L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CorrectionDialog.class);
 
 
 	private final CorrectionEntry correction;
 	private final BiConsumer<String, String> okButtonAction;
 
 
-	public AutoCorrectDialog(CorrectionEntry correction, BiConsumer<String, String> okButtonAction, Frame parent){
+	public CorrectionDialog(CorrectionEntry correction, BiConsumer<String, String> okButtonAction, Frame parent){
 		super(parent, "Change auto correction for \"" + correction + "\"", true);
 
 		Objects.requireNonNull(parent);
