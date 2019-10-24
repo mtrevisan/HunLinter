@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import org.xml.sax.SAXException;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -124,7 +125,7 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void loadFile(String affixFilePath) throws IOException{
+	public void loadFile(String affixFilePath) throws IOException, SAXException{
 		clear();
 
 		openAffixFile(affixFilePath);
@@ -148,7 +149,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	/* NOTE: used for testing purposes */
-	public void loadFile(String affixFilePath, String dictionaryFilePath) throws IOException{
+	public void loadFile(String affixFilePath, String dictionaryFilePath) throws IOException, SAXException{
 		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();
@@ -282,7 +283,7 @@ public class Backbone implements FileChangeListener{
 			theParser.clear();
 	}
 
-	public void openAutoCorrectFile(final Path acoPath) throws IOException{
+	public void openAutoCorrectFile(final Path acoPath) throws IOException, SAXException{
 		if(acoPath.toFile().exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoPath.toFile().getName());
 

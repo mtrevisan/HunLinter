@@ -1,18 +1,23 @@
 package unit731.hunspeller.parsers.autocorrect;
 
-import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
-import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.XMLParser;
 
-import java.io.EOFException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.LineNumberReader;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
+import java.io.StringReader;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -22,13 +27,24 @@ public class AutoCorrectParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Thesaurus file malformed, the first line is not a charset, was ''{0}''");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, ...>)|meaning1|meaning2|...' or 'pos1, pos2, ...:meaning1,meaning2,...': was ''{0}''");
-	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): was ''{0}''");
-	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
+	private static final String AUTO_CORRECT_ROOT_ELEMENT = "block-list:block-list";
+	private static final String AUTO_CORRECT_BLOCK = "block-list:block";
+	private static final String AUTO_CORRECT_INCORRECT_FORM = "block-list:abbreviated-name";
+	private static final String AUTO_CORRECT_CORRECT_FORM = "block-list:name";
 
-	private static final String PART_OF_SPEECH_START = "(";
-	private static final String PART_OF_SPEECH_END = ")";
+	private static DocumentBuilder DOCUMENT_BUILDER;
+	static{
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		factory.setValidating(false);
+		try{
+			DOCUMENT_BUILDER = factory.newDocumentBuilder();
+			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
+		}
+		catch(ParserConfigurationException e){
+			LOGGER.error("Bad error while creating the XML parser, cannot create package", e);
+		}
+	}
 
 	private final List<CorrectionEntry> dictionary = new ArrayList<>();
 
@@ -43,31 +59,26 @@ public class AutoCorrectParser{
 	 * @param acoPath	The content of the auto-correct file
 	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(final Path acoPath) throws IOException{
+	public void parse(final Path acoPath) throws IOException, SAXException{
 		clear();
 
-		final Charset charset = FileHelper.determineCharset(acoPath);
-		try(final LineNumberReader br = FileHelper.createReader(acoPath, charset)){
-			String line = extractLine(br);
+		final Document doc = XMLParser.parseXMLDocument(acoPath);
 
-			//line should be a charset
-			try{ Charsets.toCharset(line); }
-			catch(final UnsupportedCharsetException e){
-				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+		final Element rootElement = doc.getDocumentElement();
+		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
+			throw new IllegalArgumentException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
+				+ rootElement.getNodeName());
+
+		final List<CorrectionEntry> corrections = new ArrayList<>();
+		final NodeList entries = rootElement.getChildNodes();
+		for(int i = 0; i < entries.getLength(); i ++){
+			final Node entry = entries.item(i);
+			if(XMLParser.isElement(entry, AUTO_CORRECT_BLOCK)){
+				final Node mediaType = XMLParser.extractAttribute(entry, AUTO_CORRECT_INCORRECT_FORM);
+				if(mediaType != null)
+					corrections.add(new CorrectionEntry(mediaType.getNodeValue(), XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
 			}
-
-//			while((line = br.readLine()) != null)
-//				if(!line.isEmpty())
-//					dictionary.add(new CorrectionEntry(line, br));
 		}
-	}
-
-	private String extractLine(final LineNumberReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Thesaurus file");
-
-		return line;
 	}
 
 	public int getAutoCorrectCounter(){

@@ -208,7 +208,7 @@ public class Packager{
 	}
 
 	private List<String> extractFileEntries(final Path manifestPath) throws IOException, SAXException{
-		final Document doc = parseXMLDocument(manifestPath);
+		final Document doc = XMLParser.parseXMLDocument(manifestPath);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!MANIFEST_ROOT_ELEMENT.equals(rootElement.getNodeName()))
@@ -220,9 +220,9 @@ public class Packager{
 		for(int i = 0; i < entries.getLength(); i ++){
 			final Node entry = entries.item(i);
 			if(entry.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(entry.getNodeName())){
-				final Node mediaType = entry.getAttributes().getNamedItem(MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+				final Node mediaType = XMLParser.extractAttribute(entry, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
 				if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-					fullPaths.add(entry.getAttributes().getNamedItem(MANIFEST_FILE_ENTRY_FULL_PATH).getNodeValue());
+					fullPaths.add(XMLParser.extractAttributeValue(entry, MANIFEST_FILE_ENTRY_FULL_PATH));
 			}
 		}
 		return fullPaths;
@@ -233,7 +233,7 @@ public class Packager{
 			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(),
 				configurationFile.split(FOLDER_SPLITTER));
 
-			final Document doc = parseXMLDocument(configurationPath);
+			final Document doc = XMLParser.parseXMLDocument(configurationPath);
 
 			final Element rootElement = doc.getDocumentElement();
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
@@ -252,8 +252,8 @@ public class Packager{
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
-			if(isNode(entry)){
-				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+			if(XMLParser.isElement(entry, CONFIGURATION_NODE)){
+				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null){
 					//extract folder
 					String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
@@ -272,8 +272,8 @@ public class Packager{
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
-			if(isNode(entry)){
-				final Node node = entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME);
+			if(XMLParser.isElement(entry, CONFIGURATION_NODE)){
+				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null && nodeName.equals(node.getNodeValue()))
 					return fun.apply(entry);
 			}
@@ -284,21 +284,11 @@ public class Packager{
 	private String extractFolder(final Node parentNode){
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(isNode(entry))
-				return entry.getAttributes().getNamedItem(CONFIGURATION_NODE_NAME).getNodeValue();
+			final Node node = nodes.item(i);
+			if(XMLParser.isElement(node, CONFIGURATION_NODE))
+				return XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME);
 		}
 		return null;
-	}
-
-	private boolean isNode(final Node entry){
-		return (entry.getNodeType() == Node.ELEMENT_NODE && CONFIGURATION_NODE.equals(entry.getNodeName()));
-	}
-
-	private Document parseXMLDocument(Path manifestPath) throws SAXException, IOException{
-		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
-		doc.getDocumentElement().normalize();
-		return doc;
 	}
 
 }
