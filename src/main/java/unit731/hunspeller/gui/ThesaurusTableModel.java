@@ -1,6 +1,5 @@
 package unit731.hunspeller.gui;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -18,11 +17,10 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String[] COLUMN_NAMES = new String[]{"Synonym", "Meanings"};
 
-	private static final String TAG_START = "\";>";
+	private static final String TAG_START = ";\">";
 	private static final String TAG_END = "</body></html>";
 	private static final String TAG_NEW_LINE = "<br>";
-	private static final MessageFormat TAG = new MessageFormat(
-		"<html><body style=\"'white-space:nowrap'; font-family:{0}; font-size:{1}" + TAG_START + "{2}" + TAG_END);
+	private static final MessageFormat TAG = new MessageFormat("<html><body style=\"'white-space:nowrap'" + TAG_START + "{0}" + TAG_END);
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -55,8 +53,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				return thesaurus.getSynonym();
 
 			case 1:
-				final Font font = GUIUtils.getCurrentFont();
-				return TAG.format(new Object[]{font.getName(), font.getSize(), thesaurus.joinMeanings(TAG_NEW_LINE)});
+				return TAG.format(new Object[]{thesaurus.joinMeanings(TAG_NEW_LINE)});
 
 			default:
 				return null;

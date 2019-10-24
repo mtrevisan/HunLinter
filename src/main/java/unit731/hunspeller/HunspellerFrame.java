@@ -837,26 +837,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
                JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
-                  BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
-                     try{
-                        backbone.getAcoParser().setCorrection(row, incorrect, correct);
+               int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
+               BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
+                  try{
+                     backbone.getAcoParser().setCorrection(row, incorrect, correct);
 
-                        // ... and save the files
-                        backbone.storeAutoCorrectFile();
-                     }
-                     catch(IllegalArgumentException | IOException ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
-                     }
-                  };
-                  CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-                  AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.setLocationRelativeTo(acoParent);
-                  dialog.setVisible(true);
-               }
+                     // ... and save the files
+                     backbone.storeAutoCorrectFile();
+                  }
+                  catch(IllegalArgumentException | IOException ex){
+                     LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                  }
+               };
+               CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+               AutoCorrectDialog dialog = new AutoCorrectDialog(synonym, okButtonAction, acoParent);
+               GUIUtils.addCancelByEscapeKey(dialog);
+               dialog.setLocationRelativeTo(acoParent);
+               dialog.setVisible(true);
             }
          }
       });
