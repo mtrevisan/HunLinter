@@ -1,6 +1,7 @@
 package unit731.hunspeller.services;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -11,9 +12,18 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 
 
 public class XMLParser{
@@ -39,6 +49,23 @@ public class XMLParser{
 		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
 		doc.getDocumentElement().normalize();
 		return doc;
+	}
+
+	public static Document newXMLDocument(){
+		return DOCUMENT_BUILDER.newDocument();
+	}
+
+	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
+			throws TransformerException{
+		//transform the DOM Object to an XML File
+		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		final Transformer transformer = transformerFactory.newTransformer();
+		if(properties != null)
+			for(final Pair<String, String> property : properties)
+				transformer.setOutputProperty(property.getKey(), property.getValue());
+		final DOMSource domSource = new DOMSource(doc);
+		final StreamResult streamResult = new StreamResult(xmlFile);
+		transformer.transform(domSource, streamResult);
 	}
 
 	public static boolean isElement(final Node entry, final String elementName){

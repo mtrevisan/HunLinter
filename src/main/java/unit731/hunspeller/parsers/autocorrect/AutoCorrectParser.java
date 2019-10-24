@@ -10,7 +10,11 @@ import org.xml.sax.SAXException;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
 import unit731.hunspeller.services.XMLParser;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -28,6 +32,11 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_BLOCK = "block-list:block";
 	private static final String AUTO_CORRECT_INCORRECT_FORM = "block-list:abbreviated-name";
 	private static final String AUTO_CORRECT_CORRECT_FORM = "block-list:name";
+
+	private static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
+		Pair.of(OutputKeys.VERSION, "1.0"),
+		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
+	};
 
 
 	private final List<CorrectionEntry> dictionary = new ArrayList<>();
@@ -135,28 +144,23 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
-	public void save(final Path acoPath) throws IOException{
-		/*
-<?xml version="1.0" encoding="UTF-8" ?>
-<block-list:block-list xmlns:block-list="http://openoffice.org/2001/block-list">
-	<block-list:block block-list:abbreviated-name="--" block-list:name="&#x2013;" />
-	...
-</block-list:block-list>
-*/
-		//FIXME
-//		final Charset charset = StandardCharsets.UTF_8;
-//		try(final BufferedWriter writer = Files.newBufferedWriter(acoFile.toPath(), charset)){
-//			int idx = charset.name().length() + 1;
-//			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
-//			final List<CorrectionEntry> synonyms = dictionary.getSynonyms();
-//			for(CorrectionEntry synonym : synonyms){
-//				synonym.saveToIndex(indexWriter, idx);
-//
-//				int meaningsLength = synonym.saveToData(writer, charset);
-//
-//				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
-//			}
-//		}
+	public void save(final File acoFile) throws TransformerException{
+		final Document doc = XMLParser.newXMLDocument();
+
+		//root element
+		final Element root = doc.createElement("block-list:block-list");
+		root.setAttribute("xmlns:block-list", "http://openoffice.org/2001/block-list");
+		doc.appendChild(root);
+
+		for(final CorrectionEntry correction : dictionary){
+			//employee element
+			final Element elem = doc.createElement("block-list:block");
+			elem.setAttribute("block-list:abbreviated-name", correction.getEscapedIncorrectForm());
+			elem.setAttribute("block-list:name", correction.getEscapedCorrectForm());
+			root.appendChild(elem);
+		}
+
+		XMLParser.createXML(acoFile, doc, XML_PROPERTIES);
 	}
 
 	public void clear(){

@@ -59,6 +59,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -867,7 +869,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeAutoCorrectFile();
                      }
-                     catch(IllegalArgumentException | IOException ex){
+                     catch(IllegalArgumentException | TransformerException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };

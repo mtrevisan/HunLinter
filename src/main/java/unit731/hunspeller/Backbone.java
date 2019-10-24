@@ -37,6 +37,8 @@ import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
+import javax.xml.transform.TransformerException;
+
 
 public class Backbone implements FileChangeListener{
 
@@ -310,9 +312,9 @@ public class Backbone implements FileChangeListener{
 		theParser.save(theIndexFile, theDataFile);
 	}
 
-	public void storeAutoCorrectFile() throws IOException{
+	public void storeAutoCorrectFile() throws TransformerException{
 		final Path acoPath = getAutoCorrectPath();
-		acoParser.save(acoPath);
+		acoParser.save(acoPath.toFile());
 	}
 
 
