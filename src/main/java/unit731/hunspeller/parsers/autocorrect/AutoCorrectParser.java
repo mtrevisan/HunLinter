@@ -12,6 +12,7 @@ import unit731.hunspeller.services.XMLParser;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -123,7 +124,7 @@ public class AutoCorrectParser{
 	/** Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean isAlreadyContained(final String incorrect, final String correct){
 		return dictionary.stream()
-			.anyMatch(elem -> elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
+			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty() && elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){
@@ -147,13 +148,15 @@ public class AutoCorrectParser{
 	public void save(final File acoFile) throws TransformerException{
 		final Document doc = XMLParser.newXMLDocument();
 
+//		doc.appendChild(doc.createProcessingInstruction(StreamResult.PI_DISABLE_OUTPUT_ESCAPING, "&"));
+
 		//root element
 		final Element root = doc.createElement("block-list:block-list");
 		root.setAttribute("xmlns:block-list", "http://openoffice.org/2001/block-list");
 		doc.appendChild(root);
 
 		for(final CorrectionEntry correction : dictionary){
-			//employee element
+			//correction element
 			final Element elem = doc.createElement("block-list:block");
 			elem.setAttribute("block-list:abbreviated-name", correction.getEscapedIncorrectForm());
 			elem.setAttribute("block-list:name", correction.getEscapedCorrectForm());

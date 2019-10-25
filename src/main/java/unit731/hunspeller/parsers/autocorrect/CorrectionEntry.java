@@ -4,9 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.text.StringEscapeUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 public class CorrectionEntry implements Comparable<CorrectionEntry>{
@@ -40,12 +41,26 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 	}
 
 	private String escape(final String text){
-		return text.chars()
-			.mapToObj(chr -> (char)chr)
-			.map(chr -> (chr > 127?
+		String result = StringUtils.EMPTY;
+		for(final char chr : text.toCharArray()){
+			String str = (chr > 127?
 				"&#x" + StringUtils.leftPad(Integer.toHexString(chr), 4, '0') + ";":
-				String.valueOf(chr)))
-			.collect(Collectors.joining(StringUtils.EMPTY, "&#x", ";"));
+				String.valueOf(chr));
+			result += str;
+		}
+		return result;
+
+//		final byte[] as = text.getBytes(StandardCharsets.UTF_8);
+//		String a = new String(as, StandardCharsets.UTF_8);
+//		String e = StringEscapeUtils.escapeJava(text);
+//		return e;
+
+//		return text.chars()
+//			.mapToObj(chr -> (char)chr)
+//			.map(chr -> (chr > 127?
+//				"\\u" + StringUtils.leftPad(Integer.toHexString(chr), 4, '0'):
+//				String.valueOf(chr)))
+//			.collect(Collectors.joining(StringUtils.EMPTY));
 	}
 
 	@Override

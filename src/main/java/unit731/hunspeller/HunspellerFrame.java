@@ -545,6 +545,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
+      //listen for row removal
+      theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame theParent = this;
       theTable.addMouseListener(new MouseAdapter(){
@@ -854,6 +856,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
+      //listen for row removal
+      acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(MouseEvent e){
@@ -869,7 +874,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeAutoCorrectFile();
                      }
-                     catch(IllegalArgumentException | TransformerException ex){
+                     catch(IllegalArgumentException | IOException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
@@ -1408,7 +1413,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
-		if(theAddButton.isEnabled() || alreadyContained){
+		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, meanings);
 			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
@@ -1458,7 +1463,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)frame.acoTable.getRowSorter();
-		if(acoAddButton.isEnabled() || alreadyContained){
+		if(StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText)){
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
 			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
