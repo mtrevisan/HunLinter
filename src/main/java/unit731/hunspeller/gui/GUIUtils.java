@@ -39,6 +39,26 @@ public class GUIUtils{
 
 	private GUIUtils(){}
 
+	public static Font chooseBestFont(final String languageSample){
+		Font bestFont = currentFont;
+		if(!canCurrentFondDisplay(languageSample) && familyNamesAll.isEmpty()){
+			//check to see if the error can be visualized, if not, change the font to one that can
+			extractFonts(languageSample);
+			final List<String> list = (!familyNamesMonospaced.isEmpty()? familyNamesMonospaced: familyNamesAll);
+			double width = 0.;
+			for(final String elem : list){
+				final Font currentFond = new Font(elem, Font.PLAIN, currentFont.getSize());
+				final double w = currentFond.getStringBounds(languageSample, FRC).getWidth();
+				if(w > width){
+					bestFont = currentFond;
+					width = w;
+				}
+			}
+			return new Font(list.get(0), Font.PLAIN, currentFont.getSize());
+		}
+		return bestFont;
+	}
+
 	public static void extractFonts(final String languageSample){
 		Objects.requireNonNull(languageSample);
 

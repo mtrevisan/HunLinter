@@ -1913,13 +1913,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final Path path = Path.of(filePath);
 			final String content = new String(Files.readAllBytes(path));
 			final String sample = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 1)[0];
-			if(!GUIUtils.canCurrentFondDisplay(sample) && GUIUtils.getFamilyNamesAll().isEmpty()){
-				//check to see if the error can be visualized, if not, change the font to one that can
-				GUIUtils.extractFonts(sample);
-				final List<String> list = (!GUIUtils.getFamilyNamesMonospaced().isEmpty()? GUIUtils.getFamilyNamesMonospaced(): GUIUtils.getFamilyNamesAll());
-				if(!list.isEmpty())
-					parsingResultTextArea.setFont(new Font(list.get(0), Font.PLAIN, GUIUtils.getCurrentFont().getSize()));
-			}
+			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
 		}
 		catch(final IOException ignored){}
 	}

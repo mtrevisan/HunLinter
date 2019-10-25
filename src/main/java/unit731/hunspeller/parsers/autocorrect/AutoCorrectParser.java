@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.autocorrect;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -137,7 +136,8 @@ public class AutoCorrectParser{
 	/** Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean isAlreadyContained(final String incorrect, final String correct){
 		return dictionary.stream()
-			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty() && elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
+			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty()
+				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){
@@ -172,8 +172,8 @@ public class AutoCorrectParser{
 		for(final CorrectionEntry correction : dictionary){
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
-			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getIncorrectForm());
-			elem.setAttribute(AUTO_CORRECT_CORRECT_FORM, correction.getCorrectForm());
+			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getEscapedIncorrectForm());
+			elem.setAttribute(AUTO_CORRECT_CORRECT_FORM, correction.getEscapedCorrectForm());
 			root.appendChild(elem);
 		}
 
