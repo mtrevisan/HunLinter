@@ -48,16 +48,20 @@ public class PatternHelper{
 	}
 
 	public static String[] extract(final String text, final Pattern pattern){
-		return extract(pattern.matcher(text));
+		return extract(text, pattern, -1);
 	}
 
-	public static String[] extract(final Matcher matcher){
+	public static String[] extract(final String text, final Pattern pattern, final int limit){
+		return extract(pattern.matcher(text), limit);
+	}
+
+	public static String[] extract(final Matcher matcher, final int limit){
 		final List<String> result = new ArrayList<>();
-		while(matcher.find()){
+		while(matcher.find() && (limit < 0 || result.size() < limit)){
 			String component = null;
 			int i = 1;
 			final int size = matcher.groupCount();
-			while(component == null && i < size)
+			while(component == null && i <= size)
 				component = matcher.group(i ++);
 			result.add(component != null? component: matcher.group());
 		}

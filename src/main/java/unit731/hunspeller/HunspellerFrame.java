@@ -25,6 +25,8 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1895,6 +1897,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
+			temporarilyChooseAFont(filePath);
+
 			prjLoaderWorker = new ProjectLoaderWorker(filePath, backbone, this::loadFileCompleted, this::loadFileCancelled);
 			prjLoaderWorker.addPropertyChangeListener(this);
 			prjLoaderWorker.execute();
@@ -1903,7 +1907,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
+	/** Chooses one font (in case of reading errors) */
+	private void temporarilyChooseAFont(final String filePath){
+		try{
+			final Path path = Path.of(filePath);
+			final String content = new String(Files.readAllBytes(path));
+			final String sample = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 1)[0];
+			if(!GUIUtils.canCurrentFondDisplay(sample) && GUIUtils.getFamilyNamesAll().isEmpty()){
+				//check to see if the error can be visualized, if not, change the font to one that can
+				GUIUtils.extractFonts(sample);
+				final List<String> list = (!GUIUtils.getFamilyNamesMonospaced().isEmpty()? GUIUtils.getFamilyNamesMonospaced(): GUIUtils.getFamilyNamesAll());
+				if(!list.isEmpty())
+					parsingResultTextArea.setFont(new Font(list.get(0), Font.PLAIN, GUIUtils.getCurrentFont().getSize()));
+			}
+		}
+		catch(final IOException ignored){}
+	}
+
 	private void loadFileCompleted(){
+		//restore default font (changed for reporting reading errors)
+		parsingResultTextArea.setFont(GUIUtils.getCurrentFont());
+
 		backbone.registerFileListener();
 		backbone.startFileListener();
 

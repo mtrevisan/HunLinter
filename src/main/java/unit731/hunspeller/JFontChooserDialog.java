@@ -1,20 +1,17 @@
 package unit731.hunspeller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.font.FontRenderContext;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.swing.*;
@@ -35,13 +32,6 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JFontChooserDialog.class);
 
-	private static final String GRAPHEME_I = "i";
-	private static final String GRAPHEME_M = "m";
-	private static final FontRenderContext FRC = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT,
-		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
-
-	private static java.util.List<String> familyNamesAll;
-	private static java.util.List<String> familyNamesMonospaced;
 	private static final Integer[] SIZES = {10, 12, 14, 16, 18, 20, 22};
 
 	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
@@ -105,7 +95,8 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 		Objects.requireNonNull(onSelection);
 		Objects.requireNonNull(parent);
 
-		retrieveFamilyNames(affixData);
+		sampleText = affixData.getSampleText();
+		GUIUtils.extractFonts(sampleText);
 
 		initComponents();
 
@@ -113,36 +104,6 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 		this.onSelection = onSelection;
 		previousFont = selectedFont;
 		setSelectedFont();
-	}
-
-	private void retrieveFamilyNames(final AffixData affixData){
-		sampleText = affixData.getSampleText();
-
-		final Pair<List<String>, List<String>> sets = extractFonts(sampleText);
-		familyNamesAll = sets.getLeft();
-		familyNamesMonospaced = sets.getRight();
-	}
-
-	private static Pair<List<String>, List<String>> extractFonts(final String languageSample){
-		final List<String> all = new ArrayList<>();
-		final List<String> monospacedOnly = new ArrayList<>();
-		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
-			.getAvailableFontFamilyNames();
-		for(final String familyName : familyNames){
-			final Font font = new Font(familyName, Font.PLAIN, 20);
-			if(font.canDisplayUpTo(languageSample) < 0){
-				all.add(familyName);
-				if(isMonospaced(font))
-					monospacedOnly.add(familyName);
-			}
-		}
-		return Pair.of(all, monospacedOnly);
-	}
-
-	private static boolean isMonospaced(final Font font){
-		final double iWidth = font.getStringBounds(GRAPHEME_I, FRC).getWidth();
-		final double mWidth = font.getStringBounds(GRAPHEME_M, FRC).getWidth();
-		return (Math.abs(iWidth - mWidth) <= 1);
 	}
 
 	/**
@@ -158,7 +119,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
       familyNameTextField = new javax.swing.JTextField();
       familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       final DefaultListModel<String> model = new DefaultListModel<>();
-      for(final String familyName : familyNamesAll)
+      for(final String familyName : GUIUtils.getFamilyNamesAll())
       model.addElement(familyName);
       familyNameList = new javax.swing.JList<>(model);
       monospacedCheckBox = new javax.swing.JCheckBox();
@@ -335,7 +296,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();
-		model.addAll(monospacedCheckBox.isSelected()? familyNamesMonospaced: familyNamesAll);
+		model.addAll(monospacedCheckBox.isSelected()? GUIUtils.getFamilyNamesMonospaced(): GUIUtils.getFamilyNamesAll());
 		setSelectedFont();
 	}//GEN-LAST:event_monospacedCheckBoxActionPerformed
 

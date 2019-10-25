@@ -1,6 +1,7 @@
 package unit731.hunspeller.services;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -81,7 +82,9 @@ public class Packager{
 					final List<String> fullPaths = extractFileEntries(manifestPath);
 
 					//extract only the Paths configuration file
-					final Node pathsNode = findPathsConfiguration(manifestPath, fullPaths);
+					final Pair<Path, Node> pair = findPathsConfiguration(manifestPath, fullPaths);
+					final Path pathsFolder = pair.getLeft().getParent();
+					final Node pathsNode = pair.getRight();
 					if(pathsNode != null){
 						final Map<String, String[]> relativeFolders = getFolders(pathsNode);
 						final Set<String> uniqueFolders = relativeFolders.values().stream()
@@ -93,9 +96,10 @@ public class Packager{
 						if(uniqueFolders.stream().anyMatch(String::isEmpty))
 							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 
+						final String basePathURI = pathsFolder.toString();
 						configurationFolders.putAll(relativeFolders.entrySet().stream()
 							.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-								final Path path = Paths.get(manifestPath.getParent().toString(), entry.getValue());
+								final Path path = Paths.get(basePathURI, entry.getValue());
 								try{
 									return Path.of(path.toFile().getCanonicalPath());
 								}
@@ -209,7 +213,7 @@ public class Packager{
 		return fullPaths;
 	}
 
-	private Node findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
+	private Pair<Path, Node> findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
 		for(final String configurationFile : configurationFiles){
 			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(),
 				configurationFile.split(FOLDER_SPLITTER));
@@ -223,7 +227,7 @@ public class Packager{
 
 			final Node foundNode = onNodeNameApply(rootElement, CONFIGURATION_NODE_NAME_PATHS, Function.identity());
 			if(foundNode != null)
-				return foundNode;
+				return Pair.of(configurationPath, foundNode);
 		}
 		return null;
 	}
