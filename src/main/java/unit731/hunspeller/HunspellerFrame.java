@@ -874,7 +874,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeAutoCorrectFile();
                      }
-                     catch(IllegalArgumentException | IOException ex){
+                     catch(IllegalArgumentException | TransformerException ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
