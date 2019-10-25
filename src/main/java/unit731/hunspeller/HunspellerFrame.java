@@ -1458,7 +1458,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String correct = pair.getRight();
 		final boolean alreadyContained = backbone.getAcoParser().isAlreadyContained(incorrect, correct);
 		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
-			&& !alreadyContained);
+			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
 
 		@SuppressWarnings("unchecked")

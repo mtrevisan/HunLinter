@@ -11,12 +11,7 @@ import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
 import unit731.hunspeller.services.XMLParser;
 
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -152,31 +147,23 @@ public class AutoCorrectParser{
 	public void save(final File acoFile) throws TransformerException{
 		final Document doc = XMLParser.newXMLDocument();
 
+		//remove `standalone="no"` from XML declaration
 		doc.setXmlStandalone(true);
 
-//		doc.appendChild(doc.createProcessingInstruction(StreamResult.PI_DISABLE_OUTPUT_ESCAPING, "&"));
-
 		//root element
-		final Element root = doc.createElement("block-list:block-list");
+		final Element root = doc.createElement(AUTO_CORRECT_ROOT_ELEMENT);
 		root.setAttribute("xmlns:block-list", "http://openoffice.org/2001/block-list");
 		doc.appendChild(root);
 
 		for(final CorrectionEntry correction : dictionary){
 			//correction element
-			final Element elem = doc.createElement("block-list:block");
-			elem.setAttribute("block-list:abbreviated-name", correction.getEscapedIncorrectForm());
-			elem.setAttribute("block-list:name", correction.getEscapedCorrectForm());
+			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
+			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getIncorrectForm());
+			elem.setAttribute(AUTO_CORRECT_CORRECT_FORM, correction.getCorrectForm());
 			root.appendChild(elem);
 		}
 
-		final DOMSource domSource = new DOMSource(doc);
-		//		final StreamResult streamResult = new StreamResult(xmlFile);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		StreamResult streamResult = new StreamResult(baos);
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		transformer.transform(domSource, streamResult);
-		System.out.println(baos.toString());
-//		XMLParser.createXML(acoFile, doc, XML_PROPERTIES);
+		XMLParser.createXML(acoFile, doc, XML_PROPERTIES);
 	}
 
 	public void clear(){
