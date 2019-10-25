@@ -1,6 +1,6 @@
 package unit731.hunspeller.gui;
 
-import java.awt.Component;
+import java.awt.*;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -15,7 +15,10 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column){
 		final String text = String.valueOf(value);
 		setText(text);
-		setFont(GUIUtils.getCurrentFont());
+
+		final Font currentFont = GUIUtils.getCurrentFont();
+		setFont(currentFont);
+		table.setFont(currentFont);
 
 		if(row >= 0 && row < table.getModel().getRowCount()){
 			try{
