@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.autocorrect;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,20 +26,15 @@ import java.util.stream.Collectors;
 
 
 /*
-Autocorrect files (https://forum.openoffice.org/en/forum/viewtopic.php?f=7&t=66912)
-I have discovered the following rules apply to valid entries in the Autocorrect DocumentList.xml:
-- HTML Entities (special characters) are Unicode HEX
-- entries cannot include smart quotes double or single (apostrophes)
-- entries cannot include double quotes, except those required for formatting
-
 The autocorrect file contains 3 XML files:
-- DocumentList.xml – pairs of mistyped words and their correct spelling
 - SentenceExceptList.xml – abbreviations that end with a fullstop that should be ignored when determining the end of a sentence
 - WordExceptList.xml – Words that may contain more than 2 leading capital eg. CDs
 */
 /** Manages pairs of mistyped words and their correct spelling */
 public class AutoCorrectParser{
 
+	private static final MessageFormat BAD_INCORRECT_QUOTE = new MessageFormat("Incorrect form cannot contain apostrophes or double quotes: ''{0}''");
+	private static final MessageFormat BAD_CORRECT_QUOTE = new MessageFormat("Correct form cannot contain apostrophes or double quotes: ''{0}''");
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = "block-list:block-list";
@@ -105,6 +101,11 @@ public class AutoCorrectParser{
 	 */
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
+		if(incorrect.contains("'") || incorrect.contains("\""))
+			throw new IllegalArgumentException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
+		if(correct.contains("'") || correct.contains("\""))
+			throw new IllegalArgumentException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
+
 		boolean forceInsertion = false;
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
 		if(!duplicates.isEmpty()){

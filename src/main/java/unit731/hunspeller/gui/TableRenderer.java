@@ -17,7 +17,7 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 		setText(text);
 		setFont(GUIUtils.getCurrentFont());
 
-		if(row >= 0 && row < table.getRowCount()){
+		if(row >= 0 && row < table.getModel().getRowCount()){
 			try{
 				table.setRowHeight(row, getPreferredSize().height + 4);
 			}
