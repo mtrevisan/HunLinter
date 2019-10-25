@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 
 
@@ -34,6 +35,8 @@ public class CorrectionDialog extends JDialog{
 
 		initComponents();
 
+		incorrectTextField.setFont(GUIUtils.getCurrentFont());
+		correctTextField.setFont(GUIUtils.getCurrentFont());
 
 		this.correction = correction;
 		this.okButtonAction = okButtonAction;
