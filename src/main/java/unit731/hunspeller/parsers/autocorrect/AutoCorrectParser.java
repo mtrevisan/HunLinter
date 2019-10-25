@@ -24,6 +24,19 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 
+/*
+Autocorrect files (https://forum.openoffice.org/en/forum/viewtopic.php?f=7&t=66912)
+I have discovered the following rules apply to valid entries in the Autocorrect DocumentList.xml:
+- HTML Entities (special characters) are Unicode HEX
+- entries cannot include smart quotes double or single (apostrophes)
+- entries cannot include double quotes, except those required for formatting
+
+The autocorrect file contains 3 XML files:
+- DocumentList.xml – pairs of mistyped words and their correct spelling
+- SentenceExceptList.xml – abbreviations that end with a fullstop that should be ignored when determining the end of a sentence
+- WordExceptList.xml – Words that may contain more than 2 leading capital eg. CDs
+*/
+/** Manages pairs of mistyped words and their correct spelling */
 public class AutoCorrectParser{
 
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
