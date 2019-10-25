@@ -17,10 +17,13 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 		setText(text);
 		setFont(GUIUtils.getCurrentFont());
 
-		try{
-			table.setRowHeight(row, getPreferredSize().height + 4);
+		if(row >= 0 && row < table.getRowCount()){
+			try{
+				table.setRowHeight(row, getPreferredSize().height + 4);
+			}
+			catch(final ArrayIndexOutOfBoundsException ignored){
+			}
 		}
-		catch(final ArrayIndexOutOfBoundsException ignored){}
 
 		return this;
 	}

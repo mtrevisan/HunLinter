@@ -1951,7 +1951,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicMenu.setEnabled(true);
 			final int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
-			mainTabbedPane.setSelectedIndex(index);
 
 
 			//aid file:
@@ -2392,6 +2391,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//FIXME
 //		acoMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+	}
+
+	@Override
+	public void clearAutoTextParser(){
+//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
+//		dm.setCorrections(null);
+
+		//FIXME
+//		atxMenu.setEnabled(false);
+//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
 
 

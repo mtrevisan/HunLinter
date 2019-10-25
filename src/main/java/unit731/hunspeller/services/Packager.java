@@ -164,12 +164,12 @@ public class Packager{
 
 	public Path getAutoCorrectPath(final File affFile){
 		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
-		return (path != null? Path.of(path.toString(), "DocumentList.xml"): null);
+		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_CORRECT): null);
 	}
 
 	public Path getAutoTextPath(final File affFile){
 		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		return (path != null? Path.of(path.toString(), "BlockList.xml"): null);
+		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_TEXT): null);
 	}
 
 	/** Go up directories until description.xml or manifest.json is found */

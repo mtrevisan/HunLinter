@@ -32,7 +32,7 @@ public class XMLParser{
 	private static DocumentBuilder DOCUMENT_BUILDER;
 	static{
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//		factory.setExpandEntityReferences(false);
+		factory.setExpandEntityReferences(false);
 		try{
 			DOCUMENT_BUILDER = factory.newDocumentBuilder();
 			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));

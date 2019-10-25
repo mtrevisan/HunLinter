@@ -55,6 +55,8 @@ public class Backbone implements FileChangeListener{
 	private static final String PREFIX_THESAURUS = "th_";
 	private static final String SUFFIX_THESAURUS = "_v2";
 	private static final String PREFIX_HYPHENATION = "hyph_";
+	public static final String FILENAME_AUTO_CORRECT = "DocumentList.xml";
+	public static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String FOLDER_AID = "aids/";
 
 	private static final String TAB = "\t";
@@ -182,6 +184,10 @@ public class Backbone implements FileChangeListener{
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
 		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
+
+		final Path acoPath = getAutoCorrectPath();
+		if(acoPath != null)
+			flm.register(this, acoPath.toFile().getAbsolutePath());
 	}
 
 	public void startFileListener(){
@@ -376,6 +382,18 @@ public class Backbone implements FileChangeListener{
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAidParser);
 		}
+		else if(isAutoCorrectFile(absolutePath)){
+			acoParser.clear();
+
+			Optional.ofNullable(hunspellable)
+				.ifPresent(Hunspellable::clearAutoCorrectParser);
+		}
+//		else if(isAutoTextFile(absolutePath)){
+//			atxParser.clear();
+//
+//			Optional.ofNullable(hunspellable)
+//				.ifPresent(Hunspellable::clearAutoTextParser);
+//		}
 	}
 
 	@Override
@@ -390,10 +408,6 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
-	private boolean hasDICExtension(final String path){
-		return path.endsWith(EXTENSION_DIC);
-	}
-
 	private boolean isHyphenationFile(final String path){
 		final String baseName = FilenameUtils.getBaseName(path);
 		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));
@@ -401,6 +415,14 @@ public class Backbone implements FileChangeListener{
 
 	private boolean hasAIDExtension(final String path){
 		return path.endsWith(EXTENSION_AID);
+	}
+
+	private boolean isAutoCorrectFile(final String path){
+		return FilenameUtils.getBaseName(path).equals(FILENAME_AUTO_CORRECT);
+	}
+
+	private boolean isAutoTextFile(final String path){
+		return FilenameUtils.getBaseName(path).equals(FILENAME_AUTO_TEXT);
 	}
 
 
