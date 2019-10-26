@@ -88,7 +88,7 @@ public class Packager{
 		final Path basePath = getPackageBaseDirectory(affFile);
 
 		if(basePath != null){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on folder {}", basePath.toString());
+			LOGGER.trace("Found base path on folder {}", basePath.toString());
 
 			try{
 				final File manifestFile = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)
@@ -143,33 +143,31 @@ public class Packager{
 
 		//package entire folder with ZIP
 		if(basePath != null){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on folder {}", basePath.toString());
-
 			try{
 				Path autoCorrectOutputPath = null;
 				final File autoCorrectFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
 				if(autoCorrectFile != null){
 					//zip directory into .dat
-					final String autoCorrectOutputFilename = autoCorrectFile.toString() + File.separator
+					final String autoCorrectOutputFilename = autoCorrectFile.getParent() + File.separator
 						+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
 					autoCorrectOutputPath = Path.of(autoCorrectOutputFilename);
-					ZIPPER.zipDirectory(autoCorrectFile, Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
+					ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
 				}
 				Path autoTextOutputPath = null;
 				final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 				if(autoTextFile != null){
 					//zip directory into .bau
-					final String autoTextOutputFilename = autoTextFile.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
-						+ language + EXTENSION_BAU;
+					final String autoTextOutputFilename = autoTextFile.getParent() + File.separator
+						+ FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
 					autoTextOutputPath = Path.of(autoTextOutputFilename);
-					ZIPPER.zipDirectory(autoTextFile, Deflater.BEST_COMPRESSION, autoTextOutputFilename);
+					ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
 				}
 
 				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1)
 					+ EXTENSION_ZIP;
 				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 				//that are not autoCorrectOutputFilename or autoTextOutputFilename
-				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename,
+				ZIPPER.zipDirectory(basePath, Deflater.BEST_COMPRESSION, outputFilename,
 					autoCorrectOutputPath, autoTextOutputPath);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");

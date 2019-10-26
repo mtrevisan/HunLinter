@@ -23,11 +23,11 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipManager{
 
-	public void zipDirectory(final File dir, final int compressionLevel, final String zipFilename) throws IOException{
+	public void zipDirectory(final Path dir, final int compressionLevel, final String zipFilename) throws IOException{
 		zipDirectory(dir, compressionLevel, zipFilename, new Path[0]);
 	}
 
-	public void zipDirectory(final File dir, final int compressionLevel, final String zipFilename, Path... excludeFolderBut) throws IOException{
+	public void zipDirectory(final Path dir, final int compressionLevel, final String zipFilename, Path... excludeFolderBut) throws IOException{
 		Files.deleteIfExists((new File(zipFilename)).toPath());
 
 		final List<String> folders = extractFilesList(dir);
@@ -37,7 +37,7 @@ public class ZipManager{
 		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
 
 		//zip files one by one
-		final int startIndex = dir.getAbsolutePath().length() + 1;
+		final int startIndex = dir.toFile().getAbsolutePath().length() + 1;
 		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
 			zos.setLevel(compressionLevel);
 
@@ -76,15 +76,15 @@ public class ZipManager{
 			.collect(Collectors.toList());
 	}
 
-	private List<String> extractFilesList(final File dir){
+	private List<String> extractFilesList(final Path dir){
 		final List<String> filesListInDir = new ArrayList<>();
 
-		final File[] files = dir.listFiles();
+		final File[] files = dir.toFile().listFiles();
 		for(final File file : files){
 			if(file.isFile())
 				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
 			else
-				filesListInDir.addAll(extractFilesList(file));
+				filesListInDir.addAll(extractFilesList(file.toPath()));
 		}
 
 		return filesListInDir;
@@ -105,7 +105,7 @@ public class ZipManager{
 			//read the file and write to ZipOutputStream
 			try(final InputStream is = new BufferedInputStream(entry)){
 				IOUtils.copy(is, zos);
-				
+
 				//close the zip entry to write to zip file
 				zos.closeEntry();
 			}

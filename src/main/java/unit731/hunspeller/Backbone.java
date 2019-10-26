@@ -464,8 +464,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void createPackage(){
-		//FIXME extract language
-		packager.createPackage(affFile, "vec-IT");
+		packager.createPackage(affFile, getAffixData().getLanguage());
 	}
 
 }
