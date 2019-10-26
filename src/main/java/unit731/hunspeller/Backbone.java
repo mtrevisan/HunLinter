@@ -10,10 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,13 +52,6 @@ public class Backbone implements FileChangeListener{
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
-	private static final String EXTENSION_THESAURUS_INDEX = ".idx";
-	private static final String EXTENSION_THESAURUS_DATA = ".dat";
-	private static final String PREFIX_THESAURUS = "th_";
-	private static final String SUFFIX_THESAURUS = "_v2";
-	private static final String PREFIX_HYPHENATION = "hyph_";
-	public static final String FILENAME_AUTO_CORRECT = "DocumentList.xml";
-	public static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String FOLDER_AID = "aids/";
 
 	private static final String TAB = "\t";
@@ -148,8 +143,8 @@ public class Backbone implements FileChangeListener{
 		final File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		final Path acoPath = getAutoCorrectPath();
-		openAutoCorrectFile(acoPath);
+		final File acoFile = getAutoCorrectFile();
+		openAutoCorrectFile(acoFile);
 	}
 
 	/* NOTE: used for testing purposes */
@@ -170,8 +165,8 @@ public class Backbone implements FileChangeListener{
 		final File theDataFile = getThesaurusDataFile();
 		openThesaurusFile(theDataFile);
 
-		final Path acoPath = getAutoCorrectPath();
-		openAutoCorrectFile(acoPath);
+		final File acoFile = getAutoCorrectFile();
+		openAutoCorrectFile(acoFile);
 	}
 
 	public void clear(){
@@ -183,11 +178,13 @@ public class Backbone implements FileChangeListener{
 	public void registerFileListener(){
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
-		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
+		final File acoFile = getAutoCorrectFile();
 
-		final Path acoPath = getAutoCorrectPath();
-		if(acoPath != null)
-			flm.register(this, acoPath.toFile().getAbsolutePath());
+		final String[] uris = Arrays.asList(affFile, hypFile, aidFile, acoFile).stream()
+			.filter(Objects::nonNull)
+			.map(File::getAbsolutePath)
+			.toArray(String[]::new);
+		flm.register(this, uris);
 	}
 
 	public void startFileListener(){
@@ -220,7 +217,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void openHyphenationFile(final File hypFile){
-		if(hypFile.exists()){
+		if(hypFile != null && hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
 			final String language = affParser.getAffixData().getLanguage();
@@ -291,11 +288,11 @@ public class Backbone implements FileChangeListener{
 			theParser.clear();
 	}
 
-	public void openAutoCorrectFile(final Path acoPath) throws IOException, SAXException{
-		if(acoPath != null && acoPath.toFile().exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoPath.toFile().getName());
+	public void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
+		if(acoFile != null && acoFile.exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoFile.getName());
 
-			acoParser.parse(acoPath);
+			acoParser.parse(acoFile);
 
 			if(hunspellable != null)
 				hunspellable.clearAutoCorrectParser();
@@ -319,8 +316,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void storeAutoCorrectFile() throws TransformerException{
-		final Path acoPath = getAutoCorrectPath();
-		acoParser.save(acoPath.toFile());
+		final File acoFile = getAutoCorrectFile();
+		acoParser.save(acoFile);
 	}
 
 
@@ -349,19 +346,23 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getThesaurusIndexFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
+		return packager.getThesaurusIndexFile();
 	}
 
 	public File getThesaurusDataFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
+		return packager.getThesaurusDataFile();
 	}
 
 	public File getHyphenationFile(){
-		return getFile(PREFIX_HYPHENATION + affParser.getAffixData().getLanguage() + EXTENSION_DIC);
+		return packager.getHyphenationFile();
 	}
 
-	public Path getAutoCorrectPath(){
-		return packager.getAutoCorrectPath();
+	public File getAutoCorrectFile(){
+		return packager.getAutoCorrectFile();
+	}
+
+	public File getAutoTextFile(){
+		return packager.getAutoTextFile();
 	}
 
 
@@ -408,21 +409,16 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
-	private boolean isHyphenationFile(final String path){
-		final String baseName = FilenameUtils.getBaseName(path);
-		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));
-	}
-
 	private boolean hasAIDExtension(final String path){
 		return path.endsWith(EXTENSION_AID);
 	}
 
 	private boolean isAutoCorrectFile(final String path){
-		return FilenameUtils.getBaseName(path).equals(FILENAME_AUTO_CORRECT);
+		return path.equals(packager.getAutoCorrectFile().getAbsolutePath());
 	}
 
 	private boolean isAutoTextFile(final String path){
-		return FilenameUtils.getBaseName(path).equals(FILENAME_AUTO_TEXT);
+		return path.equals(packager.getAutoTextFile().getAbsolutePath());
 	}
 
 

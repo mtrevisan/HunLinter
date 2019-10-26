@@ -21,7 +21,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.Path;
 
 
 public class XMLParser{
@@ -43,8 +42,8 @@ public class XMLParser{
 	}
 
 
-	public static Document parseXMLDocument(final Path path) throws SAXException, IOException{
-		final Document doc = DOCUMENT_BUILDER.parse(path.toFile());
+	public static Document parseXMLDocument(final File file) throws SAXException, IOException{
+		final Document doc = DOCUMENT_BUILDER.parse(file);
 		doc.getDocumentElement().normalize();
 		return doc;
 	}

@@ -59,7 +59,7 @@ public class GUIUtils{
 				}
 			}
 		}
-		return (height != 0.f? bestFont.deriveFont(bestFont.getSize() * 17.f / height): bestFont);
+		return (height != 0.f? bestFont.deriveFont((float)Math.round(bestFont.getSize() * 17.f / height)): bestFont);
 	}
 
 	public static void extractFonts(final String languageSample){

@@ -15,7 +15,6 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +52,14 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoPath	The reference to the auto-correct file
+	 * @param acoFile	The reference to the auto-correct file
 	 * @throws IOException	If an I/O error occurs
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
-	public void parse(final Path acoPath) throws IOException, SAXException{
+	public void parse(final File acoFile) throws IOException, SAXException{
 		clear();
 
-		final Document doc = XMLParser.parseXMLDocument(acoPath);
+		final Document doc = XMLParser.parseXMLDocument(acoFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))

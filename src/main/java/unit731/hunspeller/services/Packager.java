@@ -47,22 +47,37 @@ public class Packager{
 	private static final String MANIFEST_FILE_ENTRY_FULL_PATH = "manifest:full-path";
 	private static final String MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA = "application/vnd.sun.star.configuration-data";
 	private static final String CONFIGURATION_ROOT_ELEMENT = "oor:component-data";
+	private static final String CONFIGURATION_PROPERTY = "prop";
 	private static final String CONFIGURATION_NODE = "node";
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
+	//dictionaries spellcheck directory
+	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX = "DICT_SPELL_AFF";
+	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY = "DICT_SPELL_DIC";
+	//dictionaries hyphenation file
+	private static final String CONFIGURATION_NODE_PROPERTY_HYPHENATION = "DICT_HYPH";
+	//dictionaries thesaurus directory
+	private static final String CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA = "DICT_THES_DAT";
+	private static final String CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX = "DICT_THES_IDX";
 	//dictionaries configuration file
 	private static final String CONFIGURATION_NODE_NAME_SERVICE_MANAGER = "ServiceManager";
+	private static final String CONFIGURATION_NODE_NAME_DICTIONARIES = "Dictionaries";
+	private static final String CONFIGURATION_NODE_NAME_LOCATIONS = "Locations";
 	//autocorrect/autotext configuration file
 	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
+	private static final String FILENAME_AUTO_CORRECT = "DocumentList.xml";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
+	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 	private static final String FOLDER_ORIGIN = "%origin%";
 	private static final String FOLDER_SPLITTER = "[/\\\\]";
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
+	private static final String SPELLCHECK_FOLDERS_SEPARATOR = ".aff ";
+	private static final String THESAURUS_FOLDERS_SEPARATOR = ".dat ";
 
 
-	private final Map<String, Path> configurationFolders = new HashMap<>();
+	private final Map<String, File> configurationFiles = new HashMap<>();
 
 
 	public Packager(final File affFile){
@@ -76,26 +91,16 @@ public class Packager{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on folder {}", basePath.toString());
 
 			try{
-				final Path manifestPath = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
-				if(existFile(manifestPath)){
+				final File manifestFile = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)
+					.toFile();
+				if(existFile(manifestFile)){
 					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
-					final List<String> fullPaths = extractFileEntries(manifestPath);
+					final List<File> fullFiles = extractFileEntries(manifestFile).stream()
+						.map(configurationFile -> Paths.get(basePath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
+						.collect(Collectors.toList());
 
-					//extract only the Paths configuration file
-					final Pair<Path, Node> pair = findPathsConfiguration(manifestPath, fullPaths);
-					final Path pathsFolder = pair.getLeft().getParent();
-					final Node pathsNode = pair.getRight();
-					if(pathsNode != null){
-						configurationFolders.putAll(getFolders(pathsNode, manifestPath.getParent(), pathsFolder));
-						final Set<String> uniqueFolders = configurationFolders.values().stream()
-							.map(Path::toString)
-							.collect(Collectors.toSet());
-						if(configurationFolders.size() != uniqueFolders.size())
-							throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-								+ StringUtils.join(configurationFolders));
-						if(uniqueFolders.stream().anyMatch(String::isEmpty))
-							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-					}
+					processDictionariesConfigurationFile(manifestFile, fullFiles);
+					processPathsConfigurationFile(manifestFile, fullFiles);
 				}
 			}
 			catch(final Exception e){
@@ -103,6 +108,33 @@ public class Packager{
 
 				LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
 			}
+		}
+	}
+
+	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles)
+			throws IOException, SAXException{
+		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
+		final File file = pair.getLeft();
+		final Node node = pair.getRight();
+		if(node != null)
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
+	}
+
+	private void processPathsConfigurationFile(final File manifestFile, final List<File> configurationFiles)
+			throws IOException, SAXException{
+		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, configurationFiles);
+		final File file = pair.getLeft();
+		final Node node = pair.getRight();
+		if(node != null){
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
+			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
+				.map(File::toString)
+				.collect(Collectors.toSet());
+			if(this.configurationFiles.size() != uniqueFolders.size())
+				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+					+ StringUtils.join(this.configurationFiles));
+			if(uniqueFolders.stream().anyMatch(String::isEmpty))
+				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
 	}
 
@@ -115,22 +147,22 @@ public class Packager{
 
 			try{
 				Path autoCorrectOutputPath = null;
-				final Path autoCorrectPath = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
-				if(autoCorrectPath != null){
+				final File autoCorrectFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+				if(autoCorrectFile != null){
 					//zip directory into .dat
-					final String autoCorrectOutputFilename = autoCorrectPath.toString() + File.separator
+					final String autoCorrectOutputFilename = autoCorrectFile.toString() + File.separator
 						+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
 					autoCorrectOutputPath = Path.of(autoCorrectOutputFilename);
-					ZIPPER.zipDirectory(autoCorrectPath.toFile(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
+					ZIPPER.zipDirectory(autoCorrectFile, Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
 				}
 				Path autoTextOutputPath = null;
-				final Path autoTextPath = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-				if(autoTextPath != null){
+				final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+				if(autoTextFile != null){
 					//zip directory into .bau
-					final String autoTextOutputFilename = autoTextPath.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
+					final String autoTextOutputFilename = autoTextFile.toString() + File.separator + FILENAME_PREFIX_AUTO_TEXT
 						+ language + EXTENSION_BAU;
 					autoTextOutputPath = Path.of(autoTextOutputFilename);
-					ZIPPER.zipDirectory(autoTextPath.toFile(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
+					ZIPPER.zipDirectory(autoTextFile, Deflater.BEST_COMPRESSION, autoTextOutputFilename);
 				}
 
 				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1)
@@ -154,14 +186,24 @@ public class Packager{
 		}
 	}
 
-	public Path getAutoCorrectPath(){
-		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
-		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_CORRECT): null);
+	public File getHyphenationFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_HYPHENATION);
 	}
 
-	public Path getAutoTextPath(){
-		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_TEXT): null);
+	public File getThesaurusDataFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA);
+	}
+
+	public File getThesaurusIndexFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX);
+	}
+
+	public File getAutoCorrectFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+	}
+
+	public File getAutoTextFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 	}
 
 	/** Go up directories until description.xml or manifest.json is found */
@@ -172,16 +214,16 @@ public class Packager{
 		return parentPath;
 	}
 
-	private boolean existFile(final Path path){
-		return Files.isRegularFile(path);
+	private boolean existFile(final File file){
+		return Files.isRegularFile(file.toPath());
 	}
 
 	private boolean existFile(final Path path, final String filename){
 		return Files.isRegularFile(Paths.get(path.toString(), filename));
 	}
 
-	private List<String> extractFileEntries(final Path manifestPath) throws IOException, SAXException{
-		final Document doc = XMLParser.parseXMLDocument(manifestPath);
+	private List<String> extractFileEntries(final File manifestFile) throws IOException, SAXException{
+		final Document doc = XMLParser.parseXMLDocument(manifestFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!MANIFEST_ROOT_ELEMENT.equals(rootElement.getNodeName()))
@@ -201,47 +243,112 @@ public class Packager{
 		return fullPaths;
 	}
 
-	private Pair<Path, Node> findPathsConfiguration(final Path manifestPath, final List<String> configurationFiles) throws IOException, SAXException{
-		for(final String configurationFile : configurationFiles){
-			final Path configurationPath = Paths.get(manifestPath.getParent().getParent().toString(),
-				configurationFile.split(FOLDER_SPLITTER));
-
-			final Document doc = XMLParser.parseXMLDocument(configurationPath);
+	private Pair<File, Node> findConfiguration(final String configurationName,
+			final List<File> configurationFiles) throws IOException, SAXException{
+		for(final File configurationFile : configurationFiles){
+			final Document doc = XMLParser.parseXMLDocument(configurationFile);
 
 			final Element rootElement = doc.getDocumentElement();
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was "
 					+ rootElement.getNodeName());
 
-			final Node foundNode = onNodeNameApply(rootElement, CONFIGURATION_NODE_NAME_PATHS, Function.identity());
+			final Node foundNode = onNodeNameApply(rootElement, configurationName, Function.identity());
 			if(foundNode != null)
-				return Pair.of(configurationPath, foundNode);
+				return Pair.of(configurationFile, foundNode);
 		}
 		return null;
 	}
 
-	private Map<String, Path> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
-		final Map<String, Path> children = new HashMap<>();
+	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
+		final Map<String, File> children = new HashMap<>();
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
 			if(XMLParser.isElement(entry, CONFIGURATION_NODE)){
 				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null){
-					//extract folder
-					Path currentParentPath = basePath;
-					String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-					if(folder.startsWith(FOLDER_ORIGIN)){
-						folder = folder.substring(FOLDER_ORIGIN.length());
-						currentParentPath = originPath;
+					//extract folder(s)
+					if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
+						final NodeList subNodes = entry.getChildNodes();
+						for(int j = 0; j < subNodes.getLength(); j ++){
+							final Node subEntry = subNodes.item(j);
+							if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)){
+								if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+									final String folders = extractLocation(subEntry);
+									final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+									final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+									final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+									children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
+									final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
+									final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
+									children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
+								}
+								else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
+									final String folder = extractLocation(subEntry);
+									final File file = absolutizeFolder(folder, basePath, originPath);
+									children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
+								}
+								else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
+									final String folders = extractLocation(subEntry);
+									final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
+									final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
+									final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
+									children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
+									final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
+									final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
+									children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
+								}
+							}
+						}
 					}
-					final Path truePath = Path.of(currentParentPath.toString(), folder.split(FOLDER_SPLITTER));
-					final Path path = Path.of(truePath.toFile().getCanonicalPath());
-					children.put(node.getNodeValue(), path);
+					else{
+						final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+						final File file = absolutizeFolder(folder, basePath, originPath);
+						final String nodeValue = node.getNodeValue();
+						if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue))
+							children.put(node.getNodeValue(), Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
+						else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue))
+							children.put(node.getNodeValue(), Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
+						else
+							LOGGER.info("Unknown configuration name: {}", nodeValue);
+					}
 				}
 			}
 		}
 		return children;
+	}
+
+	private File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
+		Path currentParentPath = basePath;
+		if(folder.startsWith(FOLDER_ORIGIN)){
+			folder = folder.substring(FOLDER_ORIGIN.length());
+			currentParentPath = originPath;
+		}
+		final Path truePath = Path.of(currentParentPath.toString(), folder.split(FOLDER_SPLITTER));
+		return Path.of(truePath.toFile().getCanonicalPath())
+			.toFile();
+	}
+
+	private String extractLocation(final Node parentNode){
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node node = nodes.item(i);
+			if(XMLParser.isElement(node, CONFIGURATION_PROPERTY)
+					&& CONFIGURATION_NODE_NAME_LOCATIONS.equals(XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
+				return node.getChildNodes().item(1).getFirstChild().getNodeValue();
+		}
+		return null;
+	}
+
+	private String extractFolder(final Node parentNode){
+		final NodeList nodes = parentNode.getChildNodes();
+		for(int i = 0; i < nodes.getLength(); i ++){
+			final Node node = nodes.item(i);
+			if(XMLParser.isElement(node, CONFIGURATION_NODE))
+				return XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME);
+		}
+		return null;
 	}
 
 	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
@@ -253,16 +360,6 @@ public class Packager{
 				if(node != null && nodeName.equals(node.getNodeValue()))
 					return fun.apply(entry);
 			}
-		}
-		return null;
-	}
-
-	private String extractFolder(final Node parentNode){
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node node = nodes.item(i);
-			if(XMLParser.isElement(node, CONFIGURATION_NODE))
-				return XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME);
 		}
 		return null;
 	}
