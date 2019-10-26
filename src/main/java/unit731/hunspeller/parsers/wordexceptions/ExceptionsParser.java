@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.wordexceptions;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -11,43 +10,39 @@ import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.XMLParser;
 
-import javax.xml.transform.OutputKeys;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
-/*
-The autocorrect file contains 3 XML files:
-- SentenceExceptList.xml – abbreviations that end with a fullstop that should be ignored when determining the end of a sentence
-*/
+/**
+ * `SentenceExceptList.xml` – Manages abbreviations that end with a fullstop that should be ignored when determining
+ * 	the end of a sentence
+ * `WordExceptList.xml` – Manages words that may contain more than 2 leading capital, eg. `CDs`
+ */
+public class ExceptionsParser{
 
-/** Manages words that may contain more than 2 leading capital, eg. `CDs` */
-public class WordExceptionsParser{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(WordExceptionsParser.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String WORD_EXCEPTIONS_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
 	private static final String AUTO_CORRECT_BLOCK = AUTO_CORRECT_NAMESPACE + "block";
 	private static final String WORD_EXCEPTIONS_WORD = AUTO_CORRECT_NAMESPACE + "abbreviated-name";
 
-	@SuppressWarnings("unchecked")
-	private static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
-		Pair.of(OutputKeys.VERSION, "1.0"),
-		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
-	};
 
-
+	private final String filename;
 	private final List<String> dictionary = new ArrayList<>();
 
 
+	public ExceptionsParser(final String filename){
+		this.filename = filename;
+	}
+
 	/**
-	 * Parse the rows out from a `WordExceptList.xml` file.
+	 * Parse the rows out from a `SentenceExceptList.xml` or a `WordExceptList.xml` file.
 	 *
 	 * @param wexFile	The reference to the word exceptions file
 	 * @throws IOException	If an I/O error occurs
@@ -60,8 +55,8 @@ public class WordExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new IllegalArgumentException("Invalid root element, expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was "
-				+ rootElement.getNodeName());
+			throw new IllegalArgumentException("Invalid root element in file " + filename
+				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
 		final NodeList entries = rootElement.getChildNodes();
 		for(int i = 0; i < entries.getLength(); i ++){
@@ -84,14 +79,14 @@ public class WordExceptionsParser{
 			.filter(list -> list.size() > 1)
 			.collect(Collectors.toList());
 		for(final List<String> duplication : duplications)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in word exceptions file: '{}'", duplication);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", filename, duplication);
 	}
 
-	public List<String> getWordExceptionsDictionary(){
+	public List<String> getExceptionsDictionary(){
 		return dictionary;
 	}
 
-	public int getWordExceptionsCounter(){
+	public int getExceptionsCounter(){
 		return dictionary.size();
 	}
 

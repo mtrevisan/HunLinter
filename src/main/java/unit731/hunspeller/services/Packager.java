@@ -66,8 +66,8 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
 	private static final String FILENAME_AUTO_CORRECT = "DocumentList.xml";
-	private static final String FILENAME_SENTENCE_EXCEPTIONS = "SentenceExceptList.xml";
-	private static final String FILENAME_WORD_EXCEPTIONS = "WordExceptList.xml";
+	public static final String FILENAME_SENTENCE_EXCEPTIONS = "SentenceExceptList.xml";
+	public static final String FILENAME_WORD_EXCEPTIONS = "WordExceptList.xml";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
 	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";

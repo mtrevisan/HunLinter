@@ -34,9 +34,8 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunspeller.parsers.sentenceexceptions.SentenceExceptionsParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
-import unit731.hunspeller.parsers.wordexceptions.WordExceptionsParser;
+import unit731.hunspeller.parsers.wordexceptions.ExceptionsParser;
 import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
@@ -73,8 +72,8 @@ public class Backbone implements FileChangeListener{
 	private WordGenerator wordGenerator;
 
 	private final AutoCorrectParser acoParser;
-	private final SentenceExceptionsParser sexParser;
-	private final WordExceptionsParser wexParser;
+	private final ExceptionsParser sexParser;
+	private final ExceptionsParser wexParser;
 
 	private Packager packager;
 
@@ -87,8 +86,8 @@ public class Backbone implements FileChangeListener{
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		acoParser = new AutoCorrectParser();
-		sexParser = new SentenceExceptionsParser();
-		wexParser = new WordExceptionsParser();
+		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
+		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -122,11 +121,11 @@ public class Backbone implements FileChangeListener{
 		return acoParser;
 	}
 
-	public SentenceExceptionsParser getSexParser(){
+	public ExceptionsParser getSexParser(){
 		return sexParser;
 	}
 
-	public WordExceptionsParser getWexParser(){
+	public ExceptionsParser getWexParser(){
 		return wexParser;
 	}
 

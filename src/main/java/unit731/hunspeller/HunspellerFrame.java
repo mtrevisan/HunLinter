@@ -287,6 +287,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable = new javax.swing.JTable();
       acoCorrectionsRecordedLabel = new javax.swing.JLabel();
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      sexLayeredPane = new javax.swing.JLayeredPane();
+      sexScrollPane = new javax.swing.JScrollPane();
+      sexTextArea = new javax.swing.JTextArea();
+      sexCorrectionsRecordedLabel = new javax.swing.JLabel();
+      sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       wexLayeredPane = new javax.swing.JLayeredPane();
       wexScrollPane = new javax.swing.JScrollPane();
       wexTextArea = new javax.swing.JTextArea();
@@ -966,6 +971,47 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
+      sexTextArea.setEditable(false);
+      sexTextArea.setColumns(20);
+      sexScrollPane.setViewportView(sexTextArea);
+
+      sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
+      sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
+
+      sexCorrectionsRecordedOutputLabel.setText("...");
+
+      sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+      javax.swing.GroupLayout sexLayeredPaneLayout = new javax.swing.GroupLayout(sexLayeredPane);
+      sexLayeredPane.setLayout(sexLayeredPaneLayout);
+      sexLayeredPaneLayout.setHorizontalGroup(
+         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(sexScrollPane)
+               .addGroup(sexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(sexCorrectionsRecordedLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)))
+            .addContainerGap())
+      );
+      sexLayeredPaneLayout.setVerticalGroup(
+         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(sexCorrectionsRecordedLabel)
+               .addComponent(sexCorrectionsRecordedOutputLabel))
+            .addContainerGap())
+      );
+
+      mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
+
       wexTextArea.setEditable(false);
       wexTextArea.setColumns(20);
       wexScrollPane.setViewportView(wexTextArea);
@@ -1255,8 +1301,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap())
       );
 
-		for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
-      	mainTabbedPane.setEnabledAt(i, false);
+      for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
+      mainTabbedPane.setEnabledAt(i, false);
       KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -1909,6 +1955,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void loadFileInternal(final String filePath){
+		//clear all
+		loadFileCancelled(null);
+
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
@@ -2023,17 +2072,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//sentence exceptions file:
-			if(backbone.getSexParser().getSentenceExceptionsCounter() > 0){
+			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
-				final List<String> sentenceExceptions = backbone.getSexParser().getSentenceExceptionsDictionary();
+				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
 				sexTextArea.setText(String.join(", ", sentenceExceptions));
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 
 
 			//word exceptions file:
-			if(backbone.getWexParser().getWordExceptionsCounter() > 0){
-				final List<String> wordExceptions = backbone.getWexParser().getWordExceptionsDictionary();
+			if(backbone.getWexParser().getExceptionsCounter() > 0){
+				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
 				wexTextArea.setText(String.join(", ", wordExceptions));
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
@@ -2070,8 +2119,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void loadFileCancelled(final Exception exc){
+		mainTabbedPane.setSelectedIndex(0);
+
 		filOpenAFFMenuItem.setEnabled(true);
-		if(exc instanceof ProjectFileNotFoundException)
+		if(exc != null && (exc instanceof ProjectFileNotFoundException))
 			//remove the file from the recent files menu
 			recentFilesMenu.removeEntry(((ProjectFileNotFoundException)exc).getPath());
 
@@ -2130,11 +2181,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void updateSentenceExceptionsCounter(){
-		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getSentenceExceptionsCounter()));
+		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getExceptionsCounter()));
 	}
 
 	private void updateWordExceptionsCounter(){
-		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getWexParser().getWordExceptionsCounter()));
+		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getWexParser().getExceptionsCounter()));
 	}
 
 	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
@@ -2620,6 +2671,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JLabel sexCorrectionsRecordedLabel;
+   private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLayeredPane sexLayeredPane;
+   private javax.swing.JScrollPane sexScrollPane;
+   private javax.swing.JTextArea sexTextArea;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;
