@@ -26,11 +26,6 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 
-/*
-The autocorrect file contains 3 XML files:
-- SentenceExceptList.xml – abbreviations that end with a fullstop that should be ignored when determining the end of a sentence
-- WordExceptList.xml – Words that may contain more than 2 leading capital eg. CDs
-*/
 /** Manages pairs of mistyped words and their correct spelling */
 public class AutoCorrectParser{
 

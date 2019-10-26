@@ -287,6 +287,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable = new javax.swing.JTable();
       acoCorrectionsRecordedLabel = new javax.swing.JLabel();
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      wexLayeredPane = new javax.swing.JLayeredPane();
+      wexScrollPane = new javax.swing.JScrollPane();
+      wexTextArea = new javax.swing.JTextArea();
+      wexCorrectionsRecordedLabel = new javax.swing.JLabel();
+      wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -445,8 +450,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable.setRowSelectionAllowed(true);
       cmpScrollPane.setViewportView(cmpTable);
 
+      cmpInputTextArea.setEditable(false);
       cmpInputTextArea.setColumns(20);
-      cmpInputTextArea.setRows(1);
       cmpInputScrollPane.setViewportView(cmpInputTextArea);
 
       cmpLoadInputButton.setText("Load input from dictionary");
@@ -961,6 +966,47 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
+      wexTextArea.setEditable(false);
+      wexTextArea.setColumns(20);
+      wexScrollPane.setViewportView(wexTextArea);
+
+      wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
+      wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
+
+      wexCorrectionsRecordedOutputLabel.setText("...");
+
+      wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+      javax.swing.GroupLayout wexLayeredPaneLayout = new javax.swing.GroupLayout(wexLayeredPane);
+      wexLayeredPane.setLayout(wexLayeredPaneLayout);
+      wexLayeredPaneLayout.setHorizontalGroup(
+         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(wexScrollPane)
+               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(wexCorrectionsRecordedLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)))
+            .addContainerGap())
+      );
+      wexLayeredPaneLayout.setVerticalGroup(
+         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(wexCorrectionsRecordedLabel)
+               .addComponent(wexCorrectionsRecordedOutputLabel))
+            .addContainerGap())
+      );
+
+      mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
+
       addWindowListener(new WindowAdapter(){
          @Override
          public void windowClosed(final WindowEvent e){
@@ -1209,11 +1255,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap())
       );
 
-      mainTabbedPane.setEnabledAt(0, false);
-      mainTabbedPane.setEnabledAt(1, false);
-      mainTabbedPane.setEnabledAt(2, false);
-      mainTabbedPane.setEnabledAt(3, false);
-      mainTabbedPane.setEnabledAt(4, false);
+		for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
+      	mainTabbedPane.setEnabledAt(i, false);
       KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -1940,7 +1983,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			filCreatePackageMenuItem.setEnabled(true);
 			filFontMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
-			final int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
 
@@ -1976,6 +2019,25 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
 				updateCorrectionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
+			}
+
+
+			//sentence exceptions file:
+			//TODO
+//			if(backbone.getSexParser().getSentenceExceptionsCounter() > 0){
+//				updateSentenceExceptionsCounter();
+//				final List<String> sentenceExceptions = backbone.getSexParser().getSentenceExceptionsDictionary();
+//				sexTextArea.setText(String.join(", ", sentenceExceptions));
+//				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
+//			}
+
+
+			//word exceptions file:
+			if(backbone.getWexParser().getWordExceptionsCounter() > 0){
+				final List<String> wordExceptions = backbone.getWexParser().getWordExceptionsDictionary();
+				wexTextArea.setText(String.join(", ", wordExceptions));
+				updateWordExceptionsCounter();
+				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
 
 
@@ -2050,6 +2112,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		//auto–correct file:
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+
+
+		//sentence exceptions file:
+//		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+
+
+		//word exceptions file:
+		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
 
 	private void updateSynonymsCounter(){
@@ -2058,6 +2128,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void updateCorrectionsCounter(){
 		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getAcoParser().getCorrectionsCounter()));
+	}
+
+	private void updateSentenceExceptionsCounter(){
+		//TODO
+//		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getSentenceExceptions()));
+	}
+
+	private void updateWordExceptionsCounter(){
+		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getWexParser().getWordExceptionsCounter()));
 	}
 
 	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
@@ -2377,6 +2456,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	@Override
+	public void clearSentenceExceptionsParser(){
+//		sexTextArea.setText(null);
+//
+//		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+	}
+
+	@Override
+	public void clearWordExceptionsParser(){
+		wexTextArea.setText(null);
+
+		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+	}
+
+	@Override
 	public void clearAutoTextParser(){
 //		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
 //		dm.setCorrections(null);
@@ -2539,6 +2632,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
    private javax.swing.JTable theTable;
    private javax.swing.JButton theUndoButton;
+   private javax.swing.JLabel wexCorrectionsRecordedLabel;
+   private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLayeredPane wexLayeredPane;
+   private javax.swing.JScrollPane wexScrollPane;
+   private javax.swing.JTextArea wexTextArea;
    // End of variables declaration//GEN-END:variables
 
 }

@@ -59,7 +59,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 			backbone.openAffixFile(affixFileURI);
 
-			setProgress(14);
+			setProgress(11);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -67,14 +67,14 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File hypFile = backbone.getHyphenationFile();
 			backbone.openHyphenationFile(hypFile);
 
-			setProgress(29);
+			setProgress(22);
 
 			while(paused.get())
 				Thread.sleep(500l);
 
 			backbone.getCorrectnessChecker();
 
-			setProgress(43);
+			setProgress(33);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -82,7 +82,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File dicFile = backbone.getDictionaryFile();
 			backbone.prepareDictionaryFile(dicFile);
 
-			setProgress(57);
+			setProgress(44);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -90,7 +90,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File aidFile = backbone.getAidFile();
 			backbone.openAidFile(aidFile);
 
-			setProgress(71);
+			setProgress(56);
 
 			while(paused.get())
 				Thread.sleep(500l);
@@ -98,13 +98,29 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final File theDataFile = backbone.getThesaurusDataFile();
 			backbone.openThesaurusFile(theDataFile);
 
-			setProgress(86);
+			setProgress(67);
 
 			while(paused.get())
 				Thread.sleep(500l);
 
 			final File acoFile = backbone.getAutoCorrectFile();
 			backbone.openAutoCorrectFile(acoFile);
+
+			setProgress(78);
+
+			while(paused.get())
+				Thread.sleep(500l);
+
+			final File sexFile = backbone.getSentenceExceptionsFile();
+			backbone.openSentenceExceptionsFile(sexFile);
+
+			setProgress(88);
+
+			while(paused.get())
+				Thread.sleep(500l);
+
+			final File wexFile = backbone.getWordExceptionsFile();
+			backbone.openWordExceptionsFile(wexFile);
 
 			setProgress(100);
 

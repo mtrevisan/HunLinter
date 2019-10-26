@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +35,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
+import unit731.hunspeller.parsers.wordexceptions.WordExceptionsParser;
 import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
@@ -72,6 +72,8 @@ public class Backbone implements FileChangeListener{
 	private WordGenerator wordGenerator;
 
 	private final AutoCorrectParser acoParser;
+//	private final SentenceExceptionsParser sexParser;
+	private final WordExceptionsParser wexParser;
 
 	private Packager packager;
 
@@ -84,6 +86,8 @@ public class Backbone implements FileChangeListener{
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		acoParser = new AutoCorrectParser();
+//		sexParser = new SentenceExceptionsParser();
+		wexParser = new WordExceptionsParser();
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -117,6 +121,15 @@ public class Backbone implements FileChangeListener{
 		return acoParser;
 	}
 
+	//TODO
+//	public SentenceExceptionsParser getSexParser(){
+//		return sexParser;
+//	}
+
+	public WordExceptionsParser getWexParser(){
+		return wexParser;
+	}
+
 	public DictionaryCorrectnessChecker getChecker(){
 		return checker;
 	}
@@ -146,6 +159,12 @@ public class Backbone implements FileChangeListener{
 
 		final File acoFile = getAutoCorrectFile();
 		openAutoCorrectFile(acoFile);
+
+		final File sexFile = getSentenceExceptionsFile();
+		openSentenceExceptionsFile(sexFile);
+
+		final File wexFile = getWordExceptionsFile();
+		openWordExceptionsFile(wexFile);
 	}
 
 	/* NOTE: used for testing purposes */
@@ -168,6 +187,12 @@ public class Backbone implements FileChangeListener{
 
 		final File acoFile = getAutoCorrectFile();
 		openAutoCorrectFile(acoFile);
+
+		final File sexFile = getSentenceExceptionsFile();
+		openSentenceExceptionsFile(sexFile);
+
+		final File wexFile = getWordExceptionsFile();
+		openWordExceptionsFile(wexFile);
 	}
 
 	public void clear(){
@@ -304,6 +329,37 @@ public class Backbone implements FileChangeListener{
 			acoParser.clear();
 	}
 
+	public void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
+		//TODO
+//		if(sexFile != null && sexFile.exists()){
+//			LOGGER.info(MARKER_APPLICATION, "Opening SentenceExceptions file: {}", sexFile.getName());
+//
+//			sexParser.parse(sexFile);
+//
+//			if(hunspellable != null)
+//				hunspellable.clearSentenceExceptionsParser();
+//
+//			LOGGER.info(MARKER_APPLICATION, "Finished reading SentenceExceptions file");
+//		}
+//		else
+//			sexParser.clear();
+	}
+
+	public void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
+		if(wexFile != null && wexFile.exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening WordExceptions file: {}", wexFile.getName());
+
+			wexParser.parse(wexFile);
+
+			if(hunspellable != null)
+				hunspellable.clearWordExceptionsParser();
+
+			LOGGER.info(MARKER_APPLICATION, "Finished reading WordExceptions file");
+		}
+		else
+			wexParser.clear();
+	}
+
 
 	public void storeHyphenationFile() throws IOException{
 		final File hypFile = getHyphenationFile();
@@ -362,6 +418,14 @@ public class Backbone implements FileChangeListener{
 		return packager.getAutoCorrectFile();
 	}
 
+	public File getSentenceExceptionsFile(){
+		return packager.getSentenceExceptionsFile();
+	}
+
+	public File getWordExceptionsFile(){
+		return packager.getWordExceptionsFile();
+	}
+
 	public File getAutoTextFile(){
 		return packager.getAutoTextFile();
 	}
@@ -390,6 +454,19 @@ public class Backbone implements FileChangeListener{
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAutoCorrectParser);
 		}
+		else if(isSentenceExceptionsFile(absolutePath)){
+			//TODO
+//			sexParser.clear();
+//
+//			Optional.ofNullable(hunspellable)
+//				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
+		}
+		else if(isWordExceptionsFile(absolutePath)){
+			wexParser.clear();
+
+			Optional.ofNullable(hunspellable)
+				.ifPresent(Hunspellable::clearWordExceptionsParser);
+		}
 //		else if(isAutoTextFile(absolutePath)){
 //			atxParser.clear();
 //
@@ -416,6 +493,14 @@ public class Backbone implements FileChangeListener{
 
 	private boolean isAutoCorrectFile(final String path){
 		return path.equals(packager.getAutoCorrectFile().getAbsolutePath());
+	}
+
+	private boolean isSentenceExceptionsFile(final String path){
+		return path.equals(packager.getSentenceExceptionsFile().getAbsolutePath());
+	}
+
+	private boolean isWordExceptionsFile(final String path){
+		return path.equals(packager.getWordExceptionsFile().getAbsolutePath());
 	}
 
 	private boolean isAutoTextFile(final String path){

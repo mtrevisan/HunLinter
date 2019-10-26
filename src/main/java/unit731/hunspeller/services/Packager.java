@@ -66,6 +66,8 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
 	private static final String FILENAME_AUTO_CORRECT = "DocumentList.xml";
+	private static final String FILENAME_SENTENCE_EXCEPTIONS = "SentenceExceptList.xml";
+	private static final String FILENAME_WORD_EXCEPTIONS = "WordExceptList.xml";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
 	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
@@ -200,7 +202,15 @@ public class Packager{
 	}
 
 	public File getAutoCorrectFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+		return configurationFiles.get(FILENAME_AUTO_CORRECT);
+	}
+
+	public File getSentenceExceptionsFile(){
+		return configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+	}
+
+	public File getWordExceptionsFile(){
+		return configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
 	}
 
 	public File getAutoTextFile(){
@@ -307,10 +317,13 @@ public class Packager{
 						final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
 						final File file = absolutizeFolder(folder, basePath, originPath);
 						final String nodeValue = node.getNodeValue();
-						if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue))
-							children.put(node.getNodeValue(), Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
+						if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
+							children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
+							children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
+							children.put(FILENAME_WORD_EXCEPTIONS, Path.of(file.toString(), FILENAME_WORD_EXCEPTIONS).toFile());
+						}
 						else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue))
-							children.put(node.getNodeValue(), Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
+							children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
 						else
 							LOGGER.info("Unknown configuration name: {}", nodeValue);
 					}

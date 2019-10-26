@@ -17,6 +17,10 @@ public interface Hunspellable{
 
 	void clearAutoCorrectParser();
 
+	void clearSentenceExceptionsParser();
+
+	void clearWordExceptionsParser();
+
 	void clearAutoTextParser();
 
 }
