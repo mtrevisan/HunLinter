@@ -309,8 +309,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
-      theMenu = new javax.swing.JMenu();
-      theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
@@ -1132,23 +1130,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainMenuBar.add(dicMenu);
 
-      theMenu.setMnemonic('T');
-      theMenu.setText("Thesaurus tools");
-      theMenu.setToolTipText("");
-      theMenu.setEnabled(false);
-
-      theFindDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
-      theFindDuplicatesMenuItem.setMnemonic('d');
-      theFindDuplicatesMenuItem.setText("Find duplicates");
-      theFindDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theFindDuplicatesMenuItemActionPerformed(evt);
-         }
-      });
-      theMenu.add(theFindDuplicatesMenuItem);
-
-      mainMenuBar.add(theMenu);
-
       hypMenu.setMnemonic('H');
       hypMenu.setText("Hyphenation tools");
       hypMenu.setToolTipText("");
@@ -1388,15 +1369,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
 	}
-
-   private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		final ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
-		GUIUtils.addCancelByEscapeKey(dialog);
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-   }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void filterThesaurus(HunspellerFrame frame){
 		final String unmodifiedSearchText = StringUtils.strip(frame.theMeaningsTextField.getText());
@@ -1992,7 +1964,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
-				theMenu.setEnabled(true);
 				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
@@ -2004,8 +1975,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
 				updateCorrectionsCounter();
-				//FIXME
-//				acoMenu.setEnabled(true);
 				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 			}
 
@@ -2076,13 +2045,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		//thesaurus file:
-		theMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 
 		//auto–correct file:
-		//FIXME
-//		acoMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
@@ -2399,7 +2365,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.setSynonyms(null);
 
-		theMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 
@@ -2408,8 +2373,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 		dm.setCorrections(null);
 
-		//FIXME
-//		acoMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
@@ -2567,11 +2530,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JButton theAddButton;
-   private javax.swing.JMenuItem theFindDuplicatesMenuItem;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;
    private javax.swing.JTextField theMeaningsTextField;
-   private javax.swing.JMenu theMenu;
    private javax.swing.JButton theRedoButton;
    private javax.swing.JScrollPane theScrollPane;
    private javax.swing.JLabel theSynonymsRecordedLabel;

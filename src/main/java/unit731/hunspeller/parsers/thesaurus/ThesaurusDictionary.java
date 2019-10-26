@@ -131,7 +131,8 @@ public class ThesaurusDictionary{
 		return dictionary.get(meaning);
 	}
 
-	public List<String> extractDuplicates(){
+	/** Extracts a list of synonyms that are duplicated */
+	public List<String> extractDuplicatedSynonyms(){
 		final Set<String> allItems = new HashSet<>();
 		return synonyms.stream()
 			.map(ThesaurusEntry::getSynonym)

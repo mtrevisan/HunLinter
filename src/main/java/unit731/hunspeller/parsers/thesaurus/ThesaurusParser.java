@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -155,6 +156,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				if(!line.isEmpty())
 					dictionary.add(new ThesaurusEntry(line, br));
 		}
+
+		validate();
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
@@ -165,6 +168,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			throw new EOFException("Unexpected EOF while reading Thesaurus file");
 
 		return line;
+	}
+
+	private void validate(){
+		final List<String> duplicatedSynonyms = dictionary.extractDuplicatedSynonyms();
+		for(final String duplicatedSynonym : duplicatedSynonyms)
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated synonym in thesaurus: '{}'", duplicatedSynonym);
 	}
 
 	public int getSynonymsCounter(){
@@ -285,10 +294,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			for(int i = 0; i < count; i ++)
 				dictionary.remove(selectedRowIDs[i] - i);
 		}
-	}
-
-	public List<String> extractDuplicates(){
-		return dictionary.extractDuplicates();
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
