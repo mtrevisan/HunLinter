@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,8 +30,8 @@ import unit731.hunspeller.parsers.dictionary.Duplicate;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
@@ -276,7 +276,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						.collect(Collectors.joining(", ", " (", "): "));
 					writer.write(origin);
 					writer.write(entries.stream()
-						.map(duplicate -> 
+						.map(duplicate ->
 							String.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
 						)

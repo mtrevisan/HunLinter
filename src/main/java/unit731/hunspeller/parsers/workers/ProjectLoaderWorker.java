@@ -1,6 +1,6 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
-import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectFileNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 
 

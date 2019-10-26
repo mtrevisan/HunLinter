@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 

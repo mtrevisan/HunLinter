@@ -24,7 +24,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
+import unit731.hunspeller.parsers.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
@@ -166,7 +166,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		else{
 			//add boundary affixes
 			productions = applyAffixRules(p, false, null);
-			
+
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
 				removeTwofolds(productions);
@@ -186,15 +186,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		StringHelper.Casing lastWordCasing = null;
 		for(int i = 0; i < indexes.length; i ++){
 			final Production next = entry.get(i).get(indexes[i]);
-			
+
 			//skip forbidden words
 			if(next.hasContinuationFlag(forbiddenWordFlag)){
 				sb.setLength(0);
 				break;
 			}
-			
+
 			compoundEntries.add(next);
-			
+
 			String nextCompound = next.getWord();
 			if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
 				//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
@@ -211,13 +211,13 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(lastWordCasing == null)
 					lastWordCasing = StringHelper.classifyCasing(sb.toString());
 				final StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
-				
+
 				final char lastChar = sb.charAt(sb.length() - 1);
 				nextCompound = enforceNextCompoundCase(lastChar, nextCompound, lastWordCasing, nextWordCasing);
-				
+
 				lastWordCasing = nextWordCasing;
 			}
-			
+
 			sb.append(nextCompound);
 		}
 		return compoundEntries;

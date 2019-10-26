@@ -1,8 +1,8 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +18,7 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 

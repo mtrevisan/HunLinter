@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers.core;
+package unit731.hunspeller.parsers.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -89,19 +89,19 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		final long totalSize = dicFile.length();
 		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = ParserHelper.extractLine(br);
-			
+
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
-			
+
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
-			
+
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;
-				
+
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty())
 					lines.add(Pair.of(br.getLineNumber(), line));
-				
+
 				setProgress(getProgress(readSoFar, totalSize));
 			}
 		}
@@ -213,8 +213,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 						throw e;
 				}
 			}
-			
-			
+
+
 			watch.stop();
 
 			setProgress(100);
@@ -233,10 +233,10 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			final String message = ExceptionHelper.getMessage(e);
 			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 		}
-		
+
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
 		LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Stopped processing Dictionary file");
-		
+
 		cancel(true);
 	}
 

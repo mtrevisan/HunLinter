@@ -1,8 +1,8 @@
-package unit731.hunspeller.parsers.dictionary.workers.exceptions;
+package unit731.hunspeller.parsers.workers.exceptions;
 
 
 public class ProjectFileNotFoundException extends Exception{
-	
+
 	private static final long serialVersionUID = 3943841591851856914L;
 
 

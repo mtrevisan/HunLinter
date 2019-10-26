@@ -27,7 +27,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.workers.RulesReducerWorker;
+import unit731.hunspeller.parsers.workers.RulesReducerWorker;
 import unit731.hunspeller.services.ApplicationLogAppender;
 
 
