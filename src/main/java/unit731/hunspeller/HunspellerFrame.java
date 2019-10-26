@@ -1838,6 +1838,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             formerFilterCorrectText = null;
             acoIncorrectTextField.setText(null);
             acoCorrectTextField.setText(null);
+            acoAddButton.setEnabled(false);
             acoIncorrectTextField.requestFocusInWindow();
             @SuppressWarnings("unchecked")
             TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
@@ -2088,6 +2089,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
 
+			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
+				mainTabbedPane.setSelectedIndex(0);
+
 
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
@@ -2119,8 +2123,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void loadFileCancelled(final Exception exc){
-		mainTabbedPane.setSelectedIndex(0);
-
 		filOpenAFFMenuItem.setEnabled(true);
 		if(exc != null && (exc instanceof ProjectFileNotFoundException))
 			//remove the file from the recent files menu

@@ -188,8 +188,8 @@ public class AutoCorrectParser{
 		for(final CorrectionEntry correction : dictionary){
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
-			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getEscapedIncorrectForm());
-			elem.setAttribute(AUTO_CORRECT_CORRECT_FORM, correction.getEscapedCorrectForm());
+			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getIncorrectForm());
+			elem.setAttribute(AUTO_CORRECT_CORRECT_FORM, correction.getCorrectForm());
 			root.appendChild(elem);
 		}
 

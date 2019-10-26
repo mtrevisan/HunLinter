@@ -203,9 +203,7 @@ public class Backbone implements FileChangeListener{
 	public void registerFileListener(){
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
-		final File acoFile = getAutoCorrectFile();
-
-		final String[] uris = Stream.of(affFile, hypFile, aidFile, acoFile)
+		final String[] uris = Stream.of(affFile, hypFile, aidFile)
 			.filter(Objects::nonNull)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
