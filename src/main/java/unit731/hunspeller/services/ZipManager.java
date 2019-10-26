@@ -23,12 +23,13 @@ import java.util.zip.ZipOutputStream;
 
 public class ZipManager{
 
-	public void zipDirectory(final Path dir, final int compressionLevel, final String zipFilename) throws IOException{
-		zipDirectory(dir, compressionLevel, zipFilename, new Path[0]);
+	public void zipDirectory(final Path dir, final int compressionLevel, final File zipFile) throws IOException{
+		zipDirectory(dir, compressionLevel, zipFile, new Path[0]);
 	}
 
-	public void zipDirectory(final Path dir, final int compressionLevel, final String zipFilename, Path... excludeFolderBut) throws IOException{
-		Files.deleteIfExists((new File(zipFilename)).toPath());
+	public void zipDirectory(final Path dir, final int compressionLevel, final File zipFile, Path... excludeFolderBut)
+			throws IOException{
+		Files.deleteIfExists(zipFile.toPath());
 
 		final List<String> folders = extractFilesList(dir);
 		excludeFolderBut = Arrays.stream(excludeFolderBut)
@@ -38,7 +39,7 @@ public class ZipManager{
 
 		//zip files one by one
 		final int startIndex = dir.toFile().getAbsolutePath().length() + 1;
-		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
+		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))){
 			zos.setLevel(compressionLevel);
 
 			for(final String filePath : filesListInDir){
@@ -90,13 +91,14 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	public static void zipFile(final File file, final int compressionLevel, final String zipFilename) throws IOException{
-		zipStream(new FileInputStream(file), file.getName(), compressionLevel, zipFilename);
+	public static void zipFile(final File file, final int compressionLevel, final File zipFile) throws IOException{
+		zipStream(new FileInputStream(file), file.getName(), compressionLevel, zipFile);
 	}
 
-	public static void zipStream(final InputStream entry, final String entryName, final int compressionLevel, final String zipFilename) throws IOException{
+	public static void zipStream(final InputStream entry, final String entryName, final int compressionLevel, final File zipFile)
+			throws IOException{
 		//create ZipOutputStream to write to the zip file
-		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
+		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))){
 			zos.setLevel(compressionLevel);
 
 			//add a new Zip Entry to the ZipOutputStream

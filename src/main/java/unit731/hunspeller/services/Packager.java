@@ -148,27 +148,30 @@ public class Packager{
 				final File autoCorrectFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
 				if(autoCorrectFile != null){
 					//zip directory into .dat
-					final String autoCorrectOutputFilename = autoCorrectFile.getParent() + File.separator
-						+ FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
-					autoCorrectOutputPath = Path.of(autoCorrectOutputFilename);
-					ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputFilename);
+					autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
+						FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
+					ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
 				}
 				Path autoTextOutputPath = null;
 				final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 				if(autoTextFile != null){
 					//zip directory into .bau
-					final String autoTextOutputFilename = autoTextFile.getParent() + File.separator
-						+ FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
-					autoTextOutputPath = Path.of(autoTextOutputFilename);
-					ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputFilename);
+					autoTextOutputPath = Path.of(autoTextFile.getParent(),
+						FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
+					ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
 				}
 
-				final String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1)
-					+ EXTENSION_ZIP;
+				final File outputFile = new File(basePath.toString() + File.separator
+					+ basePath.getName(basePath.getNameCount() - 1) + EXTENSION_ZIP);
 				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 				//that are not autoCorrectOutputFilename or autoTextOutputFilename
-				ZIPPER.zipDirectory(basePath, Deflater.BEST_COMPRESSION, outputFilename,
-					autoCorrectOutputPath, autoTextOutputPath);
+				ZIPPER.zipDirectory(basePath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
+
+				//remove created sub-packages
+				if(autoCorrectOutputPath != null)
+					Files.delete(autoCorrectOutputPath);
+				if(autoTextOutputPath != null)
+					Files.delete(autoTextOutputPath);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
