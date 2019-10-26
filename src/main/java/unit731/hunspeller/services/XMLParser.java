@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 
 
 public class XMLParser{
@@ -64,6 +65,8 @@ public class XMLParser{
 		final StreamResult streamResult = new StreamResult(xmlFile);
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+		//escape HTML entities
+		transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.US_ASCII.name());
 		transformer.transform(domSource, streamResult);
 	}
 

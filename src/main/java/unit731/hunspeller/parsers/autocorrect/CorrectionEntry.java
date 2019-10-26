@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.autocorrect;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.Objects;
 
@@ -26,22 +25,9 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 		return incorrectForm;
 	}
 
-//	public String getEscapedIncorrectForm(){
-//		return escape(incorrectForm);
-//	}
-
 	public String getCorrectForm(){
 		return correctForm;
 	}
-
-//	public String getEscapedCorrectForm(){
-//		return escape(correctForm);
-//	}
-
-	/** Escape HTML entities as Unicode Hex */
-//	private String escape(final String text){
-//		return StringEscapeUtils.escapeHtml4(text);
-//	}
 
 	@Override
 	public String toString(){
