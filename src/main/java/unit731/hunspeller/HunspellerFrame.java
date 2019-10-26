@@ -2023,13 +2023,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//sentence exceptions file:
-			//TODO
-//			if(backbone.getSexParser().getSentenceExceptionsCounter() > 0){
-//				updateSentenceExceptionsCounter();
-//				final List<String> sentenceExceptions = backbone.getSexParser().getSentenceExceptionsDictionary();
-//				sexTextArea.setText(String.join(", ", sentenceExceptions));
-//				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
-//			}
+			if(backbone.getSexParser().getSentenceExceptionsCounter() > 0){
+				updateSentenceExceptionsCounter();
+				final List<String> sentenceExceptions = backbone.getSexParser().getSentenceExceptionsDictionary();
+				sexTextArea.setText(String.join(", ", sentenceExceptions));
+				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
+			}
 
 
 			//word exceptions file:
@@ -2115,7 +2114,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		//sentence exceptions file:
-//		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 
 
 		//word exceptions file:
@@ -2131,8 +2130,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void updateSentenceExceptionsCounter(){
-		//TODO
-//		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getSentenceExceptions()));
+		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getSentenceExceptionsCounter()));
 	}
 
 	private void updateWordExceptionsCounter(){
@@ -2457,9 +2455,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-//		sexTextArea.setText(null);
-//
-//		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		sexTextArea.setText(null);
+
+		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
 
 	@Override

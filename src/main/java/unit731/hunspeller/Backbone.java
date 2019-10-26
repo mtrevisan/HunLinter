@@ -34,6 +34,7 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunspeller.parsers.sentenceexceptions.SentenceExceptionsParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.wordexceptions.WordExceptionsParser;
 import unit731.hunspeller.services.Packager;
@@ -72,7 +73,7 @@ public class Backbone implements FileChangeListener{
 	private WordGenerator wordGenerator;
 
 	private final AutoCorrectParser acoParser;
-//	private final SentenceExceptionsParser sexParser;
+	private final SentenceExceptionsParser sexParser;
 	private final WordExceptionsParser wexParser;
 
 	private Packager packager;
@@ -86,7 +87,7 @@ public class Backbone implements FileChangeListener{
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		acoParser = new AutoCorrectParser();
-//		sexParser = new SentenceExceptionsParser();
+		sexParser = new SentenceExceptionsParser();
 		wexParser = new WordExceptionsParser();
 
 		this.hunspellable = hunspellable;
@@ -121,10 +122,9 @@ public class Backbone implements FileChangeListener{
 		return acoParser;
 	}
 
-	//TODO
-//	public SentenceExceptionsParser getSexParser(){
-//		return sexParser;
-//	}
+	public SentenceExceptionsParser getSexParser(){
+		return sexParser;
+	}
 
 	public WordExceptionsParser getWexParser(){
 		return wexParser;
@@ -330,19 +330,18 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
-		//TODO
-//		if(sexFile != null && sexFile.exists()){
-//			LOGGER.info(MARKER_APPLICATION, "Opening SentenceExceptions file: {}", sexFile.getName());
-//
-//			sexParser.parse(sexFile);
-//
-//			if(hunspellable != null)
-//				hunspellable.clearSentenceExceptionsParser();
-//
-//			LOGGER.info(MARKER_APPLICATION, "Finished reading SentenceExceptions file");
-//		}
-//		else
-//			sexParser.clear();
+		if(sexFile != null && sexFile.exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening SentenceExceptions file: {}", sexFile.getName());
+
+			sexParser.parse(sexFile);
+
+			if(hunspellable != null)
+				hunspellable.clearSentenceExceptionsParser();
+
+			LOGGER.info(MARKER_APPLICATION, "Finished reading SentenceExceptions file");
+		}
+		else
+			sexParser.clear();
 	}
 
 	public void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
@@ -455,11 +454,10 @@ public class Backbone implements FileChangeListener{
 				.ifPresent(Hunspellable::clearAutoCorrectParser);
 		}
 		else if(isSentenceExceptionsFile(absolutePath)){
-			//TODO
-//			sexParser.clear();
-//
-//			Optional.ofNullable(hunspellable)
-//				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
+			sexParser.clear();
+
+			Optional.ofNullable(hunspellable)
+				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
 		}
 		else if(isWordExceptionsFile(absolutePath)){
 			wexParser.clear();
