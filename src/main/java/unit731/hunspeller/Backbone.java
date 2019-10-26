@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +71,7 @@ public class Backbone implements FileChangeListener{
 	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
 
-	private AutoCorrectParser acoParser;
+	private final AutoCorrectParser acoParser;
 
 	private Packager packager;
 
@@ -180,7 +181,7 @@ public class Backbone implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File acoFile = getAutoCorrectFile();
 
-		final String[] uris = Arrays.asList(affFile, hypFile, aidFile, acoFile).stream()
+		final String[] uris = Stream.of(affFile, hypFile, aidFile, acoFile)
 			.filter(Objects::nonNull)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);

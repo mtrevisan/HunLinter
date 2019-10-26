@@ -21,7 +21,7 @@ import java.util.Arrays;
 /**
  * An implementation of {@link BitArray} that uses a memory-mapped file to persist all changes synchronously for the underlying
  * bit array. This is useful for stateful bit-arrays which are expensive to construct yet need the best overall performance.
- * 
+ *
  * NOTE: for some reason this class does not work!!
  */
 public class MemoryMappedFileBitArray implements BitArray{
@@ -144,7 +144,8 @@ public class MemoryMappedFileBitArray implements BitArray{
 			try{
 				final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
 				//do not need to check for a specific class, we can call the Unsafe method with any buffer class
-				final MethodHandle unmapper = MethodHandles.lookup().findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
+				final MethodHandle unmapper = MethodHandles.lookup()
+					.findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
 				//fetch the unsafe instance and bind it to the virtual MethodHandle
 				final Field f = unsafeClass.getDeclaredField("theUnsafe");
 				f.setAccessible(true);

@@ -139,7 +139,8 @@ public class ExternalSorter{
 		//we don't want to open up much more than maxTemporaryFiles temporary files, better run out of memory first
 		long blockSize = sizeOfFile / maxTemporaryFiles + (sizeOfFile % maxTemporaryFiles == 0l? 0l: 1l);
 
-		//on the other hand, we don't want to create many temporary files for naught. If blocksize is smaller than half the free memory, grow it
+		//on the other hand, we don't want to create many temporary files for naught. If {@code blockSize} is smaller
+		//than half the free memory, grow it
 		if((blockSize << 1) < maxMemory)
 			blockSize = maxMemory >> 1;
 

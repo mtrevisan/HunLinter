@@ -336,9 +336,8 @@ public class HyphenationParser{
 		final String oldRule;
 		if(isCustomRule(rule)){
 			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
-			oldRule = customHyphenations.get(level).get(key);
-			if(oldRule == null)
-				customHyphenations.get(level).put(key, rule);
+			oldRule = customHyphenations.get(level)
+				.putIfAbsent(key, rule);
 		}
 		else{
 			final String key = getKeyFromData(rule);

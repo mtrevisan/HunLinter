@@ -10,8 +10,8 @@ import java.util.Objects;
 
 public class CorrectionEntry implements Comparable<CorrectionEntry>{
 
-	private String incorrectForm;
-	private String correctForm;
+	private final String incorrectForm;
+	private final String correctForm;
 
 
 	public CorrectionEntry(final String incorrectForm, final String correctForm){

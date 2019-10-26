@@ -98,7 +98,7 @@ public class WordMuncher{
 
 						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
 						if(baseProductionPartOfSpeech == null && partOfSpeech == null
-								|| baseProductionPartOfSpeech != null && partOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
+								|| baseProductionPartOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
 							originators.add(originatorEntry);
 					}
 				}

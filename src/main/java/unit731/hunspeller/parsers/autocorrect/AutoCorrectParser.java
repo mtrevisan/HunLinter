@@ -40,6 +40,7 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_INCORRECT_FORM = "block-list:abbreviated-name";
 	private static final String AUTO_CORRECT_CORRECT_FORM = "block-list:name";
 
+	@SuppressWarnings("unchecked")
 	private static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
 		Pair.of(OutputKeys.VERSION, "1.0"),
 		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
@@ -116,7 +117,7 @@ public class AutoCorrectParser{
 		if(duplicates.isEmpty() || forceInsertion)
 			dictionary.add(new CorrectionEntry(incorrect, correct));
 
-		return new DuplicationResult(duplicates, forceInsertion);
+		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	public void deleteCorrections(final int[] selectedRowIDs){

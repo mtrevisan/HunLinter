@@ -90,7 +90,7 @@ public class DictionaryParser{
 			.orElse(-1);
 	}
 
-	private final void calculateDictionaryBoundaries(){
+	private void calculateDictionaryBoundaries(){
 		try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
 			//skip line count
 			br.readLine();

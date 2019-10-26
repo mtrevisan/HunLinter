@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class Debouncer<T>{
 
-	private final ScheduledExecutorService sched = Executors.newScheduledThreadPool(1);
+	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 	private final ConcurrentHashMap<T, TimerTask> delayedMap = new ConcurrentHashMap<>();
 
 	private final Consumer<T> callback;
@@ -31,13 +31,13 @@ public class Debouncer<T>{
 		do{
 			prev = delayedMap.putIfAbsent(key, task);
 			if(prev == null)
-				sched.schedule(task, interval, TimeUnit.MILLISECONDS);
+				executorService.schedule(task, interval, TimeUnit.MILLISECONDS);
 		//exit only if new task was added to map, or existing task was extended successfully
 		}while(prev != null && !prev.extend());
 	}
 
 	public void terminate(){
-		sched.shutdownNow();
+		executorService.shutdownNow();
 	}
 
 	//The task that wakes up when the wait time elapses
@@ -71,7 +71,7 @@ public class Debouncer<T>{
 				long remaining = dueTime - System.currentTimeMillis();
 				//re-schedule task
 				if(remaining > 0)
-					sched.schedule(this, remaining, TimeUnit.MILLISECONDS);
+					executorService.schedule(this, remaining, TimeUnit.MILLISECONDS);
 				//mark as terminated and invoke callback
 				else{
 					dueTime = -1;

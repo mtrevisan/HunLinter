@@ -85,7 +85,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private final Consumer<Font> onSelection;
 
 	private Font previousFont;
-	private String sampleText;
+	private final String sampleText;
 
 
 	public JFontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
