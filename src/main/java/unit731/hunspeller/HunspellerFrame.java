@@ -1997,7 +1997,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 
 
-			//auto-correct file:
+			//auto–correct file:
 			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
 				addSorterToTable(acoTable, comparator, null);
 
@@ -2080,7 +2080,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 
-		//auto-correct file:
+		//auto–correct file:
 		//FIXME
 //		acoMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);

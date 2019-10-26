@@ -2,11 +2,14 @@ package unit731.hunspeller.parsers.autocorrect;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
 import unit731.hunspeller.services.XMLParser;
 
@@ -31,14 +34,17 @@ The autocorrect file contains 3 XML files:
 /** Manages pairs of mistyped words and their correct spelling */
 public class AutoCorrectParser{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
+
 	private static final MessageFormat BAD_INCORRECT_QUOTE = new MessageFormat("Incorrect form cannot contain apostrophes or double quotes: ''{0}''");
 	private static final MessageFormat BAD_CORRECT_QUOTE = new MessageFormat("Correct form cannot contain apostrophes or double quotes: ''{0}''");
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
-	private static final String AUTO_CORRECT_ROOT_ELEMENT = "block-list:block-list";
-	private static final String AUTO_CORRECT_BLOCK = "block-list:block";
-	private static final String AUTO_CORRECT_INCORRECT_FORM = "block-list:abbreviated-name";
-	private static final String AUTO_CORRECT_CORRECT_FORM = "block-list:name";
+	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
+	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
+	private static final String AUTO_CORRECT_BLOCK = AUTO_CORRECT_NAMESPACE + "block";
+	private static final String AUTO_CORRECT_INCORRECT_FORM = AUTO_CORRECT_NAMESPACE + "abbreviated-name";
+	private static final String AUTO_CORRECT_CORRECT_FORM = AUTO_CORRECT_NAMESPACE + "name";
 
 	@SuppressWarnings("unchecked")
 	private static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
@@ -53,7 +59,7 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoFile	The reference to the auto-correct file
+	 * @param acoFile	The reference to the auto–correct file
 	 * @throws IOException	If an I/O error occurs
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
@@ -77,6 +83,21 @@ public class AutoCorrectParser{
 						XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
 			}
 		}
+
+		validate();
+	}
+
+	private void validate(){
+		//check for duplications
+		final List<List<CorrectionEntry>> duplications = dictionary.stream()
+			.collect(Collectors.groupingBy(CorrectionEntry::getIncorrectForm))
+			.values().stream()
+			.filter(list -> list.size() > 1)
+			.collect(Collectors.toList());
+		for(final List<CorrectionEntry> duplication : duplications)
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in auto–correct file: incorrect form '{}', correct forms '{}'",
+				duplication.get(0).getIncorrectForm(),
+				duplication.stream().map(CorrectionEntry::getCorrectForm).collect(Collectors.toList()));
 	}
 
 	public List<CorrectionEntry> getCorrectionsDictionary(){
