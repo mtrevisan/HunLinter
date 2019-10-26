@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,22 +42,24 @@ public class GUIUtils{
 
 	public static Font chooseBestFont(final String languageSample){
 		Font bestFont = currentFont;
+		float height = 0.f;
 		if(!canCurrentFondDisplay(languageSample) && familyNamesAll.isEmpty()){
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 			final List<String> list = (!familyNamesMonospaced.isEmpty()? familyNamesMonospaced: familyNamesAll);
 			double width = 0.;
 			for(final String elem : list){
-				final Font currentFond = new Font(elem, Font.PLAIN, currentFont.getSize());
-				final double w = currentFond.getStringBounds(languageSample, FRC).getWidth();
+				final Font currentFont = new Font(elem, Font.PLAIN, GUIUtils.currentFont.getSize());
+				final Rectangle2D bounds = currentFont.getStringBounds(languageSample, FRC);
+				final double w = bounds.getWidth();
 				if(w > width){
-					bestFont = currentFond;
+					bestFont = currentFont;
 					width = w;
+					height = (float)bounds.getHeight();
 				}
 			}
-			return new Font(list.get(0), Font.PLAIN, currentFont.getSize());
 		}
-		return bestFont;
+		return (height != 0.f? bestFont.deriveFont(bestFont.getSize() * 17.f / height): bestFont);
 	}
 
 	public static void extractFonts(final String languageSample){

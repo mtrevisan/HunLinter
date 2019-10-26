@@ -30,7 +30,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final String affixFilePath, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
+	public ProjectLoaderWorker(final String affixFilePath, final Backbone backbone, final Runnable completed,
+			final Consumer<Exception> cancelled){
 		Objects.requireNonNull(affixFilePath);
 		Objects.requireNonNull(backbone);
 
@@ -150,6 +151,9 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 	public void cancel(){
 		cancel(true);
+
+		if(getCancelled() != null)
+			getCancelled().accept(exception);
 	}
 
 }

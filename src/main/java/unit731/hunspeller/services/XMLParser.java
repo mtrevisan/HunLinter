@@ -43,8 +43,8 @@ public class XMLParser{
 	}
 
 
-	public static Document parseXMLDocument(final Path manifestPath) throws SAXException, IOException{
-		final Document doc = DOCUMENT_BUILDER.parse(manifestPath.toFile());
+	public static Document parseXMLDocument(final Path path) throws SAXException, IOException{
+		final Document doc = DOCUMENT_BUILDER.parse(path.toFile());
 		doc.getDocumentElement().normalize();
 		return doc;
 	}

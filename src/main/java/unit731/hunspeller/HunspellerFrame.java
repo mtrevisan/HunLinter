@@ -1912,7 +1912,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		try{
 			final Path path = Path.of(filePath);
 			final String content = new String(Files.readAllBytes(path));
-			final String sample = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 1)[0];
+			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 3);
+			final String sample = extractions[0] + extractions[1] + extractions[2];
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
 		}
 		catch(final IOException ignored){}
@@ -2039,6 +2040,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void loadFileCancelled(final Exception exc){
+		filOpenAFFMenuItem.setEnabled(true);
 		if(exc instanceof ProjectFileNotFoundException)
 			//remove the file from the recent files menu
 			recentFilesMenu.removeEntry(((ProjectFileNotFoundException)exc).getPath());

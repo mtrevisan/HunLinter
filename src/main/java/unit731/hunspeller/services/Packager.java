@@ -86,27 +86,15 @@ public class Packager{
 					final Path pathsFolder = pair.getLeft().getParent();
 					final Node pathsNode = pair.getRight();
 					if(pathsNode != null){
-						final Map<String, String[]> relativeFolders = getFolders(pathsNode);
-						final Set<String> uniqueFolders = relativeFolders.values().stream()
-							.map(folder -> String.join(File.separator, folder))
+						configurationFolders.putAll(getFolders(pathsNode, manifestPath.getParent(), pathsFolder));
+						final Set<String> uniqueFolders = configurationFolders.values().stream()
+							.map(Path::toString)
 							.collect(Collectors.toSet());
-						if(relativeFolders.size() != uniqueFolders.size())
+						if(configurationFolders.size() != uniqueFolders.size())
 							throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-								+ StringUtils.join(relativeFolders));
+								+ StringUtils.join(configurationFolders));
 						if(uniqueFolders.stream().anyMatch(String::isEmpty))
 							throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-
-						final String basePathURI = pathsFolder.toString();
-						configurationFolders.putAll(relativeFolders.entrySet().stream()
-							.collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-								final Path path = Paths.get(basePathURI, entry.getValue());
-								try{
-									return Path.of(path.toFile().getCanonicalPath());
-								}
-								catch(final IOException e){
-									return null;
-								}
-							})));
 					}
 				}
 			}
@@ -166,12 +154,12 @@ public class Packager{
 		}
 	}
 
-	public Path getAutoCorrectPath(final File affFile){
+	public Path getAutoCorrectPath(){
 		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
 		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_CORRECT): null);
 	}
 
-	public Path getAutoTextPath(final File affFile){
+	public Path getAutoTextPath(){
 		final Path path = configurationFolders.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
 		return (path != null? Path.of(path.toString(), Backbone.FILENAME_AUTO_TEXT): null);
 	}
@@ -232,8 +220,8 @@ public class Packager{
 		return null;
 	}
 
-	private Map<String, String[]> getFolders(final Node parentNode){
-		final Map<String, String[]> children = new HashMap<>();
+	private Map<String, Path> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
+		final Map<String, Path> children = new HashMap<>();
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
@@ -241,12 +229,15 @@ public class Packager{
 				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null){
 					//extract folder
+					Path currentParentPath = basePath;
 					String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-					if(folder.startsWith(FOLDER_ORIGIN))
+					if(folder.startsWith(FOLDER_ORIGIN)){
 						folder = folder.substring(FOLDER_ORIGIN.length());
-					final String[] folders = folder.split(FOLDER_SPLITTER);
-
-					children.put(node.getNodeValue(), folders);
+						currentParentPath = originPath;
+					}
+					final Path truePath = Path.of(currentParentPath.toString(), folder.split(FOLDER_SPLITTER));
+					final Path path = Path.of(truePath.toFile().getCanonicalPath());
+					children.put(node.getNodeValue(), path);
 				}
 			}
 		}

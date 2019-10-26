@@ -361,7 +361,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public Path getAutoCorrectPath(){
-		return packager.getAutoCorrectPath(affFile);
+		return packager.getAutoCorrectPath();
 	}
 
 
