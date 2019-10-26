@@ -33,12 +33,12 @@ public class ExceptionsParser{
 	private static final String WORD_EXCEPTIONS_WORD = AUTO_CORRECT_NAMESPACE + "abbreviated-name";
 
 
-	private final String filename;
+	private final String configurationFilename;
 	private final List<String> dictionary = new ArrayList<>();
 
 
-	public ExceptionsParser(final String filename){
-		this.filename = filename;
+	public ExceptionsParser(final String configurationFilename){
+		this.configurationFilename = configurationFilename;
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new IllegalArgumentException("Invalid root element in file " + filename
+			throw new IllegalArgumentException("Invalid root element in file " + configurationFilename
 				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
 		final NodeList entries = rootElement.getChildNodes();
@@ -79,7 +79,7 @@ public class ExceptionsParser{
 			.filter(list -> list.size() > 1)
 			.collect(Collectors.toList());
 		for(final List<String> duplication : duplications)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", filename, duplication);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
 	}
 
 	public List<String> getExceptionsDictionary(){
