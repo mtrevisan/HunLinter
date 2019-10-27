@@ -6,8 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
@@ -19,11 +21,11 @@ class WordGeneratorCompoundFlagTest{
 	private final Backbone backbone = new Backbone(null, null);
 
 
-	private void loadData(String affixFilePath) throws IOException{
+	private void loadData(String affixFilePath) throws IOException, SAXException{
 		backbone.loadFile(affixFilePath);
 	}
 
-	private void loadData(String affixFilePath, String dictionaryFilePath) throws IOException{
+	private void loadData(String affixFilePath, String dictionaryFilePath) throws IOException, SAXException{
 		backbone.loadFile(affixFilePath, dictionaryFilePath);
 	}
 
@@ -33,7 +35,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void simple() throws IOException{
+	void simple() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -65,7 +67,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void compoundMinLength() throws IOException{
+	void compoundMinLength() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -90,7 +92,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void checkCompoundTriple() throws IOException{
+	void checkCompoundTriple() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -123,7 +125,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void simplifiedTriple() throws IOException{
+	void simplifiedTriple() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -148,7 +150,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void forbidWordDuplication() throws IOException{
+	void forbidWordDuplication() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -176,7 +178,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void withAffixes() throws IOException{
+	void withAffixes() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -188,7 +190,8 @@ class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -229,7 +232,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void withAffixesOnefold() throws IOException{
+	void withAffixesOnefold() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -243,7 +246,8 @@ class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -286,7 +290,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void withAffixesTwofold() throws IOException{
+	void withAffixesTwofold() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -301,7 +305,8 @@ class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -352,7 +357,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void permitFlag() throws IOException{
+	void permitFlag() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -365,7 +370,8 @@ class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -454,7 +460,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void forbidFlag() throws IOException{
+	void forbidFlag() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -467,7 +473,8 @@ class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -496,7 +503,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void checkCompoundCase() throws IOException{
+	void checkCompoundCase() throws IOException, SAXException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
@@ -600,7 +607,7 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	void compoundReplacement() throws IOException{
+	void compoundReplacement() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -664,7 +671,7 @@ class WordGeneratorCompoundFlagTest{
 
 
 	@Test
-	void forbiddenWord() throws IOException{
+	void forbiddenWord() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -706,7 +713,7 @@ class WordGeneratorCompoundFlagTest{
 
 
 	@Test
-	void forceUppercase() throws IOException{
+	void forceUppercase() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

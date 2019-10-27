@@ -1,5 +1,6 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,15 +14,18 @@ import unit731.hunspeller.parsers.dictionary.LineEntry;
 import unit731.hunspeller.parsers.dictionary.RulesReducer;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 
 
 public class RulesReducerWorker extends WorkerDictionaryBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
+
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}'', cannot reduce");
 
 	public static final String WORKER_NAME = "Rules reducer";
 
@@ -39,14 +43,15 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> originalRules = new ArrayList<>();
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(!filteredRules.isEmpty()){

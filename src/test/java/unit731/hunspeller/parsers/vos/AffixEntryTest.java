@@ -136,7 +136,7 @@ class AffixEntryTest{
 
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
 			() -> entry.applyRule("man", false));
-		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word 'man' without the FULLSTRIP option", exception.getMessage());
 }
 
 	@Test

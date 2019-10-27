@@ -1,10 +1,11 @@
-package unit731.hunspeller.parsers.dictionary.workers.core;
+package unit731.hunspeller.parsers.workers.core;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import javax.swing.*;
 
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.vos.Production;
 
 
 public abstract class WorkerDictionaryBase{
@@ -86,17 +88,24 @@ public abstract class WorkerDictionaryBase{
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel(true);
 
-			if(cancelTask != null)
-				cancelTask.run();
+			Optional.ofNullable(cancelTask)
+				.ifPresent(Runnable::run);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
 		}
 		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 			worker.resume();
 
-			if(resumeTask != null)
-				resumeTask.run();
+			Optional.ofNullable(resumeTask)
+				.ifPresent(Runnable::run);
 		}
+	}
+
+	protected IllegalArgumentException wrapException(final Exception e, final Production production){
+		final StringBuffer sb = new StringBuffer(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		return new IllegalArgumentException(sb.toString());
 	}
 
 }

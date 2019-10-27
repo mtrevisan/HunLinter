@@ -22,11 +22,12 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.workers.RulesReducerWorker;
+import unit731.hunspeller.parsers.workers.RulesReducerWorker;
 import unit731.hunspeller.services.ApplicationLogAppender;
 
 
@@ -52,6 +53,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		initComponents();
 
+		final Font font = GUIUtils.getCurrentFont();
+		currentSetTextArea.setFont(font);
+		reducedSetTextArea.setFont(font);
 
 		init();
 
@@ -169,11 +173,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(final Font font){
-		currentSetTextArea.setFont(font);
-		reducedSetTextArea.setFont(font);
-	}
-
 	private void init(){
 		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -262,14 +261,14 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			mainProgressBar.setValue(0);
 
 			try{
-				String flag = getSelectedFlag();
-				boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
+				final String flag = getSelectedFlag();
+				final boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
 				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
 					backbone.getWordGenerator());
 				rulesReducerWorker.addPropertyChangeListener(this);
 				rulesReducerWorker.execute();
 			}
-			catch(Exception e){
+			catch(final Exception e){
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 
@@ -287,11 +286,13 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		return optimizeClosedGroupCheckBox.isSelected();
 	}
 
-	private void writeObject(ObjectOutputStream os) throws IOException{
+	@SuppressWarnings("unused")
+	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException{
+	@SuppressWarnings("unused")
+	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

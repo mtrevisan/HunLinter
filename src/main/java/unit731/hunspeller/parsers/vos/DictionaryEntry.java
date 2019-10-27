@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +30,9 @@ import unit731.hunspeller.services.PatternHelper;
 
 public class DictionaryEntry{
 
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line ''{0}''");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
+
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
@@ -47,6 +51,14 @@ public class DictionaryEntry{
 
 
 	public static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData){
+		return createFromDictionaryLine(line, affixData, true);
+	}
+
+	public static DictionaryEntry createFromDictionaryLineNoStemTag(final String line, final AffixData affixData){
+		return createFromDictionaryLine(line, affixData, false);
+	}
+
+	private static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData, final boolean addStemTag){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
@@ -56,24 +68,19 @@ public class DictionaryEntry{
 
 		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{line}));
 
 		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-		final String dicFlags = m.group(PARAM_FLAGS);
-		final String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
+		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
+		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
 		final DictionaryEntry dicEntry = new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 
 		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 		return dicEntry;
-	}
-
-	public static DictionaryEntry clone(final DictionaryEntry dicEntry){
-		return new DictionaryEntry(dicEntry);
 	}
 
 	protected DictionaryEntry(final DictionaryEntry dicEntry){
@@ -94,7 +101,7 @@ public class DictionaryEntry{
 		this.combinable = combinable;
 	}
 
-	private static String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
+	private static String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
@@ -109,15 +116,15 @@ public class DictionaryEntry{
 		return containsStem;
 	}
 
-	public static String extractWord(final String line){
-		Objects.requireNonNull(line);
-
-		final Matcher m = PATTERN_ENTRY.matcher(line);
-		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
-
-		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-	}
+//	public static String extractWord(final String line){
+//		Objects.requireNonNull(line);
+//
+//		final Matcher m = PATTERN_ENTRY.matcher(line);
+//		if(!m.find())
+//			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
+//
+//		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+//	}
 
 	public String getWord(){
 		return word;
@@ -176,10 +183,19 @@ public class DictionaryEntry{
 	/**
 	 * Get last applied rule of type {@code type}
 	 *
-	 * @param type	The type used to filter the last applied rule
-	 * @return	The last applied rule of the specified type
+	 * @param type    The type used to filter the last applied rule
+	 * @return    The last applied rule of the specified type
 	 */
 	public AffixEntry getLastAppliedRule(final AffixType type){
+		return null;
+	}
+
+	/**
+	 * Get last applied rule
+	 *
+	 * @return    The last applied rule of the specified type
+	 */
+	public AffixEntry getLastAppliedRule(){
 		return null;
 	}
 
@@ -240,11 +256,6 @@ public class DictionaryEntry{
 				fun.accept(morphologicalField);
 	}
 
-	public void removeAffixes(final AffixData affixData){
-		final Affixes affixes = separateAffixes(affixData);
-		continuationFlags = affixes.getTerminalAffixes();
-	}
-
 	/**
 	 * @param affixData	Affix data
 	 * @param reverse	Whether the complex prefixes is used
@@ -280,8 +291,7 @@ public class DictionaryEntry{
 
 					final List<AffixEntry> appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
-						StringUtils.EMPTY));
+					throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
 				if(rule instanceof RuleEntry){

@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -8,6 +8,7 @@ import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,20 +26,22 @@ import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.ParserHelper;
-import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MinimalPairsWorker.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 	public static final String WORKER_NAME = "Minimal pairs extraction";
 
@@ -75,7 +78,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
-			watch = TimeWatch.start();
+			watch.reset();
 
 			setProgress(0);
 			final Charset charset = getCharset();
@@ -89,7 +92,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				long readSoFar = line.getBytes(charset).length + 2;
 
 				if(!NumberUtils.isCreatable(line))
-					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 				int lineIndex = 1;
 				final long totalSize = dicFile.length();
@@ -100,7 +103,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					line = ParserHelper.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							final List<Production> productions = wordGenerator.applyAffixRules(line);
+							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 							for(final Production production : productions)
 								if(checker.shouldBeProcessedForMinimalPair(production)){

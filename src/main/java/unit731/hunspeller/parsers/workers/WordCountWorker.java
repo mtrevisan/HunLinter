@@ -1,7 +1,9 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
+import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -13,22 +15,22 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 
 
-public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
+public class WordCountWorker extends WorkerDictionaryBase{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryInclusionTestWorker.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
 
-	public static final String WORKER_NAME = "Dictionary inclusion test";
+	public static final String WORKER_NAME = "Word count";
 
+	private final AtomicInteger totalProductions = new AtomicInteger(0);
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public DictionaryInclusionTestWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		Objects.requireNonNull(language);
+	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
@@ -36,9 +38,12 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
-			productions.forEach(production -> dictionary.add(production.getWord()));
+			totalProductions.addAndGet(productions.size());
+			for(Production production : productions)
+				dictionary.add(production.getWord());
 		};
 		final Runnable completed = () -> {
 			dictionary.close();
@@ -46,6 +51,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 			final int totalUniqueProductions = dictionary.getAddedElements();
 			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
 			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
@@ -65,11 +71,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 
 	@Override
 	public void clear(){
+		totalProductions.set(0);
 		dictionary.clear();
-	}
-
-	public boolean isInDictionary(final String word){
-		return dictionary.contains(word);
 	}
 
 }

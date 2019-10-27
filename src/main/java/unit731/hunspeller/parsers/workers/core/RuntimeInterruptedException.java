@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers.core;
+package unit731.hunspeller.parsers.workers.core;
 
 
 public class RuntimeInterruptedException extends RuntimeException{

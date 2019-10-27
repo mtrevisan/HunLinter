@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.vos.AffixEntry;
@@ -38,6 +40,9 @@ import unit731.hunspeller.services.StringHelper;
 public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
+
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}'', cannot reduce");
+	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from ''{0}'', expected {1}, obtained {1}");
 
 	private static final String PIPE = "|";
 
@@ -630,7 +635,7 @@ public class RulesReducer{
 			throws IllegalArgumentException{
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
@@ -678,7 +683,7 @@ public class RulesReducer{
 			throws IllegalArgumentException{
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final List<AffixEntry> entries = reducedRules.stream()
 			.skip(1)
@@ -687,14 +692,14 @@ public class RulesReducer{
 		final AffixType type = ruleToBeReduced.getType();
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
-			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
-			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final List<Production> originalProductions = wordGenerator.applyAffixRules(dicEntry);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
-				throw new IllegalArgumentException("Something very bad occurs while producing from '" + line + "', expected "
-					+ filteredOriginalRules + ", obtained " + filteredRules);
+				throw new IllegalArgumentException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
 		}
 	}
 

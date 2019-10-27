@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.thesaurus;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,10 @@ import unit731.hunspeller.services.PatternHelper;
 public class ThesaurusDictionary{
 
 	public static final Pattern PATTERN_PART_OF_SPEECH = PatternHelper.pattern("\\s*\\([^)]+\\)");
+
+	private static final String LIST_SEPARATOR = ", ";
+	private static final String PART_OF_SPEECH_START = "(";
+	private static final String PART_OF_SPEECH_END = ")";
 
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
@@ -43,10 +48,10 @@ public class ThesaurusDictionary{
 			dictionary.put(synonym.getSynonym(), synonym);
 	}
 
-	public boolean add(final String partOfSpeech, final List<String> meanings){
+	public boolean add(final String[] partOfSpeeches, final List<String> meanings){
 		boolean result = false;
 		for(String meaning : meanings){
-			final MeaningEntry meaningEntry = extractPartOfSpeechAndMeanings(partOfSpeech, meanings, meaning);
+			final MeaningEntry meaningEntry = extractPartOfSpeechAndMeanings(partOfSpeeches, meanings, meaning);
 
 			meaning = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			final ThesaurusEntry foundSynonym = findByMeaning(meaning);
@@ -68,9 +73,9 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private MeaningEntry extractPartOfSpeechAndMeanings(final String partOfSpeech, final List<String> meanings, final String meaning){
+	private MeaningEntry extractPartOfSpeechAndMeanings(final String[] partOfSpeeches, final List<String> meanings, final String meaning){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
-		sj.add(partOfSpeech);
+		sj.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END)));
 		meanings.stream()
 			.filter(m -> !m.equals(meaning))
 			.forEachOrdered(sj::add);
@@ -126,7 +131,8 @@ public class ThesaurusDictionary{
 		return dictionary.get(meaning);
 	}
 
-	public List<String> extractDuplicates(){
+	/** Extracts a list of synonyms that are duplicated */
+	public List<String> extractDuplicatedSynonyms(){
 		final Set<String> allItems = new HashSet<>();
 		return synonyms.stream()
 			.map(ThesaurusEntry::getSynonym)

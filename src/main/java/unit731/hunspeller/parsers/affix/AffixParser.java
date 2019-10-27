@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,6 +45,9 @@ import unit731.hunspeller.services.PatternHelper;
  *			CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
  */
 public class AffixParser{
+
+	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non–comment line in the affix file must be a 'SET charset', was: ''{0}''");
+	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1}");
 
 	private static final String NO_LANGUAGE = "xxx";
 
@@ -158,7 +162,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
-					throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+					throw new IllegalArgumentException(BAD_FIRST_LINE.format(new Object[]{line}));
 				else
 					encodingRead = true;
 
@@ -170,7 +174,7 @@ public class AffixParser{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(final RuntimeException e){
-						throw new IllegalArgumentException(e.getMessage() + ", line " + br.getLineNumber());
+						throw new IllegalArgumentException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
 					}
 				}
 			}

@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
+import unit731.hunspeller.parsers.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
@@ -38,11 +37,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS
 		= new EnumMap<>(StringHelper.Casing.class);
 	static{
-		Set<StringHelper.Casing> lowerOrTitleCase = SetHelper.setOf(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
+		final Set<StringHelper.Casing> lowerOrTitleCase = SetHelper.setOf(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
 			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.LOWER_CASE, lowerOrTitleCase);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.TITLE_CASE, lowerOrTitleCase);
-		Set<StringHelper.Casing> allCaps = SetHelper.setOf(StringHelper.Casing.LOWER_CASE, StringHelper.Casing.TITLE_CASE,
+		final Set<StringHelper.Casing> allCaps = SetHelper.setOf(StringHelper.Casing.LOWER_CASE, StringHelper.Casing.TITLE_CASE,
 			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.ALL_CAPS, allCaps);
 	}
@@ -167,7 +166,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		else{
 			//add boundary affixes
 			productions = applyAffixRules(p, false, null);
-			
+
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
 				removeTwofolds(productions);
@@ -187,15 +186,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		StringHelper.Casing lastWordCasing = null;
 		for(int i = 0; i < indexes.length; i ++){
 			final Production next = entry.get(i).get(indexes[i]);
-			
+
 			//skip forbidden words
 			if(next.hasContinuationFlag(forbiddenWordFlag)){
 				sb.setLength(0);
 				break;
 			}
-			
+
 			compoundEntries.add(next);
-			
+
 			String nextCompound = next.getWord();
 			if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
 				//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
@@ -212,13 +211,13 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(lastWordCasing == null)
 					lastWordCasing = StringHelper.classifyCasing(sb.toString());
 				final StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
-				
+
 				final char lastChar = sb.charAt(sb.length() - 1);
 				nextCompound = enforceNextCompoundCase(lastChar, nextCompound, lastWordCasing, nextWordCasing);
-				
+
 				lastWordCasing = nextWordCasing;
 			}
-			
+
 			sb.append(nextCompound);
 		}
 		return compoundEntries;
@@ -264,13 +263,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private void removeTwofolds(final List<Production> prods){
-		final Iterator<Production> itr = prods.iterator();
-		while(itr.hasNext())
-			if(itr.next().isTwofolded())
-				itr.remove();
+		prods.removeIf(Production::isTwofolded);
 	}
 
-	//is word a non-compound with a REP substitution (see checkcompoundrep)?
+	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
 		boolean exists = compoundAsReplacement.stream()
 			.anyMatch(word::contains);

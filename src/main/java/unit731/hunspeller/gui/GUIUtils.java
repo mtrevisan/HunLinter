@@ -7,8 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -22,10 +27,80 @@ public class GUIUtils{
 
 	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
+	private static final String GRAPHEME_I = "i";
+	private static final String GRAPHEME_M = "m";
+	private static final FontRenderContext FRC = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT,
+		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+
+	private static String languageSample;
+	private static final List<String> familyNamesAll = new ArrayList<>();
+	private static final List<String> familyNamesMonospaced = new ArrayList<>();
 	private static Font currentFont = JFontChooserDialog.getDefaultFont();
 
 
 	private GUIUtils(){}
+
+	public static Font chooseBestFont(final String languageSample){
+		Font bestFont = currentFont;
+		float height = 0.f;
+		if(!canCurrentFondDisplay(languageSample) && familyNamesAll.isEmpty()){
+			//check to see if the error can be visualized, if not, change the font to one that can
+			extractFonts(languageSample);
+			final List<String> list = (!familyNamesMonospaced.isEmpty()? familyNamesMonospaced: familyNamesAll);
+			double width = 0.;
+			for(final String elem : list){
+				final Font currentFont = new Font(elem, Font.PLAIN, GUIUtils.currentFont.getSize());
+				final Rectangle2D bounds = currentFont.getStringBounds(languageSample, FRC);
+				final double w = bounds.getWidth();
+				if(w > width){
+					bestFont = currentFont;
+					width = w;
+					height = (float)bounds.getHeight();
+				}
+			}
+		}
+		return (height != 0.f? bestFont.deriveFont((float)Math.round(bestFont.getSize() * 17.f / height)): bestFont);
+	}
+
+	public static void extractFonts(final String languageSample){
+		Objects.requireNonNull(languageSample);
+
+		if(!languageSample.equals(GUIUtils.languageSample)){
+			GUIUtils.languageSample = languageSample;
+
+			familyNamesAll.clear();
+			familyNamesMonospaced.clear();
+
+			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getAvailableFontFamilyNames();
+			for(final String familyName : familyNames){
+				final Font font = new Font(familyName, Font.PLAIN, 20);
+				if(font.canDisplayUpTo(languageSample) < 0){
+					familyNamesAll.add(familyName);
+					if(isMonospaced(font))
+						familyNamesMonospaced.add(familyName);
+				}
+			}
+		}
+	}
+
+	public static boolean canCurrentFondDisplay(final String languageSample){
+		return (currentFont.canDisplayUpTo(languageSample) < 0);
+	}
+
+	private static boolean isMonospaced(final Font font){
+		final double iWidth = font.getStringBounds(GRAPHEME_I, FRC).getWidth();
+		final double mWidth = font.getStringBounds(GRAPHEME_M, FRC).getWidth();
+		return (Math.abs(iWidth - mWidth) <= 1);
+	}
+
+	public static List<String> getFamilyNamesAll(){
+		return familyNamesAll;
+	}
+
+	public static List<String> getFamilyNamesMonospaced(){
+		return familyNamesMonospaced;
+	}
 
 	public static Font getCurrentFont(){
 		return currentFont;
@@ -53,8 +128,8 @@ public class GUIUtils{
 			if(component instanceof JEditorPane)
 				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-			if(component instanceof JTextArea || component instanceof JTextField || component instanceof JTable
-					|| component instanceof JWordLabel)
+			if(component instanceof JTextArea || component instanceof JComboBox || component instanceof JTextField
+					|| component instanceof JTable || component instanceof JWordLabel)
 				component.setFont(font);
 		}
 	}

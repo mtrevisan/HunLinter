@@ -34,7 +34,7 @@ class AffixParserTest{
 
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
 			() -> affParser.parse(affFile));
-		Assertions.assertEquals("Repeated flags in multiple options", exception.getMessage());
+		Assertions.assertEquals("Same flags present in multiple options", exception.getMessage());
 	}
 
 }

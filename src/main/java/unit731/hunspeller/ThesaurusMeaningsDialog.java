@@ -11,14 +11,15 @@ import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
 public class ThesaurusMeaningsDialog extends JDialog{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusMeaningsDialog.class);
-
 	private static final long serialVersionUID = 667526009330291911L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusMeaningsDialog.class);
 
 
 	private final ThesaurusEntry synonym;
@@ -34,6 +35,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
+		meaningsTextArea.setFont(GUIUtils.getCurrentFont());
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
@@ -122,16 +124,12 @@ public class ThesaurusMeaningsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(final Font font){
-		meaningsTextArea.setFont(font);
-	}
-
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{
-			String text = meaningsTextArea.getText();
+			final String text = meaningsTextArea.getText();
 			okButtonAction.accept(text);
 		}
-		catch(IllegalArgumentException e){
+		catch(final IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
 		}
 
@@ -142,11 +140,13 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		dispose();
    }//GEN-LAST:event_btnCancelActionPerformed
 
-	private void writeObject(ObjectOutputStream os) throws IOException{
+	@SuppressWarnings("unused")
+	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException{
+	@SuppressWarnings("unused")
+	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

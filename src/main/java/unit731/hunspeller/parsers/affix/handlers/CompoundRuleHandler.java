@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,14 @@ import unit731.hunspeller.services.ParserHelper;
 
 
 public class CompoundRuleHandler implements Handler{
+
+	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': mismatched compound rule type (expected {1})");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line ''{0}'': duplicated line");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': compound rule type cannot be empty");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line ''{0}'': compound rule is bad formatted");
+
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
@@ -34,17 +43,15 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
-						+ ": mismatched compound rule type (expected " + AffixOption.COMPOUND_RULE + ")");
+					throw new IllegalArgumentException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
 				final String rule = lineParts[1];
 
-				checkRuleValidity(rule, line, i, strategy);
+				checkRuleValidity(rule, line, strategy);
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
-						+ ": duplicated line");
+					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
@@ -56,21 +63,19 @@ public class CompoundRuleHandler implements Handler{
 
 	private void checkValidity(final ParsingContext context) throws IllegalArgumentException{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException("Error reading line '" + context + "': The first parameter is not a number");
+			throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
-			throw new IllegalArgumentException("Error reading line '" + context + "': Bad number of entries, it must be a positive integer");
+			throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 	}
 
-	private void checkRuleValidity(final String rule, final String line, final int i, final FlagParsingStrategy strategy)
+	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy)
 			throws IllegalArgumentException{
 		if(StringUtils.isBlank(rule))
-			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
-				+ ": compound rule type cannot be empty");
+			throw new IllegalArgumentException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
-				+ ": compound rule is bad formatted");
+			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{line}));
 	}
 	
 }

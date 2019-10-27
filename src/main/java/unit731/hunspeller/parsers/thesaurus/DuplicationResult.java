@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class DuplicationResult{
+public class DuplicationResult<T>{
 
-	private final List<ThesaurusEntry> duplicates;
+	private final List<T> duplicates;
 	private final boolean forceInsertion;
 
 
-	public DuplicationResult(final List<ThesaurusEntry> duplicates, final boolean forceInsertion){
+	public DuplicationResult(final List<T> duplicates, final boolean forceInsertion){
 		Objects.requireNonNull(duplicates);
 
 		this.duplicates = duplicates;
 		this.forceInsertion = forceInsertion;
 	}
 
-	public List<ThesaurusEntry> getDuplicates(){
+	public List<T> getDuplicates(){
 		return duplicates;
 	}
 

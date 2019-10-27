@@ -1,19 +1,17 @@
 package unit731.hunspeller.languages;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,22 +105,16 @@ public class RulesLoader{
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		final List<String> values = new ArrayList<>();
-		@SuppressWarnings("unchecked")
-		final Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
-		for(final String k : keys)
-			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
-				final String line = readProperty(k);
-				if(StringUtils.isNotEmpty(line))
-					values.addAll(Arrays.asList(StringUtils.split(line, separator)));
-			}
-		return values.iterator();
+		return rulesProperties.keySet().stream()
+			.map(String.class::cast)
+			.filter(k -> k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length())))
+			.map(this::readProperty)
+			.filter(StringUtils::isNotEmpty)
+			.flatMap(line -> Arrays.stream(StringUtils.split(line, separator)))
+			.collect(Collectors.toList())
+			.iterator();
 	}
 
-
-	public Properties getRulesProperties(){
-		return rulesProperties;
-	}
 
 	public boolean isMorphologicalFieldsCheck(){
 		return morphologicalFieldsCheck;
@@ -161,17 +153,17 @@ public class RulesLoader{
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Production production) throws IllegalArgumentException{
-		for(final Map.Entry<String, Set<LetterMatcherEntry>> check : letterAndRulesNotCombinable.entrySet())
-			if(StringUtils.containsAny(production.getWord(), check.getKey()))
-				for(final LetterMatcherEntry entry : check.getValue())
-					entry.match(production);
+		letterAndRulesNotCombinable.entrySet().stream()
+			.filter(check -> StringUtils.containsAny(production.getWord(), check.getKey()))
+			.flatMap(check -> check.getValue().stream())
+			.forEach(entry -> entry.match(production));
 	}
 
 	public void flagToFlagIncompatibilityCheck(final Production production) throws IllegalArgumentException{
-		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
-			if(production.hasContinuationFlag(check.getKey()))
-				for(final RuleMatcherEntry entry : check.getValue())
-					entry.match(production);
+		ruleAndRulesNotCombinable.entrySet().stream()
+			.filter(check -> production.hasContinuationFlag(check.getKey()))
+			.flatMap(check -> check.getValue().stream())
+			.forEach(entry -> entry.match(production));
 	}
 
 }

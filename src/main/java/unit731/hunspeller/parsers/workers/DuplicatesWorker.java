@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,18 +27,21 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.Duplicate;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
-import unit731.hunspeller.services.TimeWatch;
 
 
 public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 
 	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
@@ -103,7 +107,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplicates extraction (pass 1/3)");
 
-			watch = TimeWatch.start();
+			watch.reset();
 
 			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
@@ -156,7 +160,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			long readSoFar = line.getBytes(charset).length + 2;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
@@ -166,7 +170,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						final List<Production> productions = wordGenerator.applyAffixRules(line);
+						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 						productions.stream()
 							.map(Production::toStringWithPartOfSpeechFields)
@@ -220,8 +225,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					line = ParserHelper.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							final List<Production> productions = wordGenerator.applyAffixRules(line);
-							final String word = productions.get(0).getWord();
+							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
 							for(final Production production : productions){
 								final String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
@@ -265,10 +271,12 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			setProgress(getProgress(1., totalSize + 1));
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
-					writer.write(entries.get(0).getProduction().toStringWithPartOfSpeechFields());
-					writer.write(": ");
+					final Production prod = entries.get(0).getProduction();
+					final String origin = prod.getWord() + prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
+						.collect(Collectors.joining(", ", " (", "): "));
+					writer.write(origin);
 					writer.write(entries.stream()
-						.map(duplicate -> 
+						.map(duplicate ->
 							String.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
 						)

@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +23,14 @@ import unit731.hunspeller.services.PatternHelper;
 
 
 public class AffixEntry{
+
+	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0}");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
+	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part does not ends with removal part: ''{0}''");
+	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part does not starts with removal part: ''{0}''");
+	//warning
+	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");
+	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word ''{0}'' without the FULLSTRIP option");
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
@@ -59,15 +68,14 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(line, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new IllegalArgumentException("Expected an affix entry, found something else"
-				+ (lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY));
+			throw new IllegalArgumentException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY)}));
 
 		final String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		final Matcher m = PATTERN_LINE.matcher(lineParts[3]);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse affix line '" + line + "'");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{line}));
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
@@ -95,15 +103,15 @@ public class AffixEntry{
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
-					throw new IllegalArgumentException("Condition part does not ends with removal part: '" + line + "'");
+					throw new IllegalArgumentException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					throw new IllegalArgumentException("Characters in common between removed and added part: '" + line + "'");
+					throw new IllegalArgumentException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 			else{
 				if(!cond.startsWith(removal))
-					throw new IllegalArgumentException("Condition part does not starts with removal part: '" + line + "'");
+					throw new IllegalArgumentException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					throw new IllegalArgumentException("Characters in common between removed and added part: '" + line + "'");
+					throw new IllegalArgumentException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 		}
 	}
@@ -116,15 +124,11 @@ public class AffixEntry{
 		return flag;
 	}
 
-	public AffixCondition getCondition(){
-		return condition;
-	}
-
 	public String getAppending(){
 		return appending;
 	}
 
-	private String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
+	private String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
@@ -146,8 +150,8 @@ public class AffixEntry{
 		return (size > 0? flags.toArray(String[]::new): null);
 	}
 
+	//FIXME is this documentation updated/true?
 	/**
-	 * FIXME is this documentation updated/true?
 	 *
 	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
@@ -167,30 +171,9 @@ public class AffixEntry{
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode()))
+			.filter(field -> (dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().affixType != affixType
+				|| !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())))
 //			.filter(field -> !overwritePartOfSpeech || !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
-			.collect(Collectors.toList());
-
-		//add morphological fields from the applied affix
-		mf.addAll((isSuffix()? mf.size(): 0), amf);
-
-		return mf.toArray(String[]::new);
-	}
-
-	//TODO
-	public String[] uncombineMorphologicalFields(final DictionaryEntry dicEntry){
-		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
-		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
-
-		//NOTE: part of speech seems to be preserved, both in simple application of an affix rule and of a compound rule
-		//		final boolean overwritePartOfSpeech = (dicEntry.getMorphologicalFieldPartOfSpeech() != null && amf.stream().anyMatch(f -> f.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())));
-		final boolean containsTerminalSuffixes = amf.stream()
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
-		//remove inflectional and terminal suffixes
-		mf = mf.stream()
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode()))
-			//			.filter(field -> !overwritePartOfSpeech || !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
@@ -226,7 +209,7 @@ public class AffixEntry{
 
 	public String applyRule(final String word, final boolean isFullstrip) throws IllegalArgumentException{
 		if(!isFullstrip && word.length() == removingLength)
-			throw new IllegalArgumentException("Cannot strip full words without the FULLSTRIP option");
+			throw new IllegalArgumentException(CANNOT_FULL_STRIP.format(new Object[]{word}));
 
 		return (isSuffix()?
 			word.substring(0, word.length() - removingLength) + appending:
@@ -234,7 +217,7 @@ public class AffixEntry{
 	}
 
 	//NOTE: {#canInverseApplyTo} should be called to verify applicability
-	public String undoRule(final String word) throws IllegalArgumentException{
+	public String undoRule(final String word){
 		return (isSuffix()?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));

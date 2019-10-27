@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,29 +30,20 @@ public class HyphenationBreak{
 
 
 	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
-	private final int size;
 
 
-	public static HyphenationBreak getEmptyInstance(){
-		return new HyphenationBreak(Collections.emptyMap(), 0);
-	}
-
-	public HyphenationBreak(Map<Integer, Pair<Integer, String>> indexesAndRules, int size){
+	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules){
 		Objects.requireNonNull(indexesAndRules);
 
 		this.indexesAndRules = indexesAndRules;
-		this.size = size;
 	}
 
-	public int getSize(){
-		return size;
-	}
 
-	public boolean isBreakpoint(int index){
+	public boolean isBreakpoint(final int index){
 		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getKey() % 2 != 0);
 	}
 
-	public String getRule(int index){
+	public String getRule(final int index){
 		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getValue();
 	}
 
@@ -63,16 +53,16 @@ public class HyphenationBreak{
 			.collect(Collectors.toList());
 	}
 
-	public void enforceNoHyphens(List<String> syllabes, Set<String> noHyphen){
+	public void enforceNoHyphens(final List<String> syllabes, final Set<String> noHyphen){
 		int syllabesCount = syllabes.size();
 		if(syllabesCount > 1){
-			int wordLength = syllabes.stream()
+			final int wordLength = syllabes.stream()
 				.map(String::length)
 				.mapToInt(x -> x)
 				.sum();
-			for(String nohyp : noHyphen){
-				String reducedKey = reduceKey(nohyp);
-				NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
+			for(final String nohyp : noHyphen){
+				final String reducedKey = reduceKey(nohyp);
+				final NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
 				syllabesCount = fun.manage(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);
 				if(syllabesCount <= 1)
 					break;
@@ -80,13 +70,13 @@ public class HyphenationBreak{
 		}
 	}
 
-	private static int manageInside(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength,
+	private static int manageInside(final Map<Integer, Pair<Integer, String>> indexesAndRules, final List<String> syllabes, final String nohyp, final int wordLength,
 			int syllabesCount){
-		int nohypLength = nohyp.length();
+		final int nohypLength = nohyp.length();
 
 		int index = 0;
 		for(int i = 0; syllabesCount > 1 && i < syllabesCount; i ++){
-			String syllabe = syllabes.get(i);
+			final String syllabe = syllabes.get(i);
 			
 			if(syllabe.equals(nohyp)){
 				indexesAndRules.remove(index);
@@ -94,7 +84,7 @@ public class HyphenationBreak{
 				
 				if(i == 0){
 					//merge syllabe with following
-					String removedSyllabe = syllabes.remove(0);
+					final String removedSyllabe = syllabes.remove(0);
 					syllabes.set(0, removedSyllabe + syllabes.get(0));
 					
 					syllabesCount --;
@@ -103,13 +93,13 @@ public class HyphenationBreak{
 					//merge syllabe with previous
 					syllabesCount --;
 
-					String removedSyllabe = syllabes.remove(syllabesCount);
+					final String removedSyllabe = syllabes.remove(syllabesCount);
 					syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
 				}
 				else{
 					//merge syllabe with previous
-					String removedSyllabe1 = syllabes.remove(i);
-					String removedSyllabe0 = syllabes.remove(i);
+					final String removedSyllabe1 = syllabes.remove(i);
+					final String removedSyllabe0 = syllabes.remove(i);
 					if(syllabes.isEmpty())
 						syllabes.add(removedSyllabe1 + removedSyllabe0);
 					else
@@ -126,7 +116,7 @@ public class HyphenationBreak{
 		return syllabesCount;
 	}
 
-	private static int manageStartsWith(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength,
+	private static int manageStartsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, final List<String> syllabes, final String nohyp, final int wordLength,
 			int syllabesCount){
 		if(syllabes.get(0).equals(nohyp.substring(1))){
 			indexesAndRules.remove(1);
@@ -134,7 +124,7 @@ public class HyphenationBreak{
 			
 			if(syllabesCount > 1){
 				//merge syllabe with following
-				String removedSyllabe = syllabes.remove(0);
+				final String removedSyllabe = syllabes.remove(0);
 				syllabes.set(0, removedSyllabe + syllabes.get(0));
 				
 				syllabesCount --;
@@ -143,7 +133,7 @@ public class HyphenationBreak{
 		return syllabesCount;
 	}
 
-	private static int manageEndsWith(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength,
+	private static int manageEndsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, final List<String> syllabes, final String nohyp, final int wordLength,
 			int syllabesCount){
 		int nohypLength = nohyp.length();
 		if(syllabes.get(syllabesCount - 1).equals(nohyp.substring(0, nohypLength - 1))){
@@ -154,14 +144,14 @@ public class HyphenationBreak{
 				//merge syllabe with previous
 				syllabesCount --;
 
-				String removedSyllabe = syllabes.remove(syllabesCount);
+				final String removedSyllabe = syllabes.remove(syllabesCount);
 				syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
 			}
 		}
 		return syllabesCount;
 	}
 
-	private static int manageWhole(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength,
+	private static int manageWhole(final Map<Integer, Pair<Integer, String>> indexesAndRules, final List<String> syllabes, String nohyp, final int wordLength,
 			int syllabesCount){
 		nohyp = nohyp.substring(1, nohyp.length() - 1);
 		return manageInside(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);

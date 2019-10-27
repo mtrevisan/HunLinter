@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -18,6 +19,13 @@ import unit731.hunspeller.services.ParserHelper;
 
 public class AffixHandler implements Handler{
 
+	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line ''{0}'': the third parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line");
+	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
+	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
+
+
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
@@ -26,7 +34,7 @@ public class AffixHandler implements Handler{
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The third parameter is not a number");
+				throw new IllegalArgumentException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
 			final List<AffixEntry> entries = readEntries(context, strategy, getData);
 
@@ -41,7 +49,7 @@ public class AffixHandler implements Handler{
 			final Function<AffixOption, List<String>> getData) throws IOException, IllegalArgumentException{
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
-			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
+			throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
 
 		final BufferedReader br = context.getReader();
 		final AffixType ruleType = AffixType.createFromCode(context.getRuleType());
@@ -53,18 +61,17 @@ public class AffixHandler implements Handler{
 		final List<String> aliasesMorphologicalField = getData.apply(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
-		try{
-			for(int i = 0; i < numEntries; i ++){
-				line = ParserHelper.extractLine(br);
+		for(int i = 0; i < numEntries; i ++){
+			line = ParserHelper.extractLine(br);
 
-				final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
+			final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
-				checkValidity(entry, ruleType, ruleFlag);
+			checkValidity(entry, ruleType, ruleFlag);
 
-				if(entries.contains(entry))
-					throw new IllegalArgumentException("duplicated line");
+			if(entries.contains(entry))
+				throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[0]));
 
-				final boolean inserted = entries.add(entry);
+			final boolean inserted = entries.add(entry);
 
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
@@ -76,19 +83,15 @@ public class AffixHandler implements Handler{
 //}
 //else
 //	prefixEntries.put(arr, lst);
-			}
-		}
-		catch(final IllegalArgumentException e){
-			throw new IllegalArgumentException("Reading error: " + e.getMessage());
 		}
 		return entries;
 	}
 
 	private void checkValidity(final AffixEntry entry, final AffixType ruleType, final String ruleFlag) throws IllegalArgumentException{
 		if(entry.getType() != ruleType)
-			throw new IllegalArgumentException("mismatched rule type (expected " + ruleType + ")");
+			throw new IllegalArgumentException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
 		if(!ruleFlag.equals(entry.getFlag()))
-			throw new IllegalArgumentException("mismatched rule flag (expected " + ruleFlag + ")");
+			throw new IllegalArgumentException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
 	}
 	
 }

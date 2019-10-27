@@ -9,9 +9,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -42,23 +42,37 @@ import unit731.hunspeller.services.PatternHelper;
  */
 public class HyphenationParser{
 
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Hyphenation data file malformed, the first line is not ''{0}''");
+	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
+	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
+	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
+	private static final MessageFormat GENERAL_EXCEPTION = new MessageFormat("{0}: {1}");
+	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule {0} has an invalid format");
+	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule {0} has no hyphenation point(s)");
+	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule {0} is invalid, the hyphenation point should not be adjacent to a dot");
+	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule {0} has not exactly one hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the index number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule {0} has the length number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule {0} has the length number that exceeds the length of the rule");
+	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern {0} already present as {1}");
+
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
-	public static final String HYPHEN = "\u2010";
-	public static final String HYPHEN_MINUS = "\u002D";
+//	private static final String HYPHEN = "\u2010";
+//	private static final String HYPHEN_MINUS = "\u002D";
 	public static final String MINUS_SIGN = "-";
 	public static final String HYPHEN_EQUALS = "=";
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
-	public static final String EM_DASH = "\u2014";
+//	private static final String EM_DASH = "\u2014";
 	public static final String APOSTROPHE = "ʼ";
 	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
 	 */
-	public static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
+//	private static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
 
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 
@@ -87,7 +101,7 @@ public class HyphenationParser{
 	public static final Pattern PATTERN_WORD_BOUNDARIES = PatternHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_EQUALS = PatternHelper.pattern(HYPHEN_EQUALS);
-	private static final Pattern PATTERN_KEY = PatternHelper.pattern("\\d|/.+$");
+	private static final Pattern PATTERN_KEY = PatternHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = PatternHelper.pattern("[^13579]|/.+$");
 
 	public static final Pattern PATTERN_REDUCE = PatternHelper.pattern("/.+$");
@@ -98,7 +112,7 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		for(Level level : Level.values())
+		for(final Level level : Level.values())
 			REDUCED_PATTERNS.put(level, new HashSet<>());
 	}
 
@@ -117,7 +131,7 @@ public class HyphenationParser{
 
 		this.comparator = comparator;
 
-		for(Level level : Level.values()){
+		for(final Level level : Level.values()){
 			rules.put(level, new HashMap<>());
 			customHyphenations.put(level, new HashMap<>());
 		}
@@ -132,11 +146,11 @@ public class HyphenationParser{
 		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		for(Level level : Level.values())
+		for(final Level level : Level.values())
 			this.patterns.put(level, patterns.get(level));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.emptyMap());
-		for(Level level : Level.values()){
-			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.emptyMap());
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new HashMap<>(0));
+		for(final Level level : Level.values()){
+			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
@@ -168,19 +182,19 @@ public class HyphenationParser{
 	 * @param hypFile	The content of the hyphenation file
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
-	public void parse(File hypFile) throws IllegalArgumentException{
+	public void parse(final File hypFile) throws IllegalArgumentException{
 		try{
 			clearInternal();
 
 			Level level = Level.NON_COMPOUND;
 
-			Path path = hypFile.toPath();
-			Charset charset = FileHelper.determineCharset(path);
-			try(LineNumberReader br = FileHelper.createReader(path, charset)){
+			final Path path = hypFile.toPath();
+			final Charset charset = FileHelper.determineCharset(path);
+			try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 				String line = extractLine(br);
 
 				if(Charset.forName(line) != charset)
-					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
+					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charset.name()}));
 
 				REDUCED_PATTERNS.get(level).clear();
 
@@ -189,31 +203,31 @@ public class HyphenationParser{
 					if(line.isEmpty())
 						continue;
 
-					boolean parsedLine = optParser.parseLine(line);
+					final boolean parsedLine = optParser.parseLine(line);
 					if(!parsedLine){
 						if(line.startsWith(NEXT_LEVEL)){
 							if(level == Level.COMPOUND)
-								throw new IllegalArgumentException("Cannot have more than two levels");
+								throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
 
 							//start with non–compound level
 							level = Level.COMPOUND;
 							secondLevelPresent = true;
 							REDUCED_PATTERNS.get(level).clear();
 						}
-						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-							String key = PatternHelper.clear(line, PATTERN_EQUALS);
+						else if(isCustomRule(line)){
+							final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 							if(customHyphenations.get(level).containsKey(key))
-								throw new IllegalArgumentException("Custom hyphenation '" + line + "' is already present");
+								throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
 							customHyphenations.get(level).put(key, line);
 						}
 						else{
 							validateRule(line, level);
 
-							String key = getKeyFromData(line);
-							boolean duplicatedRule = isRuleDuplicated(key, line, level);
+							final String key = getKeyFromData(line);
+							final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 							if(duplicatedRule)
-								throw new IllegalArgumentException("Duplicate found: '" + line + "'");
+								throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
 							else
 								//insert current pattern into the radix tree (remove all numbers)
 								rules.get(level)
@@ -224,7 +238,7 @@ public class HyphenationParser{
 
 				if(level == Level.NON_COMPOUND){
 					//dash and apostrophe are added by default (retro-compatibility)
-					List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
+					final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 					if(charset == StandardCharsets.UTF_8)
 						retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
@@ -232,7 +246,7 @@ public class HyphenationParser{
 
 					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
-					for(String noHyphen : retroCompatibilityNoHyphen){
+					for(final String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
 						if(!isRuleDuplicated(noHyphen, line, level))
 							rules.get(level)
@@ -242,41 +256,45 @@ public class HyphenationParser{
 			}
 
 			//build tries
-			for(Level l : Level.values())
+			for(final Level l : Level.values())
 				buildTrie(l, rules.get(l));
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
 		}
-		catch(Exception t){
-			String message = ExceptionHelper.getMessage(t);
-			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
+		catch(final Exception t){
+			final String message = ExceptionHelper.getMessage(t);
+			throw new IllegalArgumentException(GENERAL_EXCEPTION.format(new Object[]{t.getClass().getSimpleName(), message}));
 		}
 		finally{
-			for(Level level : Level.values())
+			for(final Level level : Level.values())
 				REDUCED_PATTERNS.get(level).clear();
 		}
 	}
 
 	private String extractLine(final LineNumberReader br) throws IOException{
-		String line = br.readLine();
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Hyphenation file");
 
 		return line;
 	}
 
-	public static boolean isAugmentedRule(String line){
+	public static boolean isAugmentedRule(final String line){
 		return line.contains(AUGMENTED_RULE);
 	}
 
-	private boolean isRuleDuplicated(String key, String line, Level level){
+	public static boolean isCustomRule(final String line){
+		return (!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS));
+	}
+
+	private boolean isRuleDuplicated(final String key, final String line, final Level level){
 		boolean duplicatedRule = false;
-		String foundNodeValue = rules.get(level)
+		final String foundNodeValue = rules.get(level)
 			.get(key);
 		if(foundNodeValue != null){
-			String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
-			String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
+			final String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
+			final String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
 		return duplicatedRule;
@@ -312,18 +330,25 @@ public class HyphenationParser{
 	 * @param level	Level to add the rule to
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
-	public String addRule(String rule, Level level){
+	public String addRule(final String rule, final Level level){
 		validateRule(rule, level);
 
-		String key = getKeyFromData(rule);
-		Map<String, String> rulesByLevel = rules.get(level);
-		String oldRule = rulesByLevel.get(key);
-		if(oldRule == null){
-			rulesByLevel.put(key, rule);
-
-			buildTrie(level, rulesByLevel);
+		final String oldRule;
+		if(isCustomRule(rule)){
+			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			oldRule = customHyphenations.get(level)
+				.putIfAbsent(key, rule);
 		}
+		else{
+			final String key = getKeyFromData(rule);
+			final Map<String, String> rulesByLevel = rules.get(level);
+			oldRule = rulesByLevel.get(key);
+			if(oldRule == null){
+				rulesByLevel.put(key, rule);
 
+				buildTrie(level, rulesByLevel);
+			}
+		}
 		return oldRule;
 	}
 
@@ -334,17 +359,26 @@ public class HyphenationParser{
 	 * @param level	Level to remove the rule from
 	 * @return <code>true</code> if the removal has completed successfully
 	 */
-	public boolean removeRule(String rule, Level level){
-		String key = getKeyFromData(rule);
-		Map<String, String> rulesByLevel = rules.get(level);
-		String oldRule = rulesByLevel.get(key);
-		if(oldRule != null)
-			buildTrie(level, rulesByLevel);
+	public boolean removeRule(final String rule, final Level level){
+		final String oldRule;
+		if(isCustomRule(rule)){
+			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			oldRule = customHyphenations.get(level).get(key);
+			if(oldRule != null)
+				customHyphenations.get(level).remove(key);
+		}
+		else{
+			final String key = getKeyFromData(rule);
+			final Map<String, String> rulesByLevel = rules.get(level);
+			oldRule = rulesByLevel.get(key);
+			if(oldRule != null)
+				buildTrie(level, rulesByLevel);
+		}
 		return (oldRule != null);
 	}
 
-	private void buildTrie(Level level, Map<String, String> rulesByLevel){
-		AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
+	private void buildTrie(final Level level, final Map<String, String> rulesByLevel){
+		final AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
 			.caseInsensitive()
 			.build(rulesByLevel);
 		patterns.put(level, trie);
@@ -356,56 +390,56 @@ public class HyphenationParser{
 	 * @param rule	Rule to be validated
 	 * @param level	Level to add the rule to
 	 */
-	public static void validateRule(String rule, Level level){
+	public static void validateRule(final String rule, final Level level){
 		validateBasicRules(rule);
 
 		String cleanedRule = rule;
-		int augmentedIndex = rule.indexOf('/');
+		final int augmentedIndex = rule.indexOf('/');
 		if(augmentedIndex >= 0){
 			cleanedRule = rule.substring(0, augmentedIndex);
 			validateAugmentedRule(cleanedRule, rule);
 		}
 
-		Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
+		final Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
 		ensureUniqueness(reducedPatterns, cleanedRule, rule);
-
-		reducedPatterns.add(cleanedRule);
 	}
 
-	private static void validateBasicRules(String rule) throws IllegalArgumentException{
+	private static void validateBasicRules(final String rule) throws IllegalArgumentException{
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
-			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
-		if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
-		if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
-			throw new IllegalArgumentException("Rule " + rule + " is invalid, the hyphenation point should not be adjacent to a dot");
-	}
-
-	private static void validateAugmentedRule(String cleanedRule, String rule) throws IllegalArgumentException{
-		int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
-		if(count != 1)
-			throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
-
-		String[] parts = StringUtils.split(rule, COMMA);
-		if(parts.length > 1){
-			int index = getIndexOfBreakpoint(rule);
-
-			int startIndex = extractStartIndex(parts);
-			if(startIndex < 0 || startIndex >= index)
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
-			int length = extractLength(parts);
-			if(length < 0 || startIndex + length < index)
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
-			if(startIndex + length >= parts[0].length())
-				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
+			throw new IllegalArgumentException(INVALID_RULE.format(new Object[]{rule}));
+		if(!rule.contains(HYPHEN_EQUALS)){
+			if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
+				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
+			if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
+				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
 		}
 	}
 
-	private static int extractStartIndex(String[] parts) throws NumberFormatException{
+	private static void validateAugmentedRule(final String cleanedRule, final String rule) throws IllegalArgumentException{
+		final int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
+		if(count != 1)
+			throw new IllegalArgumentException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
+
+		final String[] parts = StringUtils.split(rule, COMMA);
+		if(parts.length > 1){
+			final int index = getIndexOfBreakpoint(rule);
+
+			final int startIndex = extractStartIndex(parts);
+			if(startIndex < 0 || startIndex >= index)
+				throw new IllegalArgumentException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
+			final int length = extractLength(parts);
+			if(length < 0 || startIndex + length < index)
+				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
+			if(startIndex + length >= parts[0].length())
+				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
+		}
+	}
+
+	private static int extractStartIndex(final String[] parts) throws NumberFormatException{
 		return (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
 	}
 
-	private static int extractLength(String[] parts) throws NumberFormatException{
+	private static int extractLength(final String[] parts) throws NumberFormatException{
 		return (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
 	}
 
@@ -413,26 +447,26 @@ public class HyphenationParser{
 	 * A standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
 	 * (for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 	 */
-	private static void ensureUniqueness(Set<String> reducedPatterns, String cleanedRule, String rule) throws IllegalArgumentException{
+	private static void ensureUniqueness(final Set<String> reducedPatterns, final String cleanedRule, final String rule) throws IllegalArgumentException{
 		String alreadyPresentRule = null;
-		for(String pattern : reducedPatterns)
+		for(final String pattern : reducedPatterns)
 			if(pattern.contains(cleanedRule) || cleanedRule.contains(pattern)){
 				alreadyPresentRule = pattern;
 				break;
 			}
 		if(alreadyPresentRule != null)
-			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
+			throw new IllegalArgumentException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
 	}
 
-	public static int getIndexOfBreakpoint(String rule){
-		Matcher m = PATTERN_AUGMENTED_RULE_HYPHEN_INDEX.matcher(rule);
+	public static int getIndexOfBreakpoint(final String rule){
+		final Matcher m = PATTERN_AUGMENTED_RULE_HYPHEN_INDEX.matcher(rule);
 		m.find();
 		return m.start();
 	}
 
-	public void save(File hypFile) throws IOException{
-		Charset charset = StandardCharsets.UTF_8;
-		try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
+	public void save(final File hypFile) throws IOException{
+		final Charset charset = StandardCharsets.UTF_8;
+		try(final BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
 			writeln(writer, charset.name());
 
 			writer.newLine();
@@ -449,20 +483,20 @@ public class HyphenationParser{
 		}
 	}
 
-	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
-		List<String> patternsByLevel = new ArrayList<>(rules.get(level).values());
+	private void savePatternsByLevel(final BufferedWriter writer, final Level level) throws IOException{
+		final List<String> patternsByLevel = new ArrayList<>(rules.get(level).values());
 		patternsByLevel.sort(comparator);
-		for(String pattern : patternsByLevel)
+		for(final String pattern : patternsByLevel)
 			writeln(writer, pattern);
 
 		//write custom hyphenations
-		List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
+		final List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
 		customs.sort(comparator);
 		for(String rule : customs)
 			writeln(writer, rule);
 	}
 
-	private void writeln(BufferedWriter writer, String line) throws IOException{
+	private void writeln(final BufferedWriter writer, final String line) throws IOException{
 		writer.write(line);
 		writer.write(StringUtils.LF);
 	}
@@ -474,12 +508,13 @@ public class HyphenationParser{
 	 * @param level	The level to check the rule for
 	 * @return	Whether the hyphenator has the given rule
 	 */
-	public boolean hasRule(String rule, Level level){
-		String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsKey(key) || rules.get(level).get(key) != null);
+	public boolean hasRule(final String rule, final Level level){
+		return (isCustomRule(rule)?
+			customHyphenations.get(level).containsValue(rule):
+			rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
-	public static String getKeyFromData(String rule){
+	public static String getKeyFromData(final String rule){
 		return PatternHelper.clear(rule, PATTERN_KEY);
 	}
 

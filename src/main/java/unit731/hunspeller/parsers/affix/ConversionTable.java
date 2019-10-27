@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,13 @@ import unit731.hunspeller.services.ParserHelper;
 
 
 public class ConversionTable{
+
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': bad option, it must be {1}");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word ''{0}'', too many applicable rules");
+
 
 	@FunctionalInterface
 	public interface ConversionFunction{
@@ -42,20 +50,14 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public AffixOption getAffixOption(){
-		return affixOption;
-	}
-
 	public void parseConversionTable(final ParsingContext context){
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context
-					+ "\": The first parameter is not a number");
+				throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
@@ -77,11 +79,9 @@ public class ConversionTable{
 
 	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 3)
-			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad number of entries, it must be <option> <pattern-from> <pattern-to>");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!affixOption.getCode().equals(parts[0]))
-			throw new IllegalArgumentException("Error reading line \"" + context
-				+ ": Bad option, it must be " + affixOption.getCode());
+			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class ConversionTable{
 	public String applySingleConversionTable(final String word){
 		final List<String> conversions = applyConversionTable(word);
 		if(conversions.size() > 1)
-			throw new IllegalArgumentException("Cannot convert word " + word + ", too many applicable rules");
+			throw new IllegalArgumentException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
 
 		return (!conversions.isEmpty()? conversions.get(0): word);
 	}

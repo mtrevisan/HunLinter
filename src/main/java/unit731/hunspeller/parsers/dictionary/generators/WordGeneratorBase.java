@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +19,9 @@ import unit731.hunspeller.parsers.vos.Production;
 class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
+
+	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
 
 
 	protected final AffixData affixData;
@@ -50,35 +54,25 @@ class WordGeneratorBase{
 		}
 
 		//extract suffixed productions
-		final List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
-		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), onefoldProductions);
+		final List<Production> suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), suffixedProductions);
 
-		List<Production> twofoldProductions = Collections.emptyList();
+		List<Production> prefixedProductions = Collections.emptyList();
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
-			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
-			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), twofoldProductions);
+			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), prefixedProductions);
 		}
 
 		//extract lastfold productions
-		List<Production> lastfoldProductions = collectProductions(baseProduction, onefoldProductions, twofoldProductions, null);
-		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
-		printProductions("Twofold productions:", lastfoldProductions);
+		List<Production> twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
+		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
+		printProductions("Twofold productions:", twofoldProductions);
 
-		checkTwofoldCorrectness(lastfoldProductions);
+		checkTwofoldCorrectness(twofoldProductions);
 
-		final List<Production> productions = collectProductions(baseProduction, onefoldProductions, twofoldProductions, lastfoldProductions);
-
-		//remove rules that invalidate the circumfix rule
-		enforceCircumfix(productions);
-
-		//remove rules that invalidate the onlyInCompound rule
-		if(isCompound)
-			enforceOnlyInCompound(productions);
-
-		//remove rules that invalidate the affix rule
-		enforceNeedAffixFlag(productions);
-
+		final List<Production> productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, twofoldProductions);
+		filterProductions(isCompound, productions);
 		return productions;
 	}
 
@@ -137,27 +131,36 @@ class WordGeneratorBase{
 			final String[] aff = affixes.get(complexPrefixes? 1: 0);
 			if(aff.length > 0){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new IllegalArgumentException("Twofold rule violated for '" + prod + " from " + prod.getRulesSequence()
-					+ "' (" + prod.getRulesSequence() + " still has rules " + overabundantAffixes + ")");
+				throw new IllegalArgumentException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
 	}
 
-	protected List<Production> enforceOnlyInCompound(final List<Production> productions){
-		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
-		if(onlyInCompoundFlag != null)
-			productions.removeIf(production -> !production.hasContinuationFlag(onlyInCompoundFlag));
-		return productions;
+	private void filterProductions(boolean isCompound, List<Production> productions){
+		enforceCircumfix(productions);
+
+		if(isCompound)
+			enforceOnlyInCompound(productions);
+
+		enforceNeedAffixFlag(productions);
 	}
 
-	private List<Production> enforceCircumfix(final List<Production> productions){
+	/** Remove rules that invalidate the circumfix rule */
+	private void enforceCircumfix(final List<Production> productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
 			productions.removeIf(production -> production.hasContinuationFlag(circumfixFlag));
-		return productions;
 	}
 
-	protected void enforceNeedAffixFlag(final List<Production> productions){
+	/** Remove rules that invalidate the onlyInCompound rule */
+	private void enforceOnlyInCompound(final List<Production> productions){
+		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
+		if(onlyInCompoundFlag != null)
+			productions.removeIf(production -> !production.hasContinuationFlag(onlyInCompoundFlag));
+	}
+
+	/** Remove rules that invalidate the affix rule */
+	private void enforceNeedAffixFlag(final List<Production> productions){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)
 			productions.removeIf(production -> hasNeedAffixFlag(production, needAffixFlag));
@@ -221,8 +224,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-			throw new IllegalArgumentException("Non–existent rule " + affix + " found"
-				+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
 
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();

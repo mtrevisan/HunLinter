@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
@@ -18,8 +19,7 @@ public class Production extends DictionaryEntry{
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
 	private static final String LEADS_TO = " > ";
-	private static final String POS_OPEN_BRACKET = "[";
-	private static final String POS_CLOSE_BRACKET = "]";
+	private static final String POS_FIELD_PREFIX = ":";
 
 
 	private List<AffixEntry> appliedRules;
@@ -87,7 +87,7 @@ public class Production extends DictionaryEntry{
 		return appliedRules;
 	}
 
-	public AffixEntry getAppliedRule(int index){
+	public AffixEntry getAppliedRule(final int index){
 		return (appliedRules != null && index < appliedRules.size()? appliedRules.get(index): null);
 	}
 
@@ -102,8 +102,14 @@ public class Production extends DictionaryEntry{
 		return lastAppliedRule;
 	}
 
-	public List<DictionaryEntry> getCompoundEntries(){
-		return compoundEntries;
+	@Override
+	public AffixEntry getLastAppliedRule(){
+		AffixEntry lastAppliedRule = null;
+		if(hasProductionRules())
+			lastAppliedRule = appliedRules.stream()
+				.reduce((first, second) -> second)
+				.orElse(null);
+		return lastAppliedRule;
 	}
 
 	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
@@ -172,13 +178,23 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String toStringWithPartOfSpeechFields(){
-		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		sj.add(word);
 		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		if(!fields.isEmpty())
-			sj.add(POS_OPEN_BRACKET + String.join(StringUtils.SPACE, fields) + POS_CLOSE_BRACKET);
-		return sj.toString();
+		if(!fields.isEmpty()){
+			fields.sort(Comparator.naturalOrder());
+			return word + POS_FIELD_PREFIX + String.join(StringUtils.SPACE, fields);
+		}
+		return word;
 	}
+
+//	public List<String> toStringWithPartOfSpeechFields(){
+//		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+//		if(!fields.isEmpty())
+//			return fields.stream()
+//				.map(field -> word + POS_FIELD_PREFIX + field)
+//				.collect(Collectors.toList());
+//		else
+//			return Collections.singletonList(word);
+//	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){
 		word = outputConversionTable.apply(word);

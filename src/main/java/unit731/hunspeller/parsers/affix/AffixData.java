@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.affix;
 
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,7 +10,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -26,6 +26,12 @@ import unit731.hunspeller.services.Memoizer;
 
 
 public class AffixData{
+
+	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Same flags present in multiple options");
+	private static final MessageFormat CONTAINER_CLOSED = new MessageFormat("Cannot add data, container is closed");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
+
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
 		= Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
@@ -52,10 +58,6 @@ public class AffixData{
 		closed = true;
 	}
 
-	public boolean isClosed(){
-		return closed;
-	}
-
 	void clear(){
 		data.clear();
 		terminalAffixes.clear();
@@ -68,7 +70,7 @@ public class AffixData{
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new IllegalArgumentException("Repeated flags in multiple options");
+			throw new IllegalArgumentException(REPEATED_FLAG.format(new Object[0]));
 	}
 
 	private Map<AffixOption, Object> extractSingleFlags(){
@@ -120,9 +122,9 @@ public class AffixData{
 
 	<T> void addData(final String key, final T value){
 		if(closed)
-			throw new IllegalArgumentException("Cannot add data, container is closed");
+			throw new IllegalArgumentException(CONTAINER_CLOSED.format(new Object[0]));
 		if(data.containsKey(key))
-			throw new IllegalArgumentException("Duplicated flag: " + key);
+			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{key}));
 
 		if(value != null)
 			data.put(key, value);
@@ -133,17 +135,9 @@ public class AffixData{
 		return getData(AffixOption.LANGUAGE);
 	}
 
-	public Locale getLocale(){
-		return new Locale(getLanguage());
-	}
-
 	public FlagParsingStrategy getFlagParsingStrategy(){
 		final String flag = getFlag();
 		return (flag != null? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
-	}
-
-	public String getKeepCaseFlag(){
-		return getData(AffixOption.KEEP_CASE_FLAG);
 	}
 
 	public String getNeedAffixFlag(){
@@ -189,14 +183,6 @@ public class AffixData{
 		return containsData(AffixOption.COMPLEX_PREFIXES);
 	}
 
-	public Boolean isSuffix(final String affixCode){
-		Boolean isSuffix = null;
-		final Object data = getData(affixCode);
-		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
-			isSuffix = ((RuleEntry)data).isSuffix();
-		return isSuffix;
-	}
-
 	public boolean isForbidDifferentCasesInCompound(){
 		return containsData(AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND);
 	}
@@ -207,18 +193,6 @@ public class AffixData{
 
 	public boolean isSimplifyTriplesInCompound(){
 		return containsData(AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND);
-	}
-
-	public Set<String> getAffixes(){
-		//keeps only items with RuleEntry as value
-		final Set<String> affixes = new HashSet<>();
-		final Set<String> keys = data.keySet();
-		for(final String key : keys){
-			final Object data = getData(key);
-			if(RuleEntry.class.isAssignableFrom(data.getClass()))
-				affixes.add(key);
-		}
-		return affixes;
 	}
 
 	public String getFlag(){
@@ -245,10 +219,6 @@ public class AffixData{
 			.collect(Collectors.toList());
 	}
 
-	public String getNoSuggestFlag(){
-		return getData(AffixOption.NO_SUGGEST_FLAG);
-	}
-
 	public List<String> applyReplacementTable(final String word){
 		final ConversionTable table = getData(AffixOption.REPLACEMENT_TABLE);
 		return (table != null? table.applyConversionTable(word): Collections.emptyList());
@@ -270,7 +240,7 @@ public class AffixData{
 				word = table.applySingleConversionTable(word);
 			}
 			catch(final IllegalArgumentException e){
-				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too many applicable rules");
+				throw new IllegalArgumentException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
 			}
 		}
 		return word;
@@ -291,10 +261,6 @@ public class AffixData{
 		Collections.sort(sortedSample);
 		//NOTE: a space should be used because of the presence of characters that are only modifiers
 		return String.join(StringUtils.SPACE, sortedSample);
-	}
-
-	public Set<String> getWordBreakCharacters(){
-		return getData(AffixOption.WORD_BREAK_CHARACTERS);
 	}
 
 	public String getCompoundBeginFlag(){

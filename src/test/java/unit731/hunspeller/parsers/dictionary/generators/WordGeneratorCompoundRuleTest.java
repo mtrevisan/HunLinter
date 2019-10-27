@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
@@ -19,7 +20,7 @@ class WordGeneratorCompoundRuleTest{
 	private final Backbone backbone = new Backbone(null, null);
 
 
-	private void loadData(String affixFilePath) throws IOException{
+	private void loadData(String affixFilePath) throws IOException, SAXException{
 		backbone.loadFile(affixFilePath);
 	}
 
@@ -29,7 +30,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void testBjörnJacke() throws IOException{
+	void testBjörnJacke() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -63,7 +64,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void simple() throws IOException{
+	void simple() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -88,7 +89,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void infinite() throws IOException{
+	void infinite() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -148,7 +149,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void zeroOrOne() throws IOException{
+	void zeroOrOne() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -177,7 +178,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void longFlag() throws IOException{
+	void longFlag() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -207,7 +208,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void numericalFlag() throws IOException{
+	void numericalFlag() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -258,7 +259,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void forbiddenWord() throws IOException{
+	void forbiddenWord() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -279,7 +280,7 @@ class WordGeneratorCompoundRuleTest{
 
 
 	@Test
-	void forceUppercase() throws IOException{
+	void forceUppercase() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

@@ -12,16 +12,21 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -34,11 +39,17 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
  * https://github.com/dnaumenko/java-diff-utils
  * https://www.adictosaltrabajo.com/2012/06/05/comparar-ficheros-java-diff-utils/
  * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
- * @link <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
- * @link <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
- */public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+ * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
+ * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
+ */
+public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
+
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Thesaurus file malformed, the first line is not a charset, was ''{0}''");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, ...>)|meaning1|meaning2|...' or 'pos1, pos2, ...:meaning1,meaning2,...': was ''{0}''");
+	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): was ''{0}''");
+	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String PIPE = "|";
 
@@ -122,9 +133,9 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/**
-	 * Parse the rows out from a .aid file.
+	 * Parse the rows out from a .dic file.
 	 *
-	 * @param theFile	The content of the thesaurus file
+	 * @param theFile	The reference to the thesaurus file
 	 * @throws IOException	If an I/O error occurs
 	 */
 	public void parse(final File theFile) throws IOException{
@@ -138,13 +149,15 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			//line should be a charset
 			try{ Charsets.toCharset(line); }
 			catch(final UnsupportedCharsetException e){
-				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
+				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 			}
 
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty())
 					dictionary.add(new ThesaurusEntry(line, br));
 		}
+
+		validate();
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
@@ -157,6 +170,12 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		return line;
 	}
 
+	private void validate(){
+		final List<String> duplicatedSynonyms = dictionary.extractDuplicatedSynonyms();
+		for(final String duplicatedSynonym : duplicatedSynonyms)
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated synonym in thesaurus: '{}'", duplicatedSynonym);
+	}
+
 	public int getSynonymsCounter(){
 		return dictionary.size();
 	}
@@ -166,41 +185,38 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	/**
-	 * @param synonymAndMeanings			The line representing all the synonyms of a word along with their part of speech
-	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
-	 *												insertion)
+	 * @param synonymAndMeanings			The object representing all the synonyms of a word along with their part of speech
+	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
+	 * 	(return <code>true</code> to force insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult insertMeanings(final String synonymAndMeanings, final Supplier<Boolean> duplicatesDiscriminator){
+	public DuplicationResult<ThesaurusEntry> insertMeanings(final String synonymAndMeanings,
+			final Supplier<Boolean> duplicatesDiscriminator){
 		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException("Wrong format: '" + synonymAndMeanings + "'");
+			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
 
-		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		final StringBuffer sb = new StringBuffer();
-		if(!partOfSpeech.startsWith(PART_OF_SPEECH_START))
-			sb.append(PART_OF_SPEECH_START);
-		final String[] partOfSpeeches = partOfSpeech.split(",");
-		sb.append(String.join(", ", partOfSpeeches));
-		if(!partOfSpeech.endsWith(PART_OF_SPEECH_END))
-			sb.append(PART_OF_SPEECH_END);
-		partOfSpeech = sb.toString();
+		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
+		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
+			.split("\\s*,\\s*");
 
-		final String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
-		final List<String> meanings = Arrays.stream(means)
-			.filter(StringUtils::isNotBlank)
+		final List<String> meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS))
 			.map(String::trim)
+			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
-			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
+			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
 
 		boolean forceInsertion = false;
-		final List<ThesaurusEntry> duplicates = extractDuplicates(meanings, partOfSpeech);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new IllegalArgumentException("Duplicate detected for '" + duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", ")) + "'");
+				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(
+					new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion){
@@ -211,23 +227,30 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
-			dictionary.add(partOfSpeech, meanings);
+			dictionary.add(partOfSpeeches, meanings);
 		}
 
-		return new DuplicationResult(duplicates, forceInsertion);
+		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final List<String> means, final String partOfSpeech) throws IllegalArgumentException{
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-		for(final String meaning : means){
+		for(final String meaning : meanings){
 			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			for(final ThesaurusEntry synonym : synonyms)
-				if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
+				if(synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
 					duplicates.add(synonym);
 		}
 		return duplicates;
+	}
+
+	/** Find if there is a duplicate with the same part of speech and same meanings */
+	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
+		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+		return synonyms.stream()
+			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
 	}
 
 	public void setMeanings(final int index, final String text){
@@ -273,27 +296,21 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 		}
 	}
 
-	public List<String> extractDuplicates(){
-		return dictionary.extractDuplicates();
-	}
-
-	public static String[] prepareTextForThesaurusFilter(String text){
+	public static Pair<String[], String[]> extractComponentsForFilter(String text){
 		//extract part of speech if present
-		final String[] pos = extractPartOfSpeechFromThesaurusFilter(text);
-		final String posFilter = (pos != null? "[\\(\\s](" + String.join(PIPE, Arrays.asList(pos)) + ")[^)]*\\)": ".+");
+		final String[] pos = extractPartOfSpeechFromFilter(text);
 
-		text = clearThesaurusFilter(text);
+		text = clearFilter(text);
 
-		text = StringUtils.strip(text);
 		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
 		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
 		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
-		return new String[]{posFilter, "(" + text + ")"};
+		return Pair.of(pos, StringUtils.split(text, PIPE));
 	}
 
-	private static String[] extractPartOfSpeechFromThesaurusFilter(String text){
+	private static String[] extractPartOfSpeechFromFilter(String text){
 		text = StringUtils.strip(text);
 
 		int start = 0;
@@ -304,16 +321,24 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			idx = text.indexOf(")|");
 			start = 1;
 		}
-		if(idx >= 0){
-			text = text.substring(start, idx);
-			//escape points
-			pos = StringUtils.replace(text, ".", "\\.")
+		if(idx >= 0)
+			pos = text.substring(start, idx)
 				.split(", *");
-		}
 		return pos;
 	}
 
-	private static String clearThesaurusFilter(String text){
+	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> meanings){
+		//extract part of speech if present
+		final String posFilter = (!partOfSpeeches.isEmpty()?
+			"[\\(\\s](" + String.join(PIPE, partOfSpeeches) + ")[\\),]":
+			".+");
+		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
+
+		//compose filter regexp
+		return Pair.of(posFilter, meaningsFilter);
+	}
+
+	private static String clearFilter(String text){
 		text = StringUtils.strip(text);
 
 		//remove part of speech and format the search string
@@ -327,8 +352,8 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 			if(idx >= 0)
 				text = text.substring(idx + 2);
 		}
-		//escape points
-		text = StringUtils.replace(text, ".", "\\.");
+		//escape special characters
+		text = Matcher.quoteReplacement(text);
 		//remove all \s+([^)]+)
 		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}
@@ -371,7 +396,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	}
 
 	private void storeMemento() throws IOException{
-		//FIXME
+		//FIXME reduce size of data saved
 //		undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
 		undoCaretaker.pushMemento(createMemento());
 
@@ -390,7 +415,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	public boolean restorePreviousSnapshot() throws IOException{
 		boolean restored = false;
 		if(canUndo()){
-			//FIXME
+			//FIXME reduce size of data saved
 			redoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = undoCaretaker.popMemento();
@@ -409,7 +434,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 	public boolean restoreNextSnapshot() throws IOException{
 		boolean restored = false;
 		if(canRedo()){
-			//FIXME
+			//FIXME reduce size of data saved
 			undoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = redoCaretaker.popMemento();

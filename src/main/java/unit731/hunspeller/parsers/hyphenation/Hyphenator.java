@@ -117,16 +117,16 @@ public class Hyphenator implements HyphenatorInterface{
 			final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){
-				final String customRule = hyphenations[i - 1] + "1" + hyphenations[i];
+				final String customRule = hyphenations[i - 1] + HyphenationParser.HYPHEN_EQUALS + hyphenations[i];
 				indexesAndRules.put(charCount, Pair.of(1, customRule));
 
 				charCount += getNormalizedLength(hyphenations[i]);
 			}
-			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
+			hyphBreak = new HyphenationBreak(indexesAndRules);
 		}
 		else if(getNormalizedLength(word) < options.getMinimumLength())
 			//ignore short words (early out):
-			hyphBreak = new HyphenationBreak(Collections.emptyMap(), wordSize);
+			hyphBreak = new HyphenationBreak(Collections.emptyMap());
 		else
 			hyphBreak = calculateBreakpoints(word, patterns.get(level), options);
 
@@ -135,32 +135,52 @@ public class Hyphenator implements HyphenatorInterface{
 
 	private HyphenationBreak calculateBreakpoints(final String word, final AhoCorasickTrie<String> patterns,
 			final HyphenationOptions options){
-		final String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
-
 		final int wordSize = word.length();
 		final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		if(patterns != null){
+			final String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
+			final int leftMin = options.getLeftMin();
+			final int rightMin = options.getRightMin();
+
 			final int normalizedWordSize = getNormalizedLength(word);
 			final List<SearchResult<String>> itr = patterns.searchInText(w);
 			for(final SearchResult<String> r : itr){
 				final String rule = r.getValue();
-				final int i = r.getIndexBegin();
 
-				//number of non-letter characters
+				//number of non–letter characters
 				final int delta = HyphenationParser.getKeyFromData(rule).length() - HyphenationParser.getKeyFromData(rule).length();
+				final int startingIndex = r.getIndexBegin() - delta;
 
-				extractSyllabe(rule, i - delta, word, normalizedWordSize, options, indexesAndRules);
+				//cycle the pattern's characters searching for numbers
+				//start from -1 since the initial dot has to be skipped
+				int j = -1;
+				final String reducedRule = removeNonStandardPart(rule);
+				for(final char chr : reducedRule.toCharArray()){
+					if(!Character.isDigit(chr))
+						j ++;
+					else{
+						//check if a break point should be skipped based on left and right min options
+						final int idx = startingIndex + j;
+						final int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
+						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
+							final int dd = Character.digit(chr, 10);
+							//check if the break number is great than the one stored so far
+							if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
+								indexesAndRules.put(idx, Pair.of(dd, rule));
+						}
+					}
+				}
 			}
 		}
 
-		return new HyphenationBreak(indexesAndRules, wordSize);
+		return new HyphenationBreak(indexesAndRules);
 	}
 
 	@Override
 	public List<String> splitIntoCompounds(final String word){
 		final List<String> response;
 		if(hypParser.isSecondLevelPresent()){
-			//apply first level hyphenation non-compound
+			//apply first level hyphenation non–compound
 			final HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND,
 				hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
@@ -211,7 +231,7 @@ public class Hyphenator implements HyphenatorInterface{
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
-	protected List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
+	private List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
 		final List<String> result = new ArrayList<>();
 
 		int startIndex = 0;
@@ -270,65 +290,16 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	public static int getAugmentedRuleAddLength(final String rule){
-		int length = 0;
-		final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(rule);
-		if(m.find()){
-			final String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
-			final String basicRule = m.group(HyphenationParser.PARAM_RULE);
-			String start = m.group(HyphenationParser.PARAM_START);
-			if(start == null)
-				start = Integer.toString(1);
-			length = addBefore.length() - Integer.parseInt(start) + breakpointIndex(basicRule) - 1;
-		}
-		return length;
-	}
-
-	private static int breakpointIndex(final String rule){
-		return StringUtils.indexOfAny(rule, '1', '3', '5', '7', '9');
-	}
-
-
-	//FIXME method signature is awful
-	protected Map<Integer, Pair<Integer, String>> extractSyllabe(final String rule, final int startingIndex, final String word,
-			final int normalizedWordSize, final HyphenationOptions options, final Map<Integer, Pair<Integer, String>> indexesAndRules){
-		final int leftMin = options.getLeftMin();
-		final int rightMin = options.getRightMin();
-
-		final int wordSize = word.length();
-		final String reducedRule = removeNonStandardPart(rule);
-
-		//cycle the pattern's characters searching for numbers
-		//start from -1 since the initial dot has to be skipped
-		int j = -1;
-		for(final char chr : reducedRule.toCharArray()){
-			if(!Character.isDigit(chr))
-				j ++;
-			else{
-				//check if a break point should be skipped based on left and right min options
-				final int idx = startingIndex + j;
-				final int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
-				if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
-					final int dd = Character.digit(chr, 10);
-					//check if the break number is great than the one stored so far
-					if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
-						indexesAndRules.put(idx, Pair.of(dd, rule));
-				}
-			}
-		}
-		return indexesAndRules;
-	}
-
 	private String removeNonStandardPart(final String rule){
 		return PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
-	protected int getNormalizedLength(final String word){
+	private int getNormalizedLength(final String word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 
-	private static int getNormalizedLength(final String word, final int index){
-		return Normalizer.normalize(word.substring(0, index - 1), Normalizer.Form.NFKC).length() + 1;
+	private int getNormalizedLength(final String word, final int endIndex){
+		return Normalizer.normalize(word.substring(0, endIndex - 1), Normalizer.Form.NFKC).length() + 1;
 	}
 
 }

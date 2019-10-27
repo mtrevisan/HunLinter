@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -22,7 +23,7 @@ public class DictionarySortDialog extends JDialog{
 	private final DictionaryParser dicParser;
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, Frame parent){
+	public DictionarySortDialog(final DictionaryParser dicParser, final String[] listData, final int firstVisibleItemIndex, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
@@ -30,6 +31,11 @@ public class DictionarySortDialog extends JDialog{
 		this.dicParser = dicParser;
 
 		initComponents();
+
+		setCurrentFont();
+
+		entriesList.setListData(listData);
+		scrollToVisibleIndex(firstVisibleItemIndex);
 
 		lblMessage.setText("Select a section from the list:");
 	}
@@ -101,10 +107,20 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(final Font currentFont){
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
+	}
+
+	private void scrollToVisibleIndex(final int index){
+		final int visibleLines = entriesList.getLastVisibleIndex();
+		final int newIndex = Math.min(index + visibleLines, entriesList.getModel().getSize() - 1);
+		entriesList.ensureIndexIsVisible(newIndex);
+
+		//correct first item
+		entriesList.ensureIndexIsVisible(index);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
@@ -147,22 +163,21 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.addListSelectionListener(listener);
 	}
 
-	public void setListData(String[] listData){
-		entriesList.setListData(listData);
-
-		//initialize dictionary
-		dicParser.calculateDictionaryBoundaries();
+	public int getFirstVisibleIndex(){
+		return entriesList.getFirstVisibleIndex();
 	}
 
 	public int getSelectedIndex(){
 		return entriesList.getSelectedIndex();
 	}
 
-	private void writeObject(ObjectOutputStream os) throws IOException{
+	@SuppressWarnings("unused")
+	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException{
+	@SuppressWarnings("unused")
+	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

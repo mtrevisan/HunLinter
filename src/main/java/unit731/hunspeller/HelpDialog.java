@@ -22,7 +22,7 @@ public class HelpDialog extends JDialog{
 	private static final long serialVersionUID = -9151942201399886892L;
 
 
-	public HelpDialog(Frame parent){
+	public HelpDialog(final Frame parent){
 		super(parent, "About", true);
 
 		Objects.requireNonNull(parent);
@@ -31,11 +31,11 @@ public class HelpDialog extends JDialog{
 
 
 		try{
-			BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/favicon.jpg"));
-			ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
+			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/favicon.jpg"));
+			final ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
 			lblLogo.setIcon(icon);
 		}
-		catch(IOException ignored){}
+		catch(final IOException ignored){}
 
 		String artifactID = null;
 		String version = null;
@@ -48,7 +48,7 @@ public class HelpDialog extends JDialog{
 			version = prop.getProperty("version");
 			buildTimestamp = LocalDate.parse(prop.getProperty("buildTimestamp"));
 		}
-		catch(IOException ignored){}
+		catch(final IOException ignored){}
 
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);

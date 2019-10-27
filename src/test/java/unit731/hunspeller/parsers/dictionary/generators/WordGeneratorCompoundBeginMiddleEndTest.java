@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
@@ -18,7 +19,7 @@ class WordGeneratorCompoundBeginMiddleEndTest{
 	private final Backbone backbone = new Backbone(null, null);
 
 
-	private void loadData(String affixFilePath) throws IOException{
+	private void loadData(String affixFilePath) throws IOException, SAXException{
 		backbone.loadFile(affixFilePath);
 	}
 
@@ -28,7 +29,7 @@ class WordGeneratorCompoundBeginMiddleEndTest{
 	}
 
 	@Test
-	void germanCompounding() throws IOException{
+	void germanCompounding() throws IOException, SAXException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

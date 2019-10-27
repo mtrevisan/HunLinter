@@ -14,16 +14,21 @@ import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
+import java.text.MessageFormat;
 import java.util.Arrays;
 
 
 /**
  * An implementation of {@link BitArray} that uses a memory-mapped file to persist all changes synchronously for the underlying
  * bit array. This is useful for stateful bit-arrays which are expensive to construct yet need the best overall performance.
- * 
+ *
  * NOTE: for some reason this class does not work!!
  */
 public class MemoryMappedFileBitArray implements BitArray{
+
+	private static final MessageFormat EMPTY_BACKUP_FILE = new MessageFormat("Backup file cannot be empty/null");
+	private static final MessageFormat INVALID_BACKUP_FILE = new MessageFormat("Backup file does not represent a valid file");
+	private static final MessageFormat INVALID_NUMBER_OF_BITS = new MessageFormat("Number of bits must be strictly positive");
 
 	/** Underlying file that represents the state of the {@link BitArray} */
 	private final RandomAccessFile backingFile;
@@ -37,11 +42,11 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws IOException{
 		if(backingFile == null)
-			throw new IllegalArgumentException("Backing file cannot be empty/null");
+			throw new IllegalArgumentException(EMPTY_BACKUP_FILE.format(new Object[0]));
 		if(backingFile.exists() && !backingFile.isFile())
-			throw new IllegalArgumentException("Backing file does not represent a valid file");
+			throw new IllegalArgumentException(INVALID_BACKUP_FILE.format(new Object[0]));
 		if(bits <= 0)
-			throw new IllegalArgumentException("Number of bits must be strictly positive");
+			throw new IllegalArgumentException(INVALID_NUMBER_OF_BITS.format(new Object[0]));
 
 		//we open in "rwd" mode, to save one i/o operation than in "rws" mode
 		this.backingFile = new RandomAccessFile(backingFile, "rwd");
@@ -139,7 +144,8 @@ public class MemoryMappedFileBitArray implements BitArray{
 			try{
 				final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
 				//do not need to check for a specific class, we can call the Unsafe method with any buffer class
-				final MethodHandle unmapper = MethodHandles.lookup().findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
+				final MethodHandle unmapper = MethodHandles.lookup()
+					.findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
 				//fetch the unsafe instance and bind it to the virtual MethodHandle
 				final Field f = unsafeClass.getDeclaredField("theUnsafe");
 				f.setAccessible(true);

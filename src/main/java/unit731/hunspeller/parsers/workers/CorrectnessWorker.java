@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.workers;
 
 import java.util.List;
 import java.util.Objects;
@@ -6,9 +6,10 @@ import java.util.function.BiConsumer;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 
 
 public class CorrectnessWorker extends WorkerDictionaryBase{
@@ -21,7 +22,8 @@ public class CorrectnessWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(checker);
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			final List<Production> productions = wordGenerator.applyAffixRules(line);
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Production production : productions){
 				try{
@@ -34,13 +36,6 @@ public class CorrectnessWorker extends WorkerDictionaryBase{
 		};
 		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
-	}
-
-	private IllegalArgumentException wrapException(final Exception e, final Production production){
-		final StringBuffer sb = new StringBuffer(e.getMessage());
-		if(production.hasProductionRules())
-			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		return new IllegalArgumentException(sb.toString());
 	}
 
 	@Override

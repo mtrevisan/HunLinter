@@ -54,7 +54,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private final JFileChooser saveTextFileFileChooser;
 
 
-	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent){
+	public DictionaryStatisticsDialog(final DictionaryStatistics statistics, final Frame parent){
 		super(parent, "Dictionary statistics", false);
 
 		Objects.requireNonNull(statistics);
@@ -64,18 +64,23 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		initComponents();
 
+		final Font currentFont = GUIUtils.getCurrentFont();
+		mostCommonSyllabesOutputLabel.setFont(currentFont);
+		longestWordCharactersOutputLabel.setFont(currentFont);
+		longestWordSyllabesOutputLabel.setFont(currentFont);
+
 		try{
-			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(compoundWordsOutputLabel.getHeight());
+			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(compoundWordsOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
 				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
-		catch(IOException ignored){}
+		catch(final IOException ignored){}
 
 		addListenerOnClose();
 
 		saveTextFileFileChooser = new JFileChooser();
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		File currentDir = new File(".");
+		final File currentDir = new File(".");
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
 
@@ -305,22 +310,16 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setCurrentFont(final Font font){
-		mostCommonSyllabesOutputLabel.setFont(font);
-		longestWordCharactersOutputLabel.setFont(font);
-		longestWordSyllabesOutputLabel.setFont(font);
-	}
-
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-		int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);
 
 			try{
-				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				exportToFile(outputFile);
 			}
-			catch(Exception e){
+			catch(final Exception e){
 				LOGGER.error("Cannot export statistics", e);
 			}
 
@@ -331,7 +330,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void addListenerOnClose(){
 		addWindowListener(new WindowAdapter(){
 			@Override
-			public void windowClosed(WindowEvent e){
+			public void windowDeactivated(final WindowEvent e){
 				statistics.clear();
 			}
 		});
@@ -525,11 +524,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	private void writeObject(ObjectOutputStream os) throws IOException{
+	@SuppressWarnings("unused")
+	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException{
+	@SuppressWarnings("unused")
+	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

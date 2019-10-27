@@ -46,7 +46,7 @@ public class WordVEC{
 		try{
 			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
 		}
-		catch(ParseException e){
+		catch(final ParseException e){
 			//cannot happen
 			LOGGER.error(e.getMessage());
 		}
@@ -216,7 +216,6 @@ public class WordVEC{
 		final int wordSize = word.length();
 		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
 			final String subword = word.substring(idx, idx + 2);
-//FIXME is there a way to optimize this PatternService.find?
 			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
 				final String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))

@@ -1,10 +1,14 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class ParsingStrategyFactory{
+
+	private static final MessageFormat UNKNOWN_TYPE = new MessageFormat("Unknown strategy type: {0}");
+
 
 	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>();
 	static{
@@ -20,7 +24,7 @@ public class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new IllegalArgumentException("Unknown strategy type: " + flag);
+			throw new IllegalArgumentException(UNKNOWN_TYPE.format(new Object[]{flag}));
 
 		return strategy;
 	}

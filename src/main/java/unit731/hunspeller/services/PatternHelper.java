@@ -47,29 +47,30 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static Matcher getMatcher(final String text, final Pattern pattern){
-		return pattern.matcher(text);
-	}
-
 	public static String[] extract(final String text, final Pattern pattern){
-		return extract(getMatcher(text, pattern));
+		return extract(text, pattern, -1);
 	}
 
-	public static String[] extract(final Matcher matcher){
+	public static String[] extract(final String text, final Pattern pattern, final int limit){
+		return extract(pattern.matcher(text), limit);
+	}
+
+	public static String[] extract(final Matcher matcher, final int limit){
 		final List<String> result = new ArrayList<>();
-		while(matcher.find()){
+		while(matcher.find() && (limit < 0 || result.size() < limit)){
 			String component = null;
 			int i = 1;
 			final int size = matcher.groupCount();
-			while(component == null && i < size)
+			while(component == null && i <= size)
 				component = matcher.group(i ++);
 			result.add(component != null? component: matcher.group());
 		}
 		return result.toArray(String[]::new);
 	}
 
+	//FIXME is there a way to optimize this find?
 	public static boolean find(final String text, final Pattern pattern){
-		return find(getMatcher(text, pattern));
+		return find(pattern.matcher(text));
 	}
 
 	public static boolean find(final Matcher matcher){
@@ -80,7 +81,7 @@ public class PatternHelper{
 		return matcher.matches();
 	}
 
-//FIXME is there a way to optimize this PatternService.replaceAll?
+	//FIXME is there a way to optimize this replaceAll?
 	public static String replaceAll(final String text, final Pattern pattern, final String replacement){
 		return pattern.matcher(text)
 			.replaceAll(replacement);

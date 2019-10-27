@@ -16,6 +16,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.SetHelper;
 
@@ -64,6 +65,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -134,6 +136,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -217,6 +220,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -307,6 +311,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -454,6 +459,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -585,6 +591,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -633,6 +640,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -693,6 +701,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -776,6 +785,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -858,6 +868,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -917,6 +928,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -973,6 +985,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1047,6 +1060,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1132,6 +1146,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1202,6 +1217,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1249,6 +1265,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1313,6 +1330,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1435,6 +1453,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1595,6 +1614,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1661,6 +1681,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1727,6 +1748,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1801,6 +1823,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1868,6 +1891,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1909,6 +1933,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1953,6 +1978,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
@@ -1996,6 +2022,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());

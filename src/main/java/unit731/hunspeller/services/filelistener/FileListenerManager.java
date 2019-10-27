@@ -94,15 +94,14 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void register(FileChangeListener listener, String... patterns){
+	public void register(final FileChangeListener listener, final String... patterns){
 		Objects.requireNonNull(listener);
 
 		for(final String pattern : patterns){
 			final Path dir = (new File(pattern)).getParentFile().toPath();
 			final File fil = dir.toFile();
-			//create directory if it doesn't exists
-			if(!fil.exists() && !fil.mkdirs())
-				LOGGER.error("Exception while creating directory {}", dir);
+			if(!fil.exists())
+				LOGGER.error("Folder {} does not exists", dir);
 			else{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);
