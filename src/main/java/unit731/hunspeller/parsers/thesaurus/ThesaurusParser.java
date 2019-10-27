@@ -40,7 +40,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
  * https://www.adictosaltrabajo.com/2012/06/05/comparar-ficheros-java-diff-utils/
  * https://github.com/java-diff-utils/java-diff-utils/wiki/Examples
  * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
- * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code & Interactive Visualization</a>
+ * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code &amp; Interactive Visualization</a>
  */
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
