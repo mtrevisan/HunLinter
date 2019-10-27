@@ -34,8 +34,9 @@ Hunspeller
     7. [Font selection](#screenshots-font)
     8. [Statistics](#screenshots-statistics)
 7. [Changelog](#changelog)
-    1. [version 1.8.1](#changelog-1.8.1)
-    2. [version 1.8.0](#changelog-1.8.0)
+    1. [version 1.9.0](#changelog-1.9.0)
+    2. [version 1.8.1](#changelog-1.8.1)
+    3. [version 1.8.0](#changelog-1.8.0)
 
 
 <a name="motivation"></a>
@@ -161,6 +162,18 @@ It is possible to click on the first column to select the row (for cancelling it
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-1.9.0"></a>
+### version 1.9.0 - 20191027
+- added the parsing and management of auto-correct files (only `DocumentList.xml` can be edited for now, `SentenceExceptList.xml` and `WordExceptList.xml` are currently read only)
+- now all the relevant files are loaded by reading the `META-INF\manifest.xml` file, no assumptions was made
+- enhancement for hyphenation section: now it is possible also to insert custom hyphenations
+- bug fix on duplicate extraction
+- some simplifications was made in the main menu (removed thesaurus validation on request because it will be done anyway at loading)
+- improvements on thesaurus table filtering
+- prevented the insertion of a new thesaurus if it is already contained
+- revised the dictionary sort dialog from scratch to better handle sections between comments
+- minor GUI adjustments and corrections
+
 <a name="changelog-1.8.1"></a>
 ### version 1.8.1 - 20190930
 - added the link to the online help
