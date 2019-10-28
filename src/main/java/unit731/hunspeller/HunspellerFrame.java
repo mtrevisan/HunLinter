@@ -1788,7 +1788,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
-		JFontChooserDialog dialog = new JFontChooserDialog(backbone.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
+		FontChooserDialog dialog = new FontChooserDialog(backbone.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
 			this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
@@ -2122,7 +2122,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
 				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-				JFontChooserDialog.getDefaultFont());
+				FontChooserDialog.getDefaultFont());
 			GUIUtils.setCurrentFont(lastUsedFont, this);
 		}
 		catch(final IllegalArgumentException e){

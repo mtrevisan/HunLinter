@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
-import unit731.hunspeller.JFontChooserDialog;
+import unit731.hunspeller.FontChooserDialog;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -35,7 +35,7 @@ public class GUIUtils{
 	private static String languageSample;
 	private static final List<String> familyNamesAll = new ArrayList<>();
 	private static final List<String> familyNamesMonospaced = new ArrayList<>();
-	private static Font currentFont = JFontChooserDialog.getDefaultFont();
+	private static Font currentFont = FontChooserDialog.getDefaultFont();
 
 
 	private GUIUtils(){}
