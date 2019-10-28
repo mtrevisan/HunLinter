@@ -30,7 +30,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
+	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed,
+			final Consumer<Exception> cancelled){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(backbone);
 

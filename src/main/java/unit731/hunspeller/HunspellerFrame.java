@@ -147,7 +147,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
 	private final JFileChooser openProjectPathFileChooser;
-	private final JFileChooser saveTextFileFileChooser;
+	private final JFileChooser saveResultFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -195,10 +195,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
 		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-		saveTextFileFileChooser = new JFileChooser();
-		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+		saveResultFileChooser = new JFileChooser();
+		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		final File currentDir = new File(".");
-		saveTextFileFileChooser.setCurrentDirectory(currentDir);
+		saveResultFileChooser.setCurrentDirectory(currentDir);
 
 		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
@@ -1316,7 +1316,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
+		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			recentProjectsMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
 
@@ -1347,7 +1347,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		HelpDialog dialog = new HelpDialog(this);
+		final HelpDialog dialog = new HelpDialog(this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
@@ -1973,7 +1973,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				if(availableLanguages.size() > 1){
 					//choose between available languages
 					final Consumer<String> onSelection = language::set;
-					LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
+					final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
 					GUIUtils.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
@@ -2333,11 +2333,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryDuplicates(){
 		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
-			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
 
-				final File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveResultFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
 					backbone.getWordGenerator(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
@@ -2372,12 +2372,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryWordlist(final boolean plainWords){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
-				final File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveResultFileChooser.getSelectedFile();
 				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), plainWords, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
@@ -2387,11 +2387,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractMinimalPairs(){
 		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
-			final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
 
-				final File outputFile = saveTextFileFileChooser.getSelectedFile();
+				final File outputFile = saveResultFileChooser.getSelectedFile();
 				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
 					backbone.getWordGenerator(), outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
