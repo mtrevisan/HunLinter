@@ -29,13 +29,7 @@ class WordGeneratorAffixTest{
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"# Testing also whitespace and comments.",
-			"OCONV 7 # space, space",
-			"OCONV	a A # tab, space, space",
-			"OCONV	á	Á # tab, tab, space",
-			"OCONV	b	B	# tab, tab, tab",
-			"OCONV  c  C		# 2xspace, 2xspace, 2xtab",
-			"OCONV	 d 	D # tab+space, space+tab, space",
-			"OCONV e E #",
+			"OCONV 1",
 			"OCONV é É 	",
 			"",
 			" # space",
@@ -47,7 +41,7 @@ class WordGeneratorAffixTest{
 		loadData(affFile, language);
 
 		ConversionTable table = affixData.getData(AffixOption.OUTPUT_CONVERSION_TABLE);
-		Assertions.assertEquals("[affixOption=OUTPUT_CONVERSION_TABLE,table={  =[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]}]", table.toString());
+		Assertions.assertEquals("[affixOption=OUTPUT_CONVERSION_TABLE,table={  =[(é,É)]}]", table.toString());
 	}
 
 
