@@ -2,7 +2,6 @@ package unit731.hunspeller;
 
 import java.awt.*;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
@@ -40,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1969,12 +1969,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			try{
 				packager = new Packager(projectPath);
 				final List<String> availableLanguages = packager.getAvailableLanguages();
-				final String language = availableLanguages.get(0);
+				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
-					//TODO choose between available languages
+					//choose between available languages
+					final Consumer<String> onSelection = lang -> language.set(lang);
+					LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
+					GUIUtils.addCancelByEscapeKey(dialog);
+					dialog.setLocationRelativeTo(this);
+					dialog.setVisible(true);
 				}
-				//TODO then, load appropriate files
-				packager.extractConfigurationFolders(language);
+				//load appropriate files based on current language
+				packager.extractConfigurationFolders(language.get());
 
 				setTitle("Hunspeller : " + packager.getAffixFile().getName());
 

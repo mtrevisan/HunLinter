@@ -173,6 +173,10 @@ public class Packager{
 
 	private void processDictionariesConfigurationFile() throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
+		if(pair == null)
+			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
+				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
+
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null)
@@ -182,19 +186,21 @@ public class Packager{
 	private void processPathsConfigurationFile()
 			throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
-		final File file = pair.getLeft();
-		final Node node = pair.getRight();
-		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
-				.map(File::toString)
-				.collect(Collectors.toSet());
-			if(this.configurationFiles.size() != uniqueFolders.size())
-				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-					+ StringUtils.join(this.configurationFiles));
-			if(uniqueFolders.stream().anyMatch(String::isEmpty))
-				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-		}
+		if(pair != null){
+			final File file = pair.getLeft();
+			final Node node = pair.getRight();
+			if(node != null){
+				this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+				final Set<String> uniqueFolders = this.configurationFiles.values().stream()
+					.map(File::toString)
+					.collect(Collectors.toSet());
+				if(this.configurationFiles.size() != uniqueFolders.size())
+					throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+						+ StringUtils.join(this.configurationFiles));
+				if(uniqueFolders.stream().anyMatch(String::isEmpty))
+					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+				}
+			}
 	}
 
 	public void createPackage(final Path projectPath, final String language){
