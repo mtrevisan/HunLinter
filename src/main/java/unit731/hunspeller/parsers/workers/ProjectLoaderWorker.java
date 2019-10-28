@@ -4,7 +4,6 @@ import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -37,14 +36,6 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 		this.packager = packager;
 		this.backbone = backbone;
-
-		final List<String> availableLanguages = packager.getAvailableLanguages();
-		final String language = availableLanguages.get(0);
-		if(availableLanguages.size() > 1){
-			//TODO choose between available languages
-		}
-		//TODO then, load appropriate files
-		packager.extractConfigurationFolders(language);
 
 		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
 		workerData.setCompletedCallback(completed);

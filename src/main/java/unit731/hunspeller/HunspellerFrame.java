@@ -1968,9 +1968,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			try{
 				packager = new Packager(projectPath);
-				backbone = new Backbone(packager, this, this);
+				final List<String> availableLanguages = packager.getAvailableLanguages();
+				final String language = availableLanguages.get(0);
+				if(availableLanguages.size() > 1){
+					//TODO choose between available languages
+				}
+				//TODO then, load appropriate files
+				packager.extractConfigurationFolders(language);
 
-				temporarilyChooseAFont(projectPath);
+				temporarilyChooseAFont(packager.getAffixFile().toPath());
+
+				backbone = new Backbone(packager, this, this);
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
@@ -1991,9 +1999,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	/** Chooses one font (in case of reading errors) */
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
-			//TODO choose font for the specified language
-			final String language = packager.getLanguage();
-
 			final String content = new String(Files.readAllBytes(basePath));
 			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 3);
 			final String sample = extractions[0] + extractions[1] + extractions[2];
