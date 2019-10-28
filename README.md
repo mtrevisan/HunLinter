@@ -98,7 +98,7 @@ An external text file can be put int the directory `aids` (on the same level of 
 
 This file could be used as a reminder of all the flag that can be added to a word and their meaning.
 
-The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `.aid` (eg. for Venetan: `vec.aid`).
+The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `.aid` (eg. for Venetan: `vec-IT.aid`).
 
 <a name="how-to-ordering"></a>
 ### Ordering table columns
