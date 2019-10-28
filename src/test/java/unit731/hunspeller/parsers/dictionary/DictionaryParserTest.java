@@ -20,14 +20,15 @@ class DictionaryParserTest{
 
 	@Test
 	void replacementTable() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"REP 4",
 			"REP ^b bb",
 			"REP e$ ee",
 			"REP ij IJ",
 			"REP alot a_lot");
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 
 		ConversionTable table = affParser.getAffixData().getData(AffixOption.REPLACEMENT_TABLE);
 		Assertions.assertEquals("[affixOption=REPLACEMENT_TABLE,table={  =[(ij,IJ), (alot,a lot)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
@@ -44,13 +45,14 @@ class DictionaryParserTest{
 
 	@Test
 	void applyLongest() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP b 1",
 			"REP bac 3",
 			"REP ba 2");
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 
 		List<String> replaced = affParser.getAffixData().applyReplacementTable("abacc");
 		Assertions.assertEquals(Arrays.asList("a1acc", "a3c", "a2cc"), replaced);
@@ -58,13 +60,14 @@ class DictionaryParserTest{
 
 	@Test
 	void applyLongestOnStart() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP ^b 1",
 			"REP ^bac 3",
 			"REP ^ba 2");
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 
 		List<String> replaced = affParser.getAffixData().applyReplacementTable("bacc");
 		Assertions.assertEquals(Arrays.asList("1acc", "3c", "2cc"), replaced);
@@ -72,13 +75,14 @@ class DictionaryParserTest{
 
 	@Test
 	void applyLongestOnEnd() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP b$ 1",
 			"REP cab$ 3",
 			"REP ab$ 2");
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 
 		List<String> replaced = affParser.getAffixData().applyReplacementTable("ccab");
 		Assertions.assertEquals(Arrays.asList("cca1", "c3", "cc2"), replaced);

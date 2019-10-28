@@ -149,7 +149,7 @@ public class AffixParser{
 	 * @throws IOException	If an I/O error occurs
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
-	public void parse(final File affFile) throws IOException, IllegalArgumentException{
+	public void parse(final File affFile, final String configurationLanguage) throws IOException, IllegalArgumentException{
 		data.clear();
 
 		boolean encodingRead = false;
@@ -181,6 +181,9 @@ public class AffixParser{
 		}
 
 		postProcessData(affFile);
+
+		if(configurationLanguage != null && !configurationLanguage.equals(data.getLanguage()))
+			data.setLanguage(configurationLanguage);
 
 		data.close();
 

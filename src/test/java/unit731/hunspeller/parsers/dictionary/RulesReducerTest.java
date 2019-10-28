@@ -38,9 +38,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix1() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX ʼ0 Y 11",
 			"SFX ʼ0 r ʼ r",
@@ -55,7 +56,7 @@ class RulesReducerTest{
 			"SFX ʼ0 o ʼ [^d]o",
 			"SFX ʼ0 ove óʼ ove"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "ʼ0";
@@ -115,9 +116,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix2() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX §1 Y 5",
 			"SFX §1 0 ta [^ƚ]a",
@@ -126,7 +128,7 @@ class RulesReducerTest{
 			"SFX §1 èƚo eƚato èƚo",
 			"SFX §1 o ato [^è]ƚo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "§1";
@@ -186,9 +188,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix3() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"FULLSTRIP",
 			"SFX §0 Y 17",
@@ -210,7 +213,7 @@ class RulesReducerTest{
 			"SFX §0 o ato [^ò]ko",
 			"SFX §0 0 ta [^ò][kns]a"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "§0";
@@ -285,9 +288,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix4() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX v1 Y 10",
 			"SFX v1 e ista e",
@@ -301,7 +305,7 @@ class RulesReducerTest{
 			"SFX v1 òda odista òda",
 			"SFX v1 ònia onista ònia"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v1";
@@ -370,9 +374,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix5() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX v0 Y 73",
 			"SFX v0 0 ría e",
@@ -449,7 +454,7 @@ class RulesReducerTest{
 			"SFX v0 ería aría ería",
 			"SFX v0 ería arieta ería"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v0";
@@ -572,16 +577,17 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix6() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX s1 Y 3",
 			"SFX s1 0 ixmo r",
 			"SFX s1 ía ixmo ía",
 			"SFX s1 òmo omixmo òmo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s1";
@@ -618,9 +624,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix7() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX s0 Y 6",
 			"SFX s0 0 ixmo [nr]",
@@ -630,7 +637,7 @@ class RulesReducerTest{
 			"SFX s0 òmo omixmo òmo",
 			"SFX s0 òto otixmo òto"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s0";
@@ -673,9 +680,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix8() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r8 Y 12",
 			"SFX r8 r ora r",
@@ -691,7 +699,7 @@ class RulesReducerTest{
 			"SFX r8 r doreto r",
 			"SFX r8 r toreto r"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r8";
@@ -735,9 +743,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix9() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r7 Y 34",
 			"SFX r7 rò ora rò",
@@ -775,7 +784,7 @@ class RulesReducerTest{
 			"SFX r7 dora oreta dora",
 			"SFX r7 dora toreta dora"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r7";
@@ -844,9 +853,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix10() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r6 Y 8",
 			"SFX r6 r ura [^u]r",
@@ -858,7 +868,7 @@ class RulesReducerTest{
 			"SFX r6 dura ura dura",
 			"SFX r6 dura ureta dura"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r6";
@@ -900,9 +910,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix11() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r5 Y 12",
 			"SFX r5 r ura [^u]r",
@@ -918,7 +929,7 @@ class RulesReducerTest{
 			"SFX r5 dura ura dura",
 			"SFX r5 dura ureta dura"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r5";
@@ -965,9 +976,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix12() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r4 Y 4",
 			"SFX r4 r sion r",
@@ -975,7 +987,7 @@ class RulesReducerTest{
 			"SFX r4 lderò ƚusion lderò",
 			"SFX r4 lverò ƚusion lverò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r4";
@@ -1027,9 +1039,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix13() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r3 Y 17",
 			"SFX r3 ir sion uir",
@@ -1050,7 +1063,7 @@ class RulesReducerTest{
 			"SFX r3 xerò sion [^r]xerò",
 			"SFX r3 orxerò uresion orxerò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r3";
@@ -1112,9 +1125,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix14() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r2 Y 18",
 			"SFX r2 ir ŧion uir",
@@ -1136,7 +1150,7 @@ class RulesReducerTest{
 			"SFX r2 xerò ŧion [^r]xerò",
 			"SFX r2 orxerò ureŧion orxerò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r2";
@@ -1199,15 +1213,16 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix15() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r1 Y 2",
 			"SFX r1 r mento r",
 			"SFX r1 rò mento arò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r1";
@@ -1242,9 +1257,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix16() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r0 Y 7",
 			"SFX r0 0 amento n",
@@ -1255,7 +1271,7 @@ class RulesReducerTest{
 			"SFX r0 rò mento arò",
 			"SFX r0 erò imento erò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r0";
@@ -1300,9 +1316,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix17() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX q1 Y 14",
 			"SFX q1 0 sa [^d]e",
@@ -1320,7 +1337,7 @@ class RulesReducerTest{
 			"SFX q1 o esa [^è]ƚo",
 			"SFX q1 èƚo eƚesa èƚo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "q1";
@@ -1381,9 +1398,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix18() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"FULLSTRIP",
 			"SFX mf Y 55",
@@ -1443,7 +1461,7 @@ class RulesReducerTest{
 			"SFX mf obrioxo ubriuxi obrioxo",
 			"SFX mf ordioxo urdiuxi ordioxo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "mf";
@@ -1584,9 +1602,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix19() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX V0 Y 14",
 			"SFX V0 èr er èr",
@@ -1604,7 +1623,7 @@ class RulesReducerTest{
 			"SFX V0 èr iereto [^aeoucijɉñ]èr",
 			"SFX V0 èr iareto [^aeoucijɉñ]èr"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "V0";
@@ -1655,9 +1674,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix20() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX U0 Y 10",
 			"SFX U0 l i [àéèóòú]l",
@@ -1671,7 +1691,7 @@ class RulesReducerTest{
 			"SFX U0 ul úi ul",
 			"SFX U0 un úi un"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "U0";
@@ -1723,9 +1743,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix1() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX ‘0 Y 9",
 			"PFX ‘0 a ʼ a",
@@ -1738,7 +1759,7 @@ class RulesReducerTest{
 			"PFX ‘0 l ʼ l",
 			"PFX ‘0 v ʼ v"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "‘0";
@@ -1787,9 +1808,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix2() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX vŧ Y 20",
 			"PFX vŧ be ba ber",
@@ -1813,7 +1835,7 @@ class RulesReducerTest{
 			"PFX vŧ té tà té",
 			"PFX vŧ ve va ver"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "vŧ";
@@ -1874,14 +1896,15 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix3() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX ^0 Y 1",
 			"PFX ^0 0 anti ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "^0";
@@ -1914,16 +1937,17 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix4() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX .0 Y 3",
 			"PFX .0 0 re .",
 			"PFX .0 0 ra [^a]",
 			"PFX .0 0 ar [^ƚ]"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = ".0";
@@ -1960,15 +1984,16 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix5() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX +0 Y 2",
 			"PFX +0 0 in [^n]",
 			"PFX +0 0 i n"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
@@ -2003,16 +2028,17 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix6() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"KEEPCASE Z0",
 			"PFX $1 Y 2",
 			"PFX $1 0 h/Z0 .",
 			"PFX $1 0 da/Z0 ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "$1";
@@ -2045,11 +2071,11 @@ class RulesReducerTest{
 	}
 
 
-	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
+	private Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);

@@ -15,25 +15,27 @@ class AffixParserTest{
 
 	@Test
 	void verifyOk() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",
 			"COMPOUNDFLAG B");
 
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 	}
 
 	@Test
 	void verifyKo(){
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",
 			"COMPOUNDFLAG A");
 
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
-			() -> affParser.parse(affFile));
+			() -> affParser.parse(affFile, language));
 		Assertions.assertEquals("Same flags present in multiple options", exception.getMessage());
 	}
 
