@@ -61,7 +61,8 @@ public class BaseBuilder{
 			.dictionaryBaseData;
 	}
 
-	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator){
+	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData,
+			final HyphenatorInterface hyphenator){
 		final DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
 			.checker.apply(affixData, hyphenator);
 		checker.loadRules();

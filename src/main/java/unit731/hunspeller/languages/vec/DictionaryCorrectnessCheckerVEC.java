@@ -86,11 +86,14 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
 
-		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
+		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
+			Pattern.CASE_INSENSITIVE);
 		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"), Pattern.CASE_INSENSITIVE);
-		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(rulesLoader.readProperty("patternNorthernPlural"), Pattern.CASE_INSENSITIVE);
+		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"),
+			Pattern.CASE_INSENSITIVE);
+		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(rulesLoader.readProperty("patternNorthernPlural"),
+			Pattern.CASE_INSENSITIVE);
 
 		PLURAL_NOUN_MASCULINE_RULE = rulesLoader.readProperty("masculinePluralNoun");
 		VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = rulesLoader.readProperty("variantTransformationAtEndVanishingEl");
@@ -113,7 +116,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		incompatibilityCheck(production);
 
-		if(production.hasNonTerminalContinuationFlags(affixData::isTerminalAffix) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB))
+		if(production.hasNonTerminalContinuationFlags(affixData::isTerminalAffix) && !production.hasPartOfSpeech(POS_VERB)
+				&& !production.hasPartOfSpeech(POS_ADVERB))
 			northernPluralCheck(production);
 
 		finalSonorizationCheck(production);
@@ -132,7 +136,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 			if(!derivedWord.toLowerCase(Locale.ROOT).startsWith(GraphemeVEC.GRAPHEME_L)
-					&& PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY), PATTERN_NON_VANISHING_EL))
+					&& PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY),
+					PATTERN_NON_VANISHING_EL))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
@@ -166,13 +171,14 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private boolean hasToCheckForNorthernPlural(final Production production){
-		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
-			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
+		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN)
+			&& !production.hasPartOfSpeech(POS_PROPER_NOUN) && hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
 	}
 
 	private String getRuleToCheckNorthernPlural(final String word){
 		final List<String> subwords = hyphenator.splitIntoCompounds(word);
-		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
+		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1))
+			|| PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 			NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 	}
 
@@ -223,9 +229,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(appliedRuleFlag != null){
 				//retrieve last applied rule
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
+					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(),
+						appliedRuleFlag}));
 				if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
+					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(),
+						appliedRuleFlag}));
 			}
 		}
 	}

@@ -94,7 +94,8 @@ public class WordVEC{
 		int count = 0;
 		final int size = word.length();
 		for(int i = 0; i < size; i ++)
-			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, word.charAt(i)) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, word.charAt(i)) >= 0)
+			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, word.charAt(i)) >= 0
+					|| Arrays.binarySearch(CONSONANTS_ARRAY, word.charAt(i)) >= 0)
 				count ++;
 		return count;
 	}
@@ -196,7 +197,8 @@ public class WordVEC{
 			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
-			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
+			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel
+			//of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
 			if(idx >= 0 && PatternHelper.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
@@ -216,7 +218,8 @@ public class WordVEC{
 		final int wordSize = word.length();
 		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
 			final String subword = word.substring(idx, idx + 2);
-			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
+			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword)
+					&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
 				final String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 					word = tmp;

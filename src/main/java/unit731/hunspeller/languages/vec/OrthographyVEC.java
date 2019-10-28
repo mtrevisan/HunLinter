@@ -95,7 +95,8 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	private String correctIJOccurrences(String word){
-		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
+		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
+		//correcting also the converse
 		word = PatternHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
 		word = PatternHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.PHONEME_JJH);
 		boolean iInsideIntoJFalsePositive = false;
@@ -115,7 +116,8 @@ public class OrthographyVEC extends Orthography{
 		final boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			final String syllabe = syllabes.get(i);
-			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE) && !syllabe.contains(HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)
+			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
+				&& !syllabe.contains(HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)
 				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
 		return errors;
