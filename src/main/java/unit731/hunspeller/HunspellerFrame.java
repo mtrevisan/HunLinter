@@ -19,6 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -47,20 +48,11 @@ import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.MenuSelectionManager;
-import javax.swing.RowFilter;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
@@ -194,11 +186,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		openProjectPathFileChooser = new JFileChooser();
 		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
 		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		//disable the "All files" option
+		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
+		try{
+			final BufferedImage regularFolderImg = ImageIO.read(GUIUtils.class.getResourceAsStream("/regular_folder.png"));
+			final ImageIcon regularFolderIcon = new ImageIcon(regularFolderImg);
+			final BufferedImage projectFolderImg = ImageIO.read(GUIUtils.class.getResourceAsStream("/project_folder.png"));
+			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
+			openProjectPathFileChooser.setFileView(new FileView(){
+				//choose the right icon for the folder
+				public Icon getIcon(final File file){
+//					final boolean isProjectFolder = Packager.isProjectFolder(file.toPath());
+					final boolean isProjectFolder = false;
+					return (isProjectFolder? projectFolderIcon: regularFolderIcon);
+				}
+			});
+		}
+		catch(final IOException ignored){}
 
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		final File currentDir = new File(".");
-		saveResultFileChooser.setCurrentDirectory(currentDir);
 
 		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
