@@ -52,7 +52,6 @@ public class Packager{
 	private static final String CONFIGURATION_PROPERTY = "prop";
 	private static final String CONFIGURATION_NODE = "node";
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
-	private static final String CONFIGURATION_LANGUAGE = "LANGUAGE";
 	//dictionaries spellcheck directory
 	private static final String FILENAME_PREFIX_SPELLING = "HunSpellDic_";
 	private static final String FILENAME_PREFIX_HYPHENATION = "HypDic_";
@@ -87,7 +86,7 @@ public class Packager{
 
 
 	private final Path projectPath;
-	private final File mainManifestFile;
+	private final Path mainManifestPath;
 	private final List<File> manifestFiles;
 	private final List<String> languages;
 
@@ -99,21 +98,24 @@ public class Packager{
 		Objects.requireNonNull(projectPath);
 
 		this.projectPath = projectPath;
-		if(!existFile(projectPath.toFile()))
+		if(!existDirectory(projectPath))
 			throw new IllegalArgumentException("Folder " + projectPath + " does not exists, cannot proceed");
 
-		mainManifestFile = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)
-			.toFile();
-		if(!existFile(mainManifestFile))
+		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
+		if(!existFile(mainManifestPath))
 			throw new IllegalArgumentException("No " + FILENAME_MANIFEST_XML + " file found under " + projectPath + ", cannot proceed");
 
-		manifestFiles = extractFileEntries(mainManifestFile).stream()
+		manifestFiles = extractFileEntries(mainManifestPath.toFile()).stream()
 			.map(configurationFile -> Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
 			.collect(Collectors.toList());
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
 			throw new IllegalArgumentException("No language(s) defined");
+	}
+
+	public static boolean isProjectFolder(final Path projectPath){
+		return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
 	}
 
 	public List<String> getAvailableLanguages(){
@@ -173,7 +175,7 @@ public class Packager{
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null)
-			this.configurationFiles.putAll(getFolders(node, mainManifestFile.toPath().getParent(), file.toPath().getParent()));
+			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 	}
 
 	private void processPathsConfigurationFile()
@@ -182,7 +184,7 @@ public class Packager{
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, mainManifestFile.toPath().getParent(), file.toPath().getParent()));
+			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
 				.map(File::toString)
 				.collect(Collectors.toSet());
@@ -295,8 +297,12 @@ public class Packager{
 		return parentPath;
 	}
 
-	private boolean existFile(final File file){
-		return Files.isRegularFile(file.toPath());
+	private static boolean existDirectory(final Path path){
+		return Files.isDirectory(path);
+	}
+
+	private static boolean existFile(final Path path){
+		return Files.isRegularFile(path);
 	}
 
 	private boolean existFile(final Path path, final String filename){

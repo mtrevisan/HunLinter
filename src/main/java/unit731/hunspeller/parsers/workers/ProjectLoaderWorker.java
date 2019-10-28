@@ -1,10 +1,10 @@
 package unit731.hunspeller.parsers.workers;
 
-import unit731.hunspeller.parsers.workers.exceptions.ProjectFileNotFoundException;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
-import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -14,6 +14,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.Packager;
 
 
 public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
@@ -24,18 +25,26 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	public static final String WORKER_NAME = "Project loader";
 
 
-	private final Path basePath;
+	private final Packager packager;
 	private final Backbone backbone;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final Path basePath, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
-		Objects.requireNonNull(basePath);
+	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
+		Objects.requireNonNull(packager);
 		Objects.requireNonNull(backbone);
 
-		this.basePath = basePath;
+		this.packager = packager;
 		this.backbone = backbone;
+
+		final List<String> availableLanguages = packager.getAvailableLanguages();
+		final String language = availableLanguages.get(0);
+		if(availableLanguages.size() > 1){
+			//TODO choose between available languages
+		}
+		//TODO then, load appropriate files
+		packager.extractConfigurationFolders(language);
 
 		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
 		workerData.setCompletedCallback(completed);
@@ -57,7 +66,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			backbone.openAffixFile(basePath);
+			final File affFile = packager.getAffixFile();
+			backbone.openAffixFile(affFile);
 
 			setProgress(11);
 
@@ -129,7 +139,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception e){
-			exception = (e instanceof FileNotFoundException? new ProjectFileNotFoundException(basePath.toString(), e): e);
+			exception = (e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath().toString(), e): e);
 
 			if(e instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");

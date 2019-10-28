@@ -3,9 +3,11 @@ package unit731.hunspeller;
 import java.awt.*;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
 import unit731.hunspeller.gui.JWordLabel;
+import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
 
 import java.awt.event.ActionEvent;
@@ -87,7 +89,7 @@ import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
-import unit731.hunspeller.parsers.workers.exceptions.ProjectFileNotFoundException;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 import unit731.hunspeller.parsers.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.workers.DuplicatesWorker;
@@ -107,6 +109,7 @@ import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.RecentItems;
 
@@ -142,12 +145,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
-	private final JFileChooser openBasePathFileChooser;
+	private final JFileChooser openProjectPathFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
-	private final Backbone backbone;
+	private Backbone backbone;
+	private Packager packager;
 	private int lastDictionarySortVisibleIndex;
 
 	private RecentFilesMenu recentFilesMenu;
@@ -172,8 +176,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	public HunspellerFrame(){
-		backbone = new Backbone(this, this);
-
 		initComponents();
 
 		recentFilesMenu.setEnabled(recentFilesMenu.hasEntries());
@@ -189,9 +191,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		final File currentDir = new File(".");
-		openBasePathFileChooser = new JFileChooser();
-		openBasePathFileChooser.setFileFilter(new FileNameExtensionFilter("AFF files", "aff"));
-		openBasePathFileChooser.setCurrentDirectory(currentDir);
+		openProjectPathFileChooser = new JFileChooser();
+		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
+		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		openProjectPathFileChooser.setCurrentDirectory(currentDir);
 
 		saveTextFileFileChooser = new JFileChooser();
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
@@ -1313,14 +1316,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		int projectSelected = openBasePathFileChooser.showOpenDialog(this);
+		int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			recentFilesMenu.addEntry(openBasePathFileChooser.getSelectedFile().getAbsolutePath());
+			recentFilesMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
 
 			recentFilesMenu.setEnabled(true);
 			filEmptyRecentFilesMenuItem.setEnabled(true);
 
-			final File baseFile = openBasePathFileChooser.getSelectedFile();
+			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
    }//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
@@ -1955,26 +1958,39 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	@Override
-	public void loadFileInternal(final Path basePath){
+	public void loadFileInternal(final Path projectPath){
 		//clear all
 		loadFileCancelled(null);
 
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
-			temporarilyChooseAFont(basePath);
+			try{
+				packager = new Packager(projectPath);
+				backbone = new Backbone(packager, this, this);
 
-			prjLoaderWorker = new ProjectLoaderWorker(basePath, backbone, this::loadFileCompleted, this::loadFileCancelled);
-			prjLoaderWorker.addPropertyChangeListener(this);
-			prjLoaderWorker.execute();
+				temporarilyChooseAFont(projectPath);
 
-			filOpenProjectMenuItem.setEnabled(false);
+				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
+				prjLoaderWorker.addPropertyChangeListener(this);
+				prjLoaderWorker.execute();
+
+				filOpenProjectMenuItem.setEnabled(false);
+			}
+			catch(final IOException | SAXException e){
+				LOGGER.error(Backbone.MARKER_APPLICATION, "A bad error occurred while loading the project: {}", ExceptionHelper.getMessage(e));
+
+				LOGGER.error("A bad error occurred while loading the project", e);
+			}
 		}
 	}
 
 	/** Chooses one font (in case of reading errors) */
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
+			//TODO choose font for the specified language
+			final String language = packager.getLanguage();
+
 			final String content = new String(Files.readAllBytes(basePath));
 			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 3);
 			final String sample = extractions[0] + extractions[1] + extractions[2];
@@ -2123,9 +2139,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void loadFileCancelled(final Exception exc){
 		filOpenProjectMenuItem.setEnabled(true);
-		if(exc != null && (exc instanceof ProjectFileNotFoundException))
+		if(exc != null && (exc instanceof ProjectNotFoundException))
 			//remove the file from the recent files menu
-			recentFilesMenu.removeEntry(((ProjectFileNotFoundException)exc).getPath());
+			recentFilesMenu.removeEntry(((ProjectNotFoundException)exc).getPath());
 
 
 		dicCheckCorrectnessMenuItem.setEnabled(false);

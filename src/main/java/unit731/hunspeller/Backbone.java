@@ -72,13 +72,15 @@ public class Backbone implements FileChangeListener{
 	private final ExceptionsParser sexParser;
 	private final ExceptionsParser wexParser;
 
-	private Packager packager;
-
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
 
+	private final Packager packager;
 
-	public Backbone(final Hunspellable hunspellable, final Undoable undoable){
+
+	public Backbone(final Packager packager, final Hunspellable hunspellable, final Undoable undoable){
+		Objects.requireNonNull(packager);
+
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
@@ -88,6 +90,8 @@ public class Backbone implements FileChangeListener{
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
+
+		this.packager = packager;
 	}
 
 	public AffixParser getAffParser(){
@@ -159,18 +163,7 @@ public class Backbone implements FileChangeListener{
 		flm.stop();
 	}
 
-	public void openAffixFile(final Path basePath) throws IOException, SAXException{
-		packager = new Packager(basePath);
-
-		final List<String> availableLanguages = packager.getAvailableLanguages();
-		String language = availableLanguages.get(0);
-		if(availableLanguages.size() > 1){
-			//TODO choose between available languages
-		}
-		//TODO then, load appropriate files
-		packager.extractConfigurationFolders(language);
-
-		final File affFile = packager.getAffixFile();
+	public void openAffixFile(final File affFile) throws IOException{
 		if(!affFile.exists()){
 			affParser.clear();
 
