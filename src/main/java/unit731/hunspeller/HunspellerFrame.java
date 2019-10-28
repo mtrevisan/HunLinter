@@ -1972,7 +1972,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
 					//choose between available languages
-					final Consumer<String> onSelection = lang -> language.set(lang);
+					final Consumer<String> onSelection = language::set;
 					LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
 					GUIUtils.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
@@ -2154,7 +2154,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void loadFileCancelled(final Exception exc){
 		filOpenProjectMenuItem.setEnabled(true);
-		if(exc != null && (exc instanceof ProjectNotFoundException)){
+		if((exc instanceof ProjectNotFoundException)){
 			//remove the file from the recent projects menu
 			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
 

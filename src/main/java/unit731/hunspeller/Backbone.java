@@ -367,7 +367,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
 		final Path filePath = Path.of(packager.getProjectPath().toString(), path.toString());
-		if(filePath.equals(packager.getAffixFile())){
+		if(filePath.toFile().equals(packager.getAffixFile())){
 			affParser.clear();
 
 			Optional.ofNullable(hunspellable)
@@ -379,19 +379,19 @@ public class Backbone implements FileChangeListener{
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAidParser);
 		}
-		else if(filePath.equals(packager.getAutoCorrectFile())){
+		else if(filePath.toFile().equals(packager.getAutoCorrectFile())){
 			acoParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAutoCorrectParser);
 		}
-		else if(filePath.equals(packager.getSentenceExceptionsFile())){
+		else if(filePath.toFile().equals(packager.getSentenceExceptionsFile())){
 			sexParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
 		}
-		else if(filePath.equals(packager.getWordExceptionsFile())){
+		else if(filePath.toFile().equals(packager.getWordExceptionsFile())){
 			wexParser.clear();
 
 			Optional.ofNullable(hunspellable)
