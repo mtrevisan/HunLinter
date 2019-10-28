@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,9 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
 	private static final String CONFIGURATION_LANGUAGE = "LANGUAGE";
 	//dictionaries spellcheck directory
+	private static final String FILENAME_PREFIX_SPELLING = "HunSpellDic_";
+	private static final String FILENAME_PREFIX_HYPHENATION = "HypDic_";
+	private static final String FILENAME_PREFIX_THESAURUS = "ThesDic_";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX = "DICT_SPELL_AFF";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY = "DICT_SPELL_DIC";
 	//dictionaries hyphenation file
@@ -103,11 +107,15 @@ public class Packager{
 						.map(configurationFile -> Paths.get(basePath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
 						.collect(Collectors.toList());
 
-					language = extractLanguage(manifestFile, fullFiles, affFile);
+					final Map<String, File> languages = extractLanguages(manifestFile, fullFiles);
+					if(languages.isEmpty())
+						throw new IllegalArgumentException("No language(s) defined");
+					final Map<File, String> affFiles = invert(languages);
+					language = affFiles.get(affFile);
 					if(language == null)
-						throw new IllegalArgumentException("Cannot extract language");
+						throw new IllegalArgumentException("Language not present in " + FILENAME_MANIFEST_XML);
 
-					processDictionariesConfigurationFile(manifestFile, fullFiles, language);
+					processDictionariesConfigurationFile(manifestFile, fullFiles);
 					processPathsConfigurationFile(manifestFile, fullFiles);
 				}
 			}
@@ -119,7 +127,12 @@ public class Packager{
 		}
 	}
 
-	private String extractLanguage(final File manifestFile, final List<File> configurationFiles, final File affFile) throws IOException, SAXException{
+	private static <V, K> Map<V, K> invert(final Map<K, V> map){
+		return map.entrySet().stream()
+			.collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+	}
+
+	private Map<String, File> extractLanguages(final File manifestFile, final List<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final File file = pair.getLeft();
 		final Node parentNode = pair.getRight();
@@ -134,39 +147,36 @@ public class Packager{
 
 				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
-					return getLanguage(entry, basePath, originPath, affFile);
+					return getLanguages(entry, basePath, originPath);
 				}
 			}
 		}
-		return null;
+		return Collections.emptyMap();
 	}
 
-	private String getLanguage(final Node entry, final Path basePath, final Path originPath, final File affFile) throws IOException{
+	private Map<String, File> getLanguages(final Node entry, final Path basePath, final Path originPath) throws IOException{
+		final Map<String, File> languages = new HashMap<>();
 		final NodeList subNodes = entry.getChildNodes();
-		for(int j = 0; j < subNodes.getLength(); j ++){
-			final Node subEntry = subNodes.item(j);
-			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
-				continue;
-
-			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+		for(int i = 0; i < subNodes.getLength(); i ++){
+			final Node subEntry = subNodes.item(i);
+			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE) && XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+				final String language = extractLocale(subEntry);
 				final String folder = extractLocation(subEntry);
 				final int splitIndex = folder.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
 				final String folderAff = folder.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
-				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-				if(fileAff.getCanonicalPath().equals(affFile.getCanonicalPath()))
-					return extractLocale(subEntry);
+				final File affFile = absolutizeFolder(folderAff, basePath, originPath);
+				languages.put(language, affFile);
 			}
 		}
-		return null;
+		return languages;
 	}
 
-	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles, final String language)
-			throws IOException, SAXException{
+	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null)
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), language));
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
 	}
 
 	private void processPathsConfigurationFile(final File manifestFile, final List<File> configurationFiles)
@@ -175,7 +185,7 @@ public class Packager{
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), null));
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
 			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
 				.map(File::toString)
 				.collect(Collectors.toSet());
@@ -326,8 +336,7 @@ public class Packager{
 		return null;
 	}
 
-	//FIXME ugly parameter language...
-	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath, final String language) throws IOException{
+	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
 		final Map<String, File> children = new HashMap<>();
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
@@ -339,7 +348,7 @@ public class Packager{
 			if(node != null){
 				//extract folder(s)
 				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-					getFoldersForDictionaries(entry, basePath, originPath, language, children);
+					getFoldersForDictionaries(entry, basePath, originPath, children);
 				else{
 					final String nodeValue = node.getNodeValue();
 					getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
@@ -349,7 +358,7 @@ public class Packager{
 		return children;
 	}
 
-	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final String language, final Map<String, File> children) throws IOException{
+	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
 		final NodeList subNodes = entry.getChildNodes();
 		for(int j = 0; j < subNodes.getLength(); j ++){
 			final Node subEntry = subNodes.item(j);
@@ -361,7 +370,7 @@ public class Packager{
 			if(!locale.equals(language))
 				continue;
 
-			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
 				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
@@ -371,12 +380,12 @@ public class Packager{
 				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
+			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final String folder = extractLocation(subEntry);
 				final File file = absolutizeFolder(folder, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
+			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_THESAURUS)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
 				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
