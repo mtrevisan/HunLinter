@@ -236,6 +236,10 @@ public class Backbone implements FileChangeListener{
 
 		packager = new Packager(affFile);
 
+		final AffixData affixData = affParser.getAffixData();
+		if(packager.getLanguage() != null && !packager.getLanguage().equals(affixData.getLanguage()))
+			affixData.setLanguage(packager.getLanguage());
+
 		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 

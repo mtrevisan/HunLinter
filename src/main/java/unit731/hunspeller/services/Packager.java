@@ -50,6 +50,7 @@ public class Packager{
 	private static final String CONFIGURATION_PROPERTY = "prop";
 	private static final String CONFIGURATION_NODE = "node";
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
+	private static final String CONFIGURATION_LANGUAGE = "LANGUAGE";
 	//dictionaries spellcheck directory
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX = "DICT_SPELL_AFF";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY = "DICT_SPELL_DIC";
@@ -62,6 +63,7 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME_SERVICE_MANAGER = "ServiceManager";
 	private static final String CONFIGURATION_NODE_NAME_DICTIONARIES = "Dictionaries";
 	private static final String CONFIGURATION_NODE_NAME_LOCATIONS = "Locations";
+	private static final String CONFIGURATION_NODE_NAME_LOCALES = "Locales";
 	//autocorrect/autotext configuration file
 	private static final String CONFIGURATION_NODE_NAME_PATHS = "Paths";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_CORRECT = "AutoCorrect";
@@ -79,6 +81,7 @@ public class Packager{
 	private static final String THESAURUS_FOLDERS_SEPARATOR = ".dat ";
 
 
+	private String language;
 	private final Map<String, File> configurationFiles = new HashMap<>();
 
 
@@ -96,12 +99,15 @@ public class Packager{
 				final File manifestFile = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)
 					.toFile();
 				if(existFile(manifestFile)){
-					//read FILENAME_MANIFEST_XML into META-INF, collect all manifest:file-entry
 					final List<File> fullFiles = extractFileEntries(manifestFile).stream()
 						.map(configurationFile -> Paths.get(basePath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
 						.collect(Collectors.toList());
 
-					processDictionariesConfigurationFile(manifestFile, fullFiles);
+					language = extractLanguage(manifestFile, fullFiles, affFile);
+					if(language == null)
+						throw new IllegalArgumentException("Cannot extract language");
+
+					processDictionariesConfigurationFile(manifestFile, fullFiles, language);
 					processPathsConfigurationFile(manifestFile, fullFiles);
 				}
 			}
@@ -113,16 +119,54 @@ public class Packager{
 		}
 	}
 
-	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles)
+	private String extractLanguage(final File manifestFile, final List<File> configurationFiles, final File affFile) throws IOException, SAXException{
+		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
+		final File file = pair.getLeft();
+		final Node parentNode = pair.getRight();
+		if(parentNode != null){
+			final Path basePath = manifestFile.toPath().getParent();
+			final Path originPath = file.toPath().getParent();
+			final NodeList nodes = parentNode.getChildNodes();
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node entry = nodes.item(i);
+				if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
+					continue;
+
+				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
+				if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
+					return getLanguage(entry, basePath, originPath, affFile);
+				}
+			}
+		}
+		return null;
+	}
+
+	private String getLanguage(final Node entry, final Path basePath, final Path originPath, final File affFile) throws IOException{
+		final NodeList subNodes = entry.getChildNodes();
+		for(int j = 0; j < subNodes.getLength(); j ++){
+			final Node subEntry = subNodes.item(j);
+			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
+				continue;
+
+			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+				final String folder = extractLocation(subEntry);
+				final int splitIndex = folder.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+				final String folderAff = folder.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+				if(fileAff.getCanonicalPath().equals(affFile.getCanonicalPath()))
+					return extractLocale(subEntry);
+			}
+		}
+		return null;
+	}
+
+	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles, final String language)
 			throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
-		if(node != null){
-			//TODO read language corresponding to the loaded .aff file
-
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
-		}
+		if(node != null)
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), language));
 	}
 
 	private void processPathsConfigurationFile(final File manifestFile, final List<File> configurationFiles)
@@ -131,7 +175,7 @@ public class Packager{
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
+			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), null));
 			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
 				.map(File::toString)
 				.collect(Collectors.toSet());
@@ -146,7 +190,7 @@ public class Packager{
 	public void createPackage(final File affFile, final String language){
 		final Path basePath = getPackageBaseDirectory(affFile);
 
-		//package entire folder with ZIP
+		//package entire folder into a ZIP file
 		if(basePath != null){
 			try{
 				Path autoCorrectOutputPath = null;
@@ -194,6 +238,10 @@ public class Packager{
 				LOGGER.error("Something very bad happened while creating package", e);
 			}
 		}
+	}
+
+	public String getLanguage(){
+		return language;
 	}
 
 	public File getHyphenationFile(){
@@ -278,57 +326,65 @@ public class Packager{
 		return null;
 	}
 
-	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
+	//FIXME ugly parameter language...
+	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath, final String language) throws IOException{
 		final Map<String, File> children = new HashMap<>();
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
-			if(XMLParser.isElement(entry, CONFIGURATION_NODE)){
-				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-				if(node != null){
-					//extract folder(s)
-					if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-						getFoldersForDictionaries(entry, basePath, originPath, children);
-					else{
-						final String nodeValue = node.getNodeValue();
-						getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
-					}
+			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
+				continue;
+
+			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
+			if(node != null){
+				//extract folder(s)
+				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
+					getFoldersForDictionaries(entry, basePath, originPath, language, children);
+				else{
+					final String nodeValue = node.getNodeValue();
+					getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
 				}
 			}
 		}
 		return children;
 	}
 
-	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
+	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final String language, final Map<String, File> children) throws IOException{
 		final NodeList subNodes = entry.getChildNodes();
 		for(int j = 0; j < subNodes.getLength(); j ++){
 			final Node subEntry = subNodes.item(j);
-			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)){
-				if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
-					final String folders = extractLocation(subEntry);
-					final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-					final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
-					final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-					children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
-					final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
-					final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-					children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
-				}
-				else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
-					final String folder = extractLocation(subEntry);
-					final File file = absolutizeFolder(folder, basePath, originPath);
-					children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
-				}
-				else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
-					final String folders = extractLocation(subEntry);
-					final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
-					final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
-					final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
-					children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
-					final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
-					final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
-					children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
-				}
+			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
+				continue;
+
+			//restrict to given language
+			final String locale = extractLocale(subEntry);
+			if(!locale.equals(language))
+				continue;
+
+			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+				final String folders = extractLocation(subEntry);
+				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
+				final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
+				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
+				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
+			}
+			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
+				final String folder = extractLocation(subEntry);
+				final File file = absolutizeFolder(folder, basePath, originPath);
+				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
+			}
+			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
+				final String folders = extractLocation(subEntry);
+				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
+				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
+				final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
+				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
+				final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
+				final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
+				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
 			}
 		}
 	}
@@ -359,11 +415,19 @@ public class Packager{
 	}
 
 	private String extractLocation(final Node parentNode){
+		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCATIONS);
+	}
+
+	private String extractLocale(final Node parentNode){
+		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
+	}
+
+	private String extractProperty(final Node parentNode, final String propertyName){
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node node = nodes.item(i);
 			if(XMLParser.isElement(node, CONFIGURATION_PROPERTY)
-					&& CONFIGURATION_NODE_NAME_LOCATIONS.equals(XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
+					&& propertyName.equals(XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
 				return node.getChildNodes().item(1).getFirstChild().getNodeValue();
 		}
 		return null;
@@ -383,11 +447,12 @@ public class Packager{
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node entry = nodes.item(i);
-			if(XMLParser.isElement(entry, CONFIGURATION_NODE)){
-				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-				if(node != null && nodeName.equals(node.getNodeValue()))
-					return fun.apply(entry);
-			}
+			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
+				continue;
+
+			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
+			if(node != null && nodeName.equals(node.getNodeValue()))
+				return fun.apply(entry);
 		}
 		return null;
 	}

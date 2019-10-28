@@ -135,6 +135,10 @@ public class AffixData{
 		return getData(AffixOption.LANGUAGE);
 	}
 
+	public void setLanguage(final String language){
+		addData(AffixOption.LANGUAGE, language);
+	}
+
 	public FlagParsingStrategy getFlagParsingStrategy(){
 		final String flag = getFlag();
 		return (flag != null? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
