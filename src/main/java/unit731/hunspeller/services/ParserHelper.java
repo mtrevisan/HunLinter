@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class ParserHelper{
 
-	public static final Pattern PATTERN_COMMENT = PatternHelper.pattern("(^\\s*|\\s+)[#\\/].*$");
+	public static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^\\s*[#\\/].*$");
 
 
 	public static boolean isComment(final String line){

@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +57,7 @@ public class Packager{
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
 	//dictionaries spellcheck directory
 	private static final String FILENAME_PREFIX_SPELLING = "HunSpellDic_";
-	private static final String FILENAME_PREFIX_HYPHENATION = "HypDic_";
+	private static final String FILENAME_PREFIX_HYPHENATION = "HyphDic_";
 	private static final String FILENAME_PREFIX_THESAURUS = "ThesDic_";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX = "DICT_SPELL_AFF";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY = "DICT_SPELL_DIC";
@@ -160,13 +162,17 @@ public class Packager{
 	}
 
 	private List<String> getLanguages(final Node entry){
-		final List<String> languages = new ArrayList<>();
+		final Set<String> languageSets = new HashSet<>();
 		final NodeList subNodes = entry.getChildNodes();
 		for(int i = 0; i < subNodes.getLength(); i ++){
 			final Node subEntry = subNodes.item(i);
-			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE) && XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING))
-				languages.add(extractLocale(subEntry));
+			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE) && XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+				final String[] locales = extractLocale(subEntry);
+				for(final String locale : locales)
+					languageSets.add(locale);
+			}
 		}
+		final List<String> languages = new ArrayList<>(languageSets);
 		Collections.sort(languages);
 		return Collections.unmodifiableList(languages);
 	}
@@ -384,11 +390,12 @@ public class Packager{
 				continue;
 
 			//restrict to given language
-			final String locale = extractLocale(subEntry);
-			if(!locale.equals(language))
+			final String[] locale = extractLocale(subEntry);
+			if(!ArrayUtils.contains(locale, language))
 				continue;
 
-			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+			final String attributeValue = XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME);
+			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
 				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
@@ -398,12 +405,12 @@ public class Packager{
 				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_HYPHENATION)){
+			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final String folder = extractLocation(subEntry);
 				final File file = absolutizeFolder(folder, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_THESAURUS)){
+			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
 				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
@@ -445,8 +452,9 @@ public class Packager{
 		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCATIONS);
 	}
 
-	private String extractLocale(final Node parentNode){
-		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
+	private String[] extractLocale(final Node parentNode){
+		final String locale = extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
+		return StringUtils.split(locale, ' ');
 	}
 
 	private String extractProperty(final Node parentNode, final String propertyName){
