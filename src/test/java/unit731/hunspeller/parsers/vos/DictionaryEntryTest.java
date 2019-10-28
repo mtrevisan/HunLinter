@@ -12,7 +12,8 @@ class DictionaryEntryTest{
 
 	@Test
 	void parse() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX C",
 			"SFX A Y 1",
@@ -20,7 +21,7 @@ class DictionaryEntryTest{
 			"SFX B Y 1",
 			"SFX B 0 b .");
 		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 
 
 		String line = "abcdef";

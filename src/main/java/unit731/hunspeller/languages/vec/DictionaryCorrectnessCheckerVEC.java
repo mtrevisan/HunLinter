@@ -19,7 +19,7 @@ import unit731.hunspeller.services.PatternHelper;
 
 public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{
 
-	public static final String LANGUAGE = "vec";
+	public static final String LANGUAGE = "vec-IT";
 
 	private static final String POS_PROPER_NOUN = "proper_noun";
 	private static final String POS_NOUN = "noun";

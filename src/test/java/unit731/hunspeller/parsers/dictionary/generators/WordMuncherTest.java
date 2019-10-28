@@ -18,18 +18,19 @@ class WordMuncherTest{
 
 	@Test
 	void simpleOriginator() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 a .",
 			"SFX b Y 1",
 			"SFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"1",
 			"a");
 		String line = "ab";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -40,18 +41,19 @@ class WordMuncherTest{
 
 	@Test
 	void simpleOriginatorWithCompatiblePartOfSpeech() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 a .	po:noun",
 			"SFX b Y 1",
 			"SFX b 0 b .	po:noun"
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"1",
 			"a");
 		String line = "ab	po:noun";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -63,17 +65,18 @@ class WordMuncherTest{
 
 	@Test
 	void simpleOriginatorWithNonCompatiblePartOfSpeech() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 a .	po:adjective",
 			"SFX b Y 1",
 			"SFX b 0 b .	po:adjective"
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"0");
 		String line = "ab	po:noun";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -83,18 +86,19 @@ class WordMuncherTest{
 
 	@Test
 	void multipleOriginator() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"SFX b Y 1",
 			"SFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"1",
 			"a");
 		String line = "ab";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -106,19 +110,20 @@ class WordMuncherTest{
 
 	@Test
 	void multipleOriginatorPrefixAndSuffix() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"PFX b Y 1",
 			"PFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"2",
 			"ab",
 			"ba");
 		String line = "bab";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -130,16 +135,17 @@ class WordMuncherTest{
 
 	@Test
 	void multipleOriginators() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 2",
 			"SFX a 0 b .",
 			"SFX a 0 bb ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"0");
 		String line = "abb";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -149,18 +155,19 @@ class WordMuncherTest{
 
 	@Test
 	void notContainedIntoDictionary() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"PFX b Y 1",
 			"PFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"1",
 			"ba");
 		String line = "bab";
-		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, line);
+		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
 		WordMuncher muncher = pair.getLeft();
 		DictionaryEntry dicEntry = pair.getRight();
 		final List<DictionaryEntry> originators = muncher.inferAffixRules(dicEntry);
@@ -170,9 +177,9 @@ class WordMuncherTest{
 	}
 
 
-	private Pair<WordMuncher, DictionaryEntry> createMuncher(final File affFile, final File dicFile, final String line) throws IOException{
+	private Pair<WordMuncher, DictionaryEntry> createMuncher(final File affFile, final File dicFile, final String language, final String line) throws IOException{
 		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
+		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);

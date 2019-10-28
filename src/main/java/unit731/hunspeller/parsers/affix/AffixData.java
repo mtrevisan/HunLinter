@@ -136,7 +136,7 @@ public class AffixData{
 	}
 
 	public void setLanguage(final String language){
-		addData(AffixOption.LANGUAGE, language);
+		data.put(AffixOption.LANGUAGE.getCode(), language);
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){

@@ -38,9 +38,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix1() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX ʼ0 Y 11",
 			"SFX ʼ0 r ʼ r",
@@ -115,9 +116,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix2() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX §1 Y 5",
 			"SFX §1 0 ta [^ƚ]a",
@@ -186,9 +188,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix3() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"FULLSTRIP",
 			"SFX §0 Y 17",
@@ -285,9 +288,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix4() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX v1 Y 10",
 			"SFX v1 e ista e",
@@ -370,9 +374,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix5() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX v0 Y 73",
 			"SFX v0 0 ría e",
@@ -572,9 +577,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix6() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX s1 Y 3",
 			"SFX s1 0 ixmo r",
@@ -618,9 +624,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix7() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX s0 Y 6",
 			"SFX s0 0 ixmo [nr]",
@@ -673,9 +680,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix8() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r8 Y 12",
 			"SFX r8 r ora r",
@@ -735,9 +743,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix9() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r7 Y 34",
 			"SFX r7 rò ora rò",
@@ -844,9 +853,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix10() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r6 Y 8",
 			"SFX r6 r ura [^u]r",
@@ -900,9 +910,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix11() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r5 Y 12",
 			"SFX r5 r ura [^u]r",
@@ -965,9 +976,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix12() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r4 Y 4",
 			"SFX r4 r sion r",
@@ -1027,9 +1039,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix13() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r3 Y 17",
 			"SFX r3 ir sion uir",
@@ -1112,9 +1125,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix14() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r2 Y 18",
 			"SFX r2 ir ŧion uir",
@@ -1199,9 +1213,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix15() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r1 Y 2",
 			"SFX r1 r mento r",
@@ -1242,9 +1257,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix16() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX r0 Y 7",
 			"SFX r0 0 amento n",
@@ -1300,9 +1316,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix17() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX q1 Y 14",
 			"SFX q1 0 sa [^d]e",
@@ -1381,9 +1398,10 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix18() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"FULLSTRIP",
 			"SFX mf Y 55",
@@ -1584,9 +1602,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix19() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX V0 Y 14",
 			"SFX V0 èr er èr",
@@ -1655,9 +1674,10 @@ class RulesReducerTest{
 
 	@Test
 	void caseSuffix20() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"SFX U0 Y 10",
 			"SFX U0 l i [àéèóòú]l",
@@ -1723,9 +1743,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix1() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX ‘0 Y 9",
 			"PFX ‘0 a ʼ a",
@@ -1787,9 +1808,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix2() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX vŧ Y 20",
 			"PFX vŧ be ba ber",
@@ -1874,9 +1896,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix3() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX ^0 Y 1",
 			"PFX ^0 0 anti ."
@@ -1914,9 +1937,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix4() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX .0 Y 3",
 			"PFX .0 0 re .",
@@ -1960,9 +1984,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix5() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"PFX +0 Y 2",
 			"PFX +0 0 in [^n]",
@@ -2003,9 +2028,10 @@ class RulesReducerTest{
 
 	@Test
 	void casePrefix6() throws IOException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "vec-IT";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"LANG vec",
+			"LANG " + language,
 			"FLAG long",
 			"KEEPCASE Z0",
 			"PFX $1 Y 2",
@@ -2047,9 +2073,10 @@ class RulesReducerTest{
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile);
+		String language = "vec-IT";
+		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
-		File dicFile = FileHelper.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);
