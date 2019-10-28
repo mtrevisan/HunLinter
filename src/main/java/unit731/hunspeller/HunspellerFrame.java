@@ -154,7 +154,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private Packager packager;
 	private int lastDictionarySortVisibleIndex;
 
-	private RecentFilesMenu recentFilesMenu;
+	private RecentFilesMenu recentProjectsMenu;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> compoundProductionDebouncer = new Debouncer<>(this::calculateCompoundProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
@@ -178,8 +178,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public HunspellerFrame(){
 		initComponents();
 
-		recentFilesMenu.setEnabled(recentFilesMenu.hasEntries());
-		filEmptyRecentFilesMenuItem.setEnabled(recentFilesMenu.hasEntries());
+		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
+		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		try{
 			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
@@ -306,8 +306,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filCreatePackageMenuItem = new javax.swing.JMenuItem();
       filFontSeparator = new javax.swing.JPopupMenu.Separator();
       filFontMenuItem = new javax.swing.JMenuItem();
-      filRecentFilesSeparator = new javax.swing.JPopupMenu.Separator();
-      filEmptyRecentFilesMenuItem = new javax.swing.JMenuItem();
+      filRecentProjectsSeparator = new javax.swing.JPopupMenu.Separator();
+      filEmptyRecentProjectsMenuItem = new javax.swing.JMenuItem();
       filSeparator = new javax.swing.JPopupMenu.Separator();
       filExitMenuItem = new javax.swing.JMenuItem();
       dicMenu = new javax.swing.JMenu();
@@ -1097,17 +1097,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       filMenu.add(filFontMenuItem);
-      filMenu.add(filRecentFilesSeparator);
+      filMenu.add(filRecentProjectsSeparator);
 
-      filEmptyRecentFilesMenuItem.setMnemonic('e');
-      filEmptyRecentFilesMenuItem.setText("Empty Recent Files list");
-      filEmptyRecentFilesMenuItem.setEnabled(false);
-      filEmptyRecentFilesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      filEmptyRecentProjectsMenuItem.setMnemonic('e');
+      filEmptyRecentProjectsMenuItem.setText("Empty Recent Projects list");
+      filEmptyRecentProjectsMenuItem.setEnabled(false);
+      filEmptyRecentProjectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filEmptyRecentFilesMenuItemActionPerformed(evt);
+            filEmptyRecentProjectsMenuItemActionPerformed(evt);
          }
       });
-      filMenu.add(filEmptyRecentFilesMenuItem);
+      filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
       filExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
@@ -1123,10 +1123,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
-      recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-      recentFilesMenu.setText("Recent files");
-      recentFilesMenu.setMnemonic('R');
-      filMenu.add(recentFilesMenu, 3);
+      recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu.setText("Recent projects");
+      recentProjectsMenu.setMnemonic('R');
+      filMenu.add(recentProjectsMenu, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
@@ -1318,10 +1318,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			recentFilesMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
+			recentProjectsMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
 
-			recentFilesMenu.setEnabled(true);
-			filEmptyRecentFilesMenuItem.setEnabled(true);
+			recentProjectsMenu.setEnabled(true);
+			filEmptyRecentProjectsMenuItem.setEnabled(true);
 
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
@@ -1584,13 +1584,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		checkHyphenationCorrectness();
    }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
 
-   private void filEmptyRecentFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentFilesMenuItemActionPerformed
-		recentFilesMenu.clear();
+   private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+		recentProjectsMenu.clear();
 
-		recentFilesMenu.setEnabled(false);
-		filEmptyRecentFilesMenuItem.setEnabled(false);
+		recentProjectsMenu.setEnabled(false);
+		filEmptyRecentProjectsMenuItem.setEnabled(false);
 		filOpenProjectMenuItem.setEnabled(true);
-   }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
+   }//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
    private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1978,8 +1978,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				filOpenProjectMenuItem.setEnabled(false);
 			}
-			catch(final IOException | SAXException e){
-				LOGGER.error(Backbone.MARKER_APPLICATION, "A bad error occurred while loading the project: {}", ExceptionHelper.getMessage(e));
+			catch(final IOException | SAXException | ProjectNotFoundException e){
+				loadFileCancelled(e);
+
+				LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 
 				LOGGER.error("A bad error occurred while loading the project", e);
 			}
@@ -2140,9 +2142,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void loadFileCancelled(final Exception exc){
 		filOpenProjectMenuItem.setEnabled(true);
-		if(exc != null && (exc instanceof ProjectNotFoundException))
-			//remove the file from the recent files menu
-			recentFilesMenu.removeEntry(((ProjectNotFoundException)exc).getPath());
+		if(exc != null && (exc instanceof ProjectNotFoundException)){
+			//remove the file from the recent projects menu
+			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
+
+			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
+			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
+		}
 
 
 		dicCheckCorrectnessMenuItem.setEnabled(false);
@@ -2652,13 +2658,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel dicTotalProductionsOutputLabel;
    private javax.swing.JMenuItem dicWordCountMenuItem;
    private javax.swing.JMenuItem filCreatePackageMenuItem;
-   private javax.swing.JMenuItem filEmptyRecentFilesMenuItem;
+   private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
    private javax.swing.JMenuItem filExitMenuItem;
    private javax.swing.JMenuItem filFontMenuItem;
    private javax.swing.JPopupMenu.Separator filFontSeparator;
    private javax.swing.JMenu filMenu;
    private javax.swing.JMenuItem filOpenProjectMenuItem;
-   private javax.swing.JPopupMenu.Separator filRecentFilesSeparator;
+   private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
    private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JMenu hlpMenu;

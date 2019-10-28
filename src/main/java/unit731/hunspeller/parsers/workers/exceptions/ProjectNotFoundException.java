@@ -1,22 +1,31 @@
 package unit731.hunspeller.parsers.workers.exceptions;
 
 
+import java.nio.file.Path;
+
+
 public class ProjectNotFoundException extends Exception{
 
 	private static final long serialVersionUID = 3943841591851856914L;
 
 
-	private final String path;
+	private final Path projectPath;
 
 
-	public ProjectNotFoundException(final String path, final Exception e){
-		super(e);
+	public ProjectNotFoundException(final Path projectPath, final String description){
+		super(description);
 
-		this.path = path;
+		this.projectPath = projectPath;
 	}
 
-	public String getPath(){
-		return path;
+	public ProjectNotFoundException(final Path projectPath, final Exception e){
+		super(e);
+
+		this.projectPath = projectPath;
+	}
+
+	public Path getProjectPath(){
+		return projectPath;
 	}
 
 }

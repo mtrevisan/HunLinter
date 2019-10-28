@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -94,7 +95,7 @@ public class Packager{
 	private final Map<String, File> configurationFiles = new HashMap<>();
 
 
-	public Packager(final Path projectPath) throws IOException, SAXException{
+	public Packager(final Path projectPath) throws IOException, SAXException, ProjectNotFoundException{
 		Objects.requireNonNull(projectPath);
 
 		this.projectPath = projectPath;
@@ -103,7 +104,7 @@ public class Packager{
 
 		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 		if(!existFile(mainManifestPath))
-			throw new IllegalArgumentException("No " + FILENAME_MANIFEST_XML + " file found under " + projectPath + ", cannot proceed");
+			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath + ", cannot proceed");
 
 		manifestFiles = extractFileEntries(mainManifestPath.toFile()).stream()
 			.map(configurationFile -> Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
