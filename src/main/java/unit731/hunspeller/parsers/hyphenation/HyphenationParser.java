@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 
