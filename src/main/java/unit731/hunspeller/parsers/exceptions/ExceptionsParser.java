@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.wordexceptions;
+package unit731.hunspeller.parsers.exceptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -118,8 +118,11 @@ public class Packager{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
-		if(node != null)
+		if(node != null){
+			//TODO read language corresponding to the loaded .aff file
+
 			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent()));
+		}
 	}
 
 	private void processPathsConfigurationFile(final File manifestFile, final List<File> configurationFiles)
@@ -147,7 +150,11 @@ public class Packager{
 		if(basePath != null){
 			try{
 				Path autoCorrectOutputPath = null;
-				final File autoCorrectFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_CORRECT);
+				File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
+				if(autoCorrectFile == null)
+					autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+				if(autoCorrectFile == null)
+					autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
 				if(autoCorrectFile != null){
 					//zip directory into .dat
 					autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
@@ -280,57 +287,64 @@ public class Packager{
 				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null){
 					//extract folder(s)
-					if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
-						final NodeList subNodes = entry.getChildNodes();
-						for(int j = 0; j < subNodes.getLength(); j ++){
-							final Node subEntry = subNodes.item(j);
-							if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)){
-								if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
-									final String folders = extractLocation(subEntry);
-									final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-									final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
-									final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-									children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
-									final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
-									final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-									children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
-								}
-								else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
-									final String folder = extractLocation(subEntry);
-									final File file = absolutizeFolder(folder, basePath, originPath);
-									children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
-								}
-								else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
-									final String folders = extractLocation(subEntry);
-									final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
-									final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
-									final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
-									children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
-									final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
-									final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
-									children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
-								}
-							}
-						}
-					}
+					if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
+						getFoldersForDictionaries(entry, basePath, originPath, children);
 					else{
-						final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-						final File file = absolutizeFolder(folder, basePath, originPath);
 						final String nodeValue = node.getNodeValue();
-						if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
-							children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
-							children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
-							children.put(FILENAME_WORD_EXCEPTIONS, Path.of(file.toString(), FILENAME_WORD_EXCEPTIONS).toFile());
-						}
-						else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue))
-							children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
-						else
-							LOGGER.info("Unknown configuration name: {}", nodeValue);
+						getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
 					}
 				}
 			}
 		}
 		return children;
+	}
+
+	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
+		final NodeList subNodes = entry.getChildNodes();
+		for(int j = 0; j < subNodes.getLength(); j ++){
+			final Node subEntry = subNodes.item(j);
+			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)){
+				if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+					final String folders = extractLocation(subEntry);
+					final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+					final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+					final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+					children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
+					final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
+					final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
+					children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
+				}
+				else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
+					final String folder = extractLocation(subEntry);
+					final File file = absolutizeFolder(folder, basePath, originPath);
+					children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
+				}
+				else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
+					final String folders = extractLocation(subEntry);
+					final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
+					final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
+					final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
+					children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
+					final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
+					final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
+					children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
+				}
+			}
+		}
+	}
+
+	private void getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
+		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+		final File file = absolutizeFolder(folder, basePath, originPath);
+		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
+			children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
+			children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
+			children.put(FILENAME_WORD_EXCEPTIONS, Path.of(file.toString(), FILENAME_WORD_EXCEPTIONS).toFile());
+		}
+		else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue))
+			children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
+		else
+			LOGGER.info("Unknown configuration name: {}", nodeValue);
 	}
 
 	private File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
