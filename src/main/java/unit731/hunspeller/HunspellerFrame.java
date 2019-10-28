@@ -1996,7 +1996,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			catch(final IOException | SAXException | ProjectNotFoundException e){
 				loadFileCancelled(e);
 
-				LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
+				LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 
 				LOGGER.error("A bad error occurred while loading the project", e);
 			}
