@@ -8,7 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
@@ -17,17 +18,9 @@ import unit731.hunspeller.services.FileHelper;
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 class WordGeneratorCompoundRuleTest{
 
-	private final Backbone backbone = new Backbone(null, null);
+	private AffixData affixData;
+	private WordGenerator wordGenerator;
 
-
-	private void loadData(String affixFilePath) throws IOException, SAXException{
-		backbone.loadFile(affixFilePath);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
-	}
 
 	@Test
 	void testBjörnJacke() throws IOException, SAXException{
@@ -42,7 +35,7 @@ class WordGeneratorCompoundRuleTest{
 			"SFX A 0 en .",
 			"SFX A 0 em .",
 			"SFX A 0 es .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "vw";
 		String[] inputCompounds = new String[]{
@@ -50,7 +43,7 @@ class WordGeneratorCompoundRuleTest{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 10);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
@@ -71,7 +64,7 @@ class WordGeneratorCompoundRuleTest{
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE ABC");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "ABC";
 		String[] inputCompounds = new String[]{
@@ -79,7 +72,7 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
@@ -96,7 +89,7 @@ class WordGeneratorCompoundRuleTest{
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A*B*C*");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "A*B*C*";
 		String[] inputCompounds = new String[]{
@@ -104,7 +97,7 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("aa", null, "pa:a st:a pa:a st:a"),
@@ -156,7 +149,7 @@ class WordGeneratorCompoundRuleTest{
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A?B?C?");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "A?B?C?";
 		String[] inputCompounds = new String[]{
@@ -164,7 +157,7 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
@@ -186,7 +179,7 @@ class WordGeneratorCompoundRuleTest{
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "(aa)?(bb)?(cc)?";
 		String[] inputCompounds = new String[]{
@@ -194,7 +187,7 @@ class WordGeneratorCompoundRuleTest{
 			"b/bb",
 			"c/bbcc"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
@@ -216,7 +209,7 @@ class WordGeneratorCompoundRuleTest{
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (1)?(2)?(3)?");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "(1)?(2)?(3)?";
 		String[] inputCompounds = new String[]{
@@ -224,7 +217,7 @@ class WordGeneratorCompoundRuleTest{
 			"b/2",
 			"c/2,3"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
@@ -246,14 +239,14 @@ class WordGeneratorCompoundRuleTest{
 				"SET UTF-8",
 				"COMPOUNDRULE 1",
 				"COMPOUNDRULE vw");
-			loadData(affFile.getAbsolutePath());
+			loadData(affFile, language);
 
 			String line = "vw";
 			String[] inputCompounds = new String[]{
 				"arbeits/v",
 				"scheu/v"
 			};
-			backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+			wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 		});
 		Assertions.assertEquals("Missing word(s) for rule w in compound rule vw", exception.getMessage());
 	}
@@ -266,14 +259,14 @@ class WordGeneratorCompoundRuleTest{
 			"FORBIDDENWORD X",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "vw";
 		String[] inputCompounds = new String[]{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
 		Assertions.assertTrue(words.isEmpty());
 	}
@@ -287,20 +280,32 @@ class WordGeneratorCompoundRuleTest{
 			"FORCEUCASE U",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "vw";
 		String[] inputCompounds = new String[]{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 //words.forEach(System.out::println);
 
 		List<Production> expected = Collections.singletonList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
 		Assertions.assertEquals(expected, words);
+	}
+
+	private void loadData(File affFile, String language) throws IOException, SAXException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile, language);
+		affixData = affParser.getAffixData();
+		wordGenerator = new WordGenerator(affixData, null);
+	}
+
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }

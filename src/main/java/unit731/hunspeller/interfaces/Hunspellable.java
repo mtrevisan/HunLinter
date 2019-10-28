@@ -1,9 +1,11 @@
 package unit731.hunspeller.interfaces;
 
+import java.nio.file.Path;
+
 
 public interface Hunspellable{
 
-	void loadFileInternal(String filePath);
+	void loadFileInternal(final Path basePath);
 
 	void clearAffixParser();
 

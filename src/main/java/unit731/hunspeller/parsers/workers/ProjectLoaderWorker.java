@@ -1,6 +1,6 @@
 package unit731.hunspeller.parsers.workers;
 
-import unit731.hunspeller.parsers.workers.exceptions.ProjectFileNotFoundException;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
@@ -13,6 +13,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.Packager;
 
 
 public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
@@ -23,18 +24,17 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	public static final String WORKER_NAME = "Project loader";
 
 
-	private final String affixFileURI;
+	private final Packager packager;
 	private final Backbone backbone;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final String affixFileURI, final Backbone backbone, final Runnable completed,
-										final Consumer<Exception> cancelled){
-		Objects.requireNonNull(affixFileURI);
+	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
+		Objects.requireNonNull(packager);
 		Objects.requireNonNull(backbone);
 
-		this.affixFileURI = affixFileURI;
+		this.packager = packager;
 		this.backbone = backbone;
 
 		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
@@ -57,7 +57,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			backbone.openAffixFile(affixFileURI);
+			final File affFile = packager.getAffixFile();
+			backbone.openAffixFile(affFile);
 
 			setProgress(11);
 
@@ -129,7 +130,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception e){
-			exception = (e instanceof FileNotFoundException? new ProjectFileNotFoundException(affixFileURI, e): e);
+			exception = (e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
 
 			if(e instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");

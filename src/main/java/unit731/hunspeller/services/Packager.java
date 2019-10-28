@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -18,9 +20,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,8 +55,10 @@ public class Packager{
 	private static final String CONFIGURATION_PROPERTY = "prop";
 	private static final String CONFIGURATION_NODE = "node";
 	private static final String CONFIGURATION_NODE_NAME = "oor:name";
-	private static final String CONFIGURATION_LANGUAGE = "LANGUAGE";
 	//dictionaries spellcheck directory
+	private static final String FILENAME_PREFIX_SPELLING = "HunSpellDic_";
+	private static final String FILENAME_PREFIX_HYPHENATION = "HyphDic_";
+	private static final String FILENAME_PREFIX_THESAURUS = "ThesDic_";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX = "DICT_SPELL_AFF";
 	private static final String CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY = "DICT_SPELL_DIC";
 	//dictionaries hyphenation file
@@ -81,51 +88,64 @@ public class Packager{
 	private static final String THESAURUS_FOLDERS_SEPARATOR = ".dat ";
 
 
+	private final Path projectPath;
+	private final Path mainManifestPath;
+	private final List<File> manifestFiles;
+	private final List<String> languages;
+
 	private String language;
 	private final Map<String, File> configurationFiles = new HashMap<>();
 
 
-	public Packager(final File affFile){
-		extractConfigurationFolders(affFile);
+	public Packager(final Path projectPath) throws IOException, SAXException, ProjectNotFoundException{
+		Objects.requireNonNull(projectPath);
+
+		this.projectPath = projectPath;
+		if(!existDirectory(projectPath))
+			throw new IllegalArgumentException("Folder " + projectPath + " does not exists, cannot proceed");
+
+		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
+		if(!existFile(mainManifestPath))
+			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath + ", cannot proceed");
+
+		manifestFiles = extractFileEntries(mainManifestPath.toFile()).stream()
+			.map(configurationFile -> Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
+			.collect(Collectors.toList());
+
+		languages = extractLanguages(manifestFiles);
+		if(languages.isEmpty())
+			throw new IllegalArgumentException("No language(s) defined");
 	}
 
-	private void extractConfigurationFolders(final File affFile){
-		final Path basePath = getPackageBaseDirectory(affFile);
+	public static boolean isProjectFolder(final Path projectPath){
+		return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
+	}
 
-		if(basePath != null){
-			LOGGER.trace("Found base path on folder {}", basePath.toString());
+	public List<String> getAvailableLanguages(){
+		return languages;
+	}
 
-			try{
-				final File manifestFile = Paths.get(basePath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)
-					.toFile();
-				if(existFile(manifestFile)){
-					final List<File> fullFiles = extractFileEntries(manifestFile).stream()
-						.map(configurationFile -> Paths.get(basePath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
-						.collect(Collectors.toList());
+	public void extractConfigurationFolders(final String language){
+		if(!languages.contains(language))
+			throw new IllegalArgumentException("Language not present in " + FILENAME_MANIFEST_XML);
 
-					language = extractLanguage(manifestFile, fullFiles, affFile);
-					if(language == null)
-						throw new IllegalArgumentException("Cannot extract language");
+		try{
+			this.language = language;
 
-					processDictionariesConfigurationFile(manifestFile, fullFiles, language);
-					processPathsConfigurationFile(manifestFile, fullFiles);
-				}
-			}
-			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
+			processDictionariesConfigurationFile();
+			processPathsConfigurationFile();
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
 
-				LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
-			}
+			LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
 		}
 	}
 
-	private String extractLanguage(final File manifestFile, final List<File> configurationFiles, final File affFile) throws IOException, SAXException{
+	private List<String> extractLanguages(final List<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
-		final File file = pair.getLeft();
 		final Node parentNode = pair.getRight();
 		if(parentNode != null){
-			final Path basePath = manifestFile.toPath().getParent();
-			final Path originPath = file.toPath().getParent();
 			final NodeList nodes = parentNode.getChildNodes();
 			for(int i = 0; i < nodes.getLength(); i ++){
 				final Node entry = nodes.item(i);
@@ -134,114 +154,124 @@ public class Packager{
 
 				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
 				if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
-					return getLanguage(entry, basePath, originPath, affFile);
+					return getLanguages(entry);
 				}
 			}
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
-	private String getLanguage(final Node entry, final Path basePath, final Path originPath, final File affFile) throws IOException{
+	private List<String> getLanguages(final Node entry){
+		final Set<String> languageSets = new HashSet<>();
 		final NodeList subNodes = entry.getChildNodes();
-		for(int j = 0; j < subNodes.getLength(); j ++){
-			final Node subEntry = subNodes.item(j);
-			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
-				continue;
-
-			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
-				final String folder = extractLocation(subEntry);
-				final int splitIndex = folder.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-				final String folderAff = folder.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
-				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-				if(fileAff.getCanonicalPath().equals(affFile.getCanonicalPath()))
-					return extractLocale(subEntry);
+		for(int i = 0; i < subNodes.getLength(); i ++){
+			final Node subEntry = subNodes.item(i);
+			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE) && XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+				final String[] locales = extractLocale(subEntry);
+				for(final String locale : locales)
+					languageSets.add(locale);
 			}
 		}
-		return null;
+		final List<String> languages = new ArrayList<>(languageSets);
+		Collections.sort(languages);
+		return Collections.unmodifiableList(languages);
 	}
 
-	private void processDictionariesConfigurationFile(final File manifestFile, final List<File> configurationFiles, final String language)
-			throws IOException, SAXException{
-		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
+	private void processDictionariesConfigurationFile() throws IOException, SAXException{
+		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
+		if(pair == null)
+			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
+				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
+
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null)
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), language));
+			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 	}
 
-	private void processPathsConfigurationFile(final File manifestFile, final List<File> configurationFiles)
+	private void processPathsConfigurationFile()
 			throws IOException, SAXException{
-		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, configurationFiles);
-		final File file = pair.getLeft();
-		final Node node = pair.getRight();
-		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, manifestFile.toPath().getParent(), file.toPath().getParent(), null));
-			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
-				.map(File::toString)
-				.collect(Collectors.toSet());
-			if(this.configurationFiles.size() != uniqueFolders.size())
-				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-					+ StringUtils.join(this.configurationFiles));
-			if(uniqueFolders.stream().anyMatch(String::isEmpty))
-				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-		}
+		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
+		if(pair != null){
+			final File file = pair.getLeft();
+			final Node node = pair.getRight();
+			if(node != null){
+				this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+				final Set<String> uniqueFolders = this.configurationFiles.values().stream()
+					.map(File::toString)
+					.collect(Collectors.toSet());
+				if(this.configurationFiles.size() != uniqueFolders.size())
+					throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+						+ StringUtils.join(this.configurationFiles));
+				if(uniqueFolders.stream().anyMatch(String::isEmpty))
+					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+				}
+			}
 	}
 
-	public void createPackage(final File affFile, final String language){
-		final Path basePath = getPackageBaseDirectory(affFile);
-
+	public void createPackage(final Path projectPath, final String language){
 		//package entire folder into a ZIP file
-		if(basePath != null){
-			try{
-				Path autoCorrectOutputPath = null;
-				File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
-				if(autoCorrectFile == null)
-					autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
-				if(autoCorrectFile == null)
-					autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-				if(autoCorrectFile != null){
-					//zip directory into .dat
-					autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
-						FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
-					ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
-				}
-				Path autoTextOutputPath = null;
-				final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-				if(autoTextFile != null){
-					//zip directory into .bau
-					autoTextOutputPath = Path.of(autoTextFile.getParent(),
-						FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
-					ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
-				}
-
-				final File outputFile = new File(basePath.toString() + File.separator
-					+ basePath.getName(basePath.getNameCount() - 1) + EXTENSION_ZIP);
-				//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
-				//that are not autoCorrectOutputFilename or autoTextOutputFilename
-				ZIPPER.zipDirectory(basePath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
-
-				//remove created sub-packages
-				if(autoCorrectOutputPath != null)
-					Files.delete(autoCorrectOutputPath);
-				if(autoTextOutputPath != null)
-					Files.delete(autoTextOutputPath);
-
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
-
-				//open directory
-				if(Desktop.isDesktopSupported())
-					Desktop.getDesktop().open(new File(basePath.toString()));
+		try{
+			Path autoCorrectOutputPath = null;
+			File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
+			if(autoCorrectFile == null)
+				autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+			if(autoCorrectFile == null)
+				autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
+			if(autoCorrectFile != null){
+				//zip directory into .dat
+				autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
+					FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
+				ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
 			}
-			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
-
-				LOGGER.error("Something very bad happened while creating package", e);
+			Path autoTextOutputPath = null;
+			final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+			if(autoTextFile != null){
+				//zip directory into .bau
+				autoTextOutputPath = Path.of(autoTextFile.getParent(),
+					FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
+				ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
 			}
+
+			final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1) + EXTENSION_ZIP)
+				.toFile();
+			//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
+			//that are not autoCorrectOutputFilename or autoTextOutputFilename
+			ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
+
+			//remove created sub-packages
+			if(autoCorrectOutputPath != null)
+				Files.delete(autoCorrectOutputPath);
+			if(autoTextOutputPath != null)
+				Files.delete(autoTextOutputPath);
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
+
+			//open directory
+			if(Desktop.isDesktopSupported())
+				Desktop.getDesktop().open(projectPath.toFile());
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
+
+			LOGGER.error("Something very bad happened while creating package", e);
 		}
 	}
 
 	public String getLanguage(){
 		return language;
+	}
+
+	public Path getProjectPath(){
+		return projectPath;
+	}
+
+	public File getAffixFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX);
+	}
+
+	public File getDictionaryFile(){
+		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY);
 	}
 
 	public File getHyphenationFile(){
@@ -280,8 +310,12 @@ public class Packager{
 		return parentPath;
 	}
 
-	private boolean existFile(final File file){
-		return Files.isRegularFile(file.toPath());
+	private static boolean existDirectory(final Path path){
+		return Files.isDirectory(path);
+	}
+
+	private static boolean existFile(final Path path){
+		return Files.isRegularFile(path);
 	}
 
 	private boolean existFile(final Path path, final String filename){
@@ -296,17 +330,17 @@ public class Packager{
 			throw new IllegalArgumentException("Invalid root element, expected '" + MANIFEST_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
-		final List<String> fullPaths = new ArrayList<>();
+		final List<String> configurationPaths = new ArrayList<>();
 		final NodeList entries = rootElement.getChildNodes();
 		for(int i = 0; i < entries.getLength(); i ++){
 			final Node entry = entries.item(i);
 			if(entry.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(entry.getNodeName())){
 				final Node mediaType = XMLParser.extractAttribute(entry, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
 				if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-					fullPaths.add(XMLParser.extractAttributeValue(entry, MANIFEST_FILE_ENTRY_FULL_PATH));
+					configurationPaths.add(XMLParser.extractAttributeValue(entry, MANIFEST_FILE_ENTRY_FULL_PATH));
 			}
 		}
-		return fullPaths;
+		return configurationPaths;
 	}
 
 	private Pair<File, Node> findConfiguration(final String configurationName,
@@ -326,8 +360,7 @@ public class Packager{
 		return null;
 	}
 
-	//FIXME ugly parameter language...
-	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath, final String language) throws IOException{
+	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
 		final Map<String, File> children = new HashMap<>();
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
@@ -339,7 +372,7 @@ public class Packager{
 			if(node != null){
 				//extract folder(s)
 				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-					getFoldersForDictionaries(entry, basePath, originPath, language, children);
+					getFoldersForDictionaries(entry, basePath, originPath, children);
 				else{
 					final String nodeValue = node.getNodeValue();
 					getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
@@ -349,7 +382,7 @@ public class Packager{
 		return children;
 	}
 
-	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final String language, final Map<String, File> children) throws IOException{
+	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
 		final NodeList subNodes = entry.getChildNodes();
 		for(int j = 0; j < subNodes.getLength(); j ++){
 			final Node subEntry = subNodes.item(j);
@@ -357,11 +390,12 @@ public class Packager{
 				continue;
 
 			//restrict to given language
-			final String locale = extractLocale(subEntry);
-			if(!locale.equals(language))
+			final String[] locale = extractLocale(subEntry);
+			if(!ArrayUtils.contains(locale, language))
 				continue;
 
-			if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HunSpellDic_")){
+			final String attributeValue = XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME);
+			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
 				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
@@ -371,12 +405,12 @@ public class Packager{
 				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("HypDic_")){
+			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final String folder = extractLocation(subEntry);
 				final File file = absolutizeFolder(folder, basePath, originPath);
 				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
-			else if(XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith("ThesDic_")){
+			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
 				final String folders = extractLocation(subEntry);
 				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
 				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
@@ -418,8 +452,9 @@ public class Packager{
 		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCATIONS);
 	}
 
-	private String extractLocale(final Node parentNode){
-		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
+	private String[] extractLocale(final Node parentNode){
+		final String locale = extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
+		return StringUtils.split(locale, ' ');
 	}
 
 	private String extractProperty(final Node parentNode, final String propertyName){

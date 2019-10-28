@@ -26,11 +26,11 @@ import javax.swing.text.Position;
  * A dialog to prompt the user for a font. It has a static method to display the dialog and return a
  * new {@code Font} instance.
  */
-public class JFontChooserDialog extends javax.swing.JDialog{
+public class FontChooserDialog extends javax.swing.JDialog{
 
 	private static final long serialVersionUID = -4686780467476615109L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JFontChooserDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FontChooserDialog.class);
 
 	private static final Integer[] SIZES = {10, 12, 14, 16, 18, 20, 22};
 
@@ -88,7 +88,7 @@ public class JFontChooserDialog extends javax.swing.JDialog{
 	private final String sampleText;
 
 
-	public JFontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
+	public FontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
 			final java.awt.Frame parent){
 		super(parent, "Font chooser", true);
 

@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +49,12 @@ public class Backbone implements FileChangeListener{
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 
-	private static final String EXTENSION_AFF = ".aff";
-	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
 	private static final String FOLDER_AID = "aids/";
 
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
 
-
-	private File affFile;
 
 	private final AffixParser affParser;
 	private final AidParser aidParser;
@@ -75,13 +70,15 @@ public class Backbone implements FileChangeListener{
 	private final ExceptionsParser sexParser;
 	private final ExceptionsParser wexParser;
 
-	private Packager packager;
-
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
 
+	private final Packager packager;
 
-	public Backbone(final Hunspellable hunspellable, final Undoable undoable){
+
+	public Backbone(final Packager packager, final Hunspellable hunspellable, final Undoable undoable){
+		Objects.requireNonNull(packager);
+
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
@@ -91,6 +88,8 @@ public class Backbone implements FileChangeListener{
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
+
+		this.packager = packager;
 	}
 
 	public AffixParser getAffParser(){
@@ -137,63 +136,6 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void loadFile(final String affixFilePath) throws IOException, SAXException{
-		clear();
-
-		openAffixFile(affixFilePath);
-
-		final File hypFile = getHyphenationFile();
-		openHyphenationFile(hypFile);
-
-		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
-
-		final File dicFile = getDictionaryFile();
-		prepareDictionaryFile(dicFile);
-
-		final File aidFile = getAidFile();
-		openAidFile(aidFile);
-
-		final File theDataFile = getThesaurusDataFile();
-		openThesaurusFile(theDataFile);
-
-		final File acoFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoFile);
-
-		final File sexFile = getSentenceExceptionsFile();
-		openSentenceExceptionsFile(sexFile);
-
-		final File wexFile = getWordExceptionsFile();
-		openWordExceptionsFile(wexFile);
-	}
-
-	/* NOTE: used for testing purposes */
-	public void loadFile(final String affixFilePath, final String dictionaryFilePath) throws IOException, SAXException{
-		openAffixFile(affixFilePath);
-
-		final File hypFile = getHyphenationFile();
-		openHyphenationFile(hypFile);
-
-		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
-
-		final File dicFile = new File(dictionaryFilePath);
-		prepareDictionaryFile(dicFile);
-
-		final File aidFile = getAidFile();
-		openAidFile(aidFile);
-
-		final File theDataFile = getThesaurusDataFile();
-		openThesaurusFile(theDataFile);
-
-		final File acoFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoFile);
-
-		final File sexFile = getSentenceExceptionsFile();
-		openSentenceExceptionsFile(sexFile);
-
-		final File wexFile = getWordExceptionsFile();
-		openWordExceptionsFile(wexFile);
-	}
-
 	public void clear(){
 		hyphenator = null;
 		checker = null;
@@ -201,6 +143,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void registerFileListener(){
+		final File affFile = getAffixFile();
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
 		final String[] uris = Stream.of(affFile, hypFile, aidFile)
@@ -218,21 +161,17 @@ public class Backbone implements FileChangeListener{
 		flm.stop();
 	}
 
-	public void openAffixFile(final String affixFilePath) throws IOException{
-		affFile = new File(affixFilePath);
-
+	public void openAffixFile(final File affFile) throws IOException{
 		if(!affFile.exists()){
 			affParser.clear();
 
 			if(hunspellable != null)
 				hunspellable.clearAffixParser();
 
-			throw new FileNotFoundException("The file '" + affixFilePath + "' does not exists");
+			throw new FileNotFoundException("The file '" + affFile.getCanonicalPath() + "' does not exists");
 		}
 
 		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());
-
-		packager = new Packager(affFile);
 
 		affParser.parse(affFile, packager.getLanguage());
 
@@ -374,17 +313,12 @@ public class Backbone implements FileChangeListener{
 	}
 
 
-	private File getFile(String filename){
-		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
+	public File getAffixFile(){
+		return packager.getAffixFile();
 	}
 
-	public File getAffFile(){
-		return affFile;
-	}
-
-	//FIXME should this be private?!
 	public File getDictionaryFile(){
-		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
+		return packager.getDictionaryFile();
 	}
 
 	public File getAidFile(){
@@ -429,40 +363,41 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(final Path path){
+		//NOTE: `path` it's only the filename
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
-		final String absolutePath = affFile.getParent() + File.separator + path.toString();
-		if(hasAFFExtension(absolutePath)){
+		final Path filePath = Path.of(packager.getProjectPath().toString(), path.toString());
+		if(filePath.equals(packager.getAffixFile())){
 			affParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAffixParser);
 		}
-		else if(hasAIDExtension(absolutePath)){
+		else if(path.toString().endsWith(EXTENSION_AID)){
 			aidParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAidParser);
 		}
-		else if(isAutoCorrectFile(absolutePath)){
+		else if(filePath.equals(packager.getAutoCorrectFile())){
 			acoParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAutoCorrectParser);
 		}
-		else if(isSentenceExceptionsFile(absolutePath)){
+		else if(filePath.equals(packager.getSentenceExceptionsFile())){
 			sexParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
 		}
-		else if(isWordExceptionsFile(absolutePath)){
+		else if(filePath.equals(packager.getWordExceptionsFile())){
 			wexParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearWordExceptionsParser);
 		}
-//		else if(isAutoTextFile(absolutePath)){
+//		else if(filePath.equals(packager.getAutoTextFile())){
 //			atxParser.clear();
 //
 //			Optional.ofNullable(hunspellable)
@@ -475,31 +410,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
-			hunspellable.loadFileInternal(affFile.getAbsolutePath());
-	}
-
-	private boolean hasAFFExtension(final String path){
-		return path.endsWith(EXTENSION_AFF);
-	}
-
-	private boolean hasAIDExtension(final String path){
-		return path.endsWith(EXTENSION_AID);
-	}
-
-	private boolean isAutoCorrectFile(final String path){
-		return path.equals(packager.getAutoCorrectFile().getAbsolutePath());
-	}
-
-	private boolean isSentenceExceptionsFile(final String path){
-		return path.equals(packager.getSentenceExceptionsFile().getAbsolutePath());
-	}
-
-	private boolean isWordExceptionsFile(final String path){
-		return path.equals(packager.getWordExceptionsFile().getAbsolutePath());
-	}
-
-	private boolean isAutoTextFile(final String path){
-		return path.equals(packager.getAutoTextFile().getAbsolutePath());
+			hunspellable.loadFileInternal(path);
 	}
 
 
@@ -544,7 +455,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void createPackage(){
-		packager.createPackage(affFile, getAffixData().getLanguage());
+		packager.createPackage(packager.getProjectPath(), getAffixData().getLanguage());
 	}
 
 }

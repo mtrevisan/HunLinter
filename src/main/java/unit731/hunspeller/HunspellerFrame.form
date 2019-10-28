@@ -14,16 +14,16 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentFilesMenu.setText(&quot;Recent files&quot;);&#xa;recentFilesMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentFilesMenu, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentFilesMenu.setText(&quot;Recent projects&quot;);&#xa;recentFilesMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentFilesMenu, 3);"/>
           </AuxValues>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="filOpenAFFMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
               <Properties>
-                <Property name="mnemonic" type="int" value="97"/>
-                <Property name="text" type="java.lang.String" value="Open AFF file..."/>
+                <Property name="mnemonic" type="int" value="80"/>
+                <Property name="text" type="java.lang.String" value="Open Project..."/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenAFFMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenProjectMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filCreatePackageMenuItem">
@@ -51,16 +51,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filFontMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="filRecentFilesSeparator">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="filRecentProjectsSeparator">
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="filEmptyRecentFilesMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="filEmptyRecentProjectsMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="101"/>
-                <Property name="text" type="java.lang.String" value="Empty Recent Files list"/>
+                <Property name="text" type="java.lang.String" value="Empty Recent Projects list"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filEmptyRecentFilesMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filEmptyRecentProjectsMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="filSeparator">

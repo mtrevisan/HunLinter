@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -19,10 +20,10 @@ public class RecentFilesMenu extends JMenu{
 
 
 	private final RecentItems recentItems;
-	private final Consumer<String> onSelectFile;
+	private final Consumer<Path> onSelectFile;
 
 
-	public RecentFilesMenu(RecentItems recentItems, Consumer<String> onSelectFile){
+	public RecentFilesMenu(final RecentItems recentItems, final Consumer<Path> onSelectFile){
 		super();
 
 		Objects.requireNonNull(recentItems);
@@ -34,13 +35,13 @@ public class RecentFilesMenu extends JMenu{
 		addEntriesToMenu();
 	}
 
-	public void addEntry(String filePath){
+	public void addEntry(final String filePath){
 		recentItems.push(filePath);
 
 		addEntriesToMenu();
 	}
 
-	public void removeEntry(String filePath){
+	public void removeEntry(final String filePath){
 		recentItems.remove(filePath);
 
 		addEntriesToMenu();
@@ -61,19 +62,19 @@ public class RecentFilesMenu extends JMenu{
 		//clear the existing items
 		removeAll();
 
-		List<String> items = recentItems.getItems();
+		final List<String> items = recentItems.getItems();
 		int i = 0;
-		for(String item : items){
-			JMenuItem newMenuItem = new JMenuItem(i + ": " + item);
+		for(final String item : items){
+			final JMenuItem newMenuItem = new JMenuItem(i + ": " + item);
 			newMenuItem.setToolTipText(Integer.toString(i));
 			newMenuItem.setActionCommand(item);
 			newMenuItem.addActionListener(actionEvent -> {
-				String path = actionEvent.getActionCommand();
+				final String path = actionEvent.getActionCommand();
 				recentItems.push(path);
 
 				addEntriesToMenu();
 
-				onSelectFile.accept(path);
+				onSelectFile.accept(Path.of(path));
 			});
 			add(newMenuItem, i);
 

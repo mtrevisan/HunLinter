@@ -153,7 +153,7 @@ public class AffixParser{
 		data.clear();
 
 		boolean encodingRead = false;
-		Charset charset = FileHelper.determineCharset(affFile.toPath());
+		final Charset charset = FileHelper.determineCharset(affFile.toPath());
 		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
 			String line;
 			while((line = br.readLine()) != null){
