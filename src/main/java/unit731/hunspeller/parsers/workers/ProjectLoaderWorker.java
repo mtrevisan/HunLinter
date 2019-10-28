@@ -4,6 +4,7 @@ import unit731.hunspeller.parsers.workers.exceptions.ProjectFileNotFoundExceptio
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -23,18 +24,17 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	public static final String WORKER_NAME = "Project loader";
 
 
-	private final String affixFileURI;
+	private final Path basePath;
 	private final Backbone backbone;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final String affixFileURI, final Backbone backbone, final Runnable completed,
-										final Consumer<Exception> cancelled){
-		Objects.requireNonNull(affixFileURI);
+	public ProjectLoaderWorker(final Path basePath, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
+		Objects.requireNonNull(basePath);
 		Objects.requireNonNull(backbone);
 
-		this.affixFileURI = affixFileURI;
+		this.basePath = basePath;
 		this.backbone = backbone;
 
 		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
@@ -57,7 +57,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			backbone.openAffixFile(affixFileURI);
+			backbone.openAffixFile(basePath);
 
 			setProgress(11);
 
@@ -129,7 +129,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception e){
-			exception = (e instanceof FileNotFoundException? new ProjectFileNotFoundException(affixFileURI, e): e);
+			exception = (e instanceof FileNotFoundException? new ProjectFileNotFoundException(basePath.toString(), e): e);
 
 			if(e instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");

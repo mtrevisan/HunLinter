@@ -2,13 +2,16 @@ package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
@@ -18,21 +21,9 @@ import unit731.hunspeller.services.PermutationsWithRepetitions;
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 class WordGeneratorCompoundFlagTest{
 
-	private final Backbone backbone = new Backbone(null, null);
+	private AffixData affixData;
+	private WordGenerator wordGenerator;
 
-
-	private void loadData(String affixFilePath) throws IOException, SAXException{
-		backbone.loadFile(affixFilePath);
-	}
-
-	private void loadData(String affixFilePath, String dictionaryFilePath) throws IOException, SAXException{
-		backbone.loadFile(affixFilePath, dictionaryFilePath);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
-	}
 
 	@Test
 	void simple() throws IOException, SAXException{
@@ -41,7 +32,7 @@ class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/A",
@@ -49,7 +40,7 @@ class WordGeneratorCompoundFlagTest{
 			"xy/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -73,14 +64,14 @@ class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -98,7 +89,7 @@ class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/A",
@@ -106,7 +97,7 @@ class WordGeneratorCompoundFlagTest{
 			"eel/A",
 			"bare/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -133,13 +124,13 @@ class WordGeneratorCompoundFlagTest{
 			"SIMPLIFIEDTRIPLE",
 			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"glass/A",
 			"sko/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("glassglass", null, "pa:glass st:glass pa:glass st:glass"),
@@ -157,14 +148,14 @@ class WordGeneratorCompoundFlagTest{
 			"CHECKCOMPOUNDDUP",
 			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
@@ -179,19 +170,20 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void withAffixes() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
 			"PFX P 0 pre .	po:pre",
 			"SFX S Y 1",
 			"SFX S 0 suf .	po:suf");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/XPS";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -208,7 +200,7 @@ class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 20, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 20, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -233,7 +225,8 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void withAffixesOnefold() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -242,12 +235,12 @@ class WordGeneratorCompoundFlagTest{
 			"SFX S 0 suf/T .",
 			"SFX T Y 1",
 			"SFX T 0 sff .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/XPS";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -266,7 +259,7 @@ class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 20, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 20, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -291,7 +284,8 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void withAffixesTwofold() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDMORESUFFIXES",
@@ -301,12 +295,12 @@ class WordGeneratorCompoundFlagTest{
 			"SFX S 0 suf/T .",
 			"SFX T Y 1",
 			"SFX T 0 sff .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/XPS";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -325,7 +319,7 @@ class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 30, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 30, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -358,7 +352,8 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void permitFlag() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDPERMITFLAG Y",
@@ -366,12 +361,12 @@ class WordGeneratorCompoundFlagTest{
 			"PFX P 0 pre/Y .",
 			"SFX S Y 1",
 			"SFX S 0 suf/Y .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/XPS";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -388,7 +383,7 @@ class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 70, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 70, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -461,7 +456,8 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void forbidFlag() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDFORBIDFLAG Z",
@@ -469,12 +465,12 @@ class WordGeneratorCompoundFlagTest{
 			"PFX P 0 pre/Z .",
 			"SFX S Y 1",
 			"SFX S 0 suf/Z .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/XPS";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -491,7 +487,7 @@ class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 4, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -504,12 +500,13 @@ class WordGeneratorCompoundFlagTest{
 
 	@Test
 	void checkCompoundCase() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"CHECKCOMPOUNDCASE",
 			"COMPOUNDFLAG A");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String[] inputCompounds = new String[]{
@@ -519,7 +516,7 @@ class WordGeneratorCompoundFlagTest{
 			"-/A"
 		};
 
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -621,7 +618,7 @@ class WordGeneratorCompoundFlagTest{
 			"víz/A",
 			"kocsi/A",
 			"szerviz");
-		loadData(affFile.getAbsolutePath(), dicFile.getAbsolutePath());
+		loadData(affFile, dicFile, language);
 
 		String[] inputCompounds = new String[]{
 			"szer/A",
@@ -629,7 +626,7 @@ class WordGeneratorCompoundFlagTest{
 			"kocsi/A",
 			"szerviz"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 40, 3);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("szerszer", null, "pa:szer st:szer pa:szer st:szer"),
@@ -679,7 +676,7 @@ class WordGeneratorCompoundFlagTest{
 			"COMPOUNDFLAG Y",
 			"SFX S Y 1",
 			"SFX S 0 s .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/S	po:1",
@@ -689,7 +686,7 @@ class WordGeneratorCompoundFlagTest{
 			"bars/X",
 			"foos/X"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
@@ -719,14 +716,14 @@ class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"FORCEUCASE A",
 			"COMPOUNDFLAG C");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"foo/C",
 			"bar/C",
 			"baz/CA"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 //words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
@@ -768,6 +765,27 @@ class WordGeneratorCompoundFlagTest{
 			createProduction("Bazbazbaz", null, "pa:baz st:baz pa:baz st:baz pa:baz st:baz")
 		);
 		Assertions.assertEquals(expected, words);
+	}
+
+	private void loadData(File affFile, String language) throws IOException, SAXException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile, language);
+		affixData = affParser.getAffixData();
+		wordGenerator = new WordGenerator(affixData, null);
+	}
+
+	private void loadData(File affFile, File dicFile, String language) throws IOException, SAXException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile, language);
+		affixData = affParser.getAffixData();
+		Charset charset = affixData.getCharset();
+		DictionaryParser dicParser = new DictionaryParser(dicFile, language, charset);
+		wordGenerator = new WordGenerator(affixData, dicParser);
+	}
+
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }

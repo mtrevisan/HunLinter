@@ -6,7 +6,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -18,21 +19,14 @@ import unit731.hunspeller.services.FileHelper;
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 class WordGeneratorAffixTest{
 
-	private final Backbone backbone = new Backbone(null, null);
+	private AffixData affixData;
+	private WordGenerator wordGenerator;
 
-
-	private void loadData(String affixFilePath) throws IOException, SAXException{
-		backbone.loadFile(affixFilePath);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
-	}
 
 	@Test
 	void affFormat() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"# Testing also whitespace and comments.",
 			"OCONV 7 # space, space",
@@ -50,16 +44,17 @@ class WordGeneratorAffixTest{
 			"		# 2xtab",
 			" 	# space+tab",
 			"	 # tab+space");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
-		ConversionTable table = backbone.getAffixData().getData(AffixOption.OUTPUT_CONVERSION_TABLE);
+		ConversionTable table = affixData.getData(AffixOption.OUTPUT_CONVERSION_TABLE);
 		Assertions.assertEquals("[affixOption=OUTPUT_CONVERSION_TABLE,table={  =[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]}]", table.toString());
 	}
 
 
 	@Test
 	void flagUTF8() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG UTF-8",
 			"SFX A Y 1",
@@ -70,11 +65,11 @@ class WordGeneratorAffixTest{
 			"SFX ü 0 baz .",
 			"PFX Ü Y 1",
 			"PFX Ü 0 un .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/AÜ";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.size());
 		//base production
@@ -93,7 +88,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void flagNumerical() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"SFX 999 Y 1",
@@ -104,11 +100,11 @@ class WordGeneratorAffixTest{
 			"SFX 216 0 baz .",
 			"PFX 54321 Y 1",
 			"PFX 54321 0 un .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/999,54321";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.size());
 		//base production
@@ -127,7 +123,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void flagASCII() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 s/123 .",
@@ -137,11 +134,11 @@ class WordGeneratorAffixTest{
 			"SFX 2 0 baz .",
 			"PFX 3 Y 1",
 			"PFX 3 0 un .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/A3";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.size());
 		//base production
@@ -160,7 +157,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void flagDoubleASCII() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX zx Y 1",
@@ -171,11 +169,11 @@ class WordGeneratorAffixTest{
 			"SFX 1G 0 baz .",
 			"PFX 09 Y 1",
 			"PFX 09 0 un .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/zx09";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.size());
 		//base production
@@ -195,7 +193,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void conditions() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 6",
 			"SFX A 0 a .",
@@ -204,11 +203,11 @@ class WordGeneratorAffixTest{
 			"SFX A 0 d [^ab]",
 			"SFX A 0 e [^c]",
 			"SFX A 0 f a[^ab]b");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "a/A";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -222,7 +221,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stems1() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -231,11 +231,11 @@ class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "aa/S1";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(5, words.size());
 		//base production
@@ -251,7 +251,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stems2() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -260,11 +261,11 @@ class WordGeneratorAffixTest{
 			"SFX S2 0 s2/P1",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "aa/S1";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -279,7 +280,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stems3() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -288,11 +290,11 @@ class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "aa/S1P1";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -309,7 +311,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stems4() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -318,11 +321,11 @@ class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "aa/P1S1";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -339,7 +342,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stems5() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 a",
@@ -351,11 +355,11 @@ class WordGeneratorAffixTest{
 			"SFX D 0 d/AE",
 			"PFX E Y 1",
 			"PFX E 0 e");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "a/ABCDE";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(14, words.size());
 		//base production
@@ -382,31 +386,33 @@ class WordGeneratorAffixTest{
 	@Test
 	void stemsInvalidFullstrip(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			String language = "xxx";
+			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
 				"SFX A a b a");
-			loadData(affFile.getAbsolutePath());
+			loadData(affFile, language);
 
 			String line = "a/A";
-			final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-			backbone.getWordGenerator().applyAffixRules(dicEntry);
+			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			wordGenerator.applyAffixRules(dicEntry);
 		});
 		Assertions.assertEquals("Cannot strip full word 'a' without the FULLSTRIP option", exception.getMessage());
 	}
 
 	@Test
 	void stemsValidFullstrip() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FULLSTRIP",
 			"SFX A Y 1",
 			"SFX A a b a");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "a/A";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.size());
 		//base production
@@ -419,7 +425,8 @@ class WordGeneratorAffixTest{
 	@Test
 	void stemsInvalidTwofold1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			String language = "xxx";
+			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
 				"FLAG long",
 				"SFX S1 Y 1",
@@ -432,11 +439,11 @@ class WordGeneratorAffixTest{
 				"PFX P1 0 p1/P2",
 				"PFX P2 Y 1",
 				"PFX P2 0 p2");
-			loadData(affFile.getAbsolutePath());
+			loadData(affFile, language);
 
 			String line = "aa/S1";
-			final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-			backbone.getWordGenerator().applyAffixRules(dicEntry);
+			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			wordGenerator.applyAffixRules(dicEntry);
 		});
 		Assertions.assertEquals("Twofold rule violated for 'p1aas1/P2,S2	st:aa	from	S1 > P1 from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
 	}
@@ -444,7 +451,8 @@ class WordGeneratorAffixTest{
 	@Test
 	void stemsInvalidTwofold2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			String language = "xxx";
+			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
 				"SFX A 0 a",
@@ -462,11 +470,11 @@ class WordGeneratorAffixTest{
 				"PFX G 0 g/E",
 				"PFX H Y 1",
 				"PFX H 0 h/AE");
-			loadData(affFile.getAbsolutePath());
+			loadData(affFile, language);
 
 			String line = "a/ABCDEFGH";
-			final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-			backbone.getWordGenerator().applyAffixRules(dicEntry);
+			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			wordGenerator.applyAffixRules(dicEntry);
 		});
 		Assertions.assertEquals("Twofold rule violated for 'ga/A,B,C,D,E	st:a	from	G from G' (G still has rules E)", exception.getMessage());
 	}
@@ -474,7 +482,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void complexPrefixes1() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -487,11 +496,11 @@ class WordGeneratorAffixTest{
 			"PFX D 0 d/AE",
 			"SFX E Y 1",
 			"SFX E 0 e");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "a/ABCDE";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(14, words.size());
 		//base production
@@ -516,18 +525,19 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void complexPrefixes2() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
 			"PFX A 0 tek .",
 			"PFX B Y 1",
 			"PFX B 0 met/A .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "ouro/B";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.size());
 		//base production
@@ -541,18 +551,19 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void complexPrefixesUTF8() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
 			"PFX A 0 ⲧⲉⲕ .",
 			"PFX B Y 1",
 			"PFX B 0 ⲙⲉⲧ/A .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "ⲟⲩⲣⲟ/B";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.size());
 		//base production
@@ -567,7 +578,8 @@ class WordGeneratorAffixTest{
 	@Test
 	void complexPrefixesInvalidTwofold(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			String language = "xxx";
+			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
 				"COMPLEXPREFIXES",
 				"PFX A Y 1",
@@ -586,11 +598,11 @@ class WordGeneratorAffixTest{
 				"SFX G 0 g/E",
 				"SFX H Y 1",
 				"SFX H 0 h/AE");
-			loadData(affFile.getAbsolutePath());
+			loadData(affFile, language);
 
 			String line = "a/ABCDEFGH";
-			final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-			backbone.getWordGenerator().applyAffixRules(dicEntry);
+			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+			List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 		});
 		Assertions.assertEquals("Twofold rule violated for 'ag/A,B,C,D,E	st:a	from	G from G' (G still has rules E)", exception.getMessage());
 	}
@@ -598,18 +610,19 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void needAffix3() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 1",
 			"SFX A 0 s/XB .",
 			"SFX B Y 1",
 			"SFX B 0 baz .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/A";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.size());
 		//base production
@@ -622,7 +635,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void needAffix5() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 2",
@@ -633,11 +647,11 @@ class WordGeneratorAffixTest{
 			"PFX C Y 2",
 			"PFX C 0 pre- .",
 			"PFX C 0 pseudopre-/X .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "foo/AC";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(12, words.size());
 		//base production
@@ -661,7 +675,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void circumfix1() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX A Y 1",
@@ -672,11 +687,11 @@ class WordGeneratorAffixTest{
 			"SFX C 0 obb .",
 			"SFX C 0 obb/AX .",
 			"SFX C 0 obb/BX .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "nagy/C";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -691,7 +706,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void circumfix2() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX A Y 1",
@@ -702,11 +718,11 @@ class WordGeneratorAffixTest{
 			"SFX C 0 obb .",
 			"SFX C 0 obb/AX .",
 			"SFX C 0 obb/BX .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "nagy/CX";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.size());
 		//base production
@@ -719,7 +735,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void circumfix3() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX a Y 4",
@@ -740,11 +757,11 @@ class WordGeneratorAffixTest{
 			"SFX e Y 2",
 			"SFX e 0 un/cdX .",
 			"SFX e 0 n/cdX .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "bark/abe";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(16, words.size());
 		//base production
@@ -771,7 +788,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void morphologicalAnalisys() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"PFX P Y 1",
 			"PFX P 0 un . dp:pfx_un sp:un",
@@ -781,11 +799,11 @@ class WordGeneratorAffixTest{
 			"SFX Q 0 s . is:sg_3",
 			"SFX R Y 1",
 			"SFX R 0 able/PS . ds:der_able");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "drink/S	po:noun";
-		DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.size());
 		//base production
@@ -797,8 +815,8 @@ class WordGeneratorAffixTest{
 
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
-		dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		dicEntry = wordGenerator.createFromDictionaryLine(line);
+		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -819,7 +837,8 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void alias1() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"AF 2",
 			"AF AB",
@@ -828,12 +847,12 @@ class WordGeneratorAffixTest{
 			"SFX A 0 x .",
 			"SFX B Y 1",
 			"SFX B 0 y/2 .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo/1";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -849,18 +868,19 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void escapeSlash() throws IOException, SAXException{
-		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 x .",
 			"SFX B Y 1",
 			"SFX B 0 y\\/z .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "foo\\/bar/AB";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.size());
 		//base production
@@ -881,11 +901,11 @@ class WordGeneratorAffixTest{
 			"FORBIDDENWORD !",
 			"SFX s N 1",
 			"SFX s 0 os .");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String line = "forbidden/!s";
-		final DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertTrue(words.isEmpty());
 	}
@@ -913,12 +933,12 @@ class WordGeneratorAffixTest{
 			"PFX D Y 2",
 			"PFX D A a/P A",
 			"PFX D C c/P C");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "Arbeit/A-";
-		DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(10, words.size());
 		//base production
@@ -938,8 +958,8 @@ class WordGeneratorAffixTest{
 
 
 		line = "Computer/BC-";
-		dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		dicEntry = wordGenerator.createFromDictionaryLine(line);
+		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(10, words.size());
 		//base production
@@ -959,8 +979,8 @@ class WordGeneratorAffixTest{
 
 
 		line = "-/W";
-		dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		dicEntry = wordGenerator.createFromDictionaryLine(line);
+		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(1, words.size());
 		//base production
@@ -994,12 +1014,12 @@ class WordGeneratorAffixTest{
 			"PFX D Y 2",
 			"PFX D A a/P A",
 			"PFX D C c/P C");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 
 		String line = "Arbeit/A-";
-		DictionaryEntry dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(10, words.size());
 		//base production
@@ -1019,8 +1039,8 @@ class WordGeneratorAffixTest{
 
 
 		line = "Computer/BC-";
-		dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		dicEntry = wordGenerator.createFromDictionaryLine(line);
+		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(10, words.size());
 		//base production
@@ -1040,8 +1060,8 @@ class WordGeneratorAffixTest{
 
 
 		line = "-/W";
-		dicEntry = backbone.getWordGenerator().createFromDictionaryLine(line);
-		words = backbone.getWordGenerator().applyAffixRules(dicEntry);
+		dicEntry = wordGenerator.createFromDictionaryLine(line);
+		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(1, words.size());
 		//base production
@@ -1049,6 +1069,18 @@ class WordGeneratorAffixTest{
 		//suffix productions
 		//prefix productions
 		//twofold productions
+	}
+
+	private void loadData(File affFile, String language) throws IOException, SAXException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile, language);
+		affixData = affParser.getAffixData();
+		wordGenerator = new WordGenerator(affixData, null);
+	}
+
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }

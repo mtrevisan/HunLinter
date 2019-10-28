@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +57,6 @@ public class Backbone implements FileChangeListener{
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
 
-
-	private File affFile;
 
 	private final AffixParser affParser;
 	private final AidParser aidParser;
@@ -137,63 +134,6 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void loadFile(final String affixFilePath) throws IOException, SAXException{
-		clear();
-
-		openAffixFile(affixFilePath);
-
-		final File hypFile = getHyphenationFile();
-		openHyphenationFile(hypFile);
-
-		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
-
-		final File dicFile = getDictionaryFile();
-		prepareDictionaryFile(dicFile);
-
-		final File aidFile = getAidFile();
-		openAidFile(aidFile);
-
-		final File theDataFile = getThesaurusDataFile();
-		openThesaurusFile(theDataFile);
-
-		final File acoFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoFile);
-
-		final File sexFile = getSentenceExceptionsFile();
-		openSentenceExceptionsFile(sexFile);
-
-		final File wexFile = getWordExceptionsFile();
-		openWordExceptionsFile(wexFile);
-	}
-
-	/* NOTE: used for testing purposes */
-	public void loadFile(final String affixFilePath, final String dictionaryFilePath) throws IOException, SAXException{
-		openAffixFile(affixFilePath);
-
-		final File hypFile = getHyphenationFile();
-		openHyphenationFile(hypFile);
-
-		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
-
-		final File dicFile = new File(dictionaryFilePath);
-		prepareDictionaryFile(dicFile);
-
-		final File aidFile = getAidFile();
-		openAidFile(aidFile);
-
-		final File theDataFile = getThesaurusDataFile();
-		openThesaurusFile(theDataFile);
-
-		final File acoFile = getAutoCorrectFile();
-		openAutoCorrectFile(acoFile);
-
-		final File sexFile = getSentenceExceptionsFile();
-		openSentenceExceptionsFile(sexFile);
-
-		final File wexFile = getWordExceptionsFile();
-		openWordExceptionsFile(wexFile);
-	}
-
 	public void clear(){
 		hyphenator = null;
 		checker = null;
@@ -201,6 +141,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void registerFileListener(){
+		final File affFile = getAffixFile();
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
 		final String[] uris = Stream.of(affFile, hypFile, aidFile)
@@ -218,21 +159,28 @@ public class Backbone implements FileChangeListener{
 		flm.stop();
 	}
 
-	public void openAffixFile(final String affixFilePath) throws IOException{
-		affFile = new File(affixFilePath);
+	public void openAffixFile(final Path basePath) throws IOException, SAXException{
+		packager = new Packager(basePath);
 
+		final List<String> availableLanguages = packager.getAvailableLanguages();
+		String language = availableLanguages.get(0);
+		if(availableLanguages.size() > 1){
+			//TODO choose between available languages
+		}
+		//TODO then, load appropriate files
+		packager.extractConfigurationFolders(language);
+
+		final File affFile = packager.getAffixFile();
 		if(!affFile.exists()){
 			affParser.clear();
 
 			if(hunspellable != null)
 				hunspellable.clearAffixParser();
 
-			throw new FileNotFoundException("The file '" + affixFilePath + "' does not exists");
+			throw new FileNotFoundException("The file '" + affFile.getCanonicalPath() + "' does not exists");
 		}
 
 		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());
-
-		packager = new Packager(affFile);
 
 		affParser.parse(affFile, packager.getLanguage());
 
@@ -374,17 +322,13 @@ public class Backbone implements FileChangeListener{
 	}
 
 
-	private File getFile(String filename){
-		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
-	}
-
-	public File getAffFile(){
-		return affFile;
+	public File getAffixFile(){
+		return packager.getAffixFile();
 	}
 
 	//FIXME should this be private?!
 	public File getDictionaryFile(){
-		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
+		return packager.getDictionaryFile();
 	}
 
 	public File getAidFile(){
@@ -431,7 +375,8 @@ public class Backbone implements FileChangeListener{
 	public void fileDeleted(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
-		final String absolutePath = affFile.getParent() + File.separator + path.toString();
+		//FIXME what is path? can absolutePath be transformed into Path?
+		final String absolutePath = packager.getProjectPath() + File.separator + path.toString();
 		if(hasAFFExtension(absolutePath)){
 			affParser.clear();
 
@@ -475,7 +420,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
-			hunspellable.loadFileInternal(affFile.getAbsolutePath());
+			hunspellable.loadFileInternal(path);
 	}
 
 	private boolean hasAFFExtension(final String path){
@@ -544,7 +489,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void createPackage(){
-		packager.createPackage(affFile, getAffixData().getLanguage());
+		packager.createPackage(packager.getProjectPath(), getAffixData().getLanguage());
 	}
 
 }

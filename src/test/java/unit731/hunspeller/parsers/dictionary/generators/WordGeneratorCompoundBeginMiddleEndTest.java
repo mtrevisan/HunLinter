@@ -7,7 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
@@ -16,17 +17,9 @@ import unit731.hunspeller.services.FileHelper;
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 class WordGeneratorCompoundBeginMiddleEndTest{
 
-	private final Backbone backbone = new Backbone(null, null);
+	private AffixData affixData;
+	private WordGenerator wordGenerator;
 
-
-	private void loadData(String affixFilePath) throws IOException, SAXException{
-		backbone.loadFile(affixFilePath);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
-	}
 
 	@Test
 	void germanCompounding() throws IOException, SAXException{
@@ -57,7 +50,7 @@ class WordGeneratorCompoundBeginMiddleEndTest{
 			"PFX D Y 2",
 			"PFX D A a/PX A",
 			"PFX D C c/PX C");
-		loadData(affFile.getAbsolutePath());
+		loadData(affFile, language);
 
 		String[] inputCompounds = new String[]{
 			"Arbeit/A-",
@@ -65,7 +58,7 @@ class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 62);
+		List<Production> words = wordGenerator.applyCompoundBeginMiddleEnd(inputCompounds, 62);
 words.forEach(System.out::println);
 
 //good: Computerarbeits-, Computercomputern, Arbeitscomputern, Computerarbeitscomputerns, Computerarbeits-Computer,
@@ -136,6 +129,18 @@ words.forEach(System.out::println);
 			createProduction("Arbeitarbeitarbeit", "D-WX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit")
 		);
 		Assertions.assertEquals(expected, words);
+	}
+
+	private void loadData(File affFile, String language) throws IOException, SAXException{
+		AffixParser affParser = new AffixParser();
+		affParser.parse(affFile, language);
+		affixData = affParser.getAffixData();
+		wordGenerator = new WordGenerator(affixData, null);
+	}
+
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }
