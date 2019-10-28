@@ -46,7 +46,6 @@ public class HyphenationParser{
 	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
 	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
 	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
-	private static final MessageFormat GENERAL_EXCEPTION = new MessageFormat("{0}: {1}");
 	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule {0} has an invalid format");
 	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule {0} has no hyphenation point(s)");
 	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule {0} is invalid, the hyphenation point should not be adjacent to a dot");
@@ -263,8 +262,7 @@ public class HyphenationParser{
 //106 800 B basic trie
 		}
 		catch(final Exception t){
-			final String message = ExceptionHelper.getMessage(t);
-			throw new IllegalArgumentException(GENERAL_EXCEPTION.format(new Object[]{t.getClass().getSimpleName(), message}));
+			throw new IllegalArgumentException(t.getMessage());
 		}
 		finally{
 			for(final Level level : Level.values())
