@@ -49,8 +49,6 @@ public class Backbone implements FileChangeListener{
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 
-	private static final String EXTENSION_AFF = ".aff";
-	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
 	private static final String FOLDER_AID = "aids/";
 
@@ -319,7 +317,6 @@ public class Backbone implements FileChangeListener{
 		return packager.getAffixFile();
 	}
 
-	//FIXME should this be private?!
 	public File getDictionaryFile(){
 		return packager.getDictionaryFile();
 	}
@@ -366,41 +363,41 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(final Path path){
+		//NOTE: `path` it's only the filename
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
-		//FIXME what is path? can absolutePath be transformed into Path?
-		final String absolutePath = packager.getProjectPath() + File.separator + path.toString();
-		if(hasAFFExtension(absolutePath)){
+		final Path filePath = Path.of(packager.getProjectPath().toString(), path.toString());
+		if(filePath.equals(packager.getAffixFile())){
 			affParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAffixParser);
 		}
-		else if(hasAIDExtension(absolutePath)){
+		else if(path.toString().endsWith(EXTENSION_AID)){
 			aidParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAidParser);
 		}
-		else if(isAutoCorrectFile(absolutePath)){
+		else if(filePath.equals(packager.getAutoCorrectFile())){
 			acoParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearAutoCorrectParser);
 		}
-		else if(isSentenceExceptionsFile(absolutePath)){
+		else if(filePath.equals(packager.getSentenceExceptionsFile())){
 			sexParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearSentenceExceptionsParser);
 		}
-		else if(isWordExceptionsFile(absolutePath)){
+		else if(filePath.equals(packager.getWordExceptionsFile())){
 			wexParser.clear();
 
 			Optional.ofNullable(hunspellable)
 				.ifPresent(Hunspellable::clearWordExceptionsParser);
 		}
-//		else if(isAutoTextFile(absolutePath)){
+//		else if(filePath.equals(packager.getAutoTextFile())){
 //			atxParser.clear();
 //
 //			Optional.ofNullable(hunspellable)
@@ -414,30 +411,6 @@ public class Backbone implements FileChangeListener{
 
 		if(hunspellable != null)
 			hunspellable.loadFileInternal(path);
-	}
-
-	private boolean hasAFFExtension(final String path){
-		return path.endsWith(EXTENSION_AFF);
-	}
-
-	private boolean hasAIDExtension(final String path){
-		return path.endsWith(EXTENSION_AID);
-	}
-
-	private boolean isAutoCorrectFile(final String path){
-		return path.equals(packager.getAutoCorrectFile().getAbsolutePath());
-	}
-
-	private boolean isSentenceExceptionsFile(final String path){
-		return path.equals(packager.getSentenceExceptionsFile().getAbsolutePath());
-	}
-
-	private boolean isWordExceptionsFile(final String path){
-		return path.equals(packager.getWordExceptionsFile().getAbsolutePath());
-	}
-
-	private boolean isAutoTextFile(final String path){
-		return path.equals(packager.getAutoTextFile().getAbsolutePath());
 	}
 
 
