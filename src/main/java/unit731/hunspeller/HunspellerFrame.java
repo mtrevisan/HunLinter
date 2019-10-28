@@ -2,6 +2,7 @@ package unit731.hunspeller;
 
 import java.awt.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
@@ -190,14 +191,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 
 
-		final File currentDir = new File(".");
 		openProjectPathFileChooser = new JFileChooser();
 		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
 		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		openProjectPathFileChooser.setCurrentDirectory(currentDir);
 
 		saveTextFileFileChooser = new JFileChooser();
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+		final File currentDir = new File(".");
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
 		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
@@ -1975,6 +1975,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 				//TODO then, load appropriate files
 				packager.extractConfigurationFolders(language);
+
+				setTitle("Hunspeller : " + packager.getAffixFile().getName());
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
