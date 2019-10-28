@@ -1952,7 +1952,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		clearResultTextArea();
 
-		backbone.stopFileListener();
+		if(backbone != null)
+			backbone.stopFileListener();
 
 		loadFileInternal(basePath);
 	}
