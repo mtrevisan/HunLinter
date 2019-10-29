@@ -156,33 +156,23 @@ public class Packager{
 	private List<String> extractLanguages(final List<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final Node parentNode = pair.getRight();
-		if(parentNode != null){
-			final NodeList nodes = parentNode.getChildNodes();
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node entry = nodes.item(i);
-				if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
-					continue;
-
-				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-				if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
-					return getLanguages(entry);
-				}
-			}
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
+				return getLanguages(child);
 		}
 		return Collections.emptyList();
 	}
 
 	private List<String> getLanguages(final Node entry){
 		final Set<String> languageSets = new HashSet<>();
-		final NodeList subNodes = entry.getChildNodes();
-		for(int i = 0; i < subNodes.getLength(); i ++){
-			final Node subEntry = subNodes.item(i);
-			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)
-					&& XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
-				final String[] locales = extractLocale(subEntry);
+		final List<Node> children = extractChildren(entry);
+		for(final Node child : children)
+			if(XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+				final String[] locales = extractLocale(child);
 				languageSets.addAll(Arrays.asList(locales));
 			}
-		}
 		final List<String> languages = new ArrayList<>(languageSets);
 		Collections.sort(languages);
 		return Collections.unmodifiableList(languages);
@@ -190,66 +180,39 @@ public class Packager{
 
 	private void processDictionariesConfigurationFile() throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
-		if(pair == null)
-			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
-				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
-
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
-		if(node != null)
+		if(node == null)
+			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
+				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
+		else
 			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 	}
 
-	private void processPathsConfigurationFile()
-			throws IOException, SAXException{
+	private void processPathsConfigurationFile() throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
-		if(pair != null){
-			final File file = pair.getLeft();
-			final Node node = pair.getRight();
-			if(node != null){
-				this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-				final Set<String> uniqueFolders = this.configurationFiles.values().stream()
-					.map(File::toString)
-					.collect(Collectors.toSet());
-				if(this.configurationFiles.size() != uniqueFolders.size())
-					throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-						+ StringUtils.join(this.configurationFiles));
-				if(uniqueFolders.stream().anyMatch(String::isEmpty))
-					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-				}
-			}
+		final File file = pair.getLeft();
+		final Node node = pair.getRight();
+		if(node != null){
+			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
+				.map(File::toString)
+				.collect(Collectors.toSet());
+			if(this.configurationFiles.size() != uniqueFolders.size())
+				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+					+ StringUtils.join(this.configurationFiles));
+			if(uniqueFolders.stream().anyMatch(String::isEmpty))
+				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+		}
 	}
 
 	public void createPackage(final Path projectPath, final String language){
 		//package entire folder into a ZIP file
 		try{
-			Path autoCorrectOutputPath = null;
-			File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
-			if(autoCorrectFile == null)
-				autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
-			if(autoCorrectFile == null)
-				autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-			if(autoCorrectFile != null){
-				//zip directory into .dat
-				autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
-					FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
-				ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
-			}
-			Path autoTextOutputPath = null;
-			final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-			if(autoTextFile != null){
-				//zip directory into .bau
-				autoTextOutputPath = Path.of(autoTextFile.getParent(),
-					FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
-				ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
-			}
+			final Path autoCorrectOutputPath = packageAutoCorrectFiles(language);
+			final Path autoTextOutputPath = packageAutoTextFiles(language);
 
-			final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
-				+ EXTENSION_ZIP)
-				.toFile();
-			//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
-			//that are not autoCorrectOutputFilename or autoTextOutputFilename
-			ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
+			packageExtension(projectPath, autoCorrectOutputPath, autoTextOutputPath);
 
 			//remove created sub-packages
 			if(autoCorrectOutputPath != null)
@@ -268,6 +231,38 @@ public class Packager{
 
 			LOGGER.error("Something very bad happened while creating package", e);
 		}
+	}
+
+	private Path packageAutoCorrectFiles(String language) throws IOException{
+		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
+		if(autoCorrectFile == null)
+			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+		if(autoCorrectFile == null)
+			autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
+		return packageFiles(FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT, autoCorrectFile);
+	}
+
+	private Path packageAutoTextFiles(final String language) throws IOException{
+		final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		return packageFiles(FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU, autoTextFile);
+	}
+
+	private Path packageFiles(final String packageFilename, final File file) throws IOException{
+		Path outputPath = null;
+		if(file != null){
+			outputPath = Path.of(file.getParent(), packageFilename);
+			ZIPPER.zipDirectory(file.toPath().getParent(), Deflater.BEST_COMPRESSION, outputPath.toFile());
+		}
+		return outputPath;
+	}
+
+	private void packageExtension(Path projectPath, Path autoCorrectOutputPath, Path autoTextOutputPath) throws IOException{
+		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
+			+ EXTENSION_ZIP)
+			.toFile();
+		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
+		//that are not autoCorrectOutputFilename or autoTextOutputFilename
+		ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
 	}
 
 	public String getLanguage(){
@@ -344,20 +339,17 @@ public class Packager{
 				+ rootElement.getNodeName());
 
 		final List<String> configurationPaths = new ArrayList<>();
-		final NodeList entries = rootElement.getChildNodes();
-		for(int i = 0; i < entries.getLength(); i ++){
-			final Node entry = entries.item(i);
-			if(entry.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(entry.getNodeName())){
-				final Node mediaType = XMLParser.extractAttribute(entry, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
-				if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-					configurationPaths.add(XMLParser.extractAttributeValue(entry, MANIFEST_FILE_ENTRY_FULL_PATH));
-			}
+		final List<Node> children = extractChildren(rootElement);
+		for(final Node child : children){
+			final Node mediaType = XMLParser.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
+				configurationPaths.add(XMLParser.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
 		return configurationPaths;
 	}
 
-	private Pair<File, Node> findConfiguration(final String configurationName,
-			final List<File> configurationFiles) throws IOException, SAXException{
+	private Pair<File, Node> findConfiguration(final String configurationName, final List<File> configurationFiles)
+			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
 			final Document doc = XMLParser.parseXMLDocument(configurationFile);
 
@@ -370,77 +362,70 @@ public class Packager{
 			if(foundNode != null)
 				return Pair.of(configurationFile, foundNode);
 		}
-		return null;
+		return Pair.of(null, null);
 	}
 
 	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
-		final Map<String, File> children = new HashMap<>();
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
+		final Map<String, File> folders = new HashMap<>();
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			if(node == null)
 				continue;
 
-			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-			if(node != null){
-				//extract folder(s)
-				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-					getFoldersForDictionaries(entry, basePath, originPath, children);
-				else{
-					final String nodeValue = node.getNodeValue();
-					getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
-				}
-			}
+			//extract folder(s)
+			final String nodeValue = node.getNodeValue();
+			if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(nodeValue))
+				getFoldersForDictionaries(child, basePath, originPath, folders);
+			else
+				folders.putAll(getFoldersForInternalPaths(child, nodeValue, basePath, originPath));
 		}
-		return children;
+		return folders;
 	}
 
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
-			final Map<String, File> children) throws IOException{
-		final NodeList subNodes = entry.getChildNodes();
-		for(int j = 0; j < subNodes.getLength(); j ++){
-			final Node subEntry = subNodes.item(j);
-			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
-				continue;
-
+			final Map<String, File> folders) throws IOException{
+		final List<Node> children = extractChildren(entry);
+		for(final Node child : children){
 			//restrict to given language
-			final String[] locale = extractLocale(subEntry);
+			final String[] locale = extractLocale(child);
 			if(!ArrayUtils.contains(locale, language))
 				continue;
 
-			final String attributeValue = XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME);
+			final String attributeValue = XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
-				final String folders = extractLocation(subEntry);
-				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+				final String childFolders = extractLocation(child);
+				final int splitIndex = childFolders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+				final String folderAff = childFolders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
 				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
-				final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
+				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
+				final String folderDic = childFolders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
 				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
+				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
 			}
 			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
-				final String folder = extractLocation(subEntry);
-				final File file = absolutizeFolder(folder, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
+				final String childFolder = extractLocation(child);
+				final File file = absolutizeFolder(childFolder, basePath, originPath);
+				folders.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
 			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
-				final String folders = extractLocation(subEntry);
-				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
-				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
+				final String childFolders = extractLocation(child);
+				final int splitIndex = childFolders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
+				final String folderDat = childFolders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
 				final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
-				final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
+				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
+				final String folderIdx = childFolders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
 				final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
+				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
 			}
 		}
 	}
 
-	private void getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath, final Path originPath,
-			final Map<String, File> children) throws IOException{
+	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
+			final Path originPath) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
 		final File file = absolutizeFolder(folder, basePath, originPath);
+		final Map<String, File> children = new HashMap<>();
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
 			children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
 			children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
@@ -450,6 +435,7 @@ public class Packager{
 			children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
 		else
 			LOGGER.info("Unknown configuration name: {}", nodeValue);
+		return children;
 	}
 
 	private File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
@@ -484,27 +470,41 @@ public class Packager{
 	}
 
 	private String extractFolder(final Node parentNode){
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node node = nodes.item(i);
-			if(XMLParser.isElement(node, CONFIGURATION_NODE))
-				return XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME);
+		final List<Node> children = extractChildren(parentNode);
+		return (!children.isEmpty()? XMLParser.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
+	}
+
+	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			if(node != null && nodeName.equals(node.getNodeValue()))
+				return fun.apply(child);
 		}
 		return null;
 	}
 
-	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
-				continue;
+	private List<Node> extractChildren(final Element parentElement){
+		return extractChildren(parentElement,
+			node -> (node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName())));
+	}
 
-			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-			if(node != null && nodeName.equals(node.getNodeValue()))
-				return fun.apply(entry);
+	private List<Node> extractChildren(final Node parentNode){
+		return extractChildren(parentNode,
+			node -> XMLParser.isElement(node, CONFIGURATION_NODE));
+	}
+
+	private List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extrationCondition){
+		final List<Node> children = new ArrayList<>();
+		if(parentNode != null){
+			final NodeList nodes = parentNode.getChildNodes();
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node node = nodes.item(i);
+				if(extrationCondition.apply(node))
+					children.add(node);
+			}
 		}
-		return null;
+		return children;
 	}
 
 }
