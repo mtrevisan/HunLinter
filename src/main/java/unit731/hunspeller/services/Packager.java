@@ -120,9 +120,13 @@ public class Packager{
 			throw new IllegalArgumentException("No language(s) defined");
 	}
 
-	public static boolean isProjectFolder(final Path projectPath){
+	public static boolean isProjectFolder(final File file){
 		try{
-			return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
+			final Path path = file.toPath();
+			return (existDirectory(path)
+				&& existFile(Paths.get(path.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML))
+				&& existFile(Paths.get(path.toString(), FILENAME_DESCRIPTION_XML))
+			);
 		}
 		catch(final InvalidPathException ignored){}
 		return false;
