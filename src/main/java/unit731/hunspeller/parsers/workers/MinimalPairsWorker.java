@@ -30,7 +30,6 @@ import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
-import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.ParserHelper;
@@ -234,17 +233,16 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		}
-		catch(final Exception t){
-			exception = t;
+		catch(final Exception e){
+			exception = e;
 
-			if(t instanceof ClosedChannelException)
+			if(e instanceof ClosedChannelException)
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs thread interrupted");
 			else{
-				String message = ExceptionHelper.getMessage(t);
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}", e.getMessage());
 			}
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file", e);
 
 			cancel(true);
 		}

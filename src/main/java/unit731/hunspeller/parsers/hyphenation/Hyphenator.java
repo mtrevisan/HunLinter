@@ -59,7 +59,7 @@ public class Hyphenator implements HyphenatorInterface{
 	public Hyphenation hyphenate(final String word){
 		//apply first level hyphenation
 		final Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns = hypParser.getPatterns();
-		HyphenationOptions options = hypParser.getOptParser().getNonCompoundOptions();
+		HyphenationOptions options = hypParser.getOptions().getNonCompoundOptions();
 		final HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND, options);
 
 		final List<String> compounds = createHyphenatedWord(word, hyphBreak);
@@ -75,7 +75,7 @@ public class Hyphenator implements HyphenatorInterface{
 			int i = 0;
 			final int parentRulesSize = rules.size();
 			for(final String compound : compounds){
-				options = hypParser.getOptParser().getCompoundOptions();
+				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);
 
 				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
@@ -89,7 +89,7 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 
 		//enforce no-hyphens
-		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptParser().getNoHyphen());
+		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
 
 		return new Hyphenation(syllabes, compounds, rules, breakCharacter);
 	}
@@ -182,7 +182,7 @@ public class Hyphenator implements HyphenatorInterface{
 		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non–compound
 			final HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND,
-				hypParser.getOptParser().getNonCompoundOptions());
+				hypParser.getOptions().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 
 			manageNoHyphen(response);
@@ -196,7 +196,7 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private void manageNoHyphen(final List<String> response){
-		for(final String nohyp : hypParser.getOptParser().getNoHyphen()){
+		for(final String nohyp : hypParser.getOptions().getNoHyphen()){
 			if(isStarting(nohyp))
 				manageNoHyphenAtStart(response, nohyp);
 			else if(isEnding(nohyp))

@@ -121,7 +121,7 @@ public class HyphenationParser{
 	private final Map<Level, Map<String, String>> rules = new EnumMap<>(Level.class);
 	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
-	private final HyphenationOptionsParser optParser;
+	private HyphenationOptionsParser options;
 
 
 	public HyphenationParser(final Comparator<String> comparator){
@@ -133,11 +133,11 @@ public class HyphenationParser{
 			rules.put(level, new HashMap<>());
 			customHyphenations.put(level, new HashMap<>());
 		}
-		optParser = new HyphenationOptionsParser();
+		options = new HyphenationOptionsParser();
 	}
 
 	HyphenationParser(final Comparator<String> comparator, final Map<Level, AhoCorasickTrie<String>> patterns,
-			Map<Level, Map<String, String>> customHyphenations, final HyphenationOptionsParser optParser){
+			Map<Level, Map<String, String>> customHyphenations, final HyphenationOptionsParser options){
 		Objects.requireNonNull(patterns);
 		Objects.requireNonNull(comparator);
 
@@ -151,7 +151,7 @@ public class HyphenationParser{
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
 		}
-		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
+		this.options = (options != null? options: new HyphenationOptionsParser());
 	}
 
 	public boolean isSecondLevelPresent(){
@@ -170,8 +170,12 @@ public class HyphenationParser{
 		return customHyphenations;
 	}
 
-	public HyphenationOptionsParser getOptParser(){
-		return optParser;
+	public HyphenationOptionsParser getOptions(){
+		return options;
+	}
+
+	public void setOptions(final HyphenationOptionsParser options){
+		this.options = options;
 	}
 
 	/**
@@ -201,7 +205,7 @@ public class HyphenationParser{
 					if(line.isEmpty())
 						continue;
 
-					final boolean parsedLine = optParser.parseLine(line);
+					final boolean parsedLine = options.parseLine(line);
 					if(!parsedLine){
 						if(line.startsWith(NEXT_LEVEL)){
 							if(level == Level.COMPOUND)
@@ -242,7 +246,7 @@ public class HyphenationParser{
 
 					patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, null) + "]");
 
-					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
+					options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
 					for(final String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
@@ -317,7 +321,7 @@ public class HyphenationParser{
 	private void clearInternal(){
 		customHyphenations.values()
 			.forEach(Map::clear);
-		optParser.clear();
+		options.clear();
 	}
 
 	/**
@@ -467,7 +471,7 @@ public class HyphenationParser{
 			writeln(writer, charset.name());
 
 			writer.newLine();
-			optParser.write(writer);
+			options.write(writer);
 
 			writer.newLine();
 			savePatternsByLevel(writer, Level.NON_COMPOUND);

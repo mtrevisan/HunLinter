@@ -78,6 +78,7 @@ import unit731.hunspeller.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
@@ -282,6 +283,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationOutputLabel = new JWordLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
+      optionsButton = new javax.swing.JButton();
       acoLayeredPane = new javax.swing.JLayeredPane();
       acoIncorrectLabel = new javax.swing.JLabel();
       acoIncorrectTextField = new javax.swing.JTextField();
@@ -580,7 +582,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         backbone.storeThesaurusFiles();
                      }
                      catch(IllegalArgumentException | IOException ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
                      }
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
@@ -741,6 +743,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       hypAddRuleSyllabesCountOutputLabel.setText("...");
 
+      optionsButton.setText("Options");
+      optionsButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            optionsButtonActionPerformed(evt);
+         }
+      });
+
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -757,6 +766,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypLayeredPane.setLayer(hypAddRuleSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      hypLayeredPane.setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout hypLayeredPaneLayout = new javax.swing.GroupLayout(hypLayeredPane);
       hypLayeredPane.setLayout(hypLayeredPaneLayout);
@@ -780,7 +790,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(hypAddRuleLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleTextField)
+                  .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
@@ -797,7 +807,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(hypRulesLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                  .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(optionsButton)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       hypLayeredPaneLayout.setVerticalGroup(
@@ -833,7 +846,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addContainerGap(69, Short.MAX_VALUE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+            .addComponent(optionsButton)
+            .addContainerGap())
       );
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
@@ -891,7 +906,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         backbone.storeAutoCorrectFile();
                      }
                      catch(IllegalArgumentException | TransformerException ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
+                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
                      }
                   };
                   CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
@@ -1127,8 +1142,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-      recentProjectsMenu.setText("Recent projects");
-      recentProjectsMenu.setMnemonic('R');
+		recentProjectsMenu.setText("Recent projects");
+		recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
 
       dicMenu.setMnemonic('D');
@@ -1506,8 +1521,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			backbone.storeThesaurusFiles();
 		}
 		catch(final Exception e){
-			final String message = ExceptionHelper.getMessage(e);
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 
@@ -1558,8 +1572,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			backbone.storeAutoCorrectFile();
 		}
 		catch(final Exception e){
-			final String message = ExceptionHelper.getMessage(e);
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 
@@ -1577,7 +1590,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			extractWordCount();
 		}
 		catch(final Exception e){
-			LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
+			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
@@ -1731,12 +1744,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
-      catch(final IllegalArgumentException e){
+      catch(final Exception e){
          LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-      }
-      catch(final Exception t){
-         String message = ExceptionHelper.getMessage(t);
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
       }
    }//GEN-LAST:event_theAddButtonActionPerformed
 
@@ -1866,14 +1875,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
-      catch(final IllegalArgumentException e){
+      catch(final Exception e){
          LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
-      catch(final Exception t){
-         String message = ExceptionHelper.getMessage(t);
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
-      }
    }//GEN-LAST:event_acoAddButtonActionPerformed
+
+   private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
+		final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
+			try{
+				backbone.getHypParser().setOptions(options);
+
+				backbone.storeHyphenationFile();
+			}
+			catch(IllegalArgumentException | IOException ex){
+				LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+			}
+		};
+		final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(backbone.getHypParser().getOptions(), acceptButtonAction, this);
+		GUIUtils.addCancelByEscapeKey(dialog);
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
+   }//GEN-LAST:event_optionsButtonActionPerformed
 
 
 	@Override
@@ -1970,7 +1992,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
 			try{
-				packager = new Packager(projectPath);
+				packager = new Packager(projectPath != null? projectPath: packager.getProjectPath());
 				final List<String> availableLanguages = packager.getAvailableLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
@@ -2137,7 +2159,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));
+			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);
 		}
@@ -2275,7 +2297,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String language = frame.backbone.getAffixData().getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
-		//FIXME is toLowerCase() needed?
 		final String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		final HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
@@ -2708,6 +2729,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
+   private javax.swing.JButton optionsButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLabel sexCorrectionsRecordedLabel;

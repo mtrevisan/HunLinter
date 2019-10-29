@@ -50,7 +50,7 @@ public class Backbone implements FileChangeListener{
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 
 	private static final String EXTENSION_AID = ".aid";
-	private static final String FOLDER_AID = "aids/";
+	private static final String FOLDER_AID = "aids";
 
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
@@ -110,6 +110,10 @@ public class Backbone implements FileChangeListener{
 
 	public ThesaurusParser getTheParser(){
 		return theParser;
+	}
+
+	public HyphenationParser getHypParser(){
+		return hypParser;
 	}
 
 	public HyphenatorInterface getHyphenator(){
@@ -322,7 +326,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public File getAidFile(){
-		return Path.of(packager.getProjectPath().toString(), affParser.getAffixData().getLanguage() + EXTENSION_AID)
+		return Path.of(packager.getProjectPath().toString(), FOLDER_AID, affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
 
@@ -411,7 +415,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
-			hunspellable.loadFileInternal(path);
+			hunspellable.loadFileInternal(null);
 	}
 
 

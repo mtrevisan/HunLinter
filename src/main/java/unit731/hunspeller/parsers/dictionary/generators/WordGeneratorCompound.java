@@ -25,7 +25,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.DictionaryInclusionTestWorker;
-import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
 
@@ -321,7 +320,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				dicInclusionTestWorker.executeInline();
 			}
 			catch(final Exception e){
-				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
+
 				LOGGER.error("Cannot read dictionary", e);
 			}
 		}

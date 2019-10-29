@@ -9,7 +9,7 @@ public class HyphenationOptions{
 	private final int minDefault;
 
 
-	public HyphenationOptions(int minDefault){
+	public HyphenationOptions(final int minDefault){
 		this.minDefault = Math.max(minDefault, 0);
 
 		clear();
@@ -32,12 +32,12 @@ public class HyphenationOptions{
 		rightMin = minDefault;
 	}
 
-	public void setLeftMin(int value){
-		leftMin = Math.max(value, 0);
+	public void setLeftMin(final int value){
+		leftMin = Math.max(value, minDefault);
 	}
 
-	public void setRightMin(int value){
-		rightMin = Math.max(value, 0);
+	public void setRightMin(final int value){
+		rightMin = Math.max(value, minDefault);
 	}
 
 	public int getMinimumLength(){

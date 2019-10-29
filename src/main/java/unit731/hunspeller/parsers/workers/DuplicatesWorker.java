@@ -32,7 +32,6 @@ import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
-import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
 
@@ -128,17 +127,16 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				}
 			}
 		}
-		catch(final Exception t){
-			exception = t;
+		catch(final Exception e){
+			exception = e;
 
-			if(t instanceof ClosedChannelException)
+			if(e instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				final String message = ExceptionHelper.getMessage(t);
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
+				LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 			}
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file", e);
 
 			cancel(true);
 		}
