@@ -190,9 +190,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//disable the "All files" option
 		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 		try{
-			//TODO must be 13x16!
 			final BufferedImage projectFolderImg = ImageIO.read(GUIUtils.class.getResourceAsStream("/project_folder.png"));
-			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
+			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg.getScaledInstance(13, 16, Image.SCALE_SMOOTH));
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
 				public Icon getIcon(final File file){
