@@ -156,33 +156,23 @@ public class Packager{
 	private List<String> extractLanguages(final List<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final Node parentNode = pair.getRight();
-		if(parentNode != null){
-			final NodeList nodes = parentNode.getChildNodes();
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node entry = nodes.item(i);
-				if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
-					continue;
-
-				final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-				if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue())){
-					return getLanguages(entry);
-				}
-			}
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
+				return getLanguages(child);
 		}
 		return Collections.emptyList();
 	}
 
 	private List<String> getLanguages(final Node entry){
 		final Set<String> languageSets = new HashSet<>();
-		final NodeList subNodes = entry.getChildNodes();
-		for(int i = 0; i < subNodes.getLength(); i ++){
-			final Node subEntry = subNodes.item(i);
-			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)
-					&& XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
-				final String[] locales = extractLocale(subEntry);
+		final List<Node> children = extractChildren(entry);
+		for(final Node child : children)
+			if(XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+				final String[] locales = extractLocale(child);
 				languageSets.addAll(Arrays.asList(locales));
 			}
-		}
 		final List<String> languages = new ArrayList<>(languageSets);
 		Collections.sort(languages);
 		return Collections.unmodifiableList(languages);
@@ -374,65 +364,57 @@ public class Packager{
 	}
 
 	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
-		final Map<String, File> children = new HashMap<>();
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
-				continue;
-
-			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
+		final Map<String, File> folders = new HashMap<>();
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node != null){
 				//extract folder(s)
 				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-					getFoldersForDictionaries(entry, basePath, originPath, children);
+					getFoldersForDictionaries(child, basePath, originPath, folders);
 				else{
 					final String nodeValue = node.getNodeValue();
-					getFoldersForInternalPaths(entry, nodeValue, basePath, originPath, children);
+					getFoldersForInternalPaths(child, nodeValue, basePath, originPath, folders);
 				}
 			}
 		}
-		return children;
+		return folders;
 	}
 
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
-			final Map<String, File> children) throws IOException{
-		final NodeList subNodes = entry.getChildNodes();
-		for(int j = 0; j < subNodes.getLength(); j ++){
-			final Node subEntry = subNodes.item(j);
-			if(!XMLParser.isElement(subEntry, CONFIGURATION_NODE))
-				continue;
-
+			final Map<String, File> folders) throws IOException{
+		final List<Node> children = extractChildren(entry);
+		for(final Node child : children){
 			//restrict to given language
-			final String[] locale = extractLocale(subEntry);
+			final String[] locale = extractLocale(child);
 			if(!ArrayUtils.contains(locale, language))
 				continue;
 
-			final String attributeValue = XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME);
+			final String attributeValue = XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
-				final String folders = extractLocation(subEntry);
-				final int splitIndex = folders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-				final String folderAff = folders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
+				final String childFolders = extractLocation(child);
+				final int splitIndex = childFolders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
+				final String folderAff = childFolders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
 				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
-				final String folderDic = folders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
+				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
+				final String folderDic = childFolders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
 				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
+				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
 			}
 			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
-				final String folder = extractLocation(subEntry);
-				final File file = absolutizeFolder(folder, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
+				final String childFolder = extractLocation(child);
+				final File file = absolutizeFolder(childFolder, basePath, originPath);
+				folders.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
 			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
-				final String folders = extractLocation(subEntry);
-				final int splitIndex = folders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
-				final String folderDat = folders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
+				final String childFolders = extractLocation(child);
+				final int splitIndex = childFolders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
+				final String folderDat = childFolders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
 				final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
-				final String folderIdx = folders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
+				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
+				final String folderIdx = childFolders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
 				final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
-				children.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
+				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
 			}
 		}
 	}
@@ -484,27 +466,31 @@ public class Packager{
 	}
 
 	private String extractFolder(final Node parentNode){
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node node = nodes.item(i);
-			if(XMLParser.isElement(node, CONFIGURATION_NODE))
-				return XMLParser.extractAttributeValue(node, CONFIGURATION_NODE_NAME);
+		final List<Node> children = extractChildren(parentNode);
+		return (!children.isEmpty()? XMLParser.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
+	}
+
+	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
+		final List<Node> children = extractChildren(parentNode);
+		for(final Node child : children){
+			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			if(node != null && nodeName.equals(node.getNodeValue()))
+				return fun.apply(child);
 		}
 		return null;
 	}
 
-	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
-		final NodeList nodes = parentNode.getChildNodes();
-		for(int i = 0; i < nodes.getLength(); i ++){
-			final Node entry = nodes.item(i);
-			if(!XMLParser.isElement(entry, CONFIGURATION_NODE))
-				continue;
-
-			final Node node = XMLParser.extractAttribute(entry, CONFIGURATION_NODE_NAME);
-			if(node != null && nodeName.equals(node.getNodeValue()))
-				return fun.apply(entry);
+	private List<Node> extractChildren(final Node parentNode){
+		final List<Node> children = new ArrayList<>();
+		if(parentNode != null){
+			final NodeList nodes = parentNode.getChildNodes();
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node node = nodes.item(i);
+				if(XMLParser.isElement(node, CONFIGURATION_NODE))
+					children.add(node);
+			}
 		}
-		return null;
+		return children;
 	}
 
 }
