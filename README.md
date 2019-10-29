@@ -166,6 +166,8 @@ It is possible to click on the first column to select the row (for cancelling it
 <a name="changelog-1.9.1"></a>
 ### version 1.9.1 - 20191028
 - completely revised how the loading of a project works, now it is possible to load and manage all the languages in an extension (or package), all the relevant files are read from manifest.xml and linked `.xcu` files.
+- the way a project is loaded in the application is changed, now the project folder (signed by a blue icon) has to be selected instead of an `.aff` file
+- added the possibility to change the options for hyphenation
 
 <a name="changelog-1.9.0"></a>
 ### version 1.9.0 - 20191027
