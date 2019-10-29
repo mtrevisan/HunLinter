@@ -180,34 +180,30 @@ public class Packager{
 
 	private void processDictionariesConfigurationFile() throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
-		if(pair == null)
-			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
-				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
-
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
-		if(node != null)
+		if(node == null)
+			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
+				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
+		else
 			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 	}
 
-	private void processPathsConfigurationFile()
-			throws IOException, SAXException{
+	private void processPathsConfigurationFile() throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
-		if(pair != null){
-			final File file = pair.getLeft();
-			final Node node = pair.getRight();
-			if(node != null){
-				this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-				final Set<String> uniqueFolders = this.configurationFiles.values().stream()
-					.map(File::toString)
-					.collect(Collectors.toSet());
-				if(this.configurationFiles.size() != uniqueFolders.size())
-					throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-						+ StringUtils.join(this.configurationFiles));
-				if(uniqueFolders.stream().anyMatch(String::isEmpty))
-					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
-				}
-			}
+		final File file = pair.getLeft();
+		final Node node = pair.getRight();
+		if(node != null){
+			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
+				.map(File::toString)
+				.collect(Collectors.toSet());
+			if(this.configurationFiles.size() != uniqueFolders.size())
+				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
+					+ StringUtils.join(this.configurationFiles));
+			if(uniqueFolders.stream().anyMatch(String::isEmpty))
+				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+		}
 	}
 
 	public void createPackage(final Path projectPath, final String language){
@@ -343,8 +339,8 @@ public class Packager{
 		return configurationPaths;
 	}
 
-	private Pair<File, Node> findConfiguration(final String configurationName,
-			final List<File> configurationFiles) throws IOException, SAXException{
+	private Pair<File, Node> findConfiguration(final String configurationName, final List<File> configurationFiles)
+			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
 			final Document doc = XMLParser.parseXMLDocument(configurationFile);
 
@@ -357,7 +353,7 @@ public class Packager{
 			if(foundNode != null)
 				return Pair.of(configurationFile, foundNode);
 		}
-		return null;
+		return Pair.of(null, null);
 	}
 
 	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
