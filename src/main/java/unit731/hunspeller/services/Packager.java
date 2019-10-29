@@ -234,31 +234,26 @@ public class Packager{
 	}
 
 	private Path packageAutoCorrectFiles(String language) throws IOException{
-		Path autoCorrectOutputPath = null;
 		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
 		if(autoCorrectFile == null)
 			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
 		if(autoCorrectFile == null)
 			autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-		if(autoCorrectFile != null){
-			//zip directory into .dat
-			autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
-				FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
-			ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
-		}
-		return autoCorrectOutputPath;
+		return packageFiles(FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT, autoCorrectFile);
 	}
 
-	private Path packageAutoTextFiles(String language) throws IOException{
-		Path autoTextOutputPath = null;
+	private Path packageAutoTextFiles(final String language) throws IOException{
 		final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		if(autoTextFile != null){
-			//zip directory into .bau
-			autoTextOutputPath = Path.of(autoTextFile.getParent(),
-				FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
-			ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
+		return packageFiles(FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU, autoTextFile);
+	}
+
+	private Path packageFiles(final String packageFilename, final File file) throws IOException{
+		Path outputPath = null;
+		if(file != null){
+			outputPath = Path.of(file.getParent(), packageFilename);
+			ZIPPER.zipDirectory(file.toPath().getParent(), Deflater.BEST_COMPRESSION, outputPath.toFile());
 		}
-		return autoTextOutputPath;
+		return outputPath;
 	}
 
 	private void packageExtension(Path projectPath, Path autoCorrectOutputPath, Path autoTextOutputPath) throws IOException{
