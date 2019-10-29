@@ -334,14 +334,11 @@ public class Packager{
 				+ rootElement.getNodeName());
 
 		final List<String> configurationPaths = new ArrayList<>();
-		final NodeList entries = rootElement.getChildNodes();
-		for(int i = 0; i < entries.getLength(); i ++){
-			final Node entry = entries.item(i);
-			if(entry.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(entry.getNodeName())){
-				final Node mediaType = XMLParser.extractAttribute(entry, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
-				if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-					configurationPaths.add(XMLParser.extractAttributeValue(entry, MANIFEST_FILE_ENTRY_FULL_PATH));
-			}
+		final List<Node> children = extractChildren(rootElement);
+		for(final Node child : children){
+			final Node mediaType = XMLParser.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
+				configurationPaths.add(XMLParser.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
 		return configurationPaths;
 	}
@@ -478,6 +475,19 @@ public class Packager{
 				return fun.apply(child);
 		}
 		return null;
+	}
+
+	private List<Node> extractChildren(final Element parentElement){
+		final List<Node> children = new ArrayList<>();
+		if(parentElement != null){
+			final NodeList nodes = parentElement.getChildNodes();
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node node = nodes.item(i);
+				if(node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName()))
+					children.add(node);
+			}
+		}
+		return children;
 	}
 
 	private List<Node> extractChildren(final Node parentNode){
