@@ -375,15 +375,15 @@ public class Packager{
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
 			final Node node = XMLParser.extractAttribute(child, CONFIGURATION_NODE_NAME);
-			if(node != null){
-				//extract folder(s)
-				if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
-					getFoldersForDictionaries(child, basePath, originPath, folders);
-				else{
-					final String nodeValue = node.getNodeValue();
-					folders.putAll(getFoldersForInternalPaths(child, nodeValue, basePath, originPath));
-				}
-			}
+			if(node == null)
+				continue;
+
+			//extract folder(s)
+			final String nodeValue = node.getNodeValue();
+			if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(nodeValue))
+				getFoldersForDictionaries(child, basePath, originPath, folders);
+			else
+				folders.putAll(getFoldersForInternalPaths(child, nodeValue, basePath, originPath));
 		}
 		return folders;
 	}
@@ -490,25 +490,22 @@ public class Packager{
 	}
 
 	private List<Node> extractChildren(final Element parentElement){
-		final List<Node> children = new ArrayList<>();
-		if(parentElement != null){
-			final NodeList nodes = parentElement.getChildNodes();
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node node = nodes.item(i);
-				if(node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName()))
-					children.add(node);
-			}
-		}
-		return children;
+		return extractChildren(parentElement,
+			node -> (node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName())));
 	}
 
 	private List<Node> extractChildren(final Node parentNode){
+		return extractChildren(parentNode,
+			node -> XMLParser.isElement(node, CONFIGURATION_NODE));
+	}
+
+	private List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extrationCondition){
 		final List<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			for(int i = 0; i < nodes.getLength(); i ++){
 				final Node node = nodes.item(i);
-				if(XMLParser.isElement(node, CONFIGURATION_NODE))
+				if(extrationCondition.apply(node))
 					children.add(node);
 			}
 		}
