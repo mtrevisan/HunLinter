@@ -209,33 +209,10 @@ public class Packager{
 	public void createPackage(final Path projectPath, final String language){
 		//package entire folder into a ZIP file
 		try{
-			Path autoCorrectOutputPath = null;
-			File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
-			if(autoCorrectFile == null)
-				autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
-			if(autoCorrectFile == null)
-				autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-			if(autoCorrectFile != null){
-				//zip directory into .dat
-				autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
-					FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
-				ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
-			}
-			Path autoTextOutputPath = null;
-			final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-			if(autoTextFile != null){
-				//zip directory into .bau
-				autoTextOutputPath = Path.of(autoTextFile.getParent(),
-					FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
-				ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
-			}
+			final Path autoCorrectOutputPath = packageAutoCorrectFiles(language);
+			final Path autoTextOutputPath = packageAutoTextFiles(language);
 
-			final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
-				+ EXTENSION_ZIP)
-				.toFile();
-			//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
-			//that are not autoCorrectOutputFilename or autoTextOutputFilename
-			ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
+			packageExtension(projectPath, autoCorrectOutputPath, autoTextOutputPath);
 
 			//remove created sub-packages
 			if(autoCorrectOutputPath != null)
@@ -254,6 +231,43 @@ public class Packager{
 
 			LOGGER.error("Something very bad happened while creating package", e);
 		}
+	}
+
+	private Path packageAutoCorrectFiles(String language) throws IOException{
+		Path autoCorrectOutputPath = null;
+		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
+		if(autoCorrectFile == null)
+			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+		if(autoCorrectFile == null)
+			autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
+		if(autoCorrectFile != null){
+			//zip directory into .dat
+			autoCorrectOutputPath = Path.of(autoCorrectFile.getParent(),
+				FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT);
+			ZIPPER.zipDirectory(autoCorrectFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoCorrectOutputPath.toFile());
+		}
+		return autoCorrectOutputPath;
+	}
+
+	private Path packageAutoTextFiles(String language) throws IOException{
+		Path autoTextOutputPath = null;
+		final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		if(autoTextFile != null){
+			//zip directory into .bau
+			autoTextOutputPath = Path.of(autoTextFile.getParent(),
+				FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU);
+			ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
+		}
+		return autoTextOutputPath;
+	}
+
+	private void packageExtension(Path projectPath, Path autoCorrectOutputPath, Path autoTextOutputPath) throws IOException{
+		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
+			+ EXTENSION_ZIP)
+			.toFile();
+		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
+		//that are not autoCorrectOutputFilename or autoTextOutputFilename
+		ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
 	}
 
 	public String getLanguage(){
