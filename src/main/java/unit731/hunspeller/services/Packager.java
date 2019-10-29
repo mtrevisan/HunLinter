@@ -17,6 +17,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -120,7 +121,11 @@ public class Packager{
 	}
 
 	public static boolean isProjectFolder(final Path projectPath){
-		return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
+		try{
+			return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
+		}
+		catch(final InvalidPathException ignored){}
+		return false;
 	}
 
 	public List<String> getAvailableLanguages(){
