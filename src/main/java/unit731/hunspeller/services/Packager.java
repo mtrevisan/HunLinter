@@ -367,7 +367,7 @@ public class Packager{
 					getFoldersForDictionaries(child, basePath, originPath, folders);
 				else{
 					final String nodeValue = node.getNodeValue();
-					getFoldersForInternalPaths(child, nodeValue, basePath, originPath, folders);
+					folders.putAll(getFoldersForInternalPaths(child, nodeValue, basePath, originPath));
 				}
 			}
 		}
@@ -412,10 +412,11 @@ public class Packager{
 		}
 	}
 
-	private void getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath, final Path originPath,
-			final Map<String, File> children) throws IOException{
+	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
+			final Path originPath) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
 		final File file = absolutizeFolder(folder, basePath, originPath);
+		final Map<String, File> children = new HashMap<>();
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
 			children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
 			children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
@@ -425,6 +426,7 @@ public class Packager{
 			children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
 		else
 			LOGGER.info("Unknown configuration name: {}", nodeValue);
+		return children;
 	}
 
 	private File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
