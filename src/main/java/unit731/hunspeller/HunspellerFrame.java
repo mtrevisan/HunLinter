@@ -29,6 +29,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -196,9 +197,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
 				public Icon getIcon(final File file){
-//					final boolean isProjectFolder = Packager.isProjectFolder(file.toPath());
-					final boolean isProjectFolder = false;
-					return (isProjectFolder? projectFolderIcon: regularFolderIcon);
+					try{
+						if(Packager.isProjectFolder(file.toPath()))
+							return projectFolderIcon;
+					}
+					catch(final InvalidPathException ignored){}
+					return FileSystemView.getFileSystemView().getSystemIcon(file);
 				}
 			});
 		}
