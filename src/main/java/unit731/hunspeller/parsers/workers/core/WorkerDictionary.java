@@ -132,7 +132,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			if(isInterruptedException(e))
 				LOGGER.info("Thread interrupted");
 			else
-				LOGGER.error("{}", ExceptionHelper.getMessage(e), e);
+				LOGGER.error("Generic error", e);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
 			LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Stopped processing Dictionary file");

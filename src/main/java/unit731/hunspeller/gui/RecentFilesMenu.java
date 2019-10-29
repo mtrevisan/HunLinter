@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+import javax.swing.*;
+
 import unit731.hunspeller.services.RecentItems;
 
 
@@ -63,10 +63,9 @@ public class RecentFilesMenu extends JMenu{
 		removeAll();
 
 		final List<String> items = recentItems.getItems();
-		int i = 0;
+		int index = 0;
 		for(final String item : items){
-			final JMenuItem newMenuItem = new JMenuItem(i + ": " + item);
-			newMenuItem.setToolTipText(Integer.toString(i));
+			final JMenuItem newMenuItem = new JMenuItem(item);
 			newMenuItem.setActionCommand(item);
 			newMenuItem.addActionListener(actionEvent -> {
 				final String path = actionEvent.getActionCommand();
@@ -76,9 +75,7 @@ public class RecentFilesMenu extends JMenu{
 
 				onSelectFile.accept(Path.of(path));
 			});
-			add(newMenuItem, i);
-
-			i ++;
+			add(newMenuItem, index ++);
 		}
 	}
 

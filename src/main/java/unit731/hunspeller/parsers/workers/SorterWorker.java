@@ -18,7 +18,6 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
-import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -98,8 +97,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		catch(final Exception e){
 			exception = e;
 
-			String message = ExceptionHelper.getMessage(e);
-			LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			cancel(true);

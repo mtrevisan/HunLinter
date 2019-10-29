@@ -50,7 +50,7 @@ public class Backbone implements FileChangeListener{
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 
 	private static final String EXTENSION_AID = ".aid";
-	private static final String FOLDER_AID = "aids/";
+	private static final String FOLDER_AID = "aids";
 
 	private static final String TAB = "\t";
 	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
@@ -110,6 +110,10 @@ public class Backbone implements FileChangeListener{
 
 	public ThesaurusParser getTheParser(){
 		return theParser;
+	}
+
+	public HyphenationParser getHypParser(){
+		return hypParser;
 	}
 
 	public HyphenatorInterface getHyphenator(){
@@ -252,14 +256,14 @@ public class Backbone implements FileChangeListener{
 
 	public void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
 		if(acoFile != null && acoFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening AutoCorrect file: {}", acoFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Auto–Correct file: {}", acoFile.getName());
 
 			acoParser.parse(acoFile);
 
 			if(hunspellable != null)
 				hunspellable.clearAutoCorrectParser();
 
-			LOGGER.info(MARKER_APPLICATION, "Finished reading AutoCorrect file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Auto–Correct file");
 		}
 		else
 			acoParser.clear();
@@ -267,14 +271,14 @@ public class Backbone implements FileChangeListener{
 
 	public void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
 		if(sexFile != null && sexFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening SentenceExceptions file: {}", sexFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Sentence Exceptions file: {}", sexFile.getName());
 
 			sexParser.parse(sexFile);
 
 			if(hunspellable != null)
 				hunspellable.clearSentenceExceptionsParser();
 
-			LOGGER.info(MARKER_APPLICATION, "Finished reading SentenceExceptions file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Sentence Exceptions file");
 		}
 		else
 			sexParser.clear();
@@ -282,14 +286,14 @@ public class Backbone implements FileChangeListener{
 
 	public void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
 		if(wexFile != null && wexFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening WordExceptions file: {}", wexFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Word Exceptions file: {}", wexFile.getName());
 
 			wexParser.parse(wexFile);
 
 			if(hunspellable != null)
 				hunspellable.clearWordExceptionsParser();
 
-			LOGGER.info(MARKER_APPLICATION, "Finished reading WordExceptions file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Word Exceptions file");
 		}
 		else
 			wexParser.clear();
@@ -322,7 +326,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public File getAidFile(){
-		return new File(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getAffixData().getLanguage() + EXTENSION_AID);
+		return Path.of(packager.getProjectPath().toString(), FOLDER_AID, affParser.getAffixData().getLanguage() + EXTENSION_AID)
+			.toFile();
 	}
 
 	private String getCurrentWorkingDirectory(){
@@ -410,7 +415,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
-			hunspellable.loadFileInternal(path);
+			hunspellable.loadFileInternal(null);
 	}
 
 

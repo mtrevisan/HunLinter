@@ -17,6 +17,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -103,11 +104,12 @@ public class Packager{
 
 		this.projectPath = projectPath;
 		if(!existDirectory(projectPath))
-			throw new IllegalArgumentException("Folder " + projectPath + " does not exists, cannot proceed");
+			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " does not exists, cannot load project");
 
 		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 		if(!existFile(mainManifestPath))
-			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath + ", cannot proceed");
+			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
+				+ ", cannot load project");
 
 		manifestFiles = extractFileEntries(mainManifestPath.toFile()).stream()
 			.map(configurationFile -> Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
@@ -118,8 +120,16 @@ public class Packager{
 			throw new IllegalArgumentException("No language(s) defined");
 	}
 
-	public static boolean isProjectFolder(final Path projectPath){
-		return (existDirectory(projectPath) && existFile(Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML)));
+	public static boolean isProjectFolder(final File file){
+		try{
+			final Path path = file.toPath();
+			return (existDirectory(path)
+				&& existFile(Paths.get(path.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML))
+				&& existFile(Paths.get(path.toString(), FILENAME_DESCRIPTION_XML))
+			);
+		}
+		catch(final InvalidPathException ignored){}
+		return false;
 	}
 
 	public List<String> getAvailableLanguages(){
@@ -167,7 +177,8 @@ public class Packager{
 		final NodeList subNodes = entry.getChildNodes();
 		for(int i = 0; i < subNodes.getLength(); i ++){
 			final Node subEntry = subNodes.item(i);
-			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE) && XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+			if(XMLParser.isElement(subEntry, CONFIGURATION_NODE)
+					&& XMLParser.extractAttributeValue(subEntry, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(subEntry);
 				languageSets.addAll(Arrays.asList(locales));
 			}
@@ -233,7 +244,8 @@ public class Packager{
 				ZIPPER.zipDirectory(autoTextFile.toPath().getParent(), Deflater.BEST_COMPRESSION, autoTextOutputPath.toFile());
 			}
 
-			final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1) + EXTENSION_ZIP)
+			final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
+				+ EXTENSION_ZIP)
 				.toFile();
 			//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 			//that are not autoCorrectOutputFilename or autoTextOutputFilename
@@ -305,7 +317,8 @@ public class Packager{
 	/** Go up directories until description.xml or manifest.json is found */
 	private Path getPackageBaseDirectory(final File affFile){
 		Path parentPath = affFile.toPath().getParent();
-		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML) && !existFile(parentPath, FILENAME_MANIFEST_JSON))
+		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML)
+				&& !existFile(parentPath, FILENAME_MANIFEST_JSON))
 			parentPath = parentPath.getParent();
 		return parentPath;
 	}
@@ -382,7 +395,8 @@ public class Packager{
 		return children;
 	}
 
-	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
+	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
+			final Map<String, File> children) throws IOException{
 		final NodeList subNodes = entry.getChildNodes();
 		for(int j = 0; j < subNodes.getLength(); j ++){
 			final Node subEntry = subNodes.item(j);
@@ -423,7 +437,8 @@ public class Packager{
 		}
 	}
 
-	private void getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath, final Path originPath, final Map<String, File> children) throws IOException{
+	private void getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath, final Path originPath,
+			final Map<String, File> children) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
 		final File file = absolutizeFolder(folder, basePath, originPath);
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
