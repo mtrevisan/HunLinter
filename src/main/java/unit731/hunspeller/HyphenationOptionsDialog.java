@@ -2,6 +2,7 @@ package unit731.hunspeller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.IntegerFilter;
 import unit731.hunspeller.parsers.hyphenation.HyphenationOptions;
 import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
@@ -9,6 +10,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
 import javax.swing.*;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -36,6 +38,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 
 		initComponents();
 
+		setCurrentFont();
+
 		minLeftNonCompoundTextField.setText(Integer.toString(options.getNonCompoundOptions().getLeftMin()));
 		minRightNonCompoundTextField.setText(Integer.toString(options.getNonCompoundOptions().getRightMin()));
 		minLeftCompoundTextField.setText(Integer.toString(options.getCompoundOptions().getLeftMin()));
@@ -45,6 +49,12 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			.sorted()
 			.forEach(model::addElement);
 		noHyphenationList.setModel(model);
+	}
+
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
+		noHyphenationTextField.setFont(currentFont);
+		noHyphenationList.setFont(currentFont);
 	}
 
 	/**

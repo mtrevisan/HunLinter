@@ -2041,7 +2041,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void loadFileCompleted(){
 		//restore default font (changed for reporting reading errors)
-		parsingResultTextArea.setFont(GUIUtils.getCurrentFont());
+		setCurrentFont();
 
 		backbone.registerFileListener();
 		backbone.startFileListener();
@@ -2163,6 +2163,34 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
+		parsingResultTextArea.setFont(currentFont);
+
+		dicInputTextField.setFont(currentFont);
+		dicTable.setFont(currentFont);
+
+		cmpInputTextArea.setFont(currentFont);
+		cmpTable.setFont(currentFont);
+
+		theMeaningsTextField.setFont(currentFont);
+		theTable.setFont(currentFont);
+
+		hypWordTextField.setFont(currentFont);
+		hypSyllabationOutputLabel.setFont(currentFont);
+		hypSyllabesCountOutputLabel.setFont(currentFont);
+		hypAddRuleTextField.setFont(currentFont);
+		hypAddRuleSyllabationOutputLabel.setFont(currentFont);
+
+		acoIncorrectTextField.setFont(currentFont);
+		acoCorrectTextField.setFont(currentFont);
+		acoTable.setFont(currentFont);
+
+		sexTextArea.setFont(currentFont);
+
+		wexTextArea.setFont(currentFont);
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
