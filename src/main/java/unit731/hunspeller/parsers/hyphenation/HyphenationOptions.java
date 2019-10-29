@@ -33,11 +33,11 @@ public class HyphenationOptions{
 	}
 
 	public void setLeftMin(final int value){
-		leftMin = Math.max(value, minDefault);
+		leftMin = Math.max(value, 0);
 	}
 
 	public void setRightMin(final int value){
-		rightMin = Math.max(value, minDefault);
+		rightMin = Math.max(value, 0);
 	}
 
 	public int getMinimumLength(){
