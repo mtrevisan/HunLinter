@@ -1,9 +1,12 @@
 package unit731.hunspeller.parsers.workers;
 
+import org.xml.sax.SAXException;
 import unit731.hunspeller.parsers.workers.exceptions.ProjectNotFoundException;
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -22,6 +25,11 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 
 	public static final String WORKER_NAME = "Project loader";
+
+	@FunctionalInterface
+	interface StageFunction{
+		void execute() throws IOException, SAXException;
+	}
 
 
 	private final Packager packager;
@@ -55,76 +63,22 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 			backbone.clear();
 
-			while(paused.get())
-				Thread.sleep(500l);
+			final List<StageFunction> stages = Arrays.asList(
+				() -> backbone.openAffixFile(packager.getAffixFile()),
+				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),
+				() -> backbone.getCorrectnessChecker(),
+				() -> backbone.prepareDictionaryFile(backbone.getDictionaryFile()),
+				() -> backbone.openAidFile(backbone.getAidFile()),
+				() -> backbone.openThesaurusFile(backbone.getThesaurusDataFile()),
+				() -> backbone.openAutoCorrectFile(backbone.getAutoCorrectFile()),
+				() -> backbone.openSentenceExceptionsFile(backbone.getSentenceExceptionsFile()),
+				() -> backbone.openWordExceptionsFile(backbone.getWordExceptionsFile()));
+			for(int index = 0; index < stages.size(); index ++){
+				waitIfPaused();
 
-			final File affFile = packager.getAffixFile();
-			backbone.openAffixFile(affFile);
-
-			setProgress(11);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File hypFile = backbone.getHyphenationFile();
-			backbone.openHyphenationFile(hypFile);
-
-			setProgress(22);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			backbone.getCorrectnessChecker();
-
-			setProgress(33);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File dicFile = backbone.getDictionaryFile();
-			backbone.prepareDictionaryFile(dicFile);
-
-			setProgress(44);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File aidFile = backbone.getAidFile();
-			backbone.openAidFile(aidFile);
-
-			setProgress(56);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File theDataFile = backbone.getThesaurusDataFile();
-			backbone.openThesaurusFile(theDataFile);
-
-			setProgress(67);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File acoFile = backbone.getAutoCorrectFile();
-			backbone.openAutoCorrectFile(acoFile);
-
-			setProgress(78);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File sexFile = backbone.getSentenceExceptionsFile();
-			backbone.openSentenceExceptionsFile(sexFile);
-
-			setProgress(88);
-
-			while(paused.get())
-				Thread.sleep(500l);
-
-			final File wexFile = backbone.getWordExceptionsFile();
-			backbone.openWordExceptionsFile(wexFile);
-
-			setProgress(100);
+				stages.get(index).execute();
+				setProgress((int)Math.ceil((index + 1) * 100 / stages.size()));
+			}
 
 			watch.stop();
 
@@ -146,6 +100,11 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		}
 
 		return null;
+	}
+
+	private void waitIfPaused() throws InterruptedException{
+		while(paused.get())
+			Thread.sleep(500l);
 	}
 
 	@Override
