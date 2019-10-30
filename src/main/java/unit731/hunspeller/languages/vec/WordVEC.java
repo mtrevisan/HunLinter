@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -216,7 +216,7 @@ public class WordVEC{
 		final int idx = getIndexOfStress(word);
 		//check if the word have a stress and this is not on the last letter (and not followed by a minus sign)
 		final int wordSize = word.length();
-		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
+		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != HyphenationParser.MINUS_SIGN.charAt(0)){
 			final String subword = word.substring(idx, idx + 2);
 			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword)
 					&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
@@ -229,10 +229,7 @@ public class WordVEC{
 	}
 
 	private static int getIndexOfStress(final String word){
-		for(int i = 0; i < word.length(); i ++)
-			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
-				return i;
-		return -1;
+		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
 	}
 
 	public static Comparator<String> sorterComparator(){
