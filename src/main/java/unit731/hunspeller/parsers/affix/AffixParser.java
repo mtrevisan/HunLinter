@@ -194,16 +194,32 @@ public class AffixParser{
 	}
 
 	private void postProcessData(final File affFile){
-		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
-			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
-		else{
-			int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
-			if(compoundMin < 1)
-				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
-		}
+		postProcessCharset();
+//		postProcessKey();
+//		postProcessWordChars();
+		postProcessLanguage(affFile);
+		postProcessWordBreak();
+		postProcessComplesPrefixes();
+		postProcessCompoundMinimumLength();
+	}
+
+	private void postProcessCharset(){
 		//apply default charset
 		if(!data.containsData(AffixOption.CHARACTER_SET))
 			data.addData(AffixOption.CHARACTER_SET, StandardCharsets.ISO_8859_1);
+	}
+
+	private void postProcessKey(){
+//		if(!containsData(AffixOption.KEY))
+//			data.addData(AffixOption.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+	}
+
+	private void postProcessWordChars(){
+//		if(!containsData(AffixOption.WORD_CHARS))
+//			data.addData(AffixOption.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
+	}
+
+	private void postProcessLanguage(final File affFile){
 		if(!data.containsData(AffixOption.LANGUAGE)){
 			//try to infer language from filename
 			final String filename = FilenameUtils.removeExtension(affFile.getName());
@@ -213,6 +229,9 @@ public class AffixParser{
 			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 			data.addData(AffixOption.LANGUAGE, language);
 		}
+	}
+
+	private void postProcessWordBreak(){
 		if(!data.containsData(AffixOption.WORD_BREAK_CHARACTERS)){
 			final Set<String> wordBreakCharacters = new HashSet<>(3);
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
@@ -220,6 +239,9 @@ public class AffixParser{
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
 			data.addData(AffixOption.WORD_BREAK_CHARACTERS, wordBreakCharacters);
 		}
+	}
+
+	private void postProcessComplesPrefixes(){
 		//swap options:
 		if(data.isComplexPrefixes()){
 			final String compoundBegin = data.getData(AffixOption.COMPOUND_BEGIN_FLAG);
@@ -232,10 +254,16 @@ public class AffixParser{
 			data.addData(AffixOption.PREFIX, suffixes);
 			data.addData(AffixOption.SUFFIX, prefixes);
 		}
-//		if(!containsData(AffixOption.KEY))
-//			data.addData(AffixOption.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
-//		if(!containsData(AffixOption.WORD_CHARS))
-//			data.addData(AffixOption.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
+	}
+
+	private void postProcessCompoundMinimumLength(){
+		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
+			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
+		else{
+			int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
+			if(compoundMin < 1)
+				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
+		}
 	}
 
 	private Handler lookupHandlerByRuleType(final AffixOption ruleType){
