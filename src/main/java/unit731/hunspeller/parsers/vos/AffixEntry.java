@@ -49,7 +49,7 @@ public class AffixEntry{
 	private final String flag;
 	final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
-	private final AffixCondition condition;
+	private final Pattern condition;
 	/** string to strip */
 	private final String removing;
 	private final int removingLength;
@@ -84,7 +84,10 @@ public class AffixEntry{
 		affixType = AffixType.createFromCode(ruleType);
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
-		condition = new AffixCondition(cond, affixType);
+		final String matcherCondition = (affixType == AffixType.PREFIX? "^": StringUtils.EMPTY)
+			+ StringUtils.join(cond)
+			+ (affixType == AffixType.SUFFIX? "$": StringUtils.EMPTY);
+		condition = PatternHelper.pattern(matcherCondition);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		removingLength = removing.length();
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
@@ -200,7 +203,7 @@ public class AffixEntry{
 	}
 
 	public boolean canApplyTo(final String word){
-		return condition.match(word, affixType);
+		return PatternHelper.find(word, condition);
 	}
 
 	public boolean canInverseApplyTo(final String word){

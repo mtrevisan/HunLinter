@@ -52,10 +52,7 @@ public class PatternHelper{
 	}
 
 	public static String[] extract(final String text, final Pattern pattern, final int limit){
-		return extract(pattern.matcher(text), limit);
-	}
-
-	public static String[] extract(final Matcher matcher, final int limit){
+		final Matcher matcher = pattern.matcher(text);
 		final List<String> result = new ArrayList<>();
 		while(matcher.find() && (limit < 0 || result.size() < limit)){
 			String component = null;
@@ -70,15 +67,13 @@ public class PatternHelper{
 
 	//FIXME is there a way to optimize this find?
 	public static boolean find(final String text, final Pattern pattern){
-		return find(pattern.matcher(text));
+		return pattern.matcher(text)
+			.find();
 	}
 
-	public static boolean find(final Matcher matcher){
-		return matcher.find();
-	}
-
-	public static boolean matches(final Matcher matcher){
-		return matcher.matches();
+	public static boolean matches(final String text, final Pattern pattern){
+		return pattern.matcher(text)
+			.matches();
 	}
 
 	//FIXME is there a way to optimize this replaceAll?
