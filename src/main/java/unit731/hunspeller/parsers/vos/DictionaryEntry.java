@@ -9,12 +9,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -157,11 +161,8 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		if(continuationFlags != null)
-			for(final String flag : continuationFlags)
-				if(!isTerminalAffix.apply(flag))
-					return true;
-		return false;
+		return nullableArrayToStream(continuationFlags)
+			.anyMatch(Predicate.not(isTerminalAffix::apply));
 	}
 
 	public int getContinuationFlagCount(){
@@ -169,11 +170,8 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasContinuationFlag(final String ... continuationFlags){
-		if(this.continuationFlags != null && continuationFlags != null)
-			for(final String flag : this.continuationFlags)
-				if(ArrayUtils.contains(continuationFlags, flag))
-					return true;
-		return false;
+		return (this.continuationFlags != null && continuationFlags != null
+			&& nullableArrayToStream(this.continuationFlags).anyMatch(flag -> ArrayUtils.contains(continuationFlags, flag)));
 	}
 
 	public List<AffixEntry> getAppliedRules(){
@@ -200,7 +198,7 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
+		return nullableArrayToStream(continuationFlags)
 			.filter(affixData::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
@@ -211,21 +209,16 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
 		distribution.put(compoundEndFlag, new HashSet<>());
-		if(continuationFlags != null)
-			for(final String flag : continuationFlags){
-				final Set<DictionaryEntry> value = distribution.get(flag);
-				if(value != null)
-					value.add(this);
-			}
+		nullableArrayToStream(continuationFlags)
+			.map(distribution::get)
+			.filter(Objects::nonNull)
+			.forEach(value -> value.add(this));
 		return distribution;
 	}
 
 	public boolean hasPartOfSpeech(){
-		if(morphologicalFields != null)
-			for(final String morphologicalField : morphologicalFields)
-				if(morphologicalField.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
-					return true;
-		return false;
+		return nullableArrayToStream(morphologicalFields)
+			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
 	}
 
 	public boolean hasPartOfSpeech(final String partOfSpeech){
@@ -239,7 +232,7 @@ public class DictionaryEntry{
 	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
+		return nullableArrayToStream(morphologicalFields)
 			.filter(df -> df.startsWith(tag))
 			.map(df -> df.substring(purgeTag))
 			.collect(Collectors.toList());
@@ -251,9 +244,14 @@ public class DictionaryEntry{
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		if(morphologicalFields != null)
-			for(final String morphologicalField : morphologicalFields)
-				fun.accept(morphologicalField);
+		nullableArrayToStream(morphologicalFields)
+			.forEach(fun::accept);
+	}
+
+	private <T> Stream<T> nullableArrayToStream(final T[] array){
+		return Optional.ofNullable(array)
+			.map(Arrays::stream)
+			.orElseGet(Stream::empty);
 	}
 
 	/**
