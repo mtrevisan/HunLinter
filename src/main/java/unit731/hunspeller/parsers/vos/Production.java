@@ -144,15 +144,11 @@ public class Production extends DictionaryEntry{
 	public boolean isTwofolded(){
 		boolean twofolded = false;
 		if(hasProductionRules()){
-			int suffixes = 0;
-			int prefixes = 0;
+			//prefixes and affixes
+			final int[] affixes = new int[]{0, 0};
 			for(final AffixEntry appliedRule : appliedRules){
-				if(appliedRule.isSuffix())
-					suffixes ++;
-				else
-					prefixes ++;
-
-				if(suffixes > 1 || prefixes > 1){
+				affixes[appliedRule.isSuffix()? 1: 0] ++;
+				if(affixes[0] > 1 || affixes[1] > 1){
 					twofolded = true;
 					break;
 				}

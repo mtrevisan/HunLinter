@@ -20,7 +20,7 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 
 
 	@Override
-	public void setProductions(List<Production> productions){
+	public void setProductions(final List<Production> productions){
 		this.productions = productions;
 
 		fireTableDataChanged();
@@ -37,11 +37,11 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 	}
 
 	@Override
-	public Object getValueAt(int rowIndex, int columnIndex){
+	public Object getValueAt(final int rowIndex, final int columnIndex){
 		if(productions == null || productions.size() <= rowIndex)
 			return null;
 
-		Production production = productions.get(rowIndex);
+		final Production production = productions.get(rowIndex);
 		switch(columnIndex){
 			case 0:
 				return production.getWord();
@@ -55,7 +55,7 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 	}
 
 	@Override
-	public String getColumnName(int column){
+	public String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 
