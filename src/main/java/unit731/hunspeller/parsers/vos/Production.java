@@ -1,21 +1,19 @@
 package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
+import unit731.hunspeller.services.JavaHelper;
 
 
 public class Production extends DictionaryEntry{
@@ -97,7 +95,7 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixType type){
-		return collectionToStream(appliedRules)
+		return JavaHelper.nullableToStream(appliedRules)
 			.filter(rule -> rule.getType() == type)
 			.reduce((first, second) -> second)
 			.orElse(null);
@@ -105,7 +103,7 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(){
-		return collectionToStream(appliedRules)
+		return JavaHelper.nullableToStream(appliedRules)
 			.reduce((first, second) -> second)
 			.orElse(null);
 	}
@@ -140,7 +138,7 @@ public class Production extends DictionaryEntry{
 //	}
 
 	public boolean isTwofolded(){
-		final Long affixesMaxCount = collectionToStream(appliedRules)
+		final Long affixesMaxCount = JavaHelper.nullableToStream(appliedRules)
 			.map(AffixEntry::isSuffix)
 			.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
 			.values().stream()
@@ -150,15 +148,9 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getRulesSequence(){
-		return collectionToStream(appliedRules)
+		return JavaHelper.nullableToStream(appliedRules)
 			.map(AffixEntry::getFlag)
 			.collect(Collectors.joining(LEADS_TO));
-	}
-
-	private <T> Stream<T> collectionToStream(final Collection<T> collection){
-		return Optional.ofNullable(collection)
-			.map(Collection::stream)
-			.orElseGet(Stream::empty);
 	}
 
 	public String getMorphologicalFields(){

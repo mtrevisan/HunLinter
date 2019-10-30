@@ -2,14 +2,12 @@ package unit731.hunspeller.parsers.vos;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -17,7 +15,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +26,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
+import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -110,14 +108,8 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		boolean containsStem = false;
-		if(mfs != null)
-			for(final String mf : mfs)
-				if(mf.startsWith(MorphologicalTag.TAG_STEM.getCode())){
-					containsStem = true;
-					break;
-				}
-		return containsStem;
+		return JavaHelper.nullableToStream(mfs)
+			.anyMatch(mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode()));
 	}
 
 //	public static String extractWord(final String line){
@@ -161,7 +153,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return nullableArrayToStream(continuationFlags)
+		return JavaHelper.nullableToStream(continuationFlags)
 			.anyMatch(Predicate.not(isTerminalAffix::apply));
 	}
 
@@ -171,7 +163,7 @@ public class DictionaryEntry{
 
 	public boolean hasContinuationFlag(final String ... continuationFlags){
 		return (this.continuationFlags != null && continuationFlags != null
-			&& nullableArrayToStream(this.continuationFlags).anyMatch(flag -> ArrayUtils.contains(continuationFlags, flag)));
+			&& JavaHelper.nullableToStream(this.continuationFlags).anyMatch(flag -> ArrayUtils.contains(continuationFlags, flag)));
 	}
 
 	public List<AffixEntry> getAppliedRules(){
@@ -198,7 +190,7 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		return nullableArrayToStream(continuationFlags)
+		return JavaHelper.nullableToStream(continuationFlags)
 			.filter(affixData::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
@@ -209,7 +201,7 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
 		distribution.put(compoundEndFlag, new HashSet<>());
-		nullableArrayToStream(continuationFlags)
+		JavaHelper.nullableToStream(continuationFlags)
 			.map(distribution::get)
 			.filter(Objects::nonNull)
 			.forEach(value -> value.add(this));
@@ -217,7 +209,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(){
-		return nullableArrayToStream(morphologicalFields)
+		return JavaHelper.nullableToStream(morphologicalFields)
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
 	}
 
@@ -232,7 +224,7 @@ public class DictionaryEntry{
 	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		return nullableArrayToStream(morphologicalFields)
+		return JavaHelper.nullableToStream(morphologicalFields)
 			.filter(df -> df.startsWith(tag))
 			.map(df -> df.substring(purgeTag))
 			.collect(Collectors.toList());
@@ -244,14 +236,8 @@ public class DictionaryEntry{
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		nullableArrayToStream(morphologicalFields)
+		JavaHelper.nullableToStream(morphologicalFields)
 			.forEach(fun::accept);
-	}
-
-	private <T> Stream<T> nullableArrayToStream(final T[] array){
-		return Optional.ofNullable(array)
-			.map(Arrays::stream)
-			.orElseGet(Stream::empty);
 	}
 
 	/**
