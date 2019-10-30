@@ -1,12 +1,16 @@
 package unit731.hunspeller.parsers.vos;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -93,23 +97,17 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixType type){
-		AffixEntry lastAppliedRule = null;
-		if(hasProductionRules())
-			lastAppliedRule = appliedRules.stream()
-				.filter(rule -> rule.getType() == type)
-				.reduce((first, second) -> second)
-				.orElse(null);
-		return lastAppliedRule;
+		return collectionToStream(appliedRules)
+			.filter(rule -> rule.getType() == type)
+			.reduce((first, second) -> second)
+			.orElse(null);
 	}
 
 	@Override
 	public AffixEntry getLastAppliedRule(){
-		AffixEntry lastAppliedRule = null;
-		if(hasProductionRules())
-			lastAppliedRule = appliedRules.stream()
-				.reduce((first, second) -> second)
-				.orElse(null);
-		return lastAppliedRule;
+		return collectionToStream(appliedRules)
+			.reduce((first, second) -> second)
+			.orElse(null);
 	}
 
 	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
@@ -142,26 +140,25 @@ public class Production extends DictionaryEntry{
 //	}
 
 	public boolean isTwofolded(){
-		boolean twofolded = false;
-		if(hasProductionRules()){
-			//prefixes and affixes
-			final int[] affixes = new int[]{0, 0};
-			for(final AffixEntry appliedRule : appliedRules){
-				affixes[appliedRule.isSuffix()? 1: 0] ++;
-				if(affixes[0] > 1 || affixes[1] > 1){
-					twofolded = true;
-					break;
-				}
-			}
-		}
-		return twofolded;
+		final Long affixesMaxCount = collectionToStream(appliedRules)
+			.map(AffixEntry::isSuffix)
+			.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+			.values().stream()
+			.max(Comparator.naturalOrder())
+			.orElse(0L);
+		return (affixesMaxCount > 1);
 	}
 
 	public String getRulesSequence(){
-		return (appliedRules != null? appliedRules.stream()
+		return collectionToStream(appliedRules)
 			.map(AffixEntry::getFlag)
-			.collect(Collectors.joining(LEADS_TO)):
-			StringUtils.EMPTY);
+			.collect(Collectors.joining(LEADS_TO));
+	}
+
+	private <T> Stream<T> collectionToStream(final Collection<T> collection){
+		return Optional.ofNullable(collection)
+			.map(Collection::stream)
+			.orElseGet(Stream::empty);
 	}
 
 	public String getMorphologicalFields(){
