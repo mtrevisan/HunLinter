@@ -485,26 +485,13 @@ public class Packager{
 	}
 
 	private List<Node> extractChildren(final Element parentElement){
-		return extractChildren(parentElement,
+		return XMLParser.extractChildren(parentElement,
 			node -> (node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName())));
 	}
 
 	private List<Node> extractChildren(final Node parentNode){
-		return extractChildren(parentNode,
+		return XMLParser.extractChildren(parentNode,
 			node -> XMLParser.isElement(node, CONFIGURATION_NODE));
-	}
-
-	private List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extrationCondition){
-		final List<Node> children = new ArrayList<>();
-		if(parentNode != null){
-			final NodeList nodes = parentNode.getChildNodes();
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node node = nodes.item(i);
-				if(extrationCondition.apply(node))
-					children.add(node);
-			}
-		}
-		return children;
 	}
 
 }

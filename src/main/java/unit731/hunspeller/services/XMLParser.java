@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -22,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 
 public class XMLParser{
@@ -72,6 +76,19 @@ public class XMLParser{
 
 	public static boolean isElement(final Node entry, final String elementName){
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
+	}
+
+	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extrationCondition){
+		final List<Node> children = new ArrayList<>();
+		if(parentNode != null){
+			final NodeList nodes = parentNode.getChildNodes();
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node node = nodes.item(i);
+				if(extrationCondition.apply(node))
+					children.add(node);
+			}
+		}
+		return children;
 	}
 
 	public static Node extractAttribute(final Node entry, final String name){

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.XMLParser;
@@ -58,14 +57,11 @@ public class ExceptionsParser{
 			throw new IllegalArgumentException("Invalid root element in file " + configurationFilename
 				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
-		final NodeList entries = rootElement.getChildNodes();
-		for(int i = 0; i < entries.getLength(); i ++){
-			final Node entry = entries.item(i);
-			if(XMLParser.isElement(entry, AUTO_CORRECT_BLOCK)){
-				final Node mediaType = XMLParser.extractAttribute(entry, WORD_EXCEPTIONS_WORD);
-				if(mediaType != null)
-					dictionary.add(mediaType.getNodeValue());
-			}
+		final List<Node> children = XMLParser.extractChildren(rootElement, node -> XMLParser.isElement(node, AUTO_CORRECT_BLOCK));
+		for(final Node child : children){
+			final Node mediaType = XMLParser.extractAttribute(child, WORD_EXCEPTIONS_WORD);
+			if(mediaType != null)
+				dictionary.add(mediaType.getNodeValue());
 		}
 
 		validate();

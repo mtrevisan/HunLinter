@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
@@ -68,14 +67,13 @@ public class AutoCorrectParser{
 			throw new IllegalArgumentException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
-		final NodeList entries = rootElement.getChildNodes();
-		for(int i = 0; i < entries.getLength(); i ++){
-			final Node entry = entries.item(i);
-			if(XMLParser.isElement(entry, AUTO_CORRECT_BLOCK)){
-				final Node mediaType = XMLParser.extractAttribute(entry, AUTO_CORRECT_INCORRECT_FORM);
-				if(mediaType != null)
-					dictionary.add(new CorrectionEntry(mediaType.getNodeValue(),
-						XMLParser.extractAttributeValue(entry, AUTO_CORRECT_CORRECT_FORM)));
+		final List<Node> children = XMLParser.extractChildren(rootElement, node -> XMLParser.isElement(node, AUTO_CORRECT_BLOCK));
+		for(final Node child : children){
+			final Node mediaType = XMLParser.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
+			if(mediaType != null){
+				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
+					XMLParser.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
+				dictionary.add(correctionEntry);
 			}
 		}
 
