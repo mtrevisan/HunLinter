@@ -393,32 +393,31 @@ public class Packager{
 				continue;
 
 			final String attributeValue = XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
-			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
-				final String childFolders = extractLocation(child);
-				final int splitIndex = childFolders.indexOf(SPELLCHECK_FOLDERS_SEPARATOR);
-				final String folderAff = childFolders.substring(0, splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length() - 1);
-				final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, fileAff);
-				final String folderDic = childFolders.substring(splitIndex + SPELLCHECK_FOLDERS_SEPARATOR.length());
-				final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-				folders.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, fileDic);
-			}
+			final String childFolders = extractLocation(child);
+			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING))
+				folders.putAll(asd(childFolders, SPELLCHECK_FOLDERS_SEPARATOR, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX,
+					CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY, basePath, originPath));
 			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
-				final String childFolder = extractLocation(child);
-				final File file = absolutizeFolder(childFolder, basePath, originPath);
+				final File file = absolutizeFolder(childFolders, basePath, originPath);
 				folders.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
-			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
-				final String childFolders = extractLocation(child);
-				final int splitIndex = childFolders.indexOf(THESAURUS_FOLDERS_SEPARATOR);
-				final String folderDat = childFolders.substring(0, splitIndex + THESAURUS_FOLDERS_SEPARATOR.length() - 1);
-				final File fileDat = absolutizeFolder(folderDat, basePath, originPath);
-				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, fileDat);
-				final String folderIdx = childFolders.substring(splitIndex + THESAURUS_FOLDERS_SEPARATOR.length());
-				final File fileIdx = absolutizeFolder(folderIdx, basePath, originPath);
-				folders.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, fileIdx);
-			}
+			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS))
+				folders.putAll(asd(childFolders, THESAURUS_FOLDERS_SEPARATOR, CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA,
+					CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX, basePath, originPath));
 		}
+	}
+
+	private Map<String, File> asd(final String childFolders, final String foldersSeparator, final String configNodeProperty1,
+			final String configNodeProperty2, final Path basePath, final Path originPath) throws IOException{
+		final Map<String, File> folders = new HashMap<>();
+		final int splitIndex = childFolders.indexOf(foldersSeparator);
+		final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
+		final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+		folders.put(configNodeProperty1, fileAff);
+		final String folderDic = childFolders.substring(splitIndex + foldersSeparator.length());
+		final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
+		folders.put(configNodeProperty2, fileDic);
+		return folders;
 	}
 
 	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
