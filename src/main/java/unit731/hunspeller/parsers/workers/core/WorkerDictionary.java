@@ -178,6 +178,10 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			}
 		};
 
+		processLines(lines, processor);
+	}
+
+	private void processLines(final List<Pair<Integer, String>> lines, final Consumer<Pair<Integer, String>> processor){
 		if(isParallelProcessing())
 			lines.parallelStream()
 				.forEach(processor);
