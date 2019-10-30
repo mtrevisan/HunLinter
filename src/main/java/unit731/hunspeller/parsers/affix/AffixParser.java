@@ -163,8 +163,7 @@ public class AffixParser{
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
 					throw new IllegalArgumentException(BAD_FIRST_LINE.format(new Object[]{line}));
-				else
-					encodingRead = true;
+				encodingRead = true;
 
 				final ParsingContext context = new ParsingContext(line, br);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
