@@ -228,11 +228,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		if(size > 1){
 			final String interCompounds = sb.substring(Math.max(size - 1, 0), size + 1) + compound.substring(0, Math.min(compound.length(), 2));
 			final int len = interCompounds.length();
-			if(len == 3)
+			if(len == 3 || len == 4){
 				repeated = (interCompounds.charAt(0) == interCompounds.charAt(1) && interCompounds.charAt(0) == interCompounds.charAt(2));
-			else if(len == 4)
-				repeated = (interCompounds.charAt(0) == interCompounds.charAt(1) && interCompounds.charAt(0) == interCompounds.charAt(2)
-					|| interCompounds.charAt(1) == interCompounds.charAt(2) && interCompounds.charAt(1) == interCompounds.charAt(3));
+				if(len == 4)
+					repeated |= (interCompounds.charAt(1) == interCompounds.charAt(2) && interCompounds.charAt(1) == interCompounds.charAt(3));
+			}
 		}
 		return repeated;
 	}

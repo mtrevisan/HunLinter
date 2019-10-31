@@ -62,9 +62,8 @@ public class XMLParser{
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		if(properties != null)
-			for(final Pair<String, String> property : properties)
-				transformer.setOutputProperty(property.getKey(), property.getValue());
+		JavaHelper.nullableToStream(properties)
+			.forEach(property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
 		final DOMSource domSource = new DOMSource(doc);
 		final StreamResult streamResult = new StreamResult(xmlFile);
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");

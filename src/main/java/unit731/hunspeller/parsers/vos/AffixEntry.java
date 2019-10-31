@@ -19,6 +19,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
+import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -136,7 +137,7 @@ public class AffixEntry{
 	}
 
 	public boolean hasContinuationFlags(){
-		return (continuationFlags != null);
+		return (continuationFlags != null && continuationFlags.length > 0);
 	}
 
 	public boolean hasContinuationFlag(final String flag){
@@ -188,11 +189,11 @@ public class AffixEntry{
 
 	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		final List<String[]> mf = new ArrayList<>();
-		if(compoundEntries != null)
-			for(final DictionaryEntry compoundEntry : compoundEntries){
+		JavaHelper.nullableToStream(compoundEntries)
+			.forEach(compoundEntry -> {
 				final String compound = compoundEntry.getWord();
 				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
-			}
+			});
 		return mf.stream()
 			.flatMap(Arrays::stream)
 			.toArray(String[]::new);

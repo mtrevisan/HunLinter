@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import unit731.hunspeller.FontChooserDialog;
+import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -121,9 +122,8 @@ public class GUIUtils{
 				((JComponent)component).updateUI();
 			if(component instanceof Container){
 				final Component[] children = ((Container)component).getComponents();
-				if(children != null)
-					for(final Component child : children)
-						updateComponent(child, font);
+				JavaHelper.nullableToStream(children)
+					.forEach(child -> updateComponent(child, font));
 			}
 			if(component instanceof JEditorPane)
 				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
