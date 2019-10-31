@@ -41,7 +41,7 @@ import unit731.hunspeller.services.PatternHelper;
  */
 public class HyphenationParser{
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Hyphenation data file malformed, the first line is not ''{0}''");
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Hyphenation data file malformed, cannot determine charset for ''{0}''");
 	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
 	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
 	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
@@ -80,6 +80,8 @@ public class HyphenationParser{
 
 	private static final String COMMA = ",";
 
+	private static final String ESCAPE_SEQUENCE = "^^";
+	private static final Pattern PATTERN_ESCAPED_UNICODE = PatternHelper.pattern("(\\^{2}[a-fA-F0-9]{2})|.");
 	private static final Pattern PATTERN_VALID_RULE = PatternHelper.pattern("^\\.?[^.]+\\.?$");
 	private static final Pattern PATTERN_VALID_RULE_BREAK_POINTS = PatternHelper.pattern("[\\d]");
 	private static final Pattern PATTERN_INVALID_RULE_START = PatternHelper.pattern("^\\.[\\d]");
@@ -191,12 +193,16 @@ public class HyphenationParser{
 			Level level = Level.NON_COMPOUND;
 
 			final Path path = hypFile.toPath();
-			final Charset charset = FileHelper.determineCharset(path);
+			Charset charset = FileHelper.determineCharset(path);
 			try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 				String line = extractLine(br);
 
-				if(Charset.forName(line) != charset)
-					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charset.name()}));
+				try{
+					charset = Charset.forName(line);
+				}
+				catch(final Exception e){
+					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charset.name()}), e);
+				}
 
 				REDUCED_PATTERNS.get(level).clear();
 
@@ -224,6 +230,9 @@ public class HyphenationParser{
 							customHyphenations.get(level).put(key, line);
 						}
 						else{
+							if(charset == StandardCharsets.ISO_8859_1)
+								line = convertUnicode(line);
+
 							validateRule(line, level);
 
 							final String key = getKeyFromData(line);
@@ -279,6 +288,15 @@ public class HyphenationParser{
 			throw new EOFException("Unexpected EOF while reading Hyphenation file");
 
 		return line;
+	}
+
+	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
+	private String convertUnicode(final String line){
+		final String[] components = PatternHelper.extract(line, PATTERN_ESCAPED_UNICODE);
+		for(int i = 0; i < components.length; i ++)
+			if(components[i].startsWith(ESCAPE_SEQUENCE))
+				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
+		return StringUtils.join(components);
 	}
 
 	public static boolean isAugmentedRule(final String line){
