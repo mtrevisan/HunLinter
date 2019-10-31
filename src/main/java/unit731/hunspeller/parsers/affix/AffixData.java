@@ -110,10 +110,9 @@ public class AffixData{
 	}
 
 	private List<String> getStringData(final AffixOption... keys){
-		final List<String> result = new ArrayList<>(keys.length);
-		for(final AffixOption key : keys)
-			result.add(getData(key));
-		return result;
+		return Arrays.stream(keys)
+			.<String>map(this::getData)
+			.collect(Collectors.toCollection(() -> new ArrayList<>(keys.length)));
 	}
 
 	<T> void addData(final AffixOption key, final T value){
@@ -157,11 +156,8 @@ public class AffixData{
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		final Set<String> compoundRules = getCompoundRules();
-		for(final String rule : compoundRules)
-			if(isManagedByCompoundRule(rule, flag))
-				return true;
-		return false;
+		return getCompoundRules().stream()
+			.anyMatch(rule -> isManagedByCompoundRule(rule, flag));
 	}
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){

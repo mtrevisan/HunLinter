@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /** Manages pairs of mistyped words and their correct spelling */
@@ -135,9 +136,9 @@ public class AutoCorrectParser{
 	}
 
 	public void deleteCorrections(final int[] selectedRowIDs){
-		final int count = selectedRowIDs.length;
-		for(int i = 0; i < count; i ++)
-			dictionary.remove(selectedRowIDs[i] - i);
+		IntStream.range(0, selectedRowIDs.length)
+			.map(idx -> selectedRowIDs[idx] - idx)
+			.forEach(dictionary::remove);
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms */

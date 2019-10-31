@@ -67,8 +67,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines);
 
-				for(final String rule : reducedRules)
-					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
+				reducedRules.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
 			}
 			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());

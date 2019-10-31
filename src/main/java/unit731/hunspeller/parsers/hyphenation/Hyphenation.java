@@ -14,7 +14,7 @@ public class Hyphenation{
 	private final String breakCharacter;
 
 
-	public Hyphenation(List<String> syllabes, List<String> compounds, List<String> rules, String breakCharacter){
+	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules, final String breakCharacter){
 		Objects.requireNonNull(syllabes);
 		Objects.requireNonNull(compounds);
 		Objects.requireNonNull(rules);
@@ -48,9 +48,9 @@ public class Hyphenation{
 	 */
 	public int getSyllabeIndex(int idx){
 		int k = -1;
-		int size = countSyllabes();
+		final int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
-			String syllabe = syllabes.get(i);
+			final String syllabe = syllabes.get(i);
 			idx -= syllabe.length();
 			if(idx < 0){
 				k = i;
@@ -64,7 +64,7 @@ public class Hyphenation{
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the syllabe at the given (global) index
 	 */
-	public String getSyllabe(int idx){
+	public String getSyllabe(final int idx){
 		return syllabes.get(getSyllabeIndex(idx));
 	}
 
@@ -76,11 +76,11 @@ public class Hyphenation{
 	 * @param idx	Index of syllabe to extract, if negative then it's relative to the last syllabe
 	 * @return the syllabe at the given (relative) index
 	 */
-	public String getAt(int idx){
+	public String getAt(final int idx){
 		return syllabes.get(restoreRelativeIndex(idx));
 	}
 
-	private int restoreRelativeIndex(int idx){
+	private int restoreRelativeIndex(final int idx){
 		return (idx + countSyllabes()) % countSyllabes();
 	}
 
@@ -93,13 +93,13 @@ public class Hyphenation{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		Hyphenation rhs = (Hyphenation)obj;
+		final Hyphenation rhs = (Hyphenation)obj;
 		return new EqualsBuilder()
 			.append(syllabes, rhs.syllabes)
 			.append(breakCharacter, rhs.breakCharacter)

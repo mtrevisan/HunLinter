@@ -120,8 +120,7 @@ public class ConversionTable{
 		final List<Pair<String, String>> list = table.get(key);
 		if(list != null){
 			final ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(key);
-			for(final Pair<String, String> entry : list)
-				fun.convert(word, entry, conversions);
+			list.forEach(entry -> fun.convert(word, entry, conversions));
 		}
 		return conversions;
 	}

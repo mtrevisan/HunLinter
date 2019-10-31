@@ -2,11 +2,15 @@ package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
@@ -75,23 +79,18 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	}
 
 	private List<List<List<Production>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
-		final List<List<List<Production>>> entries = new ArrayList<>();
 		final Map<Integer, List<Production>> dicEntries = new HashMap<>();
-		for(final int[] permutation : permutations){
-			final List<List<Production>> compound = generateCompound(permutation, dicEntries, inputs);
-			if(compound != null)
-				entries.add(compound);
-		}
-		return entries;
+		return permutations.stream()
+			.map(permutation -> generateCompound(permutation, dicEntries, inputs))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
 	private List<List<Production>> generateCompound(final int[] permutation, final Map<Integer, List<Production>> dicEntries, final List<DictionaryEntry> inputs){
-		final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-		for(final int index : permutation){
-			final List<Production> de = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
-			if(!de.isEmpty())
-				expandedPermutationEntries.add(de);
-		}
+		final List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
+			.mapToObj(index -> dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null)))
+			.filter(Predicate.not(List::isEmpty))
+			.collect(Collectors.toList());
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);
 	}
 

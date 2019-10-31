@@ -112,8 +112,8 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		for(final Level level : Level.values())
-			REDUCED_PATTERNS.put(level, new HashSet<>());
+		Arrays.stream(Level.values())
+			.forEach(level -> REDUCED_PATTERNS.put(level, new HashSet<>()));
 	}
 
 	private final Comparator<String> comparator;
@@ -146,8 +146,8 @@ public class HyphenationParser{
 		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		for(final Level level : Level.values())
-			this.patterns.put(level, patterns.get(level));
+		Arrays.stream(Level.values())
+			.forEach(level -> this.patterns.put(level, patterns.get(level)));
 		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new HashMap<>(0));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
@@ -277,8 +277,8 @@ public class HyphenationParser{
 			throw new IllegalArgumentException(t.getMessage());
 		}
 		finally{
-			for(final Level level : Level.values())
-				REDUCED_PATTERNS.get(level).clear();
+			Arrays.stream(Level.values())
+				.forEach(level -> REDUCED_PATTERNS.get(level).clear());
 		}
 	}
 

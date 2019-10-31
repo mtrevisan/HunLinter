@@ -3,7 +3,10 @@ package unit731.hunspeller.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.prefs.Preferences;
+import java.util.stream.IntStream;
+
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -88,13 +91,10 @@ public class RecentItems{
 	}
 
 	private void loadFromPreferences(){
-		for(int i = 0; i < maxItems; i ++){
-			String val = preferenceNode.get(RECENT_ITEM_PREFIX + i, StringUtils.EMPTY);
-			if(val.isEmpty())
-				break;
-
-			items.add(val);
-		}
+		IntStream.range(0, maxItems)
+			.mapToObj(i -> preferenceNode.get(RECENT_ITEM_PREFIX + i, StringUtils.EMPTY))
+			.takeWhile(Predicate.not(String::isEmpty))
+			.forEach(items::add);
 	}
 
 	private void storeToPreferences(){

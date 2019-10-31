@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.Memoizer;
 
 
@@ -83,21 +82,20 @@ public class Frequency<T extends Comparable>{
 		return getMode(mostPopular);
 	}
 
+	/** Get the max count first, so we avoid having to recreate the list each time */
 	private long calculateMostPopularFrequency(){
-		//get the max count first, so we avoid having to recreate the list each time
-		long mostPopular = 0l;
-		for(final Long frequency : frequencies.values())
-			if(frequency > mostPopular)
-				mostPopular = frequency;
-		return mostPopular;
+		return frequencies.values().stream()
+			.mapToLong(frequency -> frequency)
+			.filter(frequency -> frequency >= 0l)
+			.max()
+			.orElse(0l);
 	}
 
 	private List<T> getMode(final long mostPopular){
-		final List<T> modeList = new ArrayList<>();
-		for(final Map.Entry<T, Long> ent : frequencies.entrySet())
-			if(ent.getValue() == mostPopular)
-				modeList.add(ent.getKey());
-		return modeList;
+		return frequencies.entrySet().stream()
+			.filter(ent -> ent.getValue() == mostPopular)
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
 	}
 
 	public List<T> getMostCommonValues(final int limit){
@@ -145,10 +143,9 @@ public class Frequency<T extends Comparable>{
 	}
 
 	private long sumOfFrequencies(final int hashCode){
-		long result = 0l;
-		for(Long aLong : frequencies.values())
-			result += aLong;
-		return result;
+		return frequencies.values().stream()
+			.mapToLong(value -> value)
+			.sum();
 	}
 
 	/**
@@ -159,7 +156,7 @@ public class Frequency<T extends Comparable>{
 	@Override
 	public String toString(){
 		final StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
-		for(T value : frequencies.keySet())
+		for(final T value : frequencies.keySet())
 			sb.append(value)
 				.append('\t')
 				.append(getCount(value))

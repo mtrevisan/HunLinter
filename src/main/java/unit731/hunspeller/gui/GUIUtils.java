@@ -12,6 +12,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -109,8 +110,8 @@ public class GUIUtils{
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
 		if(!font.equals(currentFont)){
-			for(final Component parentFrame : parentFrames)
-				updateComponent(parentFrame, font);
+			Arrays.stream(parentFrames)
+				.forEach(parentFrame -> updateComponent(parentFrame, font));
 
 			currentFont = font;
 		}

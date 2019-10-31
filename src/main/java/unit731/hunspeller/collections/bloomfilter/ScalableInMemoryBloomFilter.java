@@ -3,6 +3,7 @@ package unit731.hunspeller.collections.bloomfilter;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.stream.IntStream;
 
 
 /**
@@ -95,9 +96,9 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	public synchronized double getTrueFalsePositiveProbability(){
 		final int size = filters.size();
 		final double p0 = filters.lastElement().getFalsePositiveProbability();
-		double probability = 1.;
-		for(int i = 0; i < size; i ++)
-			probability *= 1 - p0 * Math.pow(parameters.getTighteningRatio(), i);
+		final double probability = IntStream.range(0, size)
+			.mapToDouble(i -> 1. - p0 * Math.pow(parameters.getTighteningRatio(), i))
+			.reduce(1., (a, b) -> a * b);
 		return 1. - probability;
 //		final double p0 = filters.get(filters.size() - 1).getFalsePositiveProbability();
 //		return p0 / (1. - parameters.getTighteningRatio());

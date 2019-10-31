@@ -81,8 +81,9 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			fakeNode.addChildrenId(parent.getLargestChildrenId());
 			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 		}
-		for(final Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
-			siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
+		parent.getSuccess().entrySet().stream()
+			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()))
+			.forEach(siblings::add);
 		return siblings.size();
 	}
 

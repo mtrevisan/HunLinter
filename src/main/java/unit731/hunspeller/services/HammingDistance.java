@@ -2,6 +2,8 @@ package unit731.hunspeller.services;
 
 import java.text.MessageFormat;
 import java.util.Objects;
+import java.util.stream.IntStream;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -45,11 +47,9 @@ public class HammingDistance{
 		if(left.length() != right.length())
 			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
 
-		int distance = 0;
-		for(int i = 0; i < left.length(); i ++)
-			if(left.charAt(i) != right.charAt(i))
-				distance ++;
-		return distance;
+		return (int)IntStream.range(0, left.length())
+			.filter(idx -> left.charAt(idx) != right.charAt(idx))
+			.count();
 	}
 
 	public static Pair<Character, Character> findFirstDifference(CharSequence left, CharSequence right){

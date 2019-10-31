@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -115,9 +116,8 @@ class WordGeneratorBase{
 				final List<Production> prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
 
 				final List<AffixEntry> appliedRules = production.getAppliedRules();
-				for(final Production prod : prods)
-					//add parent derivations
-					prod.prependAppliedRules(appliedRules);
+				//add parent derivations
+				prods.forEach(prod -> prod.prependAppliedRules(appliedRules));
 
 				twofoldProductions.addAll(prods);
 			}
@@ -197,16 +197,14 @@ class WordGeneratorBase{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		final String[] appliedAffixes = allAffixes.get(0);
-		String[] postponedAffixes = allAffixes.get(1);
-		if(circumfixFlag != null && ArrayUtils.contains(allAffixes.get(2), circumfixFlag))
-			postponedAffixes = ArrayUtils.addAll(postponedAffixes, circumfixFlag);
+		final String[] postponedAffixes = (circumfixFlag != null && ArrayUtils.contains(allAffixes.get(2), circumfixFlag)?
+			ArrayUtils.addAll(allAffixes.get(1), circumfixFlag): allAffixes.get(1));
 
 		final List<Production> productions = new ArrayList<>();
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
-			for(final String affix : appliedAffixes){
-				final List<Production> subProductions = applyAffixRule(dicEntry, affix, postponedAffixes, isCompound, overriddenRule);
-				productions.addAll(subProductions);
-			}
+			Arrays.stream(appliedAffixes)
+				.map(affix -> applyAffixRule(dicEntry, affix, postponedAffixes, isCompound, overriddenRule))
+				.forEach(productions::addAll);
 
 		return productions;
 	}

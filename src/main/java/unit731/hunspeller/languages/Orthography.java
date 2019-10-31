@@ -1,11 +1,15 @@
 package unit731.hunspeller.languages;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -39,14 +43,9 @@ public class Orthography{
 
 	public boolean hasSyllabationErrors(final List<String> syllabes){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-
-		boolean result = false;
-		for(boolean error : errors)
-			if(error){
-				result = true;
-				break;
-			}
-		return result;
+		return IntStream.range(0, errors.length)
+			.mapToObj(idx -> errors[idx])
+			.anyMatch(error -> error);
 	}
 
 	public StringJoiner formatHyphenation(final List<String> syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){

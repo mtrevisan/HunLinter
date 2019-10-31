@@ -163,8 +163,7 @@ public class RulesReducer{
 
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
-		for(final LineEntry entry : plainRules)
-			redistributeAddition(entry, map);
+		plainRules.forEach(entry -> redistributeAddition(entry, map));
 
 		return SetHelper.collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),

@@ -95,7 +95,7 @@ public class FileHelper{
 			builder = new ProcessBuilder("open", file.getAbsolutePath());
 
 		if(builder != null){
-			Process process = builder.start();
+			final Process process = builder.start();
 			process.waitFor();
 		}
 		else

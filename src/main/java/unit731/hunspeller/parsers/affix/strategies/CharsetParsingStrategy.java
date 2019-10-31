@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.stream.IntStream;
+
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -53,11 +55,9 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	private String[] extractFlags(final String flags){
-		final int size = flags.length();
-		final String[] singleFlags = new String[size];
-		for(int i = 0; i < size; i ++)
-			singleFlags[i] = Character.toString(flags.charAt(i));
-		return singleFlags;
+		return IntStream.range(0, flags.length())
+			.mapToObj(i -> Character.toString(flags.charAt(i)))
+			.toArray(String[]::new);
 	}
 
 	@Override

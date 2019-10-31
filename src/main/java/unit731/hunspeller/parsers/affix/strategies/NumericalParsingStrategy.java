@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -44,8 +45,8 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 		checkForDuplicates(singleFlags);
 
-		for(final String flag : singleFlags)
-			validate(flag);
+		Arrays.stream(singleFlags)
+			.forEach(this::validate);
 
 		return singleFlags;
 	}
@@ -71,8 +72,8 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		for(final String flag : flags)
-			validate(flag);
+		Arrays.stream(flags)
+			.forEach(this::validate);
 
 		return String.join(COMMA, flags);
 	}

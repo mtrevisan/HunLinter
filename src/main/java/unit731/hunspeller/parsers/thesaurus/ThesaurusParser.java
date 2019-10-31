@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -239,9 +240,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		for(final String meaning : meanings){
 			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			for(final ThesaurusEntry synonym : synonyms)
-				if(synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
-					duplicates.add(synonym);
+			synonyms.stream()
+				.filter(synonym -> synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
+				.forEach(duplicates::add);
 		}
 		return duplicates;
 	}
@@ -291,8 +292,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
-			for(int i = 0; i < count; i ++)
-				dictionary.remove(selectedRowIDs[i] - i);
+			IntStream.range(0, count)
+				.map(i -> selectedRowIDs[i] - i)
+				.forEach(dictionary::remove);
 		}
 	}
 

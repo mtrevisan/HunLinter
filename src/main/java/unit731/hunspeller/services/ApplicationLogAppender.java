@@ -5,6 +5,7 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,24 +20,23 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	private static final Map<Marker, List<JTextArea>> TEXT_AREAS = new HashMap<>();
 
 
-	public static void addTextArea(JTextArea textArea, Marker... markers){
-		for(Marker marker : markers)
-			ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>())
-				.add(textArea);
+	public static void addTextArea(final JTextArea textArea, final Marker... markers){
+		Arrays.stream(markers)
+			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>()).add(textArea));
 	}
 
-	public void setEncoder(Encoder<ILoggingEvent> encoder){
+	public void setEncoder(final Encoder<ILoggingEvent> encoder){
 		this.encoder = encoder;
 	}
 
 	@Override
-	protected void append(ILoggingEvent eventObject){
+	protected void append(final ILoggingEvent eventObject){
 		if(!TEXT_AREAS.isEmpty() && encoder != null){
-			byte[] encoded = encoder.encode(eventObject);
-			String message = new String(encoded, StandardCharsets.UTF_8);
-			Marker marker = eventObject.getMarker();
-			for(JTextArea textArea : TEXT_AREAS.get(marker))
-				textArea.append(message);
+			final byte[] encoded = encoder.encode(eventObject);
+			final String message = new String(encoded, StandardCharsets.UTF_8);
+			final Marker marker = eventObject.getMarker();
+			TEXT_AREAS.get(marker)
+				.forEach(textArea -> textArea.append(message));
 		}
 	}
 

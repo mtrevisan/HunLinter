@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,13 +93,10 @@ public class WordVEC{
 	private WordVEC(){}
 
 	public static int countGraphemes(final String word){
-		int count = 0;
-		final int size = word.length();
-		for(int i = 0; i < size; i ++)
-			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, word.charAt(i)) >= 0
-					|| Arrays.binarySearch(CONSONANTS_ARRAY, word.charAt(i)) >= 0)
-				count ++;
-		return count;
+		return (int)IntStream.range(0, word.length())
+			.mapToObj(i -> word.charAt(i))
+			.filter(chr -> Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0)
+			.count();
 	}
 
 	public static boolean isApostrophe(final char chr){
@@ -159,11 +158,9 @@ public class WordVEC{
 	}
 
 	public static int countAccents(final String word){
-		int count = 0;
-		for(int i = 0; i < word.length(); i ++)
-			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
-				count ++;
-		return count;
+		return (int)IntStream.range(0, word.length())
+			.filter(i -> Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
+			.count();
 	}
 
 	private static String suppressStress(final String word){

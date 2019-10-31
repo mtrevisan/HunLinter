@@ -107,7 +107,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 							for(final Production production : productions)
 								if(checker.shouldBeProcessedForMinimalPair(production)){
-									String word = production.getWord();
+									final String word = production.getWord();
 									writer.write(word);
 									writer.newLine();
 								}
