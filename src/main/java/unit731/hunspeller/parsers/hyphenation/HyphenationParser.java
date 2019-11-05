@@ -197,12 +197,7 @@ public class HyphenationParser{
 			try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 				String line = extractLine(br);
 
-				try{
-					charset = Charset.forName(line);
-				}
-				catch(final Exception e){
-					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charset.name()}), e);
-				}
+				charset = readCharset(line);
 
 				REDUCED_PATTERNS.get(level).clear();
 
@@ -212,38 +207,39 @@ public class HyphenationParser{
 						continue;
 
 					final boolean parsedLine = options.parseLine(line);
-					if(!parsedLine){
-						if(line.startsWith(NEXT_LEVEL)){
-							if(level == Level.COMPOUND)
-								throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
+					if(parsedLine)
+						continue;
 
-							//start with non–compound level
-							level = Level.COMPOUND;
-							secondLevelPresent = true;
-							REDUCED_PATTERNS.get(level).clear();
-						}
-						else if(isCustomRule(line)){
-							final String key = PatternHelper.clear(line, PATTERN_EQUALS);
-							if(customHyphenations.get(level).containsKey(key))
-								throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
+					if(line.startsWith(NEXT_LEVEL)){
+						if(level == Level.COMPOUND)
+							throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
 
-							customHyphenations.get(level).put(key, line);
-						}
-						else{
-							if(charset == StandardCharsets.ISO_8859_1)
-								line = convertUnicode(line);
+						//start with non–compound level
+						level = Level.COMPOUND;
+						secondLevelPresent = true;
+						REDUCED_PATTERNS.get(level).clear();
+					}
+					else if(isCustomRule(line)){
+						final String key = PatternHelper.clear(line, PATTERN_EQUALS);
+						if(customHyphenations.get(level).containsKey(key))
+							throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
-							validateRule(line, level);
+						customHyphenations.get(level).put(key, line);
+					}
+					else{
+						if(charset == StandardCharsets.ISO_8859_1)
+							line = convertUnicode(line);
 
-							final String key = getKeyFromData(line);
-							final boolean duplicatedRule = isRuleDuplicated(key, line, level);
-							if(duplicatedRule)
-								throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
-							else
-								//insert current pattern into the radix tree (remove all numbers)
-								rules.get(level)
-									.put(key, line);
-						}
+						validateRule(line, level);
+
+						final String key = getKeyFromData(line);
+						final boolean duplicatedRule = isRuleDuplicated(key, line, level);
+						if(duplicatedRule)
+							throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
+						else
+							//insert current pattern into the radix tree (remove all numbers)
+							rules.get(level)
+								.put(key, line);
 					}
 				}
 
@@ -279,6 +275,15 @@ public class HyphenationParser{
 		finally{
 			Arrays.stream(Level.values())
 				.forEach(level -> REDUCED_PATTERNS.get(level).clear());
+		}
+	}
+
+	private Charset readCharset(final String charsetName){
+		try{
+			return Charset.forName(charsetName);
+		}
+		catch(final Exception e){
+			throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}), e);
 		}
 	}
 
