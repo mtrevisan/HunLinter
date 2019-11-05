@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 
 /**
@@ -204,7 +205,7 @@ public class RadixTrieNode{
 
 	@Override
 	public String toString(){
-		return new ToStringBuilder(this)
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
 			.append("depth", depth)
 			.append("id", id)
 			.append("childrenIds", childrenIds)
