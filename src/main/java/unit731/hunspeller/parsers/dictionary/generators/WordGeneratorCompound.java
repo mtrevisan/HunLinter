@@ -195,15 +195,14 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			compoundEntries.add(next);
 
 			String nextCompound = next.getWord();
-			if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
-				//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
-				if(simplifyTriples)
-					nextCompound = nextCompound.substring(1);
-				//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
-				else /*if(forbidTriples)*/{
-					sb.setLength(0);
-					break;
-				}
+			final boolean containsTriple = containsTriple(sb, nextCompound);
+			//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+			if(containsTriple && simplifyTriples)
+				nextCompound = nextCompound.substring(1);
+			//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
+			else if(containsTriple && forbidTriples){
+				sb.setLength(0);
+				break;
 			}
 			//enforce forbidden case if CHECKCOMPOUNDCASE is set
 			if(sb.length() > 0 && forbidDifferentCasesInCompound){
