@@ -197,8 +197,6 @@ public class HyphenationParser{
 
 			charset = readCharset(line);
 
-			REDUCED_PATTERNS.get(level).clear();
-
 			while((line = br.readLine()) != null){
 				line = removeComment(line);
 				if(line.isEmpty())
@@ -208,66 +206,34 @@ public class HyphenationParser{
 				if(parsedLine)
 					continue;
 
-				if(line.equals(NEXT_LEVEL)){
-					if(level == Level.COMPOUND)
-						throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
-
-					//start with non–compound level
-					level = Level.COMPOUND;
-					secondLevelPresent = true;
-					REDUCED_PATTERNS.get(level).clear();
+				level = extractNextLevel(level, line);
+				if(level == Level.COMPOUND)
 					continue;
-				}
 
 				if(charset == StandardCharsets.ISO_8859_1)
 					line = convertUnicode(line);
 
-				if(isCustomRule(line)){
-					final String key = PatternHelper.clear(line, PATTERN_EQUALS);
-					if(customHyphenations.get(level).containsKey(key))
-						throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
-
-					customHyphenations.get(level).put(key, line);
-				}
+				if(isCustomRule(line))
+					parseCustomRule(level, line);
 				else{
 					validateRule(line, level);
 
-					final String key = getKeyFromData(line);
-					final boolean duplicatedRule = isRuleDuplicated(key, line, level);
-					if(duplicatedRule)
-						throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
-
-					//insert current pattern into the radix tree (remove all numbers)
-					rules.get(level)
-						.put(key, line);
+					parseCommonRule(level, line);
 				}
 			}
 
-			if(level == Level.NON_COMPOUND){
-				//dash and apostrophe are added by default (retro-compatibility)
-				final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
-				if(charset == StandardCharsets.UTF_8)
-					retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
-
-				patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, null) + "]");
-
-				options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
-
-				for(final String noHyphen : retroCompatibilityNoHyphen){
-					line = ONE + noHyphen + ONE;
-					if(!isRuleDuplicated(noHyphen, line, level))
-						rules.get(level)
-							.put(noHyphen, line);
-				}
-			}
+			if(level == Level.NON_COMPOUND)
+				addDefaults(level, charset);
 		}
 		catch(final Exception t){
 			throw new IllegalArgumentException(t.getMessage());
 		}
 
 		//build tries
-		for(final Level l : Level.values())
-			buildTrie(l, rules.get(l));
+		Arrays.stream(Level.values())
+			.forEach(l -> buildTrie(l, rules.get(l)));
+
+		secondLevelPresent = (level == Level.COMPOUND);
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
@@ -297,6 +263,55 @@ public class HyphenationParser{
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
 		return StringUtils.join(components);
+	}
+
+	private Level extractNextLevel(final Level level, final String line){
+		Level nextLevel = level;
+		if(line.equals(NEXT_LEVEL)){
+			if(level == Level.COMPOUND)
+				throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
+
+			//start with non–compound level
+			nextLevel = Level.COMPOUND;
+		}
+		return nextLevel;
+	}
+
+	private void parseCustomRule(final Level level, final String line){
+		final String key = PatternHelper.clear(line, PATTERN_EQUALS);
+		if(customHyphenations.get(level).containsKey(key))
+			throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
+
+		customHyphenations.get(level).put(key, line);
+	}
+
+	private void parseCommonRule(final Level level, final String line){
+		final String key = getKeyFromData(line);
+		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
+		if(duplicatedRule)
+			throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
+
+		//insert current pattern into the radix tree (remove all numbers)
+		rules.get(level)
+			.put(key, line);
+	}
+
+	private void addDefaults(final Level level, final Charset charset){
+		//dash and apostrophe are added by default (retro-compatibility)
+		final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
+		if(charset == StandardCharsets.UTF_8)
+			retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
+
+		patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, null) + "]");
+
+		options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
+
+		for(final String noHyphen : retroCompatibilityNoHyphen){
+			final String line = ONE + noHyphen + ONE;
+			if(!isRuleDuplicated(noHyphen, line, level))
+				rules.get(level)
+					.put(noHyphen, line);
+		}
 	}
 
 	public static boolean isAugmentedRule(final String line){
@@ -337,6 +352,9 @@ public class HyphenationParser{
 	}
 
 	private void clearInternal(){
+		Arrays.stream(Level.values())
+			.map(REDUCED_PATTERNS::get)
+			.forEach(Set::clear);
 		customHyphenations.values()
 			.forEach(Map::clear);
 		options.clear();
