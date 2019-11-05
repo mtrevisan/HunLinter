@@ -17,6 +17,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -462,64 +463,64 @@ public class RulesReducer{
 			final LineEntry parent = queue.remove();
 
 			final List<LineEntry> bubbles = extractBubbles(queue, parent);
-			if(!bubbles.isEmpty()){
-				//extract ratifying group
-				final int parentConditionLength = parent.condition.length();
-				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
-
-				//extract negated group
-				final Set<Character> childrenGroup = bubbles.stream()
-					.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
-					.collect(Collectors.toSet());
-
-				//if intersection(parent-group, children-group) is empty
-				final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-				parentGroup.removeAll(groupsIntersection);
-
-				//calculate new condition
-				final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
-					childrenGroup);
-				final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
-					PatternHelper.makeNotGroup(childrenGroup, comparator));
-				LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
-
-				//keep only rules that matches some existent words
-				if(newEntry.isProductive())
-					finalRules.add(newEntry);
-				else if(!growNewBush(queue, parent))
-					continue;
-				else
-					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join(PIPE, newEntry.addition),
-						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-
-				final int maxConditionLength = queue.stream()
-					.mapToInt(e -> e.condition.length())
-					.max()
-					.orElse(0);
-				if(parentConditionLength + 1 >= maxConditionLength){
-					queue.removeAll(bubbles);
-
-					finalRules.addAll(bubbles);
-				}
-				else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1))
-					for(final Character chr : childrenGroup){
-						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
-						if(!queue.contains(newEntry))
-							queue.add(newEntry);
-					}
-				else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
-					//expand intersection
-					for(final Character chr : groupsIntersection){
-						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
-						queue.add(newEntry);
-
-						finalRules.addAll(disjoinSameConditions(queue, overallLastGroups));
-					}
-
-				//continue until bubbles.condition length is reached
-			}
-			else
+			if(bubbles.isEmpty()){
 				finalRules.add(parent);
+				continue;
+			}
+
+			//extract ratifying group
+			final int parentConditionLength = parent.condition.length();
+			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
+
+			//extract negated group
+			final Set<Character> childrenGroup = bubbles.stream()
+				.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
+				.collect(Collectors.toSet());
+
+			//if intersection(parent-group, children-group) is empty
+			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+			parentGroup.removeAll(groupsIntersection);
+
+			//calculate new condition
+			final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
+				childrenGroup);
+			final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
+				PatternHelper.makeNotGroup(childrenGroup, comparator));
+			LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
+
+			//keep only rules that matches some existent words
+			if(newEntry.isProductive())
+				finalRules.add(newEntry);
+			else if(!growNewBush(queue, parent))
+				continue;
+			else
+				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join(PIPE, newEntry.addition),
+					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+
+			final int maxConditionLength = queue.stream()
+				.mapToInt(e -> e.condition.length())
+				.max()
+				.orElse(0);
+			if(parentConditionLength + 1 >= maxConditionLength){
+				queue.removeAll(bubbles);
+
+				finalRules.addAll(bubbles);
+			}
+			else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1))
+				childrenGroup.stream()
+					.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
+					.filter(Predicate.not(queue::contains))
+					.forEach(queue::add);
+			else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
+				//expand intersection
+				for(final Character chr : groupsIntersection){
+					newEntry = LineEntry.createFrom(parent, chr + parent.condition);
+					queue.add(newEntry);
+
+					finalRules.addAll(disjoinSameConditions(queue, overallLastGroups));
+				}
+
+			//continue until bubbles.condition length is reached
 		}
 
 		return finalRules;
