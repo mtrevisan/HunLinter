@@ -189,9 +189,8 @@ public class HyphenationParser{
 	public void parse(final File hypFile) throws IllegalArgumentException{
 		clearInternal();
 
-		Level level = Level.NON_COMPOUND;
-
 		final Path path = hypFile.toPath();
+		Level level = Level.NON_COMPOUND;
 		Charset charset = FileHelper.determineCharset(path);
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
@@ -209,7 +208,7 @@ public class HyphenationParser{
 				if(parsedLine)
 					continue;
 
-				if(line.startsWith(NEXT_LEVEL)){
+				if(line.equals(NEXT_LEVEL)){
 					if(level == Level.COMPOUND)
 						throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
 
@@ -217,8 +216,13 @@ public class HyphenationParser{
 					level = Level.COMPOUND;
 					secondLevelPresent = true;
 					REDUCED_PATTERNS.get(level).clear();
+					continue;
 				}
-				else if(isCustomRule(line)){
+
+				if(charset == StandardCharsets.ISO_8859_1)
+					line = convertUnicode(line);
+
+				if(isCustomRule(line)){
 					final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 					if(customHyphenations.get(level).containsKey(key))
 						throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
@@ -226,19 +230,16 @@ public class HyphenationParser{
 					customHyphenations.get(level).put(key, line);
 				}
 				else{
-					if(charset == StandardCharsets.ISO_8859_1)
-						line = convertUnicode(line);
-
 					validateRule(line, level);
 
 					final String key = getKeyFromData(line);
 					final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 					if(duplicatedRule)
 						throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
-					else
-						//insert current pattern into the radix tree (remove all numbers)
-						rules.get(level)
-							.put(key, line);
+
+					//insert current pattern into the radix tree (remove all numbers)
+					rules.get(level)
+						.put(key, line);
 				}
 			}
 
