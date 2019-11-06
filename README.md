@@ -34,11 +34,14 @@ Hunspeller
     7. [Font selection](#screenshots-font)
     8. [Statistics](#screenshots-statistics)
 7. [Changelog](#changelog)
-    1. [version 1.9.1](#changelog-1.9.1)
-    2. [version 1.9.0](#changelog-1.9.0)
-    3. [version 1.8.1](#changelog-1.8.1)
-    4. [version 1.8.0](#changelog-1.8.0)
+    1. [version 1.10.0](#changelog-1.10.0)
+    2. [version 1.9.1](#changelog-1.9.1)
+    3. [version 1.9.0](#changelog-1.9.0)
+    4. [version 1.8.1](#changelog-1.8.1)
+    5. [version 1.8.0](#changelog-1.8.0)
 
+
+<br/>
 
 <a name="motivation"></a>
 ## Motivation
@@ -47,12 +50,16 @@ I created this project in order to help me construct my hunspell language files 
 **The name I give to the project is kind of temporary...**
 
 
+<br/>
+
 <a name="can-do"></a>
 ## What the application can do
 This application is able to do many correctness checks about the files structure and its content. It is able to tell you if some rule is missing or redundant. You can test rules and compound rules. You can also test hyphenation and eventually add rules. It is also able to manage and build the thesaurus.
 
 This application can also sort the dictionary, counting words (unique and total count), gives some statistics, duplicate extraction, wordlist extraction, minimal pairs extraction, and package creation in order to build an `.oxt` or `.xpi` for deploy.
 
+
+<br/>
 
 <a name="enhancements"></a>
 ## How to enhance its capabilities
@@ -64,6 +71,8 @@ After that you have to tell the application that exists those files editing the 
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
 
+
+<br/>
 
 <a name="recognized-flags"></a>
 ## Recognized flags
@@ -83,6 +92,8 @@ PFX, SFX
 ### Others
 CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 
+
+<br/>
 
 <a name="how-to"></a>
 ## How to
@@ -113,6 +124,9 @@ Is it possible to copy content of tables and words in the statistics section. Al
 This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, add hyphenation rules, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
 
 <sup>1</sup>: Even if for the hyphenation file a new rule can actually be added...
+
+
+<br/>
 
 <a name="screenshots"></a>
 ## Screenshots
@@ -161,11 +175,17 @@ It is possible to click on the first column to select the row (for cancelling it
 ![alt text](https://i.postimg.cc/NfpgBHqX/statistics-stresses.png "Statistics - word stresses")
 
 
+<br/>
+
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-1.10.0"></a>
+### version 1.10.0 - 20191106
+- added buttons to open relevant files
+
 <a name="changelog-1.9.1"></a>
 ### version 1.9.1 - 20191028
-- completely revised how the loading of a project works, now it is possible to load and manage all the languages in an extension (or package), all the relevant files are read from manifest.xml and linked `.xcu` files.
+- completely revised how the loading of a project works, now it is possible to load and manage all the languages in an extension (or package), all the relevant files are read from manifest.xml and linked `.xcu` files
 - the way a project is loaded in the application is changed, now the project folder (signed by a blue icon) has to be selected instead of an `.aff` file
 - added the possibility to change the options for hyphenation
 
