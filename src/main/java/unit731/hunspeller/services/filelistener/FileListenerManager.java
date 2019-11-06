@@ -101,7 +101,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			final Path dir = (new File(pattern)).getParentFile().toPath();
 			final File fil = dir.toFile();
 			if(!fil.exists())
-				LOGGER.warn("File/folder {} does not exists", dir);
+				LOGGER.warn("File or folder '{}' does not exists", dir);
 			else{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);
