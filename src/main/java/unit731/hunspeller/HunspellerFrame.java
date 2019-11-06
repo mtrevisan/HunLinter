@@ -2020,7 +2020,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				setTitle("Hunspeller : " + packager.getAffixFile().getName());
+				setTitle("Hunspeller : " + packager.getAffixFile().getName() + " (" + packager.getLanguage() + ")");
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
