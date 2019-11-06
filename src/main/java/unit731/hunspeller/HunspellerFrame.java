@@ -102,6 +102,7 @@ import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.RecentItems;
@@ -246,6 +247,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicTable = new javax.swing.JTable();
       dicTotalProductionsLabel = new javax.swing.JLabel();
       dicTotalProductionsOutputLabel = new javax.swing.JLabel();
+      openAidButton = new javax.swing.JButton();
       openAffButton = new javax.swing.JButton();
       openDicButton = new javax.swing.JButton();
       cmpLayeredPane = new javax.swing.JLayeredPane();
@@ -379,6 +381,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       dicTotalProductionsOutputLabel.setText("...");
 
+      openAidButton.setText("Open Aid");
+      openAidButton.setEnabled(false);
+      openAidButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openAidButtonActionPerformed(evt);
+         }
+      });
+
       openAffButton.setText("Open Affix");
       openAffButton.setEnabled(false);
       openAffButton.addActionListener(new java.awt.event.ActionListener() {
@@ -402,6 +412,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicTotalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -426,6 +437,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(dicTotalProductionsOutputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(openAidButton)
+                  .addGap(18, 18, 18)
                   .addComponent(openAffButton)
                   .addGap(18, 18, 18)
                   .addComponent(openDicButton)))
@@ -449,7 +462,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(dicTotalProductionsLabel)
                .addComponent(dicTotalProductionsOutputLabel)
                .addComponent(openAffButton)
-               .addComponent(openDicButton))
+               .addComponent(openDicButton)
+               .addComponent(openAidButton))
             .addContainerGap())
       );
 
@@ -1981,28 +1995,67 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed
 
+	private void openAidButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAidButtonActionPerformed
+		try{
+			FileHelper.openFileWithChosenEditor(backbone.getAidFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening affix file", e);
+		}
+	}//GEN-LAST:event_openAidButtonActionPerformed
+
    private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getAffixFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening affix file", e);
+		}
    }//GEN-LAST:event_openAffButtonActionPerformed
 
    private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getDictionaryFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening dictionary file", e);
+		}
    }//GEN-LAST:event_openDicButtonActionPerformed
 
    private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getHyphenationFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening hyphenation file", e);
+		}
    }//GEN-LAST:event_openHypButtonActionPerformed
 
    private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getAutoCorrectFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening auto–correct file", e);
+		}
    }//GEN-LAST:event_openAcoButtonActionPerformed
 
    private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getSentenceExceptionsFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening sentence exceptions file", e);
+		}
    }//GEN-LAST:event_openSexButtonActionPerformed
 
    private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
-      // TODO add your handling code here:
+		try{
+			FileHelper.openFileWithChosenEditor(packager.getWordExceptionsFile());
+		}
+		catch(final IOException | InterruptedException e){
+			LOGGER.warn("Exception while opening word exceptions file", e);
+		}
    }//GEN-LAST:event_openWexButtonActionPerformed
 
 
@@ -2150,132 +2203,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(final IOException ignored){}
 	}
 
-	private void loadFileCompleted(){
-		//restore default font (changed for reporting reading errors)
-		setCurrentFont();
-
-		backbone.registerFileListener();
-		backbone.startFileListener();
-
-		final String language = backbone.getAffixData().getLanguage();
-
-		final Comparator<String> comparator = Comparator.comparingInt(String::length)
-			.thenComparing(BaseBuilder.getComparator(language));
-		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
-			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(dicTable, comparator, comparatorAffix);
-
-		try{
-			filOpenProjectMenuItem.setEnabled(true);
-			dicCheckCorrectnessMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
-
-
-			//affix file:
-			final AffixData affixData = backbone.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-			if(!compoundRules.isEmpty()){
-				cmpInputComboBox.removeAllItems();
-				compoundRules.forEach(cmpInputComboBox::addItem);
-				final String compoundFlag = affixData.getCompoundFlag();
-				if(compoundFlag != null)
-					cmpInputComboBox.addItem(compoundFlag);
-				cmpInputComboBox.setEnabled(true);
-				cmpInputComboBox.setSelectedItem(null);
-				dicInputTextField.requestFocusInWindow();
-			}
-
-
-			//hyphenation file:
-			if(backbone.getHyphenator() != null){
-				hypCheckCorrectnessMenuItem.setEnabled(true);
-
-				hypMenu.setEnabled(true);
-				hypStatisticsMenuItem.setEnabled(true);
-				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
-			}
-
-
-			filCreatePackageMenuItem.setEnabled(true);
-			filFontMenuItem.setEnabled(true);
-			dicMenu.setEnabled(true);
-			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
-			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
-
-
-			//aid file:
-			final List<String> lines = backbone.getAidParser().getLines();
-			final boolean aidLinesPresent = !lines.isEmpty();
-			clearAidParser();
-			if(aidLinesPresent){
-				lines.forEach(dicRuleFlagsAidComboBox::addItem);
-				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
-			}
-			//enable combo-box only if an AID file exists
-			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
-			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
-
-
-			//thesaurus file:
-			if(backbone.getTheParser().getSynonymsCounter() > 0){
-				addSorterToTable(theTable, comparator, null);
-
-				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
-				updateSynonymsCounter();
-				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
-			}
-
-
-			//auto–correct file:
-			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
-				addSorterToTable(acoTable, comparator, null);
-
-				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
-				updateCorrectionsCounter();
-				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
-			}
-
-
-			//sentence exceptions file:
-			if(backbone.getSexParser().getExceptionsCounter() > 0){
-				updateSentenceExceptionsCounter();
-				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
-				sexTextArea.setText(String.join(", ", sentenceExceptions));
-				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
-			}
-
-
-			//word exceptions file:
-			if(backbone.getWexParser().getExceptionsCounter() > 0){
-				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
-				wexTextArea.setText(String.join(", ", wordExceptions));
-				updateWordExceptionsCounter();
-				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
-			}
-
-			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
-				mainTabbedPane.setSelectedIndex(0);
-
-
-			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
-			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-				FontChooserDialog.getDefaultFont());
-			GUIUtils.setCurrentFont(lastUsedFont, this);
-		}
-		catch(final IllegalArgumentException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
-		}
-		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
-
-			LOGGER.error("A bad error occurred", e);
-		}
-	}
-
 	private void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
@@ -2317,8 +2244,144 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		table.setRowSorter(dicSorter);
 	}
 
+	private void loadFileCompleted(){
+		//restore default font (changed for reporting reading errors)
+		setCurrentFont();
+
+		backbone.registerFileListener();
+		backbone.startFileListener();
+
+		final String language = backbone.getAffixData().getLanguage();
+
+		final Comparator<String> comparator = Comparator.comparingInt(String::length)
+			.thenComparing(BaseBuilder.getComparator(language));
+		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
+			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
+		addSorterToTable(dicTable, comparator, comparatorAffix);
+
+		try{
+			filOpenProjectMenuItem.setEnabled(true);
+			filCreatePackageMenuItem.setEnabled(true);
+			filFontMenuItem.setEnabled(true);
+			dicCheckCorrectnessMenuItem.setEnabled(true);
+			dicSortDictionaryMenuItem.setEnabled(true);
+			dicMenu.setEnabled(true);
+			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			final AffixData affixData = backbone.getAffixData();
+			final Set<String> compoundRules = affixData.getCompoundRules();
+			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
+
+
+			//affix file:
+			if(!compoundRules.isEmpty()){
+				cmpInputComboBox.removeAllItems();
+				compoundRules.forEach(cmpInputComboBox::addItem);
+				final String compoundFlag = affixData.getCompoundFlag();
+				if(compoundFlag != null)
+					cmpInputComboBox.addItem(compoundFlag);
+				cmpInputComboBox.setEnabled(true);
+				cmpInputComboBox.setSelectedItem(null);
+				dicInputTextField.requestFocusInWindow();
+			}
+			openAffButton.setEnabled(backbone.getAffixFile() != null);
+			openDicButton.setEnabled(backbone.getDictionaryFile() != null);
+
+
+			//hyphenation file:
+			if(backbone.getHyphenator() != null){
+				hypCheckCorrectnessMenuItem.setEnabled(true);
+
+				hypMenu.setEnabled(true);
+				hypStatisticsMenuItem.setEnabled(true);
+				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
+			}
+			openHypButton.setEnabled(backbone.getHyphenationFile() != null);
+
+
+			//aid file:
+			final List<String> lines = backbone.getAidParser().getLines();
+			final boolean aidLinesPresent = !lines.isEmpty();
+			clearAidParser();
+			if(aidLinesPresent){
+				lines.forEach(dicRuleFlagsAidComboBox::addItem);
+				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
+			}
+			//enable combo-box only if an AID file exists
+			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			openAidButton.setEnabled(aidLinesPresent);
+
+
+			//thesaurus file:
+			if(backbone.getTheParser().getSynonymsCounter() > 0){
+				addSorterToTable(theTable, comparator, null);
+
+				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
+				updateSynonymsCounter();
+				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+			}
+
+
+			//auto–correct file:
+			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
+				addSorterToTable(acoTable, comparator, null);
+
+				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
+				updateCorrectionsCounter();
+				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
+			}
+			openAcoButton.setEnabled(backbone.getAutoCorrectFile() != null);
+
+
+			//sentence exceptions file:
+			if(backbone.getSexParser().getExceptionsCounter() > 0){
+				updateSentenceExceptionsCounter();
+				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
+				sexTextArea.setText(String.join(", ", sentenceExceptions));
+				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
+			}
+			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
+
+
+			//word exceptions file:
+			if(backbone.getWexParser().getExceptionsCounter() > 0){
+				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
+				wexTextArea.setText(String.join(", ", wordExceptions));
+				updateWordExceptionsCounter();
+				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
+			}
+			openWexButton.setEnabled(backbone.getWordExceptionsFile() != null);
+
+
+			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
+				mainTabbedPane.setSelectedIndex(0);
+
+
+			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
+			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
+			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
+				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
+				FontChooserDialog.getDefaultFont());
+			GUIUtils.setCurrentFont(lastUsedFont, this);
+		}
+		catch(final IllegalArgumentException e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+
+			LOGGER.error("A bad error occurred", e);
+		}
+	}
+
 	private void loadFileCancelled(final Exception exc){
 		filOpenProjectMenuItem.setEnabled(true);
+		filCreatePackageMenuItem.setEnabled(false);
+		filFontMenuItem.setEnabled(false);
+		dicMenu.setEnabled(false);
+
 		if((exc instanceof ProjectNotFoundException)){
 			//remove the file from the recent projects menu
 			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
@@ -2336,18 +2399,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//affix file:
 		cmpInputComboBox.removeAllItems();
 		cmpInputComboBox.setEnabled(false);
+		openAffButton.setEnabled(false);
+		openDicButton.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
 
 
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 		hypStatisticsMenuItem.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-
-
-		filCreatePackageMenuItem.setEnabled(false);
-		filFontMenuItem.setEnabled(false);
-		dicMenu.setEnabled(false);
-		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+		openHypButton.setEnabled(false);
 
 
 		//aid file:
@@ -2355,6 +2416,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		//enable combo-box only if an AID file exists
 		dicRuleFlagsAidComboBox.setEnabled(false);
 		cmpRuleFlagsAidComboBox.setEnabled(false);
+		openAidButton.setEnabled(false);
 
 
 		//thesaurus file:
@@ -2363,14 +2425,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		//auto–correct file:
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+		openAcoButton.setEnabled(false);
 
 
 		//sentence exceptions file:
 		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		openSexButton.setEnabled(false);
 
 
 		//word exceptions file:
 		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+		openWexButton.setEnabled(false);
 	}
 
 	private void updateSynonymsCounter(){
@@ -2879,6 +2944,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JButton openAcoButton;
    private javax.swing.JButton openAffButton;
+   private javax.swing.JButton openAidButton;
    private javax.swing.JButton openDicButton;
    private javax.swing.JButton openHypButton;
    private javax.swing.JButton openSexButton;

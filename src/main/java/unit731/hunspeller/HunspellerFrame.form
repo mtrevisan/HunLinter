@@ -381,6 +381,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="dicTotalProductionsOutputLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
+                              <Component id="openAidButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="openAffButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="openDicButton" min="-2" max="-2" attributes="0"/>
@@ -411,6 +413,7 @@
                           <Component id="dicTotalProductionsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="openAffButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="openDicButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openAidButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -489,6 +492,15 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="openAidButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Aid"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openAidButtonActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="openAffButton">
               <Properties>
