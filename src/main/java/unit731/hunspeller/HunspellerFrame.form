@@ -14,7 +14,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentFilesMenu.setText(&quot;Recent projects&quot;);&#xa;recentFilesMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentFilesMenu, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentProjectsMenu.setText(&quot;Recent projects&quot;);&#xa;recentProjectsMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentProjectsMenu, 3);"/>
           </AuxValues>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
@@ -375,12 +375,15 @@
                                   <Component id="dicInputTextField" max="32767" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="dicScrollPane" alignment="0" pref="904" max="32767" attributes="0"/>
+                          <Component id="dicScrollPane" alignment="0" pref="910" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="dicTotalProductionsLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="dicTotalProductionsOutputLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="openAffButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="openDicButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -401,11 +404,13 @@
                           <Component id="dicRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="dicScrollPane" pref="150" max="32767" attributes="0"/>
+                      <Component id="dicScrollPane" pref="141" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="dicTotalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="dicTotalProductionsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openAffButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openDicButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -484,6 +489,24 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="openAffButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Affix"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openAffButtonActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="openDicButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Dictionary"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openDicButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -874,7 +897,8 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="optionsButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="openHypButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -922,7 +946,10 @@
                           <Component id="hypAddRuleSyllabesCountOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="35" max="32767" attributes="0"/>
-                      <Component id="optionsButton" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="optionsButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openHypButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1067,6 +1094,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optionsButtonActionPerformed"/>
               </Events>
             </Component>
+            <Component class="javax.swing.JButton" name="openHypButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Hyphenation"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openHypButtonActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="acoLayeredPane">
@@ -1101,7 +1136,9 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="acoCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="acoCorrectionsRecordedOutputLabel" pref="798" max="32767" attributes="0"/>
+                              <Component id="acoCorrectionsRecordedOutputLabel" pref="673" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="openAcoButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1121,11 +1158,12 @@
                           <Component id="acoCorrectLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="acoScrollPane" pref="175" max="32767" attributes="0"/>
+                      <Component id="acoScrollPane" pref="166" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="acoCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="acoCorrectionsRecordedOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openAcoButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1209,6 +1247,14 @@
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="openAcoButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open AutoCorrect"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openAcoButtonActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="sexLayeredPane">
@@ -1230,7 +1276,9 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="sexCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="sexCorrectionsRecordedOutputLabel" pref="802" max="32767" attributes="0"/>
+                              <Component id="sexCorrectionsRecordedOutputLabel" pref="637" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="openSexButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1241,11 +1289,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sexScrollPane" pref="204" max="32767" attributes="0"/>
+                      <Component id="sexScrollPane" pref="195" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="sexCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="sexCorrectionsRecordedOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openSexButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1281,6 +1330,14 @@
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="openSexButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Sentence Exceptions"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openSexButtonActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="wexLayeredPane">
@@ -1302,7 +1359,9 @@
                           <Group type="102" attributes="0">
                               <Component id="wexCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="wexCorrectionsRecordedOutputLabel" pref="802" max="32767" attributes="0"/>
+                              <Component id="wexCorrectionsRecordedOutputLabel" pref="655" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="openWexButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1313,11 +1372,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wexScrollPane" pref="204" max="32767" attributes="0"/>
+                      <Component id="wexScrollPane" pref="195" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="wexCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="wexCorrectionsRecordedOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="openWexButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1352,6 +1412,14 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="openWexButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Open Word Exceptions"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openWexButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

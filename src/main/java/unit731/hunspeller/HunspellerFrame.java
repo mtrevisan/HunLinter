@@ -246,6 +246,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicTable = new javax.swing.JTable();
       dicTotalProductionsLabel = new javax.swing.JLabel();
       dicTotalProductionsOutputLabel = new javax.swing.JLabel();
+      openAffButton = new javax.swing.JButton();
+      openDicButton = new javax.swing.JButton();
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
       cmpInputComboBox = new javax.swing.JComboBox<>();
@@ -286,6 +288,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       optionsButton = new javax.swing.JButton();
+      openHypButton = new javax.swing.JButton();
       acoLayeredPane = new javax.swing.JLayeredPane();
       acoIncorrectLabel = new javax.swing.JLabel();
       acoIncorrectTextField = new javax.swing.JTextField();
@@ -297,16 +300,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoTable = new javax.swing.JTable();
       acoCorrectionsRecordedLabel = new javax.swing.JLabel();
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      openAcoButton = new javax.swing.JButton();
       sexLayeredPane = new javax.swing.JLayeredPane();
       sexScrollPane = new javax.swing.JScrollPane();
       sexTextArea = new javax.swing.JTextArea();
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
       sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      openSexButton = new javax.swing.JButton();
       wexLayeredPane = new javax.swing.JLayeredPane();
       wexScrollPane = new javax.swing.JScrollPane();
       wexTextArea = new javax.swing.JTextArea();
       wexCorrectionsRecordedLabel = new javax.swing.JLabel();
       wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      openWexButton = new javax.swing.JButton();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
@@ -373,6 +379,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       dicTotalProductionsOutputLabel.setText("...");
 
+      openAffButton.setText("Open Affix");
+      openAffButton.setEnabled(false);
+      openAffButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openAffButtonActionPerformed(evt);
+         }
+      });
+
+      openDicButton.setText("Open Dictionary");
+      openDicButton.setEnabled(false);
+      openDicButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openDicButtonActionPerformed(evt);
+         }
+      });
+
       dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -380,6 +402,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicTotalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
       dicLayeredPane.setLayout(dicLayeredPaneLayout);
@@ -396,12 +420,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                      .addComponent(dicInputTextField)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE)
+               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
                .addGroup(dicLayeredPaneLayout.createSequentialGroup()
                   .addComponent(dicTotalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(dicTotalProductionsOutputLabel)
-                  .addGap(0, 0, Short.MAX_VALUE)))
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(openAffButton)
+                  .addGap(18, 18, 18)
+                  .addComponent(openDicButton)))
             .addContainerGap())
       );
       dicLayeredPaneLayout.setVerticalGroup(
@@ -416,11 +443,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(dicRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(dicTotalProductionsLabel)
-               .addComponent(dicTotalProductionsOutputLabel))
+               .addComponent(dicTotalProductionsOutputLabel)
+               .addComponent(openAffButton)
+               .addComponent(openDicButton))
             .addContainerGap())
       );
 
@@ -752,6 +781,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      openHypButton.setText("Open Hyphenation");
+      openHypButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openHypButtonActionPerformed(evt);
+         }
+      });
+
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -769,6 +805,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypLayeredPane.setLayer(hypAddRuleSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      hypLayeredPane.setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout hypLayeredPaneLayout = new javax.swing.GroupLayout(hypLayeredPane);
       hypLayeredPane.setLayout(hypLayeredPaneLayout);
@@ -812,7 +849,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(optionsButton)
-                  .addGap(0, 0, Short.MAX_VALUE)))
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(openHypButton)))
             .addContainerGap())
       );
       hypLayeredPaneLayout.setVerticalGroup(
@@ -849,7 +887,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
-            .addComponent(optionsButton)
+            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(optionsButton)
+               .addComponent(openHypButton))
             .addContainerGap())
       );
 
@@ -936,6 +976,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       acoCorrectionsRecordedOutputLabel.setText("...");
 
+      openAcoButton.setText("Open AutoCorrect");
+      openAcoButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openAcoButtonActionPerformed(evt);
+         }
+      });
+
       acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -945,6 +992,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      acoLayeredPane.setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
       acoLayeredPane.setLayout(acoLayeredPaneLayout);
@@ -969,7 +1017,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(acoLayeredPaneLayout.createSequentialGroup()
                   .addComponent(acoCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)))
+                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(openAcoButton)))
             .addContainerGap())
       );
       acoLayeredPaneLayout.setVerticalGroup(
@@ -984,11 +1034,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(acoToLabel)
                .addComponent(acoCorrectLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(acoCorrectionsRecordedLabel)
-               .addComponent(acoCorrectionsRecordedOutputLabel))
+               .addComponent(acoCorrectionsRecordedOutputLabel)
+               .addComponent(openAcoButton))
             .addContainerGap())
       );
 
@@ -1003,9 +1054,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       sexCorrectionsRecordedOutputLabel.setText("...");
 
+      openSexButton.setText("Open Sentence Exceptions");
+      openSexButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openSexButtonActionPerformed(evt);
+         }
+      });
+
       sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout sexLayeredPaneLayout = new javax.swing.GroupLayout(sexLayeredPane);
       sexLayeredPane.setLayout(sexLayeredPaneLayout);
@@ -1018,18 +1077,21 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(sexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(sexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)))
+                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(openSexButton)))
             .addContainerGap())
       );
       sexLayeredPaneLayout.setVerticalGroup(
          sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(sexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
-               .addComponent(sexCorrectionsRecordedOutputLabel))
+               .addComponent(sexCorrectionsRecordedOutputLabel)
+               .addComponent(openSexButton))
             .addContainerGap())
       );
 
@@ -1044,9 +1106,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       wexCorrectionsRecordedOutputLabel.setText("...");
 
+      openWexButton.setText("Open Word Exceptions");
+      openWexButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openWexButtonActionPerformed(evt);
+         }
+      });
+
       wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout wexLayeredPaneLayout = new javax.swing.GroupLayout(wexLayeredPane);
       wexLayeredPane.setLayout(wexLayeredPaneLayout);
@@ -1059,18 +1129,21 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(wexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(wexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)))
+                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(openWexButton)))
             .addContainerGap())
       );
       wexLayeredPaneLayout.setVerticalGroup(
          wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(wexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wexCorrectionsRecordedLabel)
-               .addComponent(wexCorrectionsRecordedOutputLabel))
+               .addComponent(wexCorrectionsRecordedOutputLabel)
+               .addComponent(openWexButton))
             .addContainerGap())
       );
 
@@ -1144,8 +1217,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-		recentProjectsMenu.setText("Recent projects");
-		recentProjectsMenu.setMnemonic('R');
+      recentProjectsMenu.setText("Recent projects");
+      recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
 
       dicMenu.setMnemonic('D');
@@ -1907,6 +1980,30 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed
+
+   private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openAffButtonActionPerformed
+
+   private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openDicButtonActionPerformed
+
+   private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openHypButtonActionPerformed
+
+   private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openAcoButtonActionPerformed
+
+   private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openSexButtonActionPerformed
+
+   private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_openWexButtonActionPerformed
 
 
 	@Override
@@ -2780,6 +2877,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
+   private javax.swing.JButton openAcoButton;
+   private javax.swing.JButton openAffButton;
+   private javax.swing.JButton openDicButton;
+   private javax.swing.JButton openHypButton;
+   private javax.swing.JButton openSexButton;
+   private javax.swing.JButton openWexButton;
    private javax.swing.JButton optionsButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
