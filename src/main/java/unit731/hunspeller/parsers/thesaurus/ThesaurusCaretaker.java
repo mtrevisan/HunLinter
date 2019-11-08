@@ -15,10 +15,9 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.services.memento.CaretakerInterface;
 
 
-public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Memento>{
+public class ThesaurusCaretaker{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusCaretaker.class);
 
@@ -29,8 +28,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	private final Stack<Path> mementos = new Stack<>();
 
 
-	@Override
-	public void pushMemento(final ThesaurusParser.Memento memento) throws IOException{
+	public void pushMemento(final ThesaurusDictionary memento) throws IOException{
 		final String json = JSON_MAPPER.writeValueAsString(memento);
 		final byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
 		final Path mementoFile = createFile(bytes);
@@ -47,18 +45,16 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 		return mementoFile;
 	}
 
-	@Override
-	public ThesaurusParser.Memento popMemento() throws IOException{
+	public ThesaurusDictionary popMemento() throws IOException{
 		final Path mementoFile = mementos.pop();
 
 		LOGGER.info("Retrieve memento file '{}'", mementoFile.toString());
 
 		final byte[] bytes = Files.readAllBytes(mementoFile);
 		final String json = new String(decompress(bytes), DEFAULT_CHARSET);
-		return JSON_MAPPER.readValue(json, ThesaurusParser.Memento.class);
+		return JSON_MAPPER.readValue(json, ThesaurusDictionary.class);
 	}
 
-	@Override
 	public boolean canUndo(){
 		return !mementos.empty();
 	}

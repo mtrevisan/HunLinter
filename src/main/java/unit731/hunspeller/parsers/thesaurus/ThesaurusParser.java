@@ -324,7 +324,7 @@ public class ThesaurusParser{
 			int idx = charset.name().length() + 1;
 			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
 			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(ThesaurusEntry synonym : synonyms){
+			for(final ThesaurusEntry synonym : synonyms){
 				synonym.saveToIndex(indexWriter, idx);
 
 				int meaningsLength = synonym.saveToData(dataWriter, charset);
@@ -341,8 +341,38 @@ public class ThesaurusParser{
 	private void storeMemento() throws DiffException{
 		undoCaretaker.push(createMemento());
 
-		if(undoable != null)
-			undoable.onUndoChange(true);
+		warnUndoable();
+	}
+
+	public boolean restorePreviousSnapshot() throws DiffException{
+		return restoreSnapshot(undoCaretaker);
+	}
+
+	public boolean restoreNextSnapshot() throws DiffException{
+		return restoreSnapshot(redoCaretaker);
+	}
+
+	private boolean restoreSnapshot(final Stack<Patch<ThesaurusEntry>> fromCaretaker) throws DiffException{
+		boolean restored = false;
+		if(!fromCaretaker.isEmpty()){
+			final Stack<Patch<ThesaurusEntry>> otherCaretaker = (fromCaretaker == redoCaretaker? undoCaretaker: redoCaretaker);
+			otherCaretaker.push(createMemento());
+
+			final Patch<ThesaurusEntry> memento = fromCaretaker.pop();
+			warnUndoable();
+
+			restoreMemento(memento);
+
+			restored = true;
+		}
+		return restored;
+	}
+
+	private void warnUndoable(){
+		if(undoable != null){
+			undoable.onUndoChange(canUndo());
+			undoable.onRedoChange(canRedo());
+		}
 	}
 
 	public boolean canUndo(){
@@ -351,42 +381,6 @@ public class ThesaurusParser{
 
 	public boolean canRedo(){
 		return !redoCaretaker.isEmpty();
-	}
-
-	public boolean restorePreviousSnapshot() throws DiffException{
-		boolean restored = false;
-		if(canUndo()){
-			redoCaretaker.push(createMemento());
-
-			final Patch<ThesaurusEntry> memento = undoCaretaker.pop();
-			if(undoable != null){
-				undoable.onUndoChange(canUndo());
-				undoable.onRedoChange(true);
-			}
-
-			restoreMemento(memento);
-
-			restored = true;
-		}
-		return restored;
-	}
-
-	public boolean restoreNextSnapshot() throws DiffException{
-		boolean restored = false;
-		if(canRedo()){
-			undoCaretaker.push(createMemento());
-
-			final Patch<ThesaurusEntry> memento = redoCaretaker.pop();
-			if(undoable != null){
-				undoable.onUndoChange(true);
-				undoable.onRedoChange(canRedo());
-			}
-
-			restoreMemento(memento);
-
-			restored = true;
-		}
-		return restored;
 	}
 
 	private Patch<ThesaurusEntry> createMemento() throws DiffException{
