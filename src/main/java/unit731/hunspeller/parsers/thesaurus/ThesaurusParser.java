@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Stack;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,8 +68,8 @@ public class ThesaurusParser{
 	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
 	private final Undoable undoable;
-	private final Stack<Patch<ThesaurusEntry>> undoCaretaker = new Stack<>();
-	private final Stack<Patch<ThesaurusEntry>> redoCaretaker = new Stack<>();
+	private final ThesaurusCaretaker undoCaretaker = new ThesaurusCaretaker();
+	private final ThesaurusCaretaker redoCaretaker = new ThesaurusCaretaker();
 
 
 	public ThesaurusParser(final Undoable undoable){
@@ -173,7 +172,7 @@ public class ThesaurusParser{
 //FIXME
 				storeMemento();
 			}
-			catch(final DiffException e){
+			catch(final DiffException | IOException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -203,7 +202,7 @@ public class ThesaurusParser{
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
 	}
 
-	public void setMeanings(final int index, final String text){
+	public void setMeanings(final int index, final String text) throws IOException{
 		try{
 //FIXME
 			storeMemento();
@@ -211,12 +210,12 @@ public class ThesaurusParser{
 			dictionary.setMeanings(index, text);
 		}
 		catch(final DiffException e){
-			undoCaretaker.pop();
+			undoCaretaker.popMemento();
 
 			LOGGER.warn("Error while storing a memento", e);
 		}
 		catch(final Exception e){
-			undoCaretaker.pop();
+			undoCaretaker.popMemento();
 
 			LOGGER.warn("Error while modifying the meanings", e);
 		}
@@ -229,7 +228,7 @@ public class ThesaurusParser{
 //FIXME
 				storeMemento();
 			}
-			catch(final DiffException e){
+			catch(final DiffException | IOException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -338,27 +337,27 @@ public class ThesaurusParser{
 		dictionary.clear();
 	}
 
-	private void storeMemento() throws DiffException{
-		undoCaretaker.push(createMemento());
+	private void storeMemento() throws DiffException, IOException{
+		undoCaretaker.pushMemento(createMemento());
 
 		warnUndoable();
 	}
 
-	public boolean restorePreviousSnapshot() throws DiffException{
+	public boolean restorePreviousSnapshot() throws DiffException, IOException{
 		return restoreSnapshot(undoCaretaker);
 	}
 
-	public boolean restoreNextSnapshot() throws DiffException{
+	public boolean restoreNextSnapshot() throws DiffException, IOException{
 		return restoreSnapshot(redoCaretaker);
 	}
 
-	private boolean restoreSnapshot(final Stack<Patch<ThesaurusEntry>> fromCaretaker) throws DiffException{
+	private boolean restoreSnapshot(final ThesaurusCaretaker fromCaretaker) throws DiffException, IOException{
 		boolean restored = false;
-		if(!fromCaretaker.isEmpty()){
-			final Stack<Patch<ThesaurusEntry>> otherCaretaker = (fromCaretaker == redoCaretaker? undoCaretaker: redoCaretaker);
-			otherCaretaker.push(createMemento());
+		if(fromCaretaker.canUndo()){
+			final ThesaurusCaretaker otherCaretaker = (fromCaretaker == redoCaretaker? undoCaretaker: redoCaretaker);
+			otherCaretaker.pushMemento(createMemento());
 
-			final Patch<ThesaurusEntry> memento = fromCaretaker.pop();
+			final Patch<ThesaurusEntry> memento = fromCaretaker.popMemento();
 			warnUndoable();
 
 			restoreMemento(memento);
@@ -376,11 +375,11 @@ public class ThesaurusParser{
 	}
 
 	public boolean canUndo(){
-		return !undoCaretaker.isEmpty();
+		return undoCaretaker.canUndo();
 	}
 
 	public boolean canRedo(){
-		return !redoCaretaker.isEmpty();
+		return redoCaretaker.canUndo();
 	}
 
 	private Patch<ThesaurusEntry> createMemento() throws DiffException{

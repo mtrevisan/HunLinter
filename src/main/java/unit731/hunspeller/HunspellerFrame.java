@@ -1777,7 +1777,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             updateSynonymsCounter();
          }
       }
-      catch(final IOException e){
+      catch(final Exception e){
          LOGGER.error("Something very bad happened while redoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theRedoButtonActionPerformed
@@ -1790,7 +1790,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             updateSynonymsCounter();
          }
       }
-      catch(final IOException e){
+      catch(final Exception e){
          LOGGER.error("Something very bad happened while undoing changes to the thesaurus file", e);
       }
    }//GEN-LAST:event_theUndoButtonActionPerformed

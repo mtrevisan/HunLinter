@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import com.github.difflib.algorithm.DiffException;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
@@ -443,7 +444,7 @@ public class Backbone implements FileChangeListener{
 		return hypParser.addRule(newRule, level);
 	}
 
-	public boolean restorePreviousThesaurusSnapshot() throws IOException{
+	public boolean restorePreviousThesaurusSnapshot() throws DiffException, IOException{
 		final boolean restored = theParser.restorePreviousSnapshot();
 		if(restored)
 			storeThesaurusFiles();
@@ -451,7 +452,7 @@ public class Backbone implements FileChangeListener{
 		return restored;
 	}
 
-	public boolean restoreNextThesaurusSnapshot() throws IOException{
+	public boolean restoreNextThesaurusSnapshot() throws DiffException, IOException{
 		final boolean restored = theParser.restoreNextSnapshot();
 		if(restored)
 			storeThesaurusFiles();
