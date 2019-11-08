@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Queue;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.services.log.ShortPrefixNotNullToStringStyle;
 
 
 /**
@@ -127,7 +127,7 @@ public class HunspellRegexWordGenerator{
 
 	@Override
 	public String toString(){
-		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("graph", graph)
 			.append("finalStateIndex", finalStateIndex)
 			.toString();

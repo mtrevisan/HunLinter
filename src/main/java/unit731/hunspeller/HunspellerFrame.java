@@ -100,7 +100,7 @@ import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunspeller.services.ApplicationLogAppender;
+import unit731.hunspeller.services.log.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.Packager;

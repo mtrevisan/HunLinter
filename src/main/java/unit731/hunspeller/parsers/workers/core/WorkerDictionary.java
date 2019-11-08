@@ -19,7 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.log.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
 

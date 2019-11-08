@@ -16,12 +16,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import unit731.hunspeller.services.RegExpSequencer;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
+import unit731.hunspeller.services.log.ShortPrefixNotNullToStringStyle;
 
 
 public class LineEntry implements Serializable{
@@ -182,7 +182,7 @@ public class LineEntry implements Serializable{
 
 	@Override
 	public String toString(){
-		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("rem", removal)
 			.append("add", addition)
 			.append("cond", condition)

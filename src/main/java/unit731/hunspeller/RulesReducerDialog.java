@@ -28,7 +28,7 @@ import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.workers.RulesReducerWorker;
-import unit731.hunspeller.services.ApplicationLogAppender;
+import unit731.hunspeller.services.log.ApplicationLogAppender;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{

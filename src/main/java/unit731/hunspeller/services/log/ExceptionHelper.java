@@ -1,4 +1,4 @@
-package unit731.hunspeller.services;
+package unit731.hunspeller.services.log;
 
 import org.apache.commons.lang3.StringUtils;
 
