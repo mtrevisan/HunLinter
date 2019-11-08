@@ -306,7 +306,7 @@ public class Backbone implements FileChangeListener{
 		hypParser.save(hypFile);
 	}
 
-	public void storeThesaurusFiles() throws IOException{
+	public void storeThesaurusFiles() throws DiffException, IOException{
 		final File theIndexFile = getThesaurusIndexFile();
 		final File theDataFile = getThesaurusDataFile();
 		theParser.save(theIndexFile, theDataFile);
@@ -327,7 +327,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public File getAidFile(){
-		return Path.of(packager.getProjectPath().toString(), FOLDER_AID, affParser.getAffixData().getLanguage() + EXTENSION_AID)
+		return Path.of(packager.getProjectPath().toString(), FOLDER_AID,
+			affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
 
@@ -444,20 +445,16 @@ public class Backbone implements FileChangeListener{
 		return hypParser.addRule(newRule, level);
 	}
 
-	public boolean restorePreviousThesaurusSnapshot() throws DiffException, IOException{
-		final boolean restored = theParser.restorePreviousSnapshot();
-		if(restored)
-			storeThesaurusFiles();
-
-		return restored;
+	public boolean restorePreviousThesaurusSnapshot() throws IOException{
+		final File theIndexFile = getThesaurusIndexFile();
+		final File theDataFile = getThesaurusDataFile();
+		return theParser.restorePreviousSnapshot(theIndexFile, theDataFile);
 	}
 
-	public boolean restoreNextThesaurusSnapshot() throws DiffException, IOException{
-		final boolean restored = theParser.restoreNextSnapshot();
-		if(restored)
-			storeThesaurusFiles();
-
-		return restored;
+	public boolean restoreNextThesaurusSnapshot() throws IOException{
+		final File theIndexFile = getThesaurusIndexFile();
+		final File theDataFile = getThesaurusDataFile();
+		return theParser.restoreNextSnapshot(theIndexFile, theDataFile);
 	}
 
 	public void createPackage(){
