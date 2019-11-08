@@ -129,7 +129,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	@Override
 	public int compareTo(final ThesaurusEntry other){
 		return new CompareToBuilder()
-			.append(synonym, other.getSynonym())
+			.append(synonym, other.synonym)
+			.append(meanings, other.meanings)
 			.toComparison();
 	}
 
@@ -143,6 +144,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		final ThesaurusEntry rhs = (ThesaurusEntry)obj;
 		return new EqualsBuilder()
 			.append(synonym, rhs.synonym)
+			.append(meanings, rhs.meanings)
 			.isEquals();
 	}
 
@@ -150,6 +152,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public int hashCode(){
 		return new HashCodeBuilder()
 			.append(synonym)
+			.append(meanings)
 			.toHashCode();
 	}
 

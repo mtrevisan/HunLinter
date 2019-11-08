@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.thesaurus;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
@@ -16,12 +14,18 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Stack;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,8 +36,6 @@ import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.memento.CaretakerInterface;
-import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
 /**
@@ -44,7 +46,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
  * <a href="https://github.com/java-diff-utils/java-diff-utils">java-diff-utils</a>
  * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code &amp; Interactive Visualization</a>
  */
-public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+public class ThesaurusParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
@@ -64,54 +66,11 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
 
-	//NOTE: All members are private and accessible only by Originator
-	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	protected static class Memento{
-
-		private ThesaurusDictionary dictionary;
-
-//		private String partOfSpeech;
-//		private List<String> meanings;
-//
-//		private ThesaurusEntry updatedSynonym;
-//		private List<MeaningEntry> meaningEntries;
-//		private String text;
-//
-//		private List<ThesaurusEntry> removedSynonyms;
-
-
-		Memento(){}
-
-		//create
-//		Memento(String partOfSpeech, List<String> meanings){
-//			this.partOfSpeech = partOfSpeech;
-//			this.meanings = meanings;
-//		}
-
-		//update
-//		Memento(ThesaurusEntry updatedSynonym, List<MeaningEntry> meaningEntries, String text){
-//			this.updatedSynonym = updatedSynonym;
-//			this.meaningEntries = meaningEntries;
-//			this.text = text;
-//		}
-
-		//delete
-//		Memento(List<ThesaurusEntry> removedSynonyms){
-//			this.removedSynonyms = removedSynonyms;
-//		}
-
-		Memento(final ThesaurusDictionary dictionary){
-			this.dictionary = dictionary;
-		}
-
-	}
-
 	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
 	private final Undoable undoable;
-	private final CaretakerInterface<Memento> undoCaretaker = new ThesaurusCaretaker();
-	private final CaretakerInterface<Memento> redoCaretaker = new ThesaurusCaretaker();
+	private final Stack<Patch<ThesaurusEntry>> undoCaretaker = new Stack<>();
+	private final Stack<Patch<ThesaurusEntry>> redoCaretaker = new Stack<>();
 
 
 	public ThesaurusParser(final Undoable undoable){
@@ -120,18 +79,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public ThesaurusDictionary getDictionary(){
 		return dictionary;
-	}
-
-	public Undoable getUndoable(){
-		return undoable;
-	}
-
-	public CaretakerInterface<Memento> getUndoCaretaker(){
-		return undoCaretaker;
-	}
-
-	public CaretakerInterface<Memento> getRedoCaretaker(){
-		return redoCaretaker;
 	}
 
 	/**
@@ -223,9 +170,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		if(duplicates.isEmpty() || forceInsertion){
 			try{
+//FIXME
 				storeMemento();
 			}
-			catch(final IOException e){
+			catch(final DiffException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -257,27 +205,18 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public void setMeanings(final int index, final String text){
 		try{
+//FIXME
 			storeMemento();
 
 			dictionary.setMeanings(index, text);
 		}
-		catch(final IOException e){
-			try{
-				undoCaretaker.popMemento();
-			}
-			catch(final IOException ioe){
-				LOGGER.warn("Error while removing a memento", ioe);
-			}
+		catch(final DiffException e){
+			undoCaretaker.pop();
 
 			LOGGER.warn("Error while storing a memento", e);
 		}
 		catch(final Exception e){
-			try{
-				undoCaretaker.popMemento();
-			}
-			catch(final IOException ioe){
-				LOGGER.warn("Error while removing a memento", ioe);
-			}
+			undoCaretaker.pop();
 
 			LOGGER.warn("Error while modifying the meanings", e);
 		}
@@ -287,9 +226,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		final int count = selectedRowIDs.length;
 		if(count > 0){
 			try{
+//FIXME
 				storeMemento();
 			}
-			catch(final IOException e){
+			catch(final DiffException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -398,30 +338,27 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		dictionary.clear();
 	}
 
-	private void storeMemento() throws IOException{
-		//FIXME reduce size of data saved
-//		undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
-		undoCaretaker.pushMemento(createMemento());
+	private void storeMemento() throws DiffException{
+		undoCaretaker.push(createMemento());
 
 		if(undoable != null)
 			undoable.onUndoChange(true);
 	}
 
 	public boolean canUndo(){
-		return undoCaretaker.canUndo();
+		return !undoCaretaker.isEmpty();
 	}
 
 	public boolean canRedo(){
-		return redoCaretaker.canUndo();
+		return !redoCaretaker.isEmpty();
 	}
 
-	public boolean restorePreviousSnapshot() throws IOException{
+	public boolean restorePreviousSnapshot() throws DiffException{
 		boolean restored = false;
 		if(canUndo()){
-			//FIXME reduce size of data saved
-			redoCaretaker.pushMemento(createMemento());
+			redoCaretaker.push(createMemento());
 
-			final Memento memento = undoCaretaker.popMemento();
+			final Patch<ThesaurusEntry> memento = undoCaretaker.pop();
 			if(undoable != null){
 				undoable.onUndoChange(canUndo());
 				undoable.onRedoChange(true);
@@ -434,13 +371,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return restored;
 	}
 
-	public boolean restoreNextSnapshot() throws IOException{
+	public boolean restoreNextSnapshot() throws DiffException{
 		boolean restored = false;
 		if(canRedo()){
-			//FIXME reduce size of data saved
-			undoCaretaker.pushMemento(createMemento());
+			undoCaretaker.push(createMemento());
 
-			final Memento memento = redoCaretaker.popMemento();
+			final Patch<ThesaurusEntry> memento = redoCaretaker.pop();
 			if(undoable != null){
 				undoable.onUndoChange(true);
 				undoable.onRedoChange(canRedo());
@@ -453,14 +389,20 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return restored;
 	}
 
-	@Override
-	public Memento createMemento(){
-		return new Memento(dictionary);
+	private Patch<ThesaurusEntry> createMemento() throws DiffException{
+//FIXME old + new
+		return DiffUtils.diff(getSynonymsDictionary(), getSynonymsDictionary());
 	}
 
-	@Override
-	public void restoreMemento(final Memento memento){
-		dictionary.restore(memento.dictionary);
+	private void restoreMemento(final Patch<ThesaurusEntry> memento){
+//FIXME to check
+		final List<ThesaurusEntry> synonymsDictionary = getSynonymsDictionary();
+		final List<AbstractDelta<ThesaurusEntry>> deltas = memento.getDeltas();
+		final ListIterator itr = deltas.listIterator(deltas.size());
+		while(itr.hasPrevious()){
+			final AbstractDelta<ThesaurusEntry> delta = (AbstractDelta)itr.previous();
+			delta.restore(synonymsDictionary);
+		}
 	}
 
 }
