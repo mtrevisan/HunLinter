@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.workers.exceptions;
 
-
 import java.nio.file.Path;
 
 
