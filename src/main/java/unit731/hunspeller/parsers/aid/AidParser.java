@@ -7,6 +7,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -27,10 +29,9 @@ public class AidParser{
 		final Path path = aidFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
-			String line;
-			while((line = br.readLine()) != null)
-				if(!line.isEmpty())
-					lines.add(line);
+			br.lines()
+				.filter(Predicate.not(String::isEmpty))
+				.forEach(lines::add);
 		}
 	}
 

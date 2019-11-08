@@ -14,7 +14,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +22,6 @@ import java.util.stream.IntStream;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.algorithm.DiffException;
-import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -68,8 +66,7 @@ public class ThesaurusParser{
 	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
 	private final Undoable undoable;
-	private final ThesaurusCaretaker undoCaretaker = new ThesaurusCaretaker();
-	private final ThesaurusCaretaker redoCaretaker = new ThesaurusCaretaker();
+	private final MementoCaretaker caretaker = new MementoCaretaker();
 
 
 	public ThesaurusParser(final Undoable undoable){
@@ -167,17 +164,8 @@ public class ThesaurusParser{
 					new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 
-		if(duplicates.isEmpty() || forceInsertion){
-			try{
-//FIXME
-				storeMemento();
-			}
-			catch(final DiffException | IOException e){
-				LOGGER.warn("Error while storing a memento", e);
-			}
-
+		if(duplicates.isEmpty() || forceInsertion)
 			dictionary.add(partOfSpeeches, meanings);
-		}
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
@@ -202,40 +190,14 @@ public class ThesaurusParser{
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
 	}
 
-	public void setMeanings(final int index, final String text) throws IOException{
-		try{
-//FIXME
-			storeMemento();
-
-			dictionary.setMeanings(index, text);
-		}
-		catch(final DiffException e){
-			undoCaretaker.popMemento();
-
-			LOGGER.warn("Error while storing a memento", e);
-		}
-		catch(final Exception e){
-			undoCaretaker.popMemento();
-
-			LOGGER.warn("Error while modifying the meanings", e);
-		}
+	public void setMeanings(final int index, final String text){
+		dictionary.setMeanings(index, text);
 	}
 
 	public void deleteMeanings(final int[] selectedRowIDs){
-		final int count = selectedRowIDs.length;
-		if(count > 0){
-			try{
-//FIXME
-				storeMemento();
-			}
-			catch(final DiffException | IOException e){
-				LOGGER.warn("Error while storing a memento", e);
-			}
-
-			IntStream.range(0, count)
-				.map(i -> selectedRowIDs[i] - i)
-				.forEach(dictionary::remove);
-		}
+		IntStream.range(0, selectedRowIDs.length)
+			.map(i -> selectedRowIDs[i] - i)
+			.forEach(dictionary::remove);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
@@ -300,15 +262,36 @@ public class ThesaurusParser{
 		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}
 
-	public void save(final File theIndexFile, final File theDataFile) throws IOException{
+	public void clear(){
+		dictionary.clear();
+	}
+
+	public void save(final File theIndexFile, final File theDataFile) throws IOException, DiffException{
+		final Charset theIndexCharset = FileHelper.determineCharset(theIndexFile.toPath());
+		final List<String> theIndexPreviousContent = Files.readAllLines(theIndexFile.toPath(), theIndexCharset);
+		final Charset theDataCharset = FileHelper.determineCharset(theDataFile.toPath());
+		final List<String> theDataPreviousContent = Files.readAllLines(theDataFile.toPath(), theDataCharset);
+
+		saveIndexAndData(theIndexFile, theDataFile);
+
+		final Charset charset = StandardCharsets.UTF_8;
+		final List<String> theIndexCurrentContent = Files.readAllLines(theIndexFile.toPath(), charset);
+		final List<String> theDataCurrentContent = Files.readAllLines(theDataFile.toPath(), charset);
+		final Patch<String> indexPatch = DiffUtils.diff(theIndexPreviousContent, theIndexCurrentContent);
+		final Patch<String> dataPatch = DiffUtils.diff(theDataPreviousContent, theDataCurrentContent);
+
+		storeMemento(indexPatch, dataPatch);
+	}
+
+	private void saveIndexAndData(final File theIndexFile, final File theDataFile) throws IOException{
 		//sort the synonyms
 		dictionary.sort();
 
 		//save index and data files
 		final Charset charset = StandardCharsets.UTF_8;
 		try(
-				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
+			final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
+			final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
 				){
 			//save charset
 			indexWriter.write(charset.name());
@@ -333,38 +316,51 @@ public class ThesaurusParser{
 		}
 	}
 
-	public void clear(){
-		dictionary.clear();
-	}
-
-	private void storeMemento() throws DiffException, IOException{
-		undoCaretaker.pushMemento(createMemento());
+	private void storeMemento(final Patch<String> indexPatch, final Patch<String> dataPatch) throws IOException{
+		caretaker.pushMemento(Pair.of(indexPatch, dataPatch));
 
 		warnUndoable();
 	}
 
-	public boolean restorePreviousSnapshot() throws DiffException, IOException{
-		return restoreSnapshot(undoCaretaker);
-	}
-
-	public boolean restoreNextSnapshot() throws DiffException, IOException{
-		return restoreSnapshot(redoCaretaker);
-	}
-
-	private boolean restoreSnapshot(final ThesaurusCaretaker fromCaretaker) throws DiffException, IOException{
+	public boolean restorePreviousSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
 		boolean restored = false;
-		if(fromCaretaker.canUndo()){
-			final ThesaurusCaretaker otherCaretaker = (fromCaretaker == redoCaretaker? undoCaretaker: redoCaretaker);
-			otherCaretaker.pushMemento(createMemento());
-
-			final Patch<ThesaurusEntry> memento = fromCaretaker.popMemento();
+		final Pair<Patch<String>, Patch<String>> memento = caretaker.popPreviousMemento();
+		if(memento != null){
 			warnUndoable();
 
-			restoreMemento(memento);
+			restoreMemento(theIndexFile, theDataFile, memento);
 
 			restored = true;
 		}
 		return restored;
+	}
+
+	public boolean restoreNextSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
+		boolean restored = false;
+		final Pair<Patch<String>, Patch<String>> memento = caretaker.popNextMemento();
+		if(memento != null){
+			warnUndoable();
+
+			restoreMemento(theIndexFile, theDataFile, memento);
+
+			restored = true;
+		}
+		return restored;
+	}
+
+	private void restoreMemento(final File theIndexFile, final File theDataFile, final Pair<Patch<String>, Patch<String>> memento)
+			throws IOException{
+		final Charset charset = StandardCharsets.UTF_8;
+		final List<String> theIndexContent = Files.readAllLines(theIndexFile.toPath(), charset);
+		final List<String> theDataContent = Files.readAllLines(theDataFile.toPath(), charset);
+
+		memento.getLeft().restore(theIndexContent);
+		memento.getRight().restore(theDataContent);
+
+		//save index file
+		FileHelper.saveFile(theIndexFile.toPath(), StringUtils.LF, charset, theIndexContent);
+		//save data file
+		FileHelper.saveFile(theDataFile.toPath(), StringUtils.LF, charset, theDataContent);
 	}
 
 	private void warnUndoable(){
@@ -375,27 +371,11 @@ public class ThesaurusParser{
 	}
 
 	public boolean canUndo(){
-		return undoCaretaker.canUndo();
+		return caretaker.canUndo();
 	}
 
 	public boolean canRedo(){
-		return redoCaretaker.canUndo();
-	}
-
-	private Patch<ThesaurusEntry> createMemento() throws DiffException{
-//FIXME old + new
-		return DiffUtils.diff(getSynonymsDictionary(), getSynonymsDictionary());
-	}
-
-	private void restoreMemento(final Patch<ThesaurusEntry> memento){
-//FIXME to check
-		final List<ThesaurusEntry> synonymsDictionary = getSynonymsDictionary();
-		final List<AbstractDelta<ThesaurusEntry>> deltas = memento.getDeltas();
-		final ListIterator itr = deltas.listIterator(deltas.size());
-		while(itr.hasPrevious()){
-			final AbstractDelta<ThesaurusEntry> delta = (AbstractDelta)itr.previous();
-			delta.restore(synonymsDictionary);
-		}
+		return caretaker.canRedo();
 	}
 
 }

@@ -123,7 +123,8 @@ public class ThesaurusDictionary{
 	public void setMeanings(final int index, final String text){
 		if(StringUtils.isNotBlank(text)){
 			final String[] lines = StringUtils.split(text, StringUtils.LF);
-			synonyms.get(index).setMeanings(lines);
+			synonyms.get(index).
+				setMeanings(lines);
 		}
 	}
 

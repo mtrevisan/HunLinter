@@ -1,6 +1,7 @@
 package unit731.hunspeller.services;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -60,6 +61,16 @@ public class FileHelper{
 		file.deleteOnExit();
 		Files.write(file.toPath(), bytes);
 		return file;
+	}
+
+	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
+			throws IOException{
+		try(final BufferedWriter writer = Files.newBufferedWriter(path, charset)){
+			for(final String line : content){
+				writer.write(line);
+				writer.write(lineTerminator);
+			}
+		}
 	}
 
 	public static byte[] compressData(final byte[] bytes) throws IOException{
