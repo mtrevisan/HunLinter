@@ -68,6 +68,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private final Orthography orthography;
 
 	private String[] pluralFlags;
+	private String finalSonorizationFlag;
 
 
 	public DictionaryCorrectnessCheckerVEC(final AffixData affixData, final HyphenatorInterface hyphenator){
@@ -85,6 +86,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final String pluralFlagsValue = rulesLoader.readProperty("pluralFlags");
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
+		finalSonorizationFlag = rulesLoader.readProperty("finalSonorizationFlag");
 
 		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
 			Pattern.CASE_INSENSITIVE);
@@ -257,13 +259,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 //	private void variantIncompatibilityCheck(final RuleProductionEntry production, final Set<MatcherEntry> checks)
 //			throws IllegalArgumentException{
-//		if(canContainsVanishingEl(production.getWord()))
+//		if(canContainVanishingEl(production.getWord()))
 //			for(final MatcherEntry entry : checks)
 //				entry.match(production);
 //	}
 //
 //	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
-//	private static boolean canContainsVanishingEl(final String word){
+//	private static boolean canContainVanishingEl(final String word){
 //		boolean result = false;
 //		final int size = word.length();
 //		if(size > 1){
@@ -287,14 +289,16 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //	}
 
 	private void finalSonorizationCheck(final Production production) throws IllegalArgumentException{
-//		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
-//			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(FINAL_SONORIZATION_RULE);
-//			final boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
+		//FIXME
+//		if(!production.hasProductionRules()){
+//			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(finalSonorizationFlag);
+//			final boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.GRAPHEME_L_STROKE)
+//				&& affixData.isAffixProductive(production.getWord(), finalSonorizationFlag));
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
+//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + finalSonorizationFlag);
 //				if(!canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
+//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + finalSonorizationFlag);
 //			}
 //		}
 	}
