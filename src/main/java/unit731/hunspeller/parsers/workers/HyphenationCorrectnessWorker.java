@@ -17,6 +17,7 @@ import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
@@ -57,7 +58,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
 						sb.append(", line ").append(row);
-						throw new IllegalArgumentException(sb.toString());
+						throw new HunspellException(sb.toString());
 					}
 				}
 			});

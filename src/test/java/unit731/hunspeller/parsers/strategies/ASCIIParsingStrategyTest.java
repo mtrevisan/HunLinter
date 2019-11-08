@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class ASCIIParsingStrategyTest{
@@ -43,7 +44,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
@@ -52,7 +53,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNoASCII(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
@@ -61,7 +62,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
@@ -70,7 +71,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});

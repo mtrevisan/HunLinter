@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.SetHelper;
 
 import java.text.MessageFormat;
@@ -13,7 +14,7 @@ public abstract class FlagParsingStrategy{
 	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: {0}");
 
 
-	public abstract void validate(final String flag) throws IllegalArgumentException;
+	public abstract void validate(final String flag);
 
 	/**
 	 * Parses the given String into multiple flags
@@ -23,10 +24,10 @@ public abstract class FlagParsingStrategy{
 	 */
 	public abstract String[] parseFlags(final String flags);
 
-	protected void checkForDuplicates(final String[] flags) throws IllegalArgumentException{
+	protected void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+			throw new HunspellException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
 	}
 
 

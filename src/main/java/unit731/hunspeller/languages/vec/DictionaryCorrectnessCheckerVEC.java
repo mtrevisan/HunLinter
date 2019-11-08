@@ -14,6 +14,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -109,7 +110,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	public void checkProduction(final Production production) throws IllegalArgumentException{
+	public void checkProduction(final Production production){
 		super.checkProduction(production);
 
 		stressCheck(production);
@@ -127,47 +128,47 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		orthographyCheck(production);
 	}
 
-	private void stressCheck(final Production production) throws IllegalArgumentException{
+	private void stressCheck(final Production production){
 		final String derivedWord = production.getWord();
 		final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
 		if(!derivedWord.equals(unmarkedDefaultStressWord))
-			throw new IllegalArgumentException(WORD_WITH_UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
+			throw new HunspellException(WORD_WITH_UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
 	}
 
-	private void vanishingElCheck(final Production production) throws IllegalArgumentException{
+	private void vanishingElCheck(final Production production){
 		final String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 			if(!derivedWord.toLowerCase(Locale.ROOT).startsWith(GraphemeVEC.GRAPHEME_L)
 					&& PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY),
 					PATTERN_NON_VANISHING_EL))
-				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
+				throw new HunspellException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
+				throw new HunspellException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
 					NORTHERN_PLURAL_STRESSED_RULE, derivedWord}));
 			if(derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE))
-				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
+				throw new HunspellException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
 		}
 		if(PatternHelper.find(derivedWord, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
-			throw new IllegalArgumentException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
+			throw new HunspellException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 	}
 
-	private void incompatibilityCheck(final Production production) throws IllegalArgumentException{
+	private void incompatibilityCheck(final Production production){
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
-			throw new IllegalArgumentException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
+			throw new HunspellException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
 	}
 
-	private void northernPluralCheck(final Production production) throws IllegalArgumentException{
+	private void northernPluralCheck(final Production production){
 		if(hasToCheckForNorthernPlural(production)){
 			final String word = production.getWord();
 			final String rule = getRuleToCheckNorthernPlural(word);
 			final boolean canHaveNorthernPlural = canHaveNorthernPlural(production, rule);
 			final boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
-				throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
+				throw new HunspellException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
 			if(!canHaveNorthernPlural && hasNorthernPluralFlag)
-				throw new IllegalArgumentException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{NORTHERN_PLURAL_RULE,
+				throw new HunspellException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{NORTHERN_PLURAL_RULE,
 					NORTHERN_PLURAL_STRESSED_RULE}));
 		}
 	}
@@ -191,7 +192,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
 	}
 
-	private void orthographyCheck(final Production production) throws IllegalArgumentException{
+	private void orthographyCheck(final Production production){
 		if(hasToCheckForOrthographyAndSyllabation(production)){
 			String word = production.getWord();
 			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
@@ -206,35 +207,34 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			&& !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
 
-	private void orthographyCheck(final String word) throws IllegalArgumentException{
+	private void orthographyCheck(final String word){
 		final String correctedDerivedWord = orthography.correctOrthography(word);
 		if(!correctedDerivedWord.equals(word))
-			throw new IllegalArgumentException(WORD_IS_MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
+			throw new HunspellException(WORD_IS_MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
 	}
 
 	@Override
-	protected void checkCompoundProduction(final String subword, final int subwordIndex, final Production production)
-			throws IllegalArgumentException{
+	protected void checkCompoundProduction(final String subword, final int subwordIndex, final Production production){
 		if(subwordIndex == 0)
 			accentCheck(subword, production);
 
 		ciuiCheck(subword, production);
 	}
 
-	private void accentCheck(final String subword, final Production production) throws IllegalArgumentException{
+	private void accentCheck(final String subword, final Production production){
 		if(!rulesLoader.containsMultipleAccentedWords(subword)){
 			final int accents = WordVEC.countAccents(subword);
 			if(!rulesLoader.isWordCanHaveMultipleAccents() && accents > 1)
-				throw new IllegalArgumentException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
+				throw new HunspellException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
 			final String appliedRuleFlag = getLastAppliedRule(production);
 			if(appliedRuleFlag != null){
 				//retrieve last applied rule
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(),
+					throw new HunspellException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(),
 						appliedRuleFlag}));
 				if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(),
+					throw new HunspellException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(),
 						appliedRuleFlag}));
 			}
 		}
@@ -249,16 +249,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		return appliedRuleFlag;
 	}
 
-	private void ciuiCheck(final String subword, final Production production) throws IllegalArgumentException{
+	private void ciuiCheck(final String subword, final Production production){
 		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
-				throw new IllegalArgumentException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
+				throw new HunspellException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
 		}
 	}
 
-//	private void variantIncompatibilityCheck(final RuleProductionEntry production, final Set<MatcherEntry> checks)
-//			throws IllegalArgumentException{
+//	private void variantIncompatibilityCheck(final RuleProductionEntry production, final Set<MatcherEntry> checks){
 //		if(canContainVanishingEl(production.getWord()))
 //			for(final MatcherEntry entry : checks)
 //				entry.match(production);
@@ -288,7 +287,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //		return result;
 //	}
 
-	private void finalSonorizationCheck(final Production production) throws IllegalArgumentException{
+	private void finalSonorizationCheck(final Production production){
 		//FIXME
 //		if(!production.hasProductionRules()){
 //			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(finalSonorizationFlag);
@@ -296,9 +295,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //				&& affixData.isAffixProductive(production.getWord(), finalSonorizationFlag));
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + finalSonorizationFlag);
+//					throw new HunspellException("Final sonorization missing for " + production.getWord() + ", add " + finalSonorizationFlag);
 //				if(!canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + finalSonorizationFlag);
+//					throw new HunspellException("Final sonorization not needed for " + production.getWord() + ", remove " + finalSonorizationFlag);
 //			}
 //		}
 	}

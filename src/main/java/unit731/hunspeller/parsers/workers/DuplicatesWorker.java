@@ -32,6 +32,7 @@ import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
 
@@ -158,7 +159,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			long readSoFar = line.getBytes(charset).length + 2;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+				throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
@@ -176,7 +177,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
-					catch(final IllegalArgumentException e){
+					catch(final HunspellException e){
 						LOGGER.error(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
@@ -232,7 +233,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 									result.add(new Duplicate(production, word, lineIndex));
 							}
 						}
-						catch(final IllegalArgumentException e){
+						catch(final Exception e){
 							LOGGER.warn(Backbone.MARKER_APPLICATION, e.getMessage());
 						}
 					}

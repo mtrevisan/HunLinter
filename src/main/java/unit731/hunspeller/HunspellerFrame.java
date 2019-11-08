@@ -56,7 +56,6 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -626,7 +625,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeThesaurusFiles();
                      }
-                     catch(IllegalArgumentException | IOException ex){
+                     catch(Exception ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
                      }
                   };
@@ -961,7 +960,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         // ... and save the files
                         backbone.storeAutoCorrectFile();
                      }
-                     catch(IllegalArgumentException | TransformerException ex){
+                     catch(Exception ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
                      }
                   };
@@ -1483,7 +1482,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				frame.dicTotalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
-			catch(final IllegalArgumentException e){
+			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
@@ -1875,7 +1874,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
             dm.setProductions(words);
          }
-         catch(final IllegalArgumentException e){
+         catch(final Exception e){
             LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
          }
       }
@@ -1984,7 +1983,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				backbone.storeHyphenationFile();
 			}
-			catch(IllegalArgumentException | IOException ex){
+			catch(Exception ex){
 				LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
 			}
 		};
@@ -2366,7 +2365,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				FontChooserDialog.getDefaultFont());
 			GUIUtils.setCurrentFont(lastUsedFont, this);
 		}
-		catch(final IllegalArgumentException e){
+		catch(final IndexOutOfBoundsException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
 		catch(final Exception e){

@@ -129,7 +129,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			final String text = meaningsTextArea.getText();
 			okButtonAction.accept(text);
 		}
-		catch(final IllegalArgumentException e){
+		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
 		}
 

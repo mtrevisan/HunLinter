@@ -26,6 +26,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -70,7 +71,7 @@ public class DictionaryEntry{
 
 		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{line}));
+			throw new HunspellException(WRONG_FORMAT.format(new Object[]{line}));
 
 		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
@@ -117,7 +118,7 @@ public class DictionaryEntry{
 //
 //		final Matcher m = PATTERN_ENTRY.matcher(line);
 //		if(!m.find())
-//			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
+//			throw new HunspellException("Cannot parse dictionary line '" + line + "'");
 //
 //		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 //	}
@@ -257,7 +258,7 @@ public class DictionaryEntry{
 	 * @param affixData	The {@link AffixData}
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
-	private Affixes separateAffixes(final AffixData affixData) throws IllegalArgumentException{
+	private Affixes separateAffixes(final AffixData affixData){
 		final List<String> terminalAffixes = new ArrayList<>();
 		final List<String> prefixes = new ArrayList<>();
 		final List<String> suffixes = new ArrayList<>();
@@ -275,7 +276,7 @@ public class DictionaryEntry{
 
 					final List<AffixEntry> appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+					throw new HunspellException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
 				if(rule instanceof RuleEntry){

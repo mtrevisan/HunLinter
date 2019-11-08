@@ -12,6 +12,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -34,11 +35,11 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit) throws IllegalArgumentException{
+	List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)
-			throw new IllegalArgumentException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new HunspellException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
@@ -78,7 +79,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	private void checkCompoundRuleInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs, final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new IllegalArgumentException(MISSING_WORD.format(new Object[]{component, StringUtils.join(compoundRuleComponents, null)}));
+				throw new HunspellException(MISSING_WORD.format(new Object[]{component, StringUtils.join(compoundRuleComponents, null)}));
 	}
 
 	private boolean raiseError(final Map<String, Set<DictionaryEntry>> inputs, final String component){

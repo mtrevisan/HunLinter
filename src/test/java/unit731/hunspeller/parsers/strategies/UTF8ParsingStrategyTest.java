@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class UTF8ParsingStrategyTest{
@@ -43,7 +44,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
@@ -52,7 +53,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNoUTF8(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"\\x{FFFD}"};
 			strategy.joinFlags(flags);
 		});
@@ -61,7 +62,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
@@ -70,7 +71,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ŧ", null};
 			strategy.joinFlags(flags);
 		});

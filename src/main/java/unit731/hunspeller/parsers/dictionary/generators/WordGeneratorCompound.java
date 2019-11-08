@@ -91,7 +91,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected List<Production> applyCompound(final List<List<List<Production>>> entries, final int limit) throws IllegalArgumentException{
+	protected List<Production> applyCompound(final List<List<List<Production>>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -150,8 +150,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return response;
 	}
 
-	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags)
-			throws IllegalArgumentException{
+	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);

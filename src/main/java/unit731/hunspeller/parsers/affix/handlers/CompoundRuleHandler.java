@@ -13,6 +13,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.ParserHelper;
 
 
@@ -43,7 +44,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new IllegalArgumentException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
+					throw new HunspellException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
 				final String rule = lineParts[1];
 
@@ -51,7 +52,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line}));
+					throw new HunspellException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
@@ -61,21 +62,20 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
-	private void checkValidity(final ParsingContext context) throws IllegalArgumentException{
+	private void checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+			throw new HunspellException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
-			throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+			throw new HunspellException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 	}
 
-	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy)
-			throws IllegalArgumentException{
+	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
-			throw new IllegalArgumentException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
+			throw new HunspellException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{line}));
+			throw new HunspellException(BAD_FORMAT.format(new Object[]{line}));
 	}
 	
 }

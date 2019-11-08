@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{
@@ -45,7 +46,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(!canEncode(flags))
-			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
+			throw new HunspellException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -61,9 +62,9 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public void validate(final String flag) throws IllegalArgumentException{
+	public void validate(final String flag){
 		if(flag == null || flag.length() != 1 || !canEncode(flag))
-			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
+			throw new HunspellException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
 	}
 
 	@Override
@@ -89,9 +90,9 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		return result;
 	}
 
-	private void checkCompoundValidity(final String compoundRule) throws IllegalArgumentException{
+	private void checkCompoundValidity(final String compoundRule){
 		if(!canEncode(compoundRule))
-			throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
+			throw new HunspellException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
 	}
 
 	public boolean canEncode(final String cs){

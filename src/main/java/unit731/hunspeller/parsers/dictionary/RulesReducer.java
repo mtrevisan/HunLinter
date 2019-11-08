@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -274,7 +275,7 @@ public class RulesReducer{
 					overallLastGroups.put(index, overallLastGroup);
 				}
 			}
-			catch(final IllegalArgumentException ignored){}
+			catch(final Exception ignored){}
 		}
 		return overallLastGroups;
 	}
@@ -631,11 +632,10 @@ public class RulesReducer{
 			}
 	}
 
-	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules)
-			throws IllegalArgumentException{
+	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new HunspellException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
@@ -679,11 +679,10 @@ public class RulesReducer{
 			.collect(Collectors.toList());
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines)
-			throws IllegalArgumentException{
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new HunspellException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final List<AffixEntry> entries = reducedRules.stream()
 			.skip(1)
@@ -699,7 +698,7 @@ public class RulesReducer{
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
-				throw new IllegalArgumentException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
+				throw new HunspellException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
 		}
 	}
 

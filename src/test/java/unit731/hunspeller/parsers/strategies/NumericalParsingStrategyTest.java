@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class NumericalParsingStrategyTest{
@@ -21,13 +22,13 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void notOk1(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("ab"));
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> strategy.parseFlags("ab"));
 		Assertions.assertEquals("Flag must be an integer number: was 'ab'", exception.getMessage());
 	}
 
 	@Test
 	void notOk2(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("1.2"));
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> strategy.parseFlags("1.2"));
 		Assertions.assertEquals("Flag must be an integer number: was '1.2'", exception.getMessage());
 	}
 
@@ -55,7 +56,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError1(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"1", "c"};
 			strategy.joinFlags(flags);
 		});
@@ -64,7 +65,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError2(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"1", "1.2"};
 			strategy.joinFlags(flags);
 		});
@@ -73,7 +74,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"1", ""};
 			strategy.joinFlags(flags);
 		});
@@ -82,7 +83,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});

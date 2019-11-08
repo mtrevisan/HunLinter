@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.RegExpSequencer;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.services.PatternHelper;
@@ -137,7 +138,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new IllegalArgumentException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","), indexFromLast, word}));
+				throw new HunspellException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","), indexFromLast, word}));
 
 			group.add(word.charAt(index));
 		}
@@ -147,11 +148,7 @@ public class LineEntry implements Serializable{
 	public void expandConditionToMaxLength(final Comparator<String> comparator){
 		final String lcs = StringHelper.longestCommonSuffix(from);
 		if(lcs != null){
-			final Set<Character> group = new HashSet<>();
-			try{
-				group.addAll(extractGroup(lcs.length()));
-			}
-			catch(final IllegalArgumentException ignored){}
+			final Set<Character> group = extractGroup(lcs.length());
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
 				condition = PatternHelper.makeGroup(group, comparator) + lcs;

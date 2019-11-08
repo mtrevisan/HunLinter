@@ -13,7 +13,7 @@ import unit731.hunspeller.services.Memoizer;
 /**
  * Maintains a frequency distribution.
  * <p>
- * New values added must be comparable to those that have been added, otherwise the add method will throw an IllegalArgumentException.
+ * New values added must be comparable to those that have been added, otherwise the add method will throw an Exception.
  * </p>
  * <p>
  * The values are ordered using the default (natural order).

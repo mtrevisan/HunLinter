@@ -15,6 +15,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 
@@ -37,12 +38,12 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
-	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds) throws IllegalArgumentException{
+	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
-			throw new IllegalArgumentException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new HunspellException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
-			throw new IllegalArgumentException(NON_POSITIVE_MAX_COMPOUNDS.format(new Object[]{maxCompounds}));
+			throw new HunspellException(NON_POSITIVE_MAX_COMPOUNDS.format(new Object[]{maxCompounds}));
 
 		final boolean forbidDuplicates = affixData.isForbidDuplicatesInCompound();
 

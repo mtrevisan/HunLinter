@@ -24,6 +24,7 @@ import unit731.hunspeller.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -147,9 +148,9 @@ public class AffixParser{
 	 *
 	 * @param affFile	The content of the affix file
 	 * @throws IOException	If an I/O error occurs
-	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
+	 * @throws	HunspellException	If something is wrong while parsing the file (eg. a missing rule)
 	 */
-	public void parse(final File affFile, final String configurationLanguage) throws IOException, IllegalArgumentException{
+	public void parse(final File affFile, final String configurationLanguage) throws IOException{
 		data.clear();
 
 		boolean encodingRead = false;
@@ -162,7 +163,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
-					throw new IllegalArgumentException(BAD_FIRST_LINE.format(new Object[]{line}));
+					throw new HunspellException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
 				final ParsingContext context = new ParsingContext(line, br);
@@ -173,7 +174,7 @@ public class AffixParser{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(final RuntimeException e){
-						throw new IllegalArgumentException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
+						throw new HunspellException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
 					}
 				}
 			}

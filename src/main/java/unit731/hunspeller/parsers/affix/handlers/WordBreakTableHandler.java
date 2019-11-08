@@ -14,6 +14,7 @@ import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.ParserHelper;
 
 
@@ -34,10 +35,10 @@ public class WordBreakTableHandler implements Handler{
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new HunspellException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new HunspellException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			final Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -46,15 +47,15 @@ public class WordBreakTableHandler implements Handler{
 				final String[] lineParts = StringUtils.split(line);
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.WORD_BREAK_CHARACTERS)
-					throw new IllegalArgumentException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
+					throw new HunspellException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
 
 				final String breakCharacter = (DOUBLE_MINUS_SIGN.equals(lineParts[1])? HyphenationParser.EN_DASH: lineParts[1]);
 				if(StringUtils.isBlank(breakCharacter))
-					throw new IllegalArgumentException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
+					throw new HunspellException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
 
 				final boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)
-					throw new IllegalArgumentException(DUPLICATED_LINE.format(new Object[]{line}));
+					throw new HunspellException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);

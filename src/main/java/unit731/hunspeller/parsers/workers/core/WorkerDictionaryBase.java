@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public abstract class WorkerDictionaryBase{
@@ -101,11 +102,11 @@ public abstract class WorkerDictionaryBase{
 		}
 	}
 
-	protected IllegalArgumentException wrapException(final Exception e, final Production production){
+	protected HunspellException wrapException(final Exception e, final Production production){
 		final StringBuffer sb = new StringBuffer(e.getMessage());
 		if(production.hasProductionRules())
 			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		return new IllegalArgumentException(sb.toString());
+		return new HunspellException(sb.toString());
 	}
 
 }

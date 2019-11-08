@@ -148,7 +148,7 @@ public class CorrectionDialog extends JDialog{
 			final String correct = correctTextField.getText();
          okButtonAction.accept(incorrect, correct);
       }
-      catch(final IllegalArgumentException e){
+      catch(final Exception e){
          LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction, e.getMessage());
       }
 

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.vos.AffixEntry;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class AffixEntryTest{
@@ -13,7 +14,7 @@ class AffixEntryTest{
 	void notValidSuffix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 b i a";
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
 		Assertions.assertEquals("Condition part does not ends with removal part: '" + line + "'", exception.getMessage());
@@ -23,7 +24,7 @@ class AffixEntryTest{
 	void notValidSuffix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 a ai a";
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
 		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
@@ -33,7 +34,7 @@ class AffixEntryTest{
 	void notValidPrefix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 b i a";
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
 		Assertions.assertEquals("Condition part does not starts with removal part: '" + line + "'", exception.getMessage());
@@ -43,7 +44,7 @@ class AffixEntryTest{
 	void notValidPrefix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 a ia a";
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
 		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
@@ -134,7 +135,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 man i/A man", strategy, null, null);
 
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
+		Throwable exception = Assertions.assertThrows(HunspellException.class,
 			() -> entry.applyRule("man", false));
 		Assertions.assertEquals("Cannot strip full word 'man' without the FULLSTRIP option", exception.getMessage());
 }

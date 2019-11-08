@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class MeaningEntry implements Comparable<MeaningEntry>{
@@ -45,7 +46,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 			final String partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
-				throw new IllegalArgumentException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndMeanings}));
+				throw new HunspellException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndMeanings}));
 
 			partOfSpeeches = partOfSpeech.substring(1, partOfSpeech.length() - 1)
 				.split(",\\s*");
@@ -55,10 +56,10 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 				.distinct()
 				.collect(Collectors.toList());
 			if(meanings.size() < 1)
-				throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{partOfSpeechAndMeanings}));
+				throw new HunspellException(NOT_ENOUGH_MEANINGS.format(new Object[]{partOfSpeechAndMeanings}));
 		}
 		catch(final ArrayIndexOutOfBoundsException e){
-			throw new IllegalArgumentException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndMeanings}));
+			throw new HunspellException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndMeanings}));
 		}
 	}
 

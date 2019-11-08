@@ -12,6 +12,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -233,7 +234,7 @@ class WordGeneratorCompoundRuleTest{
 
 	@Test
 	void forbiddenWordMissingRule(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",

@@ -2,6 +2,7 @@ package unit731.hunspeller.languages;
 
 import java.text.MessageFormat;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class LetterMatcherEntry{
@@ -19,10 +20,10 @@ public class LetterMatcherEntry{
 		this.correctRule = correctRule;
 	}
 
-	public void match(final Production production) throws IllegalArgumentException{
+	public void match(final Production production){
 		for(final String flag : wrongFlags)
 			if(production.hasContinuationFlag(flag))
-				throw new IllegalArgumentException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
+				throw new HunspellException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}
 	
 }

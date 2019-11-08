@@ -78,7 +78,7 @@ public final class Digraph<T>{
 	 *
 	 * @param vertex the vertex
 	 * @return the vertices adjacent from vertex {@code vertex}
-	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
+	 * @throws IndexOutOfBoundsException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());

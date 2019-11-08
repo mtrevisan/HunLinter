@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,7 @@ public class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new IllegalArgumentException(UNKNOWN_TYPE.format(new Object[]{flag}));
+			throw new HunspellException(UNKNOWN_TYPE.format(new Object[]{flag}));
 
 		return strategy;
 	}

@@ -30,6 +30,7 @@ import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.ParserHelper;
@@ -91,7 +92,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				long readSoFar = line.getBytes(charset).length + 2;
 
 				if(!NumberUtils.isCreatable(line))
-					throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+					throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 				int lineIndex = 1;
 				final long totalSize = dicFile.length();
@@ -112,7 +113,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 									writer.newLine();
 								}
 						}
-						catch(final IllegalArgumentException e){
+						catch(final HunspellException e){
 							LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 						}
 					}
@@ -174,7 +175,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 							}
 						}
 					}
-					catch(final IllegalArgumentException e){
+					catch(final Exception ignored){
+						//FIXME
 						//length varied, consider another line for minimal pair search
 					}
 

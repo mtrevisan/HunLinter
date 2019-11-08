@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new IllegalArgumentException("Invalid root element in file " + configurationFilename
+			throw new HunspellException("Invalid root element in file " + configurationFilename
 				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
 		final List<Node> children = XMLParser.extractChildren(rootElement, node -> XMLParser.isElement(node, AUTO_CORRECT_BLOCK));

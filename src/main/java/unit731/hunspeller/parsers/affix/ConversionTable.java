@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.enums.AffixOption;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.ParserHelper;
 
 
@@ -54,10 +55,10 @@ public class ConversionTable{
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new HunspellException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new HunspellException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
@@ -77,11 +78,11 @@ public class ConversionTable{
 		}
 	}
 
-	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
+	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{context}));
+			throw new HunspellException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!affixOption.getCode().equals(parts[0]))
-			throw new IllegalArgumentException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
+			throw new HunspellException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class ConversionTable{
 	public String applySingleConversionTable(final String word){
 		final List<String> conversions = applyConversionTable(word);
 		if(conversions.size() > 1)
-			throw new IllegalArgumentException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
+			throw new HunspellException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
 
 		return (!conversions.isEmpty()? conversions.get(0): word);
 	}

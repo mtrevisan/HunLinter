@@ -8,6 +8,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.enums.AffixOption;
 import unit731.hunspeller.parsers.affix.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class CopyOverAsNumberHandler implements Handler{
@@ -19,7 +20,7 @@ public class CopyOverAsNumberHandler implements Handler{
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+			throw new HunspellException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 
 		addData.accept(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
 	}

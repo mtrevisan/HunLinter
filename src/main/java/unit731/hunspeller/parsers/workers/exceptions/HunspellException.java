@@ -1,27 +1,32 @@
 package unit731.hunspeller.parsers.workers.exceptions;
 
 
-public class HunspellException extends Exception{
+public class HunspellException extends RuntimeException{
 
-	public enum FixType{FIX, ADD, REMOVE};
+	public enum FixActionType{ADD, REPLACE, REMOVE};
 
 
 	private final Runnable fix;
-	private final FixType fixType;
+	private final FixActionType fixActionType;
 
-	public HunspellException(final String description, final Runnable fix, final FixType fixType){
+
+	public HunspellException(final String description){
+		this(description, null, null);
+	}
+
+	public HunspellException(final String description, final Runnable fix, final FixActionType fixActionType){
 		super(description);
 
 		this.fix = fix;
-		this.fixType = fixType;
+		this.fixActionType = fixActionType;
 	}
 
-	public Runnable getFix(){
+	public Runnable getFixAction(){
 		return fix;
 	}
 
-	public FixType getFixType(){
-		return fixType;
+	public FixActionType getFixActionType(){
+		return fixActionType;
 	}
 
 }

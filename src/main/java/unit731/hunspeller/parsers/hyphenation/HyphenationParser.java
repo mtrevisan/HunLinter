@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -184,9 +185,9 @@ public class HyphenationParser{
 	 * Parse the hyphenation rules out from a .dic file.
 	 *
 	 * @param hypFile	The content of the hyphenation file
-	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
+	 * @throws	HunspellException	If something is wrong while parsing the file
 	 */
-	public void parse(final File hypFile) throws IllegalArgumentException{
+	public void parse(final File hypFile){
 		clearInternal();
 
 		final Path path = hypFile.toPath();
@@ -226,7 +227,7 @@ public class HyphenationParser{
 				addDefaults(level, charset);
 		}
 		catch(final Exception t){
-			throw new IllegalArgumentException(t.getMessage());
+			throw new HunspellException(t.getMessage());
 		}
 
 		//build tries
@@ -244,7 +245,7 @@ public class HyphenationParser{
 			return Charset.forName(charsetName);
 		}
 		catch(final Exception e){
-			throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}), e);
+			throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}));
 		}
 	}
 
@@ -269,7 +270,7 @@ public class HyphenationParser{
 		Level nextLevel = level;
 		if(line.equals(NEXT_LEVEL)){
 			if(level == Level.COMPOUND)
-				throw new IllegalArgumentException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
+				throw new HunspellException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
 
 			//start with non–compound level
 			nextLevel = Level.COMPOUND;
@@ -280,7 +281,7 @@ public class HyphenationParser{
 	private void parseCustomRule(final Level level, final String line){
 		final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 		if(customHyphenations.get(level).containsKey(key))
-			throw new IllegalArgumentException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
+			throw new HunspellException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
 		customHyphenations.get(level).put(key, line);
 	}
@@ -289,7 +290,7 @@ public class HyphenationParser{
 		final String key = getKeyFromData(line);
 		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 		if(duplicatedRule)
-			throw new IllegalArgumentException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
+			throw new HunspellException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
 
 		//insert current pattern into the radix tree (remove all numbers)
 		rules.get(level)
@@ -440,21 +441,21 @@ public class HyphenationParser{
 		ensureUniqueness(reducedPatterns, cleanedRule, rule);
 	}
 
-	private static void validateBasicRules(final String rule) throws IllegalArgumentException{
+	private static void validateBasicRules(final String rule){
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
-			throw new IllegalArgumentException(INVALID_RULE.format(new Object[]{rule}));
+			throw new HunspellException(INVALID_RULE.format(new Object[]{rule}));
 		if(!rule.contains(HYPHEN_EQUALS)){
 			if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
+				throw new HunspellException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
 			if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
-				throw new IllegalArgumentException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
+				throw new HunspellException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
 		}
 	}
 
-	private static void validateAugmentedRule(final String cleanedRule, final String rule) throws IllegalArgumentException{
+	private static void validateAugmentedRule(final String cleanedRule, final String rule){
 		final int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
-			throw new IllegalArgumentException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
+			throw new HunspellException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
 
 		final String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
@@ -462,12 +463,12 @@ public class HyphenationParser{
 
 			final int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
-				throw new IllegalArgumentException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new HunspellException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
 			final int length = extractLength(parts);
 			if(length < 0 || startIndex + length < index)
-				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new HunspellException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
 			if(startIndex + length >= parts[0].length())
-				throw new IllegalArgumentException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
+				throw new HunspellException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
 		}
 	}
 
@@ -483,7 +484,7 @@ public class HyphenationParser{
 	 * A standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
 	 * (for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 	 */
-	private static void ensureUniqueness(final Set<String> reducedPatterns, final String cleanedRule, final String rule) throws IllegalArgumentException{
+	private static void ensureUniqueness(final Set<String> reducedPatterns, final String cleanedRule, final String rule){
 		String alreadyPresentRule = null;
 		for(final String pattern : reducedPatterns)
 			if(pattern.contains(cleanedRule) || cleanedRule.contains(pattern)){
@@ -491,7 +492,7 @@ public class HyphenationParser{
 				break;
 			}
 		if(alreadyPresentRule != null)
-			throw new IllegalArgumentException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
+			throw new HunspellException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
 	}
 
 	public static int getIndexOfBreakpoint(final String rule){

@@ -15,6 +15,7 @@ import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class WordGeneratorBase{
@@ -41,8 +42,7 @@ class WordGeneratorBase{
 	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule)
-			throws IllegalArgumentException{
+	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();
@@ -124,14 +124,14 @@ class WordGeneratorBase{
 		return twofoldProductions;
 	}
 
-	private void checkTwofoldCorrectness(final List<Production> twofoldProductions) throws IllegalArgumentException{
+	private void checkTwofoldCorrectness(final List<Production> twofoldProductions){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Production prod : twofoldProductions){
 			final List<String[]> affixes = prod.extractAllAffixes(affixData, false);
 			final String[] aff = affixes.get(complexPrefixes? 1: 0);
 			if(aff.length > 0){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new IllegalArgumentException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
+				throw new HunspellException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
 	}
@@ -222,7 +222,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+			throw new HunspellException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
 
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();

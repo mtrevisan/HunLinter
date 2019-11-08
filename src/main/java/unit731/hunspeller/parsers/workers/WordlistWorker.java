@@ -17,6 +17,7 @@ import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -45,7 +46,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				}
 			}
 			catch(final IOException e){
-				throw new IllegalArgumentException(e);
+				throw new HunspellException(e.getMessage());
 			}
 		};
 		final Runnable completed = () -> {

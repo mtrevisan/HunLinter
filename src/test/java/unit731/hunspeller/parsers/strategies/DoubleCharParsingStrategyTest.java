@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 class DoubleCharParsingStrategyTest{
@@ -21,7 +22,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void notOk(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("abc"));
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> strategy.parseFlags("abc"));
 		Assertions.assertEquals("Flag must be of length multiple of two: 'abc'", exception.getMessage());
 	}
 
@@ -49,7 +50,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
@@ -58,7 +59,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
@@ -67,7 +68,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(HunspellException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});

@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 
 import java.io.File;
@@ -34,7 +35,7 @@ class AffixParserTest{
 			"CIRCUMFIX A",
 			"COMPOUNDFLAG A");
 
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
+		Throwable exception = Assertions.assertThrows(HunspellException.class,
 			() -> affParser.parse(affFile, language));
 		Assertions.assertEquals("Same flags present in multiple options", exception.getMessage());
 	}

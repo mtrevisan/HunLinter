@@ -57,7 +57,6 @@ public class StringHelper{
 	 * @param keyA	Character sequence A
 	 * @param keyB	Character sequence B
 	 * @return	The indexes of keyA and keyB of the start of the longest common substring between <code>A</code> and <code>B</code>
-	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
 	public static Pair<Integer, Integer> longestCommonSubstring(final String keyA, final String keyB){
 		final int m = keyA.length();

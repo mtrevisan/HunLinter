@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.affix.strategies;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -37,7 +38,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(flags.length() % 2 != 0)
-			throw new IllegalArgumentException(FLAG_MUST_BE_EVEN_IN_LENGTH.format(new Object[]{flags}));
+			throw new HunspellException(FLAG_MUST_BE_EVEN_IN_LENGTH.format(new Object[]{flags}));
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -51,9 +52,9 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public void validate(final String flag) throws IllegalArgumentException{
+	public void validate(final String flag){
 		if(flag == null || flag.length() != 2)
-			throw new IllegalArgumentException(FLAG_MUST_BE_OF_LENGTH_TWO.format(new Object[]{flag}));
+			throw new HunspellException(FLAG_MUST_BE_OF_LENGTH_TWO.format(new Object[]{flag}));
 	}
 
 	@Override
@@ -76,12 +77,12 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final String compoundRule) throws IllegalArgumentException{
+	private void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
 			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 			if(size != 2 && isFlag)
-				throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new HunspellException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 		}
 	}
 

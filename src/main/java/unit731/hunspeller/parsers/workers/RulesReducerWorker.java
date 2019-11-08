@@ -19,6 +19,7 @@ import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class RulesReducerWorker extends WorkerDictionaryBase{
@@ -43,7 +44,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new HunspellException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 

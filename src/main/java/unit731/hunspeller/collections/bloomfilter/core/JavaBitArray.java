@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
-
 import java.text.MessageFormat;
 
 

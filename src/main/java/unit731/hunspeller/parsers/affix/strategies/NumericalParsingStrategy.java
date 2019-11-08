@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -56,14 +57,14 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public void validate(final String flag) throws IllegalArgumentException{
+	public void validate(final String flag){
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new IllegalArgumentException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new HunspellException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
 		}
 		catch(final NumberFormatException e){
-			throw new IllegalArgumentException(BAD_FORMAT.format(new Object[]{flag}));
+			throw new HunspellException(BAD_FORMAT.format(new Object[]{flag}));
 		}
 	}
 
@@ -87,11 +88,11 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final String compoundRule) throws IllegalArgumentException{
+	private void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
 			final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new IllegalArgumentException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new HunspellException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 		}
 	}
 

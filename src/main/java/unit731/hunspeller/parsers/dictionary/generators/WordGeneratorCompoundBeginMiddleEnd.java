@@ -10,6 +10,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -32,10 +33,10 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException{
+	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
-			throw new IllegalArgumentException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new HunspellException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
 		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
@@ -84,7 +85,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
-				throw new IllegalArgumentException(MISSING_WORD.format(new Object[]{entry.getKey()}));
+				throw new HunspellException(MISSING_WORD.format(new Object[]{entry.getKey()}));
 	}
 
 }

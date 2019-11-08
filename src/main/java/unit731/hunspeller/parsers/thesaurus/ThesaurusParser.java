@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Undoable;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.memento.CaretakerInterface;
@@ -150,7 +151,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			//line should be a charset
 			try{ Charsets.toCharset(line); }
 			catch(final UnsupportedCharsetException e){
-				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+				throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 			}
 
 			while((line = br.readLine()) != null)
@@ -195,7 +196,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			final Supplier<Boolean> duplicatesDiscriminator){
 		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
+			throw new HunspellException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
 
 		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
@@ -209,14 +210,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
-			throw new IllegalArgumentException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
+			throw new HunspellException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
 
 		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(
+				throw new HunspellException(DUPLICATE_DETECTED.format(
 					new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
 		}
 

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.log.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
@@ -93,7 +94,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+				throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;

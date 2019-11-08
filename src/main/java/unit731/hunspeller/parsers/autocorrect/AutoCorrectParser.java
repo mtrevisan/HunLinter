@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
 import javax.xml.transform.OutputKeys;
@@ -65,7 +66,7 @@ public class AutoCorrectParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new IllegalArgumentException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
+			throw new HunspellException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
 		final List<Node> children = XMLParser.extractChildren(rootElement, node -> XMLParser.isElement(node, AUTO_CORRECT_BLOCK));
@@ -116,16 +117,16 @@ public class AutoCorrectParser{
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains("'") || incorrect.contains("\""))
-			throw new IllegalArgumentException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new HunspellException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
 		if(correct.contains("'") || correct.contains("\""))
-			throw new IllegalArgumentException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new HunspellException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
 
 		boolean forceInsertion = false;
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new IllegalArgumentException(DUPLICATE_DETECTED.format(
+				throw new HunspellException(DUPLICATE_DETECTED.format(
 					new Object[]{duplicates.stream().map(CorrectionEntry::toString).collect(Collectors.joining(", "))}));
 		}
 
