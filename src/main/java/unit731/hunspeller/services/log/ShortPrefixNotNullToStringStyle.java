@@ -22,6 +22,7 @@ public class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private Object readResolve(){
 		return SHORT_PREFIX_NOT_NULL_STYLE;
 	}
