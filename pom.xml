@@ -194,9 +194,6 @@
 		<!-- Jackson -->
 		<com.fasterxml.jackson.version>2.10.0</com.fasterxml.jackson.version>
 
-		<!-- Java-diff-utils -->
-		<io.github.java-diff-utils.version>4.4</io.github.java-diff-utils.version>
-
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
 
@@ -242,13 +239,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${com.fasterxml.jackson.version}</version>
-		</dependency>
-
-		<!-- Java-diff-utils -->
-		<dependency>
-			<groupId>io.github.java-diff-utils</groupId>
-			<artifactId>java-diff-utils</artifactId>
-			<version>${io.github.java-diff-utils.version}</version>
 		</dependency>
 
 		<!-- Memory usage -->

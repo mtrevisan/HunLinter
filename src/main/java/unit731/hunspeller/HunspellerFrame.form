@@ -722,17 +722,13 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="theScrollPane" pref="904" max="32767" attributes="0"/>
+                          <Component id="theScrollPane" pref="910" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="theMeaningsLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="theMeaningsTextField" max="32767" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="theAddButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="theUndoButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="theRedoButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="theSynonymsRecordedLabel" min="-2" max="-2" attributes="0"/>
@@ -752,11 +748,9 @@
                           <Component id="theMeaningsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="theMeaningsTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="theAddButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="theUndoButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="theRedoButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="theScrollPane" pref="173" max="32767" attributes="0"/>
+                      <Component id="theScrollPane" pref="175" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="theSynonymsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -828,26 +822,6 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JButton" name="theUndoButton">
-              <Properties>
-                <Property name="mnemonic" type="int" value="85"/>
-                <Property name="text" type="java.lang.String" value="Undo"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="theUndoButtonActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JButton" name="theRedoButton">
-              <Properties>
-                <Property name="mnemonic" type="int" value="82"/>
-                <Property name="text" type="java.lang.String" value="Redo"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="theRedoButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>

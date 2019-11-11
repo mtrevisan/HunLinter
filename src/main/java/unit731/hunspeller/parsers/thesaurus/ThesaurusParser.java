@@ -20,16 +20,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.DiffException;
-import com.github.difflib.patch.Patch;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -65,13 +61,6 @@ public class ThesaurusParser{
 
 	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
-	private final Undoable undoable;
-	private final MementoCaretaker caretaker = new MementoCaretaker();
-
-
-	public ThesaurusParser(final Undoable undoable){
-		this.undoable = undoable;
-	}
 
 	public ThesaurusDictionary getDictionary(){
 		return dictionary;
@@ -266,19 +255,7 @@ public class ThesaurusParser{
 		dictionary.clear();
 	}
 
-	public void save(final File theIndexFile, final File theDataFile) throws IOException, DiffException{
-		final Charset theDataCharset = FileHelper.determineCharset(theDataFile.toPath());
-		final List<String> theDataPreviousContent = Files.readAllLines(theDataFile.toPath(), theDataCharset);
-
-		saveIndexAndData(theIndexFile, theDataFile);
-
-		final List<String> theDataCurrentContent = Files.readAllLines(theDataFile.toPath(), StandardCharsets.UTF_8);
-		final Patch<String> dataPatch = DiffUtils.diff(theDataPreviousContent, theDataCurrentContent);
-
-		storeMemento(dataPatch);
-	}
-
-	private void saveIndexAndData(final File theIndexFile, final File theDataFile) throws IOException{
+	public void save(final File theIndexFile, final File theDataFile) throws IOException{
 		//sort the synonyms
 		dictionary.sort();
 
@@ -309,69 +286,6 @@ public class ThesaurusParser{
 				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
 			}
 		}
-	}
-
-	private void storeMemento(final Patch<String> dataPatch) throws IOException{
-		caretaker.pushMemento(dataPatch);
-
-		warnUndoable();
-	}
-
-	public boolean restorePreviousSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
-		boolean restored = false;
-		final Patch<String> memento = caretaker.popPreviousMemento();
-		if(memento != null){
-			restoreMemento(theIndexFile, theDataFile, memento);
-
-			warnUndoable();
-
-			restored = true;
-		}
-		return restored;
-	}
-
-	public boolean restoreNextSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
-		boolean restored = false;
-		final Patch<String> memento = caretaker.popNextMemento();
-		if(memento != null){
-			restoreMemento(theIndexFile, theDataFile, memento);
-
-			warnUndoable();
-
-			restored = true;
-		}
-		return restored;
-	}
-
-	//TODO restore memento
-	private void restoreMemento(final File theIndexFile, final File theDataFile, final Patch<String> memento)
-			throws IOException{
-//		final Charset charset = StandardCharsets.UTF_8;
-//		final List<String> theIndexContent = Files.readAllLines(theIndexFile.toPath(), charset);
-//		final List<String> theDataContent = Files.readAllLines(theDataFile.toPath(), charset);
-
-//		memento.getLeft().restore(theIndexContent);
-//		memento.getRight().restore(theDataContent);
-
-		//save index file
-//		FileHelper.saveFile(theIndexFile.toPath(), StringUtils.LF, charset, theIndexContent);
-		//save data file
-//		FileHelper.saveFile(theDataFile.toPath(), StringUtils.LF, charset, theDataContent);
-	}
-
-	private void warnUndoable(){
-		if(undoable != null){
-			undoable.onUndoChange(canUndo());
-			undoable.onRedoChange(canRedo());
-		}
-	}
-
-	public boolean canUndo(){
-		return caretaker.canUndo();
-	}
-
-	public boolean canRedo(){
-		return caretaker.canRedo();
 	}
 
 }

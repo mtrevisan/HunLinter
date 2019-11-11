@@ -61,7 +61,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.CompoundTableModel;
-import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.HunspellerTableModel;
 import unit731.hunspeller.gui.ProductionTableModel;
@@ -118,7 +117,7 @@ import unit731.hunspeller.services.RecentItems;
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
-public class HunspellerFrame extends JFrame implements ActionListener, PropertyChangeListener, Hunspellable, Undoable{
+public class HunspellerFrame extends JFrame implements ActionListener, PropertyChangeListener, Hunspellable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -269,8 +268,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable = new javax.swing.JTable();
       theSynonymsRecordedLabel = new javax.swing.JLabel();
       theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
-      theUndoButton = new javax.swing.JButton();
-      theRedoButton = new javax.swing.JButton();
       hypLayeredPane = new javax.swing.JLayeredPane();
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
@@ -654,32 +651,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theSynonymsRecordedOutputLabel.setText("...");
 
-      theUndoButton.setMnemonic('U');
-      theUndoButton.setText("Undo");
-      theUndoButton.setEnabled(false);
-      theUndoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theUndoButtonActionPerformed(evt);
-         }
-      });
-
-      theRedoButton.setMnemonic('R');
-      theRedoButton.setText("Redo");
-      theRedoButton.setEnabled(false);
-      theRedoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theRedoButtonActionPerformed(evt);
-         }
-      });
-
       theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theUndoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theRedoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout theLayeredPaneLayout = new javax.swing.GroupLayout(theLayeredPane);
       theLayeredPane.setLayout(theLayeredPaneLayout);
@@ -688,17 +665,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE)
+               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theMeaningsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(theMeaningsTextField)
                   .addGap(18, 18, 18)
-                  .addComponent(theAddButton)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theUndoButton)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theRedoButton))
+                  .addComponent(theAddButton))
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -712,11 +685,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theMeaningsLabel)
                .addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(theAddButton)
-               .addComponent(theUndoButton)
-               .addComponent(theRedoButton))
+               .addComponent(theAddButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theSynonymsRecordedLabel)
@@ -1769,32 +1740,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypDebouncer.call(this);
    }//GEN-LAST:event_hypWordTextFieldKeyReleased
 
-   private void theRedoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theRedoButtonActionPerformed
-      try{
-         if(backbone.restoreNextThesaurusSnapshot()){
-            updateSynonyms();
-
-            updateSynonymsCounter();
-         }
-      }
-      catch(final Exception e){
-         LOGGER.error("Something very bad happened while redoing changes to the thesaurus file", e);
-      }
-   }//GEN-LAST:event_theRedoButtonActionPerformed
-
-   private void theUndoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theUndoButtonActionPerformed
-      try{
-         if(backbone.restorePreviousThesaurusSnapshot()){
-            updateSynonyms();
-
-            updateSynonymsCounter();
-         }
-      }
-      catch(final Exception e){
-         LOGGER.error("Something very bad happened while undoing changes to the thesaurus file", e);
-      }
-   }//GEN-LAST:event_theUndoButtonActionPerformed
-
    private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
       try{
          //try adding the meanings
@@ -2173,7 +2118,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				backbone = new Backbone(packager, this, this);
+				backbone = new Backbone(packager, this);
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
@@ -2806,16 +2751,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	@Override
-	public void onUndoChange(boolean canUndo){
-		theUndoButton.setEnabled(canUndo);
-	}
-
-	@Override
-	public void onRedoChange(boolean canRedo){
-		theRedoButton.setEnabled(canRedo);
-	}
-
-	@Override
 	public void propertyChange(PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case "progress":
@@ -2960,12 +2895,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;
    private javax.swing.JTextField theMeaningsTextField;
-   private javax.swing.JButton theRedoButton;
    private javax.swing.JScrollPane theScrollPane;
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
    private javax.swing.JTable theTable;
-   private javax.swing.JButton theUndoButton;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;
    private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
    private javax.swing.JLayeredPane wexLayeredPane;
