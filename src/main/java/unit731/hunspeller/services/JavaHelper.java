@@ -9,15 +9,13 @@ import java.util.stream.Stream;
 public class JavaHelper{
 
 	public static <T> Stream<T> nullableToStream(final T[] array){
-		return Optional.ofNullable(array)
-			.map(Arrays::stream)
-			.orElseGet(Stream::empty);
+		return Optional.ofNullable(array).stream()
+			.flatMap(Arrays::stream);
 	}
 
 	public static <T> Stream<T> nullableToStream(final Collection<T> collection){
-		return Optional.ofNullable(collection)
-			.map(Collection::stream)
-			.orElseGet(Stream::empty);
+		return Optional.ofNullable(collection).stream()
+			.flatMap(Collection::stream);
 	}
 
 }

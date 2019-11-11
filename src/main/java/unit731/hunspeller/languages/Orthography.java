@@ -1,6 +1,5 @@
 package unit731.hunspeller.languages;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
@@ -9,7 +8,6 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
 
 

@@ -238,7 +238,7 @@ public class DictionaryEntry{
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
 		JavaHelper.nullableToStream(morphologicalFields)
-			.forEach(fun::accept);
+			.forEach(fun);
 	}
 
 	/**

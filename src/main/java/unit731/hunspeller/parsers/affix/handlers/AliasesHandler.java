@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.affix.handlers;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;

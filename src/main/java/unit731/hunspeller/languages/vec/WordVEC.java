@@ -94,7 +94,7 @@ public class WordVEC{
 
 	public static int countGraphemes(final String word){
 		return (int)IntStream.range(0, word.length())
-			.mapToObj(i -> word.charAt(i))
+			.mapToObj(word::charAt)
 			.filter(chr -> Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0)
 			.count();
 	}

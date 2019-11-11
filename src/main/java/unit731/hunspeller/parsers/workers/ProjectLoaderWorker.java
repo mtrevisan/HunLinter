@@ -66,7 +66,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			final List<StageFunction> stages = Arrays.asList(
 				() -> backbone.openAffixFile(packager.getAffixFile()),
 				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),
-				() -> backbone.getCorrectnessChecker(),
+				backbone::getCorrectnessChecker,
 				() -> backbone.prepareDictionaryFile(backbone.getDictionaryFile()),
 				() -> backbone.openAidFile(backbone.getAidFile()),
 				() -> backbone.openThesaurusFile(backbone.getThesaurusDataFile()),
