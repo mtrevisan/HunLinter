@@ -1,6 +1,5 @@
 package unit731.hunspeller;
 
-import com.github.difflib.algorithm.DiffException;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -77,12 +75,12 @@ public class Backbone implements FileChangeListener{
 	private final Packager packager;
 
 
-	public Backbone(final Packager packager, final Hunspellable hunspellable, final Undoable undoable){
+	public Backbone(final Packager packager, final Hunspellable hunspellable){
 		Objects.requireNonNull(packager);
 
 		affParser = new AffixParser();
 		aidParser = new AidParser();
-		theParser = new ThesaurusParser(undoable);
+		theParser = new ThesaurusParser();
 		acoParser = new AutoCorrectParser();
 		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
 		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);
@@ -306,7 +304,7 @@ public class Backbone implements FileChangeListener{
 		hypParser.save(hypFile);
 	}
 
-	public void storeThesaurusFiles() throws DiffException, IOException{
+	public void storeThesaurusFiles() throws IOException{
 		final File theIndexFile = getThesaurusIndexFile();
 		final File theDataFile = getThesaurusDataFile();
 		theParser.save(theIndexFile, theDataFile);
@@ -443,18 +441,6 @@ public class Backbone implements FileChangeListener{
 
 	public String addHyphenationRule(final String newRule, final HyphenationParser.Level level){
 		return hypParser.addRule(newRule, level);
-	}
-
-	public boolean restorePreviousThesaurusSnapshot() throws IOException{
-		final File theIndexFile = getThesaurusIndexFile();
-		final File theDataFile = getThesaurusDataFile();
-		return theParser.restorePreviousSnapshot(theIndexFile, theDataFile);
-	}
-
-	public boolean restoreNextThesaurusSnapshot() throws IOException{
-		final File theIndexFile = getThesaurusIndexFile();
-		final File theDataFile = getThesaurusDataFile();
-		return theParser.restoreNextSnapshot(theIndexFile, theDataFile);
 	}
 
 	public void createPackage(){
