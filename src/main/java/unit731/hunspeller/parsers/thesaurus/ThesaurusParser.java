@@ -267,20 +267,15 @@ public class ThesaurusParser{
 	}
 
 	public void save(final File theIndexFile, final File theDataFile) throws IOException, DiffException{
-		final Charset theIndexCharset = FileHelper.determineCharset(theIndexFile.toPath());
-		final List<String> theIndexPreviousContent = Files.readAllLines(theIndexFile.toPath(), theIndexCharset);
 		final Charset theDataCharset = FileHelper.determineCharset(theDataFile.toPath());
 		final List<String> theDataPreviousContent = Files.readAllLines(theDataFile.toPath(), theDataCharset);
 
 		saveIndexAndData(theIndexFile, theDataFile);
 
-		final Charset charset = StandardCharsets.UTF_8;
-		final List<String> theIndexCurrentContent = Files.readAllLines(theIndexFile.toPath(), charset);
-		final List<String> theDataCurrentContent = Files.readAllLines(theDataFile.toPath(), charset);
-		final Patch<String> indexPatch = DiffUtils.diff(theIndexPreviousContent, theIndexCurrentContent);
+		final List<String> theDataCurrentContent = Files.readAllLines(theDataFile.toPath(), StandardCharsets.UTF_8);
 		final Patch<String> dataPatch = DiffUtils.diff(theDataPreviousContent, theDataCurrentContent);
 
-		storeMemento(indexPatch, dataPatch);
+		storeMemento(dataPatch);
 	}
 
 	private void saveIndexAndData(final File theIndexFile, final File theDataFile) throws IOException{
@@ -316,19 +311,19 @@ public class ThesaurusParser{
 		}
 	}
 
-	private void storeMemento(final Patch<String> indexPatch, final Patch<String> dataPatch) throws IOException{
-		caretaker.pushMemento(Pair.of(indexPatch, dataPatch));
+	private void storeMemento(final Patch<String> dataPatch) throws IOException{
+		caretaker.pushMemento(dataPatch);
 
 		warnUndoable();
 	}
 
 	public boolean restorePreviousSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
 		boolean restored = false;
-		final Pair<Patch<String>, Patch<String>> memento = caretaker.popPreviousMemento();
+		final Patch<String> memento = caretaker.popPreviousMemento();
 		if(memento != null){
-			warnUndoable();
-
 			restoreMemento(theIndexFile, theDataFile, memento);
+
+			warnUndoable();
 
 			restored = true;
 		}
@@ -337,30 +332,31 @@ public class ThesaurusParser{
 
 	public boolean restoreNextSnapshot(final File theIndexFile, final File theDataFile) throws IOException{
 		boolean restored = false;
-		final Pair<Patch<String>, Patch<String>> memento = caretaker.popNextMemento();
+		final Patch<String> memento = caretaker.popNextMemento();
 		if(memento != null){
-			warnUndoable();
-
 			restoreMemento(theIndexFile, theDataFile, memento);
+
+			warnUndoable();
 
 			restored = true;
 		}
 		return restored;
 	}
 
-	private void restoreMemento(final File theIndexFile, final File theDataFile, final Pair<Patch<String>, Patch<String>> memento)
+	//TODO restore memento
+	private void restoreMemento(final File theIndexFile, final File theDataFile, final Patch<String> memento)
 			throws IOException{
-		final Charset charset = StandardCharsets.UTF_8;
-		final List<String> theIndexContent = Files.readAllLines(theIndexFile.toPath(), charset);
-		final List<String> theDataContent = Files.readAllLines(theDataFile.toPath(), charset);
+//		final Charset charset = StandardCharsets.UTF_8;
+//		final List<String> theIndexContent = Files.readAllLines(theIndexFile.toPath(), charset);
+//		final List<String> theDataContent = Files.readAllLines(theDataFile.toPath(), charset);
 
-		memento.getLeft().restore(theIndexContent);
-		memento.getRight().restore(theDataContent);
+//		memento.getLeft().restore(theIndexContent);
+//		memento.getRight().restore(theDataContent);
 
 		//save index file
-		FileHelper.saveFile(theIndexFile.toPath(), StringUtils.LF, charset, theIndexContent);
+//		FileHelper.saveFile(theIndexFile.toPath(), StringUtils.LF, charset, theIndexContent);
 		//save data file
-		FileHelper.saveFile(theDataFile.toPath(), StringUtils.LF, charset, theDataContent);
+//		FileHelper.saveFile(theDataFile.toPath(), StringUtils.LF, charset, theDataContent);
 	}
 
 	private void warnUndoable(){
