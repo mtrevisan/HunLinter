@@ -91,7 +91,7 @@ public class DictionaryParser{
 	}
 
 	private void calculateDictionaryBoundaries(){
-		try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
+		try(final BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
 			//skip line count
 			br.readLine();
 			int lineIndex = 1;

@@ -99,8 +99,7 @@ public class FileHelper{
 
 	public static Charset determineCharset(final Path path){
 		for(final Charset cs : HUNSPELL_CHARSETS){
-			try{
-				final BufferedReader reader = Files.newBufferedReader(path, cs);
+			try(final BufferedReader reader = Files.newBufferedReader(path, cs)){
 				reader.read();
 				return cs;
 			}
