@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -31,7 +32,7 @@ public class PatternHelper{
 
 	/**
 	 * Returns the delimiters along with the split elements
-	 * 
+	 *
 	 * @param delimitersRegex	regex stating the delimiters
 	 * @return	The pattern to be used to split a string
 	 */
