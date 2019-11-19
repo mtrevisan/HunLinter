@@ -196,7 +196,7 @@ public class HyphenationParser{
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
 
-			charset = readCharset(line);
+			charset = FileHelper.readCharset(line);
 
 			while((line = br.readLine()) != null){
 				line = removeComment(line);
@@ -238,15 +238,6 @@ public class HyphenationParser{
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
-	}
-
-	private Charset readCharset(final String charsetName){
-		try{
-			return Charset.forName(charsetName);
-		}
-		catch(final Exception e){
-			throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}));
-		}
 	}
 
 	private String extractLine(final LineNumberReader br) throws IOException{

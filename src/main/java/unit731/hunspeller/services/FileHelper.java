@@ -27,6 +27,7 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 
 
 public class FileHelper{
@@ -38,7 +39,8 @@ public class FileHelper{
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
 	static{
-		HUNSPELL_CHARSETS = Stream.of("UTF-8", "ISO_8859_1", "ISO_8859_2", "ISO_8859_3", "ISO_8859_4", "ISO_8859_5",
+		HUNSPELL_CHARSETS = Stream.of(
+				"UTF-8", "ISO_8859_1", "ISO_8859_2", "ISO_8859_3", "ISO_8859_4", "ISO_8859_5",
 				"ISO_8859_6", "ISO_8859_7", "ISO_8859_8", "ISO_8859_9", "ISO_8859_10", "ISO_8859_13", "ISO_8859_14", "ISO_8859_15",
 				"KOI8_R", "KOI8_U", "MICROSOFT_CP1251", "ISCII_DEVANAGARI")
 			.map(name -> {
@@ -97,6 +99,21 @@ public class FileHelper{
 		}
 	}
 
+	public static Charset readCharset(final String charsetName){
+		try{
+			final Charset cs = Charset.forName(charsetName);
+
+			//line should be a valid charset
+			if(!HUNSPELL_CHARSETS.contains(cs))
+				throw new Exception();
+
+			return cs;
+		}
+		catch(final Exception e){
+			throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}));
+		}
+	}
+
 	public static Charset determineCharset(final Path path){
 		for(final Charset cs : HUNSPELL_CHARSETS){
 			try(final BufferedReader reader = Files.newBufferedReader(path, cs)){
@@ -106,7 +123,9 @@ public class FileHelper{
 			catch(final IOException ignored){}
 		}
 
-		final String charsets = HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", "));
+		final String charsets = HUNSPELL_CHARSETS.stream()
+			.map(Charset::name)
+			.collect(Collectors.joining(", "));
 		throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charsets}));
 	}
 

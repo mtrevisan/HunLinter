@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -20,7 +19,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -80,11 +78,7 @@ public class ThesaurusParser{
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
 
-			//line should be a charset
-			try{ Charsets.toCharset(line); }
-			catch(final UnsupportedCharsetException e){
-				throw new HunspellException(WRONG_FILE_FORMAT.format(new Object[]{line}));
-			}
+			FileHelper.readCharset(line);
 
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty())
