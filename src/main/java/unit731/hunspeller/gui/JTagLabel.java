@@ -3,6 +3,8 @@ package unit731.hunspeller.gui;
 import javax.swing.*;
 
 
+//https://github.com/richardeigenmann/TagCloud
+//http://selectize.github.io/selectize.js/
 public class JTagLabel extends JLabel{
 
 	//TODO
