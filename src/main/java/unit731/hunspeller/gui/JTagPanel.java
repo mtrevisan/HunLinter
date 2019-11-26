@@ -10,8 +10,8 @@ public class JTagPanel extends JPanel{
 
 	private static final Color COLOR_BACKGROUND = new Color(222, 231, 247);
 	private static final Color COLOR_BORDER = new Color(202, 216, 242);
-	private static final Color COLOR_TEXT = new Color(119, 119, 119);
-	private static final Color COLOR_CLOSE = new Color(85, 85, 85);
+	private static final Color COLOR_TEXT = new Color(85, 85, 85);
+	private static final Color COLOR_CLOSE = new Color(119, 119, 119);
 
 	private static final String TEXT_CROSS_MARK = "\u274C";
 
@@ -62,7 +62,7 @@ public class JTagPanel extends JPanel{
 		graphics.setColor(COLOR_BORDER);
 		graphics.setStroke(new BasicStroke(BORDER_THICKNESS));
 		graphics.drawRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
-		//sets strokes to default
+		//reset strokes to default
 		graphics.setStroke(new BasicStroke());
 	}
 
