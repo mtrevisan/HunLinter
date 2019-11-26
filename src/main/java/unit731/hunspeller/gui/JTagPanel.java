@@ -1,6 +1,8 @@
 package unit731.hunspeller.gui;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 
@@ -9,6 +11,7 @@ import java.awt.*;
 public class JTagPanel extends JPanel{
 
 	private static final Color COLOR_BACKGROUND = new Color(222, 231, 247);
+	private static final Color COLOR_BORDER = new Color(202, 216, 242);
 	private static final Color COLOR_CLOSE = new Color(119, 119, 119);
 	private static final Color COLOR_TEXT = new Color(85, 85, 85);
 
@@ -22,6 +25,8 @@ public class JTagPanel extends JPanel{
 
 	public JTagPanel(final String text){
 		setLayout(new BorderLayout());
+		setOpaque(true);
+		setBorder(new LineBorder(COLOR_BORDER, 1));
 
 		final JLabel label = new JLabel(text);
 		label.setBackground(COLOR_BACKGROUND);
@@ -30,6 +35,7 @@ public class JTagPanel extends JPanel{
 
 		final JLabel close = new JLabel(TEXT_CROSS_MARK);
 		close.setOpaque(true);
+		label.setForeground(COLOR_CLOSE);
 		close.addMouseListener(new java.awt.event.MouseAdapter(){
 			public void mousePressed(java.awt.event.MouseEvent evt){
 				System.out.println("remove component " + this);
