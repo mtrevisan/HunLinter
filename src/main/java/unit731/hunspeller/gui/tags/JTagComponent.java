@@ -1,16 +1,12 @@
 package unit731.hunspeller.gui.tags;
 
-import unit731.hunspeller.services.JavaHelper;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 
 class JTagComponent extends JPanel{
@@ -30,13 +26,8 @@ class JTagComponent extends JPanel{
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
 
-	private final JPanel parent;
-
-
-	JTagComponent(final String text, final JPanel parent){
-		Objects.requireNonNull(parent);
-
-		this.parent = parent;
+	JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
+		Objects.requireNonNull(tagRemover);
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -54,10 +45,7 @@ class JTagComponent extends JPanel{
 		closeLabel.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mousePressed(final MouseEvent evt){
-				parent.remove(JTagComponent.this);
-
-				parent.repaint();
-				parent.revalidate();
+				tagRemover.accept(JTagComponent.this);
 			}
 
 			@Override
@@ -96,15 +84,6 @@ class JTagComponent extends JPanel{
 		graphics.drawRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		//reset strokes to default
 		graphics.setStroke(new BasicStroke());
-	}
-
-	public Set<String> getTags(){
-		return JavaHelper.nullableToStream(parent.getComponents())
-			.filter(comp -> comp instanceof JTagComponent)
-			.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
-			.filter(comp -> comp instanceof JLabel)
-			.map(comp -> ((JLabel)comp).getText())
-			.collect(Collectors.toSet());
 	}
 
 }
