@@ -64,6 +64,7 @@ public class JTagPanel extends JPanel{
 			}
 		});
 		final JPanel closePanel = new JPanel(new GridBagLayout());
+		closePanel.setOpaque(false);
 		closePanel.add(closeLabel);
 		ps = closeLabel.getPreferredSize();
 		closePanel.setBackground(COLOR_BACKGROUND);
