@@ -5,6 +5,8 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 
 //https://github.com/richardeigenmann/TagCloud
@@ -31,7 +33,9 @@ public class JTagPanel extends JPanel{
 	//on enter in a jtextfield, create and place the tag, remove the text just inserted
 	//on select and canc, remove the tag
 
-	public JTagPanel(final String text){
+	public JTagPanel(final String text, final Consumer<JTagPanel> tagRemover){
+		Objects.requireNonNull(tagRemover);
+
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
@@ -48,9 +52,7 @@ public class JTagPanel extends JPanel{
 		closeLabel.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mousePressed(MouseEvent evt){
-				System.out.println("remove component " + this);
-				//TODO
-//				Example.example.removecomp(JTagPanel.this);
+				tagRemover.accept(JTagPanel.this);
 			}
 
 			@Override
