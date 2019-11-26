@@ -1,8 +1,6 @@
 package unit731.hunspeller.gui;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 
@@ -17,6 +15,10 @@ public class JTagPanel extends JPanel{
 
 	private static final String TEXT_CROSS_MARK = "\u274C";
 
+	//values for horizontal and vertical radius of corner arcs
+	private static final Dimension CORNER_RADIUS = new Dimension(5, 5);
+	private static final int BORDER_THICKNESS = 1;
+
 
 	//TODO
 	//format GUI to look like `xgajho`
@@ -25,13 +27,10 @@ public class JTagPanel extends JPanel{
 
 	public JTagPanel(final String text){
 		setLayout(new BorderLayout());
-		setOpaque(true);
-		setBorder(new LineBorder(COLOR_BORDER, 1));
+		setOpaque(false);
 
 		final JLabel label = new JLabel(text);
-		label.setBackground(COLOR_BACKGROUND);
 		label.setForeground(COLOR_TEXT);
-		label.setOpaque(true);
 
 		final JLabel close = new JLabel(TEXT_CROSS_MARK);
 		close.setOpaque(true);
@@ -45,6 +44,24 @@ public class JTagPanel extends JPanel{
 		});
 		add(close, BorderLayout.EAST);
 		add(label, BorderLayout.WEST);
+	}
+
+	@Override
+	protected void paintComponent(final Graphics g){
+		super.paintComponent(g);
+
+		final int width = getWidth();
+		final int height = getHeight();
+		final Graphics2D graphics = (Graphics2D)g;
+		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		graphics.setColor(COLOR_BACKGROUND);
+		graphics.fillRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		graphics.setColor(COLOR_BORDER);
+		graphics.setStroke(new BasicStroke(BORDER_THICKNESS));
+		graphics.drawRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		//sets strokes to default
+		graphics.setStroke(new BasicStroke());
 	}
 
 }
