@@ -32,14 +32,17 @@ public class JTagPanel extends JPanel{
 
 		final JLabel label = new JLabel(text);
 		label.setForeground(COLOR_TEXT);
-		final Dimension ps = label.getPreferredSize();
-		//FIXME horizontal pad
+		Dimension ps = label.getPreferredSize();
 		label.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
+		label.setHorizontalAlignment(SwingConstants.CENTER);
 
 		final JLabel close = new JLabel(TEXT_CROSS_MARK);
 		final Font closeFont = close.getFont();
 		close.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
-		label.setForeground(COLOR_CLOSE);
+		close.setForeground(COLOR_CLOSE);
+		ps = close.getPreferredSize();
+		close.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
+		close.setHorizontalAlignment(SwingConstants.LEFT);
 		close.addMouseListener(new java.awt.event.MouseAdapter(){
 			public void mousePressed(java.awt.event.MouseEvent evt){
 				System.out.println("remove component " + this);
