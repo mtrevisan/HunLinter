@@ -14,18 +14,17 @@ import java.util.stream.Collectors;
 
 public class JTagPanel extends JPanel{
 
-	public JTagPanel(){
-		JTextField t = new JTextField("type here", 10);
-		Dimension ps = t.getPreferredSize();
-		int height = 40;
+	/**
+	 * @param text	The text to be displayed, or <code>null</code>
+	 */
+	public JTagPanel(final String text){
+		final JTextField t = new JTextField(text);
+		final Dimension ps = t.getPreferredSize();
+		final int height = 40;
 		t.setPreferredSize(new Dimension(ps.width, height));
-		setPreferredSize(new Dimension(400, height));
-		setLayout(new FlowLayout(1, 2, 2));
-		setBackground(Color.white);
-		setBorder(javax.swing.BorderFactory.createLineBorder(Color.magenta));
 		t.setBorder(null);
 		t.setOpaque(false);
-		JTagPanel parent = this;
+		final JTagPanel parent = this;
 		t.addKeyListener(new KeyAdapter(){
 			public void keyReleased(final KeyEvent evt){
 				final String s = t.getText();
@@ -40,6 +39,11 @@ public class JTagPanel extends JPanel{
 				}
 			}
 		});
+
+		setPreferredSize(new Dimension(400, height));
+//		setLayout(new FlowLayout(1, 2, 2));
+//		setBackground(Color.WHITE);
+//		setBorder(javax.swing.BorderFactory.createLineBorder(Color.magenta));
 
 		add(t);
 	}
