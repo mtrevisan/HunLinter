@@ -29,6 +29,7 @@ public class JTagPanel extends JPanel{
 		t.setOpaque(false);
 		final JTagPanel parent = this;
 		t.addKeyListener(new KeyAdapter(){
+			@Override
 			public void keyReleased(final KeyEvent evt){
 				final String text = t.getText();
 				if(StringUtils.isNotBlank(text)){
