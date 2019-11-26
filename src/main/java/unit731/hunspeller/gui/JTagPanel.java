@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 
 //https://github.com/richardeigenmann/TagCloud
@@ -28,13 +27,8 @@ public class JTagPanel extends JPanel{
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
 
-	//TODO
-	//format GUI to look like `xgajho`
-	//on enter in a jtextfield, create and place the tag, remove the text just inserted
-	//on select and canc, remove the tag
-
-	public JTagPanel(final String text, final Consumer<JTagPanel> tagRemover){
-		Objects.requireNonNull(tagRemover);
+	public JTagPanel(final String text, final JPanel parent){
+		Objects.requireNonNull(parent);
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -51,17 +45,20 @@ public class JTagPanel extends JPanel{
 		closeLabel.setForeground(COLOR_CLOSE);
 		closeLabel.addMouseListener(new MouseAdapter(){
 			@Override
-			public void mousePressed(MouseEvent evt){
-				tagRemover.accept(JTagPanel.this);
+			public void mousePressed(final MouseEvent evt){
+				parent.remove(JTagPanel.this);
+
+				parent.repaint();
+				parent.revalidate();
 			}
 
 			@Override
-			public void mouseEntered(MouseEvent evt){
+			public void mouseEntered(final MouseEvent evt){
 				closeLabel.setBorder(CLOSE_BORDER);
 			}
 
 			@Override
-			public void mouseExited(MouseEvent evt){
+			public void mouseExited(final MouseEvent evt){
 				closeLabel.setBorder(null);
 			}
 		});
