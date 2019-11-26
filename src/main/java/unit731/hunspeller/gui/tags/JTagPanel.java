@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 
 public class JTagPanel extends JPanel{
 
+	private final Object synchronizer = new Object();
+
+
 	/**
 	 * @param text	The text to be displayed, or <code>null</code>
 	 */
@@ -29,15 +32,17 @@ public class JTagPanel extends JPanel{
 			public void keyReleased(final KeyEvent evt){
 				final String text = t.getText();
 				if(StringUtils.isNotBlank(text)){
-					final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
-					parent.add(tag, parent.getComponentCount() - 1);
+					synchronized(synchronizer){
+						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
+						parent.add(tag, parent.getComponentCount() - 1);
 
-					//reset input
-					t.setText(StringUtils.EMPTY);
+						//reset input
+						t.setText(StringUtils.EMPTY);
 
-					//force repaint of the component
-					repaint();
-					revalidate();
+						//force repaint of the component
+						repaint();
+						revalidate();
+					}
 				}
 			}
 		});
@@ -59,12 +64,14 @@ public class JTagPanel extends JPanel{
 	}
 
 	public Set<String> getTags(){
-		return JavaHelper.nullableToStream(getComponents())
-			.filter(comp -> comp instanceof JTagComponent)
-			.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
-			.filter(comp -> comp instanceof JLabel)
-			.map(comp -> ((JLabel)comp).getText())
-			.collect(Collectors.toSet());
+		synchronized(synchronizer){
+			return JavaHelper.nullableToStream(getComponents())
+				.filter(comp -> comp instanceof JTagComponent)
+				.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
+				.filter(comp -> comp instanceof JLabel)
+				.map(comp -> ((JLabel)comp).getText())
+				.collect(Collectors.toSet());
+		}
 	}
 
 
