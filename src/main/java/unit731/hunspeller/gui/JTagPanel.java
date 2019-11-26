@@ -1,15 +1,18 @@
 package unit731.hunspeller.gui;
 
+import unit731.hunspeller.services.JavaHelper;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
-//https://github.com/richardeigenmann/TagCloud
-//http://selectize.github.io/selectize.js/
 public class JTagPanel extends JPanel{
 
 	private static final Color COLOR_BACKGROUND = new Color(222, 231, 247);
@@ -27,8 +30,13 @@ public class JTagPanel extends JPanel{
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
 
+	private final JPanel parent;
+
+
 	public JTagPanel(final String text, final JPanel parent){
 		Objects.requireNonNull(parent);
+
+		this.parent = parent;
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -89,6 +97,15 @@ public class JTagPanel extends JPanel{
 		graphics.drawRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		//reset strokes to default
 		graphics.setStroke(new BasicStroke());
+	}
+
+	public Set<String> getTags(){
+		return JavaHelper.nullableToStream(parent.getComponents())
+			.filter(comp -> comp instanceof JTagPanel)
+			.flatMap(comp -> Arrays.stream(((JTagPanel)comp).getComponents()))
+			.filter(comp -> comp instanceof JLabel)
+			.map(comp -> ((JLabel)comp).getText())
+			.collect(Collectors.toSet());
 	}
 
 }
