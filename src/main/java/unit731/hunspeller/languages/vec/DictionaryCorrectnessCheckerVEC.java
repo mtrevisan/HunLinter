@@ -289,7 +289,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void finalSonorizationCheck(final Production production){
 		//FIXME
-//		if(!production.hasProductionRules()){
+//		if(!production.hasProductionRules() && !production.getWord().contains("–")){
 //			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(finalSonorizationFlag);
 //			final boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.GRAPHEME_L_STROKE)
 //				&& affixData.isAffixProductive(production.getWord(), finalSonorizationFlag));
