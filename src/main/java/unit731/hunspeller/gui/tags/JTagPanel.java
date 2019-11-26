@@ -42,10 +42,11 @@ public class JTagPanel extends JPanel{
 			}
 		});
 
+		//FIXME
 		setPreferredSize(new Dimension(400, height));
-//		setLayout(new FlowLayout(1, 2, 2));
-//		setBackground(Color.WHITE);
-//		setBorder(javax.swing.BorderFactory.createLineBorder(Color.magenta));
+		setLayout(new FlowLayout(1, 2, 2));
+		setBackground(UIManager.getColor("TextArea.background"));
+		setBorder(javax.swing.BorderFactory.createLineBorder(Color.BLACK));
 
 		add(t);
 	}
