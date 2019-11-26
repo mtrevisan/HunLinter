@@ -1,7 +1,10 @@
 package unit731.hunspeller.gui;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 //https://github.com/richardeigenmann/TagCloud
@@ -20,6 +23,8 @@ public class JTagPanel extends JPanel{
 	private static final int BORDER_THICKNESS = 1;
 	private static final int PAD = 3;
 
+	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
+
 
 	//TODO
 	//format GUI to look like `xgajho`
@@ -30,29 +35,42 @@ public class JTagPanel extends JPanel{
 		setLayout(new BorderLayout());
 		setOpaque(false);
 
-		final JLabel label = new JLabel(text);
-		label.setForeground(COLOR_TEXT);
-		Dimension ps = label.getPreferredSize();
-		label.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		final JLabel textLabel = new JLabel(text);
+		textLabel.setForeground(COLOR_TEXT);
+		Dimension ps = textLabel.getPreferredSize();
+		textLabel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
+		textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-		final JLabel close = new JLabel(TEXT_CROSS_MARK);
-		final Font closeFont = close.getFont();
-		close.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
-		close.setForeground(COLOR_CLOSE);
-		ps = close.getPreferredSize();
-		close.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
-		close.setHorizontalAlignment(SwingConstants.LEFT);
-		close.addMouseListener(new java.awt.event.MouseAdapter(){
-			public void mousePressed(java.awt.event.MouseEvent evt){
+		final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
+		final Font closeFont = closeLabel.getFont();
+		closeLabel.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
+		closeLabel.setForeground(COLOR_CLOSE);
+		closeLabel.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mousePressed(MouseEvent evt){
 				System.out.println("remove component " + this);
 				//TODO
 //				Example.example.removecomp(JTagPanel.this);
 			}
-		});
 
-		add(label, BorderLayout.WEST);
-		add(close, BorderLayout.EAST);
+			@Override
+			public void mouseEntered(MouseEvent evt){
+				closeLabel.setBorder(CLOSE_BORDER);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent evt){
+				closeLabel.setBorder(null);
+			}
+		});
+		final JPanel closePanel = new JPanel(new GridBagLayout());
+		closePanel.add(closeLabel);
+		ps = closeLabel.getPreferredSize();
+		closePanel.setBackground(COLOR_BACKGROUND);
+		closePanel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
+
+		add(textLabel, BorderLayout.WEST);
+		add(closePanel, BorderLayout.EAST);
 	}
 
 	@Override
