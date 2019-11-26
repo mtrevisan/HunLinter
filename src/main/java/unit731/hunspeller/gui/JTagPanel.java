@@ -18,6 +18,7 @@ public class JTagPanel extends JPanel{
 	//values for horizontal and vertical radius of corner arcs
 	private static final Dimension CORNER_RADIUS = new Dimension(5, 5);
 	private static final int BORDER_THICKNESS = 1;
+	private static final int PAD = 3;
 
 
 	//TODO
@@ -31,6 +32,9 @@ public class JTagPanel extends JPanel{
 
 		final JLabel label = new JLabel(text);
 		label.setForeground(COLOR_TEXT);
+		final Dimension ps = label.getPreferredSize();
+		//FIXME horizontal pad
+		label.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
 
 		final JLabel close = new JLabel(TEXT_CROSS_MARK);
 		final Font closeFont = close.getFont();
