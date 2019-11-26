@@ -74,7 +74,6 @@ public class JTagPanel extends JPanel{
 		closePanel.setOpaque(false);
 		closePanel.add(closeLabel);
 		ps = closeLabel.getPreferredSize();
-		closePanel.setBackground(COLOR_BACKGROUND);
 		closePanel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
 
 		add(textLabel, BorderLayout.WEST);
