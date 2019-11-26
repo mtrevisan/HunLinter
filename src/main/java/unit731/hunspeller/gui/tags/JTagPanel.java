@@ -83,7 +83,6 @@ public class JTagPanel extends JPanel{
 		catch(final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){}
 
 		class JTagPanelExample extends JFrame{
-
 			public JTagPanelExample(){
 				setSize(new Dimension(500, 180));
 				GridBagLayout layout = new GridBagLayout();
