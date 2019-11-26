@@ -67,4 +67,32 @@ public class JTagPanel extends JPanel{
 			.collect(Collectors.toSet());
 	}
 
+
+	public static void main(String[] args){
+		try{
+			final String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
+			UIManager.setLookAndFeel(lookAndFeelName);
+		}
+		catch(final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){}
+
+		class JTagPanelExample extends JFrame{
+
+			public JTagPanelExample(){
+				setSize(new Dimension(500, 180));
+				GridBagLayout layout = new GridBagLayout();
+				GridBagConstraints c = new GridBagConstraints();
+				setLayout(layout);
+				c.gridx = 0;
+				c.gridy = 0;
+
+				JPanel panel = new JTagPanel("type");
+				add(panel, c);
+				setVisible(true);
+			}
+		}
+
+		//create and display the form
+		EventQueue.invokeLater(() -> (new JTagPanelExample()).setVisible(true));
+	}
+
 }
