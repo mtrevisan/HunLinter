@@ -27,13 +27,15 @@ public class JTagPanel extends JPanel{
 		final JTagPanel parent = this;
 		t.addKeyListener(new KeyAdapter(){
 			public void keyReleased(final KeyEvent evt){
-				final String s = t.getText();
-				if(s.length() > 0){
-					final JTagComponent tagp1 = new JTagComponent(s, parent::removeTag);
-					parent.add(tagp1, parent.getComponentCount() - 1);
+				final String text = t.getText();
+				if(StringUtils.isNotBlank(text)){
+					final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
+					parent.add(tag, parent.getComponentCount() - 1);
 
+					//reset input
 					t.setText(StringUtils.EMPTY);
 
+					//force repaint of the component
 					repaint();
 					revalidate();
 				}
