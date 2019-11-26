@@ -33,7 +33,8 @@ public class JTagPanel extends JPanel{
 		label.setForeground(COLOR_TEXT);
 
 		final JLabel close = new JLabel(TEXT_CROSS_MARK);
-		close.setOpaque(true);
+		final Font closeFont = close.getFont();
+		close.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
 		label.setForeground(COLOR_CLOSE);
 		close.addMouseListener(new java.awt.event.MouseAdapter(){
 			public void mousePressed(java.awt.event.MouseEvent evt){
@@ -42,8 +43,9 @@ public class JTagPanel extends JPanel{
 //				Example.example.removecomp(JTagPanel.this);
 			}
 		});
-		add(close, BorderLayout.EAST);
+
 		add(label, BorderLayout.WEST);
+		add(close, BorderLayout.EAST);
 	}
 
 	@Override
