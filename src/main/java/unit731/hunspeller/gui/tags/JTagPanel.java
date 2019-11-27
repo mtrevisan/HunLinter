@@ -17,23 +17,10 @@ public class JTagPanel extends JPanel{
 	private final Object synchronizer = new Object();
 
 
-	public JTagPanel(){
-		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 4));
-//		setLayout(new GridBagLayout());
-//		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-//		add(Box.createRigidArea(new Dimension(4, 0)));
-
-//		add(new JButton("a"));
-//		add(new JButton("b"));
-//		add(new JTagComponent("a", this::removeTag));
-//		add(new JTagComponent("b", this::removeTag));
-
-//		final JTextArea t = new JTextArea();
-//		t.setLineWrap(true);
-//		t.setWrapStyleWord(true);
+	public JTagPanel(final int width, final int lines){
 		final JTextField t = new JTextField();
 		final Dimension ps = t.getPreferredSize();
-		t.setPreferredSize(new Dimension(ps.width, ps.height * 2 * 16 / 10));
+		t.setPreferredSize(new Dimension(ps.width + 1, ps.height));
 		t.setBorder(null);
 		t.setOpaque(false);
 		final JTagPanel parent = this;
@@ -44,9 +31,7 @@ public class JTagPanel extends JPanel{
 				if(StringUtils.isNotBlank(text)){
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
-//tag.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 						parent.add(tag, parent.getComponentCount() - 1);
-//						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
 						//reset input
 						t.setText(StringUtils.EMPTY);
@@ -59,8 +44,8 @@ public class JTagPanel extends JPanel{
 			}
 		});
 
-		//FIXME
-		setPreferredSize(new Dimension(400, ps.height * 2 * 16 / 10));
+		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 4));
+		setPreferredSize(new Dimension(width, ps.height * lines * 16 / 10));
 		setBackground(UIManager.getColor("TextArea.background"));
 
 		add(t);
@@ -101,7 +86,7 @@ public class JTagPanel extends JPanel{
 				gbc.gridx = 0;
 				gbc.gridy = 0;
 
-				JPanel panel = new JTagPanel();
+				JPanel panel = new JTagPanel(400, 3);
 				add(panel, gbc);
 
 				setVisible(true);
