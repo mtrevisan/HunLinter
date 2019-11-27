@@ -21,10 +21,15 @@ public class JTagPanel extends JPanel{
 	 * @param text	The text to be displayed, or <code>null</code>
 	 */
 	public JTagPanel(final String text){
-		final JTextField t = new JTextField(text);
+		setLayout(new GridBagLayout());
+//		final GridBagConstraints gbc = new GridBagConstraints();
+//		setLayout(new GridLayout(2,10));
+
+		final JTextArea t = new JTextArea(text);
+		t.setLineWrap(true);
+		t.setWrapStyleWord(true);
 		final Dimension ps = t.getPreferredSize();
-		final int height = 32;
-		t.setPreferredSize(new Dimension(ps.width, height));
+		t.setPreferredSize(new Dimension(ps.width, ps.height * 2 * 16 / 10));
 		t.setBorder(null);
 		t.setOpaque(false);
 		final JTagPanel parent = this;
@@ -49,10 +54,9 @@ public class JTagPanel extends JPanel{
 		});
 
 		//FIXME
-		setPreferredSize(new Dimension(400, height));
-		setLayout(new FlowLayout(1, 2, 2));
+		setPreferredSize(new Dimension(400, ps.height * 2 * 16 / 10));
+//		setLayout(new FlowLayout(1, 2, 2));
 		setBackground(UIManager.getColor("TextArea.background"));
-		setBorder(javax.swing.BorderFactory.createLineBorder(Color.BLACK));
 
 		add(t);
 	}
@@ -87,13 +91,13 @@ public class JTagPanel extends JPanel{
 			public JTagPanelExample(){
 				setSize(new Dimension(500, 180));
 				GridBagLayout layout = new GridBagLayout();
-				GridBagConstraints c = new GridBagConstraints();
+				GridBagConstraints gbc = new GridBagConstraints();
 				setLayout(layout);
-				c.gridx = 0;
-				c.gridy = 0;
+				gbc.gridx = 0;
+				gbc.gridy = 0;
 
 				JPanel panel = new JTagPanel("type");
-				add(panel, c);
+				add(panel, gbc);
 				setVisible(true);
 			}
 		}
