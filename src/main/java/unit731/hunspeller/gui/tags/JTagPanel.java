@@ -21,9 +21,6 @@ public class JTagPanel extends JPanel{
 	 * @param text	The text to be displayed, or <code>null</code>
 	 */
 	public JTagPanel(final String text){
-//		setLayout(new GridBagLayout());
-//		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-//		add(Box.createRigidArea(new Dimension(4, 0)));
 		final FlowLayout lay = new FlowLayout(FlowLayout.LEADING, 2, 4);
 		setLayout(lay);
 
@@ -43,7 +40,6 @@ public class JTagPanel extends JPanel{
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
 						parent.add(tag, parent.getComponentCount() - 1);
-//						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
 						//reset input
 						t.setText(StringUtils.EMPTY);
