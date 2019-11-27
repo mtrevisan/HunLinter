@@ -23,12 +23,15 @@ public class JTagPanel extends JPanel{
 //		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 //		add(Box.createRigidArea(new Dimension(4, 0)));
 
+//		add(new JButton("a"));
+//		add(new JButton("b"));
 //		add(new JTagComponent("a", this::removeTag));
 //		add(new JTagComponent("b", this::removeTag));
 
-		final JTextArea t = new JTextArea();
-		t.setLineWrap(true);
-		t.setWrapStyleWord(true);
+//		final JTextArea t = new JTextArea();
+//		t.setLineWrap(true);
+//		t.setWrapStyleWord(true);
+		final JTextField t = new JTextField();
 		final Dimension ps = t.getPreferredSize();
 		t.setPreferredSize(new Dimension(ps.width, ps.height * 2 * 16 / 10));
 		t.setBorder(null);
@@ -100,6 +103,7 @@ public class JTagPanel extends JPanel{
 
 				JPanel panel = new JTagPanel();
 				add(panel, gbc);
+
 				setVisible(true);
 			}
 		}
