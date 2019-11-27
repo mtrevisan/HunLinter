@@ -24,8 +24,7 @@ public class JTagPanel extends JPanel{
 //		setLayout(new GridBagLayout());
 //		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 //		add(Box.createRigidArea(new Dimension(4, 0)));
-		final FlowLayout lay = new FlowLayout(1, 2, 4);
-		lay.setAlignment(FlowLayout.LEADING);
+		final FlowLayout lay = new FlowLayout(FlowLayout.LEADING, 2, 4);
 		setLayout(lay);
 
 		final JTextArea t = new JTextArea(text);
