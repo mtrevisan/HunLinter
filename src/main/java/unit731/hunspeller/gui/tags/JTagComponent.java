@@ -31,15 +31,12 @@ class JTagComponent extends JPanel{
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
-//setBorder(CLOSE_BORDER);
 
 		final JLabel textLabel = new JLabel(text);
 		textLabel.setForeground(COLOR_TEXT);
 		Dimension ps = textLabel.getPreferredSize();
 		final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 		textLabel.setPreferredSize(textLabelSize);
-//textLabel.setMinimumSize(textLabelSize);
-//textLabel.setMaximumSize(textLabelSize);
 		textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
@@ -67,14 +64,7 @@ class JTagComponent extends JPanel{
 		ps = closeLabel.getPreferredSize();
 		final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 		closePanel.setPreferredSize(closePanelSize);
-//closePanel.setMinimumSize(closePanelSize);
-//closePanel.setMaximumSize(closePanelSize);
 		closePanel.add(closeLabel);
-
-//		final Dimension componentSize = new Dimension(textLabelSize.width + closePanelSize.width, textLabelSize.height);
-//		setPreferredSize(componentSize);
-//setMinimumSize(componentSize);
-//setMaximumSize(componentSize);
 
 		add(textLabel, BorderLayout.WEST);
 		add(closePanel, BorderLayout.EAST);
@@ -84,16 +74,16 @@ class JTagComponent extends JPanel{
 	protected void paintComponent(final Graphics g){
 		super.paintComponent(g);
 
-		final int width = getWidth();
-		final int height = getHeight() - PAD * 2;
+		final int width = getWidth() - 1;
+		final int height = getHeight() - PAD * 2 - 1;
 		final Graphics2D graphics = (Graphics2D)g;
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		graphics.setColor(COLOR_BACKGROUND);
-		graphics.fillRoundRect(0, PAD, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		graphics.fillRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		graphics.setColor(COLOR_BORDER);
 		graphics.setStroke(new BasicStroke(BORDER_THICKNESS));
-		graphics.drawRoundRect(0, PAD, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		graphics.drawRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		//reset strokes to default
 		graphics.setStroke(new BasicStroke());
 	}

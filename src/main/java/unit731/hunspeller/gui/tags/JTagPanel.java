@@ -41,6 +41,7 @@ public class JTagPanel extends JPanel{
 				if(StringUtils.isNotBlank(text)){
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
+//tag.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 						parent.add(tag, parent.getComponentCount() - 1);
 //						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
