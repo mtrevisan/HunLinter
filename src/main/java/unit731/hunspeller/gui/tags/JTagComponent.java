@@ -34,8 +34,8 @@ class JTagComponent extends JPanel{
 
 		final JLabel textLabel = new JLabel(text);
 		textLabel.setForeground(COLOR_TEXT);
-		final Dimension ps = textLabel.getPreferredSize();
-		textLabel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
+		Dimension ps = textLabel.getPreferredSize();
+		textLabel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 4));
 		textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
@@ -60,6 +60,8 @@ class JTagComponent extends JPanel{
 		});
 		final JPanel closePanel = new JPanel(new GridBagLayout());
 		closePanel.setOpaque(false);
+		ps = closeLabel.getPreferredSize();
+		closePanel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 4));
 		closePanel.add(closeLabel);
 
 		add(textLabel, BorderLayout.WEST);
@@ -71,15 +73,15 @@ class JTagComponent extends JPanel{
 		super.paintComponent(g);
 
 		final int width = getWidth();
-		final int height = getHeight();
+		final int height = getHeight() - PAD * 2;
 		final Graphics2D graphics = (Graphics2D)g;
 		graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		graphics.setColor(COLOR_BACKGROUND);
-		graphics.fillRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		graphics.fillRoundRect(0, PAD, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		graphics.setColor(COLOR_BORDER);
 		graphics.setStroke(new BasicStroke(BORDER_THICKNESS));
-		graphics.drawRoundRect(0, 0, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
+		graphics.drawRoundRect(0, PAD, width - 1, height - 1, CORNER_RADIUS.width, CORNER_RADIUS.height);
 		//reset strokes to default
 		graphics.setStroke(new BasicStroke());
 	}

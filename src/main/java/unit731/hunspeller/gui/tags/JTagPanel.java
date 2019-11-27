@@ -23,6 +23,7 @@ public class JTagPanel extends JPanel{
 	public JTagPanel(final String text){
 //		setLayout(new GridBagLayout());
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		add(Box.createRigidArea(new Dimension(4, 0)), getComponentCount() - 1);
 //		final GridBagConstraints gbc = new GridBagConstraints();
 //		setLayout(new GridLayout(2,10));
 
@@ -42,7 +43,7 @@ public class JTagPanel extends JPanel{
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
 						parent.add(tag, parent.getComponentCount() - 1);
-						parent.add(Box.createRigidArea(new Dimension(4, 2)), parent.getComponentCount() - 1);
+						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
 						//reset input
 						t.setText(StringUtils.EMPTY);
