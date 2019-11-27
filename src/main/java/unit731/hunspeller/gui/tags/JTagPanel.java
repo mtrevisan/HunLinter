@@ -22,10 +22,11 @@ public class JTagPanel extends JPanel{
 	 */
 	public JTagPanel(final String text){
 //		setLayout(new GridBagLayout());
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-		add(Box.createRigidArea(new Dimension(4, 0)), getComponentCount() - 1);
-//		final GridBagConstraints gbc = new GridBagConstraints();
-//		setLayout(new GridLayout(2,10));
+//		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+//		add(Box.createRigidArea(new Dimension(4, 0)));
+		final FlowLayout lay = new FlowLayout(1, 2, 4);
+		lay.setAlignment(FlowLayout.LEADING);
+		setLayout(lay);
 
 		final JTextArea t = new JTextArea(text);
 		t.setLineWrap(true);
@@ -43,7 +44,7 @@ public class JTagPanel extends JPanel{
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
 						parent.add(tag, parent.getComponentCount() - 1);
-						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
+//						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
 						//reset input
 						t.setText(StringUtils.EMPTY);
@@ -58,7 +59,6 @@ public class JTagPanel extends JPanel{
 
 		//FIXME
 		setPreferredSize(new Dimension(400, ps.height * 2 * 16 / 10));
-//		setLayout(new FlowLayout(1, 2, 2));
 		setBackground(UIManager.getColor("TextArea.background"));
 
 		add(t);
