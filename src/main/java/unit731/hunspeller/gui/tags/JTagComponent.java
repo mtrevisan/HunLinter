@@ -34,7 +34,7 @@ class JTagComponent extends JPanel{
 
 		final JLabel textLabel = new JLabel(text);
 		textLabel.setForeground(COLOR_TEXT);
-		Dimension ps = textLabel.getPreferredSize();
+		final Dimension ps = textLabel.getPreferredSize();
 		textLabel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
 		textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -61,7 +61,6 @@ class JTagComponent extends JPanel{
 		final JPanel closePanel = new JPanel(new GridBagLayout());
 		closePanel.setOpaque(false);
 		closePanel.add(closeLabel);
-		ps = closeLabel.getPreferredSize();
 		closePanel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
 
 		add(textLabel, BorderLayout.WEST);

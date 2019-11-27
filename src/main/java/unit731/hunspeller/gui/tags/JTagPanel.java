@@ -23,7 +23,7 @@ public class JTagPanel extends JPanel{
 	public JTagPanel(final String text){
 		final JTextField t = new JTextField(text);
 		final Dimension ps = t.getPreferredSize();
-		final int height = 40;
+		final int height = 32;
 		t.setPreferredSize(new Dimension(ps.width, height));
 		t.setBorder(null);
 		t.setOpaque(false);
