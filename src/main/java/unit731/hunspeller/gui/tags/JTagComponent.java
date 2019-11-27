@@ -61,7 +61,6 @@ class JTagComponent extends JPanel{
 		final JPanel closePanel = new JPanel(new GridBagLayout());
 		closePanel.setOpaque(false);
 		closePanel.add(closeLabel);
-		closePanel.setPreferredSize(new Dimension(ps.width + PAD * 2, ps.height + PAD * 2));
 
 		add(textLabel, BorderLayout.WEST);
 		add(closePanel, BorderLayout.EAST);
