@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,9 +37,7 @@ public class JTagPanel extends JPanel{
 						//reset input
 						t.setText(StringUtils.EMPTY);
 
-						//force repaint of the component
-						repaint();
-						revalidate();
+						forceRepaint();
 					}
 				}
 			}
@@ -54,6 +53,21 @@ public class JTagPanel extends JPanel{
 	private void removeTag(final JTagComponent tag){
 		remove(tag);
 
+		forceRepaint();
+	}
+
+	public void setTags(final List<String> tags){
+		synchronized(synchronizer){
+			for(final String tag : tags){
+				final JTagComponent component = new JTagComponent(tag, this::removeTag);
+				add(component, getComponentCount() - 1);
+			}
+
+			forceRepaint();
+		}
+	}
+
+	private void forceRepaint(){
 		repaint();
 		revalidate();
 	}
@@ -86,7 +100,8 @@ public class JTagPanel extends JPanel{
 				gbc.gridx = 0;
 				gbc.gridy = 0;
 
-				JPanel panel = new JTagPanel(400, 3);
+				JTagPanel panel = new JTagPanel(400, 3);
+				panel.setTags(Arrays.asList("a", "b", "c"));
 				add(panel, gbc);
 
 				setVisible(true);
