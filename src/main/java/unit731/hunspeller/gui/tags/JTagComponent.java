@@ -31,12 +31,15 @@ class JTagComponent extends JPanel{
 
 		setLayout(new BorderLayout());
 		setOpaque(false);
+//setBorder(CLOSE_BORDER);
 
 		final JLabel textLabel = new JLabel(text);
 		textLabel.setForeground(COLOR_TEXT);
 		Dimension ps = textLabel.getPreferredSize();
 		final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 		textLabel.setPreferredSize(textLabelSize);
+//textLabel.setMinimumSize(textLabelSize);
+//textLabel.setMaximumSize(textLabelSize);
 		textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 		final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
@@ -64,12 +67,14 @@ class JTagComponent extends JPanel{
 		ps = closeLabel.getPreferredSize();
 		final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 		closePanel.setPreferredSize(closePanelSize);
+//closePanel.setMinimumSize(closePanelSize);
+//closePanel.setMaximumSize(closePanelSize);
 		closePanel.add(closeLabel);
 
-		final Dimension componentSize = new Dimension(textLabelSize.width + closePanelSize.width, textLabelSize.height);
-		setPreferredSize(componentSize);
-		setMinimumSize(componentSize);
-		setMaximumSize(componentSize);
+//		final Dimension componentSize = new Dimension(textLabelSize.width + closePanelSize.width, textLabelSize.height);
+//		setPreferredSize(componentSize);
+//setMinimumSize(componentSize);
+//setMaximumSize(componentSize);
 
 		add(textLabel, BorderLayout.WEST);
 		add(closePanel, BorderLayout.EAST);

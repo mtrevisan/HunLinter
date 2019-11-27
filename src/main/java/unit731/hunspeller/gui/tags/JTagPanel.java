@@ -17,14 +17,16 @@ public class JTagPanel extends JPanel{
 	private final Object synchronizer = new Object();
 
 
-	/**
-	 * @param text	The text to be displayed, or <code>null</code>
-	 */
-	public JTagPanel(final String text){
-		final FlowLayout lay = new FlowLayout(FlowLayout.LEADING, 2, 4);
-		setLayout(lay);
+	public JTagPanel(){
+		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 4));
+//		setLayout(new GridBagLayout());
+//		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+//		add(Box.createRigidArea(new Dimension(4, 0)));
 
-		final JTextArea t = new JTextArea(text);
+//		add(new JTagComponent("a", this::removeTag));
+//		add(new JTagComponent("b", this::removeTag));
+
+		final JTextArea t = new JTextArea();
 		t.setLineWrap(true);
 		t.setWrapStyleWord(true);
 		final Dimension ps = t.getPreferredSize();
@@ -40,6 +42,7 @@ public class JTagPanel extends JPanel{
 					synchronized(synchronizer){
 						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
 						parent.add(tag, parent.getComponentCount() - 1);
+//						parent.add(Box.createRigidArea(new Dimension(4, 0)), parent.getComponentCount() - 1);
 
 						//reset input
 						t.setText(StringUtils.EMPTY);
@@ -94,7 +97,7 @@ public class JTagPanel extends JPanel{
 				gbc.gridx = 0;
 				gbc.gridy = 0;
 
-				JPanel panel = new JTagPanel("type");
+				JPanel panel = new JTagPanel();
 				add(panel, gbc);
 				setVisible(true);
 			}
