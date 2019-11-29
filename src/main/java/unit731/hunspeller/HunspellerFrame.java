@@ -1580,6 +1580,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//... and save the files
 			backbone.storeThesaurusFiles();
+
+
+			//redo filtering, that is re-set the state of the button (it may have changed)
+			final String unmodifiedSearchText = theMeaningsTextField.getText();
+			if(StringUtils.isNotBlank(unmodifiedSearchText)){
+				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
+				final List<String> meanings = Arrays.asList(pair.getRight());
+				final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+				theAddButton.setEnabled(!alreadyContained);
+			}
 		}
 		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
