@@ -94,4 +94,8 @@ public class ExceptionsParser{
 		dictionary.clear();
 	}
 
+	public void save(final List<String> tags){
+		//TODO
+	}
+
 }

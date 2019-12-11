@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
+import unit731.hunspeller.gui.JTagPanel;
 import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -303,7 +304,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexInputLabel = new javax.swing.JLabel();
       sexTextField = new javax.swing.JTextField();
       sexScrollPane = new javax.swing.JScrollPane();
-      sexTagPanel = new unit731.hunspeller.gui.JTagPanel();
+      sexTagPanel = new JTagPanel(() -> {
+         final List<String> tags = sexTagPanel.getTags();
+         backbone.getSexParser().save(tags);
+      });
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
       sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openSexButton = new javax.swing.JButton();
@@ -311,7 +315,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       wexInputLabel = new javax.swing.JLabel();
       wexTextField = new javax.swing.JTextField();
       wexScrollPane = new javax.swing.JScrollPane();
-      wexTagPanel = new unit731.hunspeller.gui.JTagPanel();
+      wexTagPanel = new JTagPanel(() -> {
+         final List<String> tags = wexTagPanel.getTags();
+         backbone.getWexParser().save(tags);
+      });
       wexCorrectionsRecordedLabel = new javax.swing.JLabel();
       wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openWexButton = new javax.swing.JButton();
@@ -1105,6 +1112,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      wexScrollPane.setHorizontalScrollBar(null);
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);

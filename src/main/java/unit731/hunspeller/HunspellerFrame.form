@@ -1317,6 +1317,9 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Component class="unit731.hunspeller.gui.JTagPanel" name="sexTagPanel">
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel(() -&gt; {&#xd;&#xa;&#x9;final List&lt;String&gt; tags = sexTagPanel.getTags();&#xd;&#xa;&#x9;backbone.getSexParser().save(tags);&#xd;&#xa;})"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -1420,6 +1423,9 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Container class="unit731.hunspeller.gui.JTagPanel" name="wexTagPanel">
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel(() -&gt; {&#xd;&#xa;&#x9;final List&lt;String&gt; tags = wexTagPanel.getTags();&#xd;&#xa;&#x9;backbone.getWexParser().save(tags);&#xd;&#xa;})"/>
+                  </AuxValues>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                     <Property name="alignment" type="int" value="3"/>

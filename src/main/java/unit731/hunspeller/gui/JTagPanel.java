@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -19,21 +18,29 @@ public class JTagPanel extends JPanel{
 
 	private final Object synchronizer = new Object();
 
+	private final Runnable tagsChanged;
+
 
 	public JTagPanel(){
+		tagsChanged = null;
+	}
+
+	public JTagPanel(final Runnable tagsChanged){
+		this.tagsChanged = tagsChanged;
+
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
 		setPreferredSize(getSize());
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
-	public Set<String> getTags(){
+	public List<String> getTags(){
 		synchronized(synchronizer){
 			return JavaHelper.nullableToStream(getComponents())
 				.filter(comp -> comp instanceof JTagComponent)
 				.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
 				.filter(comp -> comp instanceof JLabel)
 				.map(comp -> ((JLabel)comp).getText())
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 		}
 	}
 
@@ -44,6 +51,9 @@ public class JTagPanel extends JPanel{
 			else
 				tags.forEach(this::createAndAddTag);
 
+			if(tagsChanged != null)
+				tagsChanged.run();
+
 			forceRepaint();
 		}
 	}
@@ -52,11 +62,14 @@ public class JTagPanel extends JPanel{
 		synchronized(synchronizer){
 			createAndAddTag(tag);
 
+			if(tagsChanged != null)
+				tagsChanged.run();
+
 			forceRepaint();
 		}
 	}
 
-	public void createAndAddTag(final String tag){
+	private void createAndAddTag(final String tag){
 		final JTagComponent component = new JTagComponent(tag, this::removeTag);
 		add(component, getComponentCount());
 	}
@@ -64,6 +77,9 @@ public class JTagPanel extends JPanel{
 	private void removeTag(final JTagComponent tag){
 		synchronized(synchronizer){
 			remove(tag);
+
+			if(tagsChanged != null)
+				tagsChanged.run();
 
 			forceRepaint();
 		}
