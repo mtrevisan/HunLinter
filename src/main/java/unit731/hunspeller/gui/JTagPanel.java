@@ -19,35 +19,40 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
-public class JTagPanel extends JTextField{
+public class JTagPanel extends JPanel{
 
 	private final Object synchronizer = new Object();
 
 
 	public JTagPanel(){
-//		final JTextField t = new JTextField();
-//		final Dimension ps = t.getPreferredSize();
-//		t.setPreferredSize(new Dimension(ps.width + 10, ps.height));
-//		t.setBorder(null);
-//t.setBorder(new LineBorder(Color.RED));
-//		t.setOpaque(false);
+		final JTextField t = new JTextField();
+		final Dimension ps = t.getPreferredSize();
+		t.setPreferredSize(new Dimension(ps.width + 10, ps.height));
+		t.setBorder(null);
+t.setBorder(new LineBorder(Color.RED));
+		t.setOpaque(false);
 		final JTagPanel parent = this;
-//		t.addKeyListener(new KeyAdapter(){
-		addKeyListener(new KeyAdapter(){
+		t.addKeyListener(new KeyAdapter(){
 			@Override
 			public void keyReleased(final KeyEvent evt){
 				if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-//					final String text = t.getText();
-					final String text = getText();
+					final String text = t.getText();
 					if(StringUtils.isNotBlank(text)){
 						synchronized(synchronizer){
 							final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
-//							parent.add(tag, parent.getComponentCount() - 1);
-							parent.add(tag, parent.getComponentCount());
+							parent.add(tag, parent.getComponentCount() - 1);
 
 							//reset input
-//							t.setText(StringUtils.EMPTY);
-							setText(StringUtils.EMPTY);
+							t.setText(StringUtils.EMPTY);
+
+							//re-set the with of the text field
+							final Component[] components = parent.getComponents();
+							final int occupiedWidth = (int)JavaHelper.nullableToStream(components)
+								.map(Component::getWidth)
+								.mapToLong(a -> a)
+								.sum()
+								+ components.length * 20;
+							t.setPreferredSize(new Dimension(getWidth() - occupiedWidth, ps.height));
 
 							forceRepaint();
 						}
@@ -57,9 +62,9 @@ public class JTagPanel extends JTextField{
 		});
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-//		setBackground(UIManager.getColor("TextArea.background"));
+		setBackground(UIManager.getColor("TextField.background"));
 
-//		add(t);
+		add(t);
 	}
 
 	public Set<String> getTags(){
