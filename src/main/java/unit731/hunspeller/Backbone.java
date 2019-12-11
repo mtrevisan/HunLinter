@@ -272,7 +272,8 @@ public class Backbone implements FileChangeListener{
 		if(sexFile != null && sexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Sentence Exceptions file: {}", sexFile.getName());
 
-			sexParser.parse(sexFile);
+			final String language = affParser.getAffixData().getLanguage();
+			sexParser.parse(sexFile, language);
 
 			if(hunspellable != null)
 				hunspellable.clearSentenceExceptionsParser();
@@ -287,7 +288,8 @@ public class Backbone implements FileChangeListener{
 		if(wexFile != null && wexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Word Exceptions file: {}", wexFile.getName());
 
-			wexParser.parse(wexFile);
+			final String language = affParser.getAffixData().getLanguage();
+			wexParser.parse(wexFile, language);
 
 			if(hunspellable != null)
 				hunspellable.clearWordExceptionsParser();

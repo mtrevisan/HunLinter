@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
-import unit731.hunspeller.gui.JTagPanel;
 import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -302,9 +301,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       openAcoButton = new javax.swing.JButton();
       sexLayeredPane = new javax.swing.JLayeredPane();
       sexScrollPane = new javax.swing.JScrollPane();
-      sexTextArea = new javax.swing.JTextArea();
-      sexScrollPane2 = new javax.swing.JScrollPane();
-      sexTagPanel = new JTagPanel();
+      sexTagPanel = new unit731.hunspeller.gui.JTagPanel();
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
       sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openSexButton = new javax.swing.JButton();
@@ -1032,22 +1029,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
-      sexTextArea.setEditable(false);
-      sexTextArea.setColumns(20);
-      sexScrollPane.setViewportView(sexTextArea);
-
-      javax.swing.GroupLayout sexTagPanelLayout = new javax.swing.GroupLayout(sexTagPanel);
-      sexTagPanel.setLayout(sexTagPanelLayout);
-      sexTagPanelLayout.setHorizontalGroup(
-         sexTagPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 891, Short.MAX_VALUE)
-      );
-      sexTagPanelLayout.setVerticalGroup(
-         sexTagPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 100, Short.MAX_VALUE)
-      );
-
-      sexScrollPane2.setViewportView(sexTagPanel);
+      sexScrollPane.setHorizontalScrollBar(null);
+      sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
       sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
@@ -1062,7 +1045,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexScrollPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1080,18 +1062,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton))
-               .addComponent(sexScrollPane2))
+                  .addComponent(openSexButton)))
             .addContainerGap())
       );
       sexLayeredPaneLayout.setVerticalGroup(
          sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(sexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(sexScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+            .addGap(18, 18, 18)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
                .addComponent(sexCorrectionsRecordedOutputLabel)
@@ -2201,7 +2180,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		acoCorrectTextField.setFont(currentFont);
 		acoTable.setFont(currentFont);
 
-		sexTextArea.setFont(currentFont);
+		sexTagPanel.setFont(currentFont);
 
 		wexTextArea.setFont(currentFont);
 	}
@@ -2314,7 +2293,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
-				sexTextArea.setText(String.join(", ", sentenceExceptions));
+				sexTagPanel.setTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
@@ -2754,7 +2733,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		sexTextArea.setText(null);
+		sexTagPanel.setTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
@@ -2921,9 +2900,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JScrollPane sexScrollPane;
-   private javax.swing.JScrollPane sexScrollPane2;
-   private javax.swing.JPanel sexTagPanel;
-   private javax.swing.JTextArea sexTextArea;
+   private unit731.hunspeller.gui.JTagPanel sexTagPanel;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;

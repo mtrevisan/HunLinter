@@ -7,6 +7,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
@@ -45,10 +46,11 @@ public class ExceptionsParser{
 	 * Parse the rows out from a `SentenceExceptList.xml` or a `WordExceptList.xml` file.
 	 *
 	 * @param wexFile	The reference to the word exceptions file
+	 * @param language	The language (used to sort)
 	 * @throws IOException	If an I/O error occurs
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
-	public void parse(final File wexFile) throws IOException, SAXException{
+	public void parse(final File wexFile, final String language) throws IOException, SAXException{
 		clear();
 
 		final Document doc = XMLParser.parseXMLDocument(wexFile);
@@ -64,6 +66,7 @@ public class ExceptionsParser{
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
 		}
+		dictionary.sort(BaseBuilder.getComparator(language));
 
 		validate();
 	}
