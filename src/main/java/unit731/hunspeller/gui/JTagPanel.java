@@ -42,10 +42,7 @@ public class JTagPanel extends JPanel{
 			if(tags == null)
 				removeAll();
 			else
-				for(final String tag : tags){
-					final JTagComponent component = new JTagComponent(tag, this::removeTag);
-					add(component, getComponentCount() - 1);
-				}
+				tags.forEach(this::createAndAddTag);
 
 			forceRepaint();
 		}
@@ -53,11 +50,15 @@ public class JTagPanel extends JPanel{
 
 	public void addTag(final String tag){
 		synchronized(synchronizer){
-			final JTagComponent component = new JTagComponent(tag, this::removeTag);
-			add(component, getComponentCount());
+			createAndAddTag(tag);
 
 			forceRepaint();
 		}
+	}
+
+	public void createAndAddTag(final String tag){
+		final JTagComponent component = new JTagComponent(tag, this::removeTag);
+		add(component, getComponentCount());
 	}
 
 	private void removeTag(final JTagComponent tag){
@@ -88,7 +89,7 @@ public class JTagPanel extends JPanel{
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	public static class JTagComponent extends JPanel{
+	private static class JTagComponent extends JPanel{
 
 		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
-import unit731.hunspeller.gui.JTagPanel;
 import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -310,8 +309,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openSexButton = new javax.swing.JButton();
       wexLayeredPane = new javax.swing.JLayeredPane();
+      wexInputLabel = new javax.swing.JLabel();
+      wexTextField = new javax.swing.JTextField();
       wexScrollPane = new javax.swing.JScrollPane();
-      wexTextArea = new javax.swing.JTextArea();
+      wexTagPanel = new unit731.hunspeller.gui.JTagPanel();
       wexCorrectionsRecordedLabel = new javax.swing.JLabel();
       wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openWexButton = new javax.swing.JButton();
@@ -1091,8 +1092,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(sexInputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
@@ -1103,9 +1104,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
 
-      wexTextArea.setEditable(false);
-      wexTextArea.setColumns(20);
-      wexScrollPane.setViewportView(wexTextArea);
+      wexInputLabel.setLabelFor(wexTextField);
+      wexInputLabel.setText("Exception:");
+      wexInputLabel.setToolTipText("");
+
+      wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            wexTextFieldKeyReleased(evt);
+         }
+      });
+
+      wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
       wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
@@ -1119,6 +1128,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1137,14 +1148,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openWexButton)))
+                  .addComponent(openWexButton))
+               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(wexInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(wexTextField)))
             .addContainerGap())
       );
       wexLayeredPaneLayout.setVerticalGroup(
          wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(wexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(wexInputLabel)
+               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wexCorrectionsRecordedLabel)
@@ -2047,6 +2066,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
    }//GEN-LAST:event_sexTextFieldKeyReleased
 
+   private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
+		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+			final String text = wexTextField.getText();
+			if(StringUtils.isNotBlank(text)){
+				wexTagPanel.addTag(text.trim());
+
+				//reset input
+				wexTextField.setText(StringUtils.EMPTY);
+			}
+		}
+   }//GEN-LAST:event_wexTextFieldKeyReleased
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -2217,7 +2248,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		sexTagPanel.setFont(currentFont);
 
-		wexTextArea.setFont(currentFont);
+		wexTagPanel.setFont(currentFont);
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
@@ -2337,7 +2368,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//word exceptions file:
 			if(backbone.getWexParser().getExceptionsCounter() > 0){
 				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
-				wexTextArea.setText(String.join(", ", wordExceptions));
+				wexTagPanel.setTags(wordExceptions);
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
@@ -2775,7 +2806,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearWordExceptionsParser(){
-		wexTextArea.setText(null);
+		wexTagPanel.setTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
@@ -2948,9 +2979,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTable theTable;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;
    private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLabel wexInputLabel;
    private javax.swing.JLayeredPane wexLayeredPane;
    private javax.swing.JScrollPane wexScrollPane;
-   private javax.swing.JTextArea wexTextArea;
+   private unit731.hunspeller.gui.JTagPanel wexTagPanel;
+   private javax.swing.JTextField wexTextField;
    // End of variables declaration//GEN-END:variables
 
 }
