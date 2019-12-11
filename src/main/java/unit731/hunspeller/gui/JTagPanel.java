@@ -1,20 +1,17 @@
 package unit731.hunspeller.gui;
 
 import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
-import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 
 public class JTagPanel extends JPanel{
@@ -36,37 +33,12 @@ public class JTagPanel extends JPanel{
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
-	public List<String> getTags(){
-		synchronized(synchronizer){
-			return JavaHelper.nullableToStream(getComponents())
-				.filter(comp -> comp instanceof JTagComponent)
-				.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
-				.filter(comp -> comp instanceof JLabel)
-				.map(comp -> ((JLabel)comp).getText())
-				.collect(Collectors.toList());
-		}
-	}
-
 	public void initializeTags(final List<String> tags){
 		synchronized(synchronizer){
 			if(tags == null)
 				removeAll();
 			else
 				tags.forEach(this::createAndAddTag);
-
-			forceRepaint();
-		}
-	}
-
-	public void setTags(final List<String> tags){
-		synchronized(synchronizer){
-			if(tags == null)
-				removeAll();
-			else
-				tags.forEach(this::createAndAddTag);
-
-			if(tagsChanged != null)
-				tagsChanged.accept((tags != null && !tags.isEmpty()? ExceptionsParser.TagChangeType.SET: ExceptionsParser.TagChangeType.CLEAR), tags);
 
 			forceRepaint();
 		}
