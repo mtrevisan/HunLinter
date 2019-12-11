@@ -2328,8 +2328,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
-				//FIXME
-//				sexTagPanel.setTags(sentenceExceptions);
+				sexTagPanel.setTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
