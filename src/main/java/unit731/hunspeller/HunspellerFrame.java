@@ -193,6 +193,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
+				@Override
 				public Icon getIcon(final File file){
 					return (Packager.isProjectFolder(file)? projectFolderIcon:
 						FileSystemView.getFileSystemView().getSystemIcon(file));

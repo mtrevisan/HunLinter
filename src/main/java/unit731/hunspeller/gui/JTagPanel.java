@@ -19,41 +19,47 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
-public class JTagPanel extends JPanel{
+public class JTagPanel extends JTextArea{
 
 	private final Object synchronizer = new Object();
 
 
 	public JTagPanel(){
-		final JTextField t = new JTextField();
-		final Dimension ps = t.getPreferredSize();
-		t.setPreferredSize(new Dimension(ps.width + 1, ps.height));
+//		final JTextField t = new JTextField();
+//		final Dimension ps = t.getPreferredSize();
+//		t.setPreferredSize(new Dimension(ps.width + 10, ps.height));
+//		t.setBorder(null);
 //t.setBorder(new LineBorder(Color.RED));
-		t.setBorder(null);
-		t.setOpaque(false);
+//		t.setOpaque(false);
 		final JTagPanel parent = this;
-		t.addKeyListener(new KeyAdapter(){
+//		t.addKeyListener(new KeyAdapter(){
+		addKeyListener(new KeyAdapter(){
 			@Override
 			public void keyReleased(final KeyEvent evt){
-				final String text = t.getText();
-				if(StringUtils.isNotBlank(text)){
-					synchronized(synchronizer){
-						final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
-						parent.add(tag, parent.getComponentCount() - 1);
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+//					final String text = t.getText();
+					final String text = getText();
+					if(StringUtils.isNotBlank(text)){
+						synchronized(synchronizer){
+							final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
+//							parent.add(tag, parent.getComponentCount() - 1);
+							parent.add(tag, parent.getComponentCount());
 
-						//reset input
-						t.setText(StringUtils.EMPTY);
+							//reset input
+//							t.setText(StringUtils.EMPTY);
+							setText(StringUtils.EMPTY);
 
-						forceRepaint();
+							forceRepaint();
+						}
 					}
 				}
 			}
 		});
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-		setBackground(UIManager.getColor("TextArea.background"));
+//		setBackground(UIManager.getColor("TextArea.background"));
 
-		add(t);
+//		add(t);
 	}
 
 	public Set<String> getTags(){
@@ -106,7 +112,11 @@ public class JTagPanel extends JPanel{
 				setLayout(new GridBagLayout());
 
 				JTagPanel panel = new JTagPanel();
-				panel.setPreferredSize(new Dimension(400, 100));
+				panel.setPreferredSize(new Dimension(400, 50));
+
+				JScrollPane scrollPane = new JScrollPane();
+				scrollPane.setHorizontalScrollBar(null);
+				scrollPane.setViewportView(panel);
 				add(panel);
 
 				panel.setTags(Arrays.asList("a", "b", "c"));
@@ -147,6 +157,7 @@ public class JTagPanel extends JPanel{
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 			textLabel.setPreferredSize(textLabelSize);
+			textLabel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 			final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
@@ -174,6 +185,7 @@ public class JTagPanel extends JPanel{
 			ps = closeLabel.getPreferredSize();
 			final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 			closePanel.setPreferredSize(closePanelSize);
+			closePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			closePanel.add(closeLabel);
 
 			add(textLabel, BorderLayout.WEST);
