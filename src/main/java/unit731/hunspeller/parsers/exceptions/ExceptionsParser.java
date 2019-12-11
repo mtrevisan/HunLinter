@@ -14,6 +14,7 @@ import unit731.hunspeller.services.XMLParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +29,8 @@ public class ExceptionsParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
 
+	public enum TagChangeType{SET, ADD, REMOVE, CLEAR};
+
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String WORD_EXCEPTIONS_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
 	private static final String AUTO_CORRECT_BLOCK = AUTO_CORRECT_NAMESPACE + "block";
@@ -36,6 +39,7 @@ public class ExceptionsParser{
 
 	private final String configurationFilename;
 	private final List<String> dictionary = new ArrayList<>();
+	private Comparator<String> comparator;
 
 
 	public ExceptionsParser(final String configurationFilename){
@@ -51,6 +55,8 @@ public class ExceptionsParser{
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
 	public void parse(final File wexFile, final String language) throws IOException, SAXException{
+		comparator = BaseBuilder.getComparator(language);
+
 		clear();
 
 		final Document doc = XMLParser.parseXMLDocument(wexFile);
@@ -66,7 +72,7 @@ public class ExceptionsParser{
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
 		}
-		dictionary.sort(BaseBuilder.getComparator(language));
+		dictionary.sort(comparator);
 
 		validate();
 	}
@@ -94,7 +100,24 @@ public class ExceptionsParser{
 		dictionary.clear();
 	}
 
-	public void save(final List<String> tags){
+	public void modify(final TagChangeType changeType, final List<String> tags){
+		switch(changeType){
+			case ADD:
+				dictionary.addAll(tags);
+				dictionary.sort(comparator);
+				break;
+
+			case REMOVE:
+				dictionary.removeAll(tags);
+				break;
+
+			case SET:
+				dictionary.clear();
+				dictionary.addAll(tags);
+		}
+	}
+
+	public void save(){
 		//TODO
 	}
 

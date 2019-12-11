@@ -1,5 +1,6 @@
 package unit731.hunspeller.gui;
 
+import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
 import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
@@ -8,8 +9,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -18,14 +21,14 @@ public class JTagPanel extends JPanel{
 
 	private final Object synchronizer = new Object();
 
-	private final Runnable tagsChanged;
+	private final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged;
 
 
 	public JTagPanel(){
 		tagsChanged = null;
 	}
 
-	public JTagPanel(final Runnable tagsChanged){
+	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
@@ -44,6 +47,17 @@ public class JTagPanel extends JPanel{
 		}
 	}
 
+	public void initializeTags(final List<String> tags){
+		synchronized(synchronizer){
+			if(tags == null)
+				removeAll();
+			else
+				tags.forEach(this::createAndAddTag);
+
+			forceRepaint();
+		}
+	}
+
 	public void setTags(final List<String> tags){
 		synchronized(synchronizer){
 			if(tags == null)
@@ -52,7 +66,7 @@ public class JTagPanel extends JPanel{
 				tags.forEach(this::createAndAddTag);
 
 			if(tagsChanged != null)
-				tagsChanged.run();
+				tagsChanged.accept((tags != null && !tags.isEmpty()? ExceptionsParser.TagChangeType.SET: ExceptionsParser.TagChangeType.CLEAR), tags);
 
 			forceRepaint();
 		}
@@ -63,7 +77,7 @@ public class JTagPanel extends JPanel{
 			createAndAddTag(tag);
 
 			if(tagsChanged != null)
-				tagsChanged.run();
+				tagsChanged.accept(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(tag));
 
 			forceRepaint();
 		}
@@ -79,7 +93,7 @@ public class JTagPanel extends JPanel{
 			remove(tag);
 
 			if(tagsChanged != null)
-				tagsChanged.run();
+				tagsChanged.accept(ExceptionsParser.TagChangeType.REMOVE, Collections.singletonList(((JTextField)tag.getComponent(0)).getText()));
 
 			forceRepaint();
 		}

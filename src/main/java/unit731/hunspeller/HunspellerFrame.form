@@ -1318,7 +1318,7 @@
               <SubComponents>
                 <Component class="unit731.hunspeller.gui.JTagPanel" name="sexTagPanel">
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel(() -&gt; {&#xd;&#xa;&#x9;final List&lt;String&gt; tags = sexTagPanel.getTags();&#xd;&#xa;&#x9;backbone.getSexParser().save(tags);&#xd;&#xa;})"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getSexParser().modify(changeType, tags);&#xd;&#xa;&#x9;backbone.getSexParser().save();&#xd;&#xa;})"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1424,7 +1424,7 @@
               <SubComponents>
                 <Container class="unit731.hunspeller.gui.JTagPanel" name="wexTagPanel">
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel(() -&gt; {&#xd;&#xa;&#x9;final List&lt;String&gt; tags = wexTagPanel.getTags();&#xd;&#xa;&#x9;backbone.getWexParser().save(tags);&#xd;&#xa;})"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getSexParser().modify(changeType, tags);&#xd;&#xa;&#x9;backbone.getSexParser().save();&#xd;&#xa;})"/>
                   </AuxValues>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
