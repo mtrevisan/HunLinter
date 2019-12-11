@@ -32,6 +32,14 @@ public class XMLParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLParser.class);
 
+	@SuppressWarnings("unchecked")
+	public static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
+		Pair.of(OutputKeys.VERSION, "1.0"),
+		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
+	};
+	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
+	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
+
 
 	private static DocumentBuilder DOCUMENT_BUILDER;
 	static{
@@ -53,8 +61,11 @@ public class XMLParser{
 		return doc;
 	}
 
-	public static Document newXMLDocument(){
-		return DOCUMENT_BUILDER.newDocument();
+	public static Document newXMLDocumentStandalone(){
+		final Document doc = DOCUMENT_BUILDER.newDocument();
+		//remove `standalone="no"` from XML declaration
+		doc.setXmlStandalone(true);
+		return doc;
 	}
 
 	/** Transform the DOM Object to an XML File */

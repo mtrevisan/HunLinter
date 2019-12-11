@@ -13,11 +13,9 @@ import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +39,6 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_BLOCK = AUTO_CORRECT_NAMESPACE + "block";
 	private static final String AUTO_CORRECT_INCORRECT_FORM = AUTO_CORRECT_NAMESPACE + "abbreviated-name";
 	private static final String AUTO_CORRECT_CORRECT_FORM = AUTO_CORRECT_NAMESPACE + "name";
-
-	@SuppressWarnings("unchecked")
-	private static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
-		Pair.of(OutputKeys.VERSION, "1.0"),
-		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
-	};
 
 
 	private final List<CorrectionEntry> dictionary = new ArrayList<>();
@@ -175,14 +167,11 @@ public class AutoCorrectParser{
 	}
 
 	public void save(final File acoFile) throws TransformerException{
-		final Document doc = XMLParser.newXMLDocument();
-
-		//remove `standalone="no"` from XML declaration
-		doc.setXmlStandalone(true);
+		final Document doc = XMLParser.newXMLDocumentStandalone();
 
 		//root element
 		final Element root = doc.createElement(AUTO_CORRECT_ROOT_ELEMENT);
-		root.setAttribute("xmlns:block-list", "http://openoffice.org/2001/block-list");
+		root.setAttribute(XMLParser.ROOT_ATTRIBUTE_NAME, XMLParser.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
 		for(final CorrectionEntry correction : dictionary){
@@ -193,7 +182,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		XMLParser.createXML(acoFile, doc, XML_PROPERTIES);
+		XMLParser.createXML(acoFile, doc, XMLParser.XML_PROPERTIES);
 	}
 
 	public void clear(){

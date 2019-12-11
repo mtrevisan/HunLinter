@@ -11,6 +11,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,10 +97,6 @@ public class ExceptionsParser{
 		return dictionary.size();
 	}
 
-	public void clear(){
-		dictionary.clear();
-	}
-
 	public void modify(final TagChangeType changeType, final List<String> tags){
 		switch(changeType){
 			case ADD:
@@ -120,6 +117,29 @@ public class ExceptionsParser{
 	public void save(){
 		//TODO
 		System.out.println("save");
+	}
+
+	public void save(final File excFile) throws TransformerException{
+		final Document doc = XMLParser.newXMLDocumentStandalone();
+
+		//root element
+		final Element root = doc.createElement(WORD_EXCEPTIONS_ROOT_ELEMENT);
+		root.setAttribute(XMLParser.ROOT_ATTRIBUTE_NAME, XMLParser.ROOT_ATTRIBUTE_VALUE);
+		doc.appendChild(root);
+
+		//TODO
+//		for(final String exception : dictionary){
+//			//correction element
+//			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
+//			elem.setAttribute(WORD_EXCEPTIONS_INCORRECT_FORM, exception);
+//			root.appendChild(elem);
+//		}
+
+		XMLParser.createXML(excFile, doc, XMLParser.XML_PROPERTIES);
+	}
+
+	public void clear(){
+		dictionary.clear();
 	}
 
 }
