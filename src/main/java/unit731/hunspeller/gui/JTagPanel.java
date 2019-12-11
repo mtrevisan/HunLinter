@@ -48,7 +48,7 @@ public class JTagPanel extends JPanel{
 			}
 		});
 
-		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 4));
+		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
 		setPreferredSize(new Dimension(width, ps.height * lines * 16 / 10));
 		setBackground(UIManager.getColor("TextArea.background"));
 
