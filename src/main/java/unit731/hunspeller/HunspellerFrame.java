@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
+import unit731.hunspeller.gui.JTagPanel;
 import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -301,6 +302,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
       sexLayeredPane = new javax.swing.JLayeredPane();
+      sexInputLabel = new javax.swing.JLabel();
+      sexTextField = new javax.swing.JTextField();
       sexScrollPane = new javax.swing.JScrollPane();
       sexTagPanel = new unit731.hunspeller.gui.JTagPanel();
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
@@ -1030,6 +1033,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
+      sexInputLabel.setLabelFor(sexTextField);
+      sexInputLabel.setText("Exception:");
+
+      sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            sexTextFieldKeyReleased(evt);
+         }
+      });
+
       sexScrollPane.setHorizontalScrollBar(null);
       sexScrollPane.setViewportView(sexTagPanel);
 
@@ -1045,6 +1057,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1063,14 +1077,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton)))
+                  .addComponent(openSexButton))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(sexInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(sexTextField)))
             .addContainerGap())
       );
       sexLayeredPaneLayout.setVerticalGroup(
          sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(sexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(sexInputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
@@ -2013,6 +2035,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
    }//GEN-LAST:event_openWexButtonActionPerformed
 
+   private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
+		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+			final String text = sexTextField.getText();
+			if(StringUtils.isNotBlank(text)){
+				sexTagPanel.addTag(text.trim());
+
+				//reset input
+				sexTextField.setText(StringUtils.EMPTY);
+			}
+		}
+   }//GEN-LAST:event_sexTextFieldKeyReleased
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -2294,7 +2328,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
-				sexTagPanel.setTags(sentenceExceptions);
+				//FIXME
+//				sexTagPanel.setTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
@@ -2899,9 +2934,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLabel sexCorrectionsRecordedLabel;
    private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLabel sexInputLabel;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JScrollPane sexScrollPane;
    private unit731.hunspeller.gui.JTagPanel sexTagPanel;
+   private javax.swing.JTextField sexTextField;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;

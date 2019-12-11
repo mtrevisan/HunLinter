@@ -1,14 +1,10 @@
 package unit731.hunspeller.gui;
 
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -25,46 +21,8 @@ public class JTagPanel extends JPanel{
 
 
 	public JTagPanel(){
-		final JTextField t = new JTextField();
-		final Dimension ps = t.getPreferredSize();
-		t.setPreferredSize(new Dimension(ps.width + 10, ps.height));
-		t.setBorder(null);
-t.setBorder(new LineBorder(Color.RED));
-		t.setOpaque(false);
-		final JTagPanel parent = this;
-		t.addKeyListener(new KeyAdapter(){
-			@Override
-			public void keyReleased(final KeyEvent evt){
-				if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-					final String text = t.getText();
-					if(StringUtils.isNotBlank(text)){
-						synchronized(synchronizer){
-							final JTagComponent tag = new JTagComponent(text.trim(), parent::removeTag);
-							parent.add(tag, parent.getComponentCount() - 1);
-
-							//reset input
-							t.setText(StringUtils.EMPTY);
-
-							//re-set the with of the text field
-							final Component[] components = parent.getComponents();
-							final int occupiedWidth = (int)JavaHelper.nullableToStream(components)
-								.map(Component::getWidth)
-								.mapToLong(a -> a)
-								.sum()
-								+ components.length * 20;
-							t.setPreferredSize(new Dimension(getWidth() - occupiedWidth, ps.height));
-
-							forceRepaint();
-						}
-					}
-				}
-			}
-		});
-
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
 		setBackground(UIManager.getColor("TextField.background"));
-
-		add(t);
 	}
 
 	public Set<String> getTags(){
@@ -92,6 +50,13 @@ t.setBorder(new LineBorder(Color.RED));
 		}
 	}
 
+	public void addTag(final String tag){
+		final JTagComponent component = new JTagComponent(tag, this::removeTag);
+		add(component, getComponentCount());
+
+		forceRepaint();
+	}
+
 	private void removeTag(final JTagComponent tag){
 		remove(tag);
 
@@ -101,37 +66,6 @@ t.setBorder(new LineBorder(Color.RED));
 	private void forceRepaint(){
 		repaint();
 		revalidate();
-	}
-
-
-	public static void main(String[] args){
-		try{
-			final String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){}
-
-		class JTagPanelExample extends JFrame{
-			public JTagPanelExample(){
-				setSize(new Dimension(500, 180));
-				setLayout(new GridBagLayout());
-
-				JTagPanel panel = new JTagPanel();
-				panel.setPreferredSize(new Dimension(400, 50));
-
-				JScrollPane scrollPane = new JScrollPane();
-				scrollPane.setHorizontalScrollBar(null);
-				scrollPane.setViewportView(panel);
-				add(panel);
-
-				panel.setTags(Arrays.asList("a", "b", "c"));
-
-				setVisible(true);
-			}
-		}
-
-		//create and display the form
-		EventQueue.invokeLater(() -> (new JTagPanelExample()).setVisible(true));
 	}
 
 
@@ -149,9 +83,9 @@ t.setBorder(new LineBorder(Color.RED));
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	private class JTagComponent extends JPanel{
+	public static class JTagComponent extends JPanel{
 
-		private JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
+		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);
 
 			setLayout(new BorderLayout());
