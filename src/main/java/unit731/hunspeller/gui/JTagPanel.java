@@ -51,16 +51,20 @@ public class JTagPanel extends JPanel{
 	}
 
 	public void addTag(final String tag){
-		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-		add(component, getComponentCount());
+		synchronized(synchronizer){
+			final JTagComponent component = new JTagComponent(tag, this::removeTag);
+			add(component, getComponentCount());
 
-		forceRepaint();
+			forceRepaint();
+		}
 	}
 
 	private void removeTag(final JTagComponent tag){
-		remove(tag);
+		synchronized(synchronizer){
+			remove(tag);
 
-		forceRepaint();
+			forceRepaint();
+		}
 	}
 
 	private void forceRepaint(){
