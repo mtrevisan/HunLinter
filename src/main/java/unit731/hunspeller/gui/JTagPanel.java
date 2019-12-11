@@ -93,7 +93,7 @@ public class JTagPanel extends JPanel{
 			remove(tag);
 
 			if(tagsChanged != null)
-				tagsChanged.accept(ExceptionsParser.TagChangeType.REMOVE, Collections.singletonList(((JTextField)tag.getComponent(0)).getText()));
+				tagsChanged.accept(ExceptionsParser.TagChangeType.REMOVE, Collections.singletonList(tag.getTag()));
 
 			forceRepaint();
 		}
@@ -183,6 +183,10 @@ public class JTagPanel extends JPanel{
 			graphics.drawRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);
 			//reset strokes to default
 			graphics.setStroke(new BasicStroke());
+		}
+
+		public String getTag(){
+			return ((JLabel)getComponent(0)).getText();
 		}
 
 	}
