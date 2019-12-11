@@ -2784,14 +2784,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		sexTagPanel.setTags(null);
+		sexTagPanel.initializeTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
 
 	@Override
 	public void clearWordExceptionsParser(){
-		wexTagPanel.setTags(null);
+		wexTagPanel.initializeTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
