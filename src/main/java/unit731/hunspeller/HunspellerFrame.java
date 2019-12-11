@@ -264,7 +264,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theLayeredPane = new javax.swing.JLayeredPane();
       theMeaningsLabel = new javax.swing.JLabel();
       theMeaningsTextField = new javax.swing.JTextField();
-      theAddButton = new javax.swing.JButton();
       theScrollPane = new javax.swing.JScrollPane();
       theTable = new javax.swing.JTable();
       theSynonymsRecordedLabel = new javax.swing.JLabel();
@@ -358,6 +357,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
+
+      mainTabbedPane.setToolTipText("hit `enter` to add");
 
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
@@ -587,18 +588,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theMeaningsLabel.setLabelFor(theMeaningsTextField);
       theMeaningsLabel.setText("New synonym:");
 
+      theMeaningsTextField.setToolTipText("hit `enter` to add");
       theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             theMeaningsTextFieldKeyReleased(evt);
-         }
-      });
-
-      theAddButton.setMnemonic('A');
-      theAddButton.setText("Add");
-      theAddButton.setEnabled(false);
-      theAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theAddButtonActionPerformed(evt);
          }
       });
 
@@ -658,7 +651,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -674,9 +666,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theMeaningsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theMeaningsTextField)
-                  .addGap(18, 18, 18)
-                  .addComponent(theAddButton))
+                  .addComponent(theMeaningsTextField))
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -689,10 +679,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theMeaningsLabel)
-               .addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(theAddButton))
+               .addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theSynonymsRecordedLabel)
@@ -1037,6 +1026,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexInputLabel.setLabelFor(sexTextField);
       sexInputLabel.setText("Exception:");
 
+      sexTextField.setToolTipText("hit `enter` to add");
       sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             sexTextFieldKeyReleased(evt);
@@ -1108,6 +1098,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       wexInputLabel.setText("Exception:");
       wexInputLabel.setToolTipText("");
 
+      wexTextField.setToolTipText("hit `enter` to add");
       wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             wexTextFieldKeyReleased(evt);
@@ -1593,9 +1584,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
-		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
-		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
-
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
@@ -1621,17 +1609,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//... and save the files
 			backbone.storeThesaurusFiles();
-
-
-			//redo filtering, that is re-set the state of the button (it may have changed)
-			final String unmodifiedSearchText = theMeaningsTextField.getText();
-			if(StringUtils.isNotBlank(unmodifiedSearchText)){
-				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
-				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
-				final List<String> meanings = Arrays.asList(pair.getRight());
-				final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
-				theAddButton.setEnabled(!alreadyContained);
-			}
 		}
 		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
@@ -1792,56 +1769,56 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypDebouncer.call(this);
    }//GEN-LAST:event_hypWordTextFieldKeyReleased
 
-   private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
-      try{
-         //try adding the meanings
-			final String synonyms = theMeaningsTextField.getText();
-			final Supplier<Boolean> duplicatesDiscriminator = () -> {
-				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
-					JOptionPane.YES_NO_OPTION);
-				return (responseOption == JOptionPane.YES_OPTION);
-			};
-			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
-				.insertMeanings(synonyms, duplicatesDiscriminator);
-         final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
-
-         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
-            //if everything's ok update the table and the sorter...
-				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-            dm.fireTableDataChanged();
-
-            formerFilterThesaurusText = null;
-            theMeaningsTextField.setText(null);
-            theMeaningsTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked")
-            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-            sorter.setRowFilter(null);
-
-            updateSynonymsCounter();
-
-            //... and save the files
-            backbone.storeThesaurusFiles();
-         }
-         else{
-				theMeaningsTextField.requestFocusInWindow();
-
-				final String duplicatedWords = duplicates.stream()
-					.map(ThesaurusEntry::getSynonym)
-					.collect(Collectors.joining(", "));
-				JOptionPane.showOptionDialog(this,
-					"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
-					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
-					null);
-         }
-      }
-      catch(final Exception e){
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-      }
-   }//GEN-LAST:event_theAddButtonActionPerformed
-
    private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
-      theFilterDebouncer.call(this);
+		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+			try{
+				//try adding the meanings
+				final String synonyms = theMeaningsTextField.getText();
+				final Supplier<Boolean> duplicatesDiscriminator = () -> {
+					final int responseOption = JOptionPane.showConfirmDialog(this,
+						"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
+						JOptionPane.YES_NO_OPTION);
+					return (responseOption == JOptionPane.YES_OPTION);
+				};
+				final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
+					.insertMeanings(synonyms, duplicatesDiscriminator);
+				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+
+				if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+					//if everything's ok update the table and the sorter...
+					final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+					dm.fireTableDataChanged();
+
+					formerFilterThesaurusText = null;
+					theMeaningsTextField.setText(null);
+					theMeaningsTextField.requestFocusInWindow();
+					@SuppressWarnings("unchecked")
+					TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+					sorter.setRowFilter(null);
+
+					updateSynonymsCounter();
+
+					//... and save the files
+					backbone.storeThesaurusFiles();
+				}
+				else{
+					theMeaningsTextField.requestFocusInWindow();
+
+					final String duplicatedWords = duplicates.stream()
+						.map(ThesaurusEntry::getSynonym)
+						.collect(Collectors.joining(", "));
+					JOptionPane.showOptionDialog(this,
+						"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
+						"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+						null);
+				}
+			}
+			catch(final Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			}
+		}
+		else
+      	theFilterDebouncer.call(this);
    }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
    private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
@@ -2969,7 +2946,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JScrollPane sexScrollPane;
    private unit731.hunspeller.gui.JTagPanel sexTagPanel;
    private javax.swing.JTextField sexTextField;
-   private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;
    private javax.swing.JTextField theMeaningsTextField;
