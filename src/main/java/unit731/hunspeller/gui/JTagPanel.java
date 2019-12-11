@@ -54,10 +54,15 @@ public class JTagPanel extends JPanel{
 		add(t);
 	}
 
-	private void removeTag(final JTagComponent tag){
-		remove(tag);
-
-		forceRepaint();
+	public Set<String> getTags(){
+		synchronized(synchronizer){
+			return JavaHelper.nullableToStream(getComponents())
+				.filter(comp -> comp instanceof JTagComponent)
+				.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
+				.filter(comp -> comp instanceof JLabel)
+				.map(comp -> ((JLabel)comp).getText())
+				.collect(Collectors.toSet());
+		}
 	}
 
 	public void setTags(final List<String> tags){
@@ -74,20 +79,15 @@ public class JTagPanel extends JPanel{
 		}
 	}
 
+	private void removeTag(final JTagComponent tag){
+		remove(tag);
+
+		forceRepaint();
+	}
+
 	private void forceRepaint(){
 		repaint();
 		revalidate();
-	}
-
-	public Set<String> getTags(){
-		synchronized(synchronizer){
-			return JavaHelper.nullableToStream(getComponents())
-				.filter(comp -> comp instanceof JTagComponent)
-				.flatMap(comp -> Arrays.stream(((JTagComponent)comp).getComponents()))
-				.filter(comp -> comp instanceof JLabel)
-				.map(comp -> ((JLabel)comp).getText())
-				.collect(Collectors.toSet());
-		}
 	}
 
 
