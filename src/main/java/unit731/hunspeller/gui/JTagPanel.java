@@ -5,6 +5,7 @@ import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -27,6 +28,7 @@ public class JTagPanel extends JPanel{
 		final JTextField t = new JTextField();
 		final Dimension ps = t.getPreferredSize();
 		t.setPreferredSize(new Dimension(ps.width + 1, ps.height));
+//t.setBorder(new LineBorder(Color.RED));
 		t.setBorder(null);
 		t.setOpaque(false);
 		final JTagPanel parent = this;
@@ -101,16 +103,13 @@ public class JTagPanel extends JPanel{
 		class JTagPanelExample extends JFrame{
 			public JTagPanelExample(){
 				setSize(new Dimension(500, 180));
-				GridBagLayout layout = new GridBagLayout();
-				GridBagConstraints gbc = new GridBagConstraints();
-				setLayout(layout);
-				gbc.gridx = 0;
-				gbc.gridy = 0;
+				setLayout(new GridBagLayout());
 
 				JTagPanel panel = new JTagPanel();
 				panel.setPreferredSize(new Dimension(400, 100));
+				add(panel);
+
 				panel.setTags(Arrays.asList("a", "b", "c"));
-				add(panel, gbc);
 
 				setVisible(true);
 			}
