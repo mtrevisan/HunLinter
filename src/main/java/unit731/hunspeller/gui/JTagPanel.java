@@ -23,7 +23,7 @@ public class JTagPanel extends JPanel{
 	private final Object synchronizer = new Object();
 
 
-	public JTagPanel(final int width, final int lines){
+	public JTagPanel(){
 		final JTextField t = new JTextField();
 		final Dimension ps = t.getPreferredSize();
 		t.setPreferredSize(new Dimension(ps.width + 1, ps.height));
@@ -49,7 +49,6 @@ public class JTagPanel extends JPanel{
 		});
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-		setPreferredSize(new Dimension(width, ps.height * lines * 16 / 10));
 		setBackground(UIManager.getColor("TextArea.background"));
 
 		add(t);
@@ -105,7 +104,8 @@ public class JTagPanel extends JPanel{
 				gbc.gridx = 0;
 				gbc.gridy = 0;
 
-				JTagPanel panel = new JTagPanel(400, 3);
+				JTagPanel panel = new JTagPanel();
+				panel.setPreferredSize(new Dimension(400, 100));
 				panel.setTags(Arrays.asList("a", "b", "c"));
 				add(panel, gbc);
 
