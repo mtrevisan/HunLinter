@@ -100,6 +100,7 @@ public class JTagPanel extends JPanel{
 			setOpaque(false);
 
 			final JLabel textLabel = new JLabel(text);
+			textLabel.setFont(GUIUtils.getCurrentFont());
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
@@ -111,6 +112,7 @@ public class JTagPanel extends JPanel{
 			final Font closeFont = closeLabel.getFont();
 			closeLabel.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
 			closeLabel.setForeground(COLOR_CLOSE);
+			closeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			closeLabel.addMouseListener(new MouseAdapter(){
 				@Override
 				public void mousePressed(final MouseEvent evt){
@@ -132,7 +134,6 @@ public class JTagPanel extends JPanel{
 			ps = closeLabel.getPreferredSize();
 			final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 			closePanel.setPreferredSize(closePanelSize);
-			closePanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			closePanel.add(closeLabel);
 
 			add(textLabel, BorderLayout.WEST);
