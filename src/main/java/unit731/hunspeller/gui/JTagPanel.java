@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
-public class JTagPanel extends JTextArea{
+public class JTagPanel extends JTextField{
 
 	private final Object synchronizer = new Object();
 
