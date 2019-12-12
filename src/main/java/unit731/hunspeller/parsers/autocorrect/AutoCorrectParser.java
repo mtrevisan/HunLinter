@@ -182,7 +182,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		XMLParser.createXML(acoFile, doc, XMLParser.XML_PROPERTIES);
+		XMLParser.createXML(acoFile, doc, XMLParser.XML_PROPERTIES_US_ASCII);
 	}
 
 	public void clear(){

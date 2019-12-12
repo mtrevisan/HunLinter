@@ -122,7 +122,6 @@ public class ExceptionsParser{
 		root.setAttribute(XMLParser.ROOT_ATTRIBUTE_NAME, XMLParser.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
-		//TODO
 		for(final String exception : dictionary){
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
@@ -130,7 +129,7 @@ public class ExceptionsParser{
 			root.appendChild(elem);
 		}
 
-		XMLParser.createXML(excFile, doc, XMLParser.XML_PROPERTIES);
+		XMLParser.createXML(excFile, doc, XMLParser.XML_PROPERTIES_UTF_8);
 	}
 
 	public void clear(){

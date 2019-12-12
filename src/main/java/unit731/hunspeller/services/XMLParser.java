@@ -33,9 +33,18 @@ public class XMLParser{
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLParser.class);
 
 	@SuppressWarnings("unchecked")
-	public static final Pair<String, String>[] XML_PROPERTIES = new Pair[]{
+	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = new Pair[]{
 		Pair.of(OutputKeys.VERSION, "1.0"),
-		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name())
+		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name()),
+		Pair.of(OutputKeys.INDENT, "yes"),
+		Pair.of("{http://xml.apache.org/xslt}indent-amount", "3")
+	};
+	@SuppressWarnings("unchecked")
+	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = new Pair[]{
+		Pair.of(OutputKeys.VERSION, "1.0"),
+		Pair.of(OutputKeys.ENCODING, StandardCharsets.US_ASCII.name()),
+		Pair.of(OutputKeys.INDENT, "yes"),
+		Pair.of("{http://xml.apache.org/xslt}indent-amount", "3")
 	};
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
@@ -77,10 +86,6 @@ public class XMLParser{
 			.forEach(property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
 		final DOMSource domSource = new DOMSource(doc);
 		final StreamResult streamResult = new StreamResult(xmlFile);
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-		//escape HTML entities
-		transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.US_ASCII.name());
 		transformer.transform(domSource, streamResult);
 	}
 
