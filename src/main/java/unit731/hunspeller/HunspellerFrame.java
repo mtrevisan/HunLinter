@@ -231,1206 +231,1217 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			() -> hypCheckCorrectnessMenuItem.setEnabled(true));
 	}
 
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents() {
-
-      parsingResultScrollPane = new javax.swing.JScrollPane();
-      parsingResultTextArea = new javax.swing.JTextArea();
-      mainProgressBar = new javax.swing.JProgressBar();
-      mainTabbedPane = new javax.swing.JTabbedPane();
-      dicLayeredPane = new javax.swing.JLayeredPane();
-      dicInputLabel = new javax.swing.JLabel();
-      dicInputTextField = new javax.swing.JTextField();
-      dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      dicScrollPane = new javax.swing.JScrollPane();
-      dicTable = new javax.swing.JTable();
-      dicTotalProductionsLabel = new javax.swing.JLabel();
-      dicTotalProductionsOutputLabel = new javax.swing.JLabel();
-      openAidButton = new javax.swing.JButton();
-      openAffButton = new javax.swing.JButton();
-      openDicButton = new javax.swing.JButton();
-      cmpLayeredPane = new javax.swing.JLayeredPane();
-      cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new javax.swing.JComboBox<>();
-      cmpLimitLabel = new javax.swing.JLabel();
-      cmpLimitComboBox = new javax.swing.JComboBox<>();
-      cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      cmpScrollPane = new javax.swing.JScrollPane();
-      cmpTable = new javax.swing.JTable();
-      cmpInputScrollPane = new javax.swing.JScrollPane();
-      cmpInputTextArea = new javax.swing.JTextArea();
-      cmpLoadInputButton = new javax.swing.JButton();
-      theLayeredPane = new javax.swing.JLayeredPane();
-      theMeaningsLabel = new javax.swing.JLabel();
-      theMeaningsTextField = new javax.swing.JTextField();
-      theScrollPane = new javax.swing.JScrollPane();
-      theTable = new javax.swing.JTable();
-      theSynonymsRecordedLabel = new javax.swing.JLabel();
-      theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
-      hypLayeredPane = new javax.swing.JLayeredPane();
-      hypWordLabel = new javax.swing.JLabel();
-      hypWordTextField = new javax.swing.JTextField();
-      hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new JWordLabel();
-      hypSyllabesCountLabel = new javax.swing.JLabel();
-      hypSyllabesCountOutputLabel = new javax.swing.JLabel();
-      hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new JWordLabel();
-      hypAddRuleLabel = new javax.swing.JLabel();
-      hypAddRuleTextField = new javax.swing.JTextField();
-      hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
-      hypAddRuleButton = new javax.swing.JButton();
-      hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new JWordLabel();
-      hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
-      optionsButton = new javax.swing.JButton();
-      openHypButton = new javax.swing.JButton();
-      acoLayeredPane = new javax.swing.JLayeredPane();
-      acoIncorrectLabel = new javax.swing.JLabel();
-      acoIncorrectTextField = new javax.swing.JTextField();
-      acoToLabel = new javax.swing.JLabel();
-      acoCorrectLabel = new javax.swing.JLabel();
-      acoCorrectTextField = new javax.swing.JTextField();
-      acoAddButton = new javax.swing.JButton();
-      acoScrollPane = new javax.swing.JScrollPane();
-      acoTable = new javax.swing.JTable();
-      acoCorrectionsRecordedLabel = new javax.swing.JLabel();
-      acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openAcoButton = new javax.swing.JButton();
-      sexLayeredPane = new javax.swing.JLayeredPane();
-      sexInputLabel = new javax.swing.JLabel();
-      sexTextField = new javax.swing.JTextField();
-      sexScrollPane = new javax.swing.JScrollPane();
-      sexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getSexParser().modify(changeType, tags);
-         backbone.getSexParser().save();
-      });
-      sexCorrectionsRecordedLabel = new javax.swing.JLabel();
-      sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openSexButton = new javax.swing.JButton();
-      wexLayeredPane = new javax.swing.JLayeredPane();
-      wexInputLabel = new javax.swing.JLabel();
-      wexTextField = new javax.swing.JTextField();
-      wexScrollPane = new javax.swing.JScrollPane();
-      wexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getSexParser().modify(changeType, tags);
-         backbone.getSexParser().save();
-      });
-      wexCorrectionsRecordedLabel = new javax.swing.JLabel();
-      wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openWexButton = new javax.swing.JButton();
-      mainMenuBar = new javax.swing.JMenuBar();
-      filMenu = new javax.swing.JMenu();
-      filOpenProjectMenuItem = new javax.swing.JMenuItem();
-      filCreatePackageMenuItem = new javax.swing.JMenuItem();
-      filFontSeparator = new javax.swing.JPopupMenu.Separator();
-      filFontMenuItem = new javax.swing.JMenuItem();
-      filRecentProjectsSeparator = new javax.swing.JPopupMenu.Separator();
-      filEmptyRecentProjectsMenuItem = new javax.swing.JMenuItem();
-      filSeparator = new javax.swing.JPopupMenu.Separator();
-      filExitMenuItem = new javax.swing.JMenuItem();
-      dicMenu = new javax.swing.JMenu();
-      dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
-      dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
-      dicRulesReducerMenuItem = new javax.swing.JMenuItem();
-      dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
-      dicWordCountMenuItem = new javax.swing.JMenuItem();
-      dicStatisticsMenuItem = new javax.swing.JMenuItem();
-      dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
-      dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
-      dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
-      dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
-      dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
-      hypMenu = new javax.swing.JMenu();
-      hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
-      hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
-      hypStatisticsMenuItem = new javax.swing.JMenuItem();
-      hlpMenu = new javax.swing.JMenu();
-      hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
-      hlpAboutMenuItem = new javax.swing.JMenuItem();
-
-      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle("Hunspeller");
-      setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
-      setMinimumSize(new java.awt.Dimension(964, 534));
-
-      parsingResultTextArea.setEditable(false);
-      parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setRows(1);
-      parsingResultTextArea.setTabSize(3);
-      DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
-      caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-      parsingResultScrollPane.setViewportView(parsingResultTextArea);
-
-      mainTabbedPane.setToolTipText("hit `enter` to add");
-
-      dicInputLabel.setLabelFor(dicInputTextField);
-      dicInputLabel.setText("Dictionary entry:");
-
-      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            dicInputTextFieldKeyReleased(evt);
-         }
-      });
-
-      dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
-      dicRuleFlagsAidLabel.setText("Rule flags aid:");
-
-      dicTable.setModel(new ProductionTableModel());
-      dicTable.setShowHorizontalLines(false);
-      dicTable.setShowVerticalLines(false);
-      dicTable.setRowSelectionAllowed(true);
-      dicScrollPane.setViewportView(dicTable);
-
-      dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
-      dicTotalProductionsLabel.setText("Total productions:");
-
-      dicTotalProductionsOutputLabel.setText("...");
-
-      openAidButton.setText("Open Aid");
-      openAidButton.setEnabled(false);
-      openAidButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAidButtonActionPerformed(evt);
-         }
-      });
-
-      openAffButton.setText("Open Affix");
-      openAffButton.setEnabled(false);
-      openAffButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAffButtonActionPerformed(evt);
-         }
-      });
-
-      openDicButton.setText("Open Dictionary");
-      openDicButton.setEnabled(false);
-      openDicButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openDicButtonActionPerformed(evt);
-         }
-      });
-
-      dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicTotalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
-      dicLayeredPane.setLayout(dicLayeredPaneLayout);
-      dicLayeredPaneLayout.setHorizontalGroup(
-         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dicLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                     .addComponent(dicInputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicRuleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicInputTextField)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
-               .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(dicTotalProductionsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(dicTotalProductionsOutputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(openAidButton)
-                  .addGap(18, 18, 18)
-                  .addComponent(openAffButton)
-                  .addGap(18, 18, 18)
-                  .addComponent(openDicButton)))
-            .addContainerGap())
-      );
-      dicLayeredPaneLayout.setVerticalGroup(
-         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicInputLabel)
-               .addComponent(dicInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(dicRuleFlagsAidLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicTotalProductionsLabel)
-               .addComponent(dicTotalProductionsOutputLabel)
-               .addComponent(openAffButton)
-               .addComponent(openDicButton)
-               .addComponent(openAidButton))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
-      cmpInputLabel.setLabelFor(cmpInputComboBox);
-      cmpInputLabel.setText("Compound rule:");
-
-      cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
-         @Override
-         public void keyReleased(java.awt.event.KeyEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
-      cmpInputComboBox.addItemListener(new ItemListener(){
-         @Override
-         public void itemStateChanged(ItemEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
-
-      cmpLimitLabel.setLabelFor(cmpLimitComboBox);
-      cmpLimitLabel.setText("Limit:");
-
-      cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLimitComboBoxActionPerformed(evt);
-         }
-      });
-
-      cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
-      cmpRuleFlagsAidLabel.setText("Rule flags aid:");
-
-      cmpTable.setModel(new CompoundTableModel());
-      cmpTable.setShowHorizontalLines(false);
-      cmpTable.setShowVerticalLines(false);
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
-      cmpTable.setRowSelectionAllowed(true);
-      cmpScrollPane.setViewportView(cmpTable);
-
-      cmpInputTextArea.setEditable(false);
-      cmpInputTextArea.setColumns(20);
-      cmpInputScrollPane.setViewportView(cmpInputTextArea);
-
-      cmpLoadInputButton.setText("Load input from dictionary");
-      cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLoadInputButtonActionPerformed(evt);
-         }
-      });
-
-      cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLimitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLimitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpInputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
-      cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
-      cmpLayeredPaneLayout.setHorizontalGroup(
-         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputLabel)
-                     .addComponent(cmpRuleFlagsAidLabel))
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                        .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(cmpLimitLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cmpLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputScrollPane)
-                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                        .addComponent(cmpLoadInputButton)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                  .addGap(18, 18, 18)
-                  .addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)))
-            .addContainerGap())
-      );
-      cmpLayeredPaneLayout.setVerticalGroup(
-         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpInputLabel)
-               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpRuleFlagsAidLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
-               .addComponent(cmpInputScrollPane))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(cmpLoadInputButton)
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
-
-      theMeaningsLabel.setLabelFor(theMeaningsTextField);
-      theMeaningsLabel.setText("New synonym:");
-
-      theMeaningsTextField.setToolTipText("hit `enter` to add");
-      theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            theMeaningsTextFieldKeyReleased(evt);
-         }
-      });
-
-      theTable.setModel(new ThesaurusTableModel());
-      theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setShowHorizontalLines(false);
-      theTable.setShowVerticalLines(false);
-      theTable.getColumnModel().getColumn(0).setMinWidth(200);
-      theTable.getColumnModel().getColumn(0).setMaxWidth(500);
-      //listen for row removal
-      theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
-      JFrame theParent = this;
-      theTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(MouseEvent e){
-            if(e.getClickCount() == 1){
-               JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-                  Consumer<String> okButtonAction = (text) -> {
-                     try{
-                        backbone.getTheParser().setMeanings(row, text);
-
-                        // ... and save the files
-                        backbone.storeThesaurusFiles();
-                     }
-                     catch(Exception ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
-                     }
-                  };
-                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.addWindowListener(new WindowAdapter(){
-                     @Override
-                     public void windowClosed(WindowEvent e){
-                        theTable.clearSelection();
-                     }
-                  });
-                  dialog.setLocationRelativeTo(theParent);
-                  dialog.setVisible(true);
-               }
-            }
-         }
-      });
-
-      TableRenderer theCellRenderer = new TableRenderer();
-      theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
-      theScrollPane.setViewportView(theTable);
-
-      theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
-      theSynonymsRecordedLabel.setText("Synonyms recorded:");
-
-      theSynonymsRecordedOutputLabel.setText("...");
-
-      theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout theLayeredPaneLayout = new javax.swing.GroupLayout(theLayeredPane);
-      theLayeredPane.setLayout(theLayeredPaneLayout);
-      theLayeredPaneLayout.setHorizontalGroup(
-         theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(theLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(theMeaningsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theMeaningsTextField))
-               .addGroup(theLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(theSynonymsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)))
-            .addContainerGap())
-      );
-      theLayeredPaneLayout.setVerticalGroup(
-         theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theMeaningsLabel)
-               .addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theSynonymsRecordedLabel)
-               .addComponent(theSynonymsRecordedOutputLabel))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Thesaurus", theLayeredPane);
-
-      hypWordLabel.setLabelFor(hypWordTextField);
-      hypWordLabel.setText("Word:");
-
-      hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            hypWordTextFieldKeyReleased(evt);
-         }
-      });
-
-      hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
-      hypSyllabationLabel.setText("Syllabation:");
-
-      hypSyllabationOutputLabel.setText("...");
-
-      hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
-      hypSyllabesCountLabel.setText("Syllabes:");
-
-      hypSyllabesCountOutputLabel.setText("...");
-
-      hypRulesLabel.setLabelFor(hypRulesOutputLabel);
-      hypRulesLabel.setText("Rules:");
-
-      hypRulesOutputLabel.setText("...");
-
-      hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
-      hypAddRuleLabel.setText("Add rule:");
-
-      hypAddRuleTextField.setEnabled(false);
-      hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            hypAddRuleTextFieldKeyReleased(evt);
-         }
-      });
-
-      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
-      hypAddRuleLevelComboBox.setEnabled(false);
-      hypAddRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypAddRuleLevelComboBoxActionPerformed(evt);
-         }
-      });
-
-      hypAddRuleButton.setMnemonic('A');
-      hypAddRuleButton.setText("Add rule");
-      hypAddRuleButton.setEnabled(false);
-      hypAddRuleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypAddRuleButtonActionPerformed(evt);
-         }
-      });
-
-      hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
-      hypAddRuleSyllabationLabel.setText("New syllabation:");
-
-      hypAddRuleSyllabationOutputLabel.setText("...");
-
-      hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
-      hypAddRuleSyllabesCountLabel.setText("New syllabes:");
-
-      hypAddRuleSyllabesCountOutputLabel.setText("...");
-
-      optionsButton.setText("Options");
-      optionsButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optionsButtonActionPerformed(evt);
-         }
-      });
-
-      openHypButton.setText("Open Hyphenation");
-      openHypButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openHypButtonActionPerformed(evt);
-         }
-      });
-
-      hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypRulesLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypRulesOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleLevelComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout hypLayeredPaneLayout = new javax.swing.GroupLayout(hypLayeredPane);
-      hypLayeredPane.setLayout(hypLayeredPaneLayout);
-      hypLayeredPaneLayout.setHorizontalGroup(
-         hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypWordLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypWordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(hypSyllabationLabel)
-                     .addComponent(hypSyllabesCountLabel))
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addGap(18, 18, 18)
-                  .addComponent(hypAddRuleButton))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleSyllabesCountLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addGap(13, 13, 13))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleSyllabationLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypRulesLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(optionsButton)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(openHypButton)))
-            .addContainerGap())
-      );
-      hypLayeredPaneLayout.setVerticalGroup(
-         hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypWordLabel)
-               .addComponent(hypWordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypSyllabationLabel)
-               .addComponent(hypSyllabationOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypSyllabesCountLabel)
-               .addComponent(hypSyllabesCountOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypRulesLabel)
-               .addComponent(hypRulesOutputLabel))
-            .addGap(18, 18, 18)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleLabel)
-               .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypAddRuleButton)
-               .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleSyllabationLabel)
-               .addComponent(hypAddRuleSyllabationOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleSyllabesCountLabel)
-               .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(optionsButton)
-               .addComponent(openHypButton))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
-
-      acoIncorrectLabel.setLabelFor(acoIncorrectTextField);
-      acoIncorrectLabel.setText("Incorrect form:");
-
-      acoIncorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoIncorrectTextFieldKeyReleased(evt);
-         }
-      });
-
-      acoToLabel.setText("→");
-
-      acoCorrectLabel.setLabelFor(acoCorrectTextField);
-      acoCorrectLabel.setText("Correct form:");
-
-      acoCorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoCorrectTextFieldKeyReleased(evt);
-         }
-      });
-
-      acoAddButton.setMnemonic('A');
-      acoAddButton.setText("Add");
-      acoAddButton.setToolTipText("");
-      acoAddButton.setEnabled(false);
-      acoAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            acoAddButtonActionPerformed(evt);
-         }
-      });
-
-      acoTable.setModel(new AutoCorrectTableModel());
-      acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
-      acoTable.setShowHorizontalLines(false);
-      acoTable.setShowVerticalLines(false);
-      //listen for row removal
-      acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
-      JFrame acoParent = this;
-      acoTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(MouseEvent e){
-            if(e.getClickCount() == 1){
-               JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
-                  BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
-                     try{
-                        backbone.getAcoParser().setCorrection(row, incorrect, correct);
-
-                        // ... and save the files
-                        backbone.storeAutoCorrectFile();
-                     }
-                     catch(Exception ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
-                     }
-                  };
-                  CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-                  CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.addWindowListener(new WindowAdapter(){
-                     @Override
-                     public void windowClosed(WindowEvent e){
-                        acoTable.clearSelection();
-                     }
-                  });
-                  dialog.setLocationRelativeTo(acoParent);
-                  dialog.setVisible(true);
-               }
-            }
-         }
-      });
-
-      TableRenderer acoCellRenderer = new TableRenderer();
-      acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
-      acoScrollPane.setViewportView(acoTable);
-
-      acoCorrectionsRecordedLabel.setLabelFor(acoCorrectionsRecordedOutputLabel);
-      acoCorrectionsRecordedLabel.setText("Corrections recorded:");
-
-      acoCorrectionsRecordedOutputLabel.setText("...");
-
-      openAcoButton.setText("Open AutoCorrect");
-      openAcoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAcoButtonActionPerformed(evt);
-         }
-      });
-
-      acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
-      acoLayeredPane.setLayout(acoLayeredPaneLayout);
-      acoLayeredPaneLayout.setHorizontalGroup(
-         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(acoScrollPane)
-               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(acoIncorrectLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                  .addComponent(acoToLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(acoCorrectLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addGap(18, 18, 18)
-                  .addComponent(acoAddButton))
-               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(acoCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openAcoButton)))
-            .addContainerGap())
-      );
-      acoLayeredPaneLayout.setVerticalGroup(
-         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoIncorrectLabel)
-               .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoAddButton)
-               .addComponent(acoToLabel)
-               .addComponent(acoCorrectLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoCorrectionsRecordedLabel)
-               .addComponent(acoCorrectionsRecordedOutputLabel)
-               .addComponent(openAcoButton))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
-
-      sexInputLabel.setLabelFor(sexTextField);
-      sexInputLabel.setText("Exception:");
-
-      sexTextField.setToolTipText("hit `enter` to add");
-      sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            sexTextFieldKeyReleased(evt);
-         }
-      });
-
-      sexScrollPane.setHorizontalScrollBar(null);
-      sexScrollPane.setViewportView(sexTagPanel);
-
-      sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
-      sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
-
-      sexCorrectionsRecordedOutputLabel.setText("...");
-
-      openSexButton.setText("Open Sentence Exceptions");
-      openSexButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openSexButtonActionPerformed(evt);
-         }
-      });
-
-      sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout sexLayeredPaneLayout = new javax.swing.GroupLayout(sexLayeredPane);
-      sexLayeredPane.setLayout(sexLayeredPaneLayout);
-      sexLayeredPaneLayout.setHorizontalGroup(
-         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(sexScrollPane)
-               .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(sexCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(sexInputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexTextField)))
-            .addContainerGap())
-      );
-      sexLayeredPaneLayout.setVerticalGroup(
-         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(sexInputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(sexCorrectionsRecordedLabel)
-               .addComponent(sexCorrectionsRecordedOutputLabel)
-               .addComponent(openSexButton))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
-
-      wexInputLabel.setLabelFor(wexTextField);
-      wexInputLabel.setText("Exception:");
-      wexInputLabel.setToolTipText("");
-
-      wexTextField.setToolTipText("hit `enter` to add");
-      wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            wexTextFieldKeyReleased(evt);
-         }
-      });
-
-      wexTagPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 2, 0));
-      wexScrollPane.setViewportView(wexTagPanel);
-
-      wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
-      wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
-
-      wexCorrectionsRecordedOutputLabel.setText("...");
-
-      openWexButton.setText("Open Word Exceptions");
-      openWexButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openWexButtonActionPerformed(evt);
-         }
-      });
-
-      wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout wexLayeredPaneLayout = new javax.swing.GroupLayout(wexLayeredPane);
-      wexLayeredPane.setLayout(wexLayeredPaneLayout);
-      wexLayeredPaneLayout.setHorizontalGroup(
-         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(wexScrollPane)
-               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(wexCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openWexButton))
-               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(wexInputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexTextField)))
-            .addContainerGap())
-      );
-      wexLayeredPaneLayout.setVerticalGroup(
-         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexInputLabel)
-               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexCorrectionsRecordedLabel)
-               .addComponent(wexCorrectionsRecordedOutputLabel)
-               .addComponent(openWexButton))
-            .addContainerGap())
-      );
-
-      mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
-
-      addWindowListener(new WindowAdapter(){
-         @Override
-         public void windowClosed(final WindowEvent e){
-            exit();
-         }
-      });
-
-      filMenu.setMnemonic('F');
-      filMenu.setText("File");
-      filMenu.setToolTipText("");
-
-      filOpenProjectMenuItem.setMnemonic('P');
-      filOpenProjectMenuItem.setText("Open Project...");
-      filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filOpenProjectMenuItemActionPerformed(evt);
-         }
-      });
-      filMenu.add(filOpenProjectMenuItem);
-
-      filCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
-      filCreatePackageMenuItem.setMnemonic('p');
-      filCreatePackageMenuItem.setText("Create package");
-      filCreatePackageMenuItem.setEnabled(false);
-      filCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filCreatePackageMenuItemActionPerformed(evt);
-         }
-      });
-      filMenu.add(filCreatePackageMenuItem);
-      filMenu.add(filFontSeparator);
-
-      filFontMenuItem.setMnemonic('f');
-      filFontMenuItem.setText("Select font...");
-      filFontMenuItem.setEnabled(false);
-      filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filFontMenuItemActionPerformed(evt);
-         }
-      });
-      filMenu.add(filFontMenuItem);
-      filMenu.add(filRecentProjectsSeparator);
-
-      filEmptyRecentProjectsMenuItem.setMnemonic('e');
-      filEmptyRecentProjectsMenuItem.setText("Empty Recent Projects list");
-      filEmptyRecentProjectsMenuItem.setEnabled(false);
-      filEmptyRecentProjectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filEmptyRecentProjectsMenuItemActionPerformed(evt);
-         }
-      });
-      filMenu.add(filEmptyRecentProjectsMenuItem);
-      filMenu.add(filSeparator);
-
-      filExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
-      filExitMenuItem.setMnemonic('x');
-      filExitMenuItem.setText("Exit");
-      filExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filExitMenuItemActionPerformed(evt);
-         }
-      });
-      filMenu.add(filExitMenuItem);
-
-      mainMenuBar.add(filMenu);
-      Preferences preferences = Preferences.userNodeForPackage(getClass());
-      RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
-      recentProjectsMenu.setText("Recent projects");
-      recentProjectsMenu.setMnemonic('R');
-      filMenu.add(recentProjectsMenu, 3);
-
-      dicMenu.setMnemonic('D');
-      dicMenu.setText("Dictionary tools");
-      dicMenu.setToolTipText("");
-      dicMenu.setEnabled(false);
-
-      dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
-      dicCheckCorrectnessMenuItem.setMnemonic('c');
-      dicCheckCorrectnessMenuItem.setText("Check correctness");
-      dicCheckCorrectnessMenuItem.setToolTipText("");
-      dicCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicCheckCorrectnessMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicCheckCorrectnessMenuItem);
-
-      dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
-      dicSortDictionaryMenuItem.setMnemonic('s');
-      dicSortDictionaryMenuItem.setText("Sort dictionary...");
-      dicSortDictionaryMenuItem.setToolTipText("");
-      dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicSortDictionaryMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicSortDictionaryMenuItem);
-
-      dicRulesReducerMenuItem.setText("Rules reducer...");
-      dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicRulesReducerMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicRulesReducerMenuItem);
-      dicMenu.add(dicDuplicatesSeparator);
-
-      dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
-      dicWordCountMenuItem.setMnemonic('w');
-      dicWordCountMenuItem.setText("Word count");
-      dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicWordCountMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicWordCountMenuItem);
-
-      dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
-      dicStatisticsMenuItem.setMnemonic('t');
-      dicStatisticsMenuItem.setText("Statistics");
-      dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicStatisticsMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicStatisticsMenuItem);
-      dicMenu.add(dicStatisticsSeparator);
-
-      dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
-      dicExtractDuplicatesMenuItem.setMnemonic('d');
-      dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
-      dicExtractDuplicatesMenuItem.setToolTipText("");
-      dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractDuplicatesMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicExtractDuplicatesMenuItem);
-
-      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
-      dicExtractWordlistMenuItem.setText("Extract wordlist...");
-      dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractWordlistMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicExtractWordlistMenuItem);
-
-      dicExtractWordlistPlainTextMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
-      dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)...");
-      dicExtractWordlistPlainTextMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractWordlistPlainTextMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicExtractWordlistPlainTextMenuItem);
-
-      dicExtractMinimalPairsMenuItem.setMnemonic('m');
-      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
-      dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractMinimalPairsMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicExtractMinimalPairsMenuItem);
-
-      mainMenuBar.add(dicMenu);
-
-      hypMenu.setMnemonic('H');
-      hypMenu.setText("Hyphenation tools");
-      hypMenu.setToolTipText("");
-      hypMenu.setEnabled(false);
-
-      hypCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
-      hypCheckCorrectnessMenuItem.setMnemonic('d');
-      hypCheckCorrectnessMenuItem.setText("Check correctness");
-      hypCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypCheckCorrectnessMenuItemActionPerformed(evt);
-         }
-      });
-      hypMenu.add(hypCheckCorrectnessMenuItem);
-      hypMenu.add(hypDuplicatesSeparator);
-
-      hypStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
-      hypStatisticsMenuItem.setMnemonic('t');
-      hypStatisticsMenuItem.setText("Statistics");
-      hypStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypStatisticsMenuItemActionPerformed(evt);
-         }
-      });
-      hypMenu.add(hypStatisticsMenuItem);
-
-      mainMenuBar.add(hypMenu);
-
-      hlpMenu.setMnemonic('H');
-      hlpMenu.setText("Help");
-
-      hlpOnlineHelpMenuItem.setMnemonic('h');
-      hlpOnlineHelpMenuItem.setText("Online help");
-      hlpOnlineHelpMenuItem.setToolTipText("");
-      hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpOnlineHelpMenuItemActionPerformed(evt);
-         }
-      });
-      hlpMenu.add(hlpOnlineHelpMenuItem);
-
-      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
-      hlpAboutMenuItem.setMnemonic('a');
-      hlpAboutMenuItem.setText("About");
-      hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpAboutMenuItemActionPerformed(evt);
-         }
-      });
-      hlpMenu.add(hlpAboutMenuItem);
-
-      mainMenuBar.add(hlpMenu);
-
-      setJMenuBar(mainMenuBar);
-
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-      getContentPane().setLayout(layout);
-      layout.setHorizontalGroup(
-         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(mainTabbedPane)
-               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
-               .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addContainerGap())
-      );
-      layout.setVerticalGroup(
-         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(18, 18, 18)
-            .addComponent(mainTabbedPane)
-            .addContainerGap())
-      );
-
-      for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
-      mainTabbedPane.setEnabledAt(i, false);
-      KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-      mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-      pack();
-      setLocationRelativeTo(null);
-   }// </editor-fold>//GEN-END:initComponents
-
-   private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	private void initComponents() {
+
+		parsingResultScrollPane = new javax.swing.JScrollPane();
+		parsingResultTextArea = new javax.swing.JTextArea();
+		mainProgressBar = new javax.swing.JProgressBar();
+		mainTabbedPane = new javax.swing.JTabbedPane();
+		dicLayeredPane = new javax.swing.JLayeredPane();
+		dicInputLabel = new javax.swing.JLabel();
+		dicInputTextField = new javax.swing.JTextField();
+		dicRuleFlagsAidLabel = new javax.swing.JLabel();
+		dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+		dicScrollPane = new javax.swing.JScrollPane();
+		dicTable = new javax.swing.JTable();
+		dicTotalProductionsLabel = new javax.swing.JLabel();
+		dicTotalProductionsOutputLabel = new javax.swing.JLabel();
+		openAidButton = new javax.swing.JButton();
+		openAffButton = new javax.swing.JButton();
+		openDicButton = new javax.swing.JButton();
+		cmpLayeredPane = new javax.swing.JLayeredPane();
+		cmpInputLabel = new javax.swing.JLabel();
+		cmpInputComboBox = new javax.swing.JComboBox<>();
+		cmpLimitLabel = new javax.swing.JLabel();
+		cmpLimitComboBox = new javax.swing.JComboBox<>();
+		cmpRuleFlagsAidLabel = new javax.swing.JLabel();
+		cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+		cmpScrollPane = new javax.swing.JScrollPane();
+		cmpTable = new javax.swing.JTable();
+		cmpInputScrollPane = new javax.swing.JScrollPane();
+		cmpInputTextArea = new javax.swing.JTextArea();
+		cmpLoadInputButton = new javax.swing.JButton();
+		theLayeredPane = new javax.swing.JLayeredPane();
+		theMeaningsLabel = new javax.swing.JLabel();
+		theMeaningsTextField = new javax.swing.JTextField();
+		theAddButton = new javax.swing.JButton();
+		theScrollPane = new javax.swing.JScrollPane();
+		theTable = new javax.swing.JTable();
+		theSynonymsRecordedLabel = new javax.swing.JLabel();
+		theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
+		hypLayeredPane = new javax.swing.JLayeredPane();
+		hypWordLabel = new javax.swing.JLabel();
+		hypWordTextField = new javax.swing.JTextField();
+		hypSyllabationLabel = new javax.swing.JLabel();
+		hypSyllabationOutputLabel = new JWordLabel();
+		hypSyllabesCountLabel = new javax.swing.JLabel();
+		hypSyllabesCountOutputLabel = new javax.swing.JLabel();
+		hypRulesLabel = new javax.swing.JLabel();
+		hypRulesOutputLabel = new JWordLabel();
+		hypAddRuleLabel = new javax.swing.JLabel();
+		hypAddRuleTextField = new javax.swing.JTextField();
+		hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
+		hypAddRuleButton = new javax.swing.JButton();
+		hypAddRuleSyllabationLabel = new javax.swing.JLabel();
+		hypAddRuleSyllabationOutputLabel = new JWordLabel();
+		hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
+		hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
+		optionsButton = new javax.swing.JButton();
+		openHypButton = new javax.swing.JButton();
+		acoLayeredPane = new javax.swing.JLayeredPane();
+		acoIncorrectLabel = new javax.swing.JLabel();
+		acoIncorrectTextField = new javax.swing.JTextField();
+		acoToLabel = new javax.swing.JLabel();
+		acoCorrectLabel = new javax.swing.JLabel();
+		acoCorrectTextField = new javax.swing.JTextField();
+		acoAddButton = new javax.swing.JButton();
+		acoScrollPane = new javax.swing.JScrollPane();
+		acoTable = new javax.swing.JTable();
+		acoCorrectionsRecordedLabel = new javax.swing.JLabel();
+		acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+		openAcoButton = new javax.swing.JButton();
+		sexLayeredPane = new javax.swing.JLayeredPane();
+		sexInputLabel = new javax.swing.JLabel();
+		sexTextField = new javax.swing.JTextField();
+		sexScrollPane = new javax.swing.JScrollPane();
+		sexTagPanel = new JTagPanel((changeType, tags) -> {
+			backbone.getSexParser().modify(changeType, tags);
+			backbone.getSexParser().save();
+		});
+		sexCorrectionsRecordedLabel = new javax.swing.JLabel();
+		sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+		openSexButton = new javax.swing.JButton();
+		wexLayeredPane = new javax.swing.JLayeredPane();
+		wexInputLabel = new javax.swing.JLabel();
+		wexTextField = new javax.swing.JTextField();
+		wexScrollPane = new javax.swing.JScrollPane();
+		wexTagPanel = new JTagPanel((changeType, tags) -> {
+			backbone.getSexParser().modify(changeType, tags);
+			backbone.getSexParser().save();
+		});
+		wexCorrectionsRecordedLabel = new javax.swing.JLabel();
+		wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+		openWexButton = new javax.swing.JButton();
+		mainMenuBar = new javax.swing.JMenuBar();
+		filMenu = new javax.swing.JMenu();
+		filOpenProjectMenuItem = new javax.swing.JMenuItem();
+		filCreatePackageMenuItem = new javax.swing.JMenuItem();
+		filFontSeparator = new javax.swing.JPopupMenu.Separator();
+		filFontMenuItem = new javax.swing.JMenuItem();
+		filRecentProjectsSeparator = new javax.swing.JPopupMenu.Separator();
+		filEmptyRecentProjectsMenuItem = new javax.swing.JMenuItem();
+		filSeparator = new javax.swing.JPopupMenu.Separator();
+		filExitMenuItem = new javax.swing.JMenuItem();
+		dicMenu = new javax.swing.JMenu();
+		dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+		dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
+		dicRulesReducerMenuItem = new javax.swing.JMenuItem();
+		dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
+		dicWordCountMenuItem = new javax.swing.JMenuItem();
+		dicStatisticsMenuItem = new javax.swing.JMenuItem();
+		dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
+		dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
+		dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
+		dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
+		dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
+		hypMenu = new javax.swing.JMenu();
+		hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+		hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
+		hypStatisticsMenuItem = new javax.swing.JMenuItem();
+		hlpMenu = new javax.swing.JMenu();
+		hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
+		hlpAboutMenuItem = new javax.swing.JMenuItem();
+
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setTitle("Hunspeller");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
+		setMinimumSize(new java.awt.Dimension(964, 534));
+
+		parsingResultTextArea.setEditable(false);
+		parsingResultTextArea.setColumns(20);
+		parsingResultTextArea.setRows(1);
+		parsingResultTextArea.setTabSize(3);
+		DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		parsingResultScrollPane.setViewportView(parsingResultTextArea);
+
+		dicInputLabel.setLabelFor(dicInputTextField);
+		dicInputLabel.setText("Dictionary entry:");
+
+		dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				dicInputTextFieldKeyReleased(evt);
+			}
+		});
+
+		dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
+		dicRuleFlagsAidLabel.setText("Rule flags aid:");
+
+		dicTable.setModel(new ProductionTableModel());
+		dicTable.setShowHorizontalLines(false);
+		dicTable.setShowVerticalLines(false);
+		dicTable.setRowSelectionAllowed(true);
+		dicScrollPane.setViewportView(dicTable);
+
+		dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
+		dicTotalProductionsLabel.setText("Total productions:");
+
+		dicTotalProductionsOutputLabel.setText("...");
+
+		openAidButton.setText("Open Aid");
+		openAidButton.setEnabled(false);
+		openAidButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openAidButtonActionPerformed(evt);
+			}
+		});
+
+		openAffButton.setText("Open Affix");
+		openAffButton.setEnabled(false);
+		openAffButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openAffButtonActionPerformed(evt);
+			}
+		});
+
+		openDicButton.setText("Open Dictionary");
+		openDicButton.setEnabled(false);
+		openDicButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openDicButtonActionPerformed(evt);
+			}
+		});
+
+		dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(dicTotalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		dicLayeredPane.setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
+		dicLayeredPane.setLayout(dicLayeredPaneLayout);
+		dicLayeredPaneLayout.setHorizontalGroup(
+			dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(dicLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dicLayeredPaneLayout.createSequentialGroup()
+							.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+								.addComponent(dicInputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(dicRuleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(dicInputTextField)))
+						.addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+						.addGroup(dicLayeredPaneLayout.createSequentialGroup()
+							.addComponent(dicTotalProductionsLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(dicTotalProductionsOutputLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(openAidButton)
+							.addGap(18, 18, 18)
+							.addComponent(openAffButton)
+							.addGap(18, 18, 18)
+							.addComponent(openDicButton)))
+					.addContainerGap())
+		);
+		dicLayeredPaneLayout.setVerticalGroup(
+			dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(dicLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(dicInputLabel)
+						.addComponent(dicInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(dicRuleFlagsAidLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(dicTotalProductionsLabel)
+						.addComponent(dicTotalProductionsOutputLabel)
+						.addComponent(openAffButton)
+						.addComponent(openDicButton)
+						.addComponent(openAidButton))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+
+		cmpInputLabel.setLabelFor(cmpInputComboBox);
+		cmpInputLabel.setText("Compound rule:");
+
+		cmpInputComboBox.setEditable(true);
+		cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
+			@Override
+			public void keyReleased(java.awt.event.KeyEvent evt){
+				cmpInputComboBoxKeyReleased();
+			}
+		});
+		cmpInputComboBox.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent evt){
+				cmpInputComboBoxKeyReleased();
+			}
+		});
+
+		cmpLimitLabel.setLabelFor(cmpLimitComboBox);
+		cmpLimitLabel.setText("Limit:");
+
+		cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
+		cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				cmpLimitComboBoxActionPerformed(evt);
+			}
+		});
+
+		cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
+		cmpRuleFlagsAidLabel.setText("Rule flags aid:");
+
+		cmpTable.setModel(new CompoundTableModel());
+		cmpTable.setShowHorizontalLines(false);
+		cmpTable.setShowVerticalLines(false);
+		KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+		cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
+		cmpTable.setRowSelectionAllowed(true);
+		cmpScrollPane.setViewportView(cmpTable);
+
+		cmpInputTextArea.setEditable(false);
+		cmpInputTextArea.setColumns(20);
+		cmpInputScrollPane.setViewportView(cmpInputTextArea);
+
+		cmpLoadInputButton.setText("Load input from dictionary");
+		cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				cmpLoadInputButtonActionPerformed(evt);
+			}
+		});
+
+		cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpLimitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpLimitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpInputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		cmpLayeredPane.setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
+		cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
+		cmpLayeredPaneLayout.setHorizontalGroup(
+			cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+							.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(cmpInputLabel)
+								.addComponent(cmpRuleFlagsAidLabel))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(cmpRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+									.addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
+									.addGap(18, 18, 18)
+									.addComponent(cmpLimitLabel)
+									.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+									.addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cmpLayeredPaneLayout.createSequentialGroup()
+							.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(cmpInputScrollPane)
+								.addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+									.addComponent(cmpLoadInputButton)
+									.addGap(0, 0, Short.MAX_VALUE)))
+							.addGap(18, 18, 18)
+							.addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
+		);
+		cmpLayeredPaneLayout.setVerticalGroup(
+			cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(cmpInputLabel)
+						.addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(cmpLimitLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(cmpRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(cmpRuleFlagsAidLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+						.addComponent(cmpInputScrollPane))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(cmpLoadInputButton)
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
+
+		theMeaningsLabel.setLabelFor(theMeaningsTextField);
+		theMeaningsLabel.setText("New synonym:");
+
+		theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				theMeaningsTextFieldKeyReleased(evt);
+			}
+		});
+
+		theAddButton.setMnemonic('A');
+		theAddButton.setText("Add");
+		theAddButton.setEnabled(false);
+		theAddButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				theAddButtonActionPerformed(evt);
+			}
+		});
+
+		theTable.setModel(new ThesaurusTableModel());
+		theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
+		theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
+		theTable.setShowHorizontalLines(false);
+		theTable.setShowVerticalLines(false);
+		theTable.getColumnModel().getColumn(0).setMinWidth(200);
+		theTable.getColumnModel().getColumn(0).setMaxWidth(500);
+		//listen for row removal
+		theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
+		JFrame theParent = this;
+		theTable.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				if(e.getClickCount() == 1){
+					JTable target = (JTable)e.getSource();
+					int col = target.getSelectedColumn();
+					if(col == 1){
+						int row = theTable.convertRowIndexToModel(target.getSelectedRow());
+						Consumer<String> okButtonAction = (text) -> {
+							try{
+								backbone.getTheParser().setMeanings(row, text);
+
+								// ... and save the files
+								backbone.storeThesaurusFiles();
+							}
+							catch(Exception ex){
+								LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+							}
+						};
+						ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
+						ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
+						GUIUtils.addCancelByEscapeKey(dialog);
+						dialog.addWindowListener(new WindowAdapter(){
+							@Override
+							public void windowClosed(WindowEvent e){
+								theTable.clearSelection();
+							}
+						});
+						dialog.setLocationRelativeTo(theParent);
+						dialog.setVisible(true);
+					}
+				}
+			}
+		});
+
+		TableRenderer theCellRenderer = new TableRenderer();
+		theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
+		theScrollPane.setViewportView(theTable);
+
+		theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
+		theSynonymsRecordedLabel.setText("Synonyms recorded:");
+
+		theSynonymsRecordedOutputLabel.setText("...");
+
+		theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		theLayeredPane.setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout theLayeredPaneLayout = new javax.swing.GroupLayout(theLayeredPane);
+		theLayeredPane.setLayout(theLayeredPaneLayout);
+		theLayeredPaneLayout.setHorizontalGroup(
+			theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(theLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
+							.addComponent(theMeaningsLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(theMeaningsTextField)
+							.addGap(18, 18, 18)
+							.addComponent(theAddButton))
+						.addGroup(theLayeredPaneLayout.createSequentialGroup()
+							.addComponent(theSynonymsRecordedLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
+		theLayeredPaneLayout.setVerticalGroup(
+			theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(theMeaningsLabel)
+						.addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(theAddButton))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(theSynonymsRecordedLabel)
+						.addComponent(theSynonymsRecordedOutputLabel))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Thesaurus", theLayeredPane);
+
+		hypWordLabel.setLabelFor(hypWordTextField);
+		hypWordLabel.setText("Word:");
+
+		hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				hypWordTextFieldKeyReleased(evt);
+			}
+		});
+
+		hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
+		hypSyllabationLabel.setText("Syllabation:");
+
+		hypSyllabationOutputLabel.setText("...");
+
+		hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
+		hypSyllabesCountLabel.setText("Syllabes:");
+
+		hypSyllabesCountOutputLabel.setText("...");
+
+		hypRulesLabel.setLabelFor(hypRulesOutputLabel);
+		hypRulesLabel.setText("Rules:");
+
+		hypRulesOutputLabel.setText("...");
+
+		hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
+		hypAddRuleLabel.setText("Add rule:");
+
+		hypAddRuleTextField.setEnabled(false);
+		hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				hypAddRuleTextFieldKeyReleased(evt);
+			}
+		});
+
+		hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
+		hypAddRuleLevelComboBox.setEnabled(false);
+		hypAddRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hypAddRuleLevelComboBoxActionPerformed(evt);
+			}
+		});
+
+		hypAddRuleButton.setMnemonic('A');
+		hypAddRuleButton.setText("Add rule");
+		hypAddRuleButton.setEnabled(false);
+		hypAddRuleButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hypAddRuleButtonActionPerformed(evt);
+			}
+		});
+
+		hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
+		hypAddRuleSyllabationLabel.setText("New syllabation:");
+
+		hypAddRuleSyllabationOutputLabel.setText("...");
+
+		hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
+		hypAddRuleSyllabesCountLabel.setText("New syllabes:");
+
+		hypAddRuleSyllabesCountOutputLabel.setText("...");
+
+		optionsButton.setText("Options");
+		optionsButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				optionsButtonActionPerformed(evt);
+			}
+		});
+
+		openHypButton.setText("Open Hyphenation");
+		openHypButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openHypButtonActionPerformed(evt);
+			}
+		});
+
+		hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypRulesLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypRulesOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleLevelComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(hypAddRuleSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		hypLayeredPane.setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout hypLayeredPaneLayout = new javax.swing.GroupLayout(hypLayeredPane);
+		hypLayeredPane.setLayout(hypLayeredPaneLayout);
+		hypLayeredPaneLayout.setHorizontalGroup(
+			hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(hypWordLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(hypWordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE))
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(hypSyllabationLabel)
+								.addComponent(hypSyllabesCountLabel))
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+								.addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(hypAddRuleLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(hypAddRuleTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+							.addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+							.addGap(18, 18, 18)
+							.addComponent(hypAddRuleButton))
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(hypAddRuleSyllabesCountLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(hypAddRuleSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addGap(13, 13, 13))
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(hypAddRuleSyllabationLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(hypRulesLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+							.addComponent(optionsButton)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(openHypButton)))
+					.addContainerGap())
+		);
+		hypLayeredPaneLayout.setVerticalGroup(
+			hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(hypLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypWordLabel)
+						.addComponent(hypWordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypSyllabationLabel)
+						.addComponent(hypSyllabationOutputLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypSyllabesCountLabel)
+						.addComponent(hypSyllabesCountOutputLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypRulesLabel)
+						.addComponent(hypRulesOutputLabel))
+					.addGap(18, 18, 18)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypAddRuleLabel)
+						.addComponent(hypAddRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(hypAddRuleButton)
+						.addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypAddRuleSyllabationLabel)
+						.addComponent(hypAddRuleSyllabationOutputLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(hypAddRuleSyllabesCountLabel)
+						.addComponent(hypAddRuleSyllabesCountOutputLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+					.addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(optionsButton)
+						.addComponent(openHypButton))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
+
+		acoIncorrectLabel.setLabelFor(acoIncorrectTextField);
+		acoIncorrectLabel.setText("Incorrect form:");
+
+		acoIncorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				acoIncorrectTextFieldKeyReleased(evt);
+			}
+		});
+
+		acoToLabel.setText("→");
+
+		acoCorrectLabel.setLabelFor(acoCorrectTextField);
+		acoCorrectLabel.setText("Correct form:");
+
+		acoCorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				acoCorrectTextFieldKeyReleased(evt);
+			}
+		});
+
+		acoAddButton.setMnemonic('A');
+		acoAddButton.setText("Add");
+		acoAddButton.setToolTipText("");
+		acoAddButton.setEnabled(false);
+		acoAddButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				acoAddButtonActionPerformed(evt);
+			}
+		});
+
+		acoTable.setModel(new AutoCorrectTableModel());
+		acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
+		acoTable.setShowHorizontalLines(false);
+		acoTable.setShowVerticalLines(false);
+		//listen for row removal
+		acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
+		JFrame acoParent = this;
+		acoTable.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				if(e.getClickCount() == 1){
+					JTable target = (JTable)e.getSource();
+					int col = target.getSelectedColumn();
+					if(col == 1){
+						int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
+						BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
+							try{
+								backbone.getAcoParser().setCorrection(row, incorrect, correct);
+
+								// ... and save the files
+								backbone.storeAutoCorrectFile();
+							}
+							catch(Exception ex){
+								LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+							}
+						};
+						CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+						CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
+						GUIUtils.addCancelByEscapeKey(dialog);
+						dialog.addWindowListener(new WindowAdapter(){
+							@Override
+							public void windowClosed(WindowEvent e){
+								acoTable.clearSelection();
+							}
+						});
+						dialog.setLocationRelativeTo(acoParent);
+						dialog.setVisible(true);
+					}
+				}
+			}
+		});
+
+		TableRenderer acoCellRenderer = new TableRenderer();
+		acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
+		acoScrollPane.setViewportView(acoTable);
+
+		acoCorrectionsRecordedLabel.setLabelFor(acoCorrectionsRecordedOutputLabel);
+		acoCorrectionsRecordedLabel.setText("Corrections recorded:");
+
+		acoCorrectionsRecordedOutputLabel.setText("...");
+
+		openAcoButton.setText("Open AutoCorrect");
+		openAcoButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openAcoButtonActionPerformed(evt);
+			}
+		});
+
+		acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoCorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		acoLayeredPane.setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
+		acoLayeredPane.setLayout(acoLayeredPaneLayout);
+		acoLayeredPaneLayout.setHorizontalGroup(
+			acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(acoLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(acoScrollPane)
+						.addGroup(acoLayeredPaneLayout.createSequentialGroup()
+							.addComponent(acoIncorrectLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+							.addComponent(acoToLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+							.addComponent(acoCorrectLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+							.addGap(18, 18, 18)
+							.addComponent(acoAddButton))
+						.addGroup(acoLayeredPaneLayout.createSequentialGroup()
+							.addComponent(acoCorrectionsRecordedLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(openAcoButton)))
+					.addContainerGap())
+		);
+		acoLayeredPaneLayout.setVerticalGroup(
+			acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(acoLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(acoIncorrectLabel)
+						.addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(acoAddButton)
+						.addComponent(acoToLabel)
+						.addComponent(acoCorrectLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(acoCorrectionsRecordedLabel)
+						.addComponent(acoCorrectionsRecordedOutputLabel)
+						.addComponent(openAcoButton))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
+
+		sexInputLabel.setLabelFor(sexTextField);
+		sexInputLabel.setText("Exception:");
+
+		sexTextField.setToolTipText("hit `enter` to add");
+		sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				sexTextFieldKeyReleased(evt);
+			}
+		});
+
+		sexScrollPane.setHorizontalScrollBar(null);
+		sexScrollPane.setViewportView(sexTagPanel);
+
+		sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
+		sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
+
+		sexCorrectionsRecordedOutputLabel.setText("...");
+
+		openSexButton.setText("Open Sentence Exceptions");
+		openSexButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openSexButtonActionPerformed(evt);
+			}
+		});
+
+		sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		sexLayeredPane.setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout sexLayeredPaneLayout = new javax.swing.GroupLayout(sexLayeredPane);
+		sexLayeredPane.setLayout(sexLayeredPaneLayout);
+		sexLayeredPaneLayout.setHorizontalGroup(
+			sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(sexLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(sexScrollPane)
+						.addGroup(sexLayeredPaneLayout.createSequentialGroup()
+							.addComponent(sexCorrectionsRecordedLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(openSexButton))
+						.addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
+							.addComponent(sexInputLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(sexTextField)))
+					.addContainerGap())
+		);
+		sexLayeredPaneLayout.setVerticalGroup(
+			sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(sexLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+						.addComponent(sexInputLabel))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(sexCorrectionsRecordedLabel)
+						.addComponent(sexCorrectionsRecordedOutputLabel)
+						.addComponent(openSexButton))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
+
+		wexInputLabel.setLabelFor(wexTextField);
+		wexInputLabel.setText("Exception:");
+		wexInputLabel.setToolTipText("");
+
+		wexTextField.setToolTipText("hit `enter` to add");
+		wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+			public void keyReleased(java.awt.event.KeyEvent evt) {
+				wexTextFieldKeyReleased(evt);
+			}
+		});
+
+		wexTagPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 2, 0));
+		wexScrollPane.setViewportView(wexTagPanel);
+
+		wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
+		wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
+
+		wexCorrectionsRecordedOutputLabel.setText("...");
+
+		openWexButton.setText("Open Word Exceptions");
+		openWexButton.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				openWexButtonActionPerformed(evt);
+			}
+		});
+
+		wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+		wexLayeredPane.setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+		javax.swing.GroupLayout wexLayeredPaneLayout = new javax.swing.GroupLayout(wexLayeredPane);
+		wexLayeredPane.setLayout(wexLayeredPaneLayout);
+		wexLayeredPaneLayout.setHorizontalGroup(
+			wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(wexLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(wexScrollPane)
+						.addGroup(wexLayeredPaneLayout.createSequentialGroup()
+							.addComponent(wexCorrectionsRecordedLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(openWexButton))
+						.addGroup(wexLayeredPaneLayout.createSequentialGroup()
+							.addComponent(wexInputLabel)
+							.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+							.addComponent(wexTextField)))
+					.addContainerGap())
+		);
+		wexLayeredPaneLayout.setVerticalGroup(
+			wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(wexLayeredPaneLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(wexInputLabel)
+						.addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+					.addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+						.addComponent(wexCorrectionsRecordedLabel)
+						.addComponent(wexCorrectionsRecordedOutputLabel)
+						.addComponent(openWexButton))
+					.addContainerGap())
+		);
+
+		mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
+
+		addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosed(final WindowEvent e){
+				exit();
+			}
+		});
+
+		filMenu.setMnemonic('F');
+		filMenu.setText("File");
+		filMenu.setToolTipText("");
+
+		filOpenProjectMenuItem.setMnemonic('P');
+		filOpenProjectMenuItem.setText("Open Project...");
+		filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filOpenProjectMenuItemActionPerformed(evt);
+			}
+		});
+		filMenu.add(filOpenProjectMenuItem);
+
+		filCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
+		filCreatePackageMenuItem.setMnemonic('p');
+		filCreatePackageMenuItem.setText("Create package");
+		filCreatePackageMenuItem.setEnabled(false);
+		filCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filCreatePackageMenuItemActionPerformed(evt);
+			}
+		});
+		filMenu.add(filCreatePackageMenuItem);
+		filMenu.add(filFontSeparator);
+
+		filFontMenuItem.setMnemonic('f');
+		filFontMenuItem.setText("Select font...");
+		filFontMenuItem.setEnabled(false);
+		filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filFontMenuItemActionPerformed(evt);
+			}
+		});
+		filMenu.add(filFontMenuItem);
+		filMenu.add(filRecentProjectsSeparator);
+
+		filEmptyRecentProjectsMenuItem.setMnemonic('e');
+		filEmptyRecentProjectsMenuItem.setText("Empty Recent Projects list");
+		filEmptyRecentProjectsMenuItem.setEnabled(false);
+		filEmptyRecentProjectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filEmptyRecentProjectsMenuItemActionPerformed(evt);
+			}
+		});
+		filMenu.add(filEmptyRecentProjectsMenuItem);
+		filMenu.add(filSeparator);
+
+		filExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
+		filExitMenuItem.setMnemonic('x');
+		filExitMenuItem.setText("Exit");
+		filExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filExitMenuItemActionPerformed(evt);
+			}
+		});
+		filMenu.add(filExitMenuItem);
+
+		mainMenuBar.add(filMenu);
+		Preferences preferences = Preferences.userNodeForPackage(getClass());
+		RecentItems recentItems = new RecentItems(5, preferences);
+		recentProjectsMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
+		recentProjectsMenu.setText("Recent projects");
+		recentProjectsMenu.setMnemonic('R');
+		filMenu.add(recentProjectsMenu, 3);
+
+		dicMenu.setMnemonic('D');
+		dicMenu.setText("Dictionary tools");
+		dicMenu.setToolTipText("");
+		dicMenu.setEnabled(false);
+
+		dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+		dicCheckCorrectnessMenuItem.setMnemonic('c');
+		dicCheckCorrectnessMenuItem.setText("Check correctness");
+		dicCheckCorrectnessMenuItem.setToolTipText("");
+		dicCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicCheckCorrectnessMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicCheckCorrectnessMenuItem);
+
+		dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
+		dicSortDictionaryMenuItem.setMnemonic('s');
+		dicSortDictionaryMenuItem.setText("Sort dictionary...");
+		dicSortDictionaryMenuItem.setToolTipText("");
+		dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicSortDictionaryMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicSortDictionaryMenuItem);
+
+		dicRulesReducerMenuItem.setText("Rules reducer...");
+		dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicRulesReducerMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicRulesReducerMenuItem);
+		dicMenu.add(dicDuplicatesSeparator);
+
+		dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
+		dicWordCountMenuItem.setMnemonic('w');
+		dicWordCountMenuItem.setText("Word count");
+		dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicWordCountMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicWordCountMenuItem);
+
+		dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+		dicStatisticsMenuItem.setMnemonic('t');
+		dicStatisticsMenuItem.setText("Statistics");
+		dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicStatisticsMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicStatisticsMenuItem);
+		dicMenu.add(dicStatisticsSeparator);
+
+		dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
+		dicExtractDuplicatesMenuItem.setMnemonic('d');
+		dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
+		dicExtractDuplicatesMenuItem.setToolTipText("");
+		dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicExtractDuplicatesMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicExtractDuplicatesMenuItem);
+
+		dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+		dicExtractWordlistMenuItem.setText("Extract wordlist...");
+		dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicExtractWordlistMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicExtractWordlistMenuItem);
+
+		dicExtractWordlistPlainTextMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+		dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)...");
+		dicExtractWordlistPlainTextMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicExtractWordlistPlainTextMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicExtractWordlistPlainTextMenuItem);
+
+		dicExtractMinimalPairsMenuItem.setMnemonic('m');
+		dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
+		dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				dicExtractMinimalPairsMenuItemActionPerformed(evt);
+			}
+		});
+		dicMenu.add(dicExtractMinimalPairsMenuItem);
+
+		mainMenuBar.add(dicMenu);
+
+		hypMenu.setMnemonic('H');
+		hypMenu.setText("Hyphenation tools");
+		hypMenu.setToolTipText("");
+		hypMenu.setEnabled(false);
+
+		hypCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+		hypCheckCorrectnessMenuItem.setMnemonic('d');
+		hypCheckCorrectnessMenuItem.setText("Check correctness");
+		hypCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hypCheckCorrectnessMenuItemActionPerformed(evt);
+			}
+		});
+		hypMenu.add(hypCheckCorrectnessMenuItem);
+		hypMenu.add(hypDuplicatesSeparator);
+
+		hypStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+		hypStatisticsMenuItem.setMnemonic('t');
+		hypStatisticsMenuItem.setText("Statistics");
+		hypStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hypStatisticsMenuItemActionPerformed(evt);
+			}
+		});
+		hypMenu.add(hypStatisticsMenuItem);
+
+		mainMenuBar.add(hypMenu);
+
+		hlpMenu.setMnemonic('H');
+		hlpMenu.setText("Help");
+
+		hlpOnlineHelpMenuItem.setMnemonic('h');
+		hlpOnlineHelpMenuItem.setText("Online help");
+		hlpOnlineHelpMenuItem.setToolTipText("");
+		hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hlpOnlineHelpMenuItemActionPerformed(evt);
+			}
+		});
+		hlpMenu.add(hlpOnlineHelpMenuItem);
+
+		hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
+		hlpAboutMenuItem.setMnemonic('a');
+		hlpAboutMenuItem.setText("About");
+		hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hlpAboutMenuItemActionPerformed(evt);
+			}
+		});
+		hlpMenu.add(hlpAboutMenuItem);
+
+		mainMenuBar.add(hlpMenu);
+
+		setJMenuBar(mainMenuBar);
+
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(
+			layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addComponent(mainTabbedPane)
+						.addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+						.addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		layout.setVerticalGroup(
+			layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(parsingResultScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+					.addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+					.addGap(18, 18, 18)
+					.addComponent(mainTabbedPane)
+					.addContainerGap())
+		);
+
+		for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
+			mainTabbedPane.setEnabledAt(i, false);
+		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+		pack();
+		setLocationRelativeTo(null);
+	}// </editor-fold>//GEN-END:initComponents
+
+	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
@@ -1443,32 +1454,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
-   }//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
+	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
 
-   private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
+	private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		backbone.createPackage();
-   }//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
+	}//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
-   private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
+	private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		exit();
-   }//GEN-LAST:event_filExitMenuItemActionPerformed
+	}//GEN-LAST:event_filExitMenuItemActionPerformed
 
 	private void exit(){
 		dispose();
 	}
 
-   private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
+	private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final HelpDialog dialog = new HelpDialog(this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
+	}//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
 	private void calculateProductions(final HunspellerFrame frame){
@@ -1516,13 +1527,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 
-   private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
+	private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkDictionaryCorrectness();
-   }//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
 
-   private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
+	private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
@@ -1557,25 +1568,25 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(final IOException e){
 			LOGGER.error("Something very bad happened while sorting the dictionary", e);
 		}
-   }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
+	}//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
-   private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
+	private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryDuplicates();
-   }//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
 
-   private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
+	private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(false);
-   }//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
 
-   private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
+	private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractMinimalPairs();
-   }//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
 
 	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
@@ -1592,6 +1603,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
+		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
+
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
@@ -1617,6 +1631,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//... and save the files
 			backbone.storeThesaurusFiles();
+
+
+			//redo filtering, that is re-set the state of the button (it may have changed)
+			final String unmodifiedSearchText = theMeaningsTextField.getText();
+			if(StringUtils.isNotBlank(unmodifiedSearchText)){
+				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
+				final List<String> meanings = Arrays.asList(pair.getRight());
+				final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+				theAddButton.setEnabled(!alreadyContained);
+			}
 		}
 		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
@@ -1627,7 +1652,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
+			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
 		formerFilterIncorrectText = unmodifiedIncorrectText;
@@ -1676,13 +1701,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 
-   private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
+	private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(false);
-   }//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
+	}//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
 
-   private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
+	private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
@@ -1691,23 +1716,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(final Exception e){
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
-   }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
+	}//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
-   private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
+	private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkHyphenationCorrectness();
-   }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
 
-   private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
 		recentProjectsMenu.setEnabled(false);
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
 		filOpenProjectMenuItem.setEnabled(true);
-   }//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
-   private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
+	private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		dicRulesReducerMenuItem.setEnabled(false);
@@ -1721,154 +1746,154 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		});
 		rulesReducerDialog.setVisible(true);
-   }//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
+	}//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
-   private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
+	private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(true);
-   }//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
+	}//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
 
-   private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+	private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(true);
-   }//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 
-   private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
+	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		final  String newRule = hypAddRuleTextField.getText();
 		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		final String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
-      if(foundRule == null){
-         try{
-            backbone.storeHyphenationFile();
-
-            if(hypWordTextField.getText() != null){
-               formerHyphenationText = null;
-               hyphenate(this);
-            }
-
-            hypAddRuleLevelComboBox.setEnabled(false);
-            hypAddRuleButton.setEnabled(false);
-            hypAddRuleTextField.setText(null);
-            hypAddRuleSyllabationOutputLabel.setText(null);
-            hypAddRuleSyllabesCountOutputLabel.setText(null);
-         }
-         catch(final IOException e){
-            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
-         }
-      }
-      else{
-         hypAddRuleTextField.requestFocusInWindow();
-
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
-      }
-   }//GEN-LAST:event_hypAddRuleButtonActionPerformed
-
-   private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
-      hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
-
-   private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
-      hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
-
-   private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
-      hypDebouncer.call(this);
-   }//GEN-LAST:event_hypWordTextFieldKeyReleased
-
-   private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
-		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+		if(foundRule == null){
 			try{
-				//try adding the meanings
-				final String synonyms = theMeaningsTextField.getText();
-				final Supplier<Boolean> duplicatesDiscriminator = () -> {
-					final int responseOption = JOptionPane.showConfirmDialog(this,
-						"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
-						JOptionPane.YES_NO_OPTION);
-					return (responseOption == JOptionPane.YES_OPTION);
-				};
-				final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
-					.insertMeanings(synonyms, duplicatesDiscriminator);
-				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+				backbone.storeHyphenationFile();
 
-				if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
-					//if everything's ok update the table and the sorter...
-					final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-					dm.fireTableDataChanged();
-
-					formerFilterThesaurusText = null;
-					theMeaningsTextField.setText(null);
-					theMeaningsTextField.requestFocusInWindow();
-					@SuppressWarnings("unchecked")
-					TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-					sorter.setRowFilter(null);
-
-					updateSynonymsCounter();
-
-					//... and save the files
-					backbone.storeThesaurusFiles();
+				if(hypWordTextField.getText() != null){
+					formerHyphenationText = null;
+					hyphenate(this);
 				}
-				else{
-					theMeaningsTextField.requestFocusInWindow();
 
-					final String duplicatedWords = duplicates.stream()
-						.map(ThesaurusEntry::getSynonym)
-						.collect(Collectors.joining(", "));
-					JOptionPane.showOptionDialog(this,
-						"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
-						"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
-						null);
-				}
+				hypAddRuleLevelComboBox.setEnabled(false);
+				hypAddRuleButton.setEnabled(false);
+				hypAddRuleTextField.setText(null);
+				hypAddRuleSyllabationOutputLabel.setText(null);
+				hypAddRuleSyllabesCountOutputLabel.setText(null);
 			}
-			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			catch(final IOException e){
+				LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
 			}
 		}
-		else
-      	theFilterDebouncer.call(this);
-   }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
+		else{
+			hypAddRuleTextField.requestFocusInWindow();
 
-   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
-      extractCompoundRulesInputs();
-   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+		}
+	}//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
-   private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
+	private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
+		hypAddRuleDebouncer.call(this);
+	}//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
+
+	private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
+		hypAddRuleDebouncer.call(this);
+	}//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
+
+	private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
+		hypDebouncer.call(this);
+	}//GEN-LAST:event_hypWordTextFieldKeyReleased
+
+	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
+		try{
+			//try adding the meanings
+			final String synonyms = theMeaningsTextField.getText();
+			final Supplier<Boolean> duplicatesDiscriminator = () -> {
+				final int responseOption = JOptionPane.showConfirmDialog(this,
+					"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
+					JOptionPane.YES_NO_OPTION);
+				return (responseOption == JOptionPane.YES_OPTION);
+			};
+			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
+				.insertMeanings(synonyms, duplicatesDiscriminator);
+			final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+
+			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+				//if everything's ok update the table and the sorter...
+				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				dm.fireTableDataChanged();
+
+				formerFilterThesaurusText = null;
+				theMeaningsTextField.setText(null);
+				theMeaningsTextField.requestFocusInWindow();
+				@SuppressWarnings("unchecked")
+				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+				sorter.setRowFilter(null);
+
+				updateSynonymsCounter();
+
+				//... and save the files
+				backbone.storeThesaurusFiles();
+			}
+			else{
+				theMeaningsTextField.requestFocusInWindow();
+
+				final String duplicatedWords = duplicates.stream()
+					.map(ThesaurusEntry::getSynonym)
+					.collect(Collectors.joining(", "));
+				JOptionPane.showOptionDialog(this,
+					"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
+					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+					null);
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+	}//GEN-LAST:event_theAddButtonActionPerformed
+
+	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
+		theFilterDebouncer.call(this);
+	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
+
+	private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+		extractCompoundRulesInputs();
+	}//GEN-LAST:event_cmpLoadInputButtonActionPerformed
+
+	private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
 		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
 		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
 		final String inputCompounds = cmpInputTextArea.getText();
 
-      if(StringUtils.isNotBlank(inputText)){
-         try{
-         	//FIXME transfer into backbone
-            final List<Production> words;
+		if(StringUtils.isNotBlank(inputText)){
+			try{
+				//FIXME transfer into backbone
+				final List<Production> words;
 				final WordGenerator wordGenerator = backbone.getWordGenerator();
 				final AffixData affixData = backbone.getAffixData();
 				if(affixData.getCompoundFlag().equals(inputText)){
-               int maxCompounds = affixData.getCompoundMaxWordCount();
-               words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
+					int maxCompounds = affixData.getCompoundMaxWordCount();
+					words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
 						maxCompounds);
-            }
-            else
-            	words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
+				}
+				else
+					words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
 						limit);
 
 				final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
-            dm.setProductions(words);
-         }
-         catch(final Exception e){
-            LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
-         }
-      }
-      else
-      	clearOutputTable(cmpTable);
-   }//GEN-LAST:event_cmpLimitComboBoxActionPerformed
+				dm.setProductions(words);
+			}
+			catch(final Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+			}
+		}
+		else
+			clearOutputTable(cmpTable);
+	}//GEN-LAST:event_cmpLimitComboBoxActionPerformed
 
-   private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-      productionDebouncer.call(this);
-   }//GEN-LAST:event_dicInputTextFieldKeyReleased
+	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+		productionDebouncer.call(this);
+	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-   private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
+	private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		Consumer<Font> onSelection = font -> {
@@ -1883,9 +1908,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_filFontMenuItemActionPerformed
+	}//GEN-LAST:event_filFontMenuItemActionPerformed
 
-   private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
+	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
 		if(Desktop.isDesktopSupported()){
 			final Desktop desktop = Desktop.getDesktop();
 			try{
@@ -1897,19 +1922,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		else
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
-   }//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
+	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
 
-   private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
+	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
-   }//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
+	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
 
-   private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
+	private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
-   }//GEN-LAST:event_acoCorrectTextFieldKeyReleased
+	}//GEN-LAST:event_acoCorrectTextFieldKeyReleased
 
-   private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
-      try{
-         //try adding the correction
+	private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
+		try{
+			//try adding the correction
 			final String incorrect = acoIncorrectTextField.getText();
 			final String correct = acoCorrectTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
@@ -1920,45 +1945,45 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			};
 			final DuplicationResult<CorrectionEntry> duplicationResult = backbone.getAcoParser()
 				.insertCorrection(incorrect, correct, duplicatesDiscriminator);
-         final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
+			final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
 
-         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
-            //if everything's ok update the table and the sorter...
+			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+				//if everything's ok update the table and the sorter...
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-            dm.fireTableDataChanged();
+				dm.fireTableDataChanged();
 
-            formerFilterIncorrectText = null;
-            formerFilterCorrectText = null;
-            acoIncorrectTextField.setText(null);
-            acoCorrectTextField.setText(null);
-            acoAddButton.setEnabled(false);
-            acoIncorrectTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked")
-            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
-            sorter.setRowFilter(null);
+				formerFilterIncorrectText = null;
+				formerFilterCorrectText = null;
+				acoIncorrectTextField.setText(null);
+				acoCorrectTextField.setText(null);
+				acoAddButton.setEnabled(false);
+				acoIncorrectTextField.requestFocusInWindow();
+				@SuppressWarnings("unchecked")
+				TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
+				sorter.setRowFilter(null);
 
-            updateSynonymsCounter();
+				updateSynonymsCounter();
 
-            //... and save the files
-            backbone.storeAutoCorrectFile();
-         }
-         else{
+				//... and save the files
+				backbone.storeAutoCorrectFile();
+			}
+			else{
 				acoIncorrectTextField.requestFocusInWindow();
 
 				final String duplicatedWords = duplicates.stream()
 					.map(CorrectionEntry::toString)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   "
-					+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
+						+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, null, null);
-         }
-      }
-      catch(final Exception e){
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-      }
-   }//GEN-LAST:event_acoAddButtonActionPerformed
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+	}//GEN-LAST:event_acoAddButtonActionPerformed
 
-   private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
+	private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
 		final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
 			try{
 				backbone.getHypParser().setOptions(options);
@@ -1974,7 +1999,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_optionsButtonActionPerformed
+	}//GEN-LAST:event_optionsButtonActionPerformed
 
 	private void openAidButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAidButtonActionPerformed
 		try{
@@ -1985,61 +2010,61 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}//GEN-LAST:event_openAidButtonActionPerformed
 
-   private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
+	private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getAffixFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening affix file", e);
 		}
-   }//GEN-LAST:event_openAffButtonActionPerformed
+	}//GEN-LAST:event_openAffButtonActionPerformed
 
-   private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
+	private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getDictionaryFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening dictionary file", e);
 		}
-   }//GEN-LAST:event_openDicButtonActionPerformed
+	}//GEN-LAST:event_openDicButtonActionPerformed
 
-   private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
+	private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getHyphenationFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening hyphenation file", e);
 		}
-   }//GEN-LAST:event_openHypButtonActionPerformed
+	}//GEN-LAST:event_openHypButtonActionPerformed
 
-   private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
+	private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getAutoCorrectFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening auto–correct file", e);
 		}
-   }//GEN-LAST:event_openAcoButtonActionPerformed
+	}//GEN-LAST:event_openAcoButtonActionPerformed
 
-   private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
+	private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getSentenceExceptionsFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening sentence exceptions file", e);
 		}
-   }//GEN-LAST:event_openSexButtonActionPerformed
+	}//GEN-LAST:event_openSexButtonActionPerformed
 
-   private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
+	private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getWordExceptionsFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening word exceptions file", e);
 		}
-   }//GEN-LAST:event_openWexButtonActionPerformed
+	}//GEN-LAST:event_openWexButtonActionPerformed
 
-   private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
+	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
 		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
 			final String text = sexTextField.getText();
 			if(StringUtils.isNotBlank(text)){
@@ -2049,9 +2074,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				sexTextField.setText(StringUtils.EMPTY);
 			}
 		}
-   }//GEN-LAST:event_sexTextFieldKeyReleased
+	}//GEN-LAST:event_sexTextFieldKeyReleased
 
-   private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
+	private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
 		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
 			final String text = wexTextField.getText();
 			if(StringUtils.isNotBlank(text)){
@@ -2061,7 +2086,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				wexTextField.setText(StringUtils.EMPTY);
 			}
 		}
-   }//GEN-LAST:event_wexTextFieldKeyReleased
+	}//GEN-LAST:event_wexTextFieldKeyReleased
 
 
 	@Override
@@ -2096,7 +2121,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//FIXME introduce a checkAbortion case?
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-//				dicDuplicatesWorker.pause();
+				//				dicDuplicatesWorker.pause();
 
 				final Object[] options = {"Abort", "Cancel"};
 				final int answer = JOptionPane.showOptionDialog(this,
@@ -2111,7 +2136,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicDuplicatesWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-//					dicDuplicatesWorker.resume();
+					//					dicDuplicatesWorker.resume();
 				}
 			}
 
@@ -2136,7 +2161,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				for(final JComponent component : componentsToEnable)
 					component.setEnabled(true);
 			};
-//			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			//			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			worker.askUserToAbort(this, cancelTask, null);
 		}
 	}
@@ -2237,7 +2262,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-			final Comparator<AffixEntry> comparatorAffix){
+											final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
@@ -2798,12 +2823,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearAutoTextParser(){
-//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
-//		dm.setCorrections(null);
+		//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
+		//		dm.setCorrections(null);
 
 		//FIXME
-//		atxMenu.setEnabled(false);
-//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
+		//		atxMenu.setEnabled(false);
+		//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
 
 
@@ -2856,118 +2881,119 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		EventQueue.invokeLater(() -> (new HunspellerFrame()).setVisible(true));
 	}
 
-   // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JButton acoAddButton;
-   private javax.swing.JLabel acoCorrectLabel;
-   private javax.swing.JTextField acoCorrectTextField;
-   private javax.swing.JLabel acoCorrectionsRecordedLabel;
-   private javax.swing.JLabel acoCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel acoIncorrectLabel;
-   private javax.swing.JTextField acoIncorrectTextField;
-   private javax.swing.JLayeredPane acoLayeredPane;
-   private javax.swing.JScrollPane acoScrollPane;
-   private javax.swing.JTable acoTable;
-   private javax.swing.JLabel acoToLabel;
-   private javax.swing.JComboBox<String> cmpInputComboBox;
-   private javax.swing.JLabel cmpInputLabel;
-   private javax.swing.JScrollPane cmpInputScrollPane;
-   private javax.swing.JTextArea cmpInputTextArea;
-   private javax.swing.JLayeredPane cmpLayeredPane;
-   private javax.swing.JComboBox<String> cmpLimitComboBox;
-   private javax.swing.JLabel cmpLimitLabel;
-   private javax.swing.JButton cmpLoadInputButton;
-   private javax.swing.JComboBox<String> cmpRuleFlagsAidComboBox;
-   private javax.swing.JLabel cmpRuleFlagsAidLabel;
-   private javax.swing.JScrollPane cmpScrollPane;
-   private javax.swing.JTable cmpTable;
-   private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
-   private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
-   private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
-   private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
-   private javax.swing.JMenuItem dicExtractWordlistMenuItem;
-   private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
-   private javax.swing.JLabel dicInputLabel;
-   private javax.swing.JTextField dicInputTextField;
-   private javax.swing.JLayeredPane dicLayeredPane;
-   private javax.swing.JMenu dicMenu;
-   private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
-   private javax.swing.JLabel dicRuleFlagsAidLabel;
-   private javax.swing.JMenuItem dicRulesReducerMenuItem;
-   private javax.swing.JScrollPane dicScrollPane;
-   private javax.swing.JMenuItem dicSortDictionaryMenuItem;
-   private javax.swing.JMenuItem dicStatisticsMenuItem;
-   private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
-   private javax.swing.JTable dicTable;
-   private javax.swing.JLabel dicTotalProductionsLabel;
-   private javax.swing.JLabel dicTotalProductionsOutputLabel;
-   private javax.swing.JMenuItem dicWordCountMenuItem;
-   private javax.swing.JMenuItem filCreatePackageMenuItem;
-   private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
-   private javax.swing.JMenuItem filExitMenuItem;
-   private javax.swing.JMenuItem filFontMenuItem;
-   private javax.swing.JPopupMenu.Separator filFontSeparator;
-   private javax.swing.JMenu filMenu;
-   private javax.swing.JMenuItem filOpenProjectMenuItem;
-   private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
-   private javax.swing.JPopupMenu.Separator filSeparator;
-   private javax.swing.JMenuItem hlpAboutMenuItem;
-   private javax.swing.JMenu hlpMenu;
-   private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
-   private javax.swing.JButton hypAddRuleButton;
-   private javax.swing.JLabel hypAddRuleLabel;
-   private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;
-   private javax.swing.JLabel hypAddRuleSyllabationLabel;
-   private javax.swing.JLabel hypAddRuleSyllabationOutputLabel;
-   private javax.swing.JLabel hypAddRuleSyllabesCountLabel;
-   private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
-   private javax.swing.JTextField hypAddRuleTextField;
-   private javax.swing.JMenuItem hypCheckCorrectnessMenuItem;
-   private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
-   private javax.swing.JLayeredPane hypLayeredPane;
-   private javax.swing.JMenu hypMenu;
-   private javax.swing.JLabel hypRulesLabel;
-   private javax.swing.JLabel hypRulesOutputLabel;
-   private javax.swing.JMenuItem hypStatisticsMenuItem;
-   private javax.swing.JLabel hypSyllabationLabel;
-   private javax.swing.JLabel hypSyllabationOutputLabel;
-   private javax.swing.JLabel hypSyllabesCountLabel;
-   private javax.swing.JLabel hypSyllabesCountOutputLabel;
-   private javax.swing.JLabel hypWordLabel;
-   private javax.swing.JTextField hypWordTextField;
-   private javax.swing.JMenuBar mainMenuBar;
-   private javax.swing.JProgressBar mainProgressBar;
-   private javax.swing.JTabbedPane mainTabbedPane;
-   private javax.swing.JButton openAcoButton;
-   private javax.swing.JButton openAffButton;
-   private javax.swing.JButton openAidButton;
-   private javax.swing.JButton openDicButton;
-   private javax.swing.JButton openHypButton;
-   private javax.swing.JButton openSexButton;
-   private javax.swing.JButton openWexButton;
-   private javax.swing.JButton optionsButton;
-   private javax.swing.JScrollPane parsingResultScrollPane;
-   private javax.swing.JTextArea parsingResultTextArea;
-   private javax.swing.JLabel sexCorrectionsRecordedLabel;
-   private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel sexInputLabel;
-   private javax.swing.JLayeredPane sexLayeredPane;
-   private javax.swing.JScrollPane sexScrollPane;
-   private unit731.hunspeller.gui.JTagPanel sexTagPanel;
-   private javax.swing.JTextField sexTextField;
-   private javax.swing.JLayeredPane theLayeredPane;
-   private javax.swing.JLabel theMeaningsLabel;
-   private javax.swing.JTextField theMeaningsTextField;
-   private javax.swing.JScrollPane theScrollPane;
-   private javax.swing.JLabel theSynonymsRecordedLabel;
-   private javax.swing.JLabel theSynonymsRecordedOutputLabel;
-   private javax.swing.JTable theTable;
-   private javax.swing.JLabel wexCorrectionsRecordedLabel;
-   private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel wexInputLabel;
-   private javax.swing.JLayeredPane wexLayeredPane;
-   private javax.swing.JScrollPane wexScrollPane;
-   private unit731.hunspeller.gui.JTagPanel wexTagPanel;
-   private javax.swing.JTextField wexTextField;
-   // End of variables declaration//GEN-END:variables
+	// Variables declaration - do not modify//GEN-BEGIN:variables
+	private javax.swing.JButton acoAddButton;
+	private javax.swing.JLabel acoCorrectLabel;
+	private javax.swing.JTextField acoCorrectTextField;
+	private javax.swing.JLabel acoCorrectionsRecordedLabel;
+	private javax.swing.JLabel acoCorrectionsRecordedOutputLabel;
+	private javax.swing.JLabel acoIncorrectLabel;
+	private javax.swing.JTextField acoIncorrectTextField;
+	private javax.swing.JLayeredPane acoLayeredPane;
+	private javax.swing.JScrollPane acoScrollPane;
+	private javax.swing.JTable acoTable;
+	private javax.swing.JLabel acoToLabel;
+	private javax.swing.JComboBox<String> cmpInputComboBox;
+	private javax.swing.JLabel cmpInputLabel;
+	private javax.swing.JScrollPane cmpInputScrollPane;
+	private javax.swing.JTextArea cmpInputTextArea;
+	private javax.swing.JLayeredPane cmpLayeredPane;
+	private javax.swing.JComboBox<String> cmpLimitComboBox;
+	private javax.swing.JLabel cmpLimitLabel;
+	private javax.swing.JButton cmpLoadInputButton;
+	private javax.swing.JComboBox<String> cmpRuleFlagsAidComboBox;
+	private javax.swing.JLabel cmpRuleFlagsAidLabel;
+	private javax.swing.JScrollPane cmpScrollPane;
+	private javax.swing.JTable cmpTable;
+	private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
+	private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
+	private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
+	private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
+	private javax.swing.JMenuItem dicExtractWordlistMenuItem;
+	private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
+	private javax.swing.JLabel dicInputLabel;
+	private javax.swing.JTextField dicInputTextField;
+	private javax.swing.JLayeredPane dicLayeredPane;
+	private javax.swing.JMenu dicMenu;
+	private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
+	private javax.swing.JLabel dicRuleFlagsAidLabel;
+	private javax.swing.JMenuItem dicRulesReducerMenuItem;
+	private javax.swing.JScrollPane dicScrollPane;
+	private javax.swing.JMenuItem dicSortDictionaryMenuItem;
+	private javax.swing.JMenuItem dicStatisticsMenuItem;
+	private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
+	private javax.swing.JTable dicTable;
+	private javax.swing.JLabel dicTotalProductionsLabel;
+	private javax.swing.JLabel dicTotalProductionsOutputLabel;
+	private javax.swing.JMenuItem dicWordCountMenuItem;
+	private javax.swing.JMenuItem filCreatePackageMenuItem;
+	private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
+	private javax.swing.JMenuItem filExitMenuItem;
+	private javax.swing.JMenuItem filFontMenuItem;
+	private javax.swing.JPopupMenu.Separator filFontSeparator;
+	private javax.swing.JMenu filMenu;
+	private javax.swing.JMenuItem filOpenProjectMenuItem;
+	private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
+	private javax.swing.JPopupMenu.Separator filSeparator;
+	private javax.swing.JMenuItem hlpAboutMenuItem;
+	private javax.swing.JMenu hlpMenu;
+	private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
+	private javax.swing.JButton hypAddRuleButton;
+	private javax.swing.JLabel hypAddRuleLabel;
+	private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;
+	private javax.swing.JLabel hypAddRuleSyllabationLabel;
+	private javax.swing.JLabel hypAddRuleSyllabationOutputLabel;
+	private javax.swing.JLabel hypAddRuleSyllabesCountLabel;
+	private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
+	private javax.swing.JTextField hypAddRuleTextField;
+	private javax.swing.JMenuItem hypCheckCorrectnessMenuItem;
+	private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
+	private javax.swing.JLayeredPane hypLayeredPane;
+	private javax.swing.JMenu hypMenu;
+	private javax.swing.JLabel hypRulesLabel;
+	private javax.swing.JLabel hypRulesOutputLabel;
+	private javax.swing.JMenuItem hypStatisticsMenuItem;
+	private javax.swing.JLabel hypSyllabationLabel;
+	private javax.swing.JLabel hypSyllabationOutputLabel;
+	private javax.swing.JLabel hypSyllabesCountLabel;
+	private javax.swing.JLabel hypSyllabesCountOutputLabel;
+	private javax.swing.JLabel hypWordLabel;
+	private javax.swing.JTextField hypWordTextField;
+	private javax.swing.JMenuBar mainMenuBar;
+	private javax.swing.JProgressBar mainProgressBar;
+	private javax.swing.JTabbedPane mainTabbedPane;
+	private javax.swing.JButton openAcoButton;
+	private javax.swing.JButton openAffButton;
+	private javax.swing.JButton openAidButton;
+	private javax.swing.JButton openDicButton;
+	private javax.swing.JButton openHypButton;
+	private javax.swing.JButton openSexButton;
+	private javax.swing.JButton openWexButton;
+	private javax.swing.JButton optionsButton;
+	private javax.swing.JScrollPane parsingResultScrollPane;
+	private javax.swing.JTextArea parsingResultTextArea;
+	private javax.swing.JLabel sexCorrectionsRecordedLabel;
+	private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
+	private javax.swing.JLabel sexInputLabel;
+	private javax.swing.JLayeredPane sexLayeredPane;
+	private javax.swing.JScrollPane sexScrollPane;
+	private unit731.hunspeller.gui.JTagPanel sexTagPanel;
+	private javax.swing.JTextField sexTextField;
+	private javax.swing.JButton theAddButton;
+	private javax.swing.JLayeredPane theLayeredPane;
+	private javax.swing.JLabel theMeaningsLabel;
+	private javax.swing.JTextField theMeaningsTextField;
+	private javax.swing.JScrollPane theScrollPane;
+	private javax.swing.JLabel theSynonymsRecordedLabel;
+	private javax.swing.JLabel theSynonymsRecordedOutputLabel;
+	private javax.swing.JTable theTable;
+	private javax.swing.JLabel wexCorrectionsRecordedLabel;
+	private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
+	private javax.swing.JLabel wexInputLabel;
+	private javax.swing.JLayeredPane wexLayeredPane;
+	private javax.swing.JScrollPane wexScrollPane;
+	private unit731.hunspeller.gui.JTagPanel wexTagPanel;
+	private javax.swing.JTextField wexTextField;
+	// End of variables declaration//GEN-END:variables
 
 }
