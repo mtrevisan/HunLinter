@@ -1,6 +1,7 @@
 package unit731.hunspeller.gui;
 
 import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
+import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 
 public class JTagPanel extends JPanel{
@@ -78,7 +80,10 @@ public class JTagPanel extends JPanel{
 
 	public void applyFilter(final String tag){
 		final String filter = (tag != null && !tag.isEmpty()? ".*" + tag + ".*": ".+");
-		//TODO
+		final Pattern pattern = Pattern.compile(filter);
+		JavaHelper.nullableToStream(getComponents())
+			.filter(comp -> comp instanceof JTagComponent)
+			.forEach(comp -> comp.setVisible(pattern.matcher(((JTagComponent)comp).getTag()).matches()));
 	}
 
 
