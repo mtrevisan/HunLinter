@@ -1453,6 +1453,11 @@
               </Events>
             </Component>
             <Container class="javax.swing.JScrollPane" name="wexScrollPane">
+              <Properties>
+                <Property name="horizontalScrollBar" type="javax.swing.JScrollBar" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="null"/>
+                </Property>
+              </Properties>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
@@ -1460,12 +1465,6 @@
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getWexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getWexParser().save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                    <Property name="alignment" type="int" value="3"/>
-                    <Property name="horizontalGap" type="int" value="2"/>
-                    <Property name="verticalGap" type="int" value="0"/>
-                  </Layout>
                 </Container>
               </SubComponents>
             </Container>

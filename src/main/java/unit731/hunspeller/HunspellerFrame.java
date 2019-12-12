@@ -1080,7 +1080,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-		//TODO vertical scrolling
       sexScrollPane.setHorizontalScrollBar(null);
       sexScrollPane.setViewportView(sexTagPanel);
 
@@ -1166,9 +1165,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-		//FIXME WTF this setLayout? where's setHorizontalScrollBar?
-		//TODO vertical scrolling
-      wexTagPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 2, 0));
+      wexScrollPane.setHorizontalScrollBar(null);
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
