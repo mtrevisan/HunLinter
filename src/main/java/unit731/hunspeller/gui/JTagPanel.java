@@ -31,7 +31,6 @@ public class JTagPanel extends JPanel{
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-		setPreferredSize(getSize());
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
