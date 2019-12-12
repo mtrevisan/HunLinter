@@ -114,11 +114,6 @@ public class ExceptionsParser{
 		}
 	}
 
-	public void save(){
-		//TODO
-		System.out.println("save");
-	}
-
 	public void save(final File excFile) throws TransformerException{
 		final Document doc = XMLParser.newXMLDocumentStandalone();
 
@@ -128,12 +123,12 @@ public class ExceptionsParser{
 		doc.appendChild(root);
 
 		//TODO
-//		for(final String exception : dictionary){
-//			//correction element
-//			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
-//			elem.setAttribute(WORD_EXCEPTIONS_INCORRECT_FORM, exception);
-//			root.appendChild(elem);
-//		}
+		for(final String exception : dictionary){
+			//correction element
+			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
+			elem.setAttribute(WORD_EXCEPTIONS_WORD, exception);
+			root.appendChild(elem);
+		}
 
 		XMLParser.createXML(excFile, doc, XMLParser.XML_PROPERTIES);
 	}
