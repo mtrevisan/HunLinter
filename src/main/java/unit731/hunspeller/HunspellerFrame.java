@@ -2160,6 +2160,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				//reset input
 				sexTextField.setText(StringUtils.EMPTY);
+				sexTagPanel.applyFilter(null);
 
 				updateSentenceExceptionsCounter();
 
@@ -2187,6 +2188,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				//reset input
 				wexTextField.setText(StringUtils.EMPTY);
+				wexTagPanel.applyFilter(null);
 
 				updateWordExceptionsCounter();
 
