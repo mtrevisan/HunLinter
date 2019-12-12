@@ -1081,7 +1081,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       sexScrollPane.setHorizontalScrollBar(null);
-      sexScrollPane.setPreferredSize(new java.awt.Dimension(912, 166));
       sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1111,7 +1110,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(sexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+               .addComponent(sexScrollPane)
                .addGroup(sexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(sexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1135,7 +1134,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(sexInputLabel)
                .addComponent(sexAddButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(sexScrollPane)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
@@ -1167,7 +1166,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       wexScrollPane.setHorizontalScrollBar(null);
-      wexScrollPane.setPreferredSize(new java.awt.Dimension(912, 166));
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1197,7 +1195,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(wexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+               .addComponent(wexScrollPane)
                .addGroup(wexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(wexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
