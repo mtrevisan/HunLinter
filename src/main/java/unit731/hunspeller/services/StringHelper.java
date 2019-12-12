@@ -25,6 +25,12 @@ public class StringHelper{
 
 	private StringHelper(){}
 
+	public static long countUppercases(final String text){
+		return text.chars()
+			.filter(Character::isUpperCase)
+			.count();
+	}
+
 	public static Casing classifyCasing(final String text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;

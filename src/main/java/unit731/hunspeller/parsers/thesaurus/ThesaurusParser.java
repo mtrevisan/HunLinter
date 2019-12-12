@@ -167,7 +167,7 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
+	public boolean contains(final List<String> partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		return synonyms.stream()
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));

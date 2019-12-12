@@ -312,6 +312,16 @@ public class Backbone implements FileChangeListener{
 		theParser.save(theIndexFile, theDataFile);
 	}
 
+	public void storeSentenceExceptionFile() throws TransformerException{
+		final File sexFile = getSentenceExceptionsFile();
+		sexParser.save(sexFile);
+	}
+
+	public void storeWordExceptionFile() throws TransformerException{
+		final File wexFile = getWordExceptionsFile();
+		wexParser.save(wexFile);
+	}
+
 	public void storeAutoCorrectFile() throws TransformerException{
 		final File acoFile = getAutoCorrectFile();
 		acoParser.save(acoFile);

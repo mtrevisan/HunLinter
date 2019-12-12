@@ -114,6 +114,10 @@ public class ExceptionsParser{
 		}
 	}
 
+	public boolean contains(final String exception){
+		return dictionary.contains(exception);
+	}
+
 	public void save(final File excFile) throws TransformerException{
 		final Document doc = XMLParser.newXMLDocumentStandalone();
 

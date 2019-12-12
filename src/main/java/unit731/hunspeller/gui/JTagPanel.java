@@ -76,6 +76,11 @@ public class JTagPanel extends JPanel{
 		revalidate();
 	}
 
+	public void applyFilter(final String tag){
+		final String filter = (tag != null && !tag.isEmpty()? ".*" + tag + ".*": ".+");
+		//TODO
+	}
+
 
 	private static final Color COLOR_BACKGROUND = new Color(222, 231, 247);
 	private static final Color COLOR_BORDER = new Color(202, 216, 242);

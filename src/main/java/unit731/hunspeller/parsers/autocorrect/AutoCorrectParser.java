@@ -142,7 +142,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms */
-	public boolean isAlreadyContained(final String incorrect, final String correct){
+	public boolean contains(final String incorrect, final String correct){
 		return dictionary.stream()
 			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));

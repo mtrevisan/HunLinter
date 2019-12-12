@@ -78,6 +78,7 @@ import unit731.hunspeller.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
@@ -100,6 +101,7 @@ import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.log.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.FileHelper;
@@ -139,6 +141,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
+	private String formerFilterSentenceException;
+	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
 	private final JFileChooser saveResultFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
@@ -155,6 +159,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> sexFilterDebouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private CorrectnessWorker dicCorrectnessWorker;
@@ -305,6 +311,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexLayeredPane = new javax.swing.JLayeredPane();
       sexInputLabel = new javax.swing.JLabel();
       sexTextField = new javax.swing.JTextField();
+      sexAddButton = new javax.swing.JButton();
       sexScrollPane = new javax.swing.JScrollPane();
       sexTagPanel = new JTagPanel((changeType, tags) -> {
          backbone.getSexParser().modify(changeType, tags);
@@ -321,6 +328,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       wexLayeredPane = new javax.swing.JLayeredPane();
       wexInputLabel = new javax.swing.JLabel();
       wexTextField = new javax.swing.JTextField();
+      wexAddButton = new javax.swing.JButton();
       wexScrollPane = new javax.swing.JScrollPane();
       wexTagPanel = new JTagPanel((changeType, tags) -> {
          backbone.getWexParser().modify(changeType, tags);
@@ -1062,6 +1070,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      sexAddButton.setMnemonic('A');
+      sexAddButton.setText("Add");
+      sexAddButton.setToolTipText("");
+      sexAddButton.setEnabled(false);
+      sexAddButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            sexAddButtonActionPerformed(evt);
+         }
+      });
+
       sexScrollPane.setHorizontalScrollBar(null);
       sexScrollPane.setViewportView(sexTagPanel);
 
@@ -1079,6 +1097,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1101,7 +1120,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(sexInputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexTextField)))
+                  .addComponent(sexTextField)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(sexAddButton)))
             .addContainerGap())
       );
       sexLayeredPaneLayout.setVerticalGroup(
@@ -1110,9 +1131,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap()
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(sexInputLabel))
+               .addComponent(sexInputLabel)
+               .addComponent(sexAddButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
@@ -1134,6 +1156,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      wexAddButton.setMnemonic('A');
+      wexAddButton.setText("Add");
+      wexAddButton.setEnabled(false);
+      wexAddButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            wexAddButtonActionPerformed(evt);
+         }
+      });
+
       wexTagPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 2, 0));
       wexScrollPane.setViewportView(wexTagPanel);
 
@@ -1151,6 +1182,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1173,7 +1205,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(wexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(wexInputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexTextField)))
+                  .addComponent(wexTextField)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(wexAddButton)))
             .addContainerGap())
       );
       wexLayeredPaneLayout.setVerticalGroup(
@@ -1182,9 +1216,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap()
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wexInputLabel)
-               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(wexAddButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wexCorrectionsRecordedLabel)
@@ -1614,7 +1649,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
-		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+		final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
 
 
@@ -1650,7 +1685,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 				final List<String> meanings = Arrays.asList(pair.getRight());
-				final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+				final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
 				theAddButton.setEnabled(!alreadyContained);
 			}
 		}
@@ -1659,7 +1694,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void filterAutoCorrect(HunspellerFrame frame){
+	private void filterAutoCorrect(final HunspellerFrame frame){
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
@@ -1674,7 +1709,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			unmodifiedCorrectText);
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
-		final boolean alreadyContained = backbone.getAcoParser().isAlreadyContained(incorrect, correct);
+		final boolean alreadyContained = backbone.getAcoParser().contains(incorrect, correct);
 		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
@@ -1711,6 +1746,38 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
+
+	private void filterSentenceExceptions(final HunspellerFrame frame){
+		final String unmodifiedException = StringUtils.strip(frame.sexTextField.getText());
+		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
+			return;
+
+		formerFilterSentenceException = unmodifiedException;
+
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final boolean alreadyContained = backbone.getSexParser().contains(unmodifiedException);
+		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".") && !alreadyContained);
+
+
+		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
+	}
+
+
+	private void filterWordExceptions(final HunspellerFrame frame){
+		final String unmodifiedException = StringUtils.strip(frame.wexTextField.getText());
+		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
+			return;
+
+		formerFilterSentenceException = unmodifiedException;
+
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final boolean alreadyContained = backbone.getWexParser().contains(unmodifiedException);
+		//TODO
+		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
+
+
+		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
+	}
 
 	private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -2076,28 +2143,66 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}//GEN-LAST:event_openWexButtonActionPerformed
 
 	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
-		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-			final String text = sexTextField.getText();
-			if(StringUtils.isNotBlank(text)){
-				sexTagPanel.addTag(text.trim());
-
-				//reset input
-				sexTextField.setText(StringUtils.EMPTY);
-			}
-		}
+		sexFilterDebouncer.call(this);
 	}//GEN-LAST:event_sexTextFieldKeyReleased
 
 	private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
-		if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-			final String text = wexTextField.getText();
-			if(StringUtils.isNotBlank(text)){
-				wexTagPanel.addTag(text.trim());
+		wexFilterDebouncer.call(this);
+	}//GEN-LAST:event_wexTextFieldKeyReleased
+
+   private void sexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sexAddButtonActionPerformed
+		try{
+			final String exception = StringUtils.strip(sexTextField.getText());
+			if(!backbone.getSexParser().contains(exception)){
+				backbone.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+				sexTagPanel.addTag(exception);
+
+				//reset input
+				sexTextField.setText(StringUtils.EMPTY);
+
+				updateSentenceExceptionsCounter();
+
+				backbone.storeSentenceExceptionFile();
+			}
+			else{
+				sexTextField.requestFocusInWindow();
+
+				JOptionPane.showOptionDialog(this,
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+					null);
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+   }//GEN-LAST:event_sexAddButtonActionPerformed
+
+   private void wexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wexAddButtonActionPerformed
+		try{
+			final String exception = StringUtils.strip(wexTextField.getText());
+			if(!backbone.getWexParser().contains(exception)){
+				backbone.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+				wexTagPanel.addTag(exception);
 
 				//reset input
 				wexTextField.setText(StringUtils.EMPTY);
+
+				updateWordExceptionsCounter();
+
+				backbone.storeWordExceptionFile();
+			}
+			else{
+				wexTextField.requestFocusInWindow();
+
+				JOptionPane.showOptionDialog(this,
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+					null);
 			}
 		}
-	}//GEN-LAST:event_wexTextFieldKeyReleased
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+   }//GEN-LAST:event_wexAddButtonActionPerformed
 
 
 	@Override
@@ -2983,6 +3088,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JButton optionsButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JButton sexAddButton;
    private javax.swing.JLabel sexCorrectionsRecordedLabel;
    private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
    private javax.swing.JLabel sexInputLabel;
@@ -2998,6 +3104,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
    private javax.swing.JTable theTable;
+   private javax.swing.JButton wexAddButton;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;
    private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
    private javax.swing.JLabel wexInputLabel;
