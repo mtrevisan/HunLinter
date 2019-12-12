@@ -1772,7 +1772,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = backbone.getWexParser().contains(unmodifiedException);
-		//TODO
 		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
 
 
