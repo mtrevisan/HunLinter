@@ -19,7 +19,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
               <Properties>
-                <Property name="mnemonic" type="int" value="80"/>
+                <Property name="mnemonic" type="int" value="79"/>
                 <Property name="text" type="java.lang.String" value="Open Project..."/>
               </Properties>
               <Events>
@@ -1338,11 +1338,6 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Component class="unit731.hunspeller.gui.JTagPanel" name="sexTagPanel">
-                  <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[912, 166]"/>
-                    </Property>
-                  </Properties>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getSexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getSexParser().save(backbone.getSentenceExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>
@@ -1467,11 +1462,6 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Container class="unit731.hunspeller.gui.JTagPanel" name="wexTagPanel">
-                  <Properties>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[912, 166]"/>
-                    </Property>
-                  </Properties>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getWexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getWexParser().save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>

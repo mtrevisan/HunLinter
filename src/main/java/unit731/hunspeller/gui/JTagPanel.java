@@ -5,6 +5,7 @@ import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -31,6 +32,7 @@ public class JTagPanel extends JPanel{
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
+setBorder(new LineBorder(Color.RED));
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
@@ -75,6 +77,17 @@ public class JTagPanel extends JPanel{
 	private void forceRepaint(){
 		repaint();
 		revalidate();
+
+		//TODO calculate new panel height
+		final int maxHeight = JavaHelper.nullableToStream(getComponents())
+			.filter(comp -> comp instanceof JTagComponent)
+			.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
+			.max()
+			.orElse(0);
+System.out.println("height: " + maxHeight);
+		final Dimension dimension = getPreferredSize();
+		dimension.height = Math.max(getParent().getHeight(), maxHeight);
+		setPreferredSize(dimension);
 	}
 
 	public void applyFilter(final String tag){

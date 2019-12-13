@@ -1081,8 +1081,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       sexScrollPane.setHorizontalScrollBar(null);
-
-      sexTagPanel.setPreferredSize(new java.awt.Dimension(912, 166));
       sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1168,8 +1166,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
 
       wexScrollPane.setHorizontalScrollBar(null);
-
-      wexTagPanel.setPreferredSize(new java.awt.Dimension(912, 166));
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1245,7 +1241,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.setText("File");
       filMenu.setToolTipText("");
 
-      filOpenProjectMenuItem.setMnemonic('P');
+      filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open Project...");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
