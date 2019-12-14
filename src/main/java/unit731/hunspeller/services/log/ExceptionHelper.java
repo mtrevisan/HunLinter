@@ -8,16 +8,16 @@ public class ExceptionHelper{
 
 	private ExceptionHelper(){}
 
-	public static String getMessage(Throwable t){
-		StringBuffer message = new StringBuffer(composeExceptionMessage(t));
+	public static String getMessage(final Throwable t){
+		final StringBuffer sb = new StringBuffer(composeExceptionMessage(t));
 		Throwable cause = t.getCause();
 		while(cause != null){
-			message.append(System.lineSeparator())
+			sb.append(System.lineSeparator())
 				.append(composeExceptionMessage(cause));
 
 			cause = cause.getCause();
 		}
-		return message.toString();
+		return sb.toString();
 	}
 
 	private static String composeExceptionMessage(final Throwable t){
