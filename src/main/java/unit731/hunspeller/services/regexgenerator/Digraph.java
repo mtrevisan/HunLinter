@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -20,7 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * <p>
  * For additional documentation, see <a href="https://algs4.cs.princeton.edu/42digraph">Section 4.2</a> of
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
- * 
+ *
  * @param <T>	Type of values stored in transitions
  */
 public final class Digraph<T>{
@@ -107,14 +109,16 @@ public final class Digraph<T>{
 	 */
 	@Override
 	public String toString(){
-		StringBuffer s = new StringBuffer();
+		final StringBuffer s = new StringBuffer();
 		s.append(NEWLINE);
-		int vertices = adjacency.size();
+		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			String transitions = adjacency.get(v).stream()
-				.map(w -> String.format("%d (%s)", w.getKey(), (w.getValue() != null? w.getValue(): "ε")))
+			final String transitions = adjacency.get(v).stream()
+				.map(w -> w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")")
 				.collect(Collectors.joining(", "));
-			s.append(String.format("%d: ", v))
+			s.append(v)
+				.append(':')
+				.append(StringUtils.SPACE)
 				.append(transitions)
 				.append(NEWLINE);
 		}

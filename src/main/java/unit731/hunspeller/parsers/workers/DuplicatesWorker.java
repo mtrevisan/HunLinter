@@ -35,6 +35,7 @@ import unit731.hunspeller.parsers.workers.core.WorkerData;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class DuplicatesWorker extends WorkerBase<Void, Void>{
@@ -276,7 +277,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					writer.write(origin);
 					writer.write(entries.stream()
 						.map(duplicate ->
-							String.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+							StringHelper.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
 						)
 						.collect(Collectors.joining(", ")));

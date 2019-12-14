@@ -2639,7 +2639,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		frame.hypSyllabationOutputLabel.setText(text);
 		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(String.join(StringUtils.SPACE, rules));
+		frame.hypRulesOutputLabel.setText(StringHelper.join(StringUtils.SPACE, rules));
 
 		frame.hypAddRuleTextField.setText(null);
 		frame.hypAddRuleSyllabationOutputLabel.setText(null);

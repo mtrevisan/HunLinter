@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
@@ -66,8 +67,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonym;
 	}
 
-	public String joinMeanings(String separator){
-		return StringUtils.join(meanings, separator);
+	public String joinMeanings(final String separator){
+		return StringHelper.join(separator, meanings);
 
 	}
 	public void setMeanings(final String[] lines){
@@ -122,7 +123,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public String toString(){
 		final StringJoiner sj = new StringJoiner(": ");
 		sj.add(synonym);
-		meanings.forEach(meaning -> sj.add(StringUtils.join(meaning, ", ")));
+		meanings.forEach(meaning -> sj.add(StringHelper.join(", ", meaning)));
 		return sj.toString();
 	}
 

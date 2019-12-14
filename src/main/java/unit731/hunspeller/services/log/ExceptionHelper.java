@@ -9,7 +9,7 @@ public class ExceptionHelper{
 	private ExceptionHelper(){}
 
 	public static String getMessage(Throwable t){
-		StringBuilder message = new StringBuilder(composeExceptionMessage(t));
+		StringBuffer message = new StringBuffer(composeExceptionMessage(t));
 		Throwable cause = t.getCause();
 		while(cause != null){
 			message.append(System.lineSeparator())
@@ -20,11 +20,11 @@ public class ExceptionHelper{
 		return message.toString();
 	}
 
-	private static String composeExceptionMessage(Throwable t){
-		String exceptionType = extractExceptionName(t);
-		String codePosition = extractExceptionPosition(t);
-		String msg = t.getMessage();
-		StringBuilder sb = new StringBuilder();
+	private static String composeExceptionMessage(final Throwable t){
+		final String exceptionType = extractExceptionName(t);
+		final String codePosition = extractExceptionPosition(t);
+		final String msg = t.getMessage();
+		final StringBuffer sb = new StringBuffer();
 		sb.append(exceptionType)
 			.append(" at ")
 			.append(codePosition);

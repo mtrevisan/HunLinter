@@ -34,6 +34,7 @@ import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.ParserHelper;
+import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -201,7 +202,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					final String key = entry.getKey();
 					final List<String> values = entry.getValue();
 
-					destinationWriter.write(key + ": " + String.join(", ", values));
+					destinationWriter.write(key + ": " + StringHelper.join(", ", values));
 					destinationWriter.newLine();
 
 					setProgress((int)((index * 100.) / size));

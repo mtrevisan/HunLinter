@@ -279,7 +279,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 	private String getSelectedFlag(){
 		Object item = ruleComboBox.getSelectedItem();
-		return (item != null? item.toString().split(StringUtils.SPACE)[1]: null);
+		return (item != null? StringUtils.split(item.toString())[1]: null);
 	}
 
 	private boolean getKeepLongestCommonAffix(){

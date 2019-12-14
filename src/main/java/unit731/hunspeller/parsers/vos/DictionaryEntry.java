@@ -29,6 +29,7 @@ import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class DictionaryEntry{
@@ -305,10 +306,10 @@ public class DictionaryEntry{
 		final StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
+			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringHelper.join(COMMA, continuationFlags));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+			sb.append(TAB).append(StringHelper.join(StringUtils.SPACE, morphologicalFields));
 		return sb.toString();
 	}
 

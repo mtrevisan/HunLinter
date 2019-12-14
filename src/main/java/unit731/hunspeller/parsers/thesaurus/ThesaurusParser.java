@@ -27,6 +27,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 /**
@@ -217,9 +218,9 @@ public class ThesaurusParser{
 	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> meanings){
 		//extract part of speech if present
 		final String posFilter = (!partOfSpeeches.isEmpty()?
-			"[\\(\\s](" + String.join(PIPE, partOfSpeeches) + ")[\\),]":
+			"[\\(\\s](" + StringHelper.join(PIPE, partOfSpeeches) + ")[\\),]":
 			".+");
-		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
+		final String meaningsFilter = (!meanings.isEmpty()? "(" + StringHelper.join(PIPE, meanings) + ")": ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, meaningsFilter);

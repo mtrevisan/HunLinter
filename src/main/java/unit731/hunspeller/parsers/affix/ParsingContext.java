@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class ParsingContext{
@@ -43,7 +44,7 @@ public class ParsingContext{
 	}
 
 	public String getAllButFirstParameter(){
-		return String.join(StringUtils.SPACE, Arrays.asList(definitionParts).subList(1, definitionParts.length));
+		return StringHelper.join(StringUtils.SPACE, Arrays.asList(definitionParts).subList(1, definitionParts.length));
 	}
 
 	@Override

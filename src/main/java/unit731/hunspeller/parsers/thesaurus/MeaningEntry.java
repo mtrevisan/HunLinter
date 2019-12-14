@@ -14,6 +14,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class MeaningEntry implements Comparable<MeaningEntry>{
@@ -75,7 +76,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	public String toString(){
 		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
-			.add(StringUtils.join(meanings, ThesaurusEntry.PIPE))
+			.add(StringHelper.join(ThesaurusEntry.PIPE, meanings))
 			.toString();
 	}
 

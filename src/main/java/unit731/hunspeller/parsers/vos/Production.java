@@ -14,6 +14,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.JavaHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class Production extends DictionaryEntry{
@@ -154,7 +155,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getMorphologicalFields(){
-		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
+		return (morphologicalFields != null? StringHelper.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 	}
 
 	@Override
@@ -166,7 +167,7 @@ public class Production extends DictionaryEntry{
 		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(!fields.isEmpty()){
 			fields.sort(Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + String.join(StringUtils.SPACE, fields);
+			return word + POS_FIELD_PREFIX + StringHelper.join(StringUtils.SPACE, fields);
 		}
 		return word;
 	}

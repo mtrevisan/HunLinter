@@ -113,7 +113,7 @@ public class Hyphenator implements HyphenatorInterface{
 		final HyphenationBreak hyphBreak;
 		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
-			final String[] hyphenations = customHyphenation.split(HyphenationParser.HYPHEN_EQUALS);
+			final String[] hyphenations = StringUtils.split(customHyphenation, HyphenationParser.HYPHEN_EQUALS);
 			final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){

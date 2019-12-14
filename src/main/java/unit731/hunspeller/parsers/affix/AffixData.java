@@ -24,6 +24,7 @@ import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.Memoizer;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class AffixData{
@@ -252,16 +253,16 @@ public class AffixData{
 		final List<String> sortedSample;
 		String sample = getData(AffixOption.TRY);
 		if(sample != null)
-			sortedSample = Arrays.asList(sample.split(StringUtils.EMPTY));
+			sortedSample = Arrays.asList(StringUtils.split(sample, StringUtils.EMPTY));
 		else
 			sortedSample = getRuleEntries().parallelStream()
 				.flatMap(entry -> entry.getEntries().stream())
-				.flatMap(entry -> Arrays.stream(entry.getAppending().split(StringUtils.EMPTY)))
+				.flatMap(entry -> Arrays.stream(StringUtils.split(entry.getAppending(), StringUtils.EMPTY)))
 				.distinct()
 				.collect(Collectors.toList());
 		Collections.sort(sortedSample);
 		//NOTE: a space should be used because of the presence of characters that are only modifiers
-		return String.join(StringUtils.SPACE, sortedSample);
+		return StringHelper.join(StringUtils.SPACE, sortedSample);
 	}
 
 	public String getCompoundBeginFlag(){
