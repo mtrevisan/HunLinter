@@ -13,7 +13,7 @@ public class IntegerFilter extends DocumentFilter{
 	@Override
 	public void insertString(final FilterBypass fb, final int offset, final String text, final AttributeSet attr) throws BadLocationException{
 		final Document doc = fb.getDocument();
-		final StringBuilder sb = new StringBuilder();
+		final StringBuffer sb = new StringBuffer();
 		sb.append(doc.getText(0, doc.getLength()));
 		sb.insert(offset, text);
 
@@ -25,7 +25,7 @@ public class IntegerFilter extends DocumentFilter{
 	@Override
 	public void replace(final FilterBypass fb, final int offset, final int length, final String text, final AttributeSet attrs) throws BadLocationException{
 		final Document doc = fb.getDocument();
-		final StringBuilder sb = new StringBuilder();
+		final StringBuffer sb = new StringBuffer();
 		sb.append(doc.getText(0, doc.getLength()));
 		sb.replace(offset, offset + length, text);
 
@@ -37,7 +37,7 @@ public class IntegerFilter extends DocumentFilter{
 	@Override
 	public void remove(final FilterBypass fb, final int offset, final int length) throws BadLocationException{
 		final Document doc = fb.getDocument();
-		final StringBuilder sb = new StringBuilder();
+		final StringBuffer sb = new StringBuffer();
 		sb.append(doc.getText(0, doc.getLength()));
 		sb.delete(offset, offset + length);
 

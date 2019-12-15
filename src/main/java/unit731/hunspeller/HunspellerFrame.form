@@ -19,7 +19,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
               <Properties>
-                <Property name="mnemonic" type="int" value="80"/>
+                <Property name="mnemonic" type="int" value="79"/>
                 <Property name="text" type="java.lang.String" value="Open Project..."/>
               </Properties>
               <Events>

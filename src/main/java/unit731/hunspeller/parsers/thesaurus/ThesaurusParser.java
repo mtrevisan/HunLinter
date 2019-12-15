@@ -27,6 +27,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 /**
@@ -167,7 +168,7 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean isAlreadyContained(final List<String> partOfSpeeches, final List<String> meanings){
+	public boolean contains(final List<String> partOfSpeeches, final List<String> meanings){
 		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 		return synonyms.stream()
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
@@ -217,9 +218,9 @@ public class ThesaurusParser{
 	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> meanings){
 		//extract part of speech if present
 		final String posFilter = (!partOfSpeeches.isEmpty()?
-			"[\\(\\s](" + String.join(PIPE, partOfSpeeches) + ")[\\),]":
+			"[\\(\\s](" + StringHelper.join(PIPE, partOfSpeeches) + ")[\\),]":
 			".+");
-		final String meaningsFilter = (!meanings.isEmpty()? "(" + String.join(PIPE, meanings) + ")": ".+");
+		final String meaningsFilter = (!meanings.isEmpty()? "(" + StringHelper.join(PIPE, meanings) + ")": ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, meaningsFilter);

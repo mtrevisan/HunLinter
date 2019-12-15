@@ -40,7 +40,7 @@ public class SearchResult<V>{
 
 	@Override
 	public String toString(){
-		return String.format("[%d:%d] = %s", start, end, value);
+		return "[" + start + ":" + end + "] = " + value;
 	}
 
 }

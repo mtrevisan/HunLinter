@@ -7,12 +7,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.XMLParser;
 
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,6 +30,8 @@ public class ExceptionsParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
 
+	public enum TagChangeType{SET, ADD, REMOVE, CLEAR};
+
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String WORD_EXCEPTIONS_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
 	private static final String AUTO_CORRECT_BLOCK = AUTO_CORRECT_NAMESPACE + "block";
@@ -35,6 +40,7 @@ public class ExceptionsParser{
 
 	private final String configurationFilename;
 	private final List<String> dictionary = new ArrayList<>();
+	private Comparator<String> comparator;
 
 
 	public ExceptionsParser(final String configurationFilename){
@@ -45,10 +51,13 @@ public class ExceptionsParser{
 	 * Parse the rows out from a `SentenceExceptList.xml` or a `WordExceptList.xml` file.
 	 *
 	 * @param wexFile	The reference to the word exceptions file
+	 * @param language	The language (used to sort)
 	 * @throws IOException	If an I/O error occurs
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
-	public void parse(final File wexFile) throws IOException, SAXException{
+	public void parse(final File wexFile, final String language) throws IOException, SAXException{
+		comparator = BaseBuilder.getComparator(language);
+
 		clear();
 
 		final Document doc = XMLParser.parseXMLDocument(wexFile);
@@ -64,6 +73,7 @@ public class ExceptionsParser{
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
 		}
+		dictionary.sort(comparator);
 
 		validate();
 	}
@@ -85,6 +95,45 @@ public class ExceptionsParser{
 
 	public int getExceptionsCounter(){
 		return dictionary.size();
+	}
+
+	public void modify(final TagChangeType changeType, final List<String> tags){
+		switch(changeType){
+			case ADD:
+				dictionary.addAll(tags);
+				dictionary.sort(comparator);
+				break;
+
+			case REMOVE:
+				dictionary.removeAll(tags);
+				break;
+
+			case SET:
+				dictionary.clear();
+				dictionary.addAll(tags);
+		}
+	}
+
+	public boolean contains(final String exception){
+		return dictionary.contains(exception);
+	}
+
+	public void save(final File excFile) throws TransformerException{
+		final Document doc = XMLParser.newXMLDocumentStandalone();
+
+		//root element
+		final Element root = doc.createElement(WORD_EXCEPTIONS_ROOT_ELEMENT);
+		root.setAttribute(XMLParser.ROOT_ATTRIBUTE_NAME, XMLParser.ROOT_ATTRIBUTE_VALUE);
+		doc.appendChild(root);
+
+		for(final String exception : dictionary){
+			//correction element
+			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
+			elem.setAttribute(WORD_EXCEPTIONS_WORD, exception);
+			root.appendChild(elem);
+		}
+
+		XMLParser.createXML(excFile, doc, XMLParser.XML_PROPERTIES_UTF_8);
 	}
 
 	public void clear(){

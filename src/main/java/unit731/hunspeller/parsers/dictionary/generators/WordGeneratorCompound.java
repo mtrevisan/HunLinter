@@ -150,14 +150,17 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return response;
 	}
 
-	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries, final List<String[]> continuationFlags){
+	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries,
+			final List<String[]> continuationFlags){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		final List<Production> productions;
-		final String flags = (!continuationFlags.isEmpty()? StringUtils.join(continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new), StringUtils.EMPTY): null);
+		final String flags = (!continuationFlags.isEmpty()?
+			StringHelper.join(continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new)):
+			null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			productions = Collections.singletonList(p);

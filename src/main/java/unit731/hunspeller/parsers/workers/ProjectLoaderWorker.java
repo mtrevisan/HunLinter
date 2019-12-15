@@ -87,12 +87,12 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		catch(final Exception e){
 			exception = (e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
 
+			final String errorMessage = ExceptionHelper.getMessage(e);
+			LOGGER.trace("{}: {}", e.getClass().getSimpleName(), errorMessage);
 			if(e instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");
 			else
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", e.getMessage());
-			final String errorMessage = ExceptionHelper.getMessage(e);
-			LOGGER.trace("{}: {}", e.getClass().getSimpleName(), errorMessage);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", (e.getMessage() != null? e.getMessage(): errorMessage));
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped opening project");
 

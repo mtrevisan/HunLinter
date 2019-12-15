@@ -101,6 +101,7 @@ public class PatternHelper{
 		return set.stream()
 			.map(String::valueOf)
 			.sorted(comparator)
+			//TODO try to remove all `.collect(Collectors.joining(`...
 			.collect(Collectors.joining());
 	}
 

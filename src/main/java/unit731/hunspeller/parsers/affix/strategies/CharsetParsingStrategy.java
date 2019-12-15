@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
+import unit731.hunspeller.services.StringHelper;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{
@@ -75,7 +76,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		for(final String flag : flags)
 			validate(flag);
 
-		return String.join(StringUtils.EMPTY, flags);
+		return StringHelper.join(StringUtils.EMPTY, flags);
 	}
 
 	@Override

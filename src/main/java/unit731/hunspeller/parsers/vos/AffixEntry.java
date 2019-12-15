@@ -22,6 +22,7 @@ import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class AffixEntry{
@@ -87,7 +88,7 @@ public class AffixEntry{
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		final String matcherCondition = (affixType == AffixType.PREFIX? "^": StringUtils.EMPTY)
-			+ StringUtils.join(cond)
+			+ cond
 			+ (affixType == AffixType.SUFFIX? "$": StringUtils.EMPTY);
 		condition = PatternHelper.pattern(matcherCondition);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -237,7 +238,7 @@ public class AffixEntry{
 			sb.append(strategy.joinFlags(continuationFlags));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+			sb.append(TAB).append(StringHelper.join(StringUtils.SPACE, morphologicalFields));
 		return sb.toString();
 	}
 

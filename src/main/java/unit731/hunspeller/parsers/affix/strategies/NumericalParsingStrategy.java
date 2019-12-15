@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 /**
@@ -76,7 +77,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		Arrays.stream(flags)
 			.forEach(this::validate);
 
-		return String.join(COMMA, flags);
+		return StringHelper.join(COMMA, flags);
 	}
 
 	@Override

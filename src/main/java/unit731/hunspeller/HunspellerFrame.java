@@ -98,6 +98,7 @@ import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.log.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.FileHelper;
@@ -193,6 +194,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
+				@Override
 				public Icon getIcon(final File file){
 					return (Packager.isProjectFolder(file)? projectFolderIcon:
 						FileSystemView.getFileSystemView().getSystemIcon(file));
@@ -1144,7 +1146,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.setText("File");
       filMenu.setToolTipText("");
 
-      filOpenProjectMenuItem.setMnemonic('P');
+      filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open Project...");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1552,7 +1554,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 		final List<String> meanings = Arrays.asList(pair.getRight());
-		final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+		final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
 
 
@@ -1588,7 +1590,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
 				final List<String> meanings = Arrays.asList(pair.getRight());
-				final boolean alreadyContained = backbone.getTheParser().isAlreadyContained(partOfSpeeches, meanings);
+				final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
 				theAddButton.setEnabled(!alreadyContained);
 			}
 		}
@@ -1597,7 +1599,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void filterAutoCorrect(HunspellerFrame frame){
+	private void filterAutoCorrect(final HunspellerFrame frame){
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
@@ -1612,7 +1614,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			unmodifiedCorrectText);
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
-		final boolean alreadyContained = backbone.getAcoParser().isAlreadyContained(incorrect, correct);
+		final boolean alreadyContained = backbone.getAcoParser().contains(incorrect, correct);
 		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
@@ -2447,7 +2449,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		frame.hypSyllabationOutputLabel.setText(text);
 		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(String.join(StringUtils.SPACE, rules));
+		frame.hypRulesOutputLabel.setText(StringHelper.join(StringUtils.SPACE, rules));
 
 		frame.hypAddRuleTextField.setText(null);
 		frame.hypAddRuleSyllabationOutputLabel.setText(null);

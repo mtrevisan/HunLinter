@@ -495,7 +495,7 @@ public class RulesReducer{
 			else if(!growNewBush(queue, parent))
 				continue;
 			else
-				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join(PIPE, newEntry.addition),
+				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, StringHelper.join(PIPE, newEntry.addition),
 					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
 			final int maxConditionLength = queue.stream()
@@ -624,8 +624,8 @@ public class RulesReducer{
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				final String condition = StringUtils.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
-					+ StringUtils.join(commonPostCondition);
+				final String condition = StringHelper.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
+					+ StringHelper.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);

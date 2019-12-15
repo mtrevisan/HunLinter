@@ -37,6 +37,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -368,7 +369,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
 		String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedLongestWords = String.join(LIST_SEPARATOR, longestWords)
+		String formattedLongestWords = StringHelper.join(LIST_SEPARATOR, longestWords)
 			+ " (" + longestWordCharsCount + ")";
 
 		totalWordsOutputLabel.setText(formattedTotalWords);
@@ -385,16 +386,18 @@ public class DictionaryStatisticsDialog extends JDialog{
 		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
 		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
 			.map(Hyphenation::getSyllabes)
-			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
+			.map(syllabes -> StringHelper.join(HyphenationParser.SOFT_HYPHEN, syllabes))
 			.collect(Collectors.toList());
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
 		String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
-		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedMostCommonSyllabes = String.join(LIST_SEPARATOR, mostCommonSyllabes);
-		String formattedLongestWordSyllabes = String.join(LIST_SEPARATOR, longestWordSyllabes)
+		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
+			.map(String::valueOf)
+			.collect(Collectors.joining(LIST_SEPARATOR));
+		String formattedMostCommonSyllabes = StringHelper.join(LIST_SEPARATOR, mostCommonSyllabes);
+		String formattedLongestWordSyllabes = StringHelper.join(LIST_SEPARATOR, longestWordSyllabes)
 			+ " (" + longestWordSyllabesCount + ")";
 
 		compoundWordsOutputLabel.setText(formattedCompoundWords);

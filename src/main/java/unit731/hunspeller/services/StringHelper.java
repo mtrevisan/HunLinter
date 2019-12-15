@@ -25,6 +25,24 @@ public class StringHelper{
 
 	private StringHelper(){}
 
+	public static <T> String join(final T... items){
+		return StringUtils.join(items);
+	}
+
+	public static String join(final String separator, final String... items){
+		return StringUtils.join(items, separator);
+	}
+
+	public static String join(final String separator, final Collection<String> items){
+		return StringUtils.join(items, separator);
+	}
+
+	public static long countUppercases(final String text){
+		return text.chars()
+			.filter(Character::isUpperCase)
+			.count();
+	}
+
 	public static Casing classifyCasing(final String text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;

@@ -200,7 +200,7 @@ public class Packager{
 				.collect(Collectors.toSet());
 			if(this.configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-					+ StringUtils.join(this.configurationFiles));
+					+ StringHelper.join(this.configurationFiles));
 			if(uniqueFolders.stream().anyMatch(String::isEmpty))
 				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
@@ -457,7 +457,7 @@ public class Packager{
 
 	private String[] extractLocale(final Node parentNode){
 		final String locale = extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
-		return StringUtils.split(locale, ' ');
+		return StringUtils.split(locale);
 	}
 
 	private String extractProperty(final Node parentNode, final String propertyName){

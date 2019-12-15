@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
+import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -28,7 +28,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
 	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixOption.COMPOUND_RULE
-	 * 
+	 *
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param limit	Limit result count
@@ -79,7 +79,8 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	private void checkCompoundRuleInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs, final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new HunspellException(MISSING_WORD.format(new Object[]{component, StringUtils.join(compoundRuleComponents, null)}));
+				throw new HunspellException(MISSING_WORD.format(new Object[]{component,
+					StringHelper.join(null, compoundRuleComponents)}));
 	}
 
 	private boolean raiseError(final Map<String, Set<DictionaryEntry>> inputs, final String component){

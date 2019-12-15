@@ -29,6 +29,7 @@ import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 /**
@@ -254,7 +255,7 @@ public class HyphenationParser{
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
-		return StringUtils.join(components);
+		return StringHelper.join(components);
 	}
 
 	private Level extractNextLevel(final Level level, final String line){
@@ -294,7 +295,7 @@ public class HyphenationParser{
 		if(charset == StandardCharsets.UTF_8)
 			retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
-		patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, null) + "]");
+		patternNoHyphen = PatternHelper.pattern("[" + StringHelper.join(null, retroCompatibilityNoHyphen) + "]");
 
 		options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
