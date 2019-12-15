@@ -79,16 +79,16 @@ setBorder(new LineBorder(Color.RED));
 		revalidate();
 
 		//TODO calculate new panel height
-		final int maxHeight = JavaHelper.nullableToStream(getComponents())
-			.filter(comp -> comp instanceof JTagComponent)
-			.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
-			.max()
-			.orElse(0);
-		int height = getHeight();
+final int maxHeight = JavaHelper.nullableToStream(getComponents())
+	.filter(comp -> comp instanceof JTagComponent)
+	.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
+	.max()
+	.orElse(0);
+int height = getHeight();
 System.out.println("height: " + maxHeight);
-		final Dimension dimension = getPreferredSize();
-		dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
-		setPreferredSize(dimension);
+final Dimension dimension = getPreferredSize();
+//dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
+setPreferredSize(dimension);
 	}
 
 	public void applyFilter(final String tag){
@@ -114,7 +114,7 @@ System.out.println("height: " + maxHeight);
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	public static class JTagComponent extends JPanel{
+	public static class JTagComponent extends JComponent{
 
 		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);
@@ -161,8 +161,9 @@ System.out.println("height: " + maxHeight);
 
 			add(textLabel, BorderLayout.WEST);
 			add(closePanel, BorderLayout.EAST);
-//			final Dimension size = getPreferredSize();
-//			setSize(size);
+//final Dimension size = getPreferredSize();
+//size.height += PAD * 10;
+//setPreferredSize(size);
 		}
 
 		@Override
