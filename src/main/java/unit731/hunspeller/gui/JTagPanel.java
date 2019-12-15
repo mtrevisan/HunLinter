@@ -60,7 +60,7 @@ setBorder(new LineBorder(Color.RED));
 
 	private void createAndAddTag(final String tag){
 		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-		add(component, getComponentCount());
+		add(component, BorderLayout.LINE_END);
 	}
 
 	private void removeTag(final JTagComponent tag){
@@ -84,9 +84,10 @@ setBorder(new LineBorder(Color.RED));
 			.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
 			.max()
 			.orElse(0);
+		int height = getHeight();
 System.out.println("height: " + maxHeight);
 		final Dimension dimension = getPreferredSize();
-		dimension.height = Math.max(getParent().getHeight(), maxHeight);
+		dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
 		setPreferredSize(dimension);
 	}
 
@@ -113,7 +114,7 @@ System.out.println("height: " + maxHeight);
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	private static class JTagComponent extends JPanel{
+	public static class JTagComponent extends JPanel{
 
 		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);
@@ -160,6 +161,8 @@ System.out.println("height: " + maxHeight);
 
 			add(textLabel, BorderLayout.WEST);
 			add(closePanel, BorderLayout.EAST);
+//			final Dimension size = getPreferredSize();
+//			setSize(size);
 		}
 
 		@Override
