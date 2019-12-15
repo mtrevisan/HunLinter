@@ -1033,6 +1033,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       sexTextArea.setEditable(false);
       sexTextArea.setColumns(20);
+      sexTextArea.setLineWrap(true);
+      sexTextArea.setWrapStyleWord(true);
       sexScrollPane.setViewportView(sexTextArea);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1085,6 +1087,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       wexTextArea.setEditable(false);
       wexTextArea.setColumns(20);
+      wexTextArea.setLineWrap(true);
+      wexTextArea.setWrapStyleWord(true);
       wexScrollPane.setViewportView(wexTextArea);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
