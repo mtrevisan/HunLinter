@@ -2300,6 +2300,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
+				//FIXME
 				sexTextArea.setText(String.join(", ", sentenceExceptions));
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
@@ -2309,6 +2310,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//word exceptions file:
 			if(backbone.getWexParser().getExceptionsCounter() > 0){
 				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
+				//FIXME
 				wexTextArea.setText(String.join(", ", wordExceptions));
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
