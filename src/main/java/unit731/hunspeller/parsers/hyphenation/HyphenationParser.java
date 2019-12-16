@@ -255,7 +255,7 @@ public class HyphenationParser{
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
-		return StringHelper.join(components);
+		return StringHelper.join(null, components);
 	}
 
 	private Level extractNextLevel(final Level level, final String line){

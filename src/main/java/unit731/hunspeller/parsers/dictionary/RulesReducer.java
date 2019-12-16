@@ -624,8 +624,8 @@ public class RulesReducer{
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				final String condition = StringHelper.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
-					+ StringHelper.join(commonPostCondition);
+				final String condition = StringHelper.join(null, commonPreCondition) + PatternHelper.makeGroup(group, comparator)
+					+ StringHelper.join(null, commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);
