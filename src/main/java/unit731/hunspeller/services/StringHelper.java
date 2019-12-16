@@ -29,11 +29,11 @@ public class StringHelper{
 		return StringUtils.join(items);
 	}
 
-	public static String join(final String separator, final String... items){
+	public static String join(final String separator, final Object[] items){
 		return StringUtils.join(items, separator);
 	}
 
-	public static String join(final String separator, final Collection<String> items){
+	public static String join(final String separator, final Iterable<?> items){
 		return StringUtils.join(items, separator);
 	}
 

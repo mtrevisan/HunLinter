@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -277,8 +278,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					writer.write(origin);
 					writer.write(entries.stream()
 						.map(duplicate ->
-							StringHelper.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
+							StringHelper.join(StringUtils.EMPTY, Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"))
 						)
 						.collect(Collectors.joining(", ")));
 					writer.newLine();

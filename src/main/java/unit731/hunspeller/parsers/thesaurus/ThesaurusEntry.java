@@ -69,8 +69,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public String joinMeanings(final String separator){
 		return StringHelper.join(separator, meanings);
-
 	}
+
 	public void setMeanings(final String[] lines){
 		meanings.clear();
 		Arrays.stream(lines)
