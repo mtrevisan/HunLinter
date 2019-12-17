@@ -60,7 +60,9 @@ setBorder(new LineBorder(Color.RED));
 
 	private void createAndAddTag(final String tag){
 		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-		add(component, BorderLayout.LINE_END);
+component.setBorder(new LineBorder(Color.GREEN));
+//		add(component, BorderLayout.LINE_END);
+		add(new JButton(tag));
 	}
 
 	private void removeTag(final JTagComponent tag){
@@ -114,7 +116,7 @@ setPreferredSize(dimension);
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	public static class JTagComponent extends JComponent{
+	private static class JTagComponent extends JComponent{
 
 		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);
