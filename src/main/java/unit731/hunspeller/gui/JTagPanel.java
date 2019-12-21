@@ -60,9 +60,9 @@ setBorder(new LineBorder(Color.RED));
 
 	private void createAndAddTag(final String tag){
 		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-component.setBorder(new LineBorder(Color.GREEN));
 //		add(component, BorderLayout.LINE_END);
-		add(new JButton(tag));
+component.setBorder(new LineBorder(Color.GREEN));
+add(new JButton(tag));
 	}
 
 	private void removeTag(final JTagComponent tag){
