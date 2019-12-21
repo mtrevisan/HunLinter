@@ -5,7 +5,6 @@ import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -31,8 +30,8 @@ public class JTagPanel extends JPanel{
 	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
 		this.tagsChanged = tagsChanged;
 
-		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-setBorder(new LineBorder(Color.RED));
+//		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
@@ -60,9 +59,7 @@ setBorder(new LineBorder(Color.RED));
 
 	private void createAndAddTag(final String tag){
 		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-//		add(component, BorderLayout.LINE_END);
-component.setBorder(new LineBorder(Color.GREEN));
-add(new JButton(tag));
+		add(component, BorderLayout.LINE_END);
 	}
 
 	private void removeTag(final JTagComponent tag){
@@ -80,17 +77,9 @@ add(new JButton(tag));
 		repaint();
 		revalidate();
 
-		//TODO calculate new panel height
-//final int maxHeight = JavaHelper.nullableToStream(getComponents())
-//	.filter(comp -> comp instanceof JTagComponent)
-//	.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
-//	.max()
-//	.orElse(0);
-//int height = getHeight();
-//System.out.println("height: " + maxHeight);
-final Dimension dimension = getPreferredSize();
+//final Dimension dimension = getPreferredSize();
 //dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
-setPreferredSize(dimension);
+//setPreferredSize(dimension);
 	}
 
 	public void applyFilter(final String tag){
@@ -163,9 +152,6 @@ setPreferredSize(dimension);
 
 			add(textLabel, BorderLayout.WEST);
 			add(closePanel, BorderLayout.EAST);
-//final Dimension size = getPreferredSize();
-//size.height += PAD * 10;
-//setPreferredSize(size);
 		}
 
 		@Override
