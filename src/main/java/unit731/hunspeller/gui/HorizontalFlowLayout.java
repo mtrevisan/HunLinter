@@ -1,7 +1,8 @@
 package unit731.hunspeller.gui;
 
+import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
+import java.util.function.Function;
 
 
 /**
@@ -15,47 +16,30 @@ import java.io.Serializable;
  * horizontally until no more buttons fit on the same line. The line alignment is determined by the <code>align</code>
  * property. The possible values are:
  * <ul>
- * <li>{@link Alignment#LEFT_JUSTIFIED TOP}
- * <li>{@link Alignment#RIGHT_JUSTIFIED BOTTOM}
- * <li>{@link Alignment#CENTERED CENTER}
+ * <li>{@link FlowLayout#LEFT LEFT}
+ * <li>{@link FlowLayout#CENTER CENTER}
+ * <li>{@link FlowLayout#RIGHT RIGHT}
  * </ul>
  * <p>
  */
-public class HorizontalFlowLayout implements LayoutManager, Serializable{
+//http://www.camick.com/java/source/WrapLayout.java
+public class HorizontalFlowLayout extends FlowLayout{
 
-	public enum Alignment{
-		/** This value indicates that each row of components should be left-justified */
-		LEFT_JUSTIFIED,
-		/** This value indicates that each row of components should be centered */
-		CENTERED,
-		/** This value indicates that each row of components should be right-justified */
-		RIGHT_JUSTIFIED
+	/** Constructs a new <code>WrapLayout</code> with a left alignment and a default 5-unit horizontal and vertical gap. */
+	public HorizontalFlowLayout(){
+		super();
 	}
 
-
 	/**
-	 * <code>align</code> is the property that determines
-	 * how each column distributes empty space.
-	 * It can be one of the following three values:
-	 * <ul>
-	 * <code>Alignment.LEFT_JUSTIFIED</code>
-	 * <code>Alignment.CENTERED</code>
-	 * <code>Alignment.RIGHT_JUSTIFIED</code>
-	 * </ul>
+	 * Constructs a new <code>FlowLayout</code> with the specified alignment and a default 5-unit horizontal and vertical gap.
+	 * The value of the alignment argument must be one of <code>WrapLayout</code>, <code>WrapLayout</code>,
+	 * or <code>WrapLayout</code>.
+	 *
+	 * @param align	The alignment value
 	 */
-	private final Alignment align;
-	/**
-	 * The flow layout manager allows a separation of components with gaps.  The horizontal gap will
-	 * specify the space between components and between the components and the borders of the
-	 * <code>Container</code>.
-	 */
-	private final int hgap;
-	/**
-	 * The flow layout manager allows a separation of components with gaps.  The vertical gap will
-	 * specify the space between rows and between the the rows and the borders of the <code>Container</code>.
-	 */
-	private final int vgap;
-
+	public HorizontalFlowLayout(final int align){
+		super(align);
+	}
 
 	/**
 	 * Creates a new flow layout manager with the indicated alignment
@@ -65,39 +49,15 @@ public class HorizontalFlowLayout implements LayoutManager, Serializable{
 	 * <code>HorizontalFlowLayout.TOP</code>, <code>HorizontalFlowLayout.BOTTOM</code>,
 	 * or <code>HorizontalFlowLayout.CENTER</code>.
 	 *
-	 * @param align the alignment value
-	 * @param hgap  the horizontal gap between components
-	 *              and between the components and the
-	 *              borders of the <code>Container</code>
-	 * @param vgap  the vertical gap between components
-	 *              and between the components and the
-	 *              borders of the <code>Container</code>
+	 * @param align The alignment value
+	 * @param hgap The horizontal gap between components and between the components and the
+	 * 				borders of the <code>Container</code>
+	 * @param vgap	The vertical gap between components and between the components and the
+	 * 				borders of the <code>Container</code>
 	 */
-	public HorizontalFlowLayout(final Alignment align, final int hgap, final int vgap){
-		this.align = align;
-		this.hgap = hgap;
-		this.vgap = vgap;
+	public HorizontalFlowLayout(final int align, final int hgap, final int vgap){
+		super(align, hgap, vgap);
 	}
-
-	/**
-	 * Adds the specified component to the layout.<br />
-	 * Not used by this class.
-	 *
-	 * @param name the name of the component
-	 * @param component the component to be added
-	 */
-	@Override
-	public void addLayoutComponent(final String name, final Component component){}
-
-	/**
-	 * Removes the specified component from the layout.<br />
-	 * Not used by this class.
-	 *
-	 * @param component the component to remove
-	 * @see java.awt.Container#removeAll
-	 */
-	@Override
-	public void removeLayoutComponent(final Component component){}
 
 	/**
 	 * Returns the preferred dimensions for this layout given the
@@ -110,30 +70,9 @@ public class HorizontalFlowLayout implements LayoutManager, Serializable{
 	 * @see #minimumLayoutSize
 	 * @see java.awt.Container#getPreferredSize
 	 */
+	@Override
 	public Dimension preferredLayoutSize(final Container target){
-		synchronized(target.getTreeLock()){
-			final Dimension dim = new Dimension(0, 0);
-			boolean firstVisibleComponent = true;
-			final int size = target.getComponentCount();
-			for(int i = 0; i < size; i ++){
-				final Component m = target.getComponent(i);
-				if(m.isVisible()){
-					final Dimension d = m.getPreferredSize();
-					dim.width = Math.max(dim.width, d.width);
-
-					if(firstVisibleComponent)
-						firstVisibleComponent = false;
-					else
-						dim.height += vgap;
-					dim.height += d.height;
-				}
-			}
-
-			final Insets insets = target.getInsets();
-			dim.width += insets.left + insets.right + hgap * 2;
-			dim.height += insets.top + insets.bottom + vgap * 2;
-			return dim;
-		}
+		return layoutSize(target, Component::getPreferredSize);
 	}
 
 	/**
@@ -147,30 +86,82 @@ public class HorizontalFlowLayout implements LayoutManager, Serializable{
 	 * @see java.awt.Container
 	 * @see java.awt.Container#doLayout
 	 */
+	@Override
 	public Dimension minimumLayoutSize(final Container target){
+		final Dimension minimum = layoutSize(target, Component::getMinimumSize);
+		minimum.width -= getHgap() + 1;
+		return minimum;
+	}
+
+	private Dimension layoutSize(final Container target, final Function<Component, Dimension> sizeSupplier){
 		synchronized(target.getTreeLock()){
-			final Dimension dim = new Dimension(0, 0);
-			boolean firstVisibleComponent = true;
-			final int size = target.getComponentCount();
-			for(int i = 0; i < size; i ++){
+			//each row must fit with the width allocated to the container
+			final int targetWidth = target.getSize().width;
+
+			final Insets insets = target.getInsets();
+			final int horizontalInsetsAndGap = insets.left + insets.right + getHgap() * 2;
+			//when the container height is 0, the preferred height of the container has not yet been calculated
+			//so lets ask for the maximum
+			final int maxWidth = (targetWidth > 0? targetWidth: Integer.MAX_VALUE) - horizontalInsetsAndGap;
+
+			//fit components into the allowed height
+			final Dimension finalDimension = new Dimension(0, 0);
+			int rowWidth = 0;
+			int rowHeight = 0;
+			for(int i = 0; i < target.getComponentCount(); i ++){
 				final Component m = target.getComponent(i);
 				if(m.isVisible()){
-					final Dimension d = m.getMinimumSize();
-					dim.width = Math.max(dim.width, d.width);
+					final Dimension d = sizeSupplier.apply(m);
+					//can't add the component to current row: start a new row
+					if(rowWidth + d.width > maxWidth){
+						addRow(d, rowWidth, rowHeight);
 
-					if(firstVisibleComponent)
-						firstVisibleComponent = false;
-					else
-						dim.height += vgap;
-					dim.height += d.height;
+						rowWidth = 0;
+						rowHeight = 0;
+					}
+					//add an horizontal gap for all components after the first
+					rowWidth += (rowWidth > 0? getHgap(): 0) + d.width;
+					rowHeight = Math.max(rowHeight, d.height);
+
+//					final Dimension d = sizeSupplier.apply(m);
+//					finalDimension.width = Math.max(finalDimension.width, d.width);
+//					finalDimension.height += (i > 0? vgap: 0) + d.height;
+//					finalDimension.height = Math.max(finalDimension.height, d.height);
+//					finalDimension.width += (i > 0? hgap: 0) + d.width;
 				}
 			}
 
-			final Insets insets = target.getInsets();
-			dim.width += insets.left + insets.right + hgap * 2;
-			dim.height += insets.top + insets.bottom + vgap * 2;
-			return dim;
+			addRow(finalDimension, rowWidth, rowHeight);
+
+			finalDimension.width += horizontalInsetsAndGap;
+			finalDimension.height += insets.top + insets.bottom + getVgap() * 2;
+
+			//when using a scroll pane or the DecoratedLookAndFeel we need to make sure the preferred size
+			//is less than the size of the target containter so shrinking the container size works
+			//correctly: removing the horizontal gap is an easy way to do this
+			final Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
+			if(scrollPane != null)
+				finalDimension.width -= getHgap() + 1;
+			return finalDimension;
+
+//			finalDimension.width += horizontalInsetsAndGap;
+//			finalDimension.height += insets.top + insets.bottom + vgap * 2;
+//			return finalDimension;
 		}
+	}
+
+	/*
+	 *  A new row has been completed. Use the dimensions of this row to update the preferred size for the container.
+	 *
+	 *  @param dimension	Update the width and height when appropriate
+	 *  @param rowWidth	The width of the row to add
+	 *  @param rowHeight	The height of the row to add
+	 */
+	private void addRow(final Dimension dimension, final int rowWidth, final int rowHeight){
+		dimension.width = Math.max(dimension.width, rowWidth);
+		if(dimension.height > 0)
+			dimension.height += getVgap();
+		dimension.height += rowHeight;
 	}
 
 	/**
@@ -182,79 +173,85 @@ public class HorizontalFlowLayout implements LayoutManager, Serializable{
 	 * @see Container
 	 * @see java.awt.Container#doLayout
 	 */
-	public void layoutContainer(final Container target){
-		synchronized(target.getTreeLock()){
-			final Insets insets = target.getInsets();
-			final int maxWidth = target.getSize().width - (insets.left + insets.right + hgap * 2);
-			final boolean leftToRight = target.getComponentOrientation().isLeftToRight();
-			int y = insets.top + vgap;
-			int x = 0;
-			int columnHeight = 0;
-			int start = 0;
-
-			final int size = target.getComponentCount();
-			for(int i = 0; i < size; i ++){
-				final Component m = target.getComponent(i);
-
-				if(m.isVisible()){
-					final Dimension d = m.getPreferredSize();
-					m.setSize(d);
-
-					if(x == 0 || x + d.width <= maxWidth){
-						x += (x > 0? hgap: 0) + d.width;
-						columnHeight = Math.max(columnHeight, d.height);
-					}
-					else{
-						moveComponents(target, insets.left + hgap, y, maxWidth - x, columnHeight, start, i, leftToRight);
-
-						x = d.width;
-						y += vgap + columnHeight;
-						columnHeight = d.height;
-						start = i;
-					}
-				}
-			}
-
-			moveComponents(target, insets.left + hgap, y, maxWidth - x, columnHeight, start, size, leftToRight);
-		}
-	}
+//	@Override
+//	public void layoutContainer(final Container target){
+//		synchronized(target.getTreeLock()){
+//			final Insets insets = target.getInsets();
+//			final int maxWidth = target.getSize().width - (insets.left + insets.right + hgap * 2);
+//			final boolean leftToRight = target.getComponentOrientation().isLeftToRight();
+//			int y = insets.top + vgap;
+//			int x = 0;
+//			int rowHeight = 0;
+//			int start = 0;
+//
+//			final int size = target.getComponentCount();
+//			for(int i = 0; i < size; i ++){
+//				final Component m = target.getComponent(i);
+//				if(m.isVisible()){
+//					final Dimension d = m.getPreferredSize();
+//					m.setSize(d);
+//
+//					if(x == 0 || x + d.width <= maxWidth){
+//						x += (x > 0? hgap: 0) + d.width;
+//						rowHeight = Math.max(rowHeight, d.height);
+//					}
+//					else{
+//						moveComponents(target, insets.left + hgap, y, maxWidth - x, rowHeight, start, i, leftToRight);
+//
+//						x = d.width;
+//						y += vgap + rowHeight;
+//						rowHeight = d.height;
+//						start = i;
+//					}
+//				}
+//			}
+//
+//			moveComponents(target, insets.left + hgap, y, maxWidth - x, rowHeight, start, size, leftToRight);
+//		}
+//	}
 
 	/**
 	 * Centers the elements in the specified row, if there is any slack.
 	 *
-	 * @param target      the component which needs to be moved
-	 * @param x           the x coordinate
-	 * @param y           the y coordinate
-	 * @param width       the width dimensions
-	 * @param height      the height dimensions
-	 * @param columnStart the beginning of the column
-	 * @param columnEnd   the the ending of the column
+	 * @param target	The component which needs to be moved
+	 * @param x	The x coordinate
+	 * @param y	The y coordinate
+	 * @param width	The width dimensions
+	 * @param height	The height dimensions
+	 * @param columnStart	The beginning of the column
+	 * @param columnEnd	The the ending of the column
 	 */
-	private void moveComponents(final Container target, int x, final int y, final int width, final int height,
-			final int columnStart, final int columnEnd, final boolean leftToRight){
-		switch(align){
-			case LEFT_JUSTIFIED:
-				x += (leftToRight? 0: width);
-				break;
+//	private void moveComponents(final Container target, int x, final int y, final int width, final int height,
+//			final int columnStart, final int columnEnd, final boolean leftToRight){
+//		x += startingX(leftToRight, width);
+//		for(int i = columnStart; i < columnEnd; i ++){
+//			final Component m = target.getComponent(i);
+//			if(m.isVisible()){
+//				final Dimension size = m.getSize();
+//				final int cy = y + (height - size.height) / 2;
+//				m.setLocation((leftToRight? x: target.getSize().width - x - size.width), cy);
+//
+//				x += size.width + getHgap();
+//			}
+//		}
+//	}
 
-			case CENTERED:
-				x += width / 2;
-				break;
-
-			case RIGHT_JUSTIFIED:
-				x += (leftToRight? width: 0);
-		}
-
-		for(int i = columnStart; i < columnEnd; i ++){
-			final Component m = target.getComponent(i);
-			if(m.isVisible()){
-				final int cy = y + (height - m.getSize().height) / 2;
-				m.setLocation((leftToRight? x: target.getSize().width - x - m.getSize().width), cy);
-
-				x += m.getSize().width + hgap;
-			}
-		}
-	}
+//	private int startingX(final boolean leftToRight, final int width){
+//		int x = 0;
+//		switch(getAlignment()){
+//			case LEFT:
+//				x = (leftToRight? 0: width);
+//				break;
+//
+//			case CENTER:
+//				x = width / 2;
+//				break;
+//
+//			case RIGHT:
+//				x = (leftToRight? width: 0);
+//		}
+//		return x;
+//	}
 
 	/**
 	 * Returns a string representation of this <code>HorizontalFlowLayout</code>
@@ -262,22 +259,22 @@ public class HorizontalFlowLayout implements LayoutManager, Serializable{
 	 *
 	 * @return a string representation of this layout
 	 */
-	public String toString(){
-		String alignment;
-		switch(align){
-			case LEFT_JUSTIFIED:
-				alignment = "top";
-				break;
-
-			case CENTERED:
-				alignment = "center";
-				break;
-
-			case RIGHT_JUSTIFIED:
-			default:
-				alignment = "bottom";
-		}
-		return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + ",align=" + alignment + "]";
-	}
+//	public String toString(){
+//		String alignment;
+//		switch(align){
+//			case LEFT:
+//				alignment = "top";
+//				break;
+//
+//			case CENTER:
+//				alignment = "center";
+//				break;
+//
+//			case RIGHT:
+//			default:
+//				alignment = "bottom";
+//		}
+//		return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + ",align=" + alignment + "]";
+//	}
 
 }
