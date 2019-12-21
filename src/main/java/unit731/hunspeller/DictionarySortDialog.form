@@ -58,7 +58,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblMessage">
       <Properties>
-        <Property name="text" type="java.lang.String" value="..."/>
+        <Property name="text" type="java.lang.String" value="…"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="entriesScrollPane">

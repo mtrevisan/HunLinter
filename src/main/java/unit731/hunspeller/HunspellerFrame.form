@@ -20,7 +20,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="79"/>
-                <Property name="text" type="java.lang.String" value="Open Project..."/>
+                <Property name="text" type="java.lang.String" value="Open Project…"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenProjectMenuItemActionPerformed"/>
@@ -44,7 +44,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filFontMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="102"/>
-                <Property name="text" type="java.lang.String" value="Select font..."/>
+                <Property name="text" type="java.lang.String" value="Select font…"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -106,7 +106,7 @@
                   <Image iconType="3" name="/dictionary_sort.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="115"/>
-                <Property name="text" type="java.lang.String" value="Sort dictionary..."/>
+                <Property name="text" type="java.lang.String" value="Sort dictionary…"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
@@ -115,7 +115,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicRulesReducerMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Rules reducer..."/>
+                <Property name="text" type="java.lang.String" value="Rules reducer…"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicRulesReducerMenuItemActionPerformed"/>
@@ -155,7 +155,7 @@
                   <Image iconType="3" name="/dictionary_duplicates.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="100"/>
-                <Property name="text" type="java.lang.String" value="Extract duplicates..."/>
+                <Property name="text" type="java.lang.String" value="Extract duplicates…"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
@@ -167,7 +167,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Extract wordlist..."/>
+                <Property name="text" type="java.lang.String" value="Extract wordlist…"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistMenuItemActionPerformed"/>
@@ -178,7 +178,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)..."/>
+                <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)…"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistPlainTextMenuItemActionPerformed"/>
@@ -187,7 +187,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="109"/>
-                <Property name="text" type="java.lang.String" value="Extract minimal pairs..."/>
+                <Property name="text" type="java.lang.String" value="Extract minimal pairs…"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractMinimalPairsMenuItemActionPerformed"/>
@@ -475,7 +475,7 @@
                     </Property>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicTable.setRowSelectionAllowed(true);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicTable.setRowSelectionAllowed(true);&#xd;&#xa;TableRenderer dicCellRenderer = new TableRenderer();&#xd;&#xa;for(int i = 0; i &lt; dicTable.getColumnCount(); i ++)&#xd;&#xa;&#x9;dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);&#xd;&#xa;"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -490,7 +490,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="dicTotalProductionsOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openAidButton">
@@ -805,7 +805,7 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;theTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// … and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;theTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -820,7 +820,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="theSynonymsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -965,7 +965,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabationOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -981,7 +981,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabesCountOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesLabel">
@@ -994,7 +994,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -1053,7 +1053,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -1069,7 +1069,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="optionsButton">
@@ -1215,7 +1215,7 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//listen for row removal&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;BiConsumer&lt;String, String&gt; okButtonAction = (incorrect, correct) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setCorrection(row, incorrect, correct);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;acoTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer acoCellRenderer = new TableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//listen for row removal&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;BiConsumer&lt;String, String&gt; okButtonAction = (incorrect, correct) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setCorrection(row, incorrect, correct);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// … and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;acoTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer acoCellRenderer = new TableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1230,7 +1230,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="acoCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openAcoButton">
@@ -1354,7 +1354,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="sexCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openSexButton">
@@ -1480,7 +1480,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="wexCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="…"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openWexButton">

@@ -47,7 +47,7 @@ Hunspeller
 ## Motivation
 I created this project in order to help me construct my hunspell language files (particularly for the Venetan language, you can find some tools [here](http://parnodexmentegar.orgfree.com/), and the language pack [here (for the LibreOffice tools)](https://extensions.libreoffice.org/extensions/spelling-dictionary-and-hyphenator-for-the-venetan-language) and [here (for the Mozilla tools)](https://addons.mozilla.org/en-US/firefox/addon/dithionario-de-lengua-v%C3%A8neta/)). I mean `.aff` and `.dic` files, along with hyphenation and thesaurus.
 
-**The name I give to the project is kind of temporary...**
+**The name I give to the project is kind of temporary…**
 
 
 <br/>
@@ -123,7 +123,7 @@ Is it possible to copy content of tables and words in the statistics section. Al
 ### Rule/dictionary insertion
 This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, add hyphenation rules, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
 
-<sup>1</sup>: Even if for the hyphenation file a new rule can actually be added...
+<sup>1</sup>: Even if for the hyphenation file a new rule can actually be added…
 
 
 <br/>

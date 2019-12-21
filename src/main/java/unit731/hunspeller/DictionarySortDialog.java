@@ -51,7 +51,7 @@ public class DictionarySortDialog extends JDialog{
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      lblMessage.setText("...");
+      lblMessage.setText("…");
 
       entriesScrollPane.setBackground(java.awt.Color.white);
       entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));

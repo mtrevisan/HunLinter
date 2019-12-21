@@ -88,17 +88,17 @@ public class HelpDialog extends JDialog{
       lblProductVersion.setLabelFor(lblProductVersionOut);
       lblProductVersion.setText("Product Version:");
 
-      lblProductVersionOut.setText("...");
+      lblProductVersionOut.setText("…");
 
       lblReleaseDate.setLabelFor(lblReleaseDateOut);
       lblReleaseDate.setText("Release Date:");
 
-      lblReleaseDateOut.setText("...");
+      lblReleaseDateOut.setText("…");
 
       lblCopyrightOut.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-      lblCopyrightOut.setText("...");
+      lblCopyrightOut.setText("…");
 
-      lblProductNameOut.setText("...");
+      lblProductNameOut.setText("…");
 
       lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 

@@ -191,17 +191,17 @@ public class RulesReducer{
 
 	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules){
 		//transform
-		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=...]
-		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
+		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=…]
+		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=…]
 		//into
-		//	[rem=èra,add=[iera, ièra, iereta],    cond=èra,from=...]
-		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
+		//	[rem=èra,add=[iera, ièra, iereta],    cond=èra,from=…]
+		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=…]
 
 		//transform
-		//	[rem=ièr,add=[ar, areto, ereto, ier, èr, iar, iereto, er],cond=ièr,from=...]
+		//	[rem=ièr,add=[ar, areto, ereto, ier, èr, iar, iereto, er],cond=ièr,from=…]
 		//into
-		//	[rem= èr,add=[er, ar, ereto],           cond=ièr,from=...]
-		//	[rem=ièr,add=[ar, areto, ereto, èr, er],cond=ièr,from=...]
+		//	[rem= èr,add=[er, ar, ereto],           cond=ièr,from=…]
+		//	[rem=ièr,add=[ar, areto, ereto, èr, er],cond=ièr,from=…]
 		final List<LineEntry> disjointedRules = new ArrayList<>();
 
 		for(final LineEntry rule : rules){

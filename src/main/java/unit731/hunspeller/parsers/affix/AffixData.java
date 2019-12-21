@@ -215,7 +215,7 @@ public class AffixData{
 	}
 
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
-		//extract the list of applicable affixes...
+		//extract the list of applicable affixes…
 		return entries.stream()
 			.filter(entry -> entry.canApplyTo(word))
 			.collect(Collectors.toList());

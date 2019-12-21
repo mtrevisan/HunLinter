@@ -18,7 +18,7 @@ import unit731.hunspeller.services.Memoizer;
  * <p>
  * The values are ordered using the default (natural order).
  * </p>
- * 
+ *
  * @param <T>	Type of value
  */
 public class Frequency<T extends Comparable>{
@@ -59,7 +59,7 @@ public class Frequency<T extends Comparable>{
 	 * Return an Iterator over the set of keys and values that have been added.
 	 * Using the entry set to iterate is more efficient in the case where you
 	 * need to access respective counts as well as values, since it doesn't
-	 * require a "get" for every key...the value is provided in the Map.Entry.
+	 * require a "get" for every key… the value is provided in the Map.Entry.
 	 * <p>
 	 * If added values are integral (i.e., integers, longs, Integers, or Longs),
 	 * they are converted to Longs when they are added, so the values of the
