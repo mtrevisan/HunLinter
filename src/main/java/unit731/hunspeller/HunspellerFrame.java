@@ -315,6 +315,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexTextField = new javax.swing.JTextField();
       sexAddButton = new javax.swing.JButton();
       sexScrollPane = new javax.swing.JScrollPane();
+      sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       sexTagPanel = new JTagPanel((changeType, tags) -> {
          backbone.getSexParser().modify(changeType, tags);
          try{
@@ -332,6 +333,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       wexTextField = new javax.swing.JTextField();
       wexAddButton = new javax.swing.JButton();
       wexScrollPane = new javax.swing.JScrollPane();
+      wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       wexTagPanel = new JTagPanel((changeType, tags) -> {
          backbone.getWexParser().modify(changeType, tags);
          try{
@@ -1085,7 +1087,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      sexScrollPane.setHorizontalScrollBar(null);
+      sexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1170,7 +1172,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      wexScrollPane.setHorizontalScrollBar(null);
+      wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
