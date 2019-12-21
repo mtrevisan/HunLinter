@@ -81,13 +81,13 @@ component.setBorder(new LineBorder(Color.GREEN));
 		revalidate();
 
 		//TODO calculate new panel height
-final int maxHeight = JavaHelper.nullableToStream(getComponents())
-	.filter(comp -> comp instanceof JTagComponent)
-	.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
-	.max()
-	.orElse(0);
-int height = getHeight();
-System.out.println("height: " + maxHeight);
+//final int maxHeight = JavaHelper.nullableToStream(getComponents())
+//	.filter(comp -> comp instanceof JTagComponent)
+//	.mapToInt(comp -> comp.getY() + comp.getPreferredSize().height)
+//	.max()
+//	.orElse(0);
+//int height = getHeight();
+//System.out.println("height: " + maxHeight);
 final Dimension dimension = getPreferredSize();
 //dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
 setPreferredSize(dimension);
