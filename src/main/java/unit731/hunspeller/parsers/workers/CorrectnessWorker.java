@@ -17,7 +17,8 @@ public class CorrectnessWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Dictionary correctness checking";
 
 
-	public CorrectnessWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker, final WordGenerator wordGenerator){
+	public CorrectnessWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
+			final WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);
 

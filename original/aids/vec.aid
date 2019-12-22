@@ -19,7 +19,7 @@ D0: (public) feminine plural substantives, adjectives of 3rd class (0>[ei]|[^oai
 E0/E1/E2: procomplementar verbs (0>-[lƚ][oaie], 0>-[gmstv]e(ne), 0>-[gmstv]e[lƚ][oaie], 0>-ne)
 F0/F1/F2: procomplementar verbs (0>-[gmntv]e|[^a], 0>-[lƚ][oaie]|[^a], a>e-[gmntv]e, a>e-[lƚ][oaie])
 G0/G1/G2: procomplementar verbs (me>[gntv]e|[^a]me, ame>e[gmntv]e, me>[lƚ][oaie]|[^a]me, ame>e[lƚ][oaie], mene>me[lƚ][oaie], mene>[gstv]ene, mene>[gstv]e[lƚ][oaie])
-I0: (public) sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>n|ñ[oei], ñ.>ñ|ñ[oei], b.>p|b[oei], p.>p|p[oei], ...)
+I0: (public) sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>n|ñ[oei], ñ.>ñ|ñ[oei], b.>p|b[oei], p.>p|p[oei], …)
 J0: interrogatives (0>-[ei], 0>-mi|[^m][^o], 0>-mi|[^n], 0>-t[ei]|n, 0>-n(t)[ei]|[^n])
 K0: interrogatives (e>i, e>mi|[^m][^o]e, e>mi|[^n]e, e>t[ei]|ne, e>n(t)[ei]|[^n]e)
 L0: interrogatives (0>-t[ou], 0>-stu)
@@ -35,13 +35,13 @@ T3: (public) femenine transformation at the end of a word between variants (l>ƚ
 T4: (public) transformation at the beginning of a word between variants (l>ƚ, j>ɉ, ŧ>s, đ>[dx])
 U0: (public) plural substantives with transformation '[aeou][ln] > 'Vi (.>i|[èò][ln], a.>ài|a[ln], e.>éi|e[ln], o.>ói|o[ln], u.>úi|u[ln])
 u0: (public) plural substantives with transformation '.+[aeouàèéòóú][ln] > Vi (đo>i|òđo, l>i|[aeouàèéòóú]l, n>i|[aeouàèéòóú]n)
-V0: (public) plants and crafts ((i)èr>ar(o/a/i/e), dor>or(a/i/e)|[aeiou]dor, ol>i[oò]l(o/a/i/e)|[rs]ol, ol>òl(o/a/i/e)|[rs]ol, ...)
+V0: (public) plants and crafts ((i)èr>ar(o/a/i/e), dor>or(a/i/e)|[aeiou]dor, ol>i[oò]l(o/a/i/e)|[rs]ol, ol>òl(o/a/i/e)|[rs]ol, …)
 v0: (public) nominals formation with ending in -ería
 R0: (public) denominal nominals (0>ist[aei]|l, [ae]>ist[aei], o>ist[aei]|[^i]o, o>st[aei]|io)
-r0/r1: (public) deverbal nominals (-ment(o/i), ...)
-s0/s1/s2: (public) deverbal nominals (r>ŧion, r>sion, ...)
+r0/r1: (public) deverbal nominals (-ment(o/i), …)
+s0/s1/s2: (public) deverbal nominals (r>ŧion, r>sion, …)
 S0: (public) deaverbial nominals (0>ixm[oi]|[nr], a>ixm[oi])
-mf: (public) metaphonesis (oxo>uxi, ...)
+mf: (public) metaphonesis (oxo>uxi, …)
 W0/W1/W2: (public) adverbs in -mente
 Y0/Y1: (public) final lenition (Vduro>Vur[oi], ada>à[ae], ida>í[ae], uda>ú[ae])
 Z0: (public) ignore upper/lower case
@@ -62,8 +62,8 @@ Z0: (public) ignore upper/lower case
 @0: (public) altered substantives (a-)
 :0: (public) altered substantives (kon-)
 gv: (public) initial lenition gua>va
-%0: (public) numerals (collectives) (èxe>exen[ae], nto>ntèxim[oiae], ...)
-%1/%2: (public) latin numerals (I, II, III, ...)
-$0/$1/$2/$3: (public) unit of measures (k/M/G/..., h/da, d/c/m/..., ki/Mi/Gi/...)
+%0: (public) numerals (collectives) (èxe>exen[ae], nto>ntèxim[oiae], …)
+%1/%2: (public) latin numerals (I, II, III, …)
+$0/$1/$2/$3: (public) unit of measures (k/M/G/…, h/da, d/c/m/…, ki/Mi/Gi/…)
 ‘0: (public) truncated words at the begin (adds a ʼ at the begin)
 ’0: (public) truncated words at the end (adds a ʼ at the end)

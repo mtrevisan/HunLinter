@@ -46,7 +46,7 @@ public class SetHelper{
 
 	/**
 	 * Returns {@code true} if the specified set have no elements (A = ∅).
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the set
 	 * @param set	Set
 	 * @return	The emptiness of {@code set}
@@ -57,7 +57,7 @@ public class SetHelper{
 
 	/**
 	 * Returns {@code true} if the specified set have no elements (A = B).
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -69,7 +69,7 @@ public class SetHelper{
 
 	/**
 	 * Returns the cardinality of the specified set (|A|).
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the set
 	 * @param set	Set
 	 * @return	The cardinality of {@code set}
@@ -83,7 +83,7 @@ public class SetHelper{
 	 * <p>
 	 * The returned set contains all elements that are contained either in {@code set1} and {@code set2}.
 	 * The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -96,11 +96,11 @@ public class SetHelper{
 	}
 
 	/**
-	 * Returns a set with the union of a list of sets (A ∪ B ∪ ...).
+	 * Returns a set with the union of a list of sets (A ∪ B ∪ …).
 	 * <p>
 	 * The returned set contains all elements that are contained either in each set of {@code sets}.
 	 * The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param sets	List of sets
 	 * @return	The union of {@code sets}
@@ -116,7 +116,7 @@ public class SetHelper{
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
 	 * The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -129,11 +129,11 @@ public class SetHelper{
 	}
 
 	/**
-	 * Returns a set with the intersection between a list of sets (A ∩ B ∩ ...).
+	 * Returns a set with the intersection between a list of sets (A ∩ B ∩ …).
 	 * <p>
 	 * The returned set contains all elements that are contained in every set of {@code sets}.
 	 * The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param sets	List of sets
 	 * @return	The intersection of {@code sets}
@@ -150,7 +150,7 @@ public class SetHelper{
 	 * Returns a set with the intersection between two sets (A ∩ B).
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -176,7 +176,7 @@ public class SetHelper{
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and not in {@code set2}.
 	 * The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -190,7 +190,7 @@ public class SetHelper{
 
 	/**
 	 * Returns {@code true} if the two specified sets have no elements in common (A ∩ B = ∅).
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -203,7 +203,7 @@ public class SetHelper{
 
 	/**
 	 * Returns {@code true} if {@code set2} is a proper subset of {@code set1} (A ⊂ B).
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
@@ -218,7 +218,7 @@ public class SetHelper{
 	 * <p>
 	 * The returned set contains all elements that are contained in either {@code set1} or {@code set2} but not in
 	 * both. The iteration order of the returned set is undefined.
-	 * 
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set

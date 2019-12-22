@@ -20,7 +20,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="79"/>
-                <Property name="text" type="java.lang.String" value="Open Project..."/>
+                <Property name="text" type="java.lang.String" value="Open Project&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenProjectMenuItemActionPerformed"/>
@@ -44,7 +44,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filFontMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="102"/>
-                <Property name="text" type="java.lang.String" value="Select font..."/>
+                <Property name="text" type="java.lang.String" value="Select font&#x2026;"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -106,7 +106,7 @@
                   <Image iconType="3" name="/dictionary_sort.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="115"/>
-                <Property name="text" type="java.lang.String" value="Sort dictionary..."/>
+                <Property name="text" type="java.lang.String" value="Sort dictionary&#x2026;"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
@@ -115,7 +115,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicRulesReducerMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Rules reducer..."/>
+                <Property name="text" type="java.lang.String" value="Rules reducer&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicRulesReducerMenuItemActionPerformed"/>
@@ -155,7 +155,7 @@
                   <Image iconType="3" name="/dictionary_duplicates.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="100"/>
-                <Property name="text" type="java.lang.String" value="Extract duplicates..."/>
+                <Property name="text" type="java.lang.String" value="Extract duplicates&#x2026;"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
@@ -167,7 +167,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Extract wordlist..."/>
+                <Property name="text" type="java.lang.String" value="Extract wordlist&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistMenuItemActionPerformed"/>
@@ -178,7 +178,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)..."/>
+                <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistPlainTextMenuItemActionPerformed"/>
@@ -187,7 +187,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="109"/>
-                <Property name="text" type="java.lang.String" value="Extract minimal pairs..."/>
+                <Property name="text" type="java.lang.String" value="Extract minimal pairs&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractMinimalPairsMenuItemActionPerformed"/>
@@ -475,7 +475,7 @@
                     </Property>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicTable.setRowSelectionAllowed(true);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicTable.setRowSelectionAllowed(true);&#xd;&#xa;TableRenderer dicCellRenderer = new TableRenderer();&#xd;&#xa;for(int i = 0; i &lt; dicTable.getColumnCount(); i ++)&#xd;&#xa;&#x9;dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);&#xd;&#xa;"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -490,7 +490,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="dicTotalProductionsOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openAidButton">
@@ -805,7 +805,7 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;theTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame theParent = this;&#xd;&#xa;theTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = theTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;Consumer&lt;String&gt; okButtonAction = (text) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getTheParser().setMeanings(row, text);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// &#x2026; and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeThesaurusFiles();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;theTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(theParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -820,7 +820,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="theSynonymsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -965,7 +965,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabationOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -981,7 +981,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabesCountOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesLabel">
@@ -994,7 +994,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -1053,7 +1053,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
@@ -1069,7 +1069,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="optionsButton">
@@ -1215,7 +1215,7 @@
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//listen for row removal&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;BiConsumer&lt;String, String&gt; okButtonAction = (incorrect, correct) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setCorrection(row, incorrect, correct);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// ... and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;acoTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer acoCellRenderer = new TableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//listen for row removal&#xd;&#xa;acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;JFrame acoParent = this;&#xd;&#xa;acoTable.addMouseListener(new MouseAdapter(){&#xd;&#xa;&#x9;public void mouseClicked(MouseEvent e){&#xd;&#xa;&#x9;&#x9;if(e.getClickCount() == 1){&#xd;&#xa;&#x9;&#x9;&#x9;JTable target = (JTable)e.getSource();&#xd;&#xa;&#x9;&#x9;&#x9;int col = target.getSelectedColumn();&#xd;&#xa;&#x9;&#x9;&#x9;if(col == 1){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;int row = acoTable.convertRowIndexToModel(target.getSelectedRow());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;BiConsumer&lt;String, String&gt; okButtonAction = (incorrect, correct) -&gt; {&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;try{&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.getAcoParser().setCorrection(row, incorrect, correct);&#xd;&#xa;&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;// &#x2026; and save the files&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;backbone.storeAutoCorrectFile();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;catch(Exception ex){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;};&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;GUIUtils.addCancelByEscapeKey(dialog);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.addWindowListener(new WindowAdapter(){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;@Override&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;public void windowClosed(WindowEvent e){&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;&#x9;acoTable.clearSelection();&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;});&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setLocationRelativeTo(acoParent);&#xd;&#xa;&#x9;&#x9;&#x9;&#x9;dialog.setVisible(true);&#xd;&#xa;&#x9;&#x9;&#x9;}&#xd;&#xa;&#x9;&#x9;}&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;&#xd;&#xa;TableRenderer acoCellRenderer = new TableRenderer();&#xd;&#xa;acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1230,7 +1230,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="acoCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openAcoButton">
@@ -1255,16 +1255,23 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="sexScrollPane" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
+                          <Component id="sexScrollPane" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
                               <Component id="sexCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="sexCorrectionsRecordedOutputLabel" pref="637" max="32767" attributes="0"/>
+                              <Component id="sexCorrectionsRecordedOutputLabel" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="openSexButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="sexInputLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="sexTextField" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="sexAddButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1275,7 +1282,13 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="sexScrollPane" pref="195" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="sexTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="sexInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="sexAddButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="sexScrollPane" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="sexCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -1288,20 +1301,47 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
+            <Component class="javax.swing.JLabel" name="sexInputLabel">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="sexTextField"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Exception:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="sexTextField">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="hit `enter` to add"/>
+              </Properties>
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="sexTextFieldKeyReleased"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="sexAddButton">
+              <Properties>
+                <Property name="mnemonic" type="int" value="65"/>
+                <Property name="text" type="java.lang.String" value="Add"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sexAddButtonActionPerformed"/>
+              </Events>
+            </Component>
             <Container class="javax.swing.JScrollPane" name="sexScrollPane">
+              <Properties>
+                <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
+              </Properties>
               <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);"/>
               </AuxValues>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JTextArea" name="sexTextArea">
-                  <Properties>
-                    <Property name="editable" type="boolean" value="false"/>
-                    <Property name="columns" type="int" value="20"/>
-                    <Property name="lineWrap" type="boolean" value="true"/>
-                    <Property name="wrapStyleWord" type="boolean" value="true"/>
-                  </Properties>
+                <Component class="unit731.hunspeller.gui.JTagPanel" name="sexTagPanel">
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getSexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getSexParser().save(backbone.getSentenceExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
@@ -1315,7 +1355,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="sexCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openSexButton">
@@ -1344,12 +1384,19 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="wexScrollPane" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="wexCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="wexCorrectionsRecordedOutputLabel" pref="655" max="32767" attributes="0"/>
+                              <Component id="wexCorrectionsRecordedOutputLabel" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="openWexButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="wexInputLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="wexTextField" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="wexAddButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1360,7 +1407,13 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wexScrollPane" pref="195" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="wexInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="wexTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="wexAddButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="wexScrollPane" min="-2" pref="166" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="wexCorrectionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -1373,21 +1426,50 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
+            <Component class="javax.swing.JLabel" name="wexInputLabel">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="wexTextField"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Exception:"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="wexTextField">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="hit `enter` to add"/>
+              </Properties>
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="wexTextFieldKeyReleased"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="wexAddButton">
+              <Properties>
+                <Property name="mnemonic" type="int" value="65"/>
+                <Property name="text" type="java.lang.String" value="Add"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="wexAddButtonActionPerformed"/>
+              </Events>
+            </Component>
             <Container class="javax.swing.JScrollPane" name="wexScrollPane">
+              <Properties>
+                <Property name="horizontalScrollBarPolicy" type="int" value="31"/>
+              </Properties>
               <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);"/>
               </AuxValues>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JTextArea" name="wexTextArea">
-                  <Properties>
-                    <Property name="editable" type="boolean" value="false"/>
-                    <Property name="columns" type="int" value="20"/>
-                    <Property name="lineWrap" type="boolean" value="true"/>
-                    <Property name="wrapStyleWord" type="boolean" value="true"/>
-                  </Properties>
-                </Component>
+                <Container class="unit731.hunspeller.gui.JTagPanel" name="wexTagPanel">
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getWexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getWexParser().save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
+                </Container>
               </SubComponents>
             </Container>
             <Component class="javax.swing.JLabel" name="wexCorrectionsRecordedLabel">
@@ -1400,7 +1482,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="wexCorrectionsRecordedOutputLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="text" type="java.lang.String" value="&#x2026;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="openWexButton">

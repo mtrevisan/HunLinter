@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.gui.AutoCorrectTableModel;
+import unit731.hunspeller.gui.JTagPanel;
 import unit731.hunspeller.gui.JWordLabel;
 import unit731.hunspeller.gui.ProjectFolderFilter;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -56,6 +57,7 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -67,6 +69,7 @@ import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFilesMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.TableRenderer;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -76,6 +79,7 @@ import unit731.hunspeller.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunspeller.parsers.autocorrect.CorrectionEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
@@ -105,6 +109,7 @@ import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.Packager;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.RecentItems;
+import unit731.hunspeller.services.log.ExceptionHelper;
 
 
 /**
@@ -138,6 +143,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
+	private String formerFilterSentenceException;
+	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
 	private final JFileChooser saveResultFileChooser;
 	private RulesReducerDialog rulesReducerDialog;
@@ -154,6 +161,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> sexFilterDebouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private CorrectnessWorker dicCorrectnessWorker;
@@ -302,14 +311,38 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
       sexLayeredPane = new javax.swing.JLayeredPane();
+      sexInputLabel = new javax.swing.JLabel();
+      sexTextField = new javax.swing.JTextField();
+      sexAddButton = new javax.swing.JButton();
       sexScrollPane = new javax.swing.JScrollPane();
-      sexTextArea = new javax.swing.JTextArea();
+      sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+      sexTagPanel = new JTagPanel((changeType, tags) -> {
+         backbone.getSexParser().modify(changeType, tags);
+         try{
+            backbone.getSexParser().save(backbone.getSentenceExceptionsFile());
+         }
+         catch(final TransformerException e){
+            LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+         }
+      });
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
       sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openSexButton = new javax.swing.JButton();
       wexLayeredPane = new javax.swing.JLayeredPane();
+      wexInputLabel = new javax.swing.JLabel();
+      wexTextField = new javax.swing.JTextField();
+      wexAddButton = new javax.swing.JButton();
       wexScrollPane = new javax.swing.JScrollPane();
-      wexTextArea = new javax.swing.JTextArea();
+      wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+      wexTagPanel = new JTagPanel((changeType, tags) -> {
+         backbone.getWexParser().modify(changeType, tags);
+         try{
+            backbone.getWexParser().save(backbone.getWordExceptionsFile());
+         }
+         catch(final TransformerException e){
+            LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+         }
+      });
       wexCorrectionsRecordedLabel = new javax.swing.JLabel();
       wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openWexButton = new javax.swing.JButton();
@@ -372,12 +405,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
       dicTable.setRowSelectionAllowed(true);
+      TableRenderer dicCellRenderer = new TableRenderer();
+      for(int i = 0; i < dicTable.getColumnCount(); i ++)
+      dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       dicScrollPane.setViewportView(dicTable);
 
       dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
       dicTotalProductionsLabel.setText("Total productions:");
 
-      dicTotalProductionsOutputLabel.setText("...");
+      dicTotalProductionsOutputLabel.setText("…");
 
       openAidButton.setText("Open Aid");
       openAidButton.setEnabled(false);
@@ -621,7 +657,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                      try{
                         backbone.getTheParser().setMeanings(row, text);
 
-                        // ... and save the files
+                        // … and save the files
                         backbone.storeThesaurusFiles();
                      }
                      catch(Exception ex){
@@ -651,7 +687,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
       theSynonymsRecordedLabel.setText("Synonyms recorded:");
 
-      theSynonymsRecordedOutputLabel.setText("...");
+      theSynonymsRecordedOutputLabel.setText("…");
 
       theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -711,17 +747,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
       hypSyllabationLabel.setText("Syllabation:");
 
-      hypSyllabationOutputLabel.setText("...");
+      hypSyllabationOutputLabel.setText("…");
 
       hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
       hypSyllabesCountLabel.setText("Syllabes:");
 
-      hypSyllabesCountOutputLabel.setText("...");
+      hypSyllabesCountOutputLabel.setText("…");
 
       hypRulesLabel.setLabelFor(hypRulesOutputLabel);
       hypRulesLabel.setText("Rules:");
 
-      hypRulesOutputLabel.setText("...");
+      hypRulesOutputLabel.setText("…");
 
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
@@ -753,12 +789,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
       hypAddRuleSyllabationLabel.setText("New syllabation:");
 
-      hypAddRuleSyllabationOutputLabel.setText("...");
+      hypAddRuleSyllabationOutputLabel.setText("…");
 
       hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
       hypAddRuleSyllabesCountLabel.setText("New syllabes:");
 
-      hypAddRuleSyllabesCountOutputLabel.setText("...");
+      hypAddRuleSyllabesCountOutputLabel.setText("…");
 
       optionsButton.setText("Options");
       optionsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -930,7 +966,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                      try{
                         backbone.getAcoParser().setCorrection(row, incorrect, correct);
 
-                        // ... and save the files
+                        // … and save the files
                         backbone.storeAutoCorrectFile();
                      }
                      catch(Exception ex){
@@ -960,7 +996,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       acoCorrectionsRecordedLabel.setLabelFor(acoCorrectionsRecordedOutputLabel);
       acoCorrectionsRecordedLabel.setText("Corrections recorded:");
 
-      acoCorrectionsRecordedOutputLabel.setText("...");
+      acoCorrectionsRecordedOutputLabel.setText("…");
 
       openAcoButton.setText("Open AutoCorrect");
       openAcoButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1031,16 +1067,31 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
-      sexTextArea.setEditable(false);
-      sexTextArea.setColumns(20);
-      sexTextArea.setLineWrap(true);
-      sexTextArea.setWrapStyleWord(true);
-      sexScrollPane.setViewportView(sexTextArea);
+      sexInputLabel.setLabelFor(sexTextField);
+      sexInputLabel.setText("Exception:");
+
+      sexTextField.setToolTipText("hit `enter` to add");
+      sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            sexTextFieldKeyReleased(evt);
+         }
+      });
+
+      sexAddButton.setMnemonic('A');
+      sexAddButton.setText("Add");
+      sexAddButton.setToolTipText("");
+      sexAddButton.setEnabled(false);
+      sexAddButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      });
+
+      sexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
       sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
 
-      sexCorrectionsRecordedOutputLabel.setText("...");
+      sexCorrectionsRecordedOutputLabel.setText("…");
 
       openSexButton.setText("Open Sentence Exceptions");
       openSexButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1049,6 +1100,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      sexLayeredPane.setLayer(sexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1065,16 +1119,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(sexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(sexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
+                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton)))
+                  .addComponent(openSexButton))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(sexInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(sexTextField)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(sexAddButton)))
             .addContainerGap())
       );
       sexLayeredPaneLayout.setVerticalGroup(
          sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(sexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(sexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(sexInputLabel)
+               .addComponent(sexAddButton))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(sexScrollPane)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(sexCorrectionsRecordedLabel)
@@ -1085,16 +1150,31 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
 
-      wexTextArea.setEditable(false);
-      wexTextArea.setColumns(20);
-      wexTextArea.setLineWrap(true);
-      wexTextArea.setWrapStyleWord(true);
-      wexScrollPane.setViewportView(wexTextArea);
+      wexInputLabel.setLabelFor(wexTextField);
+      wexInputLabel.setText("Exception:");
+      wexInputLabel.setToolTipText("");
+
+      wexTextField.setToolTipText("hit `enter` to add");
+      wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            wexTextFieldKeyReleased(evt);
+         }
+      });
+
+      wexAddButton.setMnemonic('A');
+      wexAddButton.setText("Add");
+      wexAddButton.setEnabled(false);
+      wexAddButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+      });
+
+      wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
       wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
 
-      wexCorrectionsRecordedOutputLabel.setText("...");
+      wexCorrectionsRecordedOutputLabel.setText("…");
 
       openWexButton.setText("Open Word Exceptions");
       openWexButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1103,6 +1183,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      wexLayeredPane.setLayer(wexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1119,16 +1202,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addGroup(wexLayeredPaneLayout.createSequentialGroup()
                   .addComponent(wexCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openWexButton)))
+                  .addComponent(openWexButton))
+               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(wexInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(wexTextField)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(wexAddButton)))
             .addContainerGap())
       );
       wexLayeredPaneLayout.setVerticalGroup(
          wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(wexLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(wexInputLabel)
+               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(wexAddButton))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(wexScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wexCorrectionsRecordedLabel)
@@ -1151,7 +1245,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.setToolTipText("");
 
       filOpenProjectMenuItem.setMnemonic('O');
-      filOpenProjectMenuItem.setText("Open Project...");
+      filOpenProjectMenuItem.setText("Open Project…");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             filOpenProjectMenuItemActionPerformed(evt);
@@ -1172,7 +1266,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       filMenu.add(filFontSeparator);
 
       filFontMenuItem.setMnemonic('f');
-      filFontMenuItem.setText("Select font...");
+      filFontMenuItem.setText("Select font…");
       filFontMenuItem.setEnabled(false);
       filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1229,7 +1323,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
       dicSortDictionaryMenuItem.setMnemonic('s');
-      dicSortDictionaryMenuItem.setText("Sort dictionary...");
+      dicSortDictionaryMenuItem.setText("Sort dictionary…");
       dicSortDictionaryMenuItem.setToolTipText("");
       dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1238,7 +1332,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicRulesReducerMenuItem.setText("Rules reducer...");
+      dicRulesReducerMenuItem.setText("Rules reducer…");
       dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicRulesReducerMenuItemActionPerformed(evt);
@@ -1270,7 +1364,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
       dicExtractDuplicatesMenuItem.setMnemonic('d');
-      dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
+      dicExtractDuplicatesMenuItem.setText("Extract duplicates…");
       dicExtractDuplicatesMenuItem.setToolTipText("");
       dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1280,7 +1374,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
       dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
-      dicExtractWordlistMenuItem.setText("Extract wordlist...");
+      dicExtractWordlistMenuItem.setText("Extract wordlist…");
       dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractWordlistMenuItemActionPerformed(evt);
@@ -1289,7 +1383,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicExtractWordlistMenuItem);
 
       dicExtractWordlistPlainTextMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
-      dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)...");
+      dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicExtractWordlistPlainTextMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractWordlistPlainTextMenuItemActionPerformed(evt);
@@ -1298,7 +1392,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
-      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
+      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
       dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractMinimalPairsMenuItemActionPerformed(evt);
@@ -1396,7 +1490,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
-   private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
+	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
@@ -1409,32 +1503,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
-   }//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
+	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
 
-   private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
+	private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		backbone.createPackage();
-   }//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
+	}//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
-   private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
+	private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		exit();
-   }//GEN-LAST:event_filExitMenuItemActionPerformed
+	}//GEN-LAST:event_filExitMenuItemActionPerformed
 
 	private void exit(){
 		dispose();
 	}
 
-   private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
+	private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final HelpDialog dialog = new HelpDialog(this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
+	}//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
 	private void calculateProductions(final HunspellerFrame frame){
@@ -1458,6 +1552,29 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				frame.dicTable.scrollRectToVisible(cellRect);
 
 				frame.dicTotalProductionsOutputLabel.setText(Integer.toString(productions.size()));
+
+				//check for correctness
+				int line = 0;
+				final DictionaryCorrectnessChecker checker = backbone.getChecker();
+				final TableRenderer dicCellRenderer = (TableRenderer)dicTable.getColumnModel().getColumn(0).getCellRenderer();
+				dicCellRenderer.clearErrors();
+				for(final Production production : productions){
+					try{
+						checker.checkProduction(production);
+					}
+					catch(final Exception e){
+						dicCellRenderer.setErrorOnRow(line);
+
+						final StringBuffer sb = new StringBuffer(e.getMessage());
+						if(production.hasProductionRules())
+							sb.append(" (via ").append(production.getRulesSequence()).append(")");
+						String errorMessage = ExceptionHelper.getMessage(e);
+						LOGGER.trace("{}, line {}", errorMessage, line);
+						LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
+					}
+
+					line ++;
+				}
 			}
 			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
@@ -1482,13 +1599,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 
-   private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
+	private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkDictionaryCorrectness();
-   }//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
 
-   private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
+	private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
@@ -1523,25 +1640,25 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(final IOException e){
 			LOGGER.error("Something very bad happened while sorting the dictionary", e);
 		}
-   }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
+	}//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
-   private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
+	private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryDuplicates();
-   }//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
 
-   private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
+	private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(false);
-   }//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
 
-   private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
+	private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractMinimalPairs();
-   }//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
 
 	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
@@ -1584,7 +1701,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			updateSynonymsCounter();
 
-			//... and save the files
+			//… and save the files
 			backbone.storeThesaurusFiles();
 
 
@@ -1607,7 +1724,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
+			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
 		formerFilterIncorrectText = unmodifiedIncorrectText;
@@ -1647,7 +1764,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			updateCorrectionsCounter();
 
-			//... and save the files
+			//… and save the files
 			backbone.storeAutoCorrectFile();
 		}
 		catch(final Exception e){
@@ -1656,13 +1773,44 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 
-   private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
+	private void filterSentenceExceptions(final HunspellerFrame frame){
+		final String unmodifiedException = StringUtils.strip(frame.sexTextField.getText());
+		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
+			return;
+
+		formerFilterSentenceException = unmodifiedException;
+
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final boolean alreadyContained = backbone.getSexParser().contains(unmodifiedException);
+		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".") && !alreadyContained);
+
+
+		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
+	}
+
+
+	private void filterWordExceptions(final HunspellerFrame frame){
+		final String unmodifiedException = StringUtils.strip(frame.wexTextField.getText());
+		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
+			return;
+
+		formerFilterWordException = unmodifiedException;
+
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
+		final boolean alreadyContained = backbone.getWexParser().contains(unmodifiedException);
+		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
+
+
+		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
+	}
+
+	private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(false);
-   }//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
+	}//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
 
-   private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
+	private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
@@ -1671,23 +1819,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(final Exception e){
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
-   }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
+	}//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
-   private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
+	private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkHyphenationCorrectness();
-   }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
 
-   private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
 		recentProjectsMenu.setEnabled(false);
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
 		filOpenProjectMenuItem.setEnabled(true);
-   }//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
-   private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
+	private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		dicRulesReducerMenuItem.setEnabled(false);
@@ -1701,65 +1849,65 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		});
 		rulesReducerDialog.setVisible(true);
-   }//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
+	}//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
-   private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
+	private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(true);
-   }//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
+	}//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
 
-   private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+	private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(true);
-   }//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 
-   private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
+	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		final  String newRule = hypAddRuleTextField.getText();
 		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		final String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
-      if(foundRule == null){
-         try{
-            backbone.storeHyphenationFile();
+		if(foundRule == null){
+			try{
+				backbone.storeHyphenationFile();
 
-            if(hypWordTextField.getText() != null){
-               formerHyphenationText = null;
-               hyphenate(this);
-            }
+				if(hypWordTextField.getText() != null){
+					formerHyphenationText = null;
+					hyphenate(this);
+				}
 
-            hypAddRuleLevelComboBox.setEnabled(false);
-            hypAddRuleButton.setEnabled(false);
-            hypAddRuleTextField.setText(null);
-            hypAddRuleSyllabationOutputLabel.setText(null);
-            hypAddRuleSyllabesCountOutputLabel.setText(null);
-         }
-         catch(final IOException e){
-            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
-         }
-      }
-      else{
-         hypAddRuleTextField.requestFocusInWindow();
+				hypAddRuleLevelComboBox.setEnabled(false);
+				hypAddRuleButton.setEnabled(false);
+				hypAddRuleTextField.setText(null);
+				hypAddRuleSyllabationOutputLabel.setText(null);
+				hypAddRuleSyllabesCountOutputLabel.setText(null);
+			}
+			catch(final IOException e){
+				LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
+			}
+		}
+		else{
+			hypAddRuleTextField.requestFocusInWindow();
 
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
-      }
-   }//GEN-LAST:event_hypAddRuleButtonActionPerformed
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+		}
+	}//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
-   private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
-      hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
+	private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
+		hypAddRuleDebouncer.call(this);
+	}//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
 
-   private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
-      hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
+	private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
+		hypAddRuleDebouncer.call(this);
+	}//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
 
-   private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
-      hypDebouncer.call(this);
-   }//GEN-LAST:event_hypWordTextFieldKeyReleased
+	private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
+		hypDebouncer.call(this);
+	}//GEN-LAST:event_hypWordTextFieldKeyReleased
 
-   private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
-      try{
-         //try adding the meanings
+	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
+		try{
+			//try adding the meanings
 			final String synonyms = theMeaningsTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
@@ -1769,26 +1917,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			};
 			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
 				.insertMeanings(synonyms, duplicatesDiscriminator);
-         final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+			final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
-         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
-            //if everything's ok update the table and the sorter...
+			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+				//if everything's ok update the table and the sorter…
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-            dm.fireTableDataChanged();
+				dm.fireTableDataChanged();
 
-            formerFilterThesaurusText = null;
-            theMeaningsTextField.setText(null);
-            theMeaningsTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked")
-            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-            sorter.setRowFilter(null);
+				formerFilterThesaurusText = null;
+				theMeaningsTextField.setText(null);
+				theMeaningsTextField.requestFocusInWindow();
+				@SuppressWarnings("unchecked")
+				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+				sorter.setRowFilter(null);
 
-            updateSynonymsCounter();
+				updateSynonymsCounter();
 
-            //... and save the files
-            backbone.storeThesaurusFiles();
-         }
-         else{
+				//… and save the files
+				backbone.storeThesaurusFiles();
+			}
+			else{
 				theMeaningsTextField.requestFocusInWindow();
 
 				final String duplicatedWords = duplicates.stream()
@@ -1798,57 +1946,57 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
 					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
 					null);
-         }
-      }
-      catch(final Exception e){
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-      }
-   }//GEN-LAST:event_theAddButtonActionPerformed
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+	}//GEN-LAST:event_theAddButtonActionPerformed
 
-   private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
-      theFilterDebouncer.call(this);
-   }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
+	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
+		theFilterDebouncer.call(this);
+	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
-   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
-      extractCompoundRulesInputs();
-   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
+	private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+		extractCompoundRulesInputs();
+	}//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
-   private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
+	private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
 		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
 		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
 		final String inputCompounds = cmpInputTextArea.getText();
 
-      if(StringUtils.isNotBlank(inputText)){
-         try{
-         	//FIXME transfer into backbone
-            final List<Production> words;
+		if(StringUtils.isNotBlank(inputText)){
+			try{
+				//FIXME transfer into backbone
+				final List<Production> words;
 				final WordGenerator wordGenerator = backbone.getWordGenerator();
 				final AffixData affixData = backbone.getAffixData();
 				if(affixData.getCompoundFlag().equals(inputText)){
-               int maxCompounds = affixData.getCompoundMaxWordCount();
-               words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
+					int maxCompounds = affixData.getCompoundMaxWordCount();
+					words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
 						maxCompounds);
-            }
-            else
-            	words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
+				}
+				else
+					words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
 						limit);
 
 				final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
-            dm.setProductions(words);
-         }
-         catch(final Exception e){
-            LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
-         }
-      }
-      else
-      	clearOutputTable(cmpTable);
-   }//GEN-LAST:event_cmpLimitComboBoxActionPerformed
+				dm.setProductions(words);
+			}
+			catch(final Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+			}
+		}
+		else
+			clearOutputTable(cmpTable);
+	}//GEN-LAST:event_cmpLimitComboBoxActionPerformed
 
-   private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-      productionDebouncer.call(this);
-   }//GEN-LAST:event_dicInputTextFieldKeyReleased
+	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+		productionDebouncer.call(this);
+	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-   private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
+	private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		Consumer<Font> onSelection = font -> {
@@ -1863,9 +2011,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_filFontMenuItemActionPerformed
+	}//GEN-LAST:event_filFontMenuItemActionPerformed
 
-   private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
+	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
 		if(Desktop.isDesktopSupported()){
 			final Desktop desktop = Desktop.getDesktop();
 			try{
@@ -1877,19 +2025,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		else
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
-   }//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
+	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
 
-   private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
+	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
-   }//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
+	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
 
-   private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
+	private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
-   }//GEN-LAST:event_acoCorrectTextFieldKeyReleased
+	}//GEN-LAST:event_acoCorrectTextFieldKeyReleased
 
-   private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
-      try{
-         //try adding the correction
+	private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
+		try{
+			//try adding the correction
 			final String incorrect = acoIncorrectTextField.getText();
 			final String correct = acoCorrectTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
@@ -1900,45 +2048,45 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			};
 			final DuplicationResult<CorrectionEntry> duplicationResult = backbone.getAcoParser()
 				.insertCorrection(incorrect, correct, duplicatesDiscriminator);
-         final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
+			final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
 
-         if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
-            //if everything's ok update the table and the sorter...
+			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+				//if everything's ok update the table and the sorter…
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-            dm.fireTableDataChanged();
+				dm.fireTableDataChanged();
 
-            formerFilterIncorrectText = null;
-            formerFilterCorrectText = null;
-            acoIncorrectTextField.setText(null);
-            acoCorrectTextField.setText(null);
-            acoAddButton.setEnabled(false);
-            acoIncorrectTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked")
-            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
-            sorter.setRowFilter(null);
+				formerFilterIncorrectText = null;
+				formerFilterCorrectText = null;
+				acoIncorrectTextField.setText(null);
+				acoCorrectTextField.setText(null);
+				acoAddButton.setEnabled(false);
+				acoIncorrectTextField.requestFocusInWindow();
+				@SuppressWarnings("unchecked")
+				TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
+				sorter.setRowFilter(null);
 
-            updateSynonymsCounter();
+				updateSynonymsCounter();
 
-            //... and save the files
-            backbone.storeAutoCorrectFile();
-         }
-         else{
+				//… and save the files
+				backbone.storeAutoCorrectFile();
+			}
+			else{
 				acoIncorrectTextField.requestFocusInWindow();
 
 				final String duplicatedWords = duplicates.stream()
 					.map(CorrectionEntry::toString)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   "
-					+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
+						+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, null, null);
-         }
-      }
-      catch(final Exception e){
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-      }
-   }//GEN-LAST:event_acoAddButtonActionPerformed
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+	}//GEN-LAST:event_acoAddButtonActionPerformed
 
-   private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
+	private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
 		final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
 			try{
 				backbone.getHypParser().setOptions(options);
@@ -1954,7 +2102,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
-   }//GEN-LAST:event_optionsButtonActionPerformed
+	}//GEN-LAST:event_optionsButtonActionPerformed
 
 	private void openAidButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAidButtonActionPerformed
 		try{
@@ -1965,59 +2113,123 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}//GEN-LAST:event_openAidButtonActionPerformed
 
-   private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
+	private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getAffixFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening affix file", e);
 		}
-   }//GEN-LAST:event_openAffButtonActionPerformed
+	}//GEN-LAST:event_openAffButtonActionPerformed
 
-   private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
+	private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getDictionaryFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening dictionary file", e);
 		}
-   }//GEN-LAST:event_openDicButtonActionPerformed
+	}//GEN-LAST:event_openDicButtonActionPerformed
 
-   private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
+	private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getHyphenationFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening hyphenation file", e);
 		}
-   }//GEN-LAST:event_openHypButtonActionPerformed
+	}//GEN-LAST:event_openHypButtonActionPerformed
 
-   private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
+	private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getAutoCorrectFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening auto–correct file", e);
 		}
-   }//GEN-LAST:event_openAcoButtonActionPerformed
+	}//GEN-LAST:event_openAcoButtonActionPerformed
 
-   private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
+	private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getSentenceExceptionsFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening sentence exceptions file", e);
 		}
-   }//GEN-LAST:event_openSexButtonActionPerformed
+	}//GEN-LAST:event_openSexButtonActionPerformed
 
-   private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
+	private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
 		try{
 			FileHelper.openFileWithChosenEditor(packager.getWordExceptionsFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening word exceptions file", e);
 		}
-   }//GEN-LAST:event_openWexButtonActionPerformed
+	}//GEN-LAST:event_openWexButtonActionPerformed
+
+	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
+		sexFilterDebouncer.call(this);
+	}//GEN-LAST:event_sexTextFieldKeyReleased
+
+	private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
+		wexFilterDebouncer.call(this);
+	}//GEN-LAST:event_wexTextFieldKeyReleased
+
+   private void sexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sexAddButtonActionPerformed
+		try{
+			final String exception = StringUtils.strip(sexTextField.getText());
+			if(!backbone.getSexParser().contains(exception)){
+				backbone.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+				sexTagPanel.addTag(exception);
+
+				//reset input
+				sexTextField.setText(StringUtils.EMPTY);
+				sexTagPanel.applyFilter(null);
+
+				updateSentenceExceptionsCounter();
+
+				backbone.storeSentenceExceptionFile();
+			}
+			else{
+				sexTextField.requestFocusInWindow();
+
+				JOptionPane.showOptionDialog(this,
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+					null);
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+   }//GEN-LAST:event_sexAddButtonActionPerformed
+
+   private void wexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wexAddButtonActionPerformed
+		try{
+			final String exception = StringUtils.strip(wexTextField.getText());
+			if(!backbone.getWexParser().contains(exception)){
+				backbone.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+				wexTagPanel.addTag(exception);
+
+				//reset input
+				wexTextField.setText(StringUtils.EMPTY);
+				wexTagPanel.applyFilter(null);
+
+				updateWordExceptionsCounter();
+
+				backbone.storeWordExceptionFile();
+			}
+			else{
+				wexTextField.requestFocusInWindow();
+
+				JOptionPane.showOptionDialog(this,
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
+					null);
+			}
+		}
+		catch(final Exception e){
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+		}
+   }//GEN-LAST:event_wexAddButtonActionPerformed
 
 
 	@Override
@@ -2052,7 +2264,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//FIXME introduce a checkAbortion case?
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-//				dicDuplicatesWorker.pause();
+				//				dicDuplicatesWorker.pause();
 
 				final Object[] options = {"Abort", "Cancel"};
 				final int answer = JOptionPane.showOptionDialog(this,
@@ -2067,7 +2279,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicDuplicatesWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-//					dicDuplicatesWorker.resume();
+					//					dicDuplicatesWorker.resume();
 				}
 			}
 
@@ -2187,13 +2399,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		acoCorrectTextField.setFont(currentFont);
 		acoTable.setFont(currentFont);
 
-		sexTextArea.setFont(currentFont);
+		sexTagPanel.setFont(currentFont);
 
-		wexTextArea.setFont(currentFont);
+		wexTagPanel.setFont(currentFont);
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-			final Comparator<AffixEntry> comparatorAffix){
+											final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
@@ -2301,7 +2513,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
 				//FIXME
-				sexTextArea.setText(String.join(", ", sentenceExceptions));
+				sexTagPanel.initializeTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
@@ -2311,7 +2523,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getWexParser().getExceptionsCounter() > 0){
 				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
 				//FIXME
-				wexTextArea.setText(String.join(", ", wordExceptions));
+				wexTagPanel.initializeTags(wordExceptions);
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
@@ -2742,26 +2954,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		sexTextArea.setText(null);
+		sexTagPanel.initializeTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
 
 	@Override
 	public void clearWordExceptionsParser(){
-		wexTextArea.setText(null);
+		wexTagPanel.initializeTags(null);
 
 		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
 
 	@Override
 	public void clearAutoTextParser(){
-//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
-//		dm.setCorrections(null);
+		//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
+		//		dm.setCorrections(null);
 
 		//FIXME
-//		atxMenu.setEnabled(false);
-//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
+		//		atxMenu.setEnabled(false);
+		//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
 
 
@@ -2905,11 +3117,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JButton optionsButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JButton sexAddButton;
    private javax.swing.JLabel sexCorrectionsRecordedLabel;
    private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLabel sexInputLabel;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JScrollPane sexScrollPane;
-   private javax.swing.JTextArea sexTextArea;
+   private unit731.hunspeller.gui.JTagPanel sexTagPanel;
+   private javax.swing.JTextField sexTextField;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JLabel theMeaningsLabel;
@@ -2918,11 +3133,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
    private javax.swing.JTable theTable;
+   private javax.swing.JButton wexAddButton;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;
    private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
+   private javax.swing.JLabel wexInputLabel;
    private javax.swing.JLayeredPane wexLayeredPane;
    private javax.swing.JScrollPane wexScrollPane;
-   private javax.swing.JTextArea wexTextArea;
+   private unit731.hunspeller.gui.JTagPanel wexTagPanel;
+   private javax.swing.JTextField wexTextField;
    // End of variables declaration//GEN-END:variables
 
 }

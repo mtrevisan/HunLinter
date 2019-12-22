@@ -355,22 +355,22 @@ class RulesReducerTest{
 	}
 
 	/**
-	[rem= 0,add=[ía, ieta],                  cond= r,from=[banpor, pistor, adorator, sixor, señor, asesor, sior, ŧixor, tentor, ...]]		=> [o]
-	[rem=ar,add=[arieta, erieta, aría, ería],cond=ar,from=[axenar, sporkar, portar, fatucar, komensar, kojonbarar, koɉonbarar, ...]]			=> [a]
-	[rem=èr,add=[arieta, erieta, aría, ería],cond=èr,from=[kalegèr, sensèr, marŧèr, muscèr, masèr, bekèr, persegèr, ostèr, speŧièr, ...]]	=> [è]
+	[rem= 0,add=[ía, ieta],                  cond= r,from=[banpor, pistor, adorator, sixor, señor, asesor, sior, ŧixor, tentor, …]]		=> [o]
+	[rem=ar,add=[arieta, erieta, aría, ería],cond=ar,from=[axenar, sporkar, portar, fatucar, komensar, kojonbarar, koɉonbarar, …]]			=> [a]
+	[rem=èr,add=[arieta, erieta, aría, ería],cond=èr,from=[kalegèr, sensèr, marŧèr, muscèr, masèr, bekèr, persegèr, ostèr, speŧièr, …]]	=> [è]
 
-	[rem=   a,add=[erieta, arieta, aría, ería],        cond=   a,from=[skovasa, butiƚia, ...]]	=> [d, ŧ, g, i, ɉ, j, k, o, đ, ñ, r, s, t, v, x]
-	[rem= èla,add=[elería, elarieta, elerieta, elaría],cond= èla,from=[kasèla, kaxèla]]				=> [l]
-	[rem= èƚa,add=[eƚarieta, eƚaría, eƚerieta, eƚería],cond= èƚa,from=[kasèƚa, kaxèƚa]]				=> [ƚ]
-	[rem=ería,add=[arieta, erieta, aría],              cond=ería,from=[supercería, ...]]			=> [í]
+	[rem=   a,add=[erieta, arieta, aría, ería],        cond=   a,from=[skovasa, butiƚia, …]]	=> [d, ŧ, g, i, ɉ, j, k, o, đ, ñ, r, s, t, v, x]
+	[rem= èla,add=[elería, elarieta, elerieta, elaría],cond= èla,from=[kasèla, kaxèla]]			=> [l]
+	[rem= èƚa,add=[eƚarieta, eƚaría, eƚerieta, eƚería],cond= èƚa,from=[kasèƚa, kaxèƚa]]			=> [ƚ]
+	[rem=ería,add=[arieta, erieta, aría],              cond=ería,from=[supercería, …]]			=> [í]
 
-	[rem=  o,add=[erieta, arieta, aría, ería],        cond=  o,from=[furbo, ƚadro, ludro, storno, ...]]	=> [b, r, t, d, v, g, x, i, ƚ, k, m, n]
-	[rem=òko,add=[okería, okaría, okerieta, okarieta],cond=òko,from=[siòko]]										=> [k]
-	[rem=èđo,add=[eđería, eđaría, eđerieta, eđarieta],cond=èđo,from=[mèđo]]											=> [đ]
-	[rem=èxo,add=[exería, exaría, exerieta, exarieta],cond=èxo,from=[mèxo, pièxo]]								=> [x]
-	[rem=òco,add=[ocaría, ocerieta, ocarieta, ocería],cond=òco,from=[pedòco, peòco, piòco]]					=> [c]
-	[rem=òdo,add=[odarieta, odaría, oderieta, odería],cond=òdo,from=[còdo]]											=> [d]
-	[rem=èdo,add=[ederieta, edarieta, edería, edaría],cond=èdo,from=[mèdo]]											=> [d]
+	[rem=  o,add=[erieta, arieta, aría, ería],        cond=  o,from=[furbo, ƚadro, ludro, storno, …]]	=> [b, r, t, d, v, g, x, i, ƚ, k, m, n]
+	[rem=òko,add=[okería, okaría, okerieta, okarieta],cond=òko,from=[siòko]]									=> [k]
+	[rem=èđo,add=[eđería, eđaría, eđerieta, eđarieta],cond=èđo,from=[mèđo]]										=> [đ]
+	[rem=èxo,add=[exería, exaría, exerieta, exarieta],cond=èxo,from=[mèxo, pièxo]]							=> [x]
+	[rem=òco,add=[ocaría, ocerieta, ocarieta, ocería],cond=òco,from=[pedòco, peòco, piòco]]				=> [c]
+	[rem=òdo,add=[odarieta, odaría, oderieta, odería],cond=òdo,from=[còdo]]										=> [d]
+	[rem=èdo,add=[ederieta, edarieta, edería, edaría],cond=èdo,from=[mèdo]]										=> [d]
 	*/
 	@Test
 	void caseSuffix5() throws IOException{
@@ -1027,13 +1027,13 @@ class RulesReducerTest{
 	/**
 	[rem=   erò,add=[  ision],cond=   erò,from=[repeterò]]																											=> [t]
 	[rem=  nerò,add=[ xision],cond=  nerò,from=[prexuponerò, posponerò, esponerò, oponerò, ponerò, konponerò, proponerò, xustaponerò]]		=> [n]
-	[rem=  xerò,add=[   sion],cond=  xerò,from=[duxerò, elexerò, estraxerò, lexerò, faxerò, korexerò, aflixerò, struxerò, produxerò, ...]]	=> [x]
+	[rem=  xerò,add=[   sion],cond=  xerò,from=[duxerò, elexerò, estraxerò, lexerò, faxerò, korexerò, aflixerò, struxerò, produxerò, …]]	=> [x]
 	[rem=  ñerò,add=[  nsion],cond=  ñerò,from=[konveñerò]]																											=> [ñ]
 	[rem=  merò,add=[  nsion],cond=  merò,from=[asumerò, prexumerò, konsumerò]]																				=> [m]
 	[rem= guerò,add=[   sion],cond= guerò,from=[destinguerò]]																										=> [u]
 	[rem=orxerò,add=[uresion],cond=orxerò,from=[sorxerò]]																												=> [x]
 
-	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, komodar, permutar, suparar, ...]] => [a, i]
+	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, komodar, permutar, suparar, …]] => [a, i]
 	[rem= ir,add=[ sion],cond= ir,from=[konstituir, atribuir, kostituir, kostruir, deminuir, sostituir, instruir, destribuir, diminuir, lokuir]]					=> [i]
 	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																																		=> [e]
 	*/
@@ -1391,10 +1391,10 @@ class RulesReducerTest{
 	}
 
 	/**
-	[rem=   en,add=[           ini],cond=   en,from=[scavàđen, ƚankúxen, marúxen, fien, ...]]	=> [b, d, f, g, ŧ, i, l, m, n, p, đ, r, s, t, v, x]
+	[rem=   en,add=[           ini],cond=   en,from=[scavàđen, ƚankúxen, marúxen, fien, …]]	=> [b, d, f, g, ŧ, i, l, m, n, p, đ, r, s, t, v, x]
 	[rem=órden,add=[órdini, úrdini],cond=órden,from=[órden]]												=> [d]
 
-	...
+	…
 	*/
 	@Test
 	void caseSuffix18() throws IOException{

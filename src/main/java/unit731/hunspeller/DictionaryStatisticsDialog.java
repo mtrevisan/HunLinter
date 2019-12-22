@@ -126,45 +126,45 @@ public class DictionaryStatisticsDialog extends JDialog{
       totalWordsLabel.setLabelFor(totalWordsOutputLabel);
       totalWordsLabel.setText("Total words:");
 
-      totalWordsOutputLabel.setText("...");
+      totalWordsOutputLabel.setText("…");
 
       uniqueWordsLabel.setLabelFor(uniqueWordsOutputLabel);
       uniqueWordsLabel.setText("Unique words:");
 
-      uniqueWordsOutputLabel.setText("...");
+      uniqueWordsOutputLabel.setText("…");
 
       compoundWordsLabel.setText("Compound words:");
 
-      compoundWordsOutputLabel.setText("...");
+      compoundWordsOutputLabel.setText("…");
 
       contractedWordsLabel.setText("Contracted words:");
 
-      contractedWordsOutputLabel.setText("...");
+      contractedWordsOutputLabel.setText("…");
 
       lengthsModeLabel.setLabelFor(lengthsModeOutputLabel);
       lengthsModeLabel.setText("Mode of wordsʼ length:");
 
-      lengthsModeOutputLabel.setText("...");
+      lengthsModeOutputLabel.setText("…");
 
       syllabeLengthsModeLabel.setLabelFor(syllabeLengthsModeOutputLabel);
       syllabeLengthsModeLabel.setText("Mode of wordsʼ syllabe:");
 
-      syllabeLengthsModeOutputLabel.setText("...");
+      syllabeLengthsModeOutputLabel.setText("…");
 
       mostCommonSyllabesLabel.setLabelFor(mostCommonSyllabesOutputLabel);
       mostCommonSyllabesLabel.setText("Most common syllabes:");
 
-      mostCommonSyllabesOutputLabel.setText("...");
+      mostCommonSyllabesOutputLabel.setText("…");
 
       longestWordCharactersLabel.setLabelFor(longestWordCharactersOutputLabel);
       longestWordCharactersLabel.setText("Longest word(s) (by characters):");
 
-      longestWordCharactersOutputLabel.setText("...");
+      longestWordCharactersOutputLabel.setText("…");
 
       longestWordSyllabesLabel.setLabelFor(longestWordSyllabesOutputLabel);
       longestWordSyllabesLabel.setText("Longest word(s) (by syllabes):");
 
-      longestWordSyllabesOutputLabel.setText("...");
+      longestWordSyllabesOutputLabel.setText("…");
 
       javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
       lengthsPanel.setLayout(lengthsPanelLayout);
