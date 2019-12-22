@@ -1083,6 +1083,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       sexAddButton.setEnabled(false);
       sexAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
+            sexAddButtonActionPerformed(evt);
+         }
       });
 
       sexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -1166,6 +1168,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       wexAddButton.setEnabled(false);
       wexAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
+            wexAddButtonActionPerformed(evt);
+         }
       });
 
       wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -2512,7 +2516,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(backbone.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
-				//FIXME
 				sexTagPanel.initializeTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
@@ -2522,7 +2525,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//word exceptions file:
 			if(backbone.getWexParser().getExceptionsCounter() > 0){
 				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
-				//FIXME
 				wexTagPanel.initializeTags(wordExceptions);
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
