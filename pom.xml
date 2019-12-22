@@ -192,7 +192,7 @@
 		<org.knowm.xchart.version>3.6.0</org.knowm.xchart.version>
 
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.10.0</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.10.1</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->

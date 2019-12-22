@@ -147,6 +147,7 @@ public class AffixParser{
 	 * Parse the rules out from a .aff file.
 	 *
 	 * @param affFile	The content of the affix file
+	 * @param configurationLanguage    The language implemented by the affix file
 	 * @throws IOException	If an I/O error occurs
 	 * @throws	HunspellException	If something is wrong while parsing the file (eg. a missing rule)
 	 */
