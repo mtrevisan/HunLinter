@@ -1,6 +1,7 @@
 package unit731.hunspeller.gui;
 
-import javax.swing.*;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import java.awt.*;
 import java.util.function.Function;
 
@@ -96,15 +97,18 @@ public class HorizontalFlowLayout extends FlowLayout{
 	private Dimension layoutSize(final Container target, final Function<Component, Dimension> sizeSupplier){
 		synchronized(target.getTreeLock()){
 			//each row must fit with the width allocated to the container
-			final int targetWidth = target.getSize().width;
+			Container container = target;
+			while(container.getSize().width == 0 && container.getParent() != null)
+				container = container.getParent();
+			final int targetWidth = container.getSize().width;
 
 			final Insets insets = target.getInsets();
 			final int horizontalInsetsAndGap = insets.left + insets.right + getHgap() * 2;
 			//when the container height is 0, the preferred height of the container has not yet been calculated
 			//so lets ask for the maximum
-			final int maxWidth = (targetWidth > 0? targetWidth: Integer.MAX_VALUE) - horizontalInsetsAndGap;
+			final int maxWidth = (targetWidth > 0? targetWidth - horizontalInsetsAndGap: Integer.MAX_VALUE);
 
-			//fit components into the allowed height
+			//fit components into the allowed width
 			final Dimension finalDimension = new Dimension(0, 0);
 			int rowWidth = 0;
 			int rowHeight = 0;
@@ -114,7 +118,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 					final Dimension d = sizeSupplier.apply(m);
 					//can't add the component to current row: start a new row
 					if(rowWidth + d.width > maxWidth){
-						addRow(d, rowWidth, rowHeight);
+						addRow(finalDimension, rowWidth, rowHeight);
 
 						rowWidth = 0;
 						rowHeight = 0;
@@ -122,12 +126,6 @@ public class HorizontalFlowLayout extends FlowLayout{
 					//add an horizontal gap for all components after the first
 					rowWidth += (rowWidth > 0? getHgap(): 0) + d.width;
 					rowHeight = Math.max(rowHeight, d.height);
-
-//					final Dimension d = sizeSupplier.apply(m);
-//					finalDimension.width = Math.max(finalDimension.width, d.width);
-//					finalDimension.height += (i > 0? vgap: 0) + d.height;
-//					finalDimension.height = Math.max(finalDimension.height, d.height);
-//					finalDimension.width += (i > 0? hgap: 0) + d.width;
 				}
 			}
 
@@ -140,13 +138,9 @@ public class HorizontalFlowLayout extends FlowLayout{
 			//is less than the size of the target containter so shrinking the container size works
 			//correctly: removing the horizontal gap is an easy way to do this
 			final Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
-			if(scrollPane != null)
+			if(scrollPane != null && target.isValid())
 				finalDimension.width -= getHgap() + 1;
 			return finalDimension;
-
-//			finalDimension.width += horizontalInsetsAndGap;
-//			finalDimension.height += insets.top + insets.bottom + vgap * 2;
-//			return finalDimension;
 		}
 	}
 
@@ -159,122 +153,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	 */
 	private void addRow(final Dimension dimension, final int rowWidth, final int rowHeight){
 		dimension.width = Math.max(dimension.width, rowWidth);
-		if(dimension.height > 0)
-			dimension.height += getVgap();
-		dimension.height += rowHeight;
+		dimension.height += (dimension.height > 0? getVgap(): 0) + rowHeight;
 	}
-
-	/**
-	 * Lays out the container. This method lets each <i>visible</i> component take
-	 * its preferred size by reshaping the components in the target container in order to satisfy the alignment of
-	 * this <code>HorizontalFlowLayout</code> object.
-	 *
-	 * @param target the specified component being laid out
-	 * @see Container
-	 * @see java.awt.Container#doLayout
-	 */
-//	@Override
-//	public void layoutContainer(final Container target){
-//		synchronized(target.getTreeLock()){
-//			final Insets insets = target.getInsets();
-//			final int maxWidth = target.getSize().width - (insets.left + insets.right + hgap * 2);
-//			final boolean leftToRight = target.getComponentOrientation().isLeftToRight();
-//			int y = insets.top + vgap;
-//			int x = 0;
-//			int rowHeight = 0;
-//			int start = 0;
-//
-//			final int size = target.getComponentCount();
-//			for(int i = 0; i < size; i ++){
-//				final Component m = target.getComponent(i);
-//				if(m.isVisible()){
-//					final Dimension d = m.getPreferredSize();
-//					m.setSize(d);
-//
-//					if(x == 0 || x + d.width <= maxWidth){
-//						x += (x > 0? hgap: 0) + d.width;
-//						rowHeight = Math.max(rowHeight, d.height);
-//					}
-//					else{
-//						moveComponents(target, insets.left + hgap, y, maxWidth - x, rowHeight, start, i, leftToRight);
-//
-//						x = d.width;
-//						y += vgap + rowHeight;
-//						rowHeight = d.height;
-//						start = i;
-//					}
-//				}
-//			}
-//
-//			moveComponents(target, insets.left + hgap, y, maxWidth - x, rowHeight, start, size, leftToRight);
-//		}
-//	}
-
-	/**
-	 * Centers the elements in the specified row, if there is any slack.
-	 *
-	 * @param target	The component which needs to be moved
-	 * @param x	The x coordinate
-	 * @param y	The y coordinate
-	 * @param width	The width dimensions
-	 * @param height	The height dimensions
-	 * @param columnStart	The beginning of the column
-	 * @param columnEnd	The the ending of the column
-	 */
-//	private void moveComponents(final Container target, int x, final int y, final int width, final int height,
-//			final int columnStart, final int columnEnd, final boolean leftToRight){
-//		x += startingX(leftToRight, width);
-//		for(int i = columnStart; i < columnEnd; i ++){
-//			final Component m = target.getComponent(i);
-//			if(m.isVisible()){
-//				final Dimension size = m.getSize();
-//				final int cy = y + (height - size.height) / 2;
-//				m.setLocation((leftToRight? x: target.getSize().width - x - size.width), cy);
-//
-//				x += size.width + getHgap();
-//			}
-//		}
-//	}
-
-//	private int startingX(final boolean leftToRight, final int width){
-//		int x = 0;
-//		switch(getAlignment()){
-//			case LEFT:
-//				x = (leftToRight? 0: width);
-//				break;
-//
-//			case CENTER:
-//				x = width / 2;
-//				break;
-//
-//			case RIGHT:
-//				x = (leftToRight? width: 0);
-//		}
-//		return x;
-//	}
-
-	/**
-	 * Returns a string representation of this <code>HorizontalFlowLayout</code>
-	 * object and its values.
-	 *
-	 * @return a string representation of this layout
-	 */
-//	public String toString(){
-//		String alignment;
-//		switch(align){
-//			case LEFT:
-//				alignment = "top";
-//				break;
-//
-//			case CENTER:
-//				alignment = "center";
-//				break;
-//
-//			case RIGHT:
-//			default:
-//				alignment = "bottom";
-//		}
-//		return getClass().getName() + "[hgap=" + hgap + ",vgap=" + vgap + ",align=" + alignment + "]";
-//	}
 
 }
