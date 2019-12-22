@@ -22,8 +22,9 @@ import java.util.function.Function;
  * <li>{@link FlowLayout#RIGHT RIGHT}
  * </ul>
  * <p>
+ *
+ * @see <a href="http://www.camick.com/java/source/WrapLayout.java">WrapLayout.java</a>
  */
-//http://www.camick.com/java/source/WrapLayout.java
 public class HorizontalFlowLayout extends FlowLayout{
 
 	/** Constructs a new <code>WrapLayout</code> with a left alignment and a default 5-unit horizontal and vertical gap. */
@@ -43,12 +44,9 @@ public class HorizontalFlowLayout extends FlowLayout{
 	}
 
 	/**
-	 * Creates a new flow layout manager with the indicated alignment
-	 * and the indicated horizontal and vertical gaps.
-	 * <p>
-	 * The value of the alignment argument must be one of
-	 * <code>HorizontalFlowLayout.TOP</code>, <code>HorizontalFlowLayout.BOTTOM</code>,
-	 * or <code>HorizontalFlowLayout.CENTER</code>.
+	 * Creates a new flow layout manager with the indicated alignment and the indicated horizontal and vertical gaps.<p>
+	 * The value of the alignment argument must be one of <code>HorizontalFlowLayout.TOP</code>,
+	 * <code>HorizontalFlowLayout.BOTTOM</code>, or <code>HorizontalFlowLayout.CENTER</code>.
 	 *
 	 * @param align The alignment value
 	 * @param hgap The horizontal gap between components and between the components and the
@@ -61,15 +59,13 @@ public class HorizontalFlowLayout extends FlowLayout{
 	}
 
 	/**
-	 * Returns the preferred dimensions for this layout given the
-	 * <i>visible</i> components in the specified target container.
+	 * Returns the preferred dimensions for this layout given the <i>visible</i> components in the specified target container.
 	 *
-	 * @param target the container that needs to be laid out
-	 * @return the preferred dimensions to lay out the
-	 * subcomponents of the specified container
-	 * @see Container
+	 * @param target	The container that needs to be laid out
+	 * @return	The preferred dimensions to lay out the subcomponents of the specified container
 	 * @see #minimumLayoutSize
-	 * @see java.awt.Container#getPreferredSize
+	 * @see Container
+	 * @see Container#getPreferredSize
 	 */
 	@Override
 	public Dimension preferredLayoutSize(final Container target){
@@ -77,21 +73,19 @@ public class HorizontalFlowLayout extends FlowLayout{
 	}
 
 	/**
-	 * Returns the minimum dimensions needed to layout the <i>visible</i>
-	 * components contained in the specified target container.
+	 * Returns the minimum dimensions needed to layout the <i>visible</i> components contained in the specified target container.
 	 *
-	 * @param target the container that needs to be laid out
-	 * @return the minimum dimensions to lay out the
-	 * subcomponents of the specified container
+	 * @param target	The container that needs to be laid out
+	 * @return	The minimum dimensions to lay out the subcomponents of the specified container
 	 * @see #preferredLayoutSize
-	 * @see java.awt.Container
-	 * @see java.awt.Container#doLayout
+	 * @see Container
+	 * @see Container#doLayout
 	 */
 	@Override
 	public Dimension minimumLayoutSize(final Container target){
-		final Dimension minimum = layoutSize(target, Component::getMinimumSize);
-		minimum.width -= getHgap() + 1;
-		return minimum;
+		final Dimension dimension = layoutSize(target, Component::getMinimumSize);
+		dimension.width -= getHgap() + 1;
+		return dimension;
 	}
 
 	private Dimension layoutSize(final Container target, final Function<Component, Dimension> sizeSupplier){
@@ -144,7 +138,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 		}
 	}
 
-	/*
+	/**
 	 *  A new row has been completed. Use the dimensions of this row to update the preferred size for the container.
 	 *
 	 *  @param dimension	Update the width and height when appropriate
