@@ -1,7 +1,6 @@
 package unit731.hunspeller.gui;
 
 import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
-import unit731.hunspeller.services.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -13,12 +12,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 
 public class JTagPanel extends JPanel{
-
-	private final Object synchronizer = new Object();
 
 	private final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged;
 
@@ -30,13 +26,12 @@ public class JTagPanel extends JPanel{
 	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
 		this.tagsChanged = tagsChanged;
 
-//		setLayout(new FlowLayout(FlowLayout.LEADING, 2, 0));
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
 	public void initializeTags(final List<String> tags){
-		synchronized(synchronizer){
+		synchronized(getTreeLock()){
 			if(tags == null)
 				removeAll();
 			else
@@ -47,7 +42,7 @@ public class JTagPanel extends JPanel{
 	}
 
 	public void addTag(final String tag){
-		synchronized(synchronizer){
+		synchronized(getTreeLock()){
 			createAndAddTag(tag);
 
 			if(tagsChanged != null)
@@ -63,7 +58,7 @@ public class JTagPanel extends JPanel{
 	}
 
 	private void removeTag(final JTagComponent tag){
-		synchronized(synchronizer){
+		synchronized(getTreeLock()){
 			remove(tag);
 
 			if(tagsChanged != null)
@@ -76,18 +71,17 @@ public class JTagPanel extends JPanel{
 	private void forceRepaint(){
 		repaint();
 		revalidate();
-
-//final Dimension dimension = getPreferredSize();
-//dimension.height = Math.max(getParent().getHeight() + PAD * 6 * 13, maxHeight);
-//setPreferredSize(dimension);
 	}
 
 	public void applyFilter(final String tag){
-		final String filter = (tag != null && !tag.isEmpty()? ".*" + tag + ".*": ".+");
-		final Pattern pattern = Pattern.compile(filter);
-		JavaHelper.nullableToStream(getComponents())
-			.filter(comp -> comp instanceof JTagComponent)
-			.forEach(comp -> comp.setVisible(pattern.matcher(((JTagComponent)comp).getTag()).matches()));
+		EventQueue.invokeLater(() -> {
+			if(tag == null || tag.isEmpty())
+				for(final Component component : getComponents())
+					component.setVisible(true);
+			else
+				for(final Component component : getComponents())
+					component.setVisible(((JTagComponent)component).getTag().contains(tag));
+		});
 	}
 
 
