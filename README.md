@@ -181,6 +181,7 @@ It is possible to click on the first column to select the row (for cancelling it
 ## Changelog
 <a name="changelog-1.10.0"></a>
 ### version 1.10.0 - 20191224
+- fixed a bug while selecting the font once a project is loaded
 - added buttons to open relevant files
 - added management of SentenceExceptList.xml and WordExceptList.xml
 - reduced size of java package from 3.35 MB to 1.76 MB (47% gain)

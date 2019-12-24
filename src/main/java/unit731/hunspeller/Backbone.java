@@ -149,7 +149,10 @@ public class Backbone implements FileChangeListener{
 		final File affFile = getAffixFile();
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
-		final String[] uris = Stream.of(affFile, hypFile, aidFile)
+		final File acoFile = getAcoFile();
+		final File sexFile = getSexFile();
+		final File wexFile = getWexFile();
+		final String[] uris = Stream.of(affFile, hypFile, aidFile, acoFile, sexFile, wexFile)
 			.filter(Objects::nonNull)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
@@ -340,6 +343,18 @@ public class Backbone implements FileChangeListener{
 		return Path.of(packager.getProjectPath().toString(), FOLDER_AID,
 			affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
+	}
+
+	public File getAcoFile(){
+		return packager.getAutoCorrectFile();
+	}
+
+	public File getSexFile(){
+		return packager.getSentenceExceptionsFile();
+	}
+
+	public File getWexFile(){
+		return packager.getWordExceptionsFile();
 	}
 
 	private String getCurrentWorkingDirectory(){

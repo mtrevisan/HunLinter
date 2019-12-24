@@ -131,6 +131,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/Hunspeller";
 
+	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
+
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
 
@@ -2373,7 +2375,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
-			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+"), 10);
+			final String[] extractions = PatternHelper.extract(content, EXTRACTOR, 10);
 			final String sample = String.join(StringUtils.EMPTY, extractions).chars()
 				.mapToObj(Character::toString)
 				.collect(Collectors.toSet()).stream()
