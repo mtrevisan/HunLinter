@@ -2373,8 +2373,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
-			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\n" + "]+)"), 3);
-			final String sample = extractions[0] + extractions[1] + extractions[2];
+			final String[] extractions = PatternHelper.extract(content, PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+"), 10);
+			final String sample = String.join(StringUtils.EMPTY, extractions).chars()
+				.mapToObj(Character::toString)
+				.collect(Collectors.toSet()).stream()
+				.collect(Collectors.joining(StringUtils.EMPTY));
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
 		}
 		catch(final IOException ignored){}

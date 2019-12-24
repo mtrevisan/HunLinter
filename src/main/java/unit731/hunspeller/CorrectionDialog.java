@@ -56,6 +56,7 @@ public class CorrectionDialog extends JDialog{
       btnCancel = new javax.swing.JButton();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+      setResizable(false);
 
       incorrectLabel.setLabelFor(incorrectTextField);
       incorrectLabel.setText("Incorrect form:");
@@ -131,7 +132,7 @@ public class CorrectionDialog extends JDialog{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(correctLabel)
                .addComponent(correctTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGap(17, 17, 17)
+            .addGap(18, 18, 18)
             .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
 

@@ -5,12 +5,12 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTextArea;
 import org.slf4j.Marker;
+import unit731.hunspeller.services.JavaHelper;
 
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
@@ -21,7 +21,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
-		Arrays.stream(markers)
+		JavaHelper.nullableToStream(markers)
 			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>()).add(textArea));
 	}
 

@@ -45,9 +45,10 @@ public class GUIUtils{
 	public static Font chooseBestFont(final String languageSample){
 		Font bestFont = currentFont;
 		float height = 0.f;
-		if(!canCurrentFondDisplay(languageSample) && familyNamesAll.isEmpty()){
+		if(!canCurrentFontDisplay(languageSample)){
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
+
 			final List<String> list = (!familyNamesMonospaced.isEmpty()? familyNamesMonospaced: familyNamesAll);
 			double width = 0.;
 			for(final String elem : list){
@@ -86,7 +87,7 @@ public class GUIUtils{
 		}
 	}
 
-	public static boolean canCurrentFondDisplay(final String languageSample){
+	public static boolean canCurrentFontDisplay(final String languageSample){
 		return (currentFont.canDisplayUpTo(languageSample) < 0);
 	}
 
