@@ -30,6 +30,11 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 		setFont(GUIUtils.getCurrentFont());
 		setText(value != null? String.valueOf(value): StringUtils.SPACE);
 
+		try{
+			table.setRowHeight(table.convertRowIndexToModel(row), getPreferredSize().height + 4);
+		}
+		catch(final ArrayIndexOutOfBoundsException ignored){}
+
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)?
 			BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED): null);
