@@ -180,8 +180,10 @@ It is possible to click on the first column to select the row (for cancelling it
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-1.10.0"></a>
-### version 1.10.0 - 20191106
+### version 1.10.0 - 20191224
 - added buttons to open relevant files
+- added management of SentenceExceptList.xml and WordExceptList.xml
+- reduced size of java package from 3.35 MB to 1.76 MB (47% gain)
 
 <a name="changelog-1.9.1"></a>
 ### version 1.9.1 - 20191028

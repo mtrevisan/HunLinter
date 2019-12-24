@@ -31,7 +31,7 @@ public class HelpDialog extends JDialog{
 
 
 		try{
-			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/favicon.jpg"));
+			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
 			final ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
 			lblLogo.setIcon(icon);
 		}

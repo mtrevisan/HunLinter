@@ -81,19 +81,8 @@
 					<shadedArtifactAttached>true</shadedArtifactAttached>
 					<shadedClassifierName>shaded</shadedClassifierName>
 					<filters>
-						<filter>
-							<artifact>commons-io:commons-io</artifact>
-							<includes>
-								<include>**</include>
-							</includes>
-						</filter>
 						<!-- FIXME: strengthen the inclusions -->
-						<filter>
-							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
-							<includes>
-								<include>**</include>
-							</includes>
-						</filter>
+						<!-- ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator-->
 						<filter>
 							<artifact>ch.qos.logback:logback-classic</artifact>
 							<includes>
@@ -101,26 +90,8 @@
 							</includes>
 						</filter>
 						<filter>
-							<artifact>commons-logging:commons-logging</artifact>
-							<includes>
-								<include>**</include>
-							</includes>
-						</filter>
-<!--						<filter>
-							<artifact>com.google.code.findbugs:annotations</artifact>
-							<excludes>
-								<exclude>**</exclude>
-							</excludes>
-						</filter>-->
-						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
-								<exclude>AUTHORS</exclude>
-								<exclude>LICENSE</exclude>
-								<exclude>changelog.txt</exclude>
-								<exclude>latestchanges.html</exclude>
-								<exclude>release-timestamp.txt</exclude>
-								<exclude>.netbeans_automatic_build</exclude>
 								<exclude>META-INF/LICENSE</exclude>
 								<exclude>META-INF/LICENSE.txt</exclude>
 								<exclude>META-INF/NOTICE</exclude>
