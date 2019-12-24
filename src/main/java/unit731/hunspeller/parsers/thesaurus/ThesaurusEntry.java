@@ -1,9 +1,5 @@
 package unit731.hunspeller.parsers.thesaurus;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
@@ -29,15 +25,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public static final String MEANS = PIPE + ",";
 
 
-	@JsonProperty
 	private final String synonym;
-	@JsonProperty
 	private final List<MeaningEntry> meanings;
 
 
-	@JsonCreator
-	public ThesaurusEntry(@JsonProperty("synonym") final String synonym,
-			@JsonProperty("meanings") final List<MeaningEntry> meanings){
+	public ThesaurusEntry(final String synonym, final List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(meanings);
 
@@ -82,7 +74,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		meanings.add(meaningEntry);
 	}
 
-	@JsonIgnore
 	public int getMeaningsEntries(){
 		return meanings.size();
 	}

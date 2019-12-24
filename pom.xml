@@ -115,16 +115,6 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
-
-			<!-- Needed in order for JUnit 5 to work, until the IDE supports it -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
-				<configuration>
-					<argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
-				</configuration>
-			</plugin>
 		</plugins>
 
 		<resources>
@@ -139,7 +129,7 @@
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>
-					<include>**/rules.properties</include>
+					<include>unit731/hunspeller/languages/*/rules.properties</include>
 				</includes>
 			</resource>
 		</resources>
@@ -154,16 +144,11 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 
 		<!-- Apache -->
-		<org.apache.commons.lang3.version>3.9</org.apache.commons.lang3.version>
 		<org.apache.commons.text.version>1.8</org.apache.commons.text.version>
-		<org.apache.commons.math3.version>3.6.1</org.apache.commons.math3.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
 
 		<!-- XChart -->
 		<org.knowm.xchart.version>3.6.0</org.knowm.xchart.version>
-
-		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.10.1</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
@@ -179,18 +164,8 @@
 		<!-- Apache -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${org.apache.commons.lang3.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>${org.apache.commons.text.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>${org.apache.commons.math3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -203,13 +178,6 @@
 			<groupId>org.knowm.xchart</groupId>
 			<artifactId>xchart</artifactId>
 			<version>${org.knowm.xchart.version}</version>
-		</dependency>
-
-		<!-- Jackson -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${com.fasterxml.jackson.version}</version>
 		</dependency>
 
 		<!-- Memory usage -->

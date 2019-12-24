@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.thesaurus;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,12 +31,10 @@ public class ThesaurusDictionary{
 	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
 
 
-	@JsonProperty
 	List<ThesaurusEntry> getSynonyms(){
 		return synonyms;
 	}
 
-	@JsonProperty
 	private void setSynonyms(final List<ThesaurusEntry> synonyms){
 		clear();
 
