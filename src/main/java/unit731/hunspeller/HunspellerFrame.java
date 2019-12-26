@@ -659,8 +659,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                      try{
                         backbone.getTheParser().setMeanings(row, text);
 
-                        // … and save the files
+                        //save the files
                         backbone.storeThesaurusFiles();
+
+                        //redo the filtering
+								if(formerFilterThesaurusText != null){
+									final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(formerFilterThesaurusText);
+									final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
+									final List<String> meanings = Arrays.asList(pair.getRight());
+
+									@SuppressWarnings("unchecked") final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+									final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, meanings);
+									EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
+								}
                      }
                      catch(Exception ex){
                         LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
@@ -2859,12 +2870,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			hypCheckCorrectnessMenuItem.setEnabled(false);
 		}
-	}
-
-
-	private void updateSynonyms(){
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-		dm.fireTableDataChanged();
 	}
 
 

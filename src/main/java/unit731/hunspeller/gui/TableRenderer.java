@@ -31,7 +31,7 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 		setText(value != null? String.valueOf(value): StringUtils.SPACE);
 
 		try{
-			table.setRowHeight(table.convertRowIndexToModel(row), getPreferredSize().height + 4);
+			table.setRowHeight(row, getPreferredSize().height + 4);
 		}
 		catch(final ArrayIndexOutOfBoundsException ignored){}
 
