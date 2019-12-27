@@ -10,7 +10,7 @@
 
 	<build>
 		<plugins>
-			<!-- Maven Source Plugin -->
+			<!-- Source -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -24,13 +24,13 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Maven Deploy Plugin -->
+			<!-- Deploy -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>2.8.2</version>
 			</plugin>
-			<!-- Maven JavaDoc Plugin -->
+			<!-- JavaDoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -48,7 +48,7 @@
 					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 				</configuration>
 			</plugin>
-			<!-- Templating Maven Plugin -->
+			<!-- Templating -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>templating-maven-plugin</artifactId>
@@ -62,7 +62,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Maven Shade Plugin -->
+			<!-- Shade -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -106,7 +106,7 @@
 					</transformers>
 				</configuration>
 			</plugin>
-			<!-- Maven Compiler Plugin -->
+			<!-- Compiler -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
