@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.workers.exceptions;
 
 public class HunspellException extends RuntimeException{
 
-	public enum FixActionType{ADD, REPLACE, REMOVE};
+	public enum FixActionType{ADD, REPLACE, REMOVE}
 
 
 	//FIXME useful?

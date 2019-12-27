@@ -1741,7 +1741,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
+				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
 		formerFilterIncorrectText = unmodifiedIncorrectText;

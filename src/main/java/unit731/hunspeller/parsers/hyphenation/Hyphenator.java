@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -217,10 +216,7 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private void manageNoHyphenAtMiddle(List<String> response, String nohyp){
-		Iterator<String> itr = response.iterator();
-		while(itr.hasNext())
-			if(nohyp.equals(itr.next()))
-				itr.remove();
+		response.removeIf(nohyp::equals);
 	}
 
 	private boolean isStarting(final String key){

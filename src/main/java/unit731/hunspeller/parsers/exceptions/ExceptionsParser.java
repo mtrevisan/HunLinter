@@ -30,7 +30,7 @@ public class ExceptionsParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
 
-	public enum TagChangeType{SET, ADD, REMOVE, CLEAR};
+	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String WORD_EXCEPTIONS_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
