@@ -153,6 +153,9 @@
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
 
+		<!-- Morfologik -->
+		<org.carrot2.morfologik-stemming.version>2.1.6</org.carrot2.morfologik-stemming.version>
+
 		<!-- Logging -->
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
 
@@ -178,6 +181,13 @@
 			<groupId>org.knowm.xchart</groupId>
 			<artifactId>xchart</artifactId>
 			<version>${org.knowm.xchart.version}</version>
+		</dependency>
+
+		<!-- Morfologik -->
+		<dependency>
+			<groupId>org.carrot2</groupId>
+			<artifactId>morfologik-stemming</artifactId>
+			<version>${org.carrot2.morfologik-stemming.version}</version>
 		</dependency>
 
 		<!-- Memory usage -->
