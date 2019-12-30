@@ -62,7 +62,8 @@ public class DictionaryEntry{
 		return createFromDictionaryLine(line, affixData, false);
 	}
 
-	private static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData, final boolean addStemTag){
+	private static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData,
+			final boolean addStemTag){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
@@ -96,7 +97,8 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
+	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields,
+			final boolean combinable){
 		Objects.requireNonNull(word);
 
 		this.word = word;
@@ -106,7 +108,8 @@ public class DictionaryEntry{
 	}
 
 	private static String expandAliases(final String part, final List<String> aliases){
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)?
+			aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
 	private static boolean containsStem(final String[] mfs){
@@ -197,8 +200,8 @@ public class DictionaryEntry{
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag, final String compoundMiddleFlag,
-			final String compoundEndFlag){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
+			final String compoundMiddleFlag, final String compoundEndFlag){
 		final Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());

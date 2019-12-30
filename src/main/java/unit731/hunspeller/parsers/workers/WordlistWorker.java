@@ -27,14 +27,30 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Wordlist";
 
+	public enum WorkerType{COMPLETE, PLAN_WORDS, MORFOLOGIK}
 
-	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final boolean plainWords, final File outputFile){
+
+	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
+			final File outputFile){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
-		final Function<Production, String> toString = (plainWords? Production::getWord: Production::toString);
+		final Function<Production, String> toString;
+		switch(type){
+			case COMPLETE:
+				toString = Production::toString;
+				break;
+
+			case MORFOLOGIK:
+				toString = Production::toStringMorfologik;
+				break;
+
+			case PLAN_WORDS:
+			default:
+				toString = Production::getWord;
+		}
 		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
