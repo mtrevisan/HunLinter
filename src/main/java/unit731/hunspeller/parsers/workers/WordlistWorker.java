@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.workers;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -37,10 +38,10 @@ public class WordlistWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(outputFile);
 
 
-		final Function<Production, String> toString;
+		final Function<Production, List<String>> toString;
 		switch(type){
 			case COMPLETE:
-				toString = Production::toString;
+				toString = p -> Collections.singletonList(p.toString());
 				break;
 
 			case MORFOLOGIK:
@@ -49,7 +50,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 			case PLAN_WORDS:
 			default:
-				toString = Production::getWord;
+				toString = p -> Collections.singletonList(p.getWord());
 		}
 		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
@@ -57,7 +58,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 			try{
 				for(final Production production : productions){
-					writer.write(toString.apply(production));
+					for(final String text : toString.apply(production))
+						writer.write(text);
 					writer.newLine();
 				}
 			}

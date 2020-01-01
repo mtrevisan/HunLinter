@@ -97,7 +97,7 @@ public class WordMuncher{
 							continue;
 
 						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
-						if(baseProductionPartOfSpeech == null && partOfSpeech == null
+						if(baseProductionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty()
 								|| baseProductionPartOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
 							originators.add(originatorEntry);
 					}
@@ -117,7 +117,7 @@ public class WordMuncher{
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
 						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
-						if(partOfSpeech == null || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
+						if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
 							originatingRulesFromEntry.add(originatingRule);
 					}
 				}

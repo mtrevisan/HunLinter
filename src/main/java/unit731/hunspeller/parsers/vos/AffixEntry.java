@@ -31,6 +31,7 @@ public class AffixEntry{
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
 	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part does not ends with removal part: ''{0}''");
 	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part does not starts with removal part: ''{0}''");
+	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: ''{0}''");
 	//warning
 	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");
 	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word ''{0}'' without the FULLSTRIP option");
@@ -171,15 +172,13 @@ public class AffixEntry{
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
-		//NOTE: part of speech seems to be preserved, both in simple application of an affix rule and of a compound rule
-//		final boolean overwritePartOfSpeech = (dicEntry.getMorphologicalFieldPartOfSpeech() != null && amf.stream().anyMatch(f -> f.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())));
+		//NOTE: part of speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
 		final boolean containsTerminalSuffixes = amf.stream()
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
 			.filter(field -> (dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().affixType != affixType
 				|| !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())))
-//			.filter(field -> !overwritePartOfSpeech || !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
@@ -203,6 +202,21 @@ public class AffixEntry{
 
 	public final boolean isSuffix(){
 		return (affixType == AffixType.SUFFIX);
+	}
+
+	public void validate(){
+		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+		if(!filteredFields.isEmpty())
+			throw new HunspellException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
+	}
+
+	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		final String tag = morphologicalTag.getCode();
+		final int purgeTag = tag.length();
+		return JavaHelper.nullableToStream(morphologicalFields)
+			.filter(df -> df.startsWith(tag))
+			.map(df -> df.substring(purgeTag))
+			.collect(Collectors.toList());
 	}
 
 	public boolean canApplyTo(final String word){

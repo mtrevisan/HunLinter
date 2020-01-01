@@ -237,7 +237,7 @@ public class DictionaryEntry{
 
 	public List<String> getMorphologicalFieldPartOfSpeech(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		return (!filteredFields.isEmpty()? filteredFields: null);
+		return (!filteredFields.isEmpty()? filteredFields: Collections.emptyList());
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

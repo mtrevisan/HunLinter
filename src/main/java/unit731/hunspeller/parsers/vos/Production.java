@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.vos;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,17 +12,16 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.AffixType;
+import unit731.hunspeller.parsers.enums.InflectionTag;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.enums.PartOfSpeechTag;
-import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.StringHelper;
 
 
 public class Production extends DictionaryEntry{
 
-	private static final MessageFormat SINGLE_STEM_NOT_PRESENT = new MessageFormat("Stem not unique, found ''{0}''");
-	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique, found ''{0}''");
+//	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique, found ''{0}''");
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
@@ -186,24 +184,26 @@ public class Production extends DictionaryEntry{
 //			return Collections.singletonList(word);
 //	}
 
-	public String toStringMorfologik(){
+	public List<String> toStringMorfologik(){
 		//extract Stem
 		final List<String> stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
-		if(stem.size() != 1)
-			throw new HunspellException(SINGLE_STEM_NOT_PRESENT.format(new Object[]{String.join(", ", stem)}));
 
 		//extract Part-of-Speech
 		final List<String> pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		if(pos.size() != 1)
-			throw new HunspellException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+//		if(pos.size() != 1)
+//			throw new HunspellException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
 		final PartOfSpeechTag posTag = PartOfSpeechTag.createFromCode(pos.get(0));
 
 		//extract Inflection
 		final List<String> inflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX);
 		inflection.addAll(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX));
-		//TODO
+		final List<InflectionTag> infl = inflection.stream()
+			.map(InflectionTag::createFromCode)
+			.collect(Collectors.toList());
 
-		return word + TAB + stem.get(0) + TAB + posTag.getTag();
+		return stem.stream()
+			.map(st -> word + TAB + st + TAB + posTag.getTag() + StringUtils.join(infl, StringUtils.EMPTY))
+			.collect(Collectors.toList());
 	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){

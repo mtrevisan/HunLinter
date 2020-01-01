@@ -93,6 +93,8 @@ public class AffixHandler implements Handler{
 			throw new HunspellException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
 		if(!ruleFlag.equals(entry.getFlag()))
 			throw new HunspellException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
+
+		entry.validate();
 	}
-	
+
 }
