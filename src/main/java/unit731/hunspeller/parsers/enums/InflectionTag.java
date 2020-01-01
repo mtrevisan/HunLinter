@@ -11,8 +11,8 @@ public enum InflectionTag{
 	TAG_FEMENINE("femenine", "+f"),
 	TAG_SINGULAR_MASCULINE("singular_masculine", "+s+m"),
 	TAG_SINGULAR_FEMENINE("singular_femenine", "+s+f"),
-	TAG_PLURAL_MASCULINE("singular_masculine", "+p+m"),
-	TAG_PLURAL_FEMENINE("singular_femenine", "+p+f"),
+	TAG_PLURAL_MASCULINE("plural_masculine", "+p+m"),
+	TAG_PLURAL_FEMENINE("plural_femenine", "+p+f"),
 
 	TAG_FIRST_SINGULAR("first_singular", "+1+s"),
 	TAG_FIRST_PLURAL("first_plural", "+1+p"),

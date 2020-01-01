@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -195,14 +196,15 @@ public class Production extends DictionaryEntry{
 		final PartOfSpeechTag posTag = PartOfSpeechTag.createFromCode(pos.get(0));
 
 		//extract Inflection
-		final List<String> inflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX);
-		inflection.addAll(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX));
-		final List<InflectionTag> infl = inflection.stream()
+		final Stream<String> suffixStream = JavaHelper.nullableToStream(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX));
+		final Stream<String> prefixStream = JavaHelper.nullableToStream(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX));
+		final List<String> inflection = Stream.concat(suffixStream, prefixStream)
 			.map(InflectionTag::createFromCode)
+			.map(InflectionTag::getTag)
 			.collect(Collectors.toList());
 
 		return stem.stream()
-			.map(st -> word + TAB + st + TAB + posTag.getTag() + StringUtils.join(infl, StringUtils.EMPTY))
+			.map(st -> word + TAB + st + TAB + posTag.getTag() + StringUtils.join(inflection, StringUtils.EMPTY))
 			.collect(Collectors.toList());
 	}
 

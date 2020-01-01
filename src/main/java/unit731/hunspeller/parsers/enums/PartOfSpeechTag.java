@@ -48,12 +48,12 @@ public enum PartOfSpeechTag{
 	TAG_ARTICLE("article", "AA"),
 	TAG_DETERMINER("determiner", "DT"),
 
-	TAG_PREPOSITION("preposition", ""),
-	TAG_ADVERB("adverb", ""),
-	TAG_CONJUNCTION("conjunction", ""),
-	TAG_PREFIX("prefix", ""),
-	TAG_INTERJECTION("interjection", ""),
-	TAG_UNIT_OF_MEASURE("unit_of_measure", "");
+	TAG_PREPOSITION("preposition", "PR"),
+	TAG_ADVERB("adverb", "AD"),
+	TAG_CONJUNCTION("conjunction", "CN"),
+	TAG_PREFIX("prefix", "PX"),
+	TAG_INTERJECTION("interjection", "IN"),
+	TAG_UNIT_OF_MEASURE("unit_of_measure", "UOM");
 
 
 	private final String code;
