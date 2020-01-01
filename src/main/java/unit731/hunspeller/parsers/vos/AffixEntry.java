@@ -160,26 +160,32 @@ public class AffixEntry{
 	//FIXME is this documentation updated/true?
 	/**
 	 *
-	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
-	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
-	 * Terminal Suffix: inflectional suffix fields removed by additional (not terminal) suffixes, useful for zero morphemes and affixes
-	 * 	removed by splitting rules
+	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the
+	 * 	suffix fields)
+	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the
+	 * 	suffix fields)
+	 * Terminal Suffix: inflectional suffix fields removed by additional (not terminal) suffixes, useful for zero morphemes and
+	 * 	affixes removed by splitting rules
 	 *
 	 * @param dicEntry	The dictionary entry to combine from
 	 * @return	The list of new morphological fields
 	 */
 	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
-		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
+		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)):
+			new ArrayList<>());
 		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
 		//NOTE: part of speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		final boolean containsTerminalSuffixes = amf.stream()
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
+		final boolean containsInflectionalAffix = amf.stream()
+			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())
+				|| field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_PREFIX.getCode()));
+		final boolean containsNonTerminalAffixes = containsInflectionalAffix;
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
-			.filter(field -> (dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().affixType != affixType
-				|| !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())))
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())
+				&& !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_PREFIX.getCode())
+				|| !containsInflectionalAffix)
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsNonTerminalAffixes)
 			.collect(Collectors.toList());
 
 		//add morphological fields from the applied affix
@@ -258,7 +264,7 @@ public class AffixEntry{
 
 	@Override
 	public String toString(){
-		return entry;
+		return StringUtils.replaceChars(entry, TAB, StringUtils.SPACE);
 	}
 
 	@Override
