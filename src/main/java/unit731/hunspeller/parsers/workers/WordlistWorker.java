@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,7 @@ import unit731.hunspeller.services.FileHelper;
 
 public class WordlistWorker extends WorkerDictionaryBase{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordlistWorker.class);
 
 	public static final String WORKER_NAME = "Wordlist";
 
@@ -95,6 +96,10 @@ public class WordlistWorker extends WorkerDictionaryBase{
 						"--input", outputFile.toString()
 					};
 					DictCompile.main(buildOptions);
+
+					FileHelper.openFolder(outputFile);
+
+					Files.delete(outputFile.toPath());
 				}
 				catch(final IOException e){
 					LOGGER.warn("Exception while creating the FSA file for Morfologik", e);

@@ -222,9 +222,7 @@ public class Packager{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
-			//open directory
-			if(Desktop.isDesktopSupported())
-				Desktop.getDesktop().open(projectPath.toFile());
+			FileHelper.openFolder(projectPath.toFile());
 		}
 		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());

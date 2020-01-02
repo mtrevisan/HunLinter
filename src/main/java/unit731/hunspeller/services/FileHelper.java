@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -150,6 +151,11 @@ public class FileHelper{
 		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
+	}
+
+	public static void openFolder(final File folder) throws IOException{
+		if(Desktop.isDesktopSupported())
+			Desktop.getDesktop().open(folder);
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
