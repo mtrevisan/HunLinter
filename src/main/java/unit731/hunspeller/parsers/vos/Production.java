@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.vos;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,18 +17,22 @@ import unit731.hunspeller.parsers.enums.AffixType;
 import unit731.hunspeller.parsers.enums.InflectionTag;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.enums.PartOfSpeechTag;
+import unit731.hunspeller.parsers.workers.exceptions.HunspellException;
 import unit731.hunspeller.services.JavaHelper;
 import unit731.hunspeller.services.StringHelper;
 
 
 public class Production extends DictionaryEntry{
 
-//	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique, found ''{0}''");
+	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique, found ''{0}''");
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
 	private static final String LEADS_TO = " > ";
 	private static final String POS_FIELD_PREFIX = ":";
+
+	public static final String MORFOLOGIK_SEPARATOR = ",";
+	private static final String MORFOLOGIK_TAG_SEPARATOR = "+";
 
 
 	private List<AffixEntry> appliedRules;
@@ -191,8 +196,8 @@ public class Production extends DictionaryEntry{
 
 		//extract Part-of-Speech
 		final List<String> pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-//		if(pos.size() != 1)
-//			throw new HunspellException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+		if(pos.size() != 1)
+			throw new HunspellException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
 		final PartOfSpeechTag posTag = PartOfSpeechTag.createFromCode(pos.get(0));
 
 		//extract Inflection
@@ -200,11 +205,12 @@ public class Production extends DictionaryEntry{
 		final Stream<String> prefixStream = JavaHelper.nullableToStream(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX));
 		final List<String> inflection = Stream.concat(suffixStream, prefixStream)
 			.map(InflectionTag::createFromCode)
-			.map(InflectionTag::getTag)
+			.map(InflectionTag::getTags)
+			.map(tags -> StringUtils.join(tags, MORFOLOGIK_TAG_SEPARATOR))
 			.collect(Collectors.toList());
 
 		return stem.stream()
-			.map(st -> word + TAB + st + TAB + posTag.getTag() + StringUtils.join(inflection, StringUtils.EMPTY))
+			.map(st -> st + MORFOLOGIK_SEPARATOR + word + MORFOLOGIK_SEPARATOR + posTag.getTag() + MORFOLOGIK_TAG_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
 			.collect(Collectors.toList());
 	}
 

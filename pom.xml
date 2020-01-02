@@ -154,7 +154,7 @@
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
 
 		<!-- Morfologik -->
-		<org.carrot2.morfologik-stemming.version>2.1.6</org.carrot2.morfologik-stemming.version>
+		<org.carrot2.morfologik-tools.version>2.1.6</org.carrot2.morfologik-tools.version>
 
 		<!-- Logging -->
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
@@ -186,8 +186,8 @@
 		<!-- Morfologik -->
 		<dependency>
 			<groupId>org.carrot2</groupId>
-			<artifactId>morfologik-stemming</artifactId>
-			<version>${org.carrot2.morfologik-stemming.version}</version>
+			<artifactId>morfologik-tools</artifactId>
+			<version>${org.carrot2.morfologik-tools.version}</version>
 		</dependency>
 
 		<!-- Memory usage -->

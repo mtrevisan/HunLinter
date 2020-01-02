@@ -3,11 +3,17 @@ package unit731.hunspeller.parsers.workers;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import morfologik.tools.DictCompile;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +76,37 @@ public class WordlistWorker extends WorkerDictionaryBase{
 		final Runnable completed = () -> {
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-			try{
-				FileHelper.openFileWithChosenEditor(outputFile);
+			if(type == WorkerType.MORFOLOGIK){
+				try{
+					final File outputInfoFile = new File(FilenameUtils.removeExtension(outputFile.getAbsolutePath()) + ".info");
+					final Charset charset = dicParser.getCharset();
+					final List<String> content = Arrays.asList(
+						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
+						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+						"fsa.dict.encoder=prefix");
+					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+
+					final String[] buildOptions = {
+						"--overwrite",
+						"--accept-cr",
+						"--exit", "false",
+						"--format", "FSA5",
+//						"--format", "CFSA2",
+						"--input", outputFile.toString()
+					};
+					DictCompile.main(buildOptions);
+				}
+				catch(final IOException e){
+					LOGGER.warn("Exception while creating the FSA file for Morfologik", e);
+				}
 			}
-			catch(final IOException | InterruptedException e){
-				LOGGER.warn("Exception while opening the resulting file", e);
+			else{
+				try{
+					FileHelper.openFileWithChosenEditor(outputFile);
+				}
+				catch(final IOException | InterruptedException e){
+					LOGGER.warn("Exception while opening the resulting file", e);
+				}
 			}
 		};
 		final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
