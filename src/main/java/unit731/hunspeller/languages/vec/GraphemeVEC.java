@@ -39,7 +39,7 @@ class GraphemeVEC{
 		PatternHelper.pattern("^((r[ae]|ar)?bo[" + PHONEME_JJH + "ɉ])i(ur[ae])"),
 		PatternHelper.pattern("^(re[sŧ]e)i([ou]r[aeio]?)")
 	);
-	private static final Pattern ETEROPHONIC_SEQUENCE_FALSE_POSITIVES = PatternHelper.pattern("^[j\u0249]iog?r[aà]f");
+	private static final Pattern ETEROPHONIC_SEQUENCE_FALSE_POSITIVES = PatternHelper.pattern("^[j\u0249]iog?r[aà]f|[j\u0249]iur(et)?[ae]$");
 
 
 	private GraphemeVEC(){}
@@ -61,7 +61,7 @@ class GraphemeVEC{
 	 * Handle /j/ and /w/ phonemes.
 	 *
 	 * NOTE: Use mostly IPA standard, non–standard IPA character is used to mark /d͡ʒ/-affine grapheme.
-	 * 
+	 *
 	 * @param word	The word to be converted
 	 * @return	The converted word
 	 */
@@ -101,7 +101,7 @@ class GraphemeVEC{
 
 	/**
 	 * Convert back the /j/ and /w/ phonemes into the original alphabetical characters.
-	 * 
+	 *
 	 * @param word	The "phonemized" word to be converted
 	 * @return	The converted word
 	 */
