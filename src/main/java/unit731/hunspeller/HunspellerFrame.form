@@ -184,12 +184,12 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistPlainTextMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dicExtractMorfologikWordlistMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="dicExtractPoSFAMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Extract Morfologik wordlist&#x2026;"/>
+                <Property name="text" type="java.lang.String" value="Extract PoS FSA&#x2026;"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractMorfologikWordlistMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractPoSFAMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">

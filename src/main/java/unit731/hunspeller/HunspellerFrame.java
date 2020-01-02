@@ -230,7 +230,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-			dicExtractMorfologikWordlistMenuItem.setEnabled(true);
+			dicExtractPoSFAMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
 			cmpInputComboBox.setEnabled(true);
@@ -370,7 +370,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
-      dicExtractMorfologikWordlistMenuItem = new javax.swing.JMenuItem();
+      dicExtractPoSFAMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
@@ -1399,13 +1399,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
-      dicExtractMorfologikWordlistMenuItem.setText("Extract Morfologik wordlist…");
-      dicExtractMorfologikWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      dicExtractPoSFAMenuItem.setText("Extract PoS FSA…");
+      dicExtractPoSFAMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractMorfologikWordlistMenuItemActionPerformed(evt);
+            dicExtractPoSFAMenuItemActionPerformed(evt);
          }
       });
-      dicMenu.add(dicExtractMorfologikWordlistMenuItem);
+      dicMenu.add(dicExtractPoSFAMenuItem);
 
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
@@ -1670,11 +1670,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		extractDictionaryWordlist(WordlistWorker.WorkerType.COMPLETE);
 	}//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
 
-	private void dicExtractMorfologikWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMorfologikWordlistMenuItemActionPerformed
+	private void dicExtractPoSFAMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractPoSFAMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(WordlistWorker.WorkerType.MORFOLOGIK);
-	}//GEN-LAST:event_dicExtractMorfologikWordlistMenuItemActionPerformed
+	}//GEN-LAST:event_dicExtractPoSFAMenuItemActionPerformed
 
 	private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -2312,7 +2312,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
 
 			checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem,
-				dicExtractMorfologikWordlistMenuItem);
+				dicExtractPoSFAMenuItem);
 
 			checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
 				cmpLoadInputButton);
@@ -2813,7 +2813,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
-				dicExtractMorfologikWordlistMenuItem.setEnabled(false);
+				dicExtractPoSFAMenuItem.setEnabled(false);
 
 				File outputFile = saveResultFileChooser.getSelectedFile();
 				if(type == WordlistWorker.WorkerType.MORFOLOGIK){
@@ -3082,7 +3082,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
-   private javax.swing.JMenuItem dicExtractMorfologikWordlistMenuItem;
+   private javax.swing.JMenuItem dicExtractPoSFAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
    private javax.swing.JLabel dicInputLabel;
