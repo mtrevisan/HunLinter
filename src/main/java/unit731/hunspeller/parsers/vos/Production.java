@@ -208,9 +208,10 @@ public class Production extends DictionaryEntry{
 			.map(InflectionTag::getTags)
 			.map(tags -> StringUtils.join(tags, MORFOLOGIK_TAG_SEPARATOR))
 			.collect(Collectors.toList());
+		inflection.add(0, posTag.getTag());
 
 		return stem.stream()
-			.map(st -> word + MORFOLOGIK_SEPARATOR + st + MORFOLOGIK_SEPARATOR + posTag.getTag() + MORFOLOGIK_TAG_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
+			.map(st -> word + MORFOLOGIK_SEPARATOR + st + MORFOLOGIK_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
 			.collect(Collectors.toList());
 	}
 
