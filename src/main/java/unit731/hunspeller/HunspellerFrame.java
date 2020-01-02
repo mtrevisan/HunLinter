@@ -2301,7 +2301,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicDuplicatesWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					//					dicDuplicatesWorker.resume();
+//					dicDuplicatesWorker.resume();
 				}
 			}
 
@@ -2766,6 +2766,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryDuplicates(){
 		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
@@ -2806,13 +2807,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
+			saveResultFileChooser.setFileSelectionMode(type == WordlistWorker.WorkerType.MORFOLOGIK?
+				JFileChooser.DIRECTORIES_ONLY: JFileChooser.FILES_ONLY);
 			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 				dicExtractMorfologikWordlistMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
+				File outputFile = saveResultFileChooser.getSelectedFile();
+				if(type == WordlistWorker.WorkerType.MORFOLOGIK){
+					final String temporaryFile = outputFile.getAbsolutePath() + File.separatorChar
+						+ backbone.getAffixData().getLanguage() + ".txt";
+					outputFile = new File(temporaryFile);
+				}
 				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), type,
 					outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
@@ -2823,6 +2831,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractMinimalPairs(){
 		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);

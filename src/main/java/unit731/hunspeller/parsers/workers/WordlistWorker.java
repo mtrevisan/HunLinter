@@ -64,22 +64,23 @@ public class WordlistWorker extends WorkerDictionaryBase{
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			try{
-				for(final Production production : productions){
-					for(final String text : toString.apply(production))
+				for(final Production production : productions)
+					for(final String text : toString.apply(production)){
 						writer.write(text);
-					writer.newLine();
-				}
+						writer.newLine();
+					}
 			}
 			catch(final IOException e){
 				throw new HunspellException(e.getMessage());
 			}
 		};
 		final Runnable completed = () -> {
-			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
-
 			if(type == WorkerType.MORFOLOGIK){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Begin post-processing");
+
 				try{
-					final File outputInfoFile = new File(FilenameUtils.removeExtension(outputFile.getAbsolutePath()) + ".info");
+					final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+					final File outputInfoFile = new File(filenameNoExtension + ".info");
 					final Charset charset = dicParser.getCharset();
 					final List<String> content = Arrays.asList(
 						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
@@ -91,13 +92,14 @@ public class WordlistWorker extends WorkerDictionaryBase{
 						"--overwrite",
 						"--accept-cr",
 						"--exit", "false",
-						"--format", "FSA5",
-//						"--format", "CFSA2",
+						"--format", "CFSA2",
 						"--input", outputFile.toString()
 					};
 					DictCompile.main(buildOptions);
 
-					FileHelper.openFolder(outputFile);
+					LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
+
+					FileHelper.openFolder(outputFile.getParentFile());
 
 					Files.delete(outputFile.toPath());
 				}
@@ -106,6 +108,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				}
 			}
 			else{
+				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+
 				try{
 					FileHelper.openFileWithChosenEditor(outputFile);
 				}
