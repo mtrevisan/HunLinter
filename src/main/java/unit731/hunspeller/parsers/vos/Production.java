@@ -210,7 +210,7 @@ public class Production extends DictionaryEntry{
 			.collect(Collectors.toList());
 
 		return stem.stream()
-			.map(st -> st + MORFOLOGIK_SEPARATOR + word + MORFOLOGIK_SEPARATOR + posTag.getTag() + MORFOLOGIK_TAG_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
+			.map(st -> word + MORFOLOGIK_SEPARATOR + st + MORFOLOGIK_SEPARATOR + posTag.getTag() + MORFOLOGIK_TAG_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
 			.collect(Collectors.toList());
 	}
 
