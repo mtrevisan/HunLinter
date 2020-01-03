@@ -23,6 +23,8 @@ public enum PartOfSpeechTag{
 //	TAG_ADJECTIVE_QUALIFICATIVE_COMPOUNDED("adjective_compounded", "JC"),
 	TAG_ADJECTIVE_DETERMINATIVE_POSSESSIVE_STRONG("adjective_possessive_strong", "JPS"),
 	TAG_ADJECTIVE_DETERMINATIVE_POSSESSIVE_WEAK("adjective_possessive_weak", "JPW"),
+//FIXME to be replaced
+TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_NEAR("adjective_demonstrative_near", "JDN"),
 	TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_FAR("adjective_demonstrative_far", "JDF"),
 	TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_WEAK("adjective_demonstrative_far_weak", "JDFW"),

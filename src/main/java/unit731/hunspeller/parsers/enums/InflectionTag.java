@@ -36,6 +36,8 @@ public enum InflectionTag{
 	TAG_THIRD_SINGULAR_FEMENINE("third_singular_femenine", "3", "s", "f"),
 	TAG_THIRD_PLURAL_FEMENINE("third_plural_femenine", "3", "p", "f"),
 
+	TAG_NON_ENUMERABLE("non_enumerable", "ne"),
+
 	TAG_PROCOMPLEMENTAR("procomplementar", "pc"),
 	TAG_INTERROGATIVE("interrogative", "in"),
 
