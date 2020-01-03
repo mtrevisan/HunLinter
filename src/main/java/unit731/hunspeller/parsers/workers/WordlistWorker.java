@@ -85,7 +85,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 					final List<String> content = Arrays.asList(
 						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
 						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-						"fsa.dict.encoder=suffix");
+						"fsa.dict.encoder=prefix");
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 
 					final String[] buildOptions = {

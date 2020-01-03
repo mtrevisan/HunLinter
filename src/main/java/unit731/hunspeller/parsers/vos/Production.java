@@ -211,7 +211,7 @@ public class Production extends DictionaryEntry{
 		inflection.add(0, posTag.getTag());
 
 		return stem.stream()
-			.map(st -> word + MORFOLOGIK_SEPARATOR + st + MORFOLOGIK_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
+			.map(st -> st + MORFOLOGIK_SEPARATOR + word + MORFOLOGIK_SEPARATOR + StringUtils.join(inflection, StringUtils.EMPTY))
 			.collect(Collectors.toList());
 	}
 
