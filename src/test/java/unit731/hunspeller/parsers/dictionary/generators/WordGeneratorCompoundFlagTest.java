@@ -175,9 +175,9 @@ class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
-			"PFX P 0 pre .	po:pre",
+			"PFX P 0 pre .",
 			"SFX S Y 1",
-			"SFX S 0 suf .	po:suf");
+			"SFX S 0 suf .");
 		loadData(affFile, language);
 
 
@@ -189,10 +189,10 @@ class WordGeneratorCompoundFlagTest{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo po:suf"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words.get(1));
 		//twofold productions
-		Assertions.assertEquals(createProduction("prefoo", "S", "po:pre st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo po:suf"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("prefoosuf", null, "st:foo"), words.get(3));
 		//lastfold productions
 
 
@@ -204,21 +204,21 @@ class WordGeneratorCompoundFlagTest{
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
-			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo po:suf"),
-			createProduction("prefoofoo", "S", "po:pre pa:foo st:foo pa:foo st:foo"),
-			createProduction("prefoofoosuf", null, "po:pre pa:foo st:foo pa:foo st:foo po:suf"),
+			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoosuf", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
-			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar po:suf"),
-			createProduction("prefoobar", "S", "po:pre pa:foo st:foo pa:bar st:bar"),
-			createProduction("prefoobarsuf", null, "po:pre pa:foo st:foo pa:bar st:bar po:suf"),
+			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobar", "S", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobarsuf", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
-			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo po:suf"),
-			createProduction("prebarfoo", "S", "po:pre pa:bar st:bar pa:foo st:foo"),
-			createProduction("prebarfoosuf", null, "po:pre pa:bar st:bar pa:foo st:foo po:suf"),
+			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoo", "S", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoosuf", null, "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar po:suf"),
-			createProduction("prebarbar", "S", "po:pre pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbarsuf", null, "po:pre pa:bar st:bar pa:bar st:bar po:suf")
+			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
 		);
 		Assertions.assertEquals(expected, words);
 	}

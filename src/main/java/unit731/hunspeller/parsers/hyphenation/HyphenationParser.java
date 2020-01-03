@@ -67,7 +67,7 @@ public class HyphenationParser{
 	public static final String EN_DASH = "\u2013";
 //	private static final String EM_DASH = "\u2014";
 	public static final String APOSTROPHE = "ʼ";
-	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
+	public static final String RIGHT_MODIFIER_LETTER_APOSTROPHE = "\u02BC";
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
@@ -293,7 +293,7 @@ public class HyphenationParser{
 		//dash and apostrophe are added by default (retro-compatibility)
 		final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 		if(charset == StandardCharsets.UTF_8)
-			retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
+			retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_MODIFIER_LETTER_APOSTROPHE, EN_DASH));
 
 		patternNoHyphen = PatternHelper.pattern("[" + StringHelper.join(null, retroCompatibilityNoHyphen) + "]");
 
