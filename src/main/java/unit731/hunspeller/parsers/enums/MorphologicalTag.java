@@ -9,13 +9,17 @@ public enum MorphologicalTag{
 	TAG_STEM("st:"),
 	TAG_ALLOMORPH("al:"),
 	TAG_PART_OF_SPEECH("po:"),
+
 	TAG_DERIVATIONAL_PREFIX("dp:"),
 	TAG_INFLECTIONAL_PREFIX("ip:"),
 	TAG_TERMINAL_PREFIX("tp:"),
+
 	TAG_DERIVATIONAL_SUFFIX("ds:"),
 	TAG_INFLECTIONAL_SUFFIX("is:"),
 	TAG_TERMINAL_SUFFIX("ts:"),
+
 	TAG_SURFACE_PREFIX("sp:"),
+
 	TAG_FREQUENCY("fr:"),
 	TAG_PHONETIC("ph:"),
 	TAG_HYPHENATION("hy:"),
