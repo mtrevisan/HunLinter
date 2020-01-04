@@ -180,16 +180,6 @@ public class Production extends DictionaryEntry{
 		return word;
 	}
 
-//	public List<String> toStringWithPartOfSpeechFields(){
-//		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-//		if(!fields.isEmpty())
-//			return fields.stream()
-//				.map(field -> word + POS_FIELD_PREFIX + field)
-//				.collect(Collectors.toList());
-//		else
-//			return Collections.singletonList(word);
-//	}
-
 	public List<String> toStringPoSFSA(){
 		//extract Stem
 		final List<String> stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
