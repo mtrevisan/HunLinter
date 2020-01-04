@@ -61,12 +61,14 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 			try{
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 				final File outputInfoFile = new File(filenameNoExtension + ".info");
-				final Charset charset = dicParser.getCharset();
-				final List<String> content = Arrays.asList(
-					"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
-					"fsa.dict.encoding=" + charset.name().toLowerCase(),
-					"fsa.dict.encoder=prefix");
-				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+				if(!outputInfoFile.exists()){
+					final Charset charset = dicParser.getCharset();
+					final List<String> content = Arrays.asList(
+						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
+						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+						"fsa.dict.encoder=prefix");
+					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+				}
 
 				final String[] buildOptions = {
 					"--overwrite",
