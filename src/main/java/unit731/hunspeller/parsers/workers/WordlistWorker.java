@@ -3,18 +3,11 @@ package unit731.hunspeller.parsers.workers;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import morfologik.tools.DictCompile;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +28,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Wordlist";
 
-	public enum WorkerType{COMPLETE, PLAN_WORDS, MORFOLOGIK}
+	public enum WorkerType{COMPLETE, PLAIN_WORDS}
 
 
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
@@ -45,78 +38,29 @@ public class WordlistWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(outputFile);
 
 
-		final Function<Production, List<String>> toString;
-		switch(type){
-			case COMPLETE:
-				toString = p -> Collections.singletonList(p.toString());
-				break;
-
-			case MORFOLOGIK:
-				toString = Production::toStringMorfologik;
-				break;
-
-			case PLAN_WORDS:
-			default:
-				toString = p -> Collections.singletonList(p.getWord());
-		}
+		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
 		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			try{
-				final String lineSeparator = (type == WorkerType.MORFOLOGIK? StringUtils.LF: System.lineSeparator());
-				for(final Production production : productions)
-					for(final String text : toString.apply(production)){
-						writer.write(text);
-						writer.write(lineSeparator);
-					}
+				for(final Production production : productions){
+					writer.write(toString.apply(production));
+					writer.newLine();
+				}
 			}
 			catch(final IOException e){
 				throw new HunspellException(e.getMessage());
 			}
 		};
 		final Runnable completed = () -> {
-			if(type == WorkerType.MORFOLOGIK){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Begin post-processing");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-				try{
-					final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-					final File outputInfoFile = new File(filenameNoExtension + ".info");
-					final Charset charset = dicParser.getCharset();
-					final List<String> content = Arrays.asList(
-						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
-						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-						"fsa.dict.encoder=prefix");
-					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-
-					final String[] buildOptions = {
-						"--overwrite",
-						"--accept-cr",
-						"--exit", "false",
-						"--format", "CFSA2",
-						"--input", outputFile.toString()
-					};
-					DictCompile.main(buildOptions);
-
-					LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
-
-					FileHelper.openFolder(outputFile.getParentFile());
-
-					Files.delete(outputFile.toPath());
-				}
-				catch(final IOException e){
-					LOGGER.warn("Exception while creating the FSA file for Morfologik", e);
-				}
+			try{
+				FileHelper.openFileWithChosenEditor(outputFile);
 			}
-			else{
-				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
-
-				try{
-					FileHelper.openFileWithChosenEditor(outputFile);
-				}
-				catch(final IOException | InterruptedException e){
-					LOGGER.warn("Exception while opening the resulting file", e);
-				}
+			catch(final IOException | InterruptedException e){
+				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
 		final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);

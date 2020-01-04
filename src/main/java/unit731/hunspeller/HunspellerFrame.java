@@ -81,6 +81,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.exceptions.ExceptionsParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationOptionsParser;
+import unit731.hunspeller.parsers.workers.PoSFSAWorker;
 import unit731.hunspeller.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
@@ -173,6 +174,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private WordCountWorker dicWordCountWorker;
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
+	private PoSFSAWorker dicPoSFSAWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
@@ -230,6 +232,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+		});
+		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> {
 			dicExtractPoSFAMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
@@ -1673,7 +1677,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void dicExtractPoSFAMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractPoSFAMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		extractDictionaryWordlist(WordlistWorker.WorkerType.MORFOLOGIK);
+		extractPoSFSA();
 	}//GEN-LAST:event_dicExtractPoSFAMenuItemActionPerformed
 
 	private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
@@ -1882,7 +1886,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		extractDictionaryWordlist(WordlistWorker.WorkerType.PLAN_WORDS);
+		extractDictionaryWordlist(WordlistWorker.WorkerType.PLAIN_WORDS);
 	}//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 
 	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
@@ -2311,8 +2315,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
 
-			checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem,
-				dicExtractPoSFAMenuItem);
+			checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
+
+			checkAbortion(dicPoSFSAWorker, dicExtractPoSFAMenuItem);
 
 			checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
 				cmpLoadInputButton);
@@ -2807,24 +2812,36 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(type == WordlistWorker.WorkerType.MORFOLOGIK?
-				JFileChooser.DIRECTORIES_ONLY: JFileChooser.FILES_ONLY);
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
-				dicExtractPoSFAMenuItem.setEnabled(false);
 
-				File outputFile = saveResultFileChooser.getSelectedFile();
-				if(type == WordlistWorker.WorkerType.MORFOLOGIK){
-					final String temporaryFile = outputFile.getAbsolutePath() + File.separatorChar
-						+ backbone.getAffixData().getLanguage() + ".txt";
-					outputFile = new File(temporaryFile);
-				}
+				final File outputFile = saveResultFileChooser.getSelectedFile();
 				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), type,
 					outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
+			}
+		}
+	}
+
+	private void extractPoSFSA(){
+		if(dicPoSFSAWorker == null || dicPoSFSAWorker.isDone()){
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+			if(fileChosen == JFileChooser.APPROVE_OPTION){
+				dicExtractPoSFAMenuItem.setEnabled(false);
+
+				File outputFile = saveResultFileChooser.getSelectedFile();
+				final String temporaryFile = outputFile.getAbsolutePath() + File.separatorChar
+					+ backbone.getAffixData().getLanguage() + ".txt";
+				outputFile = new File(temporaryFile);
+				dicPoSFSAWorker = new PoSFSAWorker(backbone.getDicParser(), backbone.getWordGenerator(),
+					outputFile);
+				dicPoSFSAWorker.addPropertyChangeListener(this);
+				dicPoSFSAWorker.execute();
 			}
 		}
 	}
