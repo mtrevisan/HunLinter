@@ -64,7 +64,7 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 				if(!outputInfoFile.exists()){
 					final Charset charset = dicParser.getCharset();
 					final List<String> content = Arrays.asList(
-						"fsa.dict.separator=" + Production.MORFOLOGIK_SEPARATOR,
+						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
 						"fsa.dict.encoding=" + charset.name().toLowerCase(),
 						"fsa.dict.encoder=prefix");
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
@@ -86,7 +86,7 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 				Files.delete(outputFile.toPath());
 			}
 			catch(final IOException e){
-				LOGGER.warn("Exception while creating the FSA file for Morfologik", e);
+				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
 			}
 		};
 		final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);

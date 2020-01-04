@@ -31,8 +31,8 @@ public class Production extends DictionaryEntry{
 	private static final String LEADS_TO = " > ";
 	private static final String POS_FIELD_PREFIX = ":";
 
-	public static final String MORFOLOGIK_SEPARATOR = ",";
-	private static final String MORFOLOGIK_TAG_SEPARATOR = "+";
+	public static final String POS_FSA_SEPARATOR = ",";
+	private static final String POS_FSA_TAG_SEPARATOR = "+";
 
 
 	private List<AffixEntry> appliedRules;
@@ -196,12 +196,12 @@ public class Production extends DictionaryEntry{
 		final List<String> inflection = Stream.concat(suffixStream, prefixStream)
 			.map(InflectionTag::createFromCode)
 			.map(InflectionTag::getTags)
-			.map(tags -> StringUtils.join(tags, MORFOLOGIK_TAG_SEPARATOR))
+			.map(tags -> StringUtils.join(tags, POS_FSA_TAG_SEPARATOR))
 			.collect(Collectors.toList());
 		inflection.add(0, posTag.getTag());
 
 		return stem.stream()
-			.map(st -> st + MORFOLOGIK_SEPARATOR + word + MORFOLOGIK_SEPARATOR + StringUtils.join(inflection, MORFOLOGIK_TAG_SEPARATOR))
+			.map(st -> st + POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + StringUtils.join(inflection, POS_FSA_TAG_SEPARATOR))
 			.collect(Collectors.toList());
 	}
 
