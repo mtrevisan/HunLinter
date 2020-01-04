@@ -24,6 +24,7 @@ HunLinter
     3. [Ordering table columns](#how-to-ordering)
     4. [Copying text](#how-to-copy)
     5. [Rule/dictionary insertion](#how-to-insertion)
+    6. [Create an Part-of-Speech FSA](#how-to-posfsa)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
@@ -123,6 +124,12 @@ This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add 
 
 <sup>1</sup>: Even if for the hyphenation file a new rule can actually be added…
 
+<a name="how-to-posfsa"></a>
+### Create an Part-of-Speech FSA
+In order to create an FSA for Part-of-Speech, suitable for use in [LanguageTool](https://languagetool.org/) you have to use the option `File|Extract PoS FSA` selecting the output folder. This will create an FSA using a provided `<language>.info` file (or automatically generated).
+
+Remember that the FSA file will have the same name as specified in the `LANG` option in the `.aff` file, and extension `.dict`.
+
 
 <br/>
 
@@ -178,10 +185,12 @@ It is possible to click on the first column to select the row (for cancelling it
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-1.10.0"></a>
-### version 1.10.0 - 20191224
+### version 1.10.0 - 20200104
+- (finally) given a decent name to the project: HunLinter
 - fixed a bug while selecting the font once a project is loaded
 - added buttons to open relevant files
 - added management of SentenceExceptList.xml and WordExceptList.xml
+- added menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
 - reduced size of java package from 3.35 MB to 1.71 MB (49% gain)
 
 <a name="changelog-1.9.1"></a>
