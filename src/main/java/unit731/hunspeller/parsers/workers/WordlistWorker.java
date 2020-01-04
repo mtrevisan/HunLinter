@@ -64,10 +64,11 @@ public class WordlistWorker extends WorkerDictionaryBase{
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			try{
+				final String lineSeparator = (type == WorkerType.MORFOLOGIK? StringUtils.LF: System.lineSeparator());
 				for(final Production production : productions)
 					for(final String text : toString.apply(production)){
 						writer.write(text);
-						writer.newLine();
+						writer.write(lineSeparator);
 					}
 			}
 			catch(final IOException e){
