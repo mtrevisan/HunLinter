@@ -24,7 +24,7 @@ HunLinter
     3. [Ordering table columns](#how-to-ordering)
     4. [Copying text](#how-to-copy)
     5. [Rule/dictionary insertion](#how-to-insertion)
-    6. [Create an Part-of-Speech FSA](#how-to-posfsa)
+    6. [Create a Part-of-Speech FSA](#how-to-posfsa)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
@@ -125,7 +125,7 @@ This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add 
 <sup>1</sup>: Even if for the hyphenation file a new rule can actually be added…
 
 <a name="how-to-posfsa"></a>
-### Create an Part-of-Speech FSA
+### Create a Part-of-Speech FSA
 In order to create an FSA for Part-of-Speech, suitable for use in [LanguageTool](https://languagetool.org/) you have to use the option `File|Extract PoS FSA` selecting the output folder. This will create an FSA using a provided `<language>.info` file (or automatically generated).
 
 Remember that the FSA file will have the same name as specified in the `LANG` option in the `.aff` file, and extension `.dict`.
