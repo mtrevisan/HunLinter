@@ -340,7 +340,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public File getAidFile(){
-		return Path.of(packager.getProjectPath().toString(), FOLDER_AID,
+		return Path.of(getCurrentWorkingDirectory(), FOLDER_AID,
 			affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
@@ -359,8 +359,8 @@ public class Backbone implements FileChangeListener{
 
 	private String getCurrentWorkingDirectory(){
 		final String codePath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-		return codePath
-			.replaceFirst("(classes/)?[^/]*$", StringUtils.EMPTY)
+		return (StringUtils.startsWithAny(codePath, "\\/")? codePath.substring(1): codePath)
+			.replaceFirst("(classes\\/)?[^\\/]*$", StringUtils.EMPTY)
 			.replaceAll("%20", StringUtils.SPACE);
 	}
 
