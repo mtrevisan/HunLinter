@@ -6,8 +6,8 @@ import java.util.Arrays;
 public enum PartOfSpeechTag{
 
 	//noun
-	TAG_NOUN("noun", "N"),
-	TAG_NOUN_PROPER("noun_proper", "NP"),
+	TAG_NOUN("noun", "NN"),
+	TAG_NOUN_PROPER("noun_proper", "NNP"),
 
 	//article
 	TAG_ARTICLE_DEFINITE("article_definite", "AD"),
