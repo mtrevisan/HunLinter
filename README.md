@@ -1,9 +1,9 @@
-Hunspeller
+HunLinter
 ==========
 ![Java-12+](https://img.shields.io/badge/java-12%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2a1759913c44e66bd265efc1881cbf4)](https://www.codacy.com/app/mauro-trevisan/Hunspeller?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtrevisan/Hunspeller&amp;utm_campaign=Badge_Grade)
-<a href="https://codeclimate.com/github/mtrevisan/Hunspeller/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2a1759913c44e66bd265efc1881cbf4)](https://www.codacy.com/app/mauro-trevisan/HunLinter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtrevisan/HunLinter&amp;utm_campaign=Badge_Grade)
+<a href="https://codeclimate.com/github/mtrevisan/HunLinter/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ==========
@@ -63,11 +63,11 @@ This application can also sort the dictionary, counting words (unique and total 
 
 <a name="enhancements"></a>
 ## How to enhance its capabilities
-You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) or [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunspeller/languages/DictionaryCorrectnessChecker.java), [Orthography](src/main/java/unit731/hunspeller/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunspeller/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
+You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) or [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunlinter/languages/DictionaryCorrectnessChecker.java), [Orthography](src/main/java/unit731/hunlinter/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunlinter/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
 
 Along with these classes you can insert your `rules.properties`, a file that describes various constraints about the rules in the `.dic` file.
 
-After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunspeller/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
+After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunlinter/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
 

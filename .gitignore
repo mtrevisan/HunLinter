@@ -5,4 +5,4 @@ nbactions-nexus.xml
 nbactions-release-profile.xml
 nb-configuration.xml
 .idea/
-Hunspeller.iml
+HunLinter.iml

@@ -6,8 +6,8 @@
 		</encoder>
 	</appender>
 
-	<logger name="unit731.hunspeller" level="trace" />
-<!--	<logger name="unit731.hunspeller.parsers" level="info" />-->
+	<logger name="unit731.hunlinter" level="trace" />
+<!--	<logger name="unit731.hunlinter.parsers" level="info" />-->
 
 	<logger name="sun.misc" level="off" />
 	<logger name="java.util" level="off" />
