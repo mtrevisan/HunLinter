@@ -11,7 +11,7 @@ public enum PartOfSpeechTag{
 
 	//article
 	TAG_ARTICLE_DEFINITE("article_definite", "AD"),
-	TAG_ARTICLE_UNDEFINITE("article_undefinite", "AU"),
+	TAG_ARTICLE_INDEFINITE("article_indefinite", "AI"),
 	TAG_ARTICLE_PERSONAL("article_personal", "AP"),
 	TAG_ARTICLE_PARTITIVE("article_partitive", "AT"),
 
@@ -33,7 +33,7 @@ TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_NEUTRAL("adjective_demonstrative_neutral", "JDU"),
 	TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_BEFORE_NOUN("adjective_demonstrative_before_noun", "PDBN"),
 	TAG_ADJECTIVE_DETERMINATIVE_IDENTIFICATIVE("adjective_identificative", "JN"),
-	TAG_ADJECTIVE_DETERMINATIVE_INTERROGATIVE_ESCLAMATIVE("adjective_interrogative_esclamative", "JIE"),
+	TAG_ADJECTIVE_DETERMINATIVE_INTERROGATIVE_EXCLAMATORY("adjective_interrogative_exclamatory", "JIE"),
 
 	//pronoun
 	TAG_PRONOUN_FREE_SUBJECT("pronoun_free_subject", "PFS"),
@@ -58,10 +58,15 @@ TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	TAG_PRONOUN_DEMONSTRATIVE_NEUTRAL("pronoun_demonstrative_neutral", "PDU"),
 	TAG_PRONOUN_DEMONSTRATIVE_BEFORE_NOUN("pronoun_demonstrative_before_noun", "PDBN"),
 	TAG_PRONOUN_IDENTIFICATIVE("pronoun_identificative", "PN"),
-	TAG_PRONOUN_INTERROGATIVE_ESCLAMATIVE("pronoun_interrogative_esclamative", "PIE"),
+	TAG_PRONOUN_INTERROGATIVE_EXCLAMATORY("pronoun_interrogative_exclamatory", "PIE"),
+
+	//quantifier
+	TAG_QUANTIFIER_EXISTENTIAL("quantifier_existential", "QE"),
+	TAG_QUANTIFIER_DISTRIBUTIVE("quantifier_distributive", "QD"),
+	TAG_QUANTIFIER_UNIVERSAL_POSSIBLE("quantifier_universal_possible", "QUP"),
+	TAG_QUANTIFIER_UNIVERSAL_EFFECTIVE("quantifier_universal_effective", "QUE"),
 
 	TAG_VERB("verb", "VB"),
-	TAG_QUANTIFIER("quantifier", "QQ"),
 	TAG_NUMERAL_LATIN("numeral_latin", "NL"),
 	TAG_NUMERAL_CARDENAL("numeral_cardenal", "NC"),
 	TAG_NUMERAL_ORDENAL("numeral_ordenal", "NO"),
