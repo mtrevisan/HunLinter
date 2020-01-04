@@ -46,7 +46,7 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 
 			try{
 				for(final Production production : productions)
-					for(final String text : production.toStringMorfologik()){
+					for(final String text : production.toStringPoSFSA()){
 						writer.write(text);
 						writer.write(StringUtils.LF);
 					}

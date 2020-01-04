@@ -190,7 +190,7 @@ public class Production extends DictionaryEntry{
 //			return Collections.singletonList(word);
 //	}
 
-	public List<String> toStringMorfologik(){
+	public List<String> toStringPoSFSA(){
 		//extract Stem
 		final List<String> stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
 
