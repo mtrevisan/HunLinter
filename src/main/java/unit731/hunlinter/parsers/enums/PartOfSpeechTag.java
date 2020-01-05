@@ -18,6 +18,7 @@ public enum PartOfSpeechTag{
 	//adjective
 //FIXME to be replaced
 TAG_ADJECTIVE("adjective", "JJ"),
+TAG_ADJECTIVE_QUALIFICATIVE("adjective_qualificative", "JQ"),
 //	TAG_ADJECTIVE_QUALIFICATIVE_PRIMITIVE("adjective_primitive", "JP"),
 //	TAG_ADJECTIVE_QUALIFICATIVE_DERIVED("adjective_derived", "JD"),
 //	TAG_ADJECTIVE_QUALIFICATIVE_ALTERED("adjective_altered", "JA"),

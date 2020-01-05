@@ -340,7 +340,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public File getAidFile(){
-		return Path.of(getCurrentWorkingDirectory(), FOLDER_AID,
+		return Path.of(".", FOLDER_AID,
 			affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
@@ -355,13 +355,6 @@ public class Backbone implements FileChangeListener{
 
 	public File getWexFile(){
 		return packager.getWordExceptionsFile();
-	}
-
-	private String getCurrentWorkingDirectory(){
-		final String codePath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-		return (StringUtils.startsWithAny(codePath, "\\/")? codePath.substring(1): codePath)
-			.replaceFirst("(classes\\/)?[^\\/]*$", StringUtils.EMPTY)
-			.replaceAll("%20", StringUtils.SPACE);
 	}
 
 	private File getThesaurusIndexFile(){
