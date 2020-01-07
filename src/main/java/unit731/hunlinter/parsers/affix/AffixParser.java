@@ -48,7 +48,7 @@ import unit731.hunlinter.services.PatternHelper;
 public class AffixParser{
 
 	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non–comment line in the affix file must be a 'SET charset', was: ''{0}''");
-	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1}");
+	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1,number,#}");
 
 	private static final String NO_LANGUAGE = "xxx";
 
