@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.StringHelper;
-import unit731.hunlinter.services.regexgenerator.HunLintRegexWordGenerator;
+import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
@@ -52,7 +52,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
-		final HunLintRegexWordGenerator regexWordGenerator = new HunLintRegexWordGenerator(compoundRuleComponents);
+		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRuleComponents);
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 

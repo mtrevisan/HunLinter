@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-class HunLintRegexWordGeneratorTest{
+class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allOne(){
 		String[] regex = new String[]{"abc", "de", "a"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
 
 		List<List<String>> expected = Collections.singletonList(
@@ -26,7 +26,7 @@ class HunLintRegexWordGeneratorTest{
 	void oneForEach(){
 		String[] regex = new String[]{"abc", "de", "?", "a", "*"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
 
 		List<List<String>> expected = Arrays.asList(
@@ -44,7 +44,7 @@ class HunLintRegexWordGeneratorTest{
 	void allZeroOrOne(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
 
 		List<List<String>> expected = Arrays.asList(
@@ -63,7 +63,7 @@ class HunLintRegexWordGeneratorTest{
 	void allZeroOrOneWithZeroMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(0, 7);
 
 		List<List<String>> expected = Arrays.asList(
@@ -82,7 +82,7 @@ class HunLintRegexWordGeneratorTest{
 	void allZeroOrOneWithTwoMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(2, 7);
 
 		List<List<String>> expected = Arrays.asList(
@@ -98,7 +98,7 @@ class HunLintRegexWordGeneratorTest{
 	void allZeroOrMore(){
 		String[] regex = new String[]{"abc", "*", "de", "*", "a", "*"};
 
-		HunLintRegexWordGenerator generator = new HunLintRegexWordGenerator(regex);
+		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
 
 		List<List<String>> expected = Arrays.asList(

@@ -11,7 +11,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.regexgenerator.HunLintRegexWordGenerator;
+import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
@@ -53,7 +53,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		final String[] compoundRule = new String[]{compoundBeginFlag, "*",
 			compoundMiddleFlag, "*",
 			compoundEndFlag, "*"};
-		final HunLintRegexWordGenerator regexWordGenerator = new HunLintRegexWordGenerator(compoundRule);
+		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 

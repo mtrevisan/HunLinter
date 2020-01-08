@@ -20,7 +20,7 @@ import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
  * @see <a href="https://pdfs.semanticscholar.org/presentation/e14c/b69f0feb2856734a5e5e85b6ae1a210ab936.pdf">Automata &amp; Languages</a>
  * @see <a href="http://www.dfki.de/compling/pdfs/SS06-fsa-presentation.pdf">Finite-State Automata and Algorithms</a>
  */
-public class HunLintRegexWordGenerator{
+public class HunSpellRegexWordGenerator{
 
 	private static class GeneratedElement{
 		private final List<String> word;
@@ -45,7 +45,7 @@ public class HunLintRegexWordGenerator{
 	 *
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
 	 */
-	public HunLintRegexWordGenerator(final String[] regexpParts){
+	public HunSpellRegexWordGenerator(final String[] regexpParts){
 		int offset = 0;
 		for(int i = 0; i + offset < regexpParts.length; i ++){
 			final int operatorIndex = i + offset + 1;
