@@ -208,9 +208,15 @@ public class HyphenationParser{
 				if(parsedLine)
 					continue;
 
-				level = extractNextLevel(level, line);
-				if(level == Level.COMPOUND)
+				//extract next level
+				if(line.equals(NEXT_LEVEL)){
+					if(level == Level.COMPOUND)
+						throw new HunLintException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
+
+					//start with non–compound level
+					level = Level.COMPOUND;
 					continue;
+				}
 
 				if(charset == StandardCharsets.ISO_8859_1)
 					line = convertUnicode(line);
@@ -256,18 +262,6 @@ public class HyphenationParser{
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
 		return StringHelper.join(null, components);
-	}
-
-	private Level extractNextLevel(final Level level, final String line){
-		Level nextLevel = level;
-		if(line.equals(NEXT_LEVEL)){
-			if(level == Level.COMPOUND)
-				throw new HunLintException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
-
-			//start with non–compound level
-			nextLevel = Level.COMPOUND;
-		}
-		return nextLevel;
 	}
 
 	private void parseCustomRule(final Level level, final String line){
