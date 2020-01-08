@@ -12,6 +12,8 @@ class GraphemeVEC{
 	public static final String PHONEME_JJH = "ʝ";
 	public static final String PHONEME_FH = "\uA799";
 	public static final String PHONEME_I_UMLAUT = "ï";
+	private static final String PHONEME_U_UMLAUT = "ü";
+
 	public static final String GRAPHEME_D_STROKE = "đ";
 	private static final String GRAPHEME_F = "f";
 	public static final String GRAPHEME_H = "h";
@@ -20,7 +22,6 @@ class GraphemeVEC{
 	public static final String GRAPHEME_I = "i";
 	public static final String GRAPHEME_L = "l";
 	public static final String GRAPHEME_L_STROKE = "ƚ";
-	private static final String GRAPHEME_W = "w";
 	private static final String GRAPHEME_U = "u";
 	public static final String GRAPHEME_S = "s";
 	public static final String GRAPHEME_T_STROKE = "ŧ";
@@ -71,9 +72,9 @@ class GraphemeVEC{
 
 		//phonize etherophonic sequences
 		if(phonemizedWord.contains(GRAPHEME_U))
-			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_W, "$1w$2");
+			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_W, "$1" + PHONEME_U_UMLAUT + "$2");
 		if(phonemizedWord.contains(GRAPHEME_I))
-			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1j$2");
+			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1" + GRAPHEME_J + "$2");
 
 		return phonemizedWord;
 	}
@@ -107,7 +108,7 @@ class GraphemeVEC{
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, GRAPHEME_J, GRAPHEME_I);
 		word = StringUtils.replace(word, PHONEME_I_UMLAUT, GRAPHEME_I);
-		word = StringUtils.replace(word, GRAPHEME_W, GRAPHEME_U);
+		word = StringUtils.replace(word, PHONEME_U_UMLAUT, GRAPHEME_U);
 		word = StringUtils.replace(word, PHONEME_JJH, GRAPHEME_J);
 		return word;
 	}
