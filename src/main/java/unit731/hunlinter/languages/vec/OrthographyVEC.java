@@ -83,8 +83,7 @@ public class OrthographyVEC extends Orthography{
 		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//correct morphological errors
-		if(!GraphemeVEC.containsNonEterophonicSequence(word))
-			correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");
 
 		correctedWord = GraphemeVEC.rollbackJHJWIUmlautPhonemes(correctedWord);
 

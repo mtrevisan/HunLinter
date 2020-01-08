@@ -34,12 +34,11 @@ class GraphemeVEC{
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Pattern ETEROPHONIC_SEQUENCE_J = PatternHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 	private static final List<Pattern> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(
-		PatternHelper.pattern("^(teñ|ko[" + PHONEME_JJH + "ɉñ])i([ou]r)"),
-		PatternHelper.pattern("^([d" + PHONEME_JJH + "ɉ])i(aspr)"),
-		PatternHelper.pattern("^((?:r[ae]|ar)?bo[" + PHONEME_JJH + "ɉ])i(ur[ae])"),
+		PatternHelper.pattern("^(teñ|ko[jɉñ])i([ou]r)"),
+		PatternHelper.pattern("^([jɉ])i(og?r[aà]f|ur|aspr|eltrude)"),
+		PatternHelper.pattern("^((?:r[ae]|ar)?bo[jɉ])i(ur[ae])"),
 		PatternHelper.pattern("^(re[sŧ]e)i([ou]r[aeio]?)")
 	);
-	private static final Pattern ETEROPHONIC_SEQUENCE_FALSE_POSITIVES = PatternHelper.pattern("^[j\u0249]iog?r[aà]f|[j\u0249]iur(et)?[ae]$");
 
 
 	private GraphemeVEC(){}
@@ -73,14 +72,10 @@ class GraphemeVEC{
 		//phonize etherophonic sequences
 		if(phonemizedWord.contains(GRAPHEME_U))
 			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_W, "$1w$2");
-		if(phonemizedWord.contains(GRAPHEME_I) && !containsNonEterophonicSequence(word))
+		if(phonemizedWord.contains(GRAPHEME_I))
 			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1j$2");
 
 		return phonemizedWord;
-	}
-
-	public static boolean containsNonEterophonicSequence(final String word){
-		return PatternHelper.find(word, ETEROPHONIC_SEQUENCE_FALSE_POSITIVES);
 	}
 
 	private static String correctFhOccurrences(String word){
@@ -90,12 +85,14 @@ class GraphemeVEC{
 	}
 
 	private static String correctIJGraphemes(String word){
-		//this step is mandatory before eterophonic sequence VjV
-		if(word.contains(GRAPHEME_J))
-			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
 		if(word.contains(GRAPHEME_I))
 			for(final Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
 				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
+
+		//this step is mandatory before eterophonic sequence VjV
+		if(word.contains(GRAPHEME_J))
+			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
+
 		return word;
 	}
 
