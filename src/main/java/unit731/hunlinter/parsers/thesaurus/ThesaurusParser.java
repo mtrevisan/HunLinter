@@ -42,8 +42,8 @@ public class ThesaurusParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|meaning1|meaning2|…' or 'pos1, pos2, …:meaning1,meaning2,…': was ''{0}''");
-	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): was ''{0}''");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': was ''{0}''");
+	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): was ''{0}''");
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String PIPE = "|";
@@ -113,71 +113,71 @@ public class ThesaurusParser{
 	}
 
 	/**
-	 * @param synonymAndMeanings			The object representing all the synonyms of a word along with their part of speech
+	 * @param partOfSpeechAndSynonyms	The object representing all the synonyms of a word along with their part of speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
 	 * 	(return <code>true</code> to force insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult<ThesaurusEntry> insertMeanings(final String synonymAndMeanings,
+	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
 			final Supplier<Boolean> duplicatesDiscriminator){
-		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
-		if(partOfSpeechAndMeanings.length != 2)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{synonymAndMeanings}));
+		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
+		if(posAndSyns.length != 2)
+			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		final String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+		final String partOfSpeech = StringUtils.strip(posAndSyns[0]);
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
 		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
 			.split("\\s*,\\s*");
 
-		final List<String> meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS))
+		final List<String> synonyms = Arrays.stream(StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR))
 			.map(String::trim)
 			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.collect(Collectors.toList());
-		if(meanings.size() < 2)
-			throw new HunLintException(NOT_ENOUGH_MEANINGS.format(new Object[]{synonymAndMeanings}));
+		if(synonyms.size() < 2)
+			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		boolean forceInsertion = false;
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, meanings);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
 				throw new HunLintException(DUPLICATE_DETECTED.format(
-					new Object[]{duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "))}));
+					new Object[]{duplicates.stream().map(ThesaurusEntry::getDefinition).collect(Collectors.joining(", "))}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion)
-			dictionary.add(partOfSpeeches, meanings);
+			dictionary.add(partOfSpeeches, synonyms);
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> meanings){
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
 		final List<ThesaurusEntry> duplicates = new ArrayList<>();
-		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-		for(final String meaning : meanings){
-			final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			synonyms.stream()
-				.filter(synonym -> synonym.getSynonym().equals(mean) && synonym.hasSamePartOfSpeech(partOfSpeeches))
+		final List<ThesaurusEntry> dictionarySynonyms = dictionary.getSynonyms();
+		for(final String synonym : synonyms){
+			final String syn = PatternHelper.replaceAll(synonym, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
+			dictionarySynonyms.stream()
+				.filter(s -> s.getDefinition().equals(syn) && s.hasSamePartOfSpeech(partOfSpeeches))
 				.forEach(duplicates::add);
 		}
 		return duplicates;
 	}
 
-	/** Find if there is a duplicate with the same part of speech and same meanings */
-	public boolean contains(final List<String> partOfSpeeches, final List<String> meanings){
-		final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-		return synonyms.stream()
-			.anyMatch(synonym -> synonym.contains(partOfSpeeches, meanings));
+	/** Find if there is a duplicate with the same part of speech and same synonyms */
+	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
+		return ss.stream()
+			.anyMatch(synonym -> synonym.contains(partOfSpeeches, synonyms));
 	}
 
-	public void setMeanings(final int index, final String text){
-		dictionary.setMeanings(index, text);
+	public void setSynonyms(final int index, final String synonyms){
+		dictionary.setSynonyms(index, synonyms);
 	}
 
-	public void deleteMeanings(final int[] selectedRowIDs){
+	public void deleteDefinitionAndSynonyms(final int[] selectedRowIDs){
 		IntStream.range(0, selectedRowIDs.length)
 			.map(i -> selectedRowIDs[i] - i)
 			.forEach(dictionary::remove);
@@ -214,15 +214,15 @@ public class ThesaurusParser{
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> meanings){
+	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> synonyms){
 		//extract part of speech if present
 		final String posFilter = (!partOfSpeeches.isEmpty()?
 			"[\\(\\s](" + StringHelper.join(PIPE, partOfSpeeches) + ")[\\),]":
 			".+");
-		final String meaningsFilter = (!meanings.isEmpty()? "(" + StringHelper.join(PIPE, meanings) + ")": ".+");
+		final String synonymsFilter = (!synonyms.isEmpty()? "(" + StringHelper.join(PIPE, synonyms) + ")": ".+");
 
 		//compose filter regexp
-		return Pair.of(posFilter, meaningsFilter);
+		return Pair.of(posFilter, synonymsFilter);
 	}
 
 	private static String clearFilter(String text){
@@ -256,8 +256,8 @@ public class ThesaurusParser{
 		//save index and data files
 		final Charset charset = StandardCharsets.UTF_8;
 		try(
-			final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-			final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
+				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
+				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
 				){
 			//save charset
 			indexWriter.write(charset.name());
@@ -275,9 +275,9 @@ public class ThesaurusParser{
 			for(final ThesaurusEntry synonym : synonyms){
 				synonym.saveToIndex(indexWriter, idx);
 
-				int meaningsLength = synonym.saveToData(dataWriter, charset);
+				final int synonymsLength = synonym.saveToData(dataWriter, charset);
 
-				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
+				idx += synonym.getDefinition().getBytes(charset).length + synonymsLength + doubleLineTerminatorLength;
 			}
 		}
 	}

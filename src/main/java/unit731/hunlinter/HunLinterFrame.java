@@ -279,8 +279,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpInputTextArea = new javax.swing.JTextArea();
       cmpLoadInputButton = new javax.swing.JButton();
       theLayeredPane = new javax.swing.JLayeredPane();
-      theMeaningsLabel = new javax.swing.JLabel();
-      theMeaningsTextField = new javax.swing.JTextField();
+      theSynonymsLabel = new javax.swing.JLabel();
+      theSynonymsTextField = new javax.swing.JTextField();
       theAddButton = new javax.swing.JButton();
       theScrollPane = new javax.swing.JScrollPane();
       theTable = new javax.swing.JTable();
@@ -625,12 +625,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
 
-      theMeaningsLabel.setLabelFor(theMeaningsTextField);
-      theMeaningsLabel.setText("New synonym:");
+      theSynonymsLabel.setLabelFor(theSynonymsTextField);
+      theSynonymsLabel.setText("New synonym:");
 
-      theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+      theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
-            theMeaningsTextFieldKeyReleased(evt);
+            theSynonymsTextFieldKeyReleased(evt);
          }
       });
 
@@ -663,7 +663,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   int row = theTable.convertRowIndexToModel(target.getSelectedRow());
                   Consumer<String> okButtonAction = (text) -> {
                      try{
-                        backbone.getTheParser().setMeanings(row, text);
+                        backbone.getTheParser().setSynonyms(row, text);
 
                         // … and save the files
                         backbone.storeThesaurusFiles();
@@ -673,7 +673,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                      }
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, theParent);
+                  ThesaurusSynonymsDialog dialog = new ThesaurusSynonymsDialog(synonym, okButtonAction, theParent);
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.addWindowListener(new WindowAdapter(){
                      @Override
@@ -697,8 +697,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       theSynonymsRecordedOutputLabel.setText("…");
 
-      theLayeredPane.setLayer(theMeaningsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theMeaningsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      theLayeredPane.setLayer(theSynonymsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      theLayeredPane.setLayer(theSynonymsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -713,9 +713,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(theMeaningsLabel)
+                  .addComponent(theSynonymsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theMeaningsTextField)
+                  .addComponent(theSynonymsTextField)
                   .addGap(18, 18, 18)
                   .addComponent(theAddButton))
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
@@ -729,8 +729,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theMeaningsLabel)
-               .addComponent(theMeaningsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(theSynonymsLabel)
+               .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(theAddButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
@@ -1691,7 +1691,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	private void filterThesaurus(HunLinterFrame frame){
-		final String unmodifiedSearchText = StringUtils.strip(frame.theMeaningsTextField.getText());
+		final String unmodifiedSearchText = StringUtils.strip(frame.theSynonymsTextField.getText());
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
 			return;
 
@@ -1700,15 +1700,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
-		final List<String> meanings = Arrays.asList(pair.getRight());
-		final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
+		final List<String> synonyms = Arrays.asList(pair.getRight());
+		final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, synonyms);
 		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
 
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
-			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, meanings);
+			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, synonyms);
 			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
@@ -1720,7 +1720,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
 				.map(theTable::convertRowIndexToModel)
 				.toArray();
-			backbone.getTheParser().deleteMeanings(selectedRows);
+			backbone.getTheParser().deleteDefinitionAndSynonyms(selectedRows);
 
 			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.fireTableDataChanged();
@@ -1732,12 +1732,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//redo filtering, that is re-set the state of the button (it may have changed)
-			final String unmodifiedSearchText = theMeaningsTextField.getText();
+			final String unmodifiedSearchText = theSynonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
-				final List<String> meanings = Arrays.asList(pair.getRight());
-				final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, meanings);
+				final List<String> synonyms = Arrays.asList(pair.getRight());
+				final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, synonyms);
 				theAddButton.setEnabled(!alreadyContained);
 			}
 		}
@@ -1933,8 +1933,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
 		try{
-			//try adding the meanings
-			final String synonyms = theMeaningsTextField.getText();
+			//try adding the synonyms
+			final String synonyms = theSynonymsTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
 					"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
@@ -1942,7 +1942,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
 			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
-				.insertMeanings(synonyms, duplicatesDiscriminator);
+				.insertSynonyms(synonyms, duplicatesDiscriminator);
 			final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
 			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
@@ -1951,8 +1951,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				dm.fireTableDataChanged();
 
 				formerFilterThesaurusText = null;
-				theMeaningsTextField.setText(null);
-				theMeaningsTextField.requestFocusInWindow();
+				theSynonymsTextField.setText(null);
+				theSynonymsTextField.requestFocusInWindow();
 				@SuppressWarnings("unchecked")
 				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
 				sorter.setRowFilter(null);
@@ -1963,10 +1963,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				backbone.storeThesaurusFiles();
 			}
 			else{
-				theMeaningsTextField.requestFocusInWindow();
+				theSynonymsTextField.requestFocusInWindow();
 
 				final String duplicatedWords = duplicates.stream()
-					.map(ThesaurusEntry::getSynonym)
+					.map(ThesaurusEntry::getDefinition)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this,
 					"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
@@ -1979,9 +1979,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
-	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
+	private void theSynonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theSynonymsTextFieldKeyReleased
 		theFilterDebouncer.call(this);
-	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
+	}//GEN-LAST:event_theSynonymsTextFieldKeyReleased
 
 	private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
 		extractCompoundRulesInputs();
@@ -2417,7 +2417,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		cmpInputTextArea.setFont(currentFont);
 		cmpTable.setFont(currentFont);
 
-		theMeaningsTextField.setFont(currentFont);
+		theSynonymsTextField.setFont(currentFont);
 		theTable.setFont(currentFont);
 
 		hypWordTextField.setFont(currentFont);
@@ -3173,8 +3173,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JTextField sexTextField;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
-   private javax.swing.JLabel theMeaningsLabel;
-   private javax.swing.JTextField theMeaningsTextField;
+   private javax.swing.JLabel theSynonymsLabel;
+   private javax.swing.JTextField theSynonymsTextField;
    private javax.swing.JScrollPane theScrollPane;
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;

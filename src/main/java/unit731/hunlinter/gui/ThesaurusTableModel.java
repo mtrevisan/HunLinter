@@ -14,7 +14,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = -2584004821296780108L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Synonym", "Meanings"};
+	private static final String[] COLUMN_NAMES = new String[]{"Definition", "Synonyms"};
 
 	private static final String TAG_START = ";\">";
 	private static final String TAG_END = "</body></html>";
@@ -49,10 +49,10 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		switch(columnIndex){
 			case 0:
-				return thesaurus.getSynonym();
+				return thesaurus.getDefinition();
 
 			case 1:
-				return TAG.format(new Object[]{thesaurus.joinMeanings(TAG_NEW_LINE)});
+				return TAG.format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
 
 			default:
 				return null;

@@ -15,40 +15,40 @@ import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.StringHelper;
 
 
-public class MeaningEntry implements Comparable<MeaningEntry>{
+public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEntry>{
 
 	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
-	private static final MessageFormat NOT_ENOUGH_MEANINGS = new MessageFormat("Not enough meanings are supplied (at least one should be present): ''{0}''");
+	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): ''{0}''");
 	private static final MessageFormat AIOOB_EXCEPTION = new MessageFormat("{0} with input ''{1}''");
 
 
 	private String[] partOfSpeeches;
-	private List<String> meanings;
+	private List<String> synonyms;
 
 
-	public MeaningEntry(final String partOfSpeechAndMeanings){
-		Objects.requireNonNull(partOfSpeechAndMeanings);
+	public DefinitionSynonymsEntry(final String partOfSpeechAndSynonyms){
+		Objects.requireNonNull(partOfSpeechAndSynonyms);
 
 		try{
 			//all entries should be in lowercase
-			final String[] components = StringUtils.split(partOfSpeechAndMeanings.toLowerCase(Locale.ROOT), ThesaurusEntry.POS_AND_MEANS, 2);
+			final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
 
 			final String partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
-				throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndMeanings}));
+				throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 
 			partOfSpeeches = partOfSpeech.substring(1, partOfSpeech.length() - 1)
 				.split(",\\s*");
-			meanings = Arrays.stream(StringUtils.split(components[1], ThesaurusEntry.POS_AND_MEANS))
+			synonyms = Arrays.stream(StringUtils.split(components[1], ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
 				.distinct()
 				.collect(Collectors.toList());
-			if(meanings.isEmpty())
-				throw new HunLintException(NOT_ENOUGH_MEANINGS.format(new Object[]{partOfSpeechAndMeanings}));
+			if(synonyms.isEmpty())
+				throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 		}
 		catch(final ArrayIndexOutOfBoundsException e){
-			throw new HunLintException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndMeanings}));
+			throw new HunLintException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndSynonyms}));
 		}
 	}
 
@@ -56,23 +56,23 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		return partOfSpeeches;
 	}
 
-	public boolean containsAllMeanings(final List<String> partOfSpeeches, final List<String> meanings){
-		return (Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches) && this.meanings.containsAll(meanings));
+	public boolean containsAllSynonyms(final List<String> partOfSpeeches, final List<String> synonyms){
+		return (Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches) && this.synonyms.containsAll(synonyms));
 	}
 
 	@Override
 	public String toString(){
 		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
-			.add(StringHelper.join(ThesaurusEntry.PIPE, meanings))
+			.add(StringHelper.join(ThesaurusEntry.PIPE, synonyms))
 			.toString();
 	}
 
 	@Override
-	public int compareTo(final MeaningEntry other){
+	public int compareTo(final DefinitionSynonymsEntry other){
 		return new CompareToBuilder()
 			.append(partOfSpeeches, other.partOfSpeeches)
-			.append(meanings, other.meanings)
+			.append(synonyms, other.synonyms)
 			.toComparison();
 	}
 
@@ -83,10 +83,10 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final MeaningEntry rhs = (MeaningEntry)obj;
+		final DefinitionSynonymsEntry rhs = (DefinitionSynonymsEntry)obj;
 		return new EqualsBuilder()
 			.append(partOfSpeeches, rhs.partOfSpeeches)
-			.append(meanings, rhs.meanings)
+			.append(synonyms, rhs.synonyms)
 			.isEquals();
 	}
 
@@ -94,7 +94,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	public int hashCode(){
 		return new HashCodeBuilder()
 			.append(partOfSpeeches)
-			.append(meanings)
+			.append(synonyms)
 			.toHashCode();
 	}
 

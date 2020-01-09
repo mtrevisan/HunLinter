@@ -15,19 +15,19 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 
 
-public class ThesaurusMeaningsDialog extends JDialog{
+public class ThesaurusSynonymsDialog extends JDialog{
 
 	private static final long serialVersionUID = 667526009330291911L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusMeaningsDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusSynonymsDialog.class);
 
 
 	private final ThesaurusEntry synonym;
 	private final Consumer<String> okButtonAction;
 
 
-	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, Consumer<String> okButtonAction, Frame parent){
-		super(parent, "Change meanings for \"" + synonym.getSynonym() + "\"", true);
+	public ThesaurusSynonymsDialog(ThesaurusEntry synonym, Consumer<String> okButtonAction, Frame parent){
+		super(parent, "Change synonyms for \"" + synonym.getDefinition() + "\"", true);
 
 		Objects.requireNonNull(parent);
 		Objects.requireNonNull(synonym);
@@ -35,30 +35,30 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
-		meaningsTextArea.setFont(GUIUtils.getCurrentFont());
+		synonymsTextArea.setFont(GUIUtils.getCurrentFont());
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
-		String content = synonym.joinMeanings(StringUtils.LF);
-		meaningsTextArea.setText(content);
+		String content = synonym.joinSynonyms(StringUtils.LF);
+		synonymsTextArea.setText(content);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       mainScrollPane = new javax.swing.JScrollPane();
-      meaningsTextArea = new javax.swing.JTextArea();
+      synonymsTextArea = new javax.swing.JTextArea();
       buttonPanel = new javax.swing.JPanel();
       btnOk = new javax.swing.JButton();
       btnCancel = new javax.swing.JButton();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      meaningsTextArea.setColumns(20);
-      meaningsTextArea.setLineWrap(true);
-      meaningsTextArea.setRows(1);
-      meaningsTextArea.setWrapStyleWord(true);
-      mainScrollPane.setViewportView(meaningsTextArea);
+      synonymsTextArea.setColumns(20);
+      synonymsTextArea.setLineWrap(true);
+      synonymsTextArea.setRows(1);
+      synonymsTextArea.setWrapStyleWord(true);
+      mainScrollPane.setViewportView(synonymsTextArea);
 
       buttonPanel.setPreferredSize(new java.awt.Dimension(600, 45));
 
@@ -126,11 +126,11 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{
-			final String text = meaningsTextArea.getText();
+			final String text = synonymsTextArea.getText();
 			okButtonAction.accept(text);
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the synonyms for definition \"{}\": {}", synonym.getDefinition(), e.getMessage());
 		}
 
 		dispose();
@@ -156,6 +156,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
    private javax.swing.JButton btnOk;
    private javax.swing.JPanel buttonPanel;
    private javax.swing.JScrollPane mainScrollPane;
-   private javax.swing.JTextArea meaningsTextArea;
+   private javax.swing.JTextArea synonymsTextArea;
    // End of variables declaration//GEN-END:variables
 }

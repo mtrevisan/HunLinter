@@ -22,20 +22,20 @@ import unit731.hunlinter.services.StringHelper;
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
-	public static final String POS_AND_MEANS = PIPE + ":";
-	public static final String MEANS = PIPE + ",";
+	public static final String PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR = PIPE + ":";
+	public static final String SYNONYMS_SEPARATOR = PIPE + ",";
 
 
-	private final String synonym;
-	private final List<MeaningEntry> meanings;
+	private final String definition;
+	private final List<DefinitionSynonymsEntry> synonyms;
 
 
-	public ThesaurusEntry(final String synonym, final List<MeaningEntry> meanings){
-		Objects.requireNonNull(synonym);
-		Objects.requireNonNull(meanings);
+	public ThesaurusEntry(final String definition, final List<DefinitionSynonymsEntry> synonyms){
+		Objects.requireNonNull(definition);
+		Objects.requireNonNull(synonyms);
 
-		this.synonym = synonym;
-		this.meanings = meanings;
+		this.definition = definition;
+		this.synonyms = synonyms;
 	}
 
 	public ThesaurusEntry(final String line, final LineNumberReader br) throws IOException{
@@ -43,88 +43,88 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(br);
 
 		//all entries should be in lowercase
-		final String[] data = StringUtils.split(line.toLowerCase(Locale.ROOT), POS_AND_MEANS);
+		final String[] data = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR);
 
-		synonym = data[0];
+		definition = data[0];
 		final int numEntries = Integer.parseInt(data[1]);
-		meanings = new ArrayList<>(numEntries);
+		synonyms = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
-			final String meaning = br.readLine();
-			if(meaning == null)
+			final String definitionAndSynonyms = br.readLine();
+			if(definitionAndSynonyms == null)
 				throw new EOFException("Unexpected EOF while reading Thesaurus file");
 
-			meanings.add(new MeaningEntry(meaning));
+			synonyms.add(new DefinitionSynonymsEntry(definitionAndSynonyms));
 		}
 	}
 
-	public String getSynonym(){
-		return synonym;
+	public String getDefinition(){
+		return definition;
 	}
 
-	public String joinMeanings(final String separator){
-		return StringHelper.join(separator, meanings);
+	public String joinSynonyms(final String separator){
+		return StringHelper.join(separator, synonyms);
 	}
 
-	public void setMeanings(final String[] lines){
-		meanings.clear();
+	public void setSynonyms(final String[] lines){
+		synonyms.clear();
 		Arrays.stream(lines)
-			.map(MeaningEntry::new)
-			.forEachOrdered(meanings::add);
+			.map(DefinitionSynonymsEntry::new)
+			.forEachOrdered(synonyms::add);
 	}
 
-	public void addMeaning(MeaningEntry meaningEntry){
-		meanings.add(meaningEntry);
+	public void addSynonym(DefinitionSynonymsEntry definitionSynonymsEntry){
+		synonyms.add(definitionSynonymsEntry);
 	}
 
-	public int getMeaningsEntries(){
-		return meanings.size();
+	public int getSynonymsEntries(){
+		return synonyms.size();
 	}
 
 	public boolean hasSamePartOfSpeech(final String[] partOfSpeeches){
-		return meanings.stream()
-			.map(MeaningEntry::getPartOfSpeeches)
+		return synonyms.stream()
+			.map(DefinitionSynonymsEntry::getPartOfSpeeches)
 			.anyMatch(pos -> Arrays.equals(pos, partOfSpeeches));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
-		writer.write(synonym);
+		writer.write(definition);
 		writer.write(ThesaurusEntry.PIPE);
 		writer.write(Integer.toString(idx));
 		writer.write(StringUtils.LF);
 	}
 
-	public int saveToData(BufferedWriter dataWriter, Charset charset) throws IOException{
-		final int meaningsEntries = getMeaningsEntries();
-		saveToIndex(dataWriter, meaningsEntries);
-		int meaningsLength = 1;
-		for(final MeaningEntry meaning : meanings){
-			final String m = meaning.toString();
-			dataWriter.write(m);
+	public int saveToData(final BufferedWriter dataWriter, final Charset charset) throws IOException{
+		final int synonymsEntries = getSynonymsEntries();
+		saveToIndex(dataWriter, synonymsEntries);
+		int synonymsLength = 1;
+		for(final DefinitionSynonymsEntry synonym : synonyms){
+			final String s = synonym.toString();
+			dataWriter.write(s);
 			dataWriter.write(StringUtils.LF);
 
-			meaningsLength += m.getBytes(charset).length;
+			synonymsLength += s.getBytes(charset).length;
 		}
-		return meaningsLength + StringUtils.LF.length() * meaningsEntries;
+		return synonymsLength + StringUtils.LF.length() * synonymsEntries;
 	}
 
-	public boolean contains(final List<String> partOfSpeeches, final List<String> meanings){
-		final List<String> mm = new ArrayList<>(meanings);
-		return (mm.remove(synonym) && meanings.contains(synonym) && this.meanings.stream().anyMatch(meaning -> meaning.containsAllMeanings(partOfSpeeches, mm)));
+	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+		final List<String> ss = new ArrayList<>(synonyms);
+		return (ss.remove(definition) && synonyms.contains(definition) && this.synonyms.stream().anyMatch(entry -> entry.containsAllSynonyms(partOfSpeeches, ss)));
 	}
 
 	@Override
 	public String toString(){
 		final StringJoiner sj = new StringJoiner(": ");
-		sj.add(synonym);
-		meanings.forEach(meaning -> sj.add(StringHelper.join(", ", meaning)));
+		sj.add(definition);
+		synonyms.forEach(synonym -> sj.add(StringHelper.join(", ", synonym)));
 		return sj.toString();
 	}
 
 	@Override
 	public int compareTo(final ThesaurusEntry other){
 		return new CompareToBuilder()
-			.append(synonym, other.synonym)
-			.append(meanings, other.meanings)
+			.append(definition, other.definition)
+			.append(synonyms, other.synonyms)
 			.toComparison();
 	}
 
@@ -137,16 +137,16 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 		final ThesaurusEntry rhs = (ThesaurusEntry)obj;
 		return new EqualsBuilder()
-			.append(synonym, rhs.synonym)
-			.append(meanings, rhs.meanings)
+			.append(definition, rhs.definition)
+			.append(synonyms, rhs.synonyms)
 			.isEquals();
 	}
 
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(synonym)
-			.append(meanings)
+			.append(definition)
+			.append(synonyms)
 			.toHashCode();
 	}
 
