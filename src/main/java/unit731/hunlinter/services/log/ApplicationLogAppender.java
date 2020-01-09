@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.JTextArea;
 import org.slf4j.Marker;
 import unit731.hunlinter.services.JavaHelper;
@@ -21,6 +22,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
+		Objects.requireNonNull(textArea);
+
 		JavaHelper.nullableToStream(markers)
 			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>()).add(textArea));
 	}
@@ -36,7 +39,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() -> {
-				TEXT_AREAS.get(marker)
+				JavaHelper.nullableToStream(TEXT_AREAS.get(marker))
 					.forEach(textArea -> textArea.append(message));
 			});
 		}
