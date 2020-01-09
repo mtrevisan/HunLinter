@@ -141,7 +141,6 @@ public class ConversionTable{
 	private static void convertInside(final String word, final Pair<String, String> entry, final List<String> conversions){
 		final String key = entry.getKey();
 
-		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
 		if(word.contains(key)){
 			final String value = entry.getValue();
 			int keyLength = key.length();
@@ -151,10 +150,11 @@ public class ConversionTable{
 			int idx = -valueLength;
 			final StringBuffer sb = new StringBuffer();
 			while((idx = word.indexOf(key, idx + valueLength)) >= 0){
-				sb.setLength(0);
 				sb.append(word);
 				sb.replace(idx, idx + keyLength, value);
 				conversions.add(sb.toString());
+
+				sb.setLength(0);
 			}
 		}
 	}

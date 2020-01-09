@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -41,7 +42,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 
-		final String[] data = StringUtils.split(line, POS_AND_MEANS);
+		//all entries should be in lowercase
+		final String[] data = StringUtils.split(line.toLowerCase(Locale.ROOT), POS_AND_MEANS);
 
 		synonym = data[0];
 		final int numEntries = Integer.parseInt(data[1]);

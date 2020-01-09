@@ -3,6 +3,7 @@ package unit731.hunlinter.parsers.thesaurus;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -29,7 +30,8 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		Objects.requireNonNull(partOfSpeechAndMeanings);
 
 		try{
-			final String[] components = StringUtils.split(partOfSpeechAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
+			//all entries should be in lowercase
+			final String[] components = StringUtils.split(partOfSpeechAndMeanings.toLowerCase(Locale.ROOT), ThesaurusEntry.POS_AND_MEANS, 2);
 
 			final String partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
@@ -42,7 +44,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 				.filter(StringUtils::isNotBlank)
 				.distinct()
 				.collect(Collectors.toList());
-			if(meanings.size() < 1)
+			if(meanings.isEmpty())
 				throw new HunLintException(NOT_ENOUGH_MEANINGS.format(new Object[]{partOfSpeechAndMeanings}));
 		}
 		catch(final ArrayIndexOutOfBoundsException e){
