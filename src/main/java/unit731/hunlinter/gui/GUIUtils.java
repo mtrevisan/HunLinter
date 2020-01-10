@@ -174,16 +174,19 @@ public class GUIUtils{
 				textToCopy = ((JCopyableTable)c).getValueAtRow(selectedRow);
 			}
 
-			if(textToCopy != null){
-				textToCopy = removeHTMLCode(textToCopy);
-
-				final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				clipboard.setContents(new StringSelection(textToCopy), null);
-			}
+			if(textToCopy != null)
+				copyToClipboard(textToCopy);
 		});
 		popupMenu.add(copyMenuItem);
 
 		return popupMenu;
+	}
+
+	public static void copyToClipboard(String textToCopy){
+		textToCopy = removeHTMLCode(textToCopy);
+
+		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(new StringSelection(textToCopy), null);
 	}
 
 	private static String removeHTMLCode(final String text){

@@ -14,6 +14,7 @@ import unit731.hunlinter.interfaces.HunLintable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -184,6 +185,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
+	private JPopupMenu copyingPopupMenu;
 
 
 	public HunLinterFrame(){
@@ -193,7 +195,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		try{
-			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
+			copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, dicTable, theTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
 		}
@@ -448,6 +450,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       TableRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < dicTable.getColumnCount(); i ++)
       dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
+      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
+      dicTable.registerKeyboardAction(event -> {
+         final int selectedRow = dicTable.getSelectedRow();
+         final String textToCopy = ((JCopyableTable)dicTable).getValueAtRow(selectedRow);
+         GUIUtils.copyToClipboard(textToCopy);
+      }, copyKeyStroke, JComponent.WHEN_FOCUSED);
       dicScrollPane.setViewportView(dicTable);
 
       dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
@@ -684,7 +692,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
-      theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      theTable.registerKeyboardAction(event -> {
+         removeSelectedRowsFromThesaurus();
+      }, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      theTable.registerKeyboardAction(event -> {
+         final int selectedRow = theTable.getSelectedRow();
+         final String textToCopy = ((JCopyableTable)theTable).getValueAtRow(selectedRow);
+         GUIUtils.copyToClipboard(textToCopy);
+      }, copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
       theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -958,7 +973,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
       //listen for row removal
-      acoTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      acoTable.registerKeyboardAction(new ActionListener(){
+         public void actionPerformed(final ActionEvent event){
+            removeSelectedRowsFromAutoCorrect();
+         }
+      }, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
@@ -2256,70 +2275,64 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		if(event.getSource() == theTable)
-			removeSelectedRowsFromThesaurus();
-		else if(event.getSource() == acoTable)
-			removeSelectedRowsFromAutoCorrect();
-		else{
-			//FIXME introduce a checkAbortion case?
-			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
-				prjLoaderWorker.pause();
+		//FIXME introduce a checkAbortion case?
+		if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
+			prjLoaderWorker.pause();
 
-				final Object[] options = {"Abort", "Cancel"};
-				final int answer = JOptionPane.showOptionDialog(this,
-					"Do you really want to abort the project loader task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					prjLoaderWorker.cancel();
+			final Object[] options = {"Abort", "Cancel"};
+			final int answer = JOptionPane.showOptionDialog(this,
+				"Do you really want to abort the project loader task?", "Warning!",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			if(answer == JOptionPane.YES_OPTION){
+				prjLoaderWorker.cancel();
 
-					dicCheckCorrectnessMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
+				dicCheckCorrectnessMenuItem.setEnabled(true);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
 
-					prjLoaderWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					prjLoaderWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
+				prjLoaderWorker = null;
 			}
+			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+				prjLoaderWorker.resume();
 
-			//FIXME introduce a checkAbortion case?
-			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-				//				dicDuplicatesWorker.pause();
-
-				final Object[] options = {"Abort", "Cancel"};
-				final int answer = JOptionPane.showOptionDialog(this,
-					"Do you really want to abort the dictionary duplicates task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					dicDuplicatesWorker.cancel(true);
-
-					dicExtractDuplicatesMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
-
-					dicDuplicatesWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-//					dicDuplicatesWorker.resume();
-				}
+				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
-
-			checkAbortion(dicCorrectnessWorker, dicCheckCorrectnessMenuItem);
-
-			checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
-
-			checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
-
-			checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
-
-			checkAbortion(dicPoSFSAWorker, dicExtractPoSFAMenuItem);
-
-			checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
-				cmpLoadInputButton);
-
-			checkAbortion(hypCorrectnessWorker, hypCheckCorrectnessMenuItem);
 		}
+
+		//FIXME introduce a checkAbortion case?
+		if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
+//			dicDuplicatesWorker.pause();
+
+			final Object[] options = {"Abort", "Cancel"};
+			final int answer = JOptionPane.showOptionDialog(this,
+				"Do you really want to abort the dictionary duplicates task?", "Warning!",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			if(answer == JOptionPane.YES_OPTION){
+				dicDuplicatesWorker.cancel(true);
+
+				dicExtractDuplicatesMenuItem.setEnabled(true);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
+
+				dicDuplicatesWorker = null;
+			}
+			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+//				dicDuplicatesWorker.resume();
+			}
+		}
+
+		checkAbortion(dicCorrectnessWorker, dicCheckCorrectnessMenuItem);
+
+		checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
+
+		checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
+
+		checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
+
+		checkAbortion(dicPoSFSAWorker, dicExtractPoSFAMenuItem);
+
+		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
+			cmpLoadInputButton);
+
+		checkAbortion(hypCorrectnessWorker, hypCheckCorrectnessMenuItem);
 	}
 
 	private void checkAbortion(final WorkerDictionaryBase worker, final JComponent ... componentsToEnable){
