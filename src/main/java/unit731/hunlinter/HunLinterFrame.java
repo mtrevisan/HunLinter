@@ -962,35 +962,33 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(MouseEvent e){
-            if(e.getClickCount() == 1){
-               JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = acoTable.convertRowIndexToModel(target.getSelectedRow());
-                  BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
-                     try{
-                        backbone.getAcoParser().setCorrection(row, incorrect, correct);
+         public void mouseClicked(final MouseEvent e){
+            if(e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3){
+               final int selectedRow = acoTable.rowAtPoint(e.getPoint());
+               acoTable.setRowSelectionInterval(selectedRow, selectedRow);
+               final int row = acoTable.convertRowIndexToModel(selectedRow);
+               final BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
+                  try{
+                     backbone.getAcoParser().setCorrection(row, incorrect, correct);
 
-                        // … and save the files
-                        backbone.storeAutoCorrectFile();
-                     }
-                     catch(Exception ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
-                     }
-                  };
-                  CorrectionEntry definition = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-                  CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, acoParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.addWindowListener(new WindowAdapter(){
-                     @Override
-                     public void windowClosed(WindowEvent e){
-                        acoTable.clearSelection();
-                     }
-                  });
-                  dialog.setLocationRelativeTo(acoParent);
-                  dialog.setVisible(true);
-               }
+                     //… and save the files
+                     backbone.storeAutoCorrectFile();
+                  }
+                  catch(Exception ex){
+                     LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+                  }
+               };
+               final CorrectionEntry definition = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+               final CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, acoParent);
+               GUIUtils.addCancelByEscapeKey(dialog);
+               dialog.addWindowListener(new WindowAdapter(){
+                  @Override
+                  public void windowClosed(final WindowEvent e){
+                     acoTable.clearSelection();
+                  }
+               });
+               dialog.setLocationRelativeTo(acoParent);
+               dialog.setVisible(true);
             }
          }
       });
