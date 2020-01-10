@@ -141,8 +141,8 @@ public class GUIUtils{
 	 *
 	 * @param dialog	Dialog to attach the escape key to
 	 */
-	public static void addCancelByEscapeKey(JDialog dialog){
-		AbstractAction cancelAction = new AbstractAction(){
+	public static void addCancelByEscapeKey(final JDialog dialog){
+		final AbstractAction cancelAction = new AbstractAction(){
 			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
@@ -150,29 +150,34 @@ public class GUIUtils{
 				dialog.dispose();
 			}
 		};
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		dialog.getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
+		final KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+		dialog.getRootPane()
+			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
-		JPopupMenu popupMenu = new JPopupMenu();
+	public static JPopupMenu createCopyingPopupMenu(final int iconSize) throws IOException{
+		final JPopupMenu popupMenu = new JPopupMenu();
 
-		JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
-		BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
-		ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+		final JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
+		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
+		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
 		copyMenuItem.setIcon(icon);
 		copyMenuItem.addActionListener(e -> {
 			String textToCopy = null;
-			Component c = popupMenu.getInvoker();
+			final Component c = popupMenu.getInvoker();
 			if(c instanceof JTextComponent)
 				textToCopy = ((JTextComponent)c).getText();
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
+			else if(c instanceof JCopyableTable){
+				final int selectedRow = ((JCopyableTable)c).getSelectedRow();
+				textToCopy = ((JCopyableTable)c).getValueAtRow(selectedRow);
+			}
 
 			if(textToCopy != null){
 				textToCopy = removeHTMLCode(textToCopy);
 
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(new StringSelection(textToCopy), null);
 			}
 		});
@@ -181,7 +186,7 @@ public class GUIUtils{
 		return popupMenu;
 	}
 
-	private static String removeHTMLCode(String text){
+	private static String removeHTMLCode(final String text){
 		return PatternHelper.clear(text, PATTERN_HTML_CODE);
 	}
 
@@ -191,22 +196,28 @@ public class GUIUtils{
 	 * @param popupMenu	The pop-up to attach to the fields
 	 * @param fields	Components for which to add the popup menu
 	 */
-	public static void addPopupMenu(JPopupMenu popupMenu, JComponent... fields){
+	public static void addPopupMenu(final JPopupMenu popupMenu, final JComponent... fields){
 		//add mouse listeners to the specified fields
-		for(JComponent field : fields){
+		for(final JComponent field : fields){
 			field.addMouseListener(new MouseAdapter(){
 				@Override
-				public void mousePressed(MouseEvent e){
+				public void mouseClicked(final MouseEvent e){
 					processMouseEvent(e);
 				}
 
 				@Override
-				public void mouseReleased(MouseEvent e){
+				public void mouseReleased(final MouseEvent e){
 					processMouseEvent(e);
 				}
 
-				private void processMouseEvent(MouseEvent e){
+				private void processMouseEvent(final MouseEvent e){
 					if(e.isPopupTrigger()){
+						//select row
+						if(field instanceof JCopyableTable){
+							final int selectedRow = ((JCopyableTable)field).rowAtPoint(e.getPoint());
+							((JCopyableTable)field).setRowSelectionInterval(selectedRow, selectedRow);
+						}
+
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 						popupMenu.setInvoker(field);
 					}

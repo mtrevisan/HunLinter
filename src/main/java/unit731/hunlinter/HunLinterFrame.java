@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
+import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.gui.JWordLabel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
@@ -39,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
@@ -137,6 +140,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
 
+	private static final String TAB = "\t";
+
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
@@ -189,7 +194,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		try{
 			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
-			GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel,
+			GUIUtils.addPopupMenu(copyingPopupMenu, dicTable, theTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
 		}
 		catch(final IOException ignored){}
@@ -260,7 +265,26 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
       dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
-      dicTable = new javax.swing.JTable();
+      dicTable = new JCopyableTable(){
+         @Override
+         public String getValueAtRow(final int row){
+            final TableModel model = getModel();
+            final String production = (String) model.getValueAt(row, 0);
+            final String morphologicalFields = (String) model.getValueAt(row, 1);
+            final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
+            .map(AffixEntry::toString)
+            .orElse(null);
+            final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
+            .map(AffixEntry::toString)
+            .orElse(null);
+            final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
+            .map(AffixEntry::toString)
+            .orElse(null);
+            return Arrays.asList(production, morphologicalFields, rule1, rule2, rule3).stream()
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(TAB));
+         }
+      };
       dicTotalProductionsLabel = new javax.swing.JLabel();
       dicTotalProductionsOutputLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
@@ -283,7 +307,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theSynonymsTextField = new javax.swing.JTextField();
       theAddButton = new javax.swing.JButton();
       theScrollPane = new javax.swing.JScrollPane();
-      theTable = new javax.swing.JTable();
+      theTable = new JCopyableTable(){
+         @Override
+         public String getValueAtRow(final int row){
+            final TableModel model = getModel();
+            final String definition = (String)model.getValueAt(row, 0);
+            final String synonyms = (String)model.getValueAt(row, 1);
+            return definition + ": " + synonyms;
+         }
+      };
       theSynonymsRecordedLabel = new javax.swing.JLabel();
       theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
       hypLayeredPane = new javax.swing.JLayeredPane();
@@ -626,7 +658,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
 
       theSynonymsLabel.setLabelFor(theSynonymsTextField);
-      theSynonymsLabel.setText("New synonym:");
+      theSynonymsLabel.setText("New definition:");
 
       theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -646,47 +678,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
+      theTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
       theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
-      JFrame theParent = this;
-      theTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(MouseEvent e){
-            if(e.getClickCount() == 1){
-               JTable target = (JTable)e.getSource();
-               int col = target.getSelectedColumn();
-               if(col == 1){
-                  int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-                  Consumer<String> okButtonAction = (text) -> {
-                     try{
-                        backbone.getTheParser().setSynonyms(row, text);
-
-                        // … and save the files
-                        backbone.storeThesaurusFiles();
-                     }
-                     catch(Exception ex){
-                        LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
-                     }
-                  };
-                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
-                  ThesaurusSynonymsDialog dialog = new ThesaurusSynonymsDialog(synonym, okButtonAction, theParent);
-                  GUIUtils.addCancelByEscapeKey(dialog);
-                  dialog.addWindowListener(new WindowAdapter(){
-                     @Override
-                     public void windowClosed(WindowEvent e){
-                        theTable.clearSelection();
-                     }
-                  });
-                  dialog.setLocationRelativeTo(theParent);
-                  dialog.setVisible(true);
-               }
-            }
-         }
-      });
 
       TableRenderer theCellRenderer = new TableRenderer();
       theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -981,8 +979,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                         LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
                      }
                   };
-                  CorrectionEntry synonym = backbone.getAcoParser().getCorrectionsDictionary().get(row);
-                  CorrectionDialog dialog = new CorrectionDialog(synonym, okButtonAction, acoParent);
+                  CorrectionEntry definition = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+                  CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, acoParent);
                   GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.addWindowListener(new WindowAdapter(){
                      @Override
@@ -3173,11 +3171,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JTextField sexTextField;
    private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
-   private javax.swing.JLabel theSynonymsLabel;
-   private javax.swing.JTextField theSynonymsTextField;
    private javax.swing.JScrollPane theScrollPane;
+   private javax.swing.JLabel theSynonymsLabel;
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
+   private javax.swing.JTextField theSynonymsTextField;
    private javax.swing.JTable theTable;
    private javax.swing.JButton wexAddButton;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;

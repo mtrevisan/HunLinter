@@ -6,10 +6,10 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
 
 
-public class TableRenderer extends JLabel implements TableCellRenderer{
+public class TableRenderer extends DefaultTableCellRenderer{
 
 	private static final long serialVersionUID = -7581282504915833642L;
 
@@ -27,6 +27,8 @@ public class TableRenderer extends JLabel implements TableCellRenderer{
 	@Override
 	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
 			final boolean hasFocus, final int row, final int column){
+		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
 		setFont(GUIUtils.getCurrentFont());
 		setText(value != null? String.valueOf(value): StringUtils.SPACE);
 
