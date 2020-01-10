@@ -39,6 +39,7 @@ class GraphemeVEC{
 		PatternHelper.pattern("^(g)u(a)$")
 	);
 	private static final List<Pattern> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(
+		PatternHelper.pattern("^()i(u)$"),
 		PatternHelper.pattern("^(teñ|ko[jɉñ])i([ou]r)"),
 		PatternHelper.pattern("^([jɉ])i(og?r[aà]f|ur|aspr|eltrude)"),
 		PatternHelper.pattern("^((?:r[ae]|ar)?bo[jɉ])i(ur[ae])"),

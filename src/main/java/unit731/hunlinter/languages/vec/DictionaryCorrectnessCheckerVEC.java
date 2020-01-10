@@ -160,7 +160,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
 
 		final List<String> pos = production.getMorphologicalFieldPartOfSpeech();
-		if(pos.size() != 1)
+		if(pos.size() > 1)
 			throw new HunLintException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
 	}
 
