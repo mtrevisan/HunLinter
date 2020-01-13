@@ -452,9 +452,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       dicTable.registerKeyboardAction(event -> {
-         final int selectedRow = dicTable.getSelectedRow();
-         final String textToCopy = ((JCopyableTable)dicTable).getValueAtRow(selectedRow);
-         GUIUtils.copyToClipboard(textToCopy);
+         GUIUtils.copyToClipboard((JCopyableTable)dicTable);
       }, copyKeyStroke, JComponent.WHEN_FOCUSED);
       dicScrollPane.setViewportView(dicTable);
 
@@ -686,7 +684,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+      theTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
@@ -696,9 +694,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          removeSelectedRowsFromThesaurus();
       }, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       theTable.registerKeyboardAction(event -> {
-         final int selectedRow = theTable.getSelectedRow();
-         final String textToCopy = ((JCopyableTable)theTable).getValueAtRow(selectedRow);
-         GUIUtils.copyToClipboard(textToCopy);
+         GUIUtils.copyToClipboard((JCopyableTable)theTable);
       }, copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();

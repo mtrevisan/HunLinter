@@ -170,7 +170,7 @@ public class GUIUtils{
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
 			else if(c instanceof JCopyableTable){
-				final int selectedRow = ((JCopyableTable)c).getSelectedRow();
+				final int selectedRow = ((JCopyableTable)c).convertRowIndexToModel(((JCopyableTable)c).getSelectedRow());
 				textToCopy = ((JCopyableTable)c).getValueAtRow(selectedRow);
 			}
 
@@ -180,6 +180,12 @@ public class GUIUtils{
 		popupMenu.add(copyMenuItem);
 
 		return popupMenu;
+	}
+
+	public static void copyToClipboard(final JCopyableTable table){
+		final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
+		final String textToCopy = table.getValueAtRow(selectedRow);
+		copyToClipboard(textToCopy);
 	}
 
 	public static void copyToClipboard(String textToCopy){
