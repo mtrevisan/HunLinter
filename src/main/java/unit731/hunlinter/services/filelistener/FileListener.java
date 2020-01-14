@@ -20,4 +20,7 @@ public interface FileListener{
 	 */
 	void register(FileChangeListener listener, String... patterns);
 
+	/** Removes all listeners */
+	void unregisterAll();
+
 }

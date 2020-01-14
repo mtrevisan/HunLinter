@@ -2380,7 +2380,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				backbone = new Backbone(packager, this);
+				if(backbone == null)
+					backbone = new Backbone(packager, this);
+				else
+					backbone.clear();
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
@@ -2494,6 +2497,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 			openAffButton.setEnabled(backbone.getAffixFile() != null);
 			openDicButton.setEnabled(backbone.getDictionaryFile() != null);
+
+			if(rulesReducerDialog != null)
+				//notify RulesReducerDialog
+				rulesReducerDialog.reload();
 
 
 			//hyphenation file:

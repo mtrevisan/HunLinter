@@ -46,7 +46,6 @@ public class FileListenerManager implements FileListener, Runnable{
 	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT
 		= new HashMap<>(3);
 	static{
-		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_CREATE, FileChangeListener::fileCreated);
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified);
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);
 	}
@@ -112,6 +111,15 @@ public class FileListenerManager implements FileListener, Runnable{
 		}
 
 		addFilePatterns(listener, patterns);
+	}
+
+	@Override
+	public void unregisterAll(){
+		stop();
+
+		watchKeyToDirPath.clear();
+		dirPathToListeners.clear();
+		listenerToFilePatterns.clear();
 	}
 
 	private void addWatchKeyToDir(final Path dir){

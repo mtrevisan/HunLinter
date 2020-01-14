@@ -146,6 +146,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void registerFileListener(){
+		flm.unregisterAll();
+
 		final File affFile = getAffixFile();
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
