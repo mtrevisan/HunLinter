@@ -135,7 +135,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			else
 				LOGGER.error("Generic error", e);
 
-			logOnApplicationAndRuleReducerAppender("Stopped processing Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file", new Object[]{});
 
 			cancel(true);
 		}
@@ -170,7 +170,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			catch(final Exception e){
 				String errorMessage = ExceptionHelper.getMessage(e);
 				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
-				logOnApplicationAndRuleReducerAppender("{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 				if(!isPreventExceptionRelaunch())
 					throw e;
@@ -237,14 +237,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 		}
 
-		logOnApplicationAndRuleReducerAppender("Stopped processing Dictionary file");
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file", new Object[]{});
 
 		cancel(true);
-	}
-
-	private void logOnApplicationAndRuleReducerAppender(final String message, final Object... vars){
-		LOGGER.info(Backbone.MARKER_APPLICATION, message, vars);
-		LOGGER.info(Backbone.MARKER_RULE_REDUCER, message, vars);
 	}
 
 	private int getProgress(final double index, final double total){

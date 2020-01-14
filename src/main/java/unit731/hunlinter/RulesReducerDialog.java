@@ -14,11 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
+import javax.swing.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +41,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 
 	public RulesReducerDialog(Backbone backbone, Frame parent){
-		super(parent, "Rules reducer", true);
+		super(parent, "Rules Reducer", true);
 
 		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(parent);
@@ -58,6 +55,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		reducedSetTextArea.setFont(font);
 
 		init();
+
+		try{
+			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(reducedSetLabel.getHeight());
+			GUIUtils.addPopupMenu(copyingPopupMenu, reducedSetTextArea);
+		}
+		catch(final IOException ignored){}
 
 		reload();
 
@@ -219,6 +222,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		reducedSetTextArea.setText(null);
 		ruleComboBox.setEnabled(false);
 		optimizeClosedGroupCheckBox.setEnabled(false);
+		reduceButton.setEnabled(false);
 
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
@@ -233,6 +237,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			Runnable cancelTask = () -> {
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
+				reduceButton.setEnabled(true);
 			};
 			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask);
@@ -253,6 +258,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 			ruleComboBox.setEnabled(true);
 			optimizeClosedGroupCheckBox.setEnabled(true);
+			reduceButton.setEnabled(true);
 		}
 	}
 
@@ -271,6 +277,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			catch(final Exception e){
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
+				reduceButton.setEnabled(true);
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
