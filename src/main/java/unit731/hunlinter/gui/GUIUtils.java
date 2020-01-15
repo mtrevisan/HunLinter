@@ -155,31 +155,50 @@ public class GUIUtils{
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	public static JPopupMenu createCopyingPopupMenu(final int iconSize) throws IOException{
-		final JPopupMenu popupMenu = new JPopupMenu();
-
+	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu) throws IOException{
 		final JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
 		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
 		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
 		copyMenuItem.setIcon(icon);
 		copyMenuItem.addActionListener(e -> {
 			String textToCopy = null;
-			final Component c = popupMenu.getInvoker();
-			if(c instanceof JTextComponent)
-				textToCopy = ((JTextComponent)c).getText();
-			else if(c instanceof JLabel)
-				textToCopy = ((JLabel)c).getText();
-			else if(c instanceof JCopyableTable){
-				final int selectedRow = ((JCopyableTable)c).convertRowIndexToModel(((JCopyableTable)c).getSelectedRow());
-				textToCopy = ((JCopyableTable)c).getValueAtRow(selectedRow);
+			final Component invoker = popupMenu.getInvoker();
+			if(invoker instanceof JTextComponent)
+				textToCopy = ((JTextComponent)invoker).getText();
+			else if(invoker instanceof JLabel)
+				textToCopy = ((JLabel)invoker).getText();
+			else if(invoker instanceof JCopyableTable){
+				final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
+				textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
 			}
 
 			if(textToCopy != null)
 				copyToClipboard(textToCopy);
 		});
-		popupMenu.add(copyMenuItem);
+		return copyMenuItem;
+	}
 
-		return popupMenu;
+	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu) throws IOException{
+		final JMenuItem copyMenuItem = new JMenuItem("Remove", 'R');
+		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_delete.png"));
+		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+		copyMenuItem.setIcon(icon);
+		copyMenuItem.addActionListener(e -> {
+			String textToCopy = null;
+			final Component invoker = popupMenu.getInvoker();
+			if(invoker instanceof JTextComponent)
+				textToCopy = ((JTextComponent)invoker).getText();
+			else if(invoker instanceof JLabel)
+				textToCopy = ((JLabel)invoker).getText();
+			else if(invoker instanceof JCopyableTable){
+				final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
+				textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
+			}
+
+			if(textToCopy != null)
+				copyToClipboard(textToCopy);
+		});
+		return copyMenuItem;
 	}
 
 	public static void copyToClipboard(final JCopyableTable table){

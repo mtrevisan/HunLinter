@@ -71,8 +71,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setFont(currentFont);
 
 		try{
-			final JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(compoundWordsOutputLabel.getHeight());
-			GUIUtils.addPopupMenu(copyingPopupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
+			final JPopupMenu popupMenu = new JPopupMenu();
+			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsOutputLabel.getHeight(), popupMenu));
+			GUIUtils.addPopupMenu(popupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
 				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
 		catch(final IOException ignored){}

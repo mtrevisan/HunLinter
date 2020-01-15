@@ -35,16 +35,6 @@ public class ThesaurusDictionary{
 		return synonyms;
 	}
 
-	private void setSynonyms(final List<ThesaurusEntry> synonyms){
-		clear();
-
-		this.synonyms.addAll(synonyms);
-
-		this.dictionary.clear();
-		for(final ThesaurusEntry synonym : synonyms)
-			dictionary.put(synonym.getDefinition(), synonym);
-	}
-
 	public boolean add(final String[] partOfSpeeches, final List<String> synonyms){
 		boolean result = false;
 		for(String synonym : synonyms){
@@ -91,15 +81,9 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	public ThesaurusEntry remove(final int index){
-		final ThesaurusEntry previousValue = synonyms.remove(index);
-		dictionary.remove(previousValue.getDefinition());
-
-		return previousValue;
-	}
-
-	public void restore(final ThesaurusDictionary dictionary){
-		setSynonyms(dictionary.synonyms);
+	public void remove(final ThesaurusEntry entry){
+		if(synonyms.remove(entry))
+			dictionary.remove(entry.getDefinition());
 	}
 
 	public void clear(){
@@ -115,14 +99,6 @@ public class ThesaurusDictionary{
 
 	public void sort(){
 		synonyms.sort(Comparator.naturalOrder());
-	}
-
-	public void setSynonyms(final int index, final String synonyms){
-		if(StringUtils.isNotBlank(synonyms)){
-			final String[] lines = StringUtils.split(synonyms, StringUtils.LF);
-			this.synonyms.get(index).
-				setSynonyms(lines);
-		}
 	}
 
 	private ThesaurusEntry findByDefinition(final String definition){

@@ -810,7 +810,7 @@
                     <Property name="rowSorter" type="javax.swing.RowSorter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="new TableRowSorter&lt;&gt;((ThesaurusTableModel)theTable.getModel())" type="code"/>
                     </Property>
-                    <Property name="selectionMode" type="int" value="2"/>
+                    <Property name="selectionMode" type="int" value="0"/>
                     <Property name="showHorizontalLines" type="boolean" value="false"/>
                     <Property name="showVerticalLines" type="boolean" value="false"/>
                   </Properties>

@@ -107,7 +107,6 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.Debouncer;
@@ -186,7 +185,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
-	private JPopupMenu copyingPopupMenu;
+	private JPopupMenu copyPopupMenu;
+	private JPopupMenu copyAndRemovePopupMenu;
 
 
 	public HunLinterFrame(){
@@ -196,9 +196,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		try{
-			copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
-			GUIUtils.addPopupMenu(copyingPopupMenu, dicTable, theTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
+			final int iconSize = hypRulesOutputLabel.getHeight();
+			copyPopupMenu = new JPopupMenu();
+			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu));
+			copyAndRemovePopupMenu = new JPopupMenu();
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu));
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu));
+			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
+			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable);
 		}
 		catch(final IOException ignored){}
 
@@ -688,7 +694,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+      theTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
@@ -1732,10 +1738,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	public void removeSelectedRowsFromThesaurus(){
 		try{
-			final int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
-				.map(theTable::convertRowIndexToModel)
-				.toArray();
-			backbone.getTheParser().deleteDefinitionAndSynonyms(selectedRows);
+			final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
+			final String selectedDefinition = (String)theTable.getModel().getValueAt(selectedRow, 0);
+			backbone.getTheParser()
+				.deleteDefinitionAndSynonyms(selectedDefinition);
 
 			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.fireTableDataChanged();

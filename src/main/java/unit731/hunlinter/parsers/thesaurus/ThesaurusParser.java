@@ -17,7 +17,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -173,13 +172,10 @@ public class ThesaurusParser{
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, synonyms));
 	}
 
-	public void setSynonyms(final int index, final String synonyms){
-		dictionary.setSynonyms(index, synonyms);
-	}
-
-	public void deleteDefinitionAndSynonyms(final int[] selectedRowIDs){
-		IntStream.range(0, selectedRowIDs.length)
-			.map(i -> selectedRowIDs[i] - i)
+	public void deleteDefinitionAndSynonyms(final String definition){
+		//recover all words (definition and synonyms) from row
+		dictionary.getSynonyms().stream()
+			.filter(entry -> entry.getDefinition().equals(definition) || entry.containsSynonym(definition))
 			.forEach(dictionary::remove);
 	}
 
