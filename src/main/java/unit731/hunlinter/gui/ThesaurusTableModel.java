@@ -18,7 +18,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String TAG_START = ";\">";
 	private static final String TAG_END = "</body></html>";
-	private static final String TAG_NEW_LINE = "<br>";
+	public static final String TAG_NEW_LINE = "<br>";
 	private static final MessageFormat TAG = new MessageFormat("<html><body style=\"'white-space:nowrap'" + TAG_START + "{0}" + TAG_END);
 
 

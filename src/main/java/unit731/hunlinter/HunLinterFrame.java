@@ -107,6 +107,7 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.Debouncer;
@@ -315,7 +316,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             final TableModel model = getModel();
             final String definition = (String)model.getValueAt(row, 0);
             final String synonyms = (String)model.getValueAt(row, 1);
-            return definition + ": " + synonyms;
+            final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
+            return Arrays.stream(synonymsByDefinition)
+            .map(syns -> definition + ": " + syns)
+            .collect(Collectors.joining("\r\n"));
          }
       };
       theSynonymsRecordedLabel = new javax.swing.JLabel();
