@@ -42,7 +42,7 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = PatternHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
-	private static final Pattern PATTERN_CONSONANT_GEMINATES = PatternHelper.pattern("([^aeiou]){1}\\1+");
+	private static final Pattern PATTERN_CONSONANT_GEMINATES = PatternHelper.pattern("((?<!^i(?=nn))[^aeiou])+\\1");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
