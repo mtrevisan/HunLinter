@@ -278,8 +278,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					writer.write(origin);
 					writer.write(entries.stream()
 						.map(duplicate ->
-							StringHelper.join(StringUtils.EMPTY, Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"))
+							StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"),
+								StringUtils.EMPTY)
 						)
 						.collect(Collectors.joining(", ")));
 					writer.newLine();

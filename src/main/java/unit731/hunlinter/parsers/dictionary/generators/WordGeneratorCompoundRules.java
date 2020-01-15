@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -80,7 +82,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
 				throw new HunLintException(MISSING_WORD.format(new Object[]{component,
-					StringHelper.join(null, compoundRuleComponents)}));
+					StringUtils.join(compoundRuleComponents)}));
 	}
 
 	private boolean raiseError(final Map<String, Set<DictionaryEntry>> inputs, final String component){

@@ -80,7 +80,7 @@ public class HyphenationOptionsParser{
 		if(compoundOptions.getRightMin() != compoundOptions.getMinDefault())
 			writeValue(writer, MIN_COMPOUND_RIGHT_HYPHENATION, compoundOptions.getRightMin());
 		if(!noHyphen.isEmpty())
-			writeValue(writer, NO_HYPHEN, StringHelper.join(NO_HYPHEN_SEPARATOR, noHyphen));
+			writeValue(writer, NO_HYPHEN, StringUtils.join(noHyphen, NO_HYPHEN_SEPARATOR));
 	}
 
 	private void writeValue(BufferedWriter writer, String key, int value) throws IOException{

@@ -66,7 +66,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		for(final String flag : flags)
 			validate(flag);
 
-		return StringHelper.join(StringUtils.EMPTY, flags);
+		return StringUtils.join(flags, StringUtils.EMPTY);
 	}
 
 	@Override

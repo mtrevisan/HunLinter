@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -62,7 +63,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public String joinSynonyms(final String separator){
-		return StringHelper.join(separator, synonyms);
+		return StringUtils.join(synonyms, separator);
 	}
 
 	public void addSynonym(DefinitionSynonymsEntry definitionSynonymsEntry){
@@ -112,10 +113,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	@Override
 	public String toString(){
-		final StringJoiner sj = new StringJoiner(": ");
-		sj.add(definition);
-		synonyms.forEach(synonym -> sj.add(StringHelper.join(", ", synonym)));
-		return sj.toString();
+		return synonyms.stream()
+			.map(DefinitionSynonymsEntry::toString)
+			.map(s -> definition + ": " + String.join(", ", s))
+			.collect(Collectors.joining("\\r\\n"));
 	}
 
 	@Override

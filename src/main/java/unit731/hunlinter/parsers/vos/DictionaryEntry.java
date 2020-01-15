@@ -309,10 +309,10 @@ public class DictionaryEntry{
 		final StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringHelper.join(COMMA, continuationFlags));
+			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringHelper.join(StringUtils.SPACE, morphologicalFields));
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
 	}
 

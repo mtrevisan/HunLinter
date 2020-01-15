@@ -106,7 +106,7 @@ public class LineEntry implements Serializable{
 			.map(add -> {
 				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
 				additions[0] = StringUtils.reverse(additions[0]);
-				return StringHelper.join(StringUtils.EMPTY, additions);
+				return StringUtils.join(additions, StringUtils.EMPTY);
 			})
 			.collect(Collectors.toSet());
 		final String reversedCondition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
@@ -138,7 +138,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new HunLintException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringHelper.join(",", words),
+				throw new HunLintException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
 					indexFromLast, word}));
 
 			group.add(word.charAt(index));

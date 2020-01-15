@@ -258,7 +258,7 @@ public class AffixEntry{
 			sb.append(strategy.joinFlags(continuationFlags));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringHelper.join(StringUtils.SPACE, morphologicalFields));
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
 	}
 

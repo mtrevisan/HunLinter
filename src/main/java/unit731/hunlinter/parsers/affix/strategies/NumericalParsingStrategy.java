@@ -77,7 +77,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		Arrays.stream(flags)
 			.forEach(this::validate);
 
-		return StringHelper.join(COMMA, flags);
+		return StringUtils.join(flags, COMMA);
 	}
 
 	@Override

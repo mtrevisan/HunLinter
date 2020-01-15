@@ -15,11 +15,13 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
@@ -58,7 +60,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu));
+			popupMenu.add(GUIUtils.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
 			GUIUtils.addPopupMenu(popupMenu, reducedSetTextArea);
 		}
 		catch(final IOException ignored){}

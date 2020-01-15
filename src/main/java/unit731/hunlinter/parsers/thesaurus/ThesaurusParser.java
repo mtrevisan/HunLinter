@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -174,8 +175,11 @@ public class ThesaurusParser{
 
 	public void deleteDefinitionAndSynonyms(final String definition){
 		//recover all words (definition and synonyms) from row
-		dictionary.getSynonyms().stream()
+		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
+		final List<ThesaurusEntry> rows = ss.stream()
 			.filter(entry -> entry.getDefinition().equals(definition) || entry.containsSynonym(definition))
+			.collect(Collectors.toList());
+		rows.stream()
 			.forEach(dictionary::remove);
 	}
 
@@ -213,9 +217,9 @@ public class ThesaurusParser{
 	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> synonyms){
 		//extract part of speech if present
 		final String posFilter = (!partOfSpeeches.isEmpty()?
-			"[\\(\\s](" + StringHelper.join(PIPE, partOfSpeeches) + ")[\\),]":
+			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
 			".+");
-		final String synonymsFilter = (!synonyms.isEmpty()? "(" + StringHelper.join(PIPE, synonyms) + ")": ".+");
+		final String synonymsFilter = (!synonyms.isEmpty()? "(" + StringUtils.join(synonyms, PIPE) + ")": ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);

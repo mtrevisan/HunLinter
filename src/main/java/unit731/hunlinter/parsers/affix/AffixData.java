@@ -262,7 +262,7 @@ public class AffixData{
 				.collect(Collectors.toList());
 		Collections.sort(sortedSample);
 		//NOTE: a space should be used because of the presence of characters that are only modifiers
-		return StringHelper.join(StringUtils.SPACE, sortedSample);
+		return StringUtils.join(sortedSample, StringUtils.SPACE);
 	}
 
 	public String getCompoundBeginFlag(){

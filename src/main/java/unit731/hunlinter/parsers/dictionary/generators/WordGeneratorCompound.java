@@ -159,7 +159,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 		final List<Production> productions;
 		final String flags = (!continuationFlags.isEmpty()?
-			StringHelper.join(null, continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new)):
+			StringUtils.join(continuationFlags.stream().flatMap(Stream::of).toArray(String[]::new)):
 			null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)

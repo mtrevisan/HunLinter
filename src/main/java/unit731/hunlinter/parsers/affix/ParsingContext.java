@@ -44,7 +44,7 @@ public class ParsingContext{
 	}
 
 	public String getAllButFirstParameter(){
-		return StringHelper.join(StringUtils.SPACE, Arrays.asList(definitionParts).subList(1, definitionParts.length));
+		return StringUtils.join(Arrays.asList(definitionParts).subList(1, definitionParts.length), StringUtils.SPACE);
 	}
 
 	@Override

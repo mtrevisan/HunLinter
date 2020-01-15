@@ -163,7 +163,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getMorphologicalFields(){
-		return (morphologicalFields != null? StringHelper.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
+		return (morphologicalFields != null? StringUtils.join(morphologicalFields, StringUtils.SPACE): StringUtils.EMPTY);
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class Production extends DictionaryEntry{
 		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(!fields.isEmpty()){
 			fields.sort(Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + StringHelper.join(StringUtils.SPACE, fields);
+			return word + POS_FIELD_PREFIX + StringUtils.join(fields, StringUtils.SPACE);
 		}
 		return word;
 	}

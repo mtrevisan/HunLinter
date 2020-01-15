@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -202,7 +203,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					final String key = entry.getKey();
 					final List<String> values = entry.getValue();
 
-					destinationWriter.write(key + ": " + StringHelper.join(", ", values));
+					destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 					destinationWriter.newLine();
 
 					setProgress((int)((index * 100.) / size));

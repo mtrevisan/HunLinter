@@ -17,11 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.JTextComponent;
+
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
@@ -32,6 +31,7 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
@@ -72,7 +72,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsOutputLabel.getHeight(), popupMenu));
+			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsOutputLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
 			GUIUtils.addPopupMenu(popupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
 				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
@@ -370,7 +370,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
 		String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedLongestWords = StringHelper.join(LIST_SEPARATOR, longestWords)
+		String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
 			+ " (" + longestWordCharsCount + ")";
 
 		totalWordsOutputLabel.setText(formattedTotalWords);
@@ -387,7 +387,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
 		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
 			.map(Hyphenation::getSyllabes)
-			.map(syllabes -> StringHelper.join(HyphenationParser.SOFT_HYPHEN, syllabes))
+			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
 			.collect(Collectors.toList());
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
@@ -397,8 +397,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
 			.map(String::valueOf)
 			.collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedMostCommonSyllabes = StringHelper.join(LIST_SEPARATOR, mostCommonSyllabes);
-		String formattedLongestWordSyllabes = StringHelper.join(LIST_SEPARATOR, longestWordSyllabes)
+		String formattedMostCommonSyllabes = StringUtils.join(mostCommonSyllabes, LIST_SEPARATOR);
+		String formattedLongestWordSyllabes = StringUtils.join(longestWordSyllabes, LIST_SEPARATOR)
 			+ " (" + longestWordSyllabesCount + ")";
 
 		compoundWordsOutputLabel.setText(formattedCompoundWords);

@@ -150,7 +150,7 @@ public class RegExpSequencer{
 	}
 
 	public String toString(final String[] sequence){
-		return StringHelper.join(StringUtils.EMPTY, sequence);
+		return StringUtils.join(sequence, StringUtils.EMPTY);
 	}
 
 }

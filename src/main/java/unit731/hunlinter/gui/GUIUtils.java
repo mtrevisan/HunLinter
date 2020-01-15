@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -155,50 +156,37 @@ public class GUIUtils{
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu) throws IOException{
-		final JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
-		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
+	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize, final JPopupMenu popupMenu,
+			final Consumer<Component> fnCallback) throws IOException{
+		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
+		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream(iconURL));
 		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-		copyMenuItem.setIcon(icon);
-		copyMenuItem.addActionListener(e -> {
-			String textToCopy = null;
-			final Component invoker = popupMenu.getInvoker();
-			if(invoker instanceof JTextComponent)
-				textToCopy = ((JTextComponent)invoker).getText();
-			else if(invoker instanceof JLabel)
-				textToCopy = ((JLabel)invoker).getText();
-			else if(invoker instanceof JCopyableTable){
-				final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
-				textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
-			}
-
-			if(textToCopy != null)
-				copyToClipboard(textToCopy);
-		});
-		return copyMenuItem;
+		menuItem.setIcon(icon);
+		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
+		return menuItem;
 	}
 
-	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu) throws IOException{
-		final JMenuItem copyMenuItem = new JMenuItem("Remove", 'R');
-		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_delete.png"));
-		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-		copyMenuItem.setIcon(icon);
-		copyMenuItem.addActionListener(e -> {
-			String textToCopy = null;
-			final Component invoker = popupMenu.getInvoker();
-			if(invoker instanceof JTextComponent)
-				textToCopy = ((JTextComponent)invoker).getText();
-			else if(invoker instanceof JLabel)
-				textToCopy = ((JLabel)invoker).getText();
-			else if(invoker instanceof JCopyableTable){
-				final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
-				textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
-			}
+	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnCopy) throws IOException{
+		return createPopupMenu("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
+	}
 
-			if(textToCopy != null)
-				copyToClipboard(textToCopy);
-		});
-		return copyMenuItem;
+	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete) throws IOException{
+		return createPopupMenu("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
+	}
+
+	public static void copyCallback(final Component invoker){
+		String textToCopy = null;
+		if(invoker instanceof JTextComponent)
+			textToCopy = ((JTextComponent)invoker).getText();
+		else if(invoker instanceof JLabel)
+			textToCopy = ((JLabel)invoker).getText();
+		else if(invoker instanceof JCopyableTable){
+			final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
+			textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
+		}
+
+		if(textToCopy != null)
+			GUIUtils.copyToClipboard(textToCopy);
 	}
 
 	public static void copyToClipboard(final JCopyableTable table){

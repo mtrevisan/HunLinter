@@ -61,6 +61,7 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.JTextComponent;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -198,10 +199,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
 			copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu));
+			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			copyAndRemovePopupMenu = new JPopupMenu();
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu));
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu));
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu, GUIUtils::copyCallback));
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, invoker -> removeSelectedRowsFromThesaurus()));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
 			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable);
@@ -2718,7 +2719,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		frame.hypSyllabationOutputLabel.setText(text);
 		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(StringHelper.join(StringUtils.SPACE, rules));
+		frame.hypRulesOutputLabel.setText(StringUtils.join(rules, StringUtils.SPACE));
 
 		frame.hypAddRuleTextField.setText(null);
 		frame.hypAddRuleSyllabationOutputLabel.setText(null);
