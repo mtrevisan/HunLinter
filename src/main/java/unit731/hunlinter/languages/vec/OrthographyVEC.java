@@ -2,6 +2,7 @@ package unit731.hunlinter.languages.vec;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -42,7 +43,8 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = PatternHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
-	private static final Pattern PATTERN_CONSONANT_GEMINATES = PatternHelper.pattern("((?<!^i(?=nn))[^aeiou])+\\1");
+	private static final Pattern PATTERN_CONSONANT_GEMINATES = PatternHelper.pattern("([^aeiou])\\1+|(?<!\\S)(inn)");
+	private static final Function<String, String> GEMINATES_REDUCER = word -> PatternHelper.replaceAll(word, PATTERN_CONSONANT_GEMINATES, "$1$2");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
@@ -88,7 +90,7 @@ public class OrthographyVEC extends Orthography{
 		correctedWord = GraphemeVEC.rollbackJHJWIUmlautPhonemes(correctedWord);
 
 		//eliminate consonant geminates
-		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_CONSONANT_GEMINATES, "$1");
+		correctedWord = GEMINATES_REDUCER.apply(correctedWord);
 
 		correctedWord = correctApostrophes(correctedWord);
 
