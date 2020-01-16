@@ -168,7 +168,7 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same synonyms */
-	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
 		return ss.stream()
 			.anyMatch(synonym -> synonym.contains(partOfSpeeches, synonyms));
@@ -177,9 +177,11 @@ public class ThesaurusParser{
 	public void deleteDefinitionAndSynonyms(final String definition){
 		//recover all words (definition and synonyms) from row
 		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
-		ss.stream()
+		final List<ThesaurusEntry> rows = ss.stream()
 			.filter(entry -> entry.getDefinition().equals(definition) || entry.containsSynonym(definition))
-			.forEach(dictionary::remove);
+			.collect(Collectors.toList());
+		//can't be inside the stream to prevent concurrent modification
+		rows.forEach(dictionary::remove);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
@@ -213,12 +215,12 @@ public class ThesaurusParser{
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final List<String> partOfSpeeches, List<String> synonyms){
+	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms){
 		//extract part of speech if present
-		final String posFilter = (!partOfSpeeches.isEmpty()?
+		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
 			".+");
-		final String synonymsFilter = (!synonyms.isEmpty()? "(" + StringUtils.join(synonyms, PIPE) + ")": ".+");
+		final String synonymsFilter = (synonyms != null && synonyms.length > 0? "(" + StringUtils.join(synonyms, PIPE) + ")": ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);

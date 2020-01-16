@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -101,9 +102,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonymsLength + StringUtils.LF.length() * synonymsEntries;
 	}
 
-	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
-		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && synonyms.contains(definition) && this.synonyms.stream().anyMatch(entry -> entry.containsAllSynonyms(partOfSpeeches, ss)));
+	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+		final List<String> ss = Arrays.asList(synonyms);
+		return (ss.remove(definition) && ArrayUtils.contains(synonyms, definition) && this.synonyms.stream().anyMatch(entry -> entry.containsAllSynonyms(partOfSpeeches, ss)));
 	}
 
 	public boolean containsSynonym(final String synonym){

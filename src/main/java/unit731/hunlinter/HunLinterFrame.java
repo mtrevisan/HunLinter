@@ -61,7 +61,6 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
-import javax.swing.text.JTextComponent;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -1721,16 +1720,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
-		final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
-		final List<String> synonyms = Arrays.asList(pair.getRight());
-		final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, synonyms);
-		theAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText) && !alreadyContained);
+		final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
+		theAddButton.setEnabled(!alreadyContained);
 
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
-			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(partOfSpeeches, synonyms);
+			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
@@ -1757,9 +1754,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final String unmodifiedSearchText = theSynonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
-				final List<String> partOfSpeeches = (pair.getLeft() != null? Arrays.asList(pair.getLeft()): Collections.emptyList());
-				final List<String> synonyms = Arrays.asList(pair.getRight());
-				final boolean alreadyContained = backbone.getTheParser().contains(partOfSpeeches, synonyms);
+				final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 				theAddButton.setEnabled(!alreadyContained);
 			}
 		}

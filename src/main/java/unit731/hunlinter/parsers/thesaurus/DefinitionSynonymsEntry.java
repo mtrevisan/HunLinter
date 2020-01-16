@@ -60,8 +60,8 @@ public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEnt
 		return synonyms.contains(synonym);
 	}
 
-	public boolean containsAllSynonyms(final List<String> partOfSpeeches, final List<String> synonyms){
-		return (Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches) && this.synonyms.containsAll(synonyms));
+	public boolean containsAllSynonyms(final String[] partOfSpeeches, final List<String> synonyms){
+		return (Arrays.asList(this.partOfSpeeches).containsAll(Arrays.asList(partOfSpeeches)) && this.synonyms.containsAll(synonyms));
 	}
 
 	@Override
