@@ -10,7 +10,7 @@ import java.util.List;
 
 public class WordTokenizerVECTest{
 
-	private static WordTokenizer tokenizer = new WordTokenizerVEC();
+	private static final WordTokenizer tokenizer = new WordTokenizerVEC();
 
 
 	@Test

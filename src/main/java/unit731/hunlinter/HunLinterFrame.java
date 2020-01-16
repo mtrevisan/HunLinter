@@ -53,6 +53,7 @@ import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -247,9 +248,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 		});
-		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> {
-			dicExtractPoSFAMenuItem.setEnabled(true);
-		});
+		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
 			cmpInputComboBox.setEnabled(true);
 			cmpLimitComboBox.setEnabled(true);
@@ -289,7 +288,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
             .map(AffixEntry::toString)
             .orElse(null);
-            return Arrays.asList(production, morphologicalFields, rule1, rule2, rule3).stream()
+            return Stream.of(production, morphologicalFields, rule1, rule2, rule3)
             .filter(Objects::nonNull)
             .collect(Collectors.joining(TAB));
          }
@@ -461,9 +460,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       for(int i = 0; i < dicTable.getColumnCount(); i ++)
       dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      dicTable.registerKeyboardAction(event -> {
-         GUIUtils.copyToClipboard((JCopyableTable)dicTable);
-      }, copyKeyStroke, JComponent.WHEN_FOCUSED);
+      dicTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)dicTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
       dicScrollPane.setViewportView(dicTable);
 
       dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
@@ -700,12 +697,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
-      theTable.registerKeyboardAction(event -> {
-         removeSelectedRowsFromThesaurus();
-      }, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-      theTable.registerKeyboardAction(event -> {
-         GUIUtils.copyToClipboard((JCopyableTable)theTable);
-      }, copyKeyStroke, JComponent.WHEN_FOCUSED);
+      theTable.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      theTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
       theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -2412,10 +2405,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
 			final String[] extractions = PatternHelper.extract(content, EXTRACTOR, 10);
-			final String sample = String.join(StringUtils.EMPTY, extractions).chars()
-				.mapToObj(Character::toString)
-				.collect(Collectors.toSet()).stream()
-				.collect(Collectors.joining(StringUtils.EMPTY));
+			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars().mapToObj(Character::toString).collect(Collectors.toSet()));
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
 		}
 		catch(final IOException ignored){}

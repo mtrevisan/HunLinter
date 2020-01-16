@@ -38,10 +38,10 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 			final Marker marker = eventObject.getMarker();
-			JavaHelper.executeOnEventDispatchThread(() -> {
+			JavaHelper.executeOnEventDispatchThread(() ->
 				JavaHelper.nullableToStream(TEXT_AREAS.get(marker))
-					.forEach(textArea -> textArea.append(message));
-			});
+					.forEach(textArea -> textArea.append(message))
+			);
 		}
 	}
 

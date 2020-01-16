@@ -14,7 +14,6 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 

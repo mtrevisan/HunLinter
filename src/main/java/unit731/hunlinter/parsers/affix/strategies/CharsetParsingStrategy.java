@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.StringHelper;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{

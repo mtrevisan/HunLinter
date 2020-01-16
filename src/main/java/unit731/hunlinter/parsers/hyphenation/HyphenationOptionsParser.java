@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class HyphenationOptionsParser{

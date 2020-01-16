@@ -36,7 +36,6 @@ import unit731.hunlinter.parsers.workers.core.WorkerData;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class DuplicatesWorker extends WorkerBase<Void, Void>{

@@ -12,7 +12,6 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEntry>{

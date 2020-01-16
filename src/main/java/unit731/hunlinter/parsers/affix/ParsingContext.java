@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class ParsingContext{

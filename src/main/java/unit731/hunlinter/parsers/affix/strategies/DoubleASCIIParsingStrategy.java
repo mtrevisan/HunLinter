@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.StringHelper;
 
 
 /**

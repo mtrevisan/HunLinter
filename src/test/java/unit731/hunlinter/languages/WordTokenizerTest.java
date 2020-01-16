@@ -9,7 +9,7 @@ import java.util.List;
 
 public class WordTokenizerTest{
 
-	private static WordTokenizer tokenizer = new WordTokenizer();
+	private static final WordTokenizer tokenizer = new WordTokenizer();
 
 
 	@Test

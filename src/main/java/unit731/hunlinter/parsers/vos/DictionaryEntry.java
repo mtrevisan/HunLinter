@@ -29,7 +29,6 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class DictionaryEntry{

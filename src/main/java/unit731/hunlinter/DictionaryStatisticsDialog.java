@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.JTextComponent;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
@@ -31,13 +30,11 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
-import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.services.StringHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{

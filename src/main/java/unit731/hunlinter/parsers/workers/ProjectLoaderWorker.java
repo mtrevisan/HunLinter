@@ -77,6 +77,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 				waitIfPaused();
 
 				stages.get(index).execute();
+				//noinspection IntegerDivisionInFloatingPointContext
 				setProgress((int)Math.ceil((index + 1) * 100 / stages.size()));
 			}
 
