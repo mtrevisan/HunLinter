@@ -13,6 +13,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,10 +177,8 @@ public class ThesaurusParser{
 	public void deleteDefinitionAndSynonyms(final String definition){
 		//recover all words (definition and synonyms) from row
 		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
-		final List<ThesaurusEntry> rows = ss.stream()
+		ss.stream()
 			.filter(entry -> entry.getDefinition().equals(definition) || entry.containsSynonym(definition))
-			.collect(Collectors.toList());
-		rows.stream()
 			.forEach(dictionary::remove);
 	}
 

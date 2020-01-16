@@ -1,13 +1,18 @@
 package unit731.hunlinter.services;
 
+import java.text.Normalizer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 
 public class StringHelper{
+
+	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
 		/** All lower case or neutral case, e.g. "lowercase" or "123" */
@@ -174,6 +179,10 @@ public class StringHelper{
 			if(word1.charAt(lastCommonLetter) != word2.charAt(lastCommonLetter))
 				break;
 		return lastCommonLetter;
+	}
+
+	public static String removeCombiningDiacriticalMarks(final String word){
+		return PatternHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS, StringUtils.EMPTY);
 	}
 
 }
