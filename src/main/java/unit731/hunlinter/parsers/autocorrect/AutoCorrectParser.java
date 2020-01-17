@@ -128,10 +128,8 @@ public class AutoCorrectParser{
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	public void deleteCorrections(final int[] selectedRowIDs){
-		IntStream.range(0, selectedRowIDs.length)
-			.map(idx -> selectedRowIDs[idx] - idx)
-			.forEach(dictionary::remove);
+	public void deleteCorrection(final int selectedRowID){
+		dictionary.remove(selectedRowID);
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms */

@@ -202,10 +202,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			copyAndRemovePopupMenu = new JPopupMenu();
 			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu, GUIUtils::copyCallback));
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, invoker -> removeSelectedRowsFromThesaurus()));
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, invoker -> removeSelectedRows(invoker)));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
-			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable);
+			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable, acoTable);
 		}
 		catch(final IOException ignored){}
 
@@ -356,7 +356,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       acoCorrectTextField = new javax.swing.JTextField();
       acoAddButton = new javax.swing.JButton();
       acoScrollPane = new javax.swing.JScrollPane();
-      acoTable = new javax.swing.JTable();
+      acoTable = new JCopyableTable(){
+         @Override
+         public String getValueAtRow(final int row){
+            final TableModel model = getModel();
+            final String incorrect = (String)model.getValueAt(row, 0);
+            final String correct = (String)model.getValueAt(row, 1);
+            return incorrect + " > " + correct;
+         }
+      };
       acoCorrectionsRecordedLabel = new javax.swing.JLabel();
       acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
@@ -969,19 +977,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       acoTable.setModel(new AutoCorrectTableModel());
       acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
+      acoTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
       //listen for row removal
-      acoTable.registerKeyboardAction(new ActionListener(){
-         public void actionPerformed(final ActionEvent event){
-            removeSelectedRowsFromAutoCorrect();
-         }
-      }, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      acoTable.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      acoTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)acoTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame acoParent = this;
       acoTable.addMouseListener(new MouseAdapter(){
          public void mouseClicked(final MouseEvent e){
-            if(e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3){
+            if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
                final int selectedRow = acoTable.rowAtPoint(e.getPoint());
                acoTable.setRowSelectionInterval(selectedRow, selectedRow);
                final int row = acoTable.convertRowIndexToModel(selectedRow);
@@ -1726,6 +1732,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sorter.setRowFilter(null);
 	}
 
+	public void removeSelectedRows(final Component invoker){
+		if(invoker == theTable)
+			removeSelectedRowsFromThesaurus();
+		else if(invoker == acoTable)
+			removeSelectedRowsFromAutoCorrect();
+	}
+
 	public void removeSelectedRowsFromThesaurus(){
 		try{
 			final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
@@ -1789,10 +1802,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	public void removeSelectedRowsFromAutoCorrect(){
 		try{
-			final int[] selectedRows = Arrays.stream(acoTable.getSelectedRows())
-				.map(acoTable::convertRowIndexToModel)
-				.toArray();
-			backbone.getAcoParser().deleteCorrections(selectedRows);
+			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
+			backbone.getAcoParser().deleteCorrection(selectedRow);
 
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 			dm.fireTableDataChanged();

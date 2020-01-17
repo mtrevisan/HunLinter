@@ -151,10 +151,9 @@ public class Backbone implements FileChangeListener{
 		final File affFile = getAffixFile();
 		final File hypFile = getHyphenationFile();
 		final File aidFile = getAidFile();
-		final File acoFile = getAcoFile();
 		final File sexFile = getSexFile();
 		final File wexFile = getWexFile();
-		final String[] uris = Stream.of(affFile, hypFile, aidFile, acoFile, sexFile, wexFile)
+		final String[] uris = Stream.of(affFile, hypFile, aidFile, sexFile, wexFile)
 			.filter(Objects::nonNull)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
