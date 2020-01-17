@@ -33,6 +33,7 @@ public class ConversionTable{
 	private static final String KEY_STARTS_WITH = reduceKey("^");
 	private static final String KEY_ENDS_WITH = reduceKey("$");
 	private static final String KEY_WHOLE = reduceKey("^$");
+	private static final String ZERO = "0";
 
 	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>();
 	static{
@@ -142,7 +143,7 @@ public class ConversionTable{
 		final String key = entry.getKey();
 
 		if(word.contains(key)){
-			final String value = entry.getValue();
+			final String value = (ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
 			int keyLength = key.length();
 			int valueLength = value.length();
 
@@ -162,23 +163,27 @@ public class ConversionTable{
 	private static void convertStartsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1);
-		if(word.startsWith(strippedKey))
-			conversions.add(entry.getValue() + word.substring(key.length() - 1));
+		if(word.startsWith(strippedKey)){
+			final String value = (ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
+			conversions.add(value + word.substring(key.length() - 1));
+		}
 	}
 
 	private static void convertEndsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
 		final String key = entry.getKey();
 		final int keyLength = key.length() - 1;
 		final String strippedKey = key.substring(0, keyLength);
-		if(word.endsWith(strippedKey))
-			conversions.add(word.substring(0, word.length() - keyLength) + entry.getValue());
+		if(word.endsWith(strippedKey)){
+			final String value = (ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
+			conversions.add(word.substring(0, word.length() - keyLength) + value);
+		}
 	}
 
 	private static void convertWhole(final String word, final Pair<String, String> entry, final List<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))
-			conversions.add(entry.getValue());
+			conversions.add(ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
 	}
 
 	@Override
