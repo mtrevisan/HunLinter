@@ -183,22 +183,23 @@ public class WordTokenizer{
 	}
 
 	private boolean urlEndsAt(final int index, final List<String> list, final String urlQuote){
+		boolean result = false;
 		final String token = list.get(index);
 		//this is guesswork
 		if(StringUtils.isWhitespace(token) || token.equals(")") || token.equals("]"))
-			return true;
+			result = true;
 		else if(list.size() > index + 1){
 			final String nextToken = list.get(index + 1);
 			if((StringUtils.isWhitespace(nextToken)
 					|| StringUtils.equalsAny(nextToken, "\"", "»", "«", "‘", "’", "“", "”", "'", DOT))
 					&& (StringUtils.equalsAny(token, DOT, ",", ";", COLUMN, "!", "?") || token.equals(urlQuote)))
-				return true;
+				result = true;
 			else if(!URL_CHARS.matcher(token).matches())
-				return true;
+				result = true;
 		}
 		else if(!URL_CHARS.matcher(token).matches() || token.equals(DOT))
-			return true;
-		return false;
+			result = true;
+		return result;
 	}
 
 }
