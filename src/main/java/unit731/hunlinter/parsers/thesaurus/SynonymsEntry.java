@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -14,7 +15,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 
 
-public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEntry>{
+public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): ''{0}''");
@@ -25,7 +26,7 @@ public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEnt
 	private List<String> synonyms;
 
 
-	public DefinitionSynonymsEntry(final String partOfSpeechAndSynonyms){
+	public SynonymsEntry(final String partOfSpeechAndSynonyms){
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
 
 		try{
@@ -55,12 +56,16 @@ public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEnt
 		return partOfSpeeches;
 	}
 
+	List<String> getSynonyms(){
+		return synonyms;
+	}
+
 	public boolean containsSynonym(final String synonym){
 		return synonyms.contains(synonym);
 	}
 
-	public boolean containsAllSynonyms(final String[] partOfSpeeches, final List<String> synonyms){
-		return (Arrays.asList(this.partOfSpeeches).containsAll(Arrays.asList(partOfSpeeches)) && this.synonyms.containsAll(synonyms));
+	public boolean contains(final String[] partOfSpeeches, final List<String> synonyms){
+		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(Arrays.asList(partOfSpeeches))) && this.synonyms.containsAll(synonyms));
 	}
 
 	@Override
@@ -72,7 +77,7 @@ public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEnt
 	}
 
 	@Override
-	public int compareTo(final DefinitionSynonymsEntry other){
+	public int compareTo(final SynonymsEntry other){
 		return new CompareToBuilder()
 			.append(partOfSpeeches, other.partOfSpeeches)
 			.append(synonyms, other.synonyms)
@@ -86,7 +91,7 @@ public class DefinitionSynonymsEntry implements Comparable<DefinitionSynonymsEnt
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final DefinitionSynonymsEntry rhs = (DefinitionSynonymsEntry)obj;
+		final SynonymsEntry rhs = (SynonymsEntry)obj;
 		return new EqualsBuilder()
 			.append(partOfSpeeches, rhs.partOfSpeeches)
 			.append(synonyms, rhs.synonyms)

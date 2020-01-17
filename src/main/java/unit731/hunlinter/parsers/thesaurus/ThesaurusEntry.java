@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,10 +27,16 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 
 	private final String definition;
-	private final List<DefinitionSynonymsEntry> synonyms;
+	private final List<SynonymsEntry> synonyms;
 
 
-	public ThesaurusEntry(final String definition, final List<DefinitionSynonymsEntry> synonyms){
+	public static ThesaurusEntry createFromDefinitionAndSynonyms(final String definition, final SynonymsEntry synonyms){
+		final List<SynonymsEntry> entries = new ArrayList<>();
+		entries.add(synonyms);
+		return new ThesaurusEntry(definition, entries);
+	}
+
+	public ThesaurusEntry(final String definition, final List<SynonymsEntry> synonyms){
 		Objects.requireNonNull(definition);
 		Objects.requireNonNull(synonyms);
 
@@ -53,7 +59,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 			if(definitionAndSynonyms == null)
 				throw new EOFException("Unexpected EOF while reading Thesaurus file");
 
-			synonyms.add(new DefinitionSynonymsEntry(definitionAndSynonyms));
+			synonyms.add(new SynonymsEntry(definitionAndSynonyms));
 		}
 	}
 
@@ -65,18 +71,29 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return StringUtils.join(synonyms, separator);
 	}
 
-	public void addSynonym(DefinitionSynonymsEntry definitionSynonymsEntry){
-		synonyms.add(definitionSynonymsEntry);
+	public void addSynonym(SynonymsEntry synonymsEntry){
+		synonyms.add(synonymsEntry);
+	}
+
+	public Set<String> getSynonyms(){
+		return synonyms.stream()
+			.map(SynonymsEntry::getSynonyms)
+			.flatMap(List::stream)
+			.collect(Collectors.toSet());
 	}
 
 	public int getSynonymsEntries(){
 		return synonyms.size();
 	}
 
-	public boolean hasSamePartOfSpeech(final String[] partOfSpeeches){
+	public boolean containsSynonym(final String synonym){
 		return synonyms.stream()
-			.map(DefinitionSynonymsEntry::getPartOfSpeeches)
-			.anyMatch(pos -> Arrays.equals(pos, partOfSpeeches));
+			.anyMatch(entry -> entry.containsSynonym(synonym));
+	}
+
+	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+		final List<String> ss = Arrays.asList(synonyms);
+		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
@@ -90,7 +107,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		final int synonymsEntries = getSynonymsEntries();
 		saveToIndex(dataWriter, synonymsEntries);
 		int synonymsLength = 1;
-		for(final DefinitionSynonymsEntry synonym : synonyms){
+		for(final SynonymsEntry synonym : synonyms){
 			final String s = synonym.toString();
 			dataWriter.write(s);
 			dataWriter.write(StringUtils.LF);
@@ -100,20 +117,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonymsLength + StringUtils.LF.length() * synonymsEntries;
 	}
 
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> ss = Arrays.asList(synonyms);
-		return (ss.remove(definition) && ArrayUtils.contains(synonyms, definition) && this.synonyms.stream().anyMatch(entry -> entry.containsAllSynonyms(partOfSpeeches, ss)));
-	}
-
-	public boolean containsSynonym(final String synonym){
-		return synonyms.stream()
-			.anyMatch(entry -> entry.containsSynonym(synonym));
-	}
-
 	@Override
 	public String toString(){
 		return synonyms.stream()
-			.map(DefinitionSynonymsEntry::toString)
+			.map(SynonymsEntry::toString)
 			.map(s -> definition + ": " + String.join(", ", s))
 			.collect(Collectors.joining("\\r\\n"));
 	}

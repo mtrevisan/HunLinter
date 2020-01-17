@@ -1711,11 +1711,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		formerFilterThesaurusText = unmodifiedSearchText;
 
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 		theAddButton.setEnabled(!alreadyContained);
-
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
@@ -1735,9 +1734,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				.deleteDefinitionAndSynonyms(selectedDefinition);
 
 			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-			dm.fireTableDataChanged();
-
+			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
+			dm.fireTableDataChanged();
 
 			//… and save the files
 			backbone.storeThesaurusFiles();
@@ -1747,6 +1746,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final String unmodifiedSearchText = theSynonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 				final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 				theAddButton.setEnabled(!alreadyContained);
 			}
@@ -1766,15 +1766,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		formerFilterIncorrectText = unmodifiedIncorrectText;
 		formerFilterCorrectText = unmodifiedCorrectText;
 
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText,
-			unmodifiedCorrectText);
+		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText, unmodifiedCorrectText);
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
+		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = backbone.getAcoParser().contains(incorrect, correct);
 		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
-
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)frame.acoTable.getRowSorter();
@@ -2589,11 +2587,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	private void loadFileCancelled(final Exception exc){
+		//menu
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
 		dicMenu.setEnabled(false);
-
 		if((exc instanceof ProjectNotFoundException)){
 			//remove the file from the recent projects menu
 			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
@@ -2601,8 +2599,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
-
-
 		dicCheckCorrectnessMenuItem.setEnabled(false);
 		dicSortDictionaryMenuItem.setEnabled(false);
 		hypCheckCorrectnessMenuItem.setEnabled(false);
@@ -2969,6 +2965,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		formerInputText = null;
 		dicInputTextField.setText(null);
+		theSynonymsTextField.setText(null);
 	}
 
 	private void clearDictionaryCompoundFields(){

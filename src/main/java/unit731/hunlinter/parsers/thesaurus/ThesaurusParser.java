@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -22,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -79,11 +77,12 @@ public class ThesaurusParser{
 			FileHelper.readCharset(line);
 
 			while((line = br.readLine()) != null)
-				if(!line.isEmpty())
-					dictionary.add(new ThesaurusEntry(line, br));
+				if(!line.isEmpty()){
+					final boolean added = dictionary.add(new ThesaurusEntry(line, br));
+					if(!added)
+						throw new IllegalArgumentException("Duplicated synonym in thesaurus");
+				}
 		}
-
-		validate();
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
@@ -96,18 +95,12 @@ public class ThesaurusParser{
 		return line;
 	}
 
-	private void validate(){
-		final List<String> duplicatedSynonyms = dictionary.extractDuplicatedSynonyms();
-		for(final String duplicatedSynonym : duplicatedSynonyms)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated synonym in thesaurus: '{}'", duplicatedSynonym);
-	}
-
 	public int getSynonymsCounter(){
 		return dictionary.size();
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return dictionary.getSynonyms();
+		return dictionary.getSortedSynonyms();
 	}
 
 	/**
@@ -128,12 +121,12 @@ public class ThesaurusParser{
 		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
 			.split("\\s*,\\s*");
 
-		final List<String> synonyms = Arrays.stream(StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR))
+		final String[] synonyms = Arrays.stream(StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR))
 			.map(String::trim)
 			.filter(StringUtils::isNotBlank)
 			.distinct()
-			.collect(Collectors.toList());
-		if(synonyms.size() < 2)
+			.toArray(String[]::new);
+		if(synonyms.length < 2)
 			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		boolean forceInsertion = false;
@@ -152,33 +145,17 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
-		final List<ThesaurusEntry> duplicates = new ArrayList<>();
-		final List<ThesaurusEntry> dictionarySynonyms = dictionary.getSynonyms();
-		for(final String synonym : synonyms){
-			final String syn = PatternHelper.replaceAll(synonym, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-			dictionarySynonyms.stream()
-				.filter(s -> s.getDefinition().equals(syn) && s.hasSamePartOfSpeech(partOfSpeeches))
-				.forEach(duplicates::add);
-		}
-		return duplicates;
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
+		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
 	/** Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
-		return ss.stream()
-			.anyMatch(synonym -> synonym.contains(partOfSpeeches, synonyms));
+		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
 	public void deleteDefinitionAndSynonyms(final String definition){
-		//recover all words (definition and synonyms) from row
-		final List<ThesaurusEntry> ss = dictionary.getSynonyms();
-		final List<ThesaurusEntry> rows = ss.stream()
-			.filter(entry -> entry.getDefinition().equals(definition) || entry.containsSynonym(definition))
-			.collect(Collectors.toList());
-		//can't be inside the stream to prevent concurrent modification
-		rows.forEach(dictionary::remove);
+		dictionary.deleteDefinition(definition);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
@@ -248,9 +225,6 @@ public class ThesaurusParser{
 	}
 
 	public void save(final File theIndexFile, final File theDataFile) throws IOException{
-		//sort the synonyms
-		dictionary.sort();
-
 		//save index and data files
 		final Charset charset = StandardCharsets.UTF_8;
 		try(
@@ -269,7 +243,7 @@ public class ThesaurusParser{
 			//save data
 			int idx = charset.name().length() + 1;
 			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
-			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();
 			for(final ThesaurusEntry synonym : synonyms){
 				synonym.saveToIndex(indexWriter, idx);
 
