@@ -1729,11 +1729,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	public void removeSelectedRowsFromThesaurus(){
 		try{
 			final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
-			final String selectedDefinition = (String)theTable.getModel().getValueAt(selectedRow, 0);
-			backbone.getTheParser()
-				.deleteDefinitionAndSynonyms(selectedDefinition);
-
 			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
+			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
+			backbone.getTheParser()
+				.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
+
 			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
 			dm.fireTableDataChanged();

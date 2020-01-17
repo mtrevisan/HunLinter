@@ -1,19 +1,20 @@
 package unit731.hunlinter.parsers.thesaurus;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.ThesaurusTableModel;
+import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -28,7 +29,12 @@ public class ThesaurusDictionary{
 
 
 	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
+	private final Comparator<String> comparator;
 
+
+	public ThesaurusDictionary(final String language){
+		comparator = BaseBuilder.getComparator(language);
+	}
 
 	public boolean add(final ThesaurusEntry entry){
 		boolean result = false;
@@ -81,21 +87,37 @@ public class ThesaurusDictionary{
 			.anyMatch(entry -> ArrayUtils.contains(syns, entry.getDefinition()) && entry.contains(partOfSpeeches, syns));
 	}
 
-	public void deleteDefinition(final String definition){
-		//recover all words (definition and synonyms) from given definition
-		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final Set<String> definitions = entryToBeDeleted.getSynonyms();
-		definitions.add(definition);
+	public void deleteDefinition(final String definition, final String synonyms){
+		//recover definition and synonyms pairs (to be deleted)
+		final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
+		final List<SynonymsEntry> entries = Arrays.stream(synonymsByDefinition)
+			.map(syns -> new SynonymsEntry(GUIUtils.removeHTMLCode(syns) + ThesaurusEntry.PIPE + definition))
+			.collect(Collectors.toList());
 
-		//remove all
+		//delete each occurrence of the definition-synonyms pair
 		dictionary.entrySet()
-			.removeIf(entry -> definitions.contains(entry.getKey()));
+			.removeIf(entry -> {
+				final String def = entry.getKey();
+				final List<SynonymsEntry> syns = entry.getValue().getSynonyms().stream()
+					.map(s -> new SynonymsEntry(s + ThesaurusEntry.PIPE + def))
+					.collect(Collectors.toList());
+				return entries.stream()
+					.anyMatch(e -> syns.stream().anyMatch(s -> e.isSame(s)));
+			});
 	}
 
 	public List<ThesaurusEntry> getSortedSynonyms(){
-		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
+		final List<ThesaurusEntry> synonyms = dictionary.values().stream()
+			.flatMap(v -> v.getSynonyms().stream()
+				.map(s -> ThesaurusEntry.createFromDefinitionAndSynonyms(v.getDefinition(), new SynonymsEntry(s + ThesaurusEntry.PIPE + v.getDefinition()))))
+			.collect(Collectors.toList());
 		//sort the synonyms
-		synonyms.sort(Comparator.naturalOrder());
+		Collections.sort(synonyms, (entry1, entry2) -> {
+			final int result = comparator.compare(entry1.getDefinition(), entry2.getDefinition());
+			return (result == 0?
+				Integer.compare(entry2.getSynonymsCount(), entry1.getSynonymsCount()):
+				result);
+		});
 		return synonyms;
 	}
 

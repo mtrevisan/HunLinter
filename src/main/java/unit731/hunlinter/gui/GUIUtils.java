@@ -202,7 +202,7 @@ public class GUIUtils{
 		clipboard.setContents(new StringSelection(textToCopy), null);
 	}
 
-	private static String removeHTMLCode(final String text){
+	public static String removeHTMLCode(final String text){
 		return PatternHelper.clear(text, PATTERN_HTML_CODE);
 	}
 

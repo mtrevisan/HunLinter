@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -31,7 +32,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 
 	public static ThesaurusEntry createFromDefinitionAndSynonyms(final String definition, final SynonymsEntry synonyms){
-		final List<SynonymsEntry> entries = new ArrayList<>();
+		final List<SynonymsEntry> entries = new ArrayList<>(1);
 		entries.add(synonyms);
 		return new ThesaurusEntry(definition, entries);
 	}
@@ -75,20 +76,18 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		synonyms.add(synonymsEntry);
 	}
 
-	public Set<String> getSynonyms(){
-		return synonyms.stream()
-			.map(SynonymsEntry::getSynonyms)
-			.flatMap(List::stream)
-			.collect(Collectors.toSet());
+	public Set<SynonymsEntry> getSynonyms(){
+		return new HashSet<>(synonyms);
 	}
 
 	public int getSynonymsEntries(){
 		return synonyms.size();
 	}
 
-	public boolean containsSynonym(final String synonym){
+	public int getSynonymsCount(){
 		return synonyms.stream()
-			.anyMatch(entry -> entry.containsSynonym(synonym));
+			.mapToInt(s -> s.getSynonyms().size())
+			.sum();
 	}
 
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){

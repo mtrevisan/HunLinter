@@ -80,7 +80,7 @@ public class Backbone implements FileChangeListener{
 
 		affParser = new AffixParser();
 		aidParser = new AidParser();
-		theParser = new ThesaurusParser();
+		theParser = new ThesaurusParser(packager.getLanguage());
 		acoParser = new AutoCorrectParser();
 		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
 		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);

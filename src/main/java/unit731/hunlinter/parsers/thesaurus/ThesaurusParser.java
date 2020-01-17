@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -35,8 +33,6 @@ import unit731.hunlinter.services.PatternHelper;
  * <a href="http://blog.robertelder.org/diff-algorithm/">Myers Diff Algorithm - Code &amp; Interactive Visualization</a>
  */
 public class ThesaurusParser{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': was ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): was ''{0}''");
@@ -53,8 +49,12 @@ public class ThesaurusParser{
 	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
 
-	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
+	private final ThesaurusDictionary dictionary;
 
+
+	public ThesaurusParser(final String language){
+		dictionary = new ThesaurusDictionary(language);
+	}
 
 	public ThesaurusDictionary getDictionary(){
 		return dictionary;
@@ -154,8 +154,8 @@ public class ThesaurusParser{
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
-	public void deleteDefinitionAndSynonyms(final String definition){
-		dictionary.deleteDefinition(definition);
+	public void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
+		dictionary.deleteDefinition(definition, selectedSynonyms);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
