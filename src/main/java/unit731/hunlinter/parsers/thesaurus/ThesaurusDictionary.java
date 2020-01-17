@@ -1,5 +1,6 @@
 package unit731.hunlinter.parsers.thesaurus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -106,7 +107,7 @@ public class ThesaurusDictionary{
 			});
 	}
 
-	public List<ThesaurusEntry> getSortedSynonyms(){
+	public List<ThesaurusEntry> getSynonymsDictionary(){
 		final List<ThesaurusEntry> synonyms = dictionary.values().stream()
 			.flatMap(v -> v.getSynonyms().stream()
 				.map(s -> ThesaurusEntry.createFromDefinitionAndSynonyms(v.getDefinition(), new SynonymsEntry(s + ThesaurusEntry.PIPE + v.getDefinition()))))
@@ -118,6 +119,13 @@ public class ThesaurusDictionary{
 				Integer.compare(entry2.getSynonymsCount(), entry1.getSynonymsCount()):
 				result);
 		});
+		return synonyms;
+	}
+
+	public List<ThesaurusEntry> getSortedSynonyms(){
+		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
+		//need to sort the definitions in natural order
+		Collections.sort(synonyms, (entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
 		return synonyms;
 	}
 
