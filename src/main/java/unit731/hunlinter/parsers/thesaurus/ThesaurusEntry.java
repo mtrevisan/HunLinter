@@ -91,7 +91,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> ss = Arrays.asList(synonyms);
+		final List<String> ss = new ArrayList(Arrays.asList(synonyms));
 		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));
 	}
 

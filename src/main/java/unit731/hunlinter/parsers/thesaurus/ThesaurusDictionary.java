@@ -110,7 +110,7 @@ public class ThesaurusDictionary{
 	public List<ThesaurusEntry> getSynonymsDictionary(){
 		final List<ThesaurusEntry> synonyms = dictionary.values().stream()
 			.flatMap(v -> v.getSynonyms().stream()
-				.map(s -> ThesaurusEntry.createFromDefinitionAndSynonyms(v.getDefinition(), new SynonymsEntry(s + ThesaurusEntry.PIPE + v.getDefinition()))))
+				.map(s -> ThesaurusEntry.createFromDefinitionAndSynonyms(v.getDefinition(), s)))
 			.collect(Collectors.toList());
 		//sort the synonyms
 		Collections.sort(synonyms, (entry1, entry2) -> {
