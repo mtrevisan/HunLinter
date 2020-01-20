@@ -2449,8 +2449,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		wexTagPanel.setFont(currentFont);
 	}
 
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-											final Comparator<AffixEntry> comparatorAffix){
+	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
@@ -2621,7 +2620,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		cmpInputComboBox.setEnabled(false);
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
-		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
 
 
 		//hyphenation file:
@@ -2641,21 +2639,30 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//thesaurus file:
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+		formerFilterThesaurusText = null;
+		((TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter()).setRowFilter(null);
 
 
 		//auto–correct file:
 		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 		openAcoButton.setEnabled(false);
+		formerFilterIncorrectText = null;
+		formerFilterCorrectText = null;
+		((TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter()).setRowFilter(null);
 
 
 		//sentence exceptions file:
 		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 		openSexButton.setEnabled(false);
+		formerFilterSentenceException = null;
+		sexTagPanel.applyFilter(null);
 
 
 		//word exceptions file:
 		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 		openWexButton.setEnabled(false);
+		formerFilterWordException = null;
+		wexTagPanel.applyFilter(null);
 	}
 
 	private void updateSynonymsCounter(){
@@ -2976,11 +2983,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		clearOutputTable(cmpTable);
 
 		formerInputText = null;
+
 		dicInputTextField.setText(null);
 		theSynonymsTextField.setText(null);
 	}
 
 	private void clearDictionaryCompoundFields(){
+		formerCompoundInputText = null;
+
 		cmpInputComboBox.setEnabled(true);
 		cmpInputTextArea.setText(null);
 		cmpInputTextArea.setEnabled(true);
