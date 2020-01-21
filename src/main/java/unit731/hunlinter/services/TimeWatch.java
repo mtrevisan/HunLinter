@@ -10,7 +10,7 @@ public class TimeWatch{
 
 	private static final String TIMER_NOT_STOPPED = "timer not stopped";
 	private static final String MINUTES = "min";
-	private static final String SECONDS = "s";
+	private static final String SECONDS = "sec";
 
 	private long start;
 	private long end;
