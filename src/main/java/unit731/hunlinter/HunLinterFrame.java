@@ -202,7 +202,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			copyAndRemovePopupMenu = new JPopupMenu();
 			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu, GUIUtils::copyCallback));
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, invoker -> removeSelectedRows(invoker)));
+			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, this::removeSelectedRows));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
 			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable, acoTable);
@@ -2640,6 +2640,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//thesaurus file:
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 		formerFilterThesaurusText = null;
+		//noinspection unchecked
 		((TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter()).setRowFilter(null);
 
 
@@ -2648,6 +2649,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		openAcoButton.setEnabled(false);
 		formerFilterIncorrectText = null;
 		formerFilterCorrectText = null;
+		//noinspection unchecked
 		((TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter()).setRowFilter(null);
 
 

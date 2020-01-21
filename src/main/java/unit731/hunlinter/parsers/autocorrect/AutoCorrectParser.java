@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 /** Manages pairs of mistyped words and their correct spelling */

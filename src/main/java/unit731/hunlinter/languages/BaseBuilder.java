@@ -37,7 +37,7 @@ public class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.checker = DictionaryCorrectnessChecker::new;
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 	}
-	private static final Map<String, LanguageData> DATAS = new HashMap<>();
+	private static final Map<String, LanguageData> DATA = new HashMap<>();
 	static{
 		LanguageData langData = new LanguageData();
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
@@ -45,38 +45,38 @@ public class BaseBuilder{
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();
 		langData.checker = DictionaryCorrectnessCheckerVEC::new;
 		langData.orthography = OrthographyVEC.getInstance();
-		DATAS.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
+		DATA.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
 	}
 
 
 	private BaseBuilder(){}
 
 	public static Comparator<String> getComparator(final String language){
-		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.comparator;
 	}
 
 	public static BloomFilterParameters getDictionaryBaseData(final String language){
-		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.dictionaryBaseData;
 	}
 
 	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData,
 			final HyphenatorInterface hyphenator){
-		final DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
+		final DictionaryCorrectnessChecker checker = DATA.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
 			.checker.apply(affixData, hyphenator);
 		checker.loadRules();
 		return checker;
 	}
 
 	public static Orthography getOrthography(final String language){
-		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.orthography;
 	}
 
 	public static Properties getRulesProperties(final String language){
 		final Properties rulesProperties = new Properties();
-		final Class<? extends DictionaryCorrectnessChecker> cl = DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+		final Class<? extends DictionaryCorrectnessChecker> cl = DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
 		try(final InputStream is = cl.getResourceAsStream("rules.properties")){
 			if(is != null)

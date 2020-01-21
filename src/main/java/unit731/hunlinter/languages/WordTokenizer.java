@@ -3,8 +3,6 @@ package unit731.hunlinter.languages;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.function.Function;

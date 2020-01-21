@@ -100,7 +100,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       ((PlainDocument)minLeftCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 
       minRightCompoundLabel.setLabelFor(minRightCompoundTextField);
-      minRightCompoundLabel.setText("Minimal right comound distance:");
+      minRightCompoundLabel.setText("Minimal right compound distance:");
 
       ((PlainDocument)minRightCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 

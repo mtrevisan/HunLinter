@@ -21,7 +21,7 @@ import unit731.hunlinter.services.Memoizer;
  *
  * @param <T>	Type of value
  */
-public class Frequency<T extends Comparable>{
+public class Frequency<T extends Comparable<?>>{
 
 	private final Function<Integer, Long> SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
 

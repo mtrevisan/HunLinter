@@ -200,7 +200,7 @@ public class AffixParser{
 //		postProcessWordChars();
 		postProcessLanguage(affFile);
 		postProcessWordBreak();
-		postProcessComplesPrefixes();
+		postProcessComplexPrefixes();
 		postProcessCompoundMinimumLength();
 	}
 
@@ -242,7 +242,7 @@ public class AffixParser{
 		}
 	}
 
-	private void postProcessComplesPrefixes(){
+	private void postProcessComplexPrefixes(){
 		//swap options:
 		if(data.isComplexPrefixes()){
 			final String compoundBegin = data.getData(AffixOption.COMPOUND_BEGIN_FLAG);

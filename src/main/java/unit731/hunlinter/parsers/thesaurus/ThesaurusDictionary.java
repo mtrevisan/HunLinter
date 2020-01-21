@@ -116,7 +116,7 @@ public class ThesaurusDictionary{
 	public List<ThesaurusEntry> getSortedSynonyms(){
 		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
 		//need to sort the definitions in natural order
-		Collections.sort(synonyms, (entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
+		synonyms.sort((entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
 		return synonyms;
 	}
 

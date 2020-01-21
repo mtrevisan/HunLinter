@@ -93,13 +93,13 @@ public class XMLParser{
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
 	}
 
-	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extrationCondition){
+	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extractionCondition){
 		final List<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			for(int i = 0; i < nodes.getLength(); i ++){
 				final Node node = nodes.item(i);
-				if(extrationCondition.apply(node))
+				if(extractionCondition.apply(node))
 					children.add(node);
 			}
 		}
