@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,23 +27,16 @@ public class ThesaurusDictionary{
 	private static final String PART_OF_SPEECH_END = ")";
 
 
-	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
-	private final Comparator<String> comparator;
+	private final Map<String, ThesaurusEntry> dictionary;
 
 
 	public ThesaurusDictionary(final String language){
-		comparator = BaseBuilder.getComparator(language);
+		final Comparator<String> comparator = BaseBuilder.getComparator(language);
+		dictionary = new TreeMap<>(comparator);
 	}
 
 	public boolean add(final ThesaurusEntry entry){
-		boolean result = false;
-		final String definition = entry.getDefinition();
-		if(!dictionary.containsKey(definition)){
-			dictionary.put(definition, entry);
-
-			result = true;
-		}
-		return result;
+		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
 	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
@@ -87,14 +80,6 @@ public class ThesaurusDictionary{
 			.anyMatch(entry -> entry.contains(pos, syns));
 	}
 
-	/** Find if there is a duplicate with the given part of speech and synonyms contained */
-	public boolean intersects(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> pos = Arrays.asList(partOfSpeeches);
-		final List<String> syns = Arrays.asList(synonyms);
-		return dictionary.values().stream()
-			.anyMatch(entry -> entry.intersects(pos, syns));
-	}
-
 	//FIXME? remove only one entry?
 	public void deleteDefinition(final String definition, final String synonyms){
 		//recover all words (definition and synonyms) from given definition
@@ -125,15 +110,7 @@ public class ThesaurusDictionary{
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
-		//sort the synonyms
-		Collections.sort(synonyms, (entry1, entry2) -> {
-			final int result = comparator.compare(entry1.getDefinition(), entry2.getDefinition());
-			return (result == 0?
-				Integer.compare(entry2.getSynonymsCount(), entry1.getSynonymsCount()):
-				result);
-		});
-		return synonyms;
+		return new ArrayList<>(dictionary.values());
 	}
 
 	public List<ThesaurusEntry> getSortedSynonyms(){
