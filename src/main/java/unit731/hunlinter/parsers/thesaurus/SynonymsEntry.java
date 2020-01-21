@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.thesaurus;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -61,12 +62,14 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return synonyms;
 	}
 
-	public boolean contains(final String[] partOfSpeeches, final List<String> synonyms){
-		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(Arrays.asList(partOfSpeeches))) && this.synonyms.containsAll(synonyms));
+	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches))
+			&& this.synonyms.containsAll(synonyms));
 	}
 
-	public boolean isSame(final SynonymsEntry entry){
-		return (Arrays.equals(partOfSpeeches, entry.partOfSpeeches) && new HashSet<>(synonyms).equals(new HashSet<>(entry.synonyms)));
+	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
+		return ((partOfSpeeches == null || !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches))
+			&& !Collections.disjoint(this.synonyms, synonyms));
 	}
 
 	@Override

@@ -92,9 +92,14 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 			.sum();
 	}
 
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> ss = new ArrayList(Arrays.asList(synonyms));
+	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+		final List<String> ss = new ArrayList(synonyms);
 		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));
+	}
+
+	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
+		final List<String> ss = new ArrayList(synonyms);
+		return (ss.remove(definition) || this.synonyms.stream().anyMatch(entry -> entry.intersects(partOfSpeeches, ss)));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{

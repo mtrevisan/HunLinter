@@ -12,7 +12,6 @@ import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.JavaHelper;
@@ -82,9 +81,18 @@ public class ThesaurusDictionary{
 
 	/** Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final String[] syns = cleanSynonymsFromUse(synonyms);
+		final List<String> pos = Arrays.asList(partOfSpeeches);
+		final List<String> syns = Arrays.asList(synonyms);
 		return dictionary.values().stream()
-			.anyMatch(entry -> ArrayUtils.contains(syns, entry.getDefinition()) && entry.contains(partOfSpeeches, syns));
+			.anyMatch(entry -> entry.contains(pos, syns));
+	}
+
+	/** Find if there is a duplicate with the given part of speech and synonyms contained */
+	public boolean intersects(final String[] partOfSpeeches, final String[] synonyms){
+		final List<String> pos = Arrays.asList(partOfSpeeches);
+		final List<String> syns = Arrays.asList(synonyms);
+		return dictionary.values().stream()
+			.anyMatch(entry -> entry.intersects(pos, syns));
 	}
 
 	//FIXME? remove only one entry?
@@ -145,16 +153,11 @@ public class ThesaurusDictionary{
 
 	/** Find all the entries that have part of speech and synonyms contained into the given ones */
 	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
-		final String[] syns = cleanSynonymsFromUse(synonyms);
+		final List<String> pos = Arrays.asList(partOfSpeeches);
+		final List<String> syns = Arrays.asList(synonyms);
 		return dictionary.values().stream()
-			.filter(entry -> ArrayUtils.contains(syns, entry.getDefinition()) && entry.contains(partOfSpeeches, syns))
+			.filter(entry -> entry.intersects(pos, syns))
 			.collect(Collectors.toList());
-	}
-
-	private String[] cleanSynonymsFromUse(final String[] synonyms){
-		return JavaHelper.nullableToStream(synonyms)
-			.map(this::removeSynonymUse)
-			.toArray(String[]::new);
 	}
 
 	private String removeSynonymUse(final String synonym){
