@@ -74,7 +74,7 @@ public class ThesaurusDictionary{
 
 	/** Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> pos = Arrays.asList(partOfSpeeches);
+		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
 		return dictionary.values().stream()
 			.anyMatch(entry -> entry.contains(pos, syns));
