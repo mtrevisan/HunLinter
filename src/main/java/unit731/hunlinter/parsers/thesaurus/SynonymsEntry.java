@@ -1,11 +1,14 @@
 package unit731.hunlinter.parsers.thesaurus;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -23,34 +26,32 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	private static final MessageFormat AIOOB_EXCEPTION = new MessageFormat("{0} with input ''{1}''");
 
 
-	private String[] partOfSpeeches;
-	private List<String> synonyms;
+	private final String[] partOfSpeeches;
+	private final List<String> synonyms = new ArrayList<>();
 
 
 	public SynonymsEntry(final String partOfSpeechAndSynonyms){
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
 
-		try{
-			//all entries should be in lowercase
-			final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
+		//all entries should be in lowercase
+		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
 
-			final String partOfSpeech = StringUtils.strip(components[0]);
-			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
-				throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
+		final String partOfSpeech = StringUtils.strip(components[0]);
+		if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
+			throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 
-			partOfSpeeches = partOfSpeech.substring(1, partOfSpeech.length() - 1)
-				.split(",\\s*");
-			synonyms = Arrays.stream(StringUtils.split(components[1], ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR))
-				.map(String::trim)
-				.filter(StringUtils::isNotBlank)
-				.distinct()
-				.collect(Collectors.toList());
-			if(synonyms.isEmpty())
-				throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+		partOfSpeeches = StringUtils.split(partOfSpeech.substring(1, partOfSpeech.length() - 1), ',');
+		for(int i = 0; i < partOfSpeeches.length; i ++)
+			partOfSpeeches[i] = partOfSpeeches[i].trim();
+
+		final Set<String> uniqueValues = new HashSet<>();
+		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR)){
+			final String trim = synonym.trim();
+			if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
+				synonyms.add(trim);
 		}
-		catch(final ArrayIndexOutOfBoundsException e){
-			throw new HunLintException(AIOOB_EXCEPTION.format(new Object[]{e.getMessage(), partOfSpeechAndSynonyms}));
-		}
+		if(synonyms.isEmpty())
+			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
 	public String[] getPartOfSpeeches(){

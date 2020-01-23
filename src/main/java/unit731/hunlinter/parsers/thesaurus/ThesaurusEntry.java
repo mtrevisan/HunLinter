@@ -48,10 +48,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(br);
 
 		//all entries should be in lowercase
-		final String[] data = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR);
+		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR);
 
-		definition = data[0];
-		final int numEntries = Integer.parseInt(data[1]);
+		definition = components[0];
+		final int numEntries = Integer.parseInt(components[1]);
 		synonyms = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			final String definitionAndSynonyms = br.readLine();
