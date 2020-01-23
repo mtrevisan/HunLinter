@@ -11,6 +11,7 @@ import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
@@ -138,19 +139,20 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void vanishingElCheck(final Production production){
 		final String derivedWord = production.getWord();
-		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-			if(!derivedWord.toLowerCase(Locale.ROOT).startsWith(GraphemeVEC.GRAPHEME_L)
-					&& PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY),
-					PATTERN_NON_VANISHING_EL))
-				throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
-			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-				throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
-					NORTHERN_PLURAL_STRESSED_RULE, derivedWord}));
-			if(derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE))
-				throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
+		final String[] derivations = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), HyphenationParser.EN_DASH);
+		for(final String derivation : derivations){
+			if(derivation.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
+				if(PatternHelper.find(derivation, PATTERN_NON_VANISHING_EL))
+					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
+				if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
+					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
+						NORTHERN_PLURAL_STRESSED_RULE, derivation}));
+				if(derivation.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivation.contains(GraphemeVEC.GRAPHEME_T_STROKE))
+					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
+			}
+			if(PatternHelper.find(derivation, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
+				throw new HunLintException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 		}
-		if(PatternHelper.find(derivedWord, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
-			throw new HunLintException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 	}
 
 	private void incompatibilityCheck(final Production production){
@@ -294,7 +296,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void finalSonorizationCheck(final Production production){
 		//FIXME
-//		if(!production.hasProductionRules() && !production.getWord().contains("–")){
+//		if(!production.hasProductionRules() && !production.getWord().contains(HyphenationParser.EN_DASH)){
 //			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(finalSonorizationFlag);
 //			final boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.GRAPHEME_L_STROKE)
 //				&& affixData.isAffixProductive(production.getWord(), finalSonorizationFlag));
