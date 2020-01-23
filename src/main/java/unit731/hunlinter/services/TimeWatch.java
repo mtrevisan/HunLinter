@@ -11,6 +11,7 @@ public class TimeWatch{
 	private static final String TIMER_NOT_STOPPED = "timer not stopped";
 	private static final String MINUTES = "min";
 	private static final String SECONDS = "sec";
+	private static final String MILLIS = "ms";
 
 	private long start;
 	private long end;
@@ -60,21 +61,8 @@ public class TimeWatch{
 			return TIMER_NOT_STOPPED;
 	}
 
-	public String toStringMinuteSecondsMillis(){
-		if(end > 0l){
-			final long delta = time(TimeUnit.MILLISECONDS);
-
-			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-			final long mins = delta / 60_000l;
-			if(mins > 0)
-				sj.add(Long.toString(mins)).add(MINUTES);
-			final long millis = delta - mins * 60_000l;
-			if(mins == 0 || millis > 0)
-				sj.add(String.format(Locale.ROOT, "%.3f", millis / 1000.)).add(SECONDS);
-			return sj.toString();
-		}
-		else
-			return TIMER_NOT_STOPPED;
+	public String toStringMillis(){
+		return (end > 0l? time(TimeUnit.MILLISECONDS) + StringUtils.SPACE + MILLIS: TIMER_NOT_STOPPED);
 	}
 
 }

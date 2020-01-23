@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.TimeWatch;
 
 
 /**
@@ -76,12 +77,15 @@ public class ThesaurusParser{
 
 			FileHelper.readCharset(line);
 
+//			TimeWatch timer = TimeWatch.start();
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty()){
 					final boolean added = dictionary.add(new ThesaurusEntry(line, br));
 					if(!added)
 						throw new IllegalArgumentException("Duplicated synonym in thesaurus");
 				}
+//			timer.stop();
+//			System.out.println(timer.toStringMillis());
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
