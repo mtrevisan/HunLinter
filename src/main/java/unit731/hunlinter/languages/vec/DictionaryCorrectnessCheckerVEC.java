@@ -1,9 +1,11 @@
 package unit731.hunlinter.languages.vec;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -43,6 +45,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 	private static Pattern PATTERN_NON_VANISHING_EL;
+	private static Pattern PATTERN_NON_VANISHING_EL_NOT_AT_END;
 	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
 	private static Pattern PATTERN_PHONEME_CIJJHNHIV;
 	private static Pattern PATTERN_NORTHERN_PLURAL;
@@ -56,8 +59,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("Word have unnecessary stress, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE = new MessageFormat("Word with ƚ cannot contain rule {0} or {1}, {2}");
-	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH = new MessageFormat("Word with ƚ cannot contain đ or ŧ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_NEAR_CONSONANT = new MessageFormat("Word with ƚ near a consonant, {0}");
+	private static final MessageFormat WORD_WITH_MIXED_VARIANTS = new MessageFormat("Word with mixed variants, {0}");
 	private static final MessageFormat WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = new MessageFormat("Word with rule {0} cannot have other rules than {1}");
 	private static final MessageFormat NORTHERN_PLURAL_MISSING = new MessageFormat("Northern plural missing, add {0}");
 	private static final MessageFormat NORTHERN_PLURAL_NOT_NEEDED = new MessageFormat("Northern plural not needed, remove {0} or {1}");
@@ -92,6 +95,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		finalSonorizationFlag = rulesLoader.readProperty("finalSonorizationFlag");
 
 		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
+			Pattern.CASE_INSENSITIVE);
+		PATTERN_NON_VANISHING_EL_NOT_AT_END = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingElNotAtEnd"),
 			Pattern.CASE_INSENSITIVE);
 		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
 			Pattern.CASE_INSENSITIVE);
@@ -139,20 +144,26 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void vanishingElCheck(final Production production){
 		final String derivedWord = production.getWord();
-		final String[] derivations = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), HyphenationParser.EN_DASH);
-		for(final String derivation : derivations){
-			if(derivation.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-				if(PatternHelper.find(derivation, PATTERN_NON_VANISHING_EL))
+		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), HyphenationParser.EN_DASH);
+		final Set<LanguageVariant> variants = new HashSet<>();
+		for(final String subword : subwords){
+			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
+				if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL))
 					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 				if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
-						NORTHERN_PLURAL_STRESSED_RULE, derivation}));
-				if(derivation.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivation.contains(GraphemeVEC.GRAPHEME_T_STROKE))
-					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
+						NORTHERN_PLURAL_STRESSED_RULE, subword}));
+				if(PatternHelper.find(subword, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
+					throw new HunLintException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
+
+				variants.add(LanguageVariant.VENETIAN);
 			}
-			if(PatternHelper.find(derivation, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
-				throw new HunLintException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
+			else if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END) || subword.contains(GraphemeVEC.GRAPHEME_D_STROKE)
+					|| subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
+				variants.add(LanguageVariant.NORTHERN);
 		}
+		if(variants.contains(LanguageVariant.VENETIAN) && variants.contains(LanguageVariant.NORTHERN))
+			throw new HunLintException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
 	}
 
 	private void incompatibilityCheck(final Production production){
