@@ -22,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.TimeWatch;
 
 
 /**
