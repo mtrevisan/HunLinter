@@ -34,7 +34,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
 
 		//all entries should be in lowercase
-		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
+		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 
 		final String partOfSpeech = StringUtils.strip(components[0]);
 		if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
@@ -45,7 +45,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			partOfSpeeches[i] = partOfSpeeches[i].trim();
 
 		final Set<String> uniqueValues = new HashSet<>();
-		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR)){
+		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR)){
 			final String trim = synonym.trim();
 			if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
 				synonyms.add(trim);

@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
-	public static final String PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR = PIPE + ":";
+	public static final String PART_OF_SPEECH_SEPARATOR = PIPE + ":";
 	public static final String SYNONYMS_SEPARATOR = PIPE + ",";
 
 
@@ -48,7 +48,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(br);
 
 		//all entries should be in lowercase
-		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR);
+		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_SEPARATOR);
 
 		definition = components[0];
 		final int numEntries = Integer.parseInt(components[1]);

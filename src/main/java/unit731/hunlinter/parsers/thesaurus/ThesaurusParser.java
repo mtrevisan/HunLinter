@@ -77,15 +77,12 @@ public class ThesaurusParser{
 
 			FileHelper.readCharset(line);
 
-//			TimeWatch timer = TimeWatch.start();
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty()){
 					final boolean added = dictionary.add(new ThesaurusEntry(line, br));
 					if(!added)
 						throw new IllegalArgumentException("Duplicated synonym in thesaurus");
 				}
-//			timer.stop();
-//			System.out.println(timer.toStringMillis());
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
@@ -115,7 +112,7 @@ public class ThesaurusParser{
 	 */
 	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
 			final Supplier<Boolean> duplicatesDiscriminator){
-		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_AND_SYNONYMS_SEPARATOR, 2);
+		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
 			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
