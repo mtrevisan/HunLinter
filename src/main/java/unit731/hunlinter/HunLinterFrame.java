@@ -1750,7 +1750,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
-			dm.fireTableDataChanged();
 
 			//… and save the files
 			backbone.storeThesaurusFiles();
@@ -1968,6 +1967,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
 				//if everything's ok update the table and the sorter…
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 				dm.fireTableDataChanged();
 
 				formerFilterThesaurusText = null;
