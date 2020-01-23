@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -38,10 +39,13 @@ public class ThesaurusDictionary{
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
-	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
+	public boolean add(final String[] partOfSpeeches, String[] synonyms){
 		boolean result = false;
 		final String wholePartOfSpeeches = Arrays.stream(partOfSpeeches)
 			.collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END));
+		synonyms = JavaHelper.nullableToStream(synonyms)
+			.map(synonym -> synonym.toLowerCase(Locale.ROOT))
+			.toArray(String[]::new);
 		for(String currentDefinition : synonyms){
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
 

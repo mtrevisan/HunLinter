@@ -35,11 +35,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return new ThesaurusEntry(definition, entries);
 	}
 
-	public ThesaurusEntry(final String definition, final List<SynonymsEntry> synonyms){
+	private ThesaurusEntry(final String definition, final List<SynonymsEntry> synonyms){
 		Objects.requireNonNull(definition);
 		Objects.requireNonNull(synonyms);
 
-		this.definition = definition;
+		this.definition = definition.toLowerCase(Locale.ROOT);
 		this.synonyms = synonyms;
 	}
 

@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,7 +81,7 @@ public class ThesaurusParser{
 				if(!line.isEmpty()){
 					final boolean added = dictionary.add(new ThesaurusEntry(line, br));
 					if(!added)
-						throw new IllegalArgumentException("Duplicated synonym in thesaurus");
+						throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
 				}
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
@@ -159,6 +160,8 @@ public class ThesaurusParser{
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
+		text = text.toLowerCase(Locale.ROOT);
+
 		//extract part of speech if present
 		final String[] pos = extractPartOfSpeechFromFilter(text);
 
