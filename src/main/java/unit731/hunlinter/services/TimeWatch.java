@@ -1,6 +1,5 @@
 package unit731.hunlinter.services;
 
-import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
