@@ -194,6 +194,7 @@ It is possible to click on the first column to select the row (for cancelling it
 - added menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
 - reduced size of java package from 3.35 MB to 1.71 MB (49% gain)
 - made tables look more standard (copy and edit operations)
+- improved thesaurus merging
 
 <a name="changelog-1.9.1"></a>
 ### version 1.9.1 - 20191028
