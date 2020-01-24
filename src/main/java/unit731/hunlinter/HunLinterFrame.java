@@ -1751,7 +1751,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
 			.collect(Collectors.toList());
 		if(filteredSynonymsEntries.isEmpty())
-			JOptionPane.showMessageDialog(null, "No synonyms with same part-of-speech present.\r\nCannot merge.", "Warning", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
+				"Warning", JOptionPane.WARNING_MESSAGE);
 		else{
 			//show merge dialog
 			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(newSynonyms, synonyms.getDefinition(), filteredSynonymsEntries, null);
