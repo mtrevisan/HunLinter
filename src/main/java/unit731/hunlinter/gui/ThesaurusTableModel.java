@@ -25,7 +25,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private List<ThesaurusEntry> synonyms;
 
 
-	public ThesaurusEntry getSynonymAt(final int index){
+	public ThesaurusEntry getSynonymsAt(final int index){
 		return synonyms.get(index);
 	}
 

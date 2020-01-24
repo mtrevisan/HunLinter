@@ -74,7 +74,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		synonyms.add(synonymsEntry);
 	}
 
-	public Set<String> getSynonyms(){
+	public List<String> getSynonyms(final int synonymsIndex){
+		return new ArrayList<>(synonyms.get(synonymsIndex).getSynonyms());
+	}
+
+	public Set<String> getSynonymsSet(){
 		return synonyms.stream()
 			.map(SynonymsEntry::getSynonyms)
 			.flatMap(List::stream)
@@ -83,6 +87,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public int getSynonymsEntries(){
 		return synonyms.size();
+	}
+
+	public boolean containsSynonym(final String synonym){
+		return (definition.equals(synonym) || synonyms.stream().anyMatch(entry -> entry.containsSynonym(synonym)));
 	}
 
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){

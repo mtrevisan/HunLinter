@@ -86,6 +86,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
+import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.workers.PoSFSAWorker;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.AffixEntry;
@@ -187,7 +188,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 	private JPopupMenu copyPopupMenu;
-	private JPopupMenu copyAndRemovePopupMenu;
+	private JPopupMenu mergeCopyRemovePopupMenu;
+	private JPopupMenu copyRemovePopupMenu;
 
 
 	public HunLinterFrame(){
@@ -200,12 +202,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final int iconSize = hypRulesOutputLabel.getHeight();
 			copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			copyAndRemovePopupMenu = new JPopupMenu();
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyAndRemovePopupMenu, GUIUtils::copyCallback));
-			copyAndRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyAndRemovePopupMenu, this::removeSelectedRows));
+			mergeCopyRemovePopupMenu = new JPopupMenu();
+			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow));
+			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
+			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
+			copyRemovePopupMenu = new JPopupMenu();
+			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
+			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
-			GUIUtils.addPopupMenu(copyAndRemovePopupMenu, theTable, acoTable);
+			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, theTable);
+			GUIUtils.addPopupMenu(copyRemovePopupMenu, acoTable);
 		}
 		catch(final IOException ignored){}
 
@@ -1731,6 +1738,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 		else
 			sorter.setRowFilter(null);
+	}
+
+	public void mergeThesaurusRow(final Component invoker){
+		//TODO choose index
+		int synonymsIndex = 0;
+
+		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
+		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
+		final String newSynonyms = theSynonymsTextField.getText();
+		//merge synonyms and newEntry
+		final SynonymsEntry mergedEntry = new SynonymsEntry(newSynonyms, -1)
+			.merge(synonymsIndex, synonyms);
+		theSynonymsTextField.setText(mergedEntry.toString());
 	}
 
 	public void removeSelectedRows(final Component invoker){

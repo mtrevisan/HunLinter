@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -27,10 +28,17 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	private final String[] partOfSpeeches;
 	private final List<String> synonyms = new ArrayList<>();
+	private final int definitionIndex;
 
 
 	public SynonymsEntry(final String partOfSpeechAndSynonyms){
+		this(partOfSpeechAndSynonyms, -1);
+	}
+
+	public SynonymsEntry(final String partOfSpeechAndSynonyms, final int definitionIndex){
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
+
+		this.definitionIndex = definitionIndex;
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
@@ -53,12 +61,26 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
+	public SynonymsEntry merge(final int synonymsIndex, final ThesaurusEntry entry){
+		final SynonymsEntry newEntry = new SynonymsEntry(toString(), definitionIndex);
+		final Iterator<String> itr = newEntry.synonyms.iterator();
+		while(itr.hasNext())
+			if(entry.containsSynonym(itr.next()))
+				itr.remove();
+		newEntry.synonyms.addAll(entry.getSynonyms(synonymsIndex));
+		return newEntry;
+	}
+
 	public String[] getPartOfSpeeches(){
 		return partOfSpeeches;
 	}
 
 	List<String> getSynonyms(){
 		return synonyms;
+	}
+
+	public boolean containsSynonym(final String synonym){
+		return synonyms.contains(synonym);
 	}
 
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
@@ -73,9 +95,20 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	@Override
 	public String toString(){
+		return toLine(null);
+	}
+
+	public String toLine(final String definition){
+		final List<String> wholeSynonyms;
+		if(definition != null && definitionIndex >= 0){
+			wholeSynonyms = new ArrayList<>(synonyms);
+			wholeSynonyms.add(definitionIndex, definition);
+		}
+		else
+			wholeSynonyms = synonyms;
 		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
-			.add(StringUtils.join(synonyms, ThesaurusEntry.PIPE))
+			.add(StringUtils.join(wholeSynonyms, ThesaurusEntry.PIPE))
 			.toString();
 	}
 

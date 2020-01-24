@@ -87,7 +87,7 @@ public class ThesaurusDictionary{
 	public void deleteDefinition(final String definition, final String synonyms){
 		//recover all words (definition and synonyms) from given definition
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final Set<String> definitions = entryToBeDeleted.getSynonyms();
+		final Set<String> definitions = entryToBeDeleted.getSynonymsSet();
 		definitions.add(definition);
 
 		//remove all
