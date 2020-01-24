@@ -1741,16 +1741,23 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	public void mergeThesaurusRow(final Component invoker){
-		//TODO choose index
-		int synonymsIndex = 0;
-
 		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
 		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
-		final String newSynonyms = theSynonymsTextField.getText();
+		final SynonymsEntry newSynonyms = new SynonymsEntry(theSynonymsTextField.getText());
+
+		//filter synonyms with same part-of-speech
+		final List<SynonymsEntry> filteredSynonymsEntries = synonyms.getSynonyms().stream()
+			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
+			.collect(Collectors.toList());
+		if(filteredSynonymsEntries.isEmpty())
+			//TODO handle exception
+			throw new IllegalArgumentException("No synonyms with same part-of-speech present");
+		//TODO choose index
+		int synonymsIndex = 0;
+
 		//merge synonyms and newEntry
-		final SynonymsEntry mergedEntry = new SynonymsEntry(newSynonyms)
-			.merge(synonymsIndex, synonyms);
+		final SynonymsEntry mergedEntry = newSynonyms.merge(synonymsIndex, synonyms);
 		theSynonymsTextField.setText(mergedEntry.toString());
 	}
 

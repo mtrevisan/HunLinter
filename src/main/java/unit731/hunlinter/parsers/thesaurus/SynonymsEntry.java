@@ -56,16 +56,25 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	public SynonymsEntry merge(final int synonymsIndex, final ThesaurusEntry entry){
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
+
+		//remove intersection
 		final Iterator<String> itr = newEntry.synonyms.iterator();
 		while(itr.hasNext())
 			if(entry.containsSynonym(itr.next()))
 				itr.remove();
+
+		//add remaining synonyms
 		newEntry.synonyms.addAll(new SynonymsEntry(entry.toLine(synonymsIndex)).synonyms);
+
 		return newEntry;
 	}
 
 	public String[] getPartOfSpeeches(){
 		return partOfSpeeches;
+	}
+
+	public boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
+		return new HashSet<>(Arrays.asList(this.partOfSpeeches)).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
 	}
 
 	List<String> getSynonyms(){

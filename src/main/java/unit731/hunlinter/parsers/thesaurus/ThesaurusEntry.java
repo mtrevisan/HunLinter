@@ -74,6 +74,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		synonyms.add(synonymsEntry);
 	}
 
+	public List<SynonymsEntry> getSynonyms(){
+		return synonyms;
+	}
+
 	public Set<String> getSynonymsSet(){
 		return synonyms.stream()
 			.map(SynonymsEntry::getSynonyms)
