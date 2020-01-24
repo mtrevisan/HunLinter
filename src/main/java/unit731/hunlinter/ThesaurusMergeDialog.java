@@ -108,11 +108,11 @@ public class ThesaurusMergeDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void lineComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
-		int synonymsIndex = lineComboBox.getSelectedIndex();
+		final int synonymsIndex = lineComboBox.getSelectedIndex();
 
-		//merge synonyms and newEntry
-		final SynonymsEntry mergedEntry = baseSynonyms.merge((baseSynonyms.containsSynonym(definition)? StringUtils.EMPTY: definition),
-			synonymsEntries.get(synonymsIndex));
+		final String def = baseSynonyms.containsSynonym(this.definition)? StringUtils.EMPTY: this.definition;
+		final SynonymsEntry selectedSynonyms = synonymsEntries.get(synonymsIndex);
+		final SynonymsEntry mergedEntry = baseSynonyms.merge(def, selectedSynonyms);
 
 		mergerTextArea.setText(mergedEntry.toString());
    }//GEN-LAST:event_lineComboBoxActionPerformed
