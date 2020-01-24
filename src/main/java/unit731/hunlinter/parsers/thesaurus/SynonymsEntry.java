@@ -54,7 +54,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
-	public SynonymsEntry merge(final int synonymsIndex, final ThesaurusEntry entry){
+	public SynonymsEntry merge(final String definition, final SynonymsEntry entry){
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 
 		//remove intersection
@@ -64,7 +64,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 				itr.remove();
 
 		//add remaining synonyms
-		newEntry.synonyms.addAll(new SynonymsEntry(entry.toLine(synonymsIndex)).synonyms);
+		newEntry.synonyms.addAll(new SynonymsEntry(entry.toLine(definition)).synonyms);
 
 		return newEntry;
 	}
@@ -104,7 +104,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		final List<String> wholeSynonyms;
 		if(definition != null){
 			wholeSynonyms = new ArrayList<>(synonyms);
-			wholeSynonyms.add(definition);
+			wholeSynonyms.add(0, definition);
 		}
 		else
 			wholeSynonyms = synonyms;

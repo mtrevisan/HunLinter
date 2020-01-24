@@ -1753,13 +1753,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		if(filteredSynonymsEntries.isEmpty())
 			JOptionPane.showMessageDialog(null, "No synonyms with same part-of-speech present.\r\nCannot merge.", "Warning", JOptionPane.WARNING_MESSAGE);
 		else{
-			//TODO show merge dialog
-			//TODO choose index
-			int synonymsIndex = 0;
+			//show merge dialog
+			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(newSynonyms, synonyms.getDefinition(), filteredSynonymsEntries, null);
+			GUIUtils.addCancelByEscapeKey(dialog);
+			dialog.setLocationRelativeTo(this);
+			dialog.setVisible(true);
 
-			//merge synonyms and newEntry
-			final SynonymsEntry mergedEntry = newSynonyms.merge(synonymsIndex, synonyms);
-			theSynonymsTextField.setText(mergedEntry.toString());
+			if(dialog.isMerged())
+				theSynonymsTextField.setText(dialog.getMerge());
 		}
 	}
 
