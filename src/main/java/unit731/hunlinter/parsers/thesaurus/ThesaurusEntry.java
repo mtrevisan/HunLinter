@@ -85,12 +85,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonyms.size();
 	}
 
-	public int getSynonymsCount(){
-		return synonyms.stream()
-			.mapToInt(s -> s.getSynonyms().size())
-			.sum();
-	}
-
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));

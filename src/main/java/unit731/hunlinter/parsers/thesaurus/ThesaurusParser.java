@@ -96,7 +96,7 @@ public class ThesaurusParser{
 		return line;
 	}
 
-	public int getSynonymsCounter(){
+	public int getSynonymsCount(){
 		return dictionary.size();
 	}
 

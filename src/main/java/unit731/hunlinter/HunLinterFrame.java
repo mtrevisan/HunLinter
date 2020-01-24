@@ -323,6 +323,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             final String synonyms = (String)model.getValueAt(row, 1);
             final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
             return Arrays.stream(synonymsByDefinition)
+            .map(GUIUtils::removeHTMLCode)
             .map(syns -> definition + ": " + syns)
             .collect(Collectors.joining("\r\n"));
          }
@@ -2534,7 +2535,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//thesaurus file:
-			if(backbone.getTheParser().getSynonymsCounter() > 0){
+			if(backbone.getTheParser().getSynonymsCount() > 0){
 				addSorterToTable(theTable, comparator, null);
 
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
@@ -2668,7 +2669,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
+		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCount()));
 	}
 
 	private void updateCorrectionsCounter(){
