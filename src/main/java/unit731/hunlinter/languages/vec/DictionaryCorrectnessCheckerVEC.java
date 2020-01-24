@@ -122,7 +122,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		stressCheck(production);
 
-		vanishingElCheck(production);
+		variantsCheck(production);
 
 		incompatibilityCheck(production);
 
@@ -142,7 +142,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new HunLintException(UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
 	}
 
-	private void vanishingElCheck(final Production production){
+	private void variantsCheck(final Production production){
 		final String derivedWord = production.getWord();
 		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), HyphenationParser.EN_DASH);
 		final Set<LanguageVariant> variants = new HashSet<>();
