@@ -1749,7 +1749,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
 		final String newSynonyms = theSynonymsTextField.getText();
 		//merge synonyms and newEntry
-		final SynonymsEntry mergedEntry = new SynonymsEntry(newSynonyms, -1)
+		final SynonymsEntry mergedEntry = new SynonymsEntry(newSynonyms)
 			.merge(synonymsIndex, synonyms);
 		theSynonymsTextField.setText(mergedEntry.toString());
 	}

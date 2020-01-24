@@ -74,10 +74,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		synonyms.add(synonymsEntry);
 	}
 
-	public List<String> getSynonyms(final int synonymsIndex){
-		return new ArrayList<>(synonyms.get(synonymsIndex).getSynonyms());
-	}
-
 	public Set<String> getSynonymsSet(){
 		return synonyms.stream()
 			.map(SynonymsEntry::getSynonyms)
@@ -130,6 +126,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 			.map(SynonymsEntry::toString)
 			.map(s -> definition + ": " + String.join(", ", s))
 			.collect(Collectors.joining("\\r\\n"));
+	}
+
+	public String toLine(final int definitionIndex){
+		return synonyms.get(definitionIndex)
+			.toLine(definition);
 	}
 
 	@Override

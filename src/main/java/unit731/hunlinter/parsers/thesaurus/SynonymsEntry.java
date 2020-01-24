@@ -28,26 +28,19 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	private final String[] partOfSpeeches;
 	private final List<String> synonyms = new ArrayList<>();
-	private final int definitionIndex;
 
 
 	public SynonymsEntry(final String partOfSpeechAndSynonyms){
-		this(partOfSpeechAndSynonyms, -1);
-	}
-
-	public SynonymsEntry(final String partOfSpeechAndSynonyms, final int definitionIndex){
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
-
-		this.definitionIndex = definitionIndex;
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 
 		final String partOfSpeech = StringUtils.strip(components[0]);
-		if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
+		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')
 			throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		partOfSpeeches = StringUtils.split(partOfSpeech.substring(1, partOfSpeech.length() - 1), ',');
+		partOfSpeeches = StringUtils.split(StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")"), ',');
 		for(int i = 0; i < partOfSpeeches.length; i ++)
 			partOfSpeeches[i] = partOfSpeeches[i].trim();
 
@@ -62,12 +55,12 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public SynonymsEntry merge(final int synonymsIndex, final ThesaurusEntry entry){
-		final SynonymsEntry newEntry = new SynonymsEntry(toString(), definitionIndex);
+		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 		final Iterator<String> itr = newEntry.synonyms.iterator();
 		while(itr.hasNext())
 			if(entry.containsSynonym(itr.next()))
 				itr.remove();
-		newEntry.synonyms.addAll(entry.getSynonyms(synonymsIndex));
+		newEntry.synonyms.addAll(new SynonymsEntry(entry.toLine(synonymsIndex)).synonyms);
 		return newEntry;
 	}
 
@@ -100,9 +93,9 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	public String toLine(final String definition){
 		final List<String> wholeSynonyms;
-		if(definition != null && definitionIndex >= 0){
+		if(definition != null){
 			wholeSynonyms = new ArrayList<>(synonyms);
-			wholeSynonyms.add(definitionIndex, definition);
+			wholeSynonyms.add(definition);
 		}
 		else
 			wholeSynonyms = synonyms;
