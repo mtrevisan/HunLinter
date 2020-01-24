@@ -1751,14 +1751,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
 			.collect(Collectors.toList());
 		if(filteredSynonymsEntries.isEmpty())
-			//TODO handle exception
-			throw new IllegalArgumentException("No synonyms with same part-of-speech present");
-		//TODO choose index
-		int synonymsIndex = 0;
+			JOptionPane.showMessageDialog(null, "No synonyms with same part-of-speech present.\r\nCannot merge.", "Warning", JOptionPane.WARNING_MESSAGE);
+		else{
+			//TODO show merge dialog
+			//TODO choose index
+			int synonymsIndex = 0;
 
-		//merge synonyms and newEntry
-		final SynonymsEntry mergedEntry = newSynonyms.merge(synonymsIndex, synonyms);
-		theSynonymsTextField.setText(mergedEntry.toString());
+			//merge synonyms and newEntry
+			final SynonymsEntry mergedEntry = newSynonyms.merge(synonymsIndex, synonyms);
+			theSynonymsTextField.setText(mergedEntry.toString());
+		}
 	}
 
 	public void removeSelectedRows(final Component invoker){
