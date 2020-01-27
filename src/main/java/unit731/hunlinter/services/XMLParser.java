@@ -22,10 +22,12 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 
 public class XMLParser{
@@ -33,19 +35,9 @@ public class XMLParser{
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLParser.class);
 
 	@SuppressWarnings("unchecked")
-	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = new Pair[]{
-		Pair.of(OutputKeys.VERSION, "1.0"),
-		Pair.of(OutputKeys.ENCODING, StandardCharsets.UTF_8.name()),
-		Pair.of(OutputKeys.INDENT, "yes"),
-		Pair.of("{http://xml.apache.org/xslt}indent-amount", "3")
-	};
+	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);
 	@SuppressWarnings("unchecked")
-	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = new Pair[]{
-		Pair.of(OutputKeys.VERSION, "1.0"),
-		Pair.of(OutputKeys.ENCODING, StandardCharsets.US_ASCII.name()),
-		Pair.of(OutputKeys.INDENT, "yes"),
-		Pair.of("{http://xml.apache.org/xslt}indent-amount", "3")
-	};
+	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = getXMLProperties(StandardCharsets.US_ASCII);
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
 
@@ -97,11 +89,10 @@ public class XMLParser{
 		final List<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node node = nodes.item(i);
-				if(extractionCondition.apply(node))
-					children.add(node);
-			}
+			IntStream.range(0, nodes.getLength())
+				.mapToObj(nodes::item)
+				.filter(extractionCondition::apply)
+				.forEach(children::add);
 		}
 		return children;
 	}
@@ -112,6 +103,15 @@ public class XMLParser{
 
 	public static String extractAttributeValue(final Node entry, final String name){
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
+	}
+
+	private static Pair<String, String>[] getXMLProperties(final Charset charset){
+		return new Pair[]{
+			Pair.of(OutputKeys.VERSION, "1.0"),
+			Pair.of(OutputKeys.ENCODING, charset.name()),
+			Pair.of(OutputKeys.INDENT, "yes"),
+			Pair.of("{http://xml.apache.org/xslt}indent-amount", "3")
+		};
 	}
 
 }
