@@ -200,6 +200,12 @@
 			<version>${com.googlecode.json-simple.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.zafarkhaja</groupId>
+			<artifactId>java-semver</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
 		<!-- Memory usage -->
 <!--		<dependency>
 			<groupId>com.carrotsearch</groupId>
