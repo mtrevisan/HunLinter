@@ -60,22 +60,19 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		}
 
 		private void update(final DocumentEvent event){
-			try{
-				final Document doc = event.getDocument();
-				final String newValue = doc.getText(0, doc.getLength());
-				if(!newValue.isEmpty() && targetList.getModel().getSize() > 0){
-					final int index = targetList.getNextMatch(newValue, 0, Position.Bias.Forward);
-					final int foundIndex = Math.max(index, 0);
+			final Document doc = event.getDocument();
+			String newValue = StringUtils.EMPTY;
+			try{ newValue = doc.getText(0, doc.getLength()); }
+			catch(final BadLocationException ignored){}
+			if(!newValue.isEmpty() && targetList.getModel().getSize() > 0){
+				final int index = targetList.getNextMatch(newValue, 0, Position.Bias.Forward);
+				final int foundIndex = Math.max(index, 0);
 
-					targetList.ensureIndexIsVisible(foundIndex);
+				targetList.ensureIndexIsVisible(foundIndex);
 
-					final String matchedName = targetList.getModel().getElementAt(foundIndex);
-					if(newValue.equalsIgnoreCase(matchedName) && foundIndex != targetList.getSelectedIndex())
-						SwingUtilities.invokeLater(() -> targetList.setSelectedIndex(foundIndex));
-				}
-			}
-			catch(final BadLocationException e){
-				LOGGER.error("Error while retrieving selection from list", e);
+				final String matchedName = targetList.getModel().getElementAt(foundIndex);
+				if(newValue.equalsIgnoreCase(matchedName) && foundIndex != targetList.getSelectedIndex())
+					SwingUtilities.invokeLater(() -> targetList.setSelectedIndex(foundIndex));
 			}
 		}
 	}
