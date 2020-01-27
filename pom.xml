@@ -150,6 +150,9 @@
 		<!-- XChart -->
 		<org.knowm.xchart.version>3.6.1</org.knowm.xchart.version>
 
+		<!-- JSON -->
+		<com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
+
 		<!-- CarrotSearch sizeof -->
 		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
 
@@ -188,6 +191,13 @@
 			<groupId>org.carrot2</groupId>
 			<artifactId>morfologik-tools</artifactId>
 			<version>${org.carrot2.morfologik-tools.version}</version>
+		</dependency>
+
+		<!-- JSON -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>${com.googlecode.json-simple.version}</version>
 		</dependency>
 
 		<!-- Memory usage -->
