@@ -10,7 +10,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -33,8 +32,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private static final int NEWLINE_SIZE = 2;
 
-
-	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
@@ -154,7 +151,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				throw new RuntimeInterruptedException();
 
 			try{
-				while(paused.get())
+				while(isPaused())
 					Thread.sleep(500l);
 
 				processingIndex.incrementAndGet();
@@ -244,24 +241,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private int getProgress(final double index, final double total){
 		return Math.min((int)Math.floor((index * 100.) / total), 100);
-	}
-
-	@Override
-	protected void done(){
-		if(!isCancelled() && getCompleted() != null)
-			getCompleted().run();
-		else if(isCancelled() && getCancelled() != null)
-			getCancelled().accept(exception);
-	}
-
-	public final void pause(){
-		if(!isDone() && paused.compareAndSet(false, true))
-			firePropertyChange("paused", false, true);
-	}
-
-	public final void resume(){
-		if(!isDone() && paused.compareAndSet(true, false))
-			firePropertyChange("paused", true, false);
 	}
 
 }

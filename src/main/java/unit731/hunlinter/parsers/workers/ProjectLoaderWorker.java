@@ -8,7 +8,6 @@ import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,6 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 	private final Packager packager;
 	private final Backbone backbone;
-
-	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
 	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed,
@@ -101,36 +98,6 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		}
 
 		return null;
-	}
-
-	private void waitIfPaused() throws InterruptedException{
-		while(paused.get())
-			Thread.sleep(500l);
-	}
-
-	@Override
-	protected void done(){
-		if(!isCancelled() && getCompleted() != null)
-			getCompleted().run();
-		else if(isCancelled() && getCancelled() != null)
-			getCancelled().accept(exception);
-	}
-
-	public final void pause(){
-		if(!isDone() && paused.compareAndSet(false, true))
-			firePropertyChange("paused", false, true);
-	}
-
-	public final void resume(){
-		if(!isDone() && paused.compareAndSet(true, false))
-			firePropertyChange("paused", true, false);
-	}
-
-	public void cancel(){
-		cancel(true);
-
-		if(getCancelled() != null)
-			getCancelled().accept(exception);
 	}
 
 }
