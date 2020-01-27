@@ -27,10 +27,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -441,6 +443,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
+      hlpOnlineSeparator = new javax.swing.JPopupMenu.Separator();
+      hlpUpdateMenuItem = new javax.swing.JMenuItem();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1490,6 +1494,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          }
       });
       hlpMenu.add(hlpOnlineHelpMenuItem);
+      hlpMenu.add(hlpOnlineSeparator);
+
+      hlpUpdateMenuItem.setText("Check for Update…");
+      hlpUpdateMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hlpUpdateMenuItemActionPerformed(evt);
+         }
+      });
+      hlpMenu.add(hlpUpdateMenuItem);
 
       hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
@@ -2309,6 +2322,39 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
    }//GEN-LAST:event_wexAddButtonActionPerformed
+
+   private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
+		//TODO add your handling code here:
+		//https://github.com/geosolutions-it/destination/blob/master/geobatch/ingestion-logic/src/main/java/it/geosolutions/geobatch/destination/common/utils/RemoteBrowserUtils.java
+		try(final InputStream is = new URL("https://api.github.com/repos/mtrevisan/HunLinter/contents/bin").openStream()){
+			final String json = new String(is.readAllBytes());
+
+			//filter for "type" equals "file"
+			//filter for "name" endsWith "-{version}.jar"
+			//choose last version
+			//if newer
+			//	warn for newer version, ask for download
+			//	get "size" + "sha" + "download_url"
+			//	download file
+			//	check size + sha
+			System.out.println(json);
+
+/*
+[
+	{
+		"name": "Hunspeller-1.0.0-javadoc.jar",
+		"sha": "37f0ce741a16da4893be241f81aa4e2f06519d5c",
+		"size": 667179,
+		"download_url": "https://raw.githubusercontent.com/mtrevisan/HunLinter/master/bin/Hunspeller-1.0.0-javadoc.jar",
+		"type": "file"
+	},
+	...
+*/
+		}
+		catch(final Exception e){
+			e.printStackTrace();
+		}
+	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
 
 
 	@Override
@@ -3188,6 +3234,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
+   private javax.swing.JPopupMenu.Separator hlpOnlineSeparator;
+   private javax.swing.JMenuItem hlpUpdateMenuItem;
    private javax.swing.JButton hypAddRuleButton;
    private javax.swing.JLabel hypAddRuleLabel;
    private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;

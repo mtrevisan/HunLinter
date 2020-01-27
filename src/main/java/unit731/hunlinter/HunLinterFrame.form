@@ -255,6 +255,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpOnlineHelpMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="hlpOnlineSeparator">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="hlpUpdateMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Check for Update&#x2026;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpUpdateMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="hlpAboutMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
