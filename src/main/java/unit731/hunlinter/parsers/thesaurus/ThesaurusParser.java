@@ -13,7 +13,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.StringHelper;
 
 
 /**
@@ -111,7 +112,7 @@ public class ThesaurusParser{
 	 * @return The duplication result
 	 */
 	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
-			final Supplier<Boolean> duplicatesDiscriminator){
+			final Function<String, Boolean> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
 			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
@@ -133,10 +134,13 @@ public class ThesaurusParser{
 		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
 		if(!duplicates.isEmpty()){
-			forceInsertion = duplicatesDiscriminator.get();
+			final String duplicatesMessage = duplicates.stream()
+				.map(ThesaurusEntry::getDefinition)
+				.collect(StringHelper.limitingJoin(", ", 5, "…"));
+			forceInsertion = duplicatesDiscriminator.apply(duplicatesMessage);
 			if(!forceInsertion)
-				throw new HunLintException(DUPLICATE_DETECTED.format(
-					new Object[]{duplicates.stream().map(ThesaurusEntry::getDefinition).collect(Collectors.joining(", "))}));
+				throw new HunLintException(DUPLICATE_DETECTED.format(new Object[]{
+					duplicates.stream().map(ThesaurusEntry::getDefinition).collect(Collectors.joining(", "))}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion)
@@ -197,7 +201,9 @@ public class ThesaurusParser{
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
 			".+");
-		final String synonymsFilter = (synonyms != null && synonyms.length > 0? "(" + StringUtils.join(synonyms, PIPE) + ")": ".+");
+		final String synonymsFilter = (synonyms != null && synonyms.length > 0?
+			"(" + StringUtils.join(synonyms, PIPE) + ")":
+			".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);

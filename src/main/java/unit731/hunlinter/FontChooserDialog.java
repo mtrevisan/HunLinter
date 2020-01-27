@@ -189,6 +189,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       sampleTextArea.setColumns(20);
       sampleTextArea.setLineWrap(true);
       sampleTextArea.setText(sampleText);
+      sampleTextArea.setCaretPosition(0);
       sampleScrollPane.setViewportView(sampleTextArea);
 
       okButton.setText("OK");

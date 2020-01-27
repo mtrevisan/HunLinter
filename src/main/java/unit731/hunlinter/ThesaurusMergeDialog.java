@@ -62,7 +62,9 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       mergerTextArea.setColumns(20);
+      mergerTextArea.setLineWrap(true);
       mergerTextArea.setRows(5);
+      mergerTextArea.setWrapStyleWord(true);
       mergerScrollPane.setViewportView(mergerTextArea);
 
       mergeButton.setText("Merge");
@@ -83,12 +85,12 @@ public class ThesaurusMergeDialog extends JDialog{
                .addGroup(layout.createSequentialGroup()
                   .addComponent(lblMessage)
                   .addGap(0, 0, Short.MAX_VALUE))
-               .addComponent(lineComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addComponent(lineComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                  .addGap(0, 0, Short.MAX_VALUE)
+                  .addComponent(mergeButton)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(mergeButton)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -115,6 +117,7 @@ public class ThesaurusMergeDialog extends JDialog{
 		final SynonymsEntry mergedEntry = baseSynonyms.merge(def, selectedSynonyms);
 
 		mergerTextArea.setText(mergedEntry.toString());
+		mergerTextArea.setCaretPosition(0);
    }//GEN-LAST:event_lineComboBoxActionPerformed
 
    private void mergeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeButtonActionPerformed

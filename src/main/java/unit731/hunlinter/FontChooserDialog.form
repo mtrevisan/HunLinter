@@ -222,6 +222,9 @@
               <Connection code="sampleText" type="code"/>
             </Property>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="sampleTextArea.setCaretPosition(0);"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

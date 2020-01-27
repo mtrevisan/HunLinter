@@ -1987,9 +1987,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		try{
 			//try adding the synonyms
 			final String synonyms = theSynonymsTextField.getText();
-			final Supplier<Boolean> duplicatesDiscriminator = () -> {
+			final Function<String, Boolean> duplicatesDiscriminator = message -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is a duplicate with same part of speech.\nForce insertion?", "Select one",
+					"There is some duplicates with same part of speech and definition(s) '" + message + "'.\nForce insertion?", "Select one",
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
@@ -3072,12 +3072,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearAutoTextParser(){
-		//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
-		//		dm.setCorrections(null);
+//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
+//		dm.setCorrections(null);
 
 		//FIXME
-		//		atxMenu.setEnabled(false);
-		//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
+//		atxMenu.setEnabled(false);
+//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
 
 
