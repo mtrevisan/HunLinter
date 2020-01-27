@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -89,18 +90,17 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonyms.size();
 	}
 
-	public boolean containsSynonym(final String synonym){
-		return (definition.equals(synonym) || synonyms.stream().anyMatch(entry -> entry.containsSynonym(synonym)));
-	}
-
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
-		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));
+		return intersects(synonyms, (entry, ss) -> entry.contains(partOfSpeeches, ss));
 	}
 
 	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
+		return intersects(synonyms, (entry, ss) -> entry.intersects(partOfSpeeches, ss));
+	}
+
+	private boolean intersects(final List<String> synonyms, final BiFunction<SynonymsEntry, List<String>, Boolean> fun){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) || this.synonyms.stream().anyMatch(entry -> entry.intersects(partOfSpeeches, ss)));
+		return (ss.remove(definition) || this.synonyms.stream().anyMatch(entry -> fun.apply(entry, ss)));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
