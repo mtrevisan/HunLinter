@@ -188,8 +188,6 @@ public class HyphenationParser{
 	 * @throws HunLintException   If something is wrong while parsing the file
 	 */
 	public void parse(final File hypFile){
-		clearInternal();
-
 		final Path path = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
 		Charset charset = FileHelper.determineCharset(path);
@@ -334,10 +332,12 @@ public class HyphenationParser{
 	}
 
 	public void clear(){
-		clearInternal();
-	}
-
-	private void clearInternal(){
+		secondLevelPresent = false;
+		patternNoHyphen = null;
+		Arrays.stream(Level.values())
+			.map(rules::get)
+			.forEach(Map::clear);
+		patterns.clear();
 		Arrays.stream(Level.values())
 			.map(REDUCED_PATTERNS::get)
 			.forEach(Set::clear);

@@ -108,25 +108,25 @@ public class HorizontalFlowLayout extends FlowLayout{
 			int rowHeight = 0;
 			for(int i = 0; i < target.getComponentCount(); i ++){
 				final Component m = target.getComponent(i);
-				if(m.isVisible()){
-					final Dimension d = sizeSupplier.apply(m);
-					//can't add the component to current row: start a new row
-					if(rowWidth + d.width > maxWidth){
-						addRow(finalDimension, rowWidth, rowHeight);
+				if(!m.isVisible())
+					continue;
 
-						rowWidth = 0;
-						rowHeight = 0;
-					}
-					//add an horizontal gap for all components after the first
-					rowWidth += (rowWidth > 0? getHgap(): 0) + d.width;
-					rowHeight = Math.max(rowHeight, d.height);
+				final Dimension d = sizeSupplier.apply(m);
+				//can't add the component to current row: start a new row
+				if(rowWidth + d.width > maxWidth){
+					addRow(finalDimension, rowWidth, rowHeight);
+
+					rowWidth = 0;
+					rowHeight = 0;
 				}
+				//add an horizontal gap for all components after the first
+				rowWidth += (rowWidth > 0? getHgap(): 0) + d.width;
+				rowHeight = Math.max(rowHeight, d.height);
 			}
 
 			addRow(finalDimension, rowWidth, rowHeight);
 
-			finalDimension.width += horizontalInsetsAndGap;
-			finalDimension.height += insets.top + insets.bottom + getVgap() * 2;
+			addToDimension(finalDimension, horizontalInsetsAndGap, insets);
 
 			//when using a scroll pane or the DecoratedLookAndFeel we need to make sure the preferred size
 			//is less than the size of the target containter so shrinking the container size works
@@ -148,6 +148,11 @@ public class HorizontalFlowLayout extends FlowLayout{
 	private void addRow(final Dimension dimension, final int rowWidth, final int rowHeight){
 		dimension.width = Math.max(dimension.width, rowWidth);
 		dimension.height += (dimension.height > 0? getVgap(): 0) + rowHeight;
+	}
+
+	private void addToDimension(final Dimension dimension, final int addedRowWidth, final Insets insets){
+		dimension.width += addedRowWidth;
+		dimension.height += insets.top + insets.bottom + getVgap() * 2;
 	}
 
 }

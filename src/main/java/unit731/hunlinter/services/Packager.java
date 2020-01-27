@@ -85,8 +85,37 @@ public class Packager{
 	private static final String FOLDER_SPLITTER = "[/\\\\]";
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
-	private static final String SPELLCHECK_FOLDERS_SEPARATOR = ".aff ";
-	private static final String THESAURUS_FOLDERS_SEPARATOR = ".dat ";
+
+	private static final class ConfigurationData{
+		final String foldersSeparator;
+		final String nodePropertyFile1;
+		final String nodePropertyFile2;
+
+		ConfigurationData(final String foldersSeparator, final String nodePropertyFile1, final String nodePropertyFile2){
+			this.foldersSeparator = foldersSeparator;
+			this.nodePropertyFile1 = nodePropertyFile1;
+			this.nodePropertyFile2 = nodePropertyFile2;
+		}
+
+		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath) throws IOException{
+			final Map<String, File> folders = new HashMap<>();
+			final int splitIndex = childFolders.indexOf(foldersSeparator);
+			final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
+			final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
+			folders.put(nodePropertyFile1, fileAff);
+			final String folderDic = childFolders.substring(splitIndex + foldersSeparator.length());
+			final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
+			folders.put(nodePropertyFile2, fileDic);
+			return folders;
+		}
+	}
+	private static final Map<String, ConfigurationData> CONFIG_DATA = new HashMap<>();
+	static{
+		CONFIG_DATA.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, new ConfigurationData(".aff ",
+			CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY));
+		CONFIG_DATA.put(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, new ConfigurationData(".dat ",
+			CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX));
+	}
 
 
 	private final Path projectPath;
@@ -382,42 +411,28 @@ public class Packager{
 
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
 			final Map<String, File> folders) throws IOException{
-		final List<Node> children = extractChildren(entry);
-		for(final Node child : children){
+		final List<Node> children = extractChildren(entry).stream()
 			//restrict to given language
-			final String[] locale = extractLocale(child);
-			if(!ArrayUtils.contains(locale, language))
-				continue;
-
+			.filter(child -> ArrayUtils.contains(extractLocale(child), language))
+			.collect(Collectors.toList());
+		for(final Node child : children){
 			final String attributeValue = XMLParser.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			final String childFolders = extractLocation(child);
-			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING))
-				folders.putAll(getDoubleFolders(childFolders, SPELLCHECK_FOLDERS_SEPARATOR,
-					CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY,
-					basePath, originPath));
-			else if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
+			if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final File file = absolutizeFolder(childFolders, basePath, originPath);
 				folders.put(CONFIGURATION_NODE_PROPERTY_HYPHENATION, file);
 			}
-			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS))
-				folders.putAll(getDoubleFolders(childFolders, THESAURUS_FOLDERS_SEPARATOR,
-					CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA, CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX,
-					basePath, originPath));
+			else if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
+				final Map<String, File> extractedFolders = CONFIG_DATA.get(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX)
+					.getDoubleFolders(childFolders, basePath, originPath);
+				folders.putAll(extractedFolders);
+			}
+			else if(attributeValue.startsWith(FILENAME_PREFIX_THESAURUS)){
+				final Map<String, File> extractedFolders = CONFIG_DATA.get(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA)
+					.getDoubleFolders(childFolders, basePath, originPath);
+				folders.putAll(extractedFolders);
+			}
 		}
-	}
-
-	private Map<String, File> getDoubleFolders(final String childFolders, final String foldersSeparator,
-			final String configNodeProperty1, final String configNodeProperty2, final Path basePath, final Path originPath)
-			throws IOException{
-		final Map<String, File> folders = new HashMap<>();
-		final int splitIndex = childFolders.indexOf(foldersSeparator);
-		final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
-		final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
-		folders.put(configNodeProperty1, fileAff);
-		final String folderDic = childFolders.substring(splitIndex + foldersSeparator.length());
-		final File fileDic = absolutizeFolder(folderDic, basePath, originPath);
-		folders.put(configNodeProperty2, fileDic);
-		return folders;
 	}
 
 	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
@@ -437,7 +452,7 @@ public class Packager{
 		return children;
 	}
 
-	private File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
+	private static File absolutizeFolder(String folder, final Path basePath, final Path originPath) throws IOException{
 		Path currentParentPath = basePath;
 		if(folder.startsWith(FOLDER_ORIGIN)){
 			folder = folder.substring(FOLDER_ORIGIN.length());

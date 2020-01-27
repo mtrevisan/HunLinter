@@ -2422,10 +2422,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				if(backbone == null)
-					backbone = new Backbone(packager, this);
-				else
-					backbone.clear();
+				backbone = new Backbone(packager, this);
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);

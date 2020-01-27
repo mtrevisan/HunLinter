@@ -58,8 +58,6 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 
 			watch.reset();
 
-			backbone.clear();
-
 			final List<StageFunction> stages = Arrays.asList(
 				() -> backbone.openAffixFile(packager.getAffixFile()),
 				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),

@@ -139,12 +139,6 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void clear(){
-		hyphenator = null;
-		checker = null;
-		wordGenerator = null;
-	}
-
 	public void registerFileListener(){
 		flm.unregisterAll();
 
