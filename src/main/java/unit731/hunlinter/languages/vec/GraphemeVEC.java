@@ -91,17 +91,20 @@ class GraphemeVEC{
 	}
 
 	private static String correctUIJGraphemes(String word){
-		if(word.contains(GRAPHEME_U))
-			for(final Pattern p : ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES)
-				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_U_UMLAUT + "$2");
-		if(word.contains(GRAPHEME_I))
-			for(final Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
-				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
+		word = correctGrapheme(word, GRAPHEME_U, ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES, PHONEME_U_UMLAUT);
+		word = correctGrapheme(word, GRAPHEME_I, ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES, PHONEME_I_UMLAUT);
 
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
 
+		return word;
+	}
+
+	private static String correctGrapheme(String word, final String grapheme, final List<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
+		if(word.contains(grapheme))
+			for(final Pattern p : eterophonicSequenceFalsePositives)
+				word = PatternHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
 		return word;
 	}
 
