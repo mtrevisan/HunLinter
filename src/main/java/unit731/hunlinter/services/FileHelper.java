@@ -35,7 +35,8 @@ public class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("The file is not in an allowable charset ({0})");
+	private static final MessageFormat WRONG_FILE_FORMAT_COUNT = new MessageFormat("The file does not starts with a line counter ({0})");
+	private static final MessageFormat WRONG_FILE_FORMAT_CHARSET = new MessageFormat("The file is not in an allowable charset ({0})");
 
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
@@ -100,6 +101,15 @@ public class FileHelper{
 		}
 	}
 
+	public static int readCount(final String count){
+		try{
+			return Integer.parseInt(count);
+		}
+		catch(final Exception e){
+			throw new HunLintException(WRONG_FILE_FORMAT_COUNT.format(new Object[]{count}));
+		}
+	}
+
 	public static Charset readCharset(final String charsetName){
 		try{
 			final Charset cs = Charset.forName(charsetName);
@@ -111,7 +121,7 @@ public class FileHelper{
 			return cs;
 		}
 		catch(final Exception e){
-			throw new HunLintException(WRONG_FILE_FORMAT.format(new Object[]{charsetName}));
+			throw new HunLintException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsetName}));
 		}
 	}
 
@@ -127,7 +137,7 @@ public class FileHelper{
 		final String charsets = HUNSPELL_CHARSETS.stream()
 			.map(Charset::name)
 			.collect(Collectors.joining(", "));
-		throw new IllegalArgumentException(WRONG_FILE_FORMAT.format(new Object[]{charsets}));
+		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
 	}
 
 	public static File getTemporaryUTF8File(final String filename, final String extension, final String... lines){

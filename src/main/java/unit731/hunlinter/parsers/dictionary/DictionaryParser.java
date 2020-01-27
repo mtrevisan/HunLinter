@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.externalsorter.ExternalSorter;
 
@@ -93,7 +94,7 @@ public class DictionaryParser{
 	private void calculateDictionaryBoundaries(){
 		try(final BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
 			//skip line count
-			br.readLine();
+			FileHelper.readCount(br.readLine());
 			int lineIndex = 1;
 
 			String prevLine = null;
@@ -101,23 +102,21 @@ public class DictionaryParser{
 			int startSection = -1;
 			boolean needSorting = false;
 			while((line = br.readLine()) != null){
-				if(ParserHelper.isComment(line) || StringUtils.isBlank(line)){
-					if(startSection >= 0){
-						//filter out single word that doesn't need to be sorted
-						if(lineIndex - startSection > 2 && needSorting)
-							boundaries.put(startSection, lineIndex - 1);
-						prevLine = null;
-						startSection = -1;
-						needSorting = false;
-					}
-				}
-				else{
+				if(!ParserHelper.isComment(line) && !StringUtils.isBlank(line)){
 					if(startSection < 0)
 						startSection = lineIndex;
 
 					if(!needSorting && StringUtils.isNotBlank(prevLine))
 						needSorting = (comparator.compare(line, prevLine) < 0);
 					prevLine = line;
+				}
+				else if(startSection >= 0){
+					//filter out single word that doesn't need to be sorted
+					if(lineIndex - startSection > 2 && needSorting)
+						boundaries.put(startSection, lineIndex - 1);
+					prevLine = null;
+					startSection = -1;
+					needSorting = false;
 				}
 
 				lineIndex ++;
