@@ -1,5 +1,6 @@
 HunLinter
 ==========
+
 ![Java-12+](https://img.shields.io/badge/java-12%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2a1759913c44e66bd265efc1881cbf4)](https://www.codacy.com/app/mauro-trevisan/HunLinter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtrevisan/HunLinter&amp;utm_campaign=Badge_Grade)
@@ -7,6 +8,21 @@ HunLinter
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ==========
+
+<br />
+
+## Main features
+- affix file and dictionary linter
+- rules reducer
+- LibreOffice and Mozilla packager
+- Part-of-Speech FSA extracto for LanguageTools
+- automatically choose font to render custom language
+- manages thesaurus, hyphenation, auto-correct, sentence exceptions, and word exception files
+- minimal pairs extraction
+- statistics
+- ... and many more!
+
+<br />
 
 ## Table of Contents
 1. [Motivation](#motivation)
