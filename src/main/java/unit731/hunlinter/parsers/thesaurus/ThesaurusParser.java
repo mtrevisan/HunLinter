@@ -139,8 +139,7 @@ public class ThesaurusParser{
 				.collect(StringHelper.limitingJoin(", ", 5, "…"));
 			forceInsertion = duplicatesDiscriminator.apply(duplicatesMessage);
 			if(!forceInsertion)
-				throw new HunLintException(DUPLICATE_DETECTED.format(new Object[]{
-					duplicates.stream().map(ThesaurusEntry::getDefinition).collect(Collectors.joining(", "))}));
+				throw new HunLintException(DUPLICATE_DETECTED.format(new Object[]{duplicatesMessage}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion)
