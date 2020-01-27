@@ -303,7 +303,7 @@ public class DictionaryStatisticsDialog extends JDialog{
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, Short.MAX_VALUE)
             .addComponent(exportButton)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addContainerGap())
       );
 
       pack();

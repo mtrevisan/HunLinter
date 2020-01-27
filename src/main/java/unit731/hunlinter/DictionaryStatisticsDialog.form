@@ -134,7 +134,7 @@
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="32767" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -150,7 +150,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="totalWordsOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="uniqueWordsLabel">
@@ -163,7 +163,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="uniqueWordsOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="compoundWordsLabel">
@@ -173,7 +173,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="compoundWordsOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="contractedWordsLabel">
@@ -183,7 +183,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="contractedWordsOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lengthsModeLabel">
@@ -196,7 +196,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lengthsModeOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeLabel">
@@ -209,7 +209,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesLabel">
@@ -222,7 +222,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersLabel">
@@ -235,7 +235,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesLabel">
@@ -248,7 +248,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="mainTabbedPane">
