@@ -27,12 +27,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -111,7 +109,6 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunlinter.services.downloader.Downloader;
 import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.Debouncer;
@@ -2327,34 +2324,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
 		SwingUtilities.invokeLater(() -> {
-			final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
+			final FileDownloaderDialog dialog = new FileDownloaderDialog(URL_ONLINE_REPOSITORY, this);
 			dialog.setLocationRelativeTo(this);
 			dialog.setVisible(true);
 		});
-
-
-		//TODO add your handling code here:
-		//https://github.com/geosolutions-it/destination/blob/master/geobatch/ingestion-logic/src/main/java/it/geosolutions/geobatch/destination/common/utils/RemoteBrowserUtils.java
-//		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY).openStream()){
-//			final String json = new String(is.readAllBytes());
-//
-//			System.out.println(json);
-
-/*
-[
-	{
-		"name": "Hunspeller-1.0.0-javadoc.jar",
-		"sha": "37f0ce741a16da4893be241f81aa4e2f06519d5c",
-		"size": 667179,
-		"download_url": "https://raw.githubusercontent.com/mtrevisan/HunLinter/master/bin/Hunspeller-1.0.0-javadoc.jar",
-		"type": "file"
-	},
-	...
-*/
-//		}
-//		catch(final Exception e){
-//			e.printStackTrace();
-//		}
 	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
 
 
