@@ -198,8 +198,12 @@ currentlyRunningApplication = "D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar";
 			if(currentVersion != null)
 				filename = filename.substring(0, filename.length() - currentVersion.length() - 1);
 			currentlyRunningApplication = FilenameUtils.getFullPath(currentlyRunningApplication) + filename + "." + FilenameUtils.getExtension(currentlyRunningApplication);
+			final Path fileToReplace = Path.of(currentlyRunningApplication);
+
+			JavaHelper.verifyAccessible(fileToReplace);
+
 			try{
-				Files.move(fileToMove, Path.of(currentlyRunningApplication), StandardCopyOption.REPLACE_EXISTING);
+				JavaHelper.secureMoveFile(fileToMove, fileToReplace);
 			}
 			catch(final Exception e){
 				throw new FileSystemException(currentlyRunningApplication);
