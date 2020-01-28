@@ -19,6 +19,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,12 +29,19 @@ import java.util.regex.Pattern;
 
 public class DownloaderHelper{
 
+	public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
+	public static final String PROPERTY_KEY_VERSION = "version";
+	public static final String PROPERTY_KEY_BUILD_TIMESTAMP = "buildTimestamp";
+
 	private static final Pattern VERSION = PatternHelper.pattern("-([\\d.]+)+\\.jar$");
+
+	private static Map<String, Object> POM_PROPERTIES;
 
 
 	private DownloaderHelper(){}
 
 	public static JSONObject extractLastVersion(final String url) throws Exception{
+//TODO read pom.xml
 		try(final InputStream is = new URL(url).openStream()){
 			final String response = new String(is.readAllBytes());
 
@@ -40,7 +50,7 @@ public class DownloaderHelper{
 			final JSONObject lastObject = newest.getRight();
 
 			//get actual version
-			final Version actualVersion = getActualVersion();
+			final Version actualVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
 			//FIXME remove comment
 //			if(lastObjectVersion.lessThanOrEqualTo(actualVersion))
 //				throw new Exception("You already have the latest version of " + getApplicationName() + " installed");
@@ -55,7 +65,6 @@ public class DownloaderHelper{
 	}
 
 	public static void validate(final String localPath, final JSONObject object) throws Exception{
-		//check size + sha
 		final FileInputStream fis = new FileInputStream(localPath);
 		final byte[] content = IOUtils.toByteArray(fis);
 		final Long size = (Long)object.getOrDefault("size", null);
@@ -69,20 +78,20 @@ public class DownloaderHelper{
 			throw new Exception("SHA mismatch while downloading " + FilenameUtils.getBaseName(localPath));
 	}
 
-	private static String getApplicationName() throws IOException{
-		try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
-			final Properties prop = new Properties();
-			prop.load(versionInfoStream);
-			return prop.getProperty("artifactId");
-		}
-	}
+	public static Map<String, Object> getPOMProperties(){
+		if(POM_PROPERTIES == null){
+			POM_PROPERTIES = new HashMap<>();
+			try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
+				final Properties prop = new Properties();
+				prop.load(versionInfoStream);
 
-	private static Version getActualVersion() throws IOException{
-		try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
-			final Properties prop = new Properties();
-			prop.load(versionInfoStream);
-			return Version.valueOf(prop.getProperty("version"));
+				POM_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
+				POM_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
+				POM_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
+			}
+			catch(final IOException ignored){}
 		}
+		return POM_PROPERTIES;
 	}
 
 	private static Pair<Version, JSONObject> extractNewest(final String json){

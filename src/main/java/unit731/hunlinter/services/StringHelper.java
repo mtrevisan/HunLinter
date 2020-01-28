@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -220,6 +221,17 @@ public class StringHelper{
 			sb.append(Character.forDigit((b & 0x0F), 16));
 		}
 		return sb.toString();
+	}
+
+	public static String byteCountToHumanReadable(final long bytes){
+		final long b = (bytes == Long.MIN_VALUE? Long.MAX_VALUE: Math.abs(bytes));
+		return (b < 1024l? bytes + " B":
+			b <= 0xFFFCCCCCCCCCCCCl >> 40? String.format(Locale.ROOT, "%.1f KiB", bytes / 0x1p10):
+			b <= 0xFFFCCCCCCCCCCCCl >> 30? String.format(Locale.ROOT, "%.1f MiB", bytes / 0x1p20):
+			b <= 0xFFFCCCCCCCCCCCCl >> 20? String.format(Locale.ROOT, "%.1f GiB", bytes / 0x1p30):
+			b <= 0xFFFCCCCCCCCCCCCl >> 10? String.format(Locale.ROOT, "%.1f TiB", bytes / 0x1p40):
+			b <= 0xFFFCCCCCCCCCCCCl? String.format(Locale.ROOT, "%.1f PiB", (bytes >> 10) / 0x1p40):
+			String.format(Locale.ROOT, "%.1f EiB", (bytes >> 20) / 0x1p40));
 	}
 
 }

@@ -3,14 +3,14 @@ package unit731.hunlinter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
 /**
@@ -37,18 +37,10 @@ public class HelpDialog extends JDialog{
 		}
 		catch(final IOException ignored){}
 
-		String artifactID = null;
-		String version = null;
-		LocalDate buildTimestamp = null;
-		try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
-			final Properties prop = new Properties();
-			prop.load(versionInfoStream);
-
-			artifactID = prop.getProperty("artifactId");
-			version = prop.getProperty("version");
-			buildTimestamp = LocalDate.parse(prop.getProperty("buildTimestamp"));
-		}
-		catch(final IOException ignored){}
+		final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
+		final String artifactID = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
+		final String version = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION);
+		final LocalDate buildTimestamp = (LocalDate)pomProperties.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
 
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);
