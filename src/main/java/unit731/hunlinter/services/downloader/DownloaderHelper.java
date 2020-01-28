@@ -51,8 +51,8 @@ public class DownloaderHelper{
 
 			//get actual version
 			final Version applicationVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
-//			if(lastObjectVersion.lessThanOrEqualTo(applicationVersion))
-//				throw new Exception("You already have the latest version installed");
+			if(lastObjectVersion.lessThanOrEqualTo(applicationVersion))
+				throw new Exception("You already have the latest version installed");
 
 			return lastObject;
 		}
