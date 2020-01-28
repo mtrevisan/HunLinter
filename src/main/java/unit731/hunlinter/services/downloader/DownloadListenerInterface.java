@@ -7,7 +7,7 @@ public interface DownloadListenerInterface{
 	default void startCheckUpdates() throws Exception{}
 
 	/** All files were passed for an update check, start download */
-	default void startDownloads() throws Exception{}
+	default void startDownloads(final String version) throws Exception{}
 
 	/**
 	 * The file was successfully downloaded and is now about to be passed through a series of validations.
