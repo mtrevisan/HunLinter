@@ -185,19 +185,19 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public void succeeded(){
-		statusLabel.setText("File has been downloaded successfully!");
+		statusLabel.setText("File has been downloaded and verified successfully!");
 		downloadButton.setEnabled(false);
 
 		try{
 			FileHelper.openFolder(new File(localPath));
+			FileHelper.openFolder(new File(HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
 		}
 		catch(final Exception ignored){}
 /** /
 		//TODO copy file to current location
 		try{
 			final Path fileToMove = Path.of(localPath);
-			String currentlyRunningApplication = HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
-				.substring(1);
+			String currentlyRunningApplication = HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 //String bla = "D:/Mauro/HunLinter/target/HunLinter-1.10.0-SNAPSHOT-shaded.jar";
 //currentlyRunningApplication = "D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar";
 			String filename = FilenameUtils.getBaseName(localPath);
