@@ -50,9 +50,12 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
+      statusLabel = new javax.swing.JLabel();
       fileProgressBar = new javax.swing.JProgressBar();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+      statusLabel.setText("…");
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -60,13 +63,19 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(fileProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(fileProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(statusLabel)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addContainerGap(308, Short.MAX_VALUE)
+            .addContainerGap(283, Short.MAX_VALUE)
+            .addComponent(statusLabel)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addComponent(fileProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(56, 56, 56))
       );
@@ -105,6 +114,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JProgressBar fileProgressBar;
-	// End of variables declaration//GEN-END:variables
+   private javax.swing.JLabel statusLabel;
+   // End of variables declaration//GEN-END:variables
 
 }
