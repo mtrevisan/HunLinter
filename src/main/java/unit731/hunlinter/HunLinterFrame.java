@@ -49,6 +49,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
@@ -2329,7 +2330,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
    }//GEN-LAST:event_wexAddButtonActionPerformed
 
-	private static final Pattern VERSION = PatternHelper.pattern("-([\\d.]+)+\\.jar&");
+	private static final Pattern VERSION = PatternHelper.pattern("-([\\d.]+)+\\.jar$");
 
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
 		try{
@@ -2360,14 +2361,26 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				}
 			}
 			//if newer
-			final Version actualVersion = Version.valueOf("1.10.0");
-			if(lastObjectVersion != null && lastObjectVersion.greaterThan(actualVersion)){
-				//warn for newer version and ask for download
-				//get "size" + "sha" + "download_url"
-				//download file
-				//check size + sha
+			if(lastObjectVersion != null){
+				Version actualVersion = null;
+				try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
+					final Properties prop = new Properties();
+					prop.load(versionInfoStream);
+					actualVersion = Version.valueOf(prop.getProperty("version"));
+				}
+				catch(final IOException ignored){}
+				if(lastObjectVersion.greaterThan(actualVersion)){
+					//warn for newer version and ask for download
 
-				System.out.println();
+					//get "size" + "sha" + "download_url"
+					final Integer size = (Integer)lastObject.getOrDefault("size", null);
+					final String sha = (String)lastObject.getOrDefault("sha", null);
+
+					//download file
+					//check size + sha
+
+					System.out.println();
+				}
 			}
 		}
 		catch(Exception e){
