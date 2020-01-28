@@ -27,28 +27,24 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private String remoteURL;
 
 
-	public FileDownloaderDialog(final String repositoryURL, final Frame parent){
+	public FileDownloaderDialog(final String repositoryURL, final Frame parent) throws Exception{
 		super(parent, "File downloader", true);
 
 		initComponents();
 
 
-		try{
-			fileProgressBar.setValue(0);
+		fileProgressBar.setValue(0);
+		downloadButton.setEnabled(true);
 
-			remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
-			remoteURL = (String)remoteObject.getOrDefault("download_url", null);
-			final String filename = (String)remoteObject.getOrDefault("name", null);
-			localPath = System.getProperty("user.home") + "/Downloads/" + filename;
+		remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
+		remoteURL = (String)remoteObject.getOrDefault("download_url", null);
+		final String filename = (String)remoteObject.getOrDefault("name", null);
+		localPath = System.getProperty("user.home") + "/Downloads/" + filename;
 
-			final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
-			currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
-			newVersionLabel.setText(DownloaderHelper.extractVersion(filename));
-			downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable((Long)remoteObject.getOrDefault("size", null)));
-		}
-		catch(final Exception e){
-			statusLabel.setText(e.getMessage());
-		}
+		final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
+		currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
+		newVersionLabel.setText(DownloaderHelper.extractVersion(filename));
+		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable((Long)remoteObject.getOrDefault("size", null)));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -185,7 +181,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public void succeeded(){
-		statusLabel.setText("File has been downloaded successfully!");
+		statusLabel.setText("File has been downloaded successfully! (Now you can overwrite current application with the downloaded file)");
+		downloadButton.setEnabled(false);
 
 		try{
 			FileHelper.openFolder(new File(localPath));

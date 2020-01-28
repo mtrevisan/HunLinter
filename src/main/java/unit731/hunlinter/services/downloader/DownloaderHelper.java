@@ -50,10 +50,9 @@ public class DownloaderHelper{
 			final JSONObject lastObject = newest.getRight();
 
 			//get actual version
-			final Version actualVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
-			//FIXME remove comment
-//			if(lastObjectVersion.lessThanOrEqualTo(actualVersion))
-//				throw new Exception("You already have the latest version of " + getApplicationName() + " installed");
+			final Version applicationVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
+			if(lastObjectVersion.lessThanOrEqualTo(applicationVersion))
+				throw new Exception("You already have the latest version installed");
 
 			return lastObject;
 		}
