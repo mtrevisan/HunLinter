@@ -98,7 +98,7 @@ public class DownloaderHelper{
 	private static Pair<Version, JSONObject> extractNewest(final String json){
 		Version lastObjectVersion = null;
 		JSONObject lastObject = null;
-		final JSONArray array = (JSONArray) JSONValue.parse(json);
+		final JSONArray array = (JSONArray)JSONValue.parse(json);
 		for(final Object elem : array){
 			final JSONObject el = (JSONObject)elem;
 
