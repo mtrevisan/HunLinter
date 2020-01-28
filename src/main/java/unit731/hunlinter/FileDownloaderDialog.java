@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 import javax.swing.*;
 
-import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.StringHelper;
@@ -25,6 +24,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private JSONObject remoteObject;
 	private String localPath;
 
+	private String remoteURL;
+
 
 	public FileDownloaderDialog(final String repositoryURL, final Frame parent){
 		super(parent, "File downloader", true);
@@ -36,7 +37,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			fileProgressBar.setValue(0);
 
 			remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
-			final String remoteURL = (String)remoteObject.getOrDefault("download_url", null);
+			remoteURL = (String)remoteObject.getOrDefault("download_url", null);
 			final String filename = (String)remoteObject.getOrDefault("name", null);
 			localPath = System.getProperty("user.home") + "/Downloads/" + filename;
 
@@ -44,12 +45,6 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
 			newVersionLabel.setText(DownloaderHelper.extractVersion(filename));
 			downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable((Long)remoteObject.getOrDefault("size", null)));
-			//TODO warn user of a new version
-			//remind me later / release notes / ignore this update / download
-
-			final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
-			task.addPropertyChangeListener(this);
-			task.execute();
 		}
 		catch(final Exception e){
 			statusLabel.setText(e.getMessage());
@@ -68,6 +63,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       downloadSizeLabel = new javax.swing.JLabel();
       statusLabel = new javax.swing.JLabel();
       fileProgressBar = new javax.swing.JProgressBar();
+      downloadButton = new javax.swing.JButton();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -85,7 +81,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
       downloadSizeLabel.setText("…");
 
-      statusLabel.setText("…");
+      statusLabel.setText(" ");
+
+      downloadButton.setText("Download");
+      downloadButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            downloadButtonActionPerformed(evt);
+         }
+      });
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -111,6 +114,10 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
                         .addComponent(downloadSizePreLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(downloadSizeLabel)))
+                  .addGap(0, 0, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addGap(0, 0, Short.MAX_VALUE)
+                  .addComponent(downloadButton)
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -131,15 +138,23 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(downloadSizePreLabel)
                .addComponent(downloadSizeLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
+            .addGap(18, 18, 18)
             .addComponent(statusLabel)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(fileProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(56, 56, 56))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addComponent(downloadButton)
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+   private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+		final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
+		task.addPropertyChangeListener(this);
+		task.execute();
+   }//GEN-LAST:event_downloadButtonActionPerformed
 
 	@Override
 	public void startCheckUpdates() throws Exception{
@@ -203,6 +218,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel currentVersionLabel;
    private javax.swing.JLabel currentVersionPreLabel;
+   private javax.swing.JButton downloadButton;
    private javax.swing.JLabel downloadSizeLabel;
    private javax.swing.JLabel downloadSizePreLabel;
    private javax.swing.JProgressBar fileProgressBar;
