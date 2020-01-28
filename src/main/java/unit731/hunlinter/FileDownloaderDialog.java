@@ -3,18 +3,15 @@ package unit731.hunlinter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.FileSystemException;
 import java.nio.file.Path;
 import java.util.Map;
 import javax.swing.*;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.JavaHelper;
@@ -26,9 +23,8 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
-	private JSONObject remoteObject;
 	private String localPath;
-
+	private JSONObject remoteObject;
 	private String remoteURL;
 
 
@@ -44,12 +40,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
 		remoteURL = (String)remoteObject.getOrDefault("download_url", null);
 		final String filename = (String)remoteObject.getOrDefault("name", null);
+		final Long size = (Long)remoteObject.getOrDefault("size", null);
+
 		localPath = System.getProperty("user.home") + "/Downloads/" + filename;
 
 		final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
 		currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
 		newVersionLabel.setText(DownloaderHelper.extractVersion(filename));
-		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable((Long)remoteObject.getOrDefault("size", null)));
+		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(size));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -194,41 +192,15 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 		try{
 			final Path fileToMove = Path.of(localPath);
-//final Path destinationFolder = Path.of("D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar");
-			//FIXME
 			final String destinationFolder = FilenameUtils.getFullPath(HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 			final Path destinationPath = Path.of((destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
 				FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
-			FileHelper.secureMoveFile(fileToMove, destinationPath);
+			FileHelper.moveFile(fileToMove, destinationPath);
 
-			FileHelper.openFolder(destinationPath.toFile());
+			//exit current jar and start new one
+			JavaHelper.closeAndStartAnotherApplication(destinationPath.toString());
 		}
 		catch(final Exception ignored){}
-/** /
-		//TODO copy file to current location
-		try{
-			final Path fileToMove = Path.of(localPath);
-			String currentlyRunningApplication = HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-//String bla = "D:/Mauro/HunLinter/target/HunLinter-1.10.0-SNAPSHOT-shaded.jar";
-//currentlyRunningApplication = "D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar";
-			String filename = FilenameUtils.getBaseName(localPath);
-			final String currentVersion = DownloaderHelper.extractVersion(filename + "." + FilenameUtils.getExtension(localPath));
-			if(currentVersion != null)
-				filename = filename.substring(0, filename.length() - currentVersion.length() - 1);
-			currentlyRunningApplication = FilenameUtils.getFullPath(currentlyRunningApplication) + filename + "." + FilenameUtils.getExtension(currentlyRunningApplication);
-			final Path fileToReplace = Path.of(currentlyRunningApplication);
-
-			FileHelper.verifyAccessible(fileToReplace);
-
-//			FileHelper.secureMoveFile(Path.of(currentlyRunningApplication), Path.of(currentlyRunningApplication + ".old"));
-//			FileHelper.secureMoveFile(fileToMove, Path.of(currentlyRunningApplication + ".new"));
-			FileHelper.secureMoveFile(fileToMove, fileToReplace);
-
-			JavaHelper.restartApplication();
-		}
-		catch(final Exception e){
-			e.printStackTrace();
-		}/**/
 	}
 
 	@Override

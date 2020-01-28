@@ -2334,7 +2334,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 			catch(final NoRouteToHostException | UnknownHostException e){
 				final String message = "Connection failed.\r\nPlease check network connection and try again.";
-				LOGGER.info(message);
+				LOGGER.warn(message);
 
 				JOptionPane.showMessageDialog(this, message, "Application update", JOptionPane.WARNING_MESSAGE);
 			}
