@@ -55,20 +55,19 @@ public class JavaHelper{
 
 	/** Restart the current Java application */
 	public static void restartApplication(){
-		//java binary
-		final String java = System.getProperty("java.home") + "/bin/java";
-		//vm arguments
-		final List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-		final StringBuffer vmArgsOneLine = new StringBuffer();
-		for(final String arg : vmArguments)
+		//init the command to execute, add the vm args
+		final StringBuffer cmd = new StringBuffer()
+			.append("\"")
+			//add java binary
+			.append(System.getProperty("java.home")).append("/bin/java")
+			.append("\" ");
+		for(final String arg : ManagementFactory.getRuntimeMXBean().getInputArguments())
 			//if it's the agent argument we ignore it, otherwise the address of the old application and the new one will be in conflict
 			if(!arg.contains("-agentlib")){
-				vmArgsOneLine.append(arg);
-				vmArgsOneLine.append(StringUtils.SPACE);
+				cmd.append(arg);
+				cmd.append(StringUtils.SPACE);
 			}
-		//init the command to execute, add the vm args
-		final StringBuffer cmd = new StringBuffer("\"" + java + "\" " + vmArgsOneLine);
-		//program main and program arguments (be careful a sun property. might not be supported by all JVM)
+		//program main and program arguments (be careful, this ia a Sun property, it might not be supported by all JVM!)
 		final String[] mainCommand = System.getProperty("sun.java.command")
 			.split(StringUtils.SPACE);
 		//program main is a jar
@@ -82,6 +81,7 @@ public class JavaHelper{
 		for(int i = 1; i < mainCommand.length; i ++)
 			cmd.append(StringUtils.SPACE)
 				.append(mainCommand[i]);
+
 		//execute the command in a shutdown hook, to be sure that all the resources have been disposed before restarting the application
 		Runtime.getRuntime()
 			.addShutdownHook(new Thread(() -> {

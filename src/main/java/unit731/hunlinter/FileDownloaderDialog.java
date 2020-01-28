@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.*;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.JavaHelper;
@@ -151,6 +152,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    }// </editor-fold>//GEN-END:initComponents
 
    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+		downloadButton.setEnabled(false);
+
 		final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
 		task.addPropertyChangeListener(this);
 		task.execute();
@@ -181,12 +184,13 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	@Override
 	public void stopped(){
 		statusLabel.setText("Update stopped");
+
+		downloadButton.setEnabled(true);
 	}
 
 	@Override
 	public void succeeded(){
 		statusLabel.setText("File has been downloaded and verified successfully!");
-		downloadButton.setEnabled(false);
 
 		try{
 			final Path fileToMove = Path.of(localPath);
@@ -228,6 +232,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	@Override
 	public void failed(final Exception e){
 		statusLabel.setText("Error downloading file: " + e.getMessage());
+
+		downloadButton.setEnabled(true);
 	}
 
 	@Override
