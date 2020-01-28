@@ -213,6 +213,7 @@ public class FileHelper{
 		if(exists && !Files.isWritable(path))
 			throw new AccessDeniedException(path.toString());
 
+		//check if the file if writable
 		try(final Writer out = Files.newBufferedWriter(path, (exists? StandardOpenOption.APPEND: StandardOpenOption.CREATE))){}
 		finally{
 			if(!exists)
