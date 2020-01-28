@@ -3,55 +3,42 @@ package unit731.hunlinter.services.downloader;
 import javax.swing.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 
 
 /** Execute file download in a background thread and update the progress */
-public class DownloadTask extends SwingWorker<Void, Void>{
+public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperDelegate{
 
-	private static final int BUFFER_SIZE = 4096;
-
-	private final String saveFilePath;
+	private final String localPath;
+	private final String remoteURL;
 	private final DownloadListenerInterface listener;
 
-	private final HttpURLConnection httpConnection;
 
-
-	public DownloadTask(final String downloadURL, final String saveFilePath, final DownloadListenerInterface listener) throws IOException{
-		this.saveFilePath = saveFilePath;
+	public DownloadTask(final String localPath, final String remoteURL, final DownloadListenerInterface listener){
+		this.localPath = localPath;
+		this.remoteURL = remoteURL;
 		this.listener = listener;
-
-		final URL url = new URL(downloadURL);
-		httpConnection = (HttpURLConnection)url.openConnection();
-		final int responseCode = httpConnection.getResponseCode();
-		if(responseCode != HttpURLConnection.HTTP_OK)
-			throw new IOException("Cannot connect to server");
 	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
 		try{
-			final int contentLength = httpConnection.getContentLength();
-			final InputStream is = httpConnection.getInputStream();
+			final URL url = new URL(remoteURL);
+			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			final int responseCode = httpConnection.getResponseCode();
+			if(responseCode != HttpURLConnection.HTTP_OK)
+				throw new IOException("Cannot connect to server");
 
-			final FileOutputStream outputStream = new FileOutputStream(saveFilePath);
-
-			final byte[] buffer = new byte[BUFFER_SIZE];
-			int bytesRead;
-			long totalBytesRead = 0;
-			while((bytesRead = is.read(buffer)) != -1){
-				outputStream.write(buffer, 0, bytesRead);
-				totalBytesRead += bytesRead;
-
-				setProgress((int)(totalBytesRead * 100 / contentLength));
-			}
-
-			outputStream.close();
-
-			is.close();
-			httpConnection.disconnect();
+			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
+			final FileOutputStream fos = new FileOutputStream(localPath);
+			final FileChannel fileChannel = fos.getChannel();
+			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+			fileChannel.close();
+			fos.close();
 		}
 		catch(final Exception e){
 			listener.error(e);
@@ -61,12 +48,31 @@ public class DownloadTask extends SwingWorker<Void, Void>{
 		return null;
 	}
 
+	private int contentLength(final URL url){
+		int contentLength = -1;
+		try{
+			HttpURLConnection.setFollowRedirects(false);
+
+			final HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection.setRequestMethod("HEAD");
+
+			contentLength = connection.getContentLength();
+		}
+		catch(final Exception ignored){}
+		return contentLength;
+	}
+
+	@Override
+	public void rbcProgressCallback(final RBCWrapper rbc, final double progress){
+		setProgress((int)Math.round(progress));
+	}
+
 	@Override
 	protected void done(){
 		setProgress(100);
 
 		if(!isCancelled())
-			listener.success(saveFilePath);
+			listener.success(localPath);
 	}
 
 }
