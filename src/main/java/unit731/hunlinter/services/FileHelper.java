@@ -166,8 +166,15 @@ public class FileHelper{
 	public static void openFolder(final File file) throws IOException{
 		if(Desktop.isDesktopSupported()){
 			final Desktop desktop = Desktop.getDesktop();
-			if(file.isFile())
-				desktop.browseFileDirectory(file);
+			if(file.isFile()){
+				try{
+					desktop.browseFileDirectory(file);
+				}
+				catch(final UnsupportedOperationException e){
+					//cannot open folder and select the file, open the folder only
+					desktop.open(file.getParentFile());
+				}
+			}
 			else
 				desktop.open(file);
 		}
