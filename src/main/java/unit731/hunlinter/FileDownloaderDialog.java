@@ -16,6 +16,7 @@ import javax.swing.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONObject;
+import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.downloader.DownloadListenerInterface;
 import unit731.hunlinter.services.downloader.DownloadTask;
@@ -208,7 +209,7 @@ currentlyRunningApplication = "D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar";
 			e.printStackTrace();
 		}
 
-		//TODO restart application
+		JavaHelper.restartApplication();
 	}
 
 	@Override
