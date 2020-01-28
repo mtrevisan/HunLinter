@@ -95,6 +95,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public void validatingFile(final String localPath){
+		statusLabel.setText("Validating download…");
+
 		try{
 			DownloaderHelper.validate(localPath, remoteObject);
 		}
