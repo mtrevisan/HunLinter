@@ -194,12 +194,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 		try{
 			final Path fileToMove = Path.of(localPath);
-			final Path destinationFolder = Path.of("D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar");
+//final Path destinationFolder = Path.of("D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar");
 			//FIXME
-//			final Path destinationFolder = Path.of(FilenameUtils.getFullPath(HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()));
-			FileHelper.secureMoveFile(fileToMove, destinationFolder);
+			final String destinationFolder = FilenameUtils.getFullPath(HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			final Path destinationPath = Path.of((destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
+				FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
+			FileHelper.secureMoveFile(fileToMove, destinationPath);
 
-			FileHelper.openFolder(destinationFolder.toFile());
+			FileHelper.openFolder(destinationPath.toFile());
 		}
 		catch(final Exception ignored){}
 /** /
