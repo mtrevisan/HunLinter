@@ -192,7 +192,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			FileHelper.openFolder(new File(localPath));
 		}
 		catch(final Exception ignored){}
-/*
+/** /
 		//TODO copy file to current location
 		try{
 			final Path fileToMove = Path.of(localPath);
@@ -207,17 +207,17 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			currentlyRunningApplication = FilenameUtils.getFullPath(currentlyRunningApplication) + filename + "." + FilenameUtils.getExtension(currentlyRunningApplication);
 			final Path fileToReplace = Path.of(currentlyRunningApplication);
 
-			JavaHelper.verifyAccessible(fileToReplace);
+			FileHelper.verifyAccessible(fileToReplace);
 
-//			JavaHelper.secureMoveFile(Path.of(currentlyRunningApplication), Path.of(currentlyRunningApplication + ".old"));
-//			JavaHelper.secureMoveFile(fileToMove, Path.of(currentlyRunningApplication + ".new"));
-			JavaHelper.secureMoveFile(fileToMove, fileToReplace);
+//			FileHelper.secureMoveFile(Path.of(currentlyRunningApplication), Path.of(currentlyRunningApplication + ".old"));
+//			FileHelper.secureMoveFile(fileToMove, Path.of(currentlyRunningApplication + ".new"));
+			FileHelper.secureMoveFile(fileToMove, fileToReplace);
 
 			JavaHelper.restartApplication();
 		}
 		catch(final Exception e){
 			e.printStackTrace();
-		}*/
+		}/**/
 	}
 
 	@Override

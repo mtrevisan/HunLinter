@@ -9,11 +9,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.ObjectInputStream;
+import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -25,6 +34,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,6 +206,75 @@ public class FileHelper{
 		}
 		else
 			LOGGER.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
+	}
+
+	public static void verifyAccessible(final Path path) throws IOException{
+		final boolean exists = Files.exists(path);
+		if(exists && !Files.isWritable(path))
+			throw new AccessDeniedException(path.toString());
+
+		try(final Writer out = Files.newBufferedWriter(path, (exists? StandardOpenOption.APPEND: StandardOpenOption.CREATE))){}
+		finally{
+			if(!exists)
+				Files.deleteIfExists(path);
+		}
+	}
+
+	public static void secureMoveFile(final Path source, final Path target) throws IOException{
+		if(JavaHelper.OS.CURRENT == JavaHelper.OS.WINDOWS || Files.notExists(target))
+			//for windows we can't go wrong because the OS manages locking
+			Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+		else{
+			//let's unlink file first so we don't run into file-busy errors
+			final Path temp = Files.createTempFile(target.getParent(), null, null);
+			Files.move(target, temp, StandardCopyOption.REPLACE_EXISTING);
+
+			try{
+				Files.move(source, target);
+			}
+			catch(final IOException e){
+				Files.move(temp, target);
+
+				throw e;
+			}
+			finally{
+				Files.deleteIfExists(temp);
+			}
+		}
+	}
+
+	/**
+	 * @param files	Files to be deleted
+	 * @param delay	Delay [s]
+	 */
+	public static void delayedDelete(final Collection<Path> files, int delay){
+		delay = Math.max(delay, 1);
+		final List<String> commands = new ArrayList<>();
+
+		final String filenames = files.stream()
+			.map(Path::toString)
+			.map(f -> "\"" + f.replace("\"", "\\\"") + "\"")
+			.collect(Collectors.joining(StringUtils.SPACE));
+
+		if(JavaHelper.OS.CURRENT == JavaHelper.OS.WINDOWS){
+			commands.addAll(List.of("cmd", "/c"));
+			commands.add("ping localhost -n " + (delay + 1) + " & del " + filenames);
+		}
+		else{
+			commands.addAll(List.of("sh", "-c"));
+			commands.add("sleep " + delay + " ; rm " + filenames);
+		}
+
+		final ProcessBuilder pb = new ProcessBuilder(commands);
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try{
+				pb.start();
+			}
+			catch(final IOException e){
+				e.printStackTrace();
+			}
+		}));
 	}
 
 }
