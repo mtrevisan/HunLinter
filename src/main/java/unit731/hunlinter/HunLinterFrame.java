@@ -145,6 +145,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
+	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 	private static final String TAB = "\t";
 
@@ -268,6 +269,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		});
 		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME,
 			() -> hypCheckCorrectnessMenuItem.setEnabled(true));
+
+
+		//check for updates
+		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
+			//TODO
+			System.out.println();
+		}
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -446,6 +454,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
       hlpOnlineSeparator = new javax.swing.JPopupMenu.Separator();
       hlpUpdateMenuItem = new javax.swing.JMenuItem();
+      hlpCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1505,6 +1514,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
       hlpMenu.add(hlpUpdateMenuItem);
 
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check updates on startup");
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed(evt);
+         }
+      });
+      hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
+
       hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
@@ -2346,6 +2364,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		});
 	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
+
+   private void hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
+		final boolean selected = hlpCheckUpdateOnStartupCheckBoxMenuItem.isSelected();
+		preferences.putBoolean(UPDATE_STARTUP_CHECK, selected);
+   }//GEN-LAST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
 
 
 	@Override
@@ -3223,6 +3246,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
    private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
+   private javax.swing.JCheckBoxMenuItem hlpCheckUpdateOnStartupCheckBoxMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
    private javax.swing.JPopupMenu.Separator hlpOnlineSeparator;
