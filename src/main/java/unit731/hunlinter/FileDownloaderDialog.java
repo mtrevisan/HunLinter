@@ -3,6 +3,7 @@ package unit731.hunlinter;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -10,6 +11,7 @@ import java.io.ObjectOutputStream;
 import javax.swing.*;
 
 import org.json.simple.JSONObject;
+import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.downloader.DownloadListenerInterface;
 import unit731.hunlinter.services.downloader.DownloadTask;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
@@ -17,13 +19,12 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
-	private final Frame parent;
+	private JSONObject remoteObject;
+	private String localPath;
 
 
 	public FileDownloaderDialog(final String repositoryURL, final Frame parent){
 		super(parent, "File downloader", true);
-
-		this.parent = parent;
 
 		initComponents();
 
@@ -31,18 +32,17 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		try{
 			fileProgressBar.setValue(0);
 
-			final JSONObject object = DownloaderHelper.extractLastVersion(repositoryURL);
-			final String remoteURL = (String)object.getOrDefault("download_url", null);
-			final String filename = (String)object.getOrDefault("name", null);
-			final String localPath = System.getProperty("user.home") + "/Downloads/" + filename;
+			remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
+			final String remoteURL = (String)remoteObject.getOrDefault("download_url", null);
+			final String filename = (String)remoteObject.getOrDefault("name", null);
+			localPath = System.getProperty("user.home") + "/Downloads/" + filename;
 
 			final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
 			task.addPropertyChangeListener(this);
 			task.execute();
 		}
 		catch(final Exception e){
-			JOptionPane.showMessageDialog(this,
-				"Error executing upload task: " + e.getMessage(), "Error",
+			JOptionPane.showMessageDialog(this, "Error executing upload task: " + e.getMessage(), "Error",
 				JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -84,15 +84,43 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void success(final String saveFilePath){
-		//TODO
-		JOptionPane.showMessageDialog(parent, "File has been downloaded successfully!", "Message", JOptionPane.INFORMATION_MESSAGE);
+	public void startCheckUpdates() throws Exception{
+		statusLabel.setText("Check for updates…");
 	}
 
 	@Override
-	public void error(final Exception e){
-		//TODO
-		JOptionPane.showMessageDialog(parent, "Error downloading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	public void startDownloads() throws Exception{
+		statusLabel.setText("Begin downloading…");
+	}
+
+	@Override
+	public void validatingFile(final String localPath){
+		try{
+			DownloaderHelper.validate(localPath, remoteObject);
+		}
+		catch(final Exception e){
+			statusLabel.setText(e.getMessage());
+		}
+	}
+
+	@Override
+	public void stopped(){
+		statusLabel.setText("Update stopped");
+	}
+
+	@Override
+	public void succeeded(){
+		statusLabel.setText("File has been downloaded successfully!");
+
+		try{
+			FileHelper.openFolder(new File(localPath));
+		}
+		catch(final Exception ignored){}
+	}
+
+	@Override
+	public void failed(final Exception e){
+		statusLabel.setText("Error downloading file: " + e.getMessage());
 	}
 
 	@Override

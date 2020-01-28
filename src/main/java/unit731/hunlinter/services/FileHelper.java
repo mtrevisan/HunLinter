@@ -163,9 +163,14 @@ public class FileHelper{
 		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
 	}
 
-	public static void openFolder(final File folder) throws IOException{
-		if(Desktop.isDesktopSupported())
-			Desktop.getDesktop().open(folder);
+	public static void openFolder(final File file) throws IOException{
+		if(Desktop.isDesktopSupported()){
+			final Desktop desktop = Desktop.getDesktop();
+			if(file.isFile())
+				desktop.browseFileDirectory(file);
+			else
+				desktop.open(file);
+		}
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file

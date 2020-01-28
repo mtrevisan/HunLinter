@@ -81,7 +81,7 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
 
-				FileHelper.openFolder(outputFile.getParentFile());
+				FileHelper.openFolder(outputFile);
 
 				Files.delete(outputFile.toPath());
 			}

@@ -54,19 +54,19 @@ final String response = "[{\"name\":\"Hunspeller-1.0.0-javadoc.jar\",\"path\":\"
 		}
 	}
 
-	public static void validate(final String saveFilePath, final JSONObject object) throws Exception{
+	public static void validate(final String localPath, final JSONObject object) throws Exception{
 		//check size + sha
-		final FileInputStream fis = new FileInputStream(saveFilePath);
+		final FileInputStream fis = new FileInputStream(localPath);
 		final byte[] content = IOUtils.toByteArray(fis);
 		final Long size = (Long)object.getOrDefault("size", null);
 		if(content.length != size)
-			throw new Exception("Size mismatch while downloading " + FilenameUtils.getBaseName(saveFilePath) + ", expected " + size + " B, had "
+			throw new Exception("Size mismatch while downloading " + FilenameUtils.getBaseName(localPath) + ", expected " + size + " B, had "
 				+ content.length + " B");
 
 		final String downloadedSha = calculateGitSha1(content);
 		final String sha = (String)object.getOrDefault("sha", null);
 		if(!downloadedSha.equals(sha))
-			throw new Exception("SHA mismatch while downloading " + FilenameUtils.getBaseName(saveFilePath));
+			throw new Exception("SHA mismatch while downloading " + FilenameUtils.getBaseName(localPath));
 	}
 
 	private static Version getActualVersion() throws IOException{
