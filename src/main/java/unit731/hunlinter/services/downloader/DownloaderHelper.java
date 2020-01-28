@@ -41,7 +41,7 @@ public class DownloaderHelper{
 	private DownloaderHelper(){}
 
 	public static JSONObject extractLastVersion(final String url) throws Exception{
-//TODO read pom.xml
+		//TODO read pom.xml instead of whole directory?
 		try(final InputStream is = new URL(url).openStream()){
 			final String response = new String(is.readAllBytes());
 
@@ -51,8 +51,8 @@ public class DownloaderHelper{
 
 			//get actual version
 			final Version applicationVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
-			if(lastObjectVersion.lessThanOrEqualTo(applicationVersion))
-				throw new Exception("You already have the latest version installed");
+//			if(lastObjectVersion.lessThanOrEqualTo(applicationVersion))
+//				throw new Exception("You already have the latest version installed");
 
 			return lastObject;
 		}
