@@ -1,7 +1,5 @@
 package unit731.hunlinter.services.downloader;
 
-import org.apache.commons.io.FilenameUtils;
-
 import javax.swing.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,7 +8,6 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.util.regex.Matcher;
 
 
 /** Execute file download in a background thread and update the progress */
@@ -38,9 +35,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 			if(responseCode != HttpURLConnection.HTTP_OK)
 				throw new IOException("Cannot connect to server");
 
-			final Matcher m = DownloaderHelper.VERSION.matcher(FilenameUtils.getBaseName(remoteURL) + "." + FilenameUtils.getExtension(remoteURL));
-			m.find();
-			final String version = m.group(1);
+			final String version = DownloaderHelper.extractVersion(remoteURL);
 			listener.startDownloads(version);
 
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);

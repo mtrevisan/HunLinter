@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 public class DownloaderHelper{
 
-	public static final Pattern VERSION = PatternHelper.pattern("-([\\d.]+)+\\.jar$");
+	private static final Pattern VERSION = PatternHelper.pattern("-([\\d.]+)+\\.jar$");
 
 
 	private DownloaderHelper(){}
@@ -39,18 +39,19 @@ public class DownloaderHelper{
 			final Version lastObjectVersion = newest.getLeft();
 			final JSONObject lastObject = newest.getRight();
 
-			if(lastObjectVersion == null)
-				throw new Exception("You already have the latest version of " + getApplicationName() + " installed");
-
 			//get actual version
 			final Version actualVersion = getActualVersion();
-
 			//FIXME remove comment
 //			if(lastObjectVersion.lessThanOrEqualTo(actualVersion))
-//				throw new Exception("No newer versions available");
+//				throw new Exception("You already have the latest version of " + getApplicationName() + " installed");
 
 			return lastObject;
 		}
+	}
+
+	public static String extractVersion(final String filename){
+		final Matcher m = VERSION.matcher(FilenameUtils.getBaseName(filename) + "." + FilenameUtils.getExtension(filename));
+		return (m.find()? m.group(1): null);
 	}
 
 	public static void validate(final String localPath, final JSONObject object) throws Exception{

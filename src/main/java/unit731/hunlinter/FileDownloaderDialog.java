@@ -37,13 +37,20 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final String filename = (String)remoteObject.getOrDefault("name", null);
 			localPath = System.getProperty("user.home") + "/Downloads/" + filename;
 
+			//TODO warn user of a new version
+			//"A new version of " + DownloaderHelper.getApplicationName() + " is available."
+			//
+			//"Current version: " + 1.0.0
+			//"New version: " + 1.2.0
+			//"Total download size is: " + 2 + " MB"
+			//remind me later / release notes / ignore this update / download
+
 			final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
 			task.addPropertyChangeListener(this);
 			task.execute();
 		}
 		catch(final Exception e){
-			JOptionPane.showMessageDialog(this, "Error executing upload task: " + e.getMessage(), "Error",
-				JOptionPane.ERROR_MESSAGE);
+			statusLabel.setText(e.getMessage());
 		}
 	}
 

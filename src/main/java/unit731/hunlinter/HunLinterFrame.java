@@ -2325,6 +2325,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
 		SwingUtilities.invokeLater(() -> {
 			final FileDownloaderDialog dialog = new FileDownloaderDialog(URL_ONLINE_REPOSITORY, this);
+			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.setVisible(true);
 		});
