@@ -64,8 +64,10 @@ public class DownloaderHelper{
 	}
 
 	public static void validate(final String localPath, final JSONObject object) throws Exception{
-		final FileInputStream fis = new FileInputStream(localPath);
-		final byte[] content = IOUtils.toByteArray(fis);
+		final byte[] content;
+		try(final FileInputStream fis = new FileInputStream(localPath)){
+			content = IOUtils.toByteArray(fis);
+		}
 		final Long size = (Long)object.getOrDefault("size", null);
 		if(content.length != size)
 			throw new Exception("Size mismatch while downloading " + FilenameUtils.getBaseName(localPath) + ", expected " + size + " B, had "
