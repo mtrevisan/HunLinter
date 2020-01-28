@@ -3,6 +3,8 @@ package unit731.hunlinter;
 import java.awt.*;
 
 import com.github.zafarkhaja.semver.Version;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -30,6 +32,8 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.NotSerializableException;
@@ -37,8 +41,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -2369,17 +2378,46 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					actualVersion = Version.valueOf(prop.getProperty("version"));
 				}
 				catch(final IOException ignored){}
-				if(lastObjectVersion.greaterThan(actualVersion)){
+				if(true || lastObjectVersion.greaterThan(actualVersion)){
 					//warn for newer version and ask for download
+					//TODO
 
 					//get "size" + "sha" + "download_url"
-					final Integer size = (Integer)lastObject.getOrDefault("size", null);
+					final Long size = (Long)lastObject.getOrDefault("size", null);
 					final String sha = (String)lastObject.getOrDefault("sha", null);
 
 					//download file
-					//check size + sha
+					final String downloadUrl = (String)lastObject.getOrDefault("download_url", null);
+					final String filename = (String)lastObject.getOrDefault("name", null);
+					final ReadableByteChannel rbc = Channels.newChannel(new URL(downloadUrl).openStream());
+					final String homeFolder = System.getProperty("user.home");
+					final FileOutputStream fos = new FileOutputStream(homeFolder + "/Downloads/" + filename);
+					final FileChannel fileChannel = fos.getChannel();
+					fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+					final long downloadedSize = fileChannel.size();
+					fileChannel.close();
+					fos.close();
 
-					System.out.println();
+					//check size + sha
+					if(downloadedSize != size){
+						LOGGER.error("Size mismatch while downloading " + filename + ", expected " + size + " B, had " + fileChannel.size() + " B");
+						//TODO
+					}
+					else{
+						final InputStream is = new FileInputStream(homeFolder + "/Downloads/" + filename);
+						final byte[] content = IOUtils.toByteArray(is);
+
+						final MessageDigest digest = MessageDigest.getInstance("SHA-1");
+						final byte[] header = ("blob " + size + "\0").getBytes(StandardCharsets.UTF_8);
+						final String downloadedSha = StringHelper.byteArrayToHexString(digest.digest(ArrayUtils.addAll(header, content)));
+						if(!sha.equals(downloadedSha)){
+							LOGGER.error("SHA mismatch while downloading " + filename);
+							//TODO
+						}
+						else{
+							System.out.println();
+						}
+					}
 				}
 			}
 		}

@@ -206,4 +206,20 @@ public class StringHelper{
 		);
 	}
 
+
+	/**
+	 * Converts an array of bytes into a string representing the hexadecimal values of each byte in order
+	 *
+	 * @param byteArray	Array to be converted to hexadecimal characters
+	 * @return	The hexadecimal characters
+	 */
+	public static String byteArrayToHexString(final byte[] byteArray){
+		final StringBuilder sb = new StringBuilder(byteArray.length << 1);
+		for(final byte b : byteArray){
+			sb.append(Character.forDigit((b >> 4) & 0x0F, 16));
+			sb.append(Character.forDigit((b & 0x0F), 16));
+		}
+		return sb.toString();
+	}
+
 }
