@@ -92,6 +92,7 @@
 						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
+								<exclude>LICENSE.txt</exclude>
 								<exclude>META-INF/LICENSE</exclude>
 								<exclude>META-INF/LICENSE.txt</exclude>
 								<exclude>META-INF/NOTICE</exclude>
