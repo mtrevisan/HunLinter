@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.FileSystemException;
 import java.util.Map;
 import javax.swing.*;
 
+import org.apache.commons.io.FilenameUtils;
 import org.json.simple.JSONObject;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.StringHelper;
@@ -181,13 +183,28 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public void succeeded(){
-		statusLabel.setText("File has been downloaded successfully! (Now you can overwrite current application with the downloaded file)");
+		statusLabel.setText("File has been downloaded successfully!");
 		downloadButton.setEnabled(false);
 
+		//TODO copy file to current location
 		try{
-			FileHelper.openFolder(new File(localPath));
+			final File fileToMove = new File(localPath);
+			String currentlyRunningApplication = HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+//currentlyRunningApplication = "D:/Mauro/HunLinter/target/Hunspeller-1.9.1.jar";
+			String filename = FilenameUtils.getBaseName(localPath);
+			final String currentVersion = DownloaderHelper.extractVersion(filename + "." + FilenameUtils.getExtension(localPath));
+			if(currentVersion != null)
+				filename = filename.substring(0, filename.length() - currentVersion.length() - 1);
+			currentlyRunningApplication = FilenameUtils.getFullPath(currentlyRunningApplication) + filename + "." + FilenameUtils.getExtension(currentlyRunningApplication);
+			final boolean moved = fileToMove.renameTo(new File(currentlyRunningApplication));
+			if(!moved)
+				throw new FileSystemException(currentlyRunningApplication);
 		}
-		catch(final Exception ignored){}
+		catch(final Exception e){
+			e.printStackTrace();
+		}
+
+		//TODO restart application
 	}
 
 	@Override
