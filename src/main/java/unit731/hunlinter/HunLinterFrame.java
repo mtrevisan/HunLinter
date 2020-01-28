@@ -273,8 +273,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//check for updates
 		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
-			//TODO
-			System.out.println();
+			SwingUtilities.invokeLater(() -> {
+				try{
+					final FileDownloaderDialog dialog = new FileDownloaderDialog(URL_ONLINE_REPOSITORY, this);
+					GUIUtils.addCancelByEscapeKey(dialog);
+					dialog.setLocationRelativeTo(this);
+					dialog.setVisible(true);
+				}
+				catch(final Exception ignored){}
+			});
 		}
 	}
 
