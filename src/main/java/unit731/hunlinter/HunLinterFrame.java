@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.NoRouteToHostException;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -2329,6 +2331,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				GUIUtils.addCancelByEscapeKey(dialog);
 				dialog.setLocationRelativeTo(this);
 				dialog.setVisible(true);
+			}
+			catch(final NoRouteToHostException | UnknownHostException e){
+				final String message = "Connection failed.\r\nPlease check network connection and try again.";
+				LOGGER.info(message);
+
+				JOptionPane.showMessageDialog(this, message, "Application update", JOptionPane.WARNING_MESSAGE);
 			}
 			catch(final Exception e){
 				final String message = e.getMessage();

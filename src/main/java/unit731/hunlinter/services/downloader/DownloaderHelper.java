@@ -70,8 +70,8 @@ public class DownloaderHelper{
 		}
 		final Long size = (Long)object.getOrDefault("size", null);
 		if(content.length != size)
-			throw new Exception("Size mismatch while downloading " + FilenameUtils.getBaseName(localPath) + ", expected " + size + " B, had "
-				+ content.length + " B");
+			throw new Exception("Size mismatch while downloading " + FilenameUtils.getBaseName(localPath) + ", expected "
+				+ size + " B, had " + content.length + " B");
 
 		final String downloadedSha = calculateGitSha1(content);
 		final String sha = (String)object.getOrDefault("sha", null);
