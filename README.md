@@ -233,7 +233,7 @@ Entries can be inserted in two ways:
 
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech if given) that are already contained into the thesaurus.
 
-It is possible to click on the first column to select the row (for cancelling it, for example), or the second column (to enter the edit mode).
+It is possible to right click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
 
 ![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
 

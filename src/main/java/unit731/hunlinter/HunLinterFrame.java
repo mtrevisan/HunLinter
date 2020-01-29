@@ -139,6 +139,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
 
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";
+	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";
 
 	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
@@ -458,6 +459,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
+      hlpIssueReporterMenuItem = new javax.swing.JMenuItem();
       hlpOnlineSeparator = new javax.swing.JPopupMenu.Separator();
       hlpUpdateMenuItem = new javax.swing.JMenuItem();
       hlpCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -1471,7 +1473,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       mainMenuBar.add(dicMenu);
 
-      hypMenu.setMnemonic('H');
+      hypMenu.setMnemonic('y');
       hypMenu.setText("Hyphenation tools");
       hypMenu.setToolTipText("");
       hypMenu.setEnabled(false);
@@ -1504,13 +1506,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       hlpOnlineHelpMenuItem.setMnemonic('h');
       hlpOnlineHelpMenuItem.setText("Online help");
-      hlpOnlineHelpMenuItem.setToolTipText("");
       hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             hlpOnlineHelpMenuItemActionPerformed(evt);
          }
       });
       hlpMenu.add(hlpOnlineHelpMenuItem);
+
+      hlpIssueReporterMenuItem.setText("Report an issue");
+      hlpIssueReporterMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hlpIssueReporterMenuItemActionPerformed(evt);
+         }
+      });
+      hlpMenu.add(hlpIssueReporterMenuItem);
       hlpMenu.add(hlpOnlineSeparator);
 
       hlpUpdateMenuItem.setText("Check for Update…");
@@ -1522,7 +1531,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.add(hlpUpdateMenuItem);
 
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check updates on startup");
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       hlpCheckUpdateOnStartupCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed(evt);
@@ -2145,6 +2154,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		else
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
 	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
+
+	private void hlpIssueReporterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpIssueReporterMenuItemActionPerformed
+		if(Desktop.isDesktopSupported()){
+			final Desktop desktop = Desktop.getDesktop();
+			try{
+				desktop.browse(new URI(URL_REPORT_ISSUE));
+			}
+			catch(final Exception e){
+				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open issue page on browser: {}", e.getMessage());
+			}
+		}
+		else
+			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open issue page on browser");
+	}//GEN-LAST:event_hlpIssueReporterMenuItemActionPerformed
 
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
@@ -3255,6 +3278,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JCheckBoxMenuItem hlpCheckUpdateOnStartupCheckBoxMenuItem;
+   private javax.swing.JMenuItem hlpIssueReporterMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
    private javax.swing.JPopupMenu.Separator hlpOnlineSeparator;
