@@ -32,7 +32,7 @@ public class JavaHelper{
 	}
 
 	/* Stop current running Java application and start a new one */
-	public static void closeAndStartAnotherApplication(final String jarURL) throws IOException{
+	public static void closeAndStartAnotherApplication(final String jarURL){
 		//init the command to execute, add the vm args
 		final String fileSeparator = System.getProperty("file.separator");
 		final StringBuffer cmd = new StringBuffer()

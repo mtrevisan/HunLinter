@@ -58,10 +58,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 
 		//remove intersection
-		final Iterator<String> itr = newEntry.synonyms.iterator();
-		while(itr.hasNext())
-			if(entry.containsSynonym(itr.next()))
-				itr.remove();
+		newEntry.synonyms.removeIf(entry::containsSynonym);
 
 		//add remaining synonyms
 		newEntry.synonyms.addAll(new SynonymsEntry(entry.toLine(definition)).synonyms);

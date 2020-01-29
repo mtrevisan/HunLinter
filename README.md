@@ -15,7 +15,7 @@ HunLinter
 - affix file and dictionary linter
 - rules reducer
 - LibreOffice and Mozilla packager
-- Part-of-Speech FSA extracto for LanguageTools
+- Part-of-Speech FSA extractor for LanguageTools
 - automatically choose font to render custom language
 - manages thesaurus, hyphenation, auto-correct, sentence exceptions, and word exception files
 - minimal pairs extraction

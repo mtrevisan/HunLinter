@@ -35,9 +35,7 @@ public class XMLManager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLManager.class);
 
-	@SuppressWarnings("unchecked")
 	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);
-	@SuppressWarnings("unchecked")
 	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = getXMLProperties(StandardCharsets.US_ASCII);
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
@@ -106,7 +104,7 @@ public class XMLManager{
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
 	}
 
-	private static Pair<String, String>[] getXMLProperties(final Charset charset){
+	private static Pair[] getXMLProperties(final Charset charset){
 		return new Pair[]{
 			Pair.of(OutputKeys.VERSION, "1.0"),
 			Pair.of(OutputKeys.ENCODING, charset.name()),

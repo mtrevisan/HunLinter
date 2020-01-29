@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -80,7 +81,8 @@ public class ZipManager{
 	private List<String> extractFilesList(final Path dir){
 		final List<String> filesListInDir = new ArrayList<>();
 
-		final File[] files = dir.toFile().listFiles();
+		final File[] files = Optional.ofNullable(dir.toFile().listFiles())
+			.orElse(new File[0]);
 		for(final File file : files){
 			if(file.isFile())
 				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));

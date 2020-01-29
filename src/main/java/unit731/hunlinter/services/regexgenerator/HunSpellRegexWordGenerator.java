@@ -11,7 +11,7 @@ import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 
 /**
- * The {@code NFA} class provides a data type for creating a <em>Nondeterministic Finite state Automaton</em> (NFA) from a regular
+ * The {@code NFA} class provides a data type for creating a <em>Non-deterministic Finite state Automaton</em> (NFA) from a regular
  * expression and testing whether a given string is matched by that regular expression.
  *
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
@@ -104,13 +104,13 @@ public class HunSpellRegexWordGenerator{
 					final int key = transition.getKey();
 					final String value = transition.getValue();
 
-					List<String> nextword = subword;
+					List<String> nextWord = subword;
 					if(StringUtils.isNotBlank(value)){
-						nextword = new ArrayList<>(subword);
-						nextword.add(value);
+						nextWord = new ArrayList<>(subword);
+						nextWord.add(value);
 					}
 
-					queue.add(new GeneratedElement(nextword, key));
+					queue.add(new GeneratedElement(nextWord, key));
 				}
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)

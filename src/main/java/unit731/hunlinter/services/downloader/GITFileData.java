@@ -6,13 +6,13 @@ import unit731.hunlinter.services.semanticversioning.Version;
 
 public class GITFileData{
 
-	public String name;
+	public final String name;
 	public Version version;
-	public Long size;
-	public String sha;
+	public final Long size;
+	public final String sha;
 	public String content;
-	public String encoding;
-	public String downloadUrl;
+	public final String encoding;
+	public final String downloadUrl;
 
 
 	GITFileData(final JSONObject jsonObject){

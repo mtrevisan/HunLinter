@@ -234,8 +234,8 @@ public class Version implements Comparable<Version>{
 	}
 
 	private int compareToCore(final Version other){
-		return (major != other.major? major - other.major:
-			(minor != other.minor? minor - other.minor:
+		return (!major.equals(other.major)? major - other.major:
+			(!minor.equals(other.minor)? minor - other.minor:
 			patch - other.patch));
 	}
 
@@ -256,7 +256,7 @@ public class Version implements Comparable<Version>{
 	}
 
 	private int getLeastCommonArrayLength(final String[] array1, final String[] array2){
-		return (array1.length <= array2.length? array1.length: array2.length);
+		return Math.min(array1.length, array2.length);
 	}
 
 	private int compareIdentifiers(final String identifier1, final String identifier2){
