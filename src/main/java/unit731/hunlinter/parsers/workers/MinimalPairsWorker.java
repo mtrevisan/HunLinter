@@ -33,7 +33,7 @@ import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.HammingDistance;
+import unit731.hunlinter.services.text.HammingDistance;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 

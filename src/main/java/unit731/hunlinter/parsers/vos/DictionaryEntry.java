@@ -27,7 +27,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.JavaHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
 

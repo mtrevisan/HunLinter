@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.Memoizer;
 
 
 public class RegExpSequencer{

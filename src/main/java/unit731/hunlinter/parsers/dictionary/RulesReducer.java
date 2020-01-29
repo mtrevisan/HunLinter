@@ -36,7 +36,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.SetHelper;
-import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.text.StringHelper;
 
 
 public class RulesReducer{

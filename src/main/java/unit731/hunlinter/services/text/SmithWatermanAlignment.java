@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.text;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.services.PatternHelper;
 
 
 /**

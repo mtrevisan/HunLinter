@@ -26,7 +26,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
-import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.text.StringHelper;
 
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{

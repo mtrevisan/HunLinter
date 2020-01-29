@@ -23,7 +23,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.Memoizer;
+import unit731.hunlinter.services.system.Memoizer;
 
 
 public class AffixData{

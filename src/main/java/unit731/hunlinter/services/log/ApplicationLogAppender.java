@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.swing.JTextArea;
 import org.slf4j.Marker;
-import unit731.hunlinter.services.JavaHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{

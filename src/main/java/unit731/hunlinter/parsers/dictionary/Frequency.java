@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import unit731.hunlinter.services.Memoizer;
+import unit731.hunlinter.services.system.Memoizer;
 
 
 /**

@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.text;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.stream.Collector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.services.PatternHelper;
 
 
 public class StringHelper{

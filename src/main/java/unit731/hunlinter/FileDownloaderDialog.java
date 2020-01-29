@@ -13,8 +13,8 @@ import javax.swing.*;
 
 import org.apache.commons.io.FilenameUtils;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.JavaHelper;
-import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.downloader.DownloadListenerInterface;
 import unit731.hunlinter.services.downloader.DownloadTask;
 import unit731.hunlinter.services.downloader.DownloaderHelper;

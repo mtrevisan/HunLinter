@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.JavaHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
 

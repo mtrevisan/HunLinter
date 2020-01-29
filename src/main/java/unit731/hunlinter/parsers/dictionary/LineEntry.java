@@ -21,7 +21,7 @@ import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.SetHelper;
-import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 

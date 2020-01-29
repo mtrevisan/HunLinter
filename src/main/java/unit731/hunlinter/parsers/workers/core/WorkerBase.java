@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.TimeWatch;
+import unit731.hunlinter.services.system.TimeWatch;
 
 
 public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{

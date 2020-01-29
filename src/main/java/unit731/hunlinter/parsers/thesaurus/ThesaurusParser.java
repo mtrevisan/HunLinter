@@ -16,14 +16,13 @@ import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.text.StringHelper;
 
 
 /**
