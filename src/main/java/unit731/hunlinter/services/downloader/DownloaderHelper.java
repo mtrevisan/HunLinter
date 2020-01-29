@@ -92,7 +92,6 @@ public class DownloaderHelper{
 			final String artifactID = PatternHelper.extract(fileData.content, PATTERN_ARTIFACT_ID_POM)[0];
 			final String packaging = PatternHelper.extract(fileData.content, PATTERN_PACKAGING_POM)[0];
 			final String name = artifactID + "-" + fileData.version + "." + packaging;
-//final String name = "Hunspeller-1.9.1.jar";
 			try(final InputStream isApps = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_APP).openStream()){
 				fileData = extractNewest(name, isApps.readAllBytes());
 			}
