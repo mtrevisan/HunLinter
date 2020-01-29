@@ -18,12 +18,13 @@ import unit731.hunlinter.services.StringHelper;
 import unit731.hunlinter.services.downloader.DownloadListenerInterface;
 import unit731.hunlinter.services.downloader.DownloadTask;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.downloader.GITFileData;
 
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
 	private String localPath;
-	private DownloaderHelper.GITFileData remoteObject;
+	private GITFileData remoteObject;
 
 
 	public FileDownloaderDialog(final Frame parent) throws Exception{

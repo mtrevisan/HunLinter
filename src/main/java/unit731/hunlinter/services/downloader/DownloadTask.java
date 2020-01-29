@@ -14,11 +14,11 @@ import java.nio.channels.ReadableByteChannel;
 public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperDelegate{
 
 	private final String localPath;
-	private final DownloaderHelper.GITFileData remoteObject;
+	private final GITFileData remoteObject;
 	private final DownloadListenerInterface listener;
 
 
-	public DownloadTask(final String localPath, final DownloaderHelper.GITFileData remoteObject, final DownloadListenerInterface listener){
+	public DownloadTask(final String localPath, final GITFileData remoteObject, final DownloadListenerInterface listener){
 		this.localPath = localPath;
 		this.remoteObject = remoteObject;
 		this.listener = listener;

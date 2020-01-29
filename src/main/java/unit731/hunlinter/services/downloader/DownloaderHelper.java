@@ -34,25 +34,6 @@ public class DownloaderHelper{
 	private static final String URL_ONLINE_REPOSITORY_POM = "pom.xml";
 	private static final String URL_ONLINE_REPOSITORY_APP = "bin/";
 
-	public static class GITFileData{
-		public String name;
-		public Version version;
-		public Long size;
-		public String sha;
-		public String content;
-		public String encoding;
-		public String downloadUrl;
-
-		GITFileData(final JSONObject jsonObject){
-			name = (String)jsonObject.get("name");
-			size = (Long)jsonObject.get("size");
-			sha = (String)jsonObject.get("sha");
-			content = (String)jsonObject.get("content");
-			encoding = (String)jsonObject.get("encoding");
-			downloadUrl = (String)jsonObject.get("download_url");
-		}
-	}
-
 
 	public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
 	public static final String PROPERTY_KEY_VERSION = "version";
@@ -73,25 +54,26 @@ public class DownloaderHelper{
 
 			final JSONParser parser = new JSONParser();
 			final JSONObject jsonObject = (JSONObject)parser.parse(response);
-			GITFileData fileData = new GITFileData(jsonObject);
+			final GITFileData pomData = new GITFileData(jsonObject);
 
-			final byte[] dataBytes = Base64.getMimeDecoder().decode(fileData.content);
-			fileData.content = new String(dataBytes, StandardCharsets.UTF_8.name());
+			final byte[] dataBytes = Base64.getMimeDecoder().decode(pomData.content);
+			pomData.content = new String(dataBytes, StandardCharsets.UTF_8.name());
 
-			validate(dataBytes, fileData);
+			validate(dataBytes, pomData);
 
-			final String version = PatternHelper.extract(fileData.content, PATTERN_VERSION_POM)[0];
-			fileData.version = Version.valueOf(version);
+			final String version = PatternHelper.extract(pomData.content, PATTERN_VERSION_POM)[0];
+			pomData.version = Version.valueOf(version);
 
 			//get actual version
 			final Version applicationVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
-			if(fileData.version.lessThanOrEqualTo(applicationVersion))
+			if(pomData.version.lessThanOrEqualTo(applicationVersion))
 				throw new Exception(ALREADY_UPDATED);
 
 			//find last build
-			final String artifactID = PatternHelper.extract(fileData.content, PATTERN_ARTIFACT_ID_POM)[0];
-			final String packaging = PatternHelper.extract(fileData.content, PATTERN_PACKAGING_POM)[0];
-			final String name = artifactID + "-" + fileData.version + "." + packaging;
+			GITFileData fileData;
+			final String artifactID = PatternHelper.extract(pomData.content, PATTERN_ARTIFACT_ID_POM)[0];
+			final String packaging = PatternHelper.extract(pomData.content, PATTERN_PACKAGING_POM)[0];
+			final String name = artifactID + "-" + pomData.version + "." + packaging;
 			try(final InputStream isApps = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_APP).openStream()){
 				fileData = extractNewest(name, isApps.readAllBytes());
 			}
