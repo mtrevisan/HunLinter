@@ -265,10 +265,11 @@ It is possible to click on the first column to select the row (for cancelling it
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-1.10.0"></a>
-### version 1.10.0 - 20200104
+### version 1.10.0 - 20200129
 - (finally) given a decent name to the project: HunLinter
 - fixed a bug while selecting the font once a project is loaded
 - fixed a bug while storing thesaurus information (only lowercase words are allowed)
+- added update capability
 - added buttons to open relevant files
 - added management of SentenceExceptList.xml and WordExceptList.xml
 - added menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
