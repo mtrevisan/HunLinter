@@ -1,6 +1,5 @@
 package unit731.hunlinter.services.downloader;
 
-import com.github.zafarkhaja.semver.Version;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.simple.JSONArray;
@@ -10,6 +9,7 @@ import org.json.simple.parser.ParseException;
 import unit731.hunlinter.HelpDialog;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.StringHelper;
+import unit731.hunlinter.services.semanticversioning.Version;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,10 +62,10 @@ public class DownloaderHelper{
 			validate(dataBytes, pomData);
 
 			final String version = PatternHelper.extract(pomData.content, PATTERN_VERSION_POM)[0];
-			pomData.version = Version.valueOf(version);
+			pomData.version = new Version(version);
 
 			//get actual version
-			final Version applicationVersion = Version.valueOf((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
+			final Version applicationVersion = new Version((String)getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
 			if(pomData.version.lessThanOrEqualTo(applicationVersion))
 				throw new Exception(ALREADY_UPDATED);
 
@@ -81,7 +81,7 @@ public class DownloaderHelper{
 			if(fileData == null)
 				throw new Exception(ALREADY_UPDATED);
 
-			fileData.version = Version.valueOf(version);
+			fileData.version = new Version(version);
 			return fileData;
 		}
 	}

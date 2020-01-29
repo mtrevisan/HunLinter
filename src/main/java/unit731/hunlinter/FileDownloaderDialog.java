@@ -159,12 +159,12 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	}
 
 	@Override
-	public void startDownloads(final String version) throws Exception{
-		statusLabel.setText("Begin downloading version " + version + "…");
+	public void startDownloads(final GITFileData fileData) throws Exception{
+		statusLabel.setText("Begin downloading version " + fileData.version + "…");
 	}
 
 	@Override
-	public void validatingFile(final String localPath){
+	public void validatingFile(final GITFileData fileData, final String localPath){
 		statusLabel.setText("Validating download…");
 
 		try{

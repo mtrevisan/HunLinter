@@ -35,7 +35,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 			if(responseCode != HttpURLConnection.HTTP_OK)
 				throw new IOException("Cannot connect to server");
 
-			listener.startDownloads(remoteObject.version.toString());
+			listener.startDownloads(remoteObject);
 
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
 			final FileOutputStream fos = new FileOutputStream(localPath);
@@ -83,7 +83,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 		if(!isCancelled()){
 			try{
-				listener.validatingFile(localPath);
+				listener.validatingFile(remoteObject, localPath);
 
 				listener.succeeded();
 			}

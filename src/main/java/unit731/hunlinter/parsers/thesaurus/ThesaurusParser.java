@@ -148,12 +148,12 @@ public class ThesaurusParser{
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	/** Find if there is a duplicate with the same part of speech */
+	/* Find if there is a duplicate with the same part of speech */
 	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
-	/** Find if there is a duplicate with the same part of speech and same synonyms */
+	/* Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}

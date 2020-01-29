@@ -31,7 +31,7 @@ public class JavaHelper{
 			SwingUtilities.invokeLater(runnable);
 	}
 
-	/** Stop current running Java application and start a new one */
+	/* Stop current running Java application and start a new one */
 	public static void closeAndStartAnotherApplication(final String jarURL) throws IOException{
 		//init the command to execute, add the vm args
 		final String fileSeparator = System.getProperty("file.separator");

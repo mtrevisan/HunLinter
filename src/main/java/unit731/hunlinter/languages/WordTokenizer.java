@@ -69,7 +69,7 @@ public class WordTokenizer{
 		return join(list, PATTERN_EMAIL, "@", null);
 	}
 
-	/**
+	/*
 	 * NOTE: explicit check for {@code containingChars} speeds up method by factor of ~10
 	 */
 	protected List<String> join(final List<String> list, final Pattern pattern, final String containingChars,
@@ -108,7 +108,7 @@ public class WordTokenizer{
 		return result;
 	}
 
-	/** see rfc1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a> */
+	/* see RFC1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a> */
 	private List<String> joinUrls(final List<String> list){
 		final List<String> newList = new ArrayList<>();
 		boolean inUrl = false;

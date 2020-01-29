@@ -75,7 +75,7 @@ public class ThesaurusDictionary{
 		return new SynonymsEntry(sj.toString());
 	}
 
-	/** Find if there is a duplicate with the same part of speech and same synonyms */
+	/* Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
@@ -131,7 +131,7 @@ public class ThesaurusDictionary{
 		return dictionary.size();
 	}
 
-	/** Find all the entries that have part of speech and synonyms contained into the given ones */
+	/* Find all the entries that have part of speech and synonyms contained into the given ones */
 	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);

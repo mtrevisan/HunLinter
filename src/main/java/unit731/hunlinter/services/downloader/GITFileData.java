@@ -1,7 +1,7 @@
 package unit731.hunlinter.services.downloader;
 
-import com.github.zafarkhaja.semver.Version;
 import org.json.simple.JSONObject;
+import unit731.hunlinter.services.semanticversioning.Version;
 
 
 public class GITFileData{

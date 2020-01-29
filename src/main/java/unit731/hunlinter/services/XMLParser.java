@@ -69,7 +69,7 @@ public class XMLParser{
 		return doc;
 	}
 
-	/** Transform the DOM Object to an XML File */
+	/* Transform the DOM Object to an XML File */
 	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();

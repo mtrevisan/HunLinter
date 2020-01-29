@@ -131,14 +131,14 @@ public class AutoCorrectParser{
 		dictionary.remove(selectedRowID);
 	}
 
-	/** Find if there is a duplicate with the same incorrect and correct forms */
+	/* Find if there is a duplicate with the same incorrect and correct forms */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
 		return dictionary.stream()
 			.filter(correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
 			.collect(Collectors.toList());
 	}
 
-	/** Find if there is a duplicate with the same incorrect and correct forms */
+	/* Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean contains(final String incorrect, final String correct){
 		return dictionary.stream()
 			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty()
