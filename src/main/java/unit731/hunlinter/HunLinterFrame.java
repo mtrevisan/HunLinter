@@ -138,7 +138,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
 
-	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter";
+	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";
 
 	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
