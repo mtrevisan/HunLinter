@@ -247,6 +247,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="hlpOnlineHelpMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/help_help.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="104"/>
                 <Property name="text" type="java.lang.String" value="Online help"/>
               </Properties>
@@ -256,6 +259,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="hlpIssueReporterMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/help_issue.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Report an issue"/>
               </Properties>
               <Events>
@@ -288,7 +294,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="hlpAboutMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/about.png"/>
+                  <Image iconType="3" name="/help_about.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="About"/>

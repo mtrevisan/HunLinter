@@ -125,7 +125,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
  * @see <a href="http://manpages.ubuntu.com/manpages/trusty/man4/hunspell.4.html">Hunspell 4</a>
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
  * @see <a href="https://github.com/nuspell/nuspell">Nuspell on github</a>
- * @see <a href="https://github.com/hunspell/hyphen">Hyphen on github</a>
+ * @see <a href="https://github.com/hunspell/hyphen">Hyphen on github</a>a
  *
  * @see <a href="https://www.shareicon.net/">Share icon</a>
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
@@ -1504,6 +1504,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
+      hlpOnlineHelpMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_help.png"))); // NOI18N
       hlpOnlineHelpMenuItem.setMnemonic('h');
       hlpOnlineHelpMenuItem.setText("Online help");
       hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1513,6 +1514,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
       hlpMenu.add(hlpOnlineHelpMenuItem);
 
+      hlpIssueReporterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_issue.png"))); // NOI18N
       hlpIssueReporterMenuItem.setText("Report an issue");
       hlpIssueReporterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1540,7 +1542,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
       hlpMenu.add(hlpUpdateSeparator);
 
-      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
+      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
       hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
