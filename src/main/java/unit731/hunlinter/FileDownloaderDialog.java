@@ -12,7 +12,6 @@ import java.util.Map;
 import javax.swing.*;
 
 import org.apache.commons.io.FilenameUtils;
-import org.json.simple.JSONObject;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.JavaHelper;
 import unit731.hunlinter.services.StringHelper;
@@ -24,11 +23,10 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
 	private String localPath;
-	private JSONObject remoteObject;
-	private String remoteURL;
+	private DownloaderHelper.GITFileData remoteObject;
 
 
-	public FileDownloaderDialog(final String repositoryURL, final Frame parent) throws Exception{
+	public FileDownloaderDialog(final Frame parent) throws Exception{
 		super(parent, "File downloader", true);
 
 		initComponents();
@@ -37,17 +35,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		fileProgressBar.setValue(0);
 		downloadButton.setEnabled(true);
 
-		remoteObject = DownloaderHelper.extractLastVersion(repositoryURL);
-		remoteURL = (String)remoteObject.getOrDefault("download_url", null);
-		final String filename = (String)remoteObject.getOrDefault("name", null);
-		final Long size = (Long)remoteObject.getOrDefault("size", null);
+		remoteObject = DownloaderHelper.extractLastVersion();
 
-		localPath = System.getProperty("user.home") + "/Downloads/" + filename;
+		localPath = System.getProperty("user.home") + "/Downloads/" + remoteObject.name;
 
 		final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
 		currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
-		newVersionLabel.setText(DownloaderHelper.extractVersion(filename));
-		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(size));
+		newVersionLabel.setText(remoteObject.version.toString());
+		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(remoteObject.size));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -152,7 +147,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
 		downloadButton.setEnabled(false);
 
-		final DownloadTask task = new DownloadTask(localPath, remoteURL, this);
+		final DownloadTask task = new DownloadTask(localPath, remoteObject, this);
 		task.addPropertyChangeListener(this);
 		task.execute();
    }//GEN-LAST:event_downloadButtonActionPerformed
@@ -172,7 +167,8 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		statusLabel.setText("Validating download…");
 
 		try{
-			DownloaderHelper.validate(localPath, remoteObject);
+			final byte[] content = DownloaderHelper.readFileContent(localPath);
+			DownloaderHelper.validate(content, remoteObject);
 		}
 		catch(final Exception e){
 			statusLabel.setText(e.getMessage());
@@ -194,16 +190,17 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final Path fileToMove = Path.of(localPath);
 			final String destinationFolder = FilenameUtils.getFullPath(
 				HunLinterFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-			final String fileSeparator = System.getProperty("file.separator");
 			final Path destinationPath = Path.of(
-				(destinationFolder.startsWith(fileSeparator)? destinationFolder.substring(1): destinationFolder),
+				(destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
 				FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
 			FileHelper.moveFile(fileToMove, destinationPath);
 
 			//exit current jar and start new one
 			JavaHelper.closeAndStartAnotherApplication(destinationPath.toString());
 		}
-		catch(final Exception ignored){}
+		catch(final Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	@Override

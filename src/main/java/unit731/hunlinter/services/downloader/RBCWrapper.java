@@ -30,8 +30,11 @@ class RBCWrapper implements ReadableByteChannel{
 		int n;
 		if((n = rbc.read(bb)) > 0){
 			readSoFar += n;
-			final double progress = (expectedSize > 0? (double)readSoFar * 100. / expectedSize: -1.);
-			delegate.rbcProgressCallback(this, progress);
+
+			if(delegate != null){
+				final double progress = (expectedSize > 0? (double) readSoFar * 100. / expectedSize: -1.);
+				delegate.rbcProgressCallback(this, progress);
+			}
 		}
 		return n;
 	}

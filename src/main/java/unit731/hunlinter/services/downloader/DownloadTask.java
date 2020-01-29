@@ -14,13 +14,13 @@ import java.nio.channels.ReadableByteChannel;
 public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperDelegate{
 
 	private final String localPath;
-	private final String remoteURL;
+	private final DownloaderHelper.GITFileData remoteObject;
 	private final DownloadListenerInterface listener;
 
 
-	public DownloadTask(final String localPath, final String remoteURL, final DownloadListenerInterface listener){
+	public DownloadTask(final String localPath, final DownloaderHelper.GITFileData remoteObject, final DownloadListenerInterface listener){
 		this.localPath = localPath;
-		this.remoteURL = remoteURL;
+		this.remoteObject = remoteObject;
 		this.listener = listener;
 	}
 
@@ -29,14 +29,13 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		try{
 			listener.startCheckUpdates();
 
-			final URL url = new URL(remoteURL);
+			final URL url = new URL(remoteObject.downloadUrl);
 			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			final int responseCode = httpConnection.getResponseCode();
 			if(responseCode != HttpURLConnection.HTTP_OK)
 				throw new IOException("Cannot connect to server");
 
-			final String version = DownloaderHelper.extractVersion(remoteURL);
-			listener.startDownloads(version);
+			listener.startDownloads(remoteObject.version.toString());
 
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
 			final FileOutputStream fos = new FileOutputStream(localPath);

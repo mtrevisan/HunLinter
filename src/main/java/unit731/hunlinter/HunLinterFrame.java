@@ -139,7 +139,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
 
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter";
-	private static final String URL_ONLINE_REPOSITORY = "https://api.github.com/repos/mtrevisan/HunLinter/contents/bin";
 
 	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
@@ -275,7 +274,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
 			SwingUtilities.invokeLater(() -> {
 				try{
-					final FileDownloaderDialog dialog = new FileDownloaderDialog(URL_ONLINE_REPOSITORY, this);
+					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 					GUIUtils.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
@@ -462,6 +461,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpOnlineSeparator = new javax.swing.JPopupMenu.Separator();
       hlpUpdateMenuItem = new javax.swing.JMenuItem();
       hlpCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+      hlpUpdateSeparator = new javax.swing.JPopupMenu.Separator();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1529,6 +1529,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          }
       });
       hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
+      hlpMenu.add(hlpUpdateSeparator);
 
       hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
@@ -2352,7 +2353,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
 		SwingUtilities.invokeLater(() -> {
 			try{
-				final FileDownloaderDialog dialog = new FileDownloaderDialog(URL_ONLINE_REPOSITORY, this);
+				final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 				GUIUtils.addCancelByEscapeKey(dialog);
 				dialog.setLocationRelativeTo(this);
 				dialog.setVisible(true);
@@ -3258,6 +3259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
    private javax.swing.JPopupMenu.Separator hlpOnlineSeparator;
    private javax.swing.JMenuItem hlpUpdateMenuItem;
+   private javax.swing.JPopupMenu.Separator hlpUpdateSeparator;
    private javax.swing.JButton hypAddRuleButton;
    private javax.swing.JLabel hypAddRuleLabel;
    private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;
