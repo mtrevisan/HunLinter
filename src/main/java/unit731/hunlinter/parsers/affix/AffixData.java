@@ -247,7 +247,11 @@ public class AffixData{
 		return word;
 	}
 
-	/** Extracts all the characters from each rule */
+	/**
+	 * Extracts all the characters from each rule
+	 *
+	 * @return	A sample text of the underlying dictionary
+	 */
 	public String getSampleText(){
 		final List<String> sortedSample;
 		String sample = getData(AffixOption.TRY);

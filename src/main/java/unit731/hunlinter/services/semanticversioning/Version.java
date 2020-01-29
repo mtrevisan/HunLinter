@@ -222,6 +222,9 @@ public class Version implements Comparable<Version>{
 	 * <p>
 	 * If one of the compared versions has no defined build metadata, this version is considered to have a lower
 	 * precedence than that of the other.</p>
+	 *
+	 * @param other	The object to be compared.
+	 * @return	A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
 	 */
 	public int compareToWithBuilds(final Version other){
 		int result = compareTo(other);
