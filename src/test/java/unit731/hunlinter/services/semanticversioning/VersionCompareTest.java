@@ -7,43 +7,6 @@ import org.junit.jupiter.api.Test;
 class VersionCompareTest{
 
 	@Test
-	void shouldBeReflexive(){
-		Version v1 = new Version("2.3.7");
-
-		Assertions.assertEquals(v1, v1);
-	}
-
-	@Test
-	void shouldBeSymmetric(){
-		Version v1 = new Version("2.3.7");
-		Version v2 = new Version("2.3.7");
-
-		Assertions.assertEquals(v1, v2);
-		Assertions.assertEquals(v2, v1);
-	}
-
-	@Test
-	void shouldBeTransitive(){
-		Version v1 = new Version("2.3.7");
-		Version v2 = new Version("2.3.7");
-		Version v3 = new Version("2.3.7");
-
-		Assertions.assertEquals(v1, v2);
-		Assertions.assertEquals(v2, v3);
-		Assertions.assertEquals(v1, v3);
-	}
-
-	@Test
-	void shouldBeConsistent(){
-		Version v1 = new Version("2.3.7");
-		Version v2 = new Version("2.3.7");
-
-		Assertions.assertEquals(v1, v2);
-		Assertions.assertEquals(v1, v2);
-		Assertions.assertEquals(v1, v2);
-	}
-
-	@Test
 	void shouldReturnFalseIfOtherVersionIsNull(){
 		Version v1 = new Version("2.3.7");
 		Version v2 = null;
