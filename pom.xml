@@ -181,6 +181,7 @@
 		</dependency>
 
 		<!-- XChart -->
+		<!-- https://approximatrix.com/products/openchart2/ ? -->
 		<dependency>
 			<groupId>org.knowm.xchart</groupId>
 			<artifactId>xchart</artifactId>
