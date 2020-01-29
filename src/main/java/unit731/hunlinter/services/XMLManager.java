@@ -31,9 +31,9 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 
-public class XMLParser{
+public class XMLManager{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(XMLParser.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLManager.class);
 
 	@SuppressWarnings("unchecked")
 	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);

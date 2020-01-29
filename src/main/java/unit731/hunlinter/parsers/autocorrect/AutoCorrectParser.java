@@ -11,7 +11,7 @@ import org.xml.sax.SAXException;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.XMLParser;
+import unit731.hunlinter.services.XMLManager;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -53,19 +53,19 @@ public class AutoCorrectParser{
 	public void parse(final File acoFile) throws IOException, SAXException{
 		clear();
 
-		final Document doc = XMLParser.parseXMLDocument(acoFile);
+		final Document doc = XMLManager.parseXMLDocument(acoFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 			throw new HunLintException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
-		final List<Node> children = XMLParser.extractChildren(rootElement, node -> XMLParser.isElement(node, AUTO_CORRECT_BLOCK));
+		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
-			final Node mediaType = XMLParser.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
+			final Node mediaType = XMLManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
 			if(mediaType != null){
 				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
-					XMLParser.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
+					XMLManager.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
 				dictionary.add(correctionEntry);
 			}
 		}
@@ -164,11 +164,11 @@ public class AutoCorrectParser{
 	}
 
 	public void save(final File acoFile) throws TransformerException{
-		final Document doc = XMLParser.newXMLDocumentStandalone();
+		final Document doc = XMLManager.newXMLDocumentStandalone();
 
 		//root element
 		final Element root = doc.createElement(AUTO_CORRECT_ROOT_ELEMENT);
-		root.setAttribute(XMLParser.ROOT_ATTRIBUTE_NAME, XMLParser.ROOT_ATTRIBUTE_VALUE);
+		root.setAttribute(XMLManager.ROOT_ATTRIBUTE_NAME, XMLManager.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
 		for(final CorrectionEntry correction : dictionary){
@@ -179,7 +179,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		XMLParser.createXML(acoFile, doc, XMLParser.XML_PROPERTIES_US_ASCII);
+		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
 	}
 
 	public void clear(){

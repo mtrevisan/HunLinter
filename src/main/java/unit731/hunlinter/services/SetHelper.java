@@ -247,7 +247,8 @@ public class SetHelper{
 		return bucket;
 	}
 
-	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
+	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper,
+			final BiConsumer<V, V> mergeFunction){
 		final Map<K, V> compaction = new HashMap<>();
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
