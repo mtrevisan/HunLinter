@@ -161,7 +161,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				setProgress(getProgress(processingIndex.get(), totalLines));
 			}
 			catch(final InterruptedException e){
-				if(!isPreventExceptionRelaunch())
+				if(isRelaunchException())
 					throw new RuntimeException(e);
 			}
 			catch(final Exception e){
@@ -169,7 +169,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-				if(!isPreventExceptionRelaunch())
+				if(isRelaunchException())
 					throw e;
 			}
 		};
@@ -209,7 +209,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-					if(!isPreventExceptionRelaunch())
+					if(isRelaunchException())
 						throw e;
 				}
 			}

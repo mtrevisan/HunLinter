@@ -104,7 +104,8 @@ public class XMLManager{
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
 	}
 
-	private static Pair[] getXMLProperties(final Charset charset){
+	@SuppressWarnings("unchecked")
+	private static Pair<String, String>[] getXMLProperties(final Charset charset){
 		return new Pair[]{
 			Pair.of(OutputKeys.VERSION, "1.0"),
 			Pair.of(OutputKeys.ENCODING, charset.name()),

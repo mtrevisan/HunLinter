@@ -49,8 +49,8 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 		return workerData.parallelProcessing;
 	}
 
-	protected boolean isPreventExceptionRelaunch(){
-		return workerData.preventExceptionRelaunch;
+	protected boolean isRelaunchException(){
+		return !workerData.preventExceptionRelaunch;
 	}
 
 	@Override
