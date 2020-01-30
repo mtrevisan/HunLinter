@@ -1328,6 +1328,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filMenu.add(filCreatePackageMenuItem);
       filMenu.add(filFontSeparator);
 
+      filFontMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_font.png"))); // NOI18N
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font…");
       filFontMenuItem.setEnabled(false);
