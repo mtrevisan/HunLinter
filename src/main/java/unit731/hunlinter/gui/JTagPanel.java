@@ -156,6 +156,8 @@ public class JTagPanel extends JPanel{
 			final int height = getHeight() - PAD * 2 - 1;
 			final Graphics2D graphics = (Graphics2D)g;
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
 			graphics.setColor(COLOR_BACKGROUND);
 			graphics.fillRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);

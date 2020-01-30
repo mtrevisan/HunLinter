@@ -131,6 +131,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
+ * @see <a href="https://icon-icons.com/">Free icons</>
  */
 public class HunLinterFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
 
@@ -1307,6 +1308,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filMenu.setText("File");
       filMenu.setToolTipText("");
 
+      filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open Project…");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
