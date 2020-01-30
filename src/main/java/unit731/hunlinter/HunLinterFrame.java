@@ -131,7 +131,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
- * @see <a href="https://icon-icons.com/">Free icons</>
+ * @see <a href="https://icon-icons.com/">Free icons</a>
  */
 public class HunLinterFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
 
