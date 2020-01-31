@@ -116,6 +116,7 @@ public class ThesaurusDictionary{
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.values());
+		//sort the definitions in language-specific order
 		Collections.sort(list, (entry1, entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
 		return list;
 	}
