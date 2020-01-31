@@ -2496,15 +2496,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//clear all
 		loadFileCancelled(null);
 
-		clearAffixParser();
-		clearHyphenationParser();
-		clearDictionaryParser();
-		clearAidParser();
-		clearThesaurusParser();
-		clearAutoCorrectParser();
-		clearSentenceExceptionsParser();
-		clearWordExceptionsParser();
-		clearAutoTextParser();
+		clearAllParsers();
 
 		mainTabbedPane.setSelectedIndex(0);
 

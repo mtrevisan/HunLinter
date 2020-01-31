@@ -7,6 +7,18 @@ public interface HunLintable{
 
 	void loadFileInternal(final Path basePath);
 
+	default void clearAllParsers(){
+		clearAffixParser();
+		clearHyphenationParser();
+		clearDictionaryParser();
+		clearAidParser();
+		clearThesaurusParser();
+		clearAutoCorrectParser();
+		clearSentenceExceptionsParser();
+		clearWordExceptionsParser();
+		clearAutoTextParser();
+	}
+
 	void clearAffixParser();
 
 	void clearHyphenationParser();
