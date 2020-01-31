@@ -1602,6 +1602,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			recentProjectsMenu.setEnabled(true);
 			filEmptyRecentProjectsMenuItem.setEnabled(true);
 
+			//TODO clear all
+
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}

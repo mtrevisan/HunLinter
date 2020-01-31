@@ -10,6 +10,7 @@ import java.util.Objects;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 
 
@@ -32,6 +33,10 @@ public class ThesaurusMergeDialog extends JDialog{
 		this.synonymsEntries = synonymsEntries;
 
 		initComponents();
+
+		final Font font = GUIUtils.getCurrentFont();
+		lineComboBox.setFont(font);
+		mergerTextArea.setFont(font);
 
 		synonymsEntries.stream()
 			.map(SynonymsEntry::toString)
