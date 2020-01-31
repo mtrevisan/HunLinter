@@ -2,13 +2,14 @@ package unit731.hunlinter.parsers.thesaurus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -27,12 +28,12 @@ public class ThesaurusDictionary{
 	private static final String PART_OF_SPEECH_END = ")";
 
 
-	private final Map<String, ThesaurusEntry> dictionary;
+	private final Comparator<String> comparator;
+	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
 
 
 	public ThesaurusDictionary(final String language){
-		final Comparator<String> comparator = BaseBuilder.getComparator(language);
-		dictionary = new TreeMap<>(comparator);
+		comparator = BaseBuilder.getComparator(language);
 	}
 
 	public boolean add(final ThesaurusEntry entry){
@@ -114,7 +115,9 @@ public class ThesaurusDictionary{
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return new ArrayList<>(dictionary.values());
+		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.values());
+		Collections.sort(list, (entry1, entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
+		return list;
 	}
 
 	public List<ThesaurusEntry> getSortedSynonyms(){
