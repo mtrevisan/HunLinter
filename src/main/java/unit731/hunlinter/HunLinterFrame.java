@@ -1602,8 +1602,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			recentProjectsMenu.setEnabled(true);
 			filEmptyRecentProjectsMenuItem.setEnabled(true);
 
-			//TODO clear all
-
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
@@ -2497,6 +2495,19 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	public void loadFileInternal(final Path projectPath){
 		//clear all
 		loadFileCancelled(null);
+
+		clearAffixParser();
+		clearHyphenationParser();
+		clearDictionaryParser();
+		clearAidParser();
+		clearThesaurusParser();
+		clearAutoCorrectParser();
+		clearSentenceExceptionsParser();
+		clearWordExceptionsParser();
+		clearAutoTextParser();
+
+		mainTabbedPane.setSelectedIndex(0);
+
 
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
