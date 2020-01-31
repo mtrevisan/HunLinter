@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
 class BitArrayTest{
@@ -26,7 +27,7 @@ class BitArrayTest{
 
 	@Test
 	void memoryMappedFile() throws IOException{
-		File file = File.createTempFile("hunlinter-duplications-bitarray", ".bits");
+		File file = File.createTempFile(DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplications-bitarray", ".bits");
 		file.deleteOnExit();
 		try(MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX)){
 			for(int i = 0; i < MAX; i ++){

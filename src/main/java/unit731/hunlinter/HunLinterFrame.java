@@ -111,6 +111,7 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.Debouncer;
@@ -468,7 +469,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle("HunLinter");
+      setTitle((String)DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
@@ -2519,7 +2520,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				setTitle("HunLinter : " + packager.getAffixFile().getName() + " (" + packager.getLanguage() + ")");
+				setTitle(DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
