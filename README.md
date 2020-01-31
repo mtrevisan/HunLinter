@@ -269,11 +269,10 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - (finally) given a decent name to the project: HunLinter
 - fixed a bug while selecting the font once a project is loaded
 - fixed a bug while storing thesaurus information (only lowercase words are allowed)
-- added update capability
+- added update capability (the new jar will be copied in the directory of the old jar and started)
 - added buttons to open relevant files
 - added management of SentenceExceptList.xml and WordExceptList.xml
 - added menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
-- reduced size of java package from 3.35 MB to 1.71 MB (49% gain)
 - made tables look more standard (copy and edit operations)
 - improved thesaurus merging
 
