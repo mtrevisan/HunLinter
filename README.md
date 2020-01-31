@@ -60,11 +60,12 @@ HunLinter
     7. [Font selection](#screenshots-font)
     8. [Statistics](#screenshots-statistics)
 7. [Changelog](#changelog)
-    1. [version 1.10.0](#changelog-1.10.0)
-    2. [version 1.9.1](#changelog-1.9.1)
-    3. [version 1.9.0](#changelog-1.9.0)
-    4. [version 1.8.1](#changelog-1.8.1)
-    5. [version 1.8.0](#changelog-1.8.0)
+    1. [version 1.10.1](#changelog-1.10.1)
+    2. [version 1.10.0](#changelog-1.10.0)
+    3. [version 1.9.1](#changelog-1.9.1)
+    4. [version 1.9.0](#changelog-1.9.0)
+    5. [version 1.8.1](#changelog-1.8.1)
+    6. [version 1.8.0](#changelog-1.8.0)
 
 
 <br/>
@@ -264,8 +265,12 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-1.10.1"></a>
+### version 1.10.1 - 20200xxx
+- bugfix
+
 <a name="changelog-1.10.0"></a>
-### version 1.10.0 - 20200129
+### version 1.10.0 - 20200131
 - (finally) given a decent name to the project: HunLinter
 - fixed a bug while selecting the font once a project is loaded
 - fixed a bug while storing thesaurus information (only lowercase words are allowed)
