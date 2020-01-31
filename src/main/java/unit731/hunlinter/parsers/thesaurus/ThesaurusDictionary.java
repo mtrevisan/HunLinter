@@ -45,6 +45,7 @@ public class ThesaurusDictionary{
 			.collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END));
 		synonyms = JavaHelper.nullableToStream(synonyms)
 			.map(synonym -> synonym.toLowerCase(Locale.ROOT))
+			.distinct()
 			.toArray(String[]::new);
 		for(String currentDefinition : synonyms){
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
