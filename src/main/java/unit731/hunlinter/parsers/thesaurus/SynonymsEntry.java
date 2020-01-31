@@ -77,6 +77,10 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return synonyms;
 	}
 
+	public boolean containsPartOfSpeech(final List<String> partOfSpeeches){
+		return !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches);
+	}
+
 	public boolean containsSynonym(final String synonym){
 		return synonyms.contains(synonym);
 	}

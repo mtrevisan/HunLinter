@@ -96,7 +96,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) || this.synonyms.stream().anyMatch(entry -> entry.intersects(partOfSpeeches, ss)));
+		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.containsPartOfSpeech(partOfSpeeches))
+			|| this.synonyms.stream().anyMatch(entry -> entry.intersects(partOfSpeeches, ss)));
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
