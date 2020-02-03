@@ -59,6 +59,9 @@ HunLinter
     6. [Rule reducer](#screenshots-reducer)
     7. [Font selection](#screenshots-font)
     8. [Statistics](#screenshots-statistics)
+    9. [Autocorrections](#screenshots-autocorrection)
+    10. [Sentence exceptions](#screenshots-sentence-exceptions)
+    11. [Word exceptions](#screenshots-word-exceptions)
 7. [Changelog](#changelog)
     1. [version 1.10.0](#changelog-1.10.0)
     2. [version 1.9.1](#changelog-1.9.1)
@@ -219,11 +222,11 @@ This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add 
 ### Productions
 Entries can be a single word followed by a slash and all the flags that have to be applied, followed optionally by one or more morphological fields.
 
-![alt text](https://i.postimg.cc/25DLks6s/Production.png "Production")
+![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Production")
 
 <a name="screenshots-correctness"></a>
 ### Dictionary correctness checking
-![alt text](https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking")
+![alt text](https://i.postimg.cc/9FX99CHq/dictionary-correctness-checking.png "Dictionary correctness checking")
 
 <a name="screenshots-thesaurus"></a>
 ### Thesaurus
@@ -235,37 +238,50 @@ Once something is written, an automatic filtering is executed to find all the wo
 
 It is possible to right click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
 
-![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
+![alt text](https://i.postimg.cc/yx1D0Xtz/thesaurus.png "Thesaurus")
+
+![alt text](https://i.postimg.cc/XYS0h7Nr/thesaurus-merger.png "Thesaurus - Merger")
 
 <a name="screenshots-hyphenation"></a>
 ### Hyphenation
-![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
+![alt text](https://i.postimg.cc/QNzDQJRk/hyphenation.png "Hyphenation")
 
 <a name="screenshots-sorter"></a>
 ### Dictionary sorter
-![alt text](https://i.postimg.cc/fTyL5Jww/dictionary-Sorter.png "Dictionary sorter")
+![alt text](https://i.postimg.cc/hvNqKK93/dictionary-sorter.png "Dictionary sorter")
 
 <a name="screenshots-reducer"></a>
 ### Rule reducer
-![alt text](https://i.postimg.cc/wMHN7HJ1/rule-Reducer.png "Rule reducer")
+![alt text](https://i.postimg.cc/x8X2rXbz/dictionary-rules-reducer.png "Rule reducer")
 
 <a name="screenshots-font"></a>
 ### Font selection
-![alt text](https://i.postimg.cc/CKFs6GdZ/font.png "Font selection")
+![alt text](https://i.postimg.cc/zfqYztg5/font-chooser.png "Font selection")
 
 <a name="screenshots-statistics"></a>
 ### Statistics
-![alt text](https://i.postimg.cc/c1PRTr5Q/statistics-lengths.png "Statistics - word lengths")
-![alt text](https://i.postimg.cc/T3th7sYZ/statistics-syllabes.png "Statistics - word syllabes")
-![alt text](https://i.postimg.cc/NfpgBHqX/statistics-stresses.png "Statistics - word stresses")
+![alt text](https://i.postimg.cc/ZRyGjGk8/dictionary-statistics-lengths.png "Statistics - word lengths")
+![alt text](https://i.postimg.cc/cCyVzFZV/dictionary-statistics-syllabes.png "Statistics - word syllabes")
+![alt text](https://i.postimg.cc/T2n8bvJG/dictionary-statistics-stresses.png "Statistics - word stresses")
 
+<a name="screenshots-autocorrection"></a>
+### Autocorrection
+![alt text](https://i.postimg.cc/L8CGS92k/autocorrect.png "Autocorrect")
+
+<a name="screenshots-sentence-exceptions"></a>
+### Sentence exceptions
+![alt text](https://i.postimg.cc/6QFS7M7y/sentence-exceptions.png "Sentence exceptions")
+
+<a name="screenshots-word-exceptions"></a>
+### Word exceptions
+![alt text](https://i.postimg.cc/6qXmcTfK/word-exceptions.png "Word exceptions")
 
 <br/>
 
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-1.10.0"></a>
-### version 1.10.0 - 20200129
+### version 1.10.0 - 20200131
 - (finally) given a decent name to the project: HunLinter
 - fixed a bug while selecting the font once a project is loaded
 - fixed a bug while storing thesaurus information (only lowercase words are allowed)
