@@ -50,7 +50,7 @@ public class DownloaderHelper{
 
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
 
-	private static Map<String, Object> POM_PROPERTIES;
+	private static Map<String, Object> APPLICATION_PROPERTIES;
 
 
 	private DownloaderHelper(){}
@@ -111,19 +111,19 @@ public class DownloaderHelper{
 	}
 
 	public static Map<String, Object> getApplicationProperties(){
-		if(POM_PROPERTIES == null){
-			POM_PROPERTIES = new HashMap<>();
+		if(APPLICATION_PROPERTIES == null){
+			APPLICATION_PROPERTIES = new HashMap<>();
 			try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
 				final Properties prop = new Properties();
 				prop.load(versionInfoStream);
 
-				POM_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
-				POM_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
-				POM_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
+				APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
+				APPLICATION_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
+				APPLICATION_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
 			}
 			catch(final IOException ignored){}
 		}
-		return POM_PROPERTIES;
+		return APPLICATION_PROPERTIES;
 	}
 
 	private static GITFileData extractData(final String filename, final byte[] directoryContent) throws ParseException{
