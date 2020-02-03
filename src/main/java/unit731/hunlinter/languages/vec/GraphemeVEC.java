@@ -11,8 +11,8 @@ class GraphemeVEC{
 
 	public static final String PHONEME_JJH = "ʝ";
 	public static final String PHONEME_FH = "\uA799";
-	public static final String PHONEME_I_UMLAUT = "ï";
-	private static final String PHONEME_U_UMLAUT = "ü";
+	public static final String PHONEME_I_CIRCUMFLEX = "î";
+	private static final String PHONEME_U_CIRCUMFLEX = "û";
 
 	public static final String GRAPHEME_D_STROKE = "đ";
 	private static final String GRAPHEME_F = "f";
@@ -91,8 +91,8 @@ class GraphemeVEC{
 	}
 
 	private static String correctUIJGraphemes(String word){
-		word = correctGrapheme(word, GRAPHEME_U, ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES, PHONEME_U_UMLAUT);
-		word = correctGrapheme(word, GRAPHEME_I, ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES, PHONEME_I_UMLAUT);
+		word = correctGrapheme(word, GRAPHEME_U, ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES, PHONEME_U_CIRCUMFLEX);
+		word = correctGrapheme(word, GRAPHEME_I, ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES, PHONEME_I_CIRCUMFLEX);
 
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
@@ -118,9 +118,9 @@ class GraphemeVEC{
 		word = StringUtils.replace(word, PHONEME_FH, GRAPHEME_FH);
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, GRAPHEME_J, GRAPHEME_I);
-		word = StringUtils.replace(word, PHONEME_I_UMLAUT, GRAPHEME_I);
+		word = StringUtils.replace(word, PHONEME_I_CIRCUMFLEX, GRAPHEME_I);
 		word = StringUtils.replace(word, GRAPHEME_W, GRAPHEME_U);
-		word = StringUtils.replace(word, PHONEME_U_UMLAUT, GRAPHEME_U);
+		word = StringUtils.replace(word, PHONEME_U_CIRCUMFLEX, GRAPHEME_U);
 		word = StringUtils.replace(word, PHONEME_JJH, GRAPHEME_J);
 		return word;
 	}

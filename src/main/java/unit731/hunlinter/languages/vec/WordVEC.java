@@ -25,7 +25,7 @@ public class WordVEC{
 
 	private static final String PIPE = "|";
 
-	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.PHONEME_I_UMLAUT;
+	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
