@@ -21,6 +21,7 @@ import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 
 public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format for thesaurus entry: ''{0}''");
 	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): ''{0}''");
 
@@ -34,6 +35,8 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
+		if(components.length < 2)
+			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String partOfSpeech = StringUtils.strip(components[0]);
 		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')

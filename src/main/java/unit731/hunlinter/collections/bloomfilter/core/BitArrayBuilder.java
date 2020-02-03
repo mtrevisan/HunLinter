@@ -29,7 +29,7 @@ public class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					final File file = File.createTempFile(DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
+					final File file = File.createTempFile(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}

@@ -37,7 +37,7 @@ public class HelpDialog extends JDialog{
 		}
 		catch(final IOException ignored){}
 
-		final Map<String, Object> pomProperties = DownloaderHelper.getPOMProperties();
+		final Map<String, Object> pomProperties = DownloaderHelper.getApplicationProperties();
 		final String artifactID = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
 		final String version = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION);
 		final LocalDate buildTimestamp = (LocalDate)pomProperties.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);

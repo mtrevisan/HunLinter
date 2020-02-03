@@ -66,7 +66,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		return contentLength;
 	}
 
-	private void cancelTask(){
+	public void cancelTask(){
 		cancel(true);
 
 		listener.stopped();

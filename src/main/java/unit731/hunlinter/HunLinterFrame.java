@@ -469,7 +469,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle((String)DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
+      setTitle((String)DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
@@ -2383,7 +2383,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		SwingUtilities.invokeLater(() -> {
 			try{
 				final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
-				GUIUtils.addCancelByEscapeKey(dialog);
+				GUIUtils.addCancelByEscapeKey(dialog, new AbstractAction(){
+					private static final long serialVersionUID = -5644390861803492172L;
+
+					@Override
+					public void actionPerformed(ActionEvent e){
+						dialog.interrupt();
+
+						dialog.dispose();
+					}
+				});
 				dialog.setLocationRelativeTo(this);
 				dialog.setVisible(true);
 			}
@@ -2520,7 +2529,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				setTitle(DownloaderHelper.getPOMProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
+				setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 

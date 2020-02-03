@@ -143,14 +143,23 @@ public class GUIUtils{
 	 * @param dialog	Dialog to attach the escape key to
 	 */
 	public static void addCancelByEscapeKey(final JDialog dialog){
-		final AbstractAction cancelAction = new AbstractAction(){
+		addCancelByEscapeKey(dialog, new AbstractAction(){
 			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
 			public void actionPerformed(ActionEvent e){
 				dialog.dispose();
 			}
-		};
+		});
+	}
+
+	/**
+	 * Force the escape key to call the same action as pressing the Cancel button.
+	 *
+	 * @param dialog	Dialog to attach the escape key to
+	 * @param cancelAction	Action to be performed on cancel
+	 */
+	public static void addCancelByEscapeKey(final JDialog dialog, final AbstractAction cancelAction){
 		final KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		dialog.getRootPane()
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
