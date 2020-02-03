@@ -12,9 +12,8 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,21 +22,39 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import com.googlecode.charts4j.AxisLabels;
-import com.googlecode.charts4j.AxisLabelsFactory;
-import com.googlecode.charts4j.AxisStyle;
-import com.googlecode.charts4j.AxisTextAlignment;
-import com.googlecode.charts4j.BarChart;
-import com.googlecode.charts4j.BarChartPlot;
-import com.googlecode.charts4j.Color;
-import com.googlecode.charts4j.Data;
-import com.googlecode.charts4j.DataUtil;
-import com.googlecode.charts4j.Fills;
-import com.googlecode.charts4j.GChart;
-import com.googlecode.charts4j.GCharts;
-import com.googlecode.charts4j.Plots;
 import org.apache.commons.lang3.StringUtils;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartTheme;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.CategoryItemLabelGenerator;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.labels.StandardXYItemLabelGenerator;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarPainter;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
+import org.jfree.chart.renderer.xy.StandardXYBarPainter;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.ui.Layer;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
@@ -454,52 +471,93 @@ public class DictionaryStatisticsDialog extends JDialog{
 				yData.add(elem.getValue().doubleValue() / totalSamples);
 			}
 
-			final GChart chartFactions = buildData(xData, yData);
-			final JLabel graphFactions = new JLabel(new ImageIcon(ImageIO.read(new URL(chartFactions.toURLString()))));
-
-			//---
-
-			final Data data = Data.newData(yData);
-			final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
-			final BarChart chart = GCharts.newBarChart(plot);
-			final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
-			final AxisLabels score = AxisLabelsFactory.newAxisLabels("Score", 50.0);
-			score.setAxisStyle(axisStyle);
-			final AxisLabels year = AxisLabelsFactory.newAxisLabels("Year", 50.0);
-			year.setAxisStyle(axisStyle);
-
-			chart.addXAxisLabels(AxisLabelsFactory.newAxisLabels(xData));
-			chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 100));
-			chart.addYAxisLabels(score);
-			chart.addXAxisLabels(year);
-
-			chart.setSize(600, 450);
-			chart.setBarWidth(100);
-			chart.setSpaceWithinGroupsOfBars(0);
-			chart.setDataStacked(true);
-			chart.setTitle("Team Scores", Color.BLACK, 16);
+//			final GChart chartFactions = buildData(xData, yData);
+//			final JLabel graphFactions = new JLabel(new ImageIcon(ImageIO.read(new URL(chartFactions.toURLString()))));
+//
+//			//---
+//
+//			final Data data = Data.newData(yData);
+//			final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
+//			final BarChart chart = GCharts.newBarChart(plot);
+//			final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
+//			final AxisLabels score = AxisLabelsFactory.newAxisLabels("Score", 50.0);
+//			score.setAxisStyle(axisStyle);
+//			final AxisLabels year = AxisLabelsFactory.newAxisLabels("Year", 50.0);
+//			year.setAxisStyle(axisStyle);
+//
+//			chart.addXAxisLabels(AxisLabelsFactory.newAxisLabels(xData));
+//			chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 100));
+//			chart.addYAxisLabels(score);
+//			chart.addXAxisLabels(year);
+//
+//			chart.setSize(600, 450);
+//			chart.setBarWidth(100);
+//			chart.setSpaceWithinGroupsOfBars(0);
+//			chart.setDataStacked(true);
+//			chart.setTitle("Team Scores", Color.BLACK, 16);
 		}
 	}
 
 	//https://github.com/SR-G/theadmiral/blob/master/src/main/java/net/coljac/pirates/gui/StatisticsPanel.java
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
-		final Data data = Data.newData(yData);
-		final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
-		final BarChart chart = GCharts.newBarChart(plot);
-		final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
-		final AxisLabels xAxis = AxisLabelsFactory.newNumericRangeAxisLabels(0., 100.);
-		xAxis.setAxisStyle(axisStyle);
-		chart.addXAxisLabels(xAxis);
-		final AxisLabels yAxis = AxisLabelsFactory.newNumericRangeAxisLabels(0., 100.);
-		yAxis.setAxisStyle(axisStyle);
-		chart.addYAxisLabels(yAxis);
+//		final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+//		dataset.setValue(46, "Gold medals", "USA");
+//		dataset.setValue(38, "Gold medals", "China");
+//		dataset.setValue(29, "Gold medals", "UK");
+//		dataset.setValue(22, "Gold medals", "Russia");
+//		dataset.setValue(13, "Gold medals", "South Korea");
+//		dataset.setValue(11, "Gold medals", "Germany");
+//		final JFreeChart chart2 = ChartFactory.createBarChart(title, xAxisTitle, yAxisTitle,
+//			null, PlotOrientation.VERTICAL, false, true, false);
 
-		chart.setSize(600, 450);
-//		chart.setBarWidth(100);
-		chart.setSpaceWithinGroupsOfBars(0);
-		chart.setDataStacked(true);
-		chart.setTitle(title, Color.BLACK, 16);
-		return chart;
+		final XYSeries series = new XYSeries("Random Data");
+		series.add(1.0, 400.2);
+		series.add(5.0, 294.1);
+		series.add(4.0, 100.0);
+		series.add(12.5, 734.4);
+		series.add(17.3, 453.2);
+		series.add(21.2, 500.2);
+		series.add(21.9, null);
+		series.add(25.6, 734.4);
+		series.add(30.0, 453.2);
+		final XYSeriesCollection dataset = new XYSeriesCollection(series);
+
+		final JFreeChart chart = ChartFactory.createXYBarChart(title, xAxisTitle, false, yAxisTitle, dataset,
+			PlotOrientation.VERTICAL, false, false, false);
+//		XYPlot plot = chart.getXYPlot();
+//		plot.setBackgroundPaint(Color.WHITE);
+//		XYItemRenderer renderer = plot.getRenderer();
+
+		final XYPlot plot = chart.getXYPlot();
+		//background color
+		plot.setBackgroundPaint(Color.WHITE);
+		final XYBarRenderer renderer = (XYBarRenderer)plot.getRenderer();
+		//bar color
+		renderer.setSeriesPaint(0, Color.BLUE);
+		//solid bar color
+		renderer.setBarPainter(new StandardXYBarPainter());
+
+//		XYItemLabelGenerator generator = new StandardXYItemLabelGenerator("{2}%");
+//		renderer.setDefaultItemLabelGenerator(generator);
+
+
+//		CategoryAxis categoryAxis = new CategoryAxis(xAxisTitle);
+//		ValueAxis valueAxis = new NumberAxis(yAxisTitle);
+//		BarRenderer renderer = new BarRenderer();
+//		ItemLabelPosition position1 = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER);
+//		renderer.setDefaultPositiveItemLabelPosition(position1);
+//		ItemLabelPosition position2 = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE6, TextAnchor.TOP_CENTER);
+//		renderer.setDefaultNegativeItemLabelPosition(position2);
+//		CategoryPlot plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
+//		plot.setOrientation(PlotOrientation.VERTICAL);
+//		plot.setDataset(dataset);
+//		plot.setBackgroundPaint(Color.WHITE);
+//		plot.setRangeGridlinePaint(Color.BLACK);
+//		JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+//		chart.setBackgroundPaint(Color.WHITE);
+//		ChartTheme currentTheme = new StandardChartTheme("JFree");
+//		currentTheme.apply(chart);
+		return new ChartPanel(chart);
 
 
 //		final CategoryStyler styler = chart.getStyler();
@@ -516,7 +574,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 //		return new XChartPanel<>(chart);
 	}
 
-	private GChart buildData(final List<String> labels, final List<Number> values){
+	/*private GChart buildData(final List<String> labels, final List<Number> values){
 		final long max = values.stream()
 			.mapToLong(v -> v.longValue())
 			.max()
@@ -546,7 +604,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 //		chart.setAreaFill(fill);
 		chart.setSize(700, (values.size() + 1) * 28);
 		return chart;
-	}
+	}/**/
 
 	private void exportToFile(final File outputFile) throws IOException{
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
@@ -584,19 +642,19 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);
-		if(hasData){
-			final String name = mainTabbedPane.getTitleAt(index);
-			final CategorySeries series = ((CategoryChart)((XChartPanel<?>)comp).getChart()).getSeriesMap().get(SERIES_NAME);
-			final Iterator<?> xItr = series.getXData().iterator();
-			final Iterator<? extends Number> yItr = series.getYData().iterator();
-			writer.newLine();
-			writer.write(name);
-			writer.newLine();
-			while(xItr.hasNext()){
-				writer.write(xItr.next() + ":" + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(yItr.next()));
-				writer.newLine();
-			}
-		}
+//		if(hasData){
+//			final String name = mainTabbedPane.getTitleAt(index);
+//			final CategorySeries series = ((CategoryChart)((XChartPanel<?>)comp).getChart()).getSeriesMap().get(SERIES_NAME);
+//			final Iterator<?> xItr = series.getXData().iterator();
+//			final Iterator<? extends Number> yItr = series.getYData().iterator();
+//			writer.newLine();
+//			writer.write(name);
+//			writer.newLine();
+//			while(xItr.hasNext()){
+//				writer.write(xItr.next() + ":" + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(yItr.next()));
+//				writer.newLine();
+//			}
+//		}
 	}
 
 	@SuppressWarnings("unused")
