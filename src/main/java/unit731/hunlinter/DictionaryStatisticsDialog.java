@@ -21,12 +21,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.CategorySeries;
-import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.style.CategoryStyler;
-import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
@@ -336,7 +330,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillStatisticData(){
-		long totalWords = statistics.getTotalProductions();
+		final long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){
 			fillBaseStatistics();
 			if(statistics.hasSyllabeStatistics())
@@ -353,21 +347,21 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillBaseStatistics(){
-		long totalWords = statistics.getTotalProductions();
-		int uniqueWords = statistics.getUniqueWords();
-		int contractedWords = statistics.getContractedWords();
-		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
-		int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
+		final long totalWords = statistics.getTotalProductions();
+		final int uniqueWords = statistics.getUniqueWords();
+		final int contractedWords = statistics.getContractedWords();
+		final Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
+		final int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
 		List<String> longestWords = statistics.getLongestWordsByCharacters();
 		longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
 
-		String formattedTotalWords = DictionaryParser.COUNTER_FORMATTER.format(totalWords);
-		String formattedUniqueWords = DictionaryParser.COUNTER_FORMATTER.format(uniqueWords)
+		final String formattedTotalWords = DictionaryParser.COUNTER_FORMATTER.format(totalWords);
+		final String formattedUniqueWords = DictionaryParser.COUNTER_FORMATTER.format(uniqueWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")";
-		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
+		final String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
-		String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
+		final String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
+		final String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
 			+ " (" + longestWordCharsCount + ")";
 
 		totalWordsOutputLabel.setText(formattedTotalWords);
@@ -378,24 +372,24 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillSyllabeStatistics(){
-		int compoundWords = statistics.getCompoundWords();
-		int uniqueWords = statistics.getUniqueWords();
-		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
-		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
+		final int compoundWords = statistics.getCompoundWords();
+		final int uniqueWords = statistics.getUniqueWords();
+		final Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+		final List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
 		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
 			.map(Hyphenation::getSyllabes)
 			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
 			.collect(Collectors.toList());
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
-		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
+		final int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
-		String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
+		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
-		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
+		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
 			.map(String::valueOf)
 			.collect(Collectors.joining(LIST_SEPARATOR));
-		String formattedMostCommonSyllabes = StringUtils.join(mostCommonSyllabes, LIST_SEPARATOR);
-		String formattedLongestWordSyllabes = StringUtils.join(longestWordSyllabes, LIST_SEPARATOR)
+		final String formattedMostCommonSyllabes = StringUtils.join(mostCommonSyllabes, LIST_SEPARATOR);
+		final String formattedLongestWordSyllabes = StringUtils.join(longestWordSyllabes, LIST_SEPARATOR)
 			+ " (" + longestWordSyllabesCount + ")";
 
 		compoundWordsOutputLabel.setText(formattedCompoundWords);
@@ -429,25 +423,25 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
-	private void fillLengthsFrequencies(Frequency<Integer> frequencies, long totalSamples, JPanel panel){
-		boolean hasData = frequencies.entrySetIterator().hasNext();
+	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final JPanel panel){
+		final boolean hasData = frequencies.entrySetIterator().hasNext();
 
 		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
-			CategoryChart chart = (CategoryChart)((XChartPanel<?>)panel).getChart();
+			final CategoryChart chart = (CategoryChart)((XChartPanel<?>)panel).getChart();
 			addSeriesToChart(chart, frequencies, totalSamples);
 		}
 	}
 
-	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
-		CategoryChart chart = new CategoryChartBuilder()
+	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
+		final CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
 			.xAxisTitle(xAxisTitle)
 			.yAxisTitle(yAxisTitle)
 			.theme(Styler.ChartTheme.Matlab)
 			.build();
 
-		CategoryStyler styler = chart.getStyler();
+		final CategoryStyler styler = chart.getStyler();
 		styler.setAvailableSpaceFill(0.98);
 		styler.setOverlapped(true);
 		styler.setLegendVisible(false);
@@ -461,12 +455,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
-	private void addSeriesToChart(CategoryChart chart, Frequency<Integer> freqs, long totalCount){
-		List<Integer> xData = new ArrayList<>();
-		List<Double> yData = new ArrayList<>();
-		Iterator<Map.Entry<Integer, Long>> itr = freqs.entrySetIterator();
+	private void addSeriesToChart(final CategoryChart chart, final Frequency<Integer> freqs, final long totalCount){
+		final List<Integer> xData = new ArrayList<>();
+		final List<Double> yData = new ArrayList<>();
+		final Iterator<Map.Entry<Integer, Long>> itr = freqs.entrySetIterator();
 		while(itr.hasNext()){
-			Map.Entry<Integer, Long> elem = itr.next();
+			final Map.Entry<Integer, Long> elem = itr.next();
 			xData.add(elem.getKey());
 			yData.add(elem.getValue().doubleValue() / totalCount);
 		}
@@ -474,9 +468,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		chart.addSeries(SERIES_NAME, xData, yData);
 	}
 
-	private void exportToFile(File outputFile) throws IOException{
-		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
-			boolean hasSyllabeStatistics = syllabeLengthsModeLabel.isEnabled();
+	private void exportToFile(final File outputFile) throws IOException{
+		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
+			final boolean hasSyllabeStatistics = syllabeLengthsModeLabel.isEnabled();
 
 			writer.write(totalWordsLabel.getText() + TAB + StringUtils.replaceChars(totalWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
 			writer.newLine();
@@ -507,14 +501,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	private void exportGraph(BufferedWriter writer, Component comp) throws IOException{
-		int index = mainTabbedPane.indexOfComponent(comp);
-		boolean hasData = mainTabbedPane.isEnabledAt(index);
+	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
+		final int index = mainTabbedPane.indexOfComponent(comp);
+		final boolean hasData = mainTabbedPane.isEnabledAt(index);
 		if(hasData){
-			String name = mainTabbedPane.getTitleAt(index);
-			CategorySeries series = ((CategoryChart)((XChartPanel<?>)comp).getChart()).getSeriesMap().get(SERIES_NAME);
-			Iterator<?> xItr = series.getXData().iterator();
-			Iterator<? extends Number> yItr = series.getYData().iterator();
+			final String name = mainTabbedPane.getTitleAt(index);
+			final CategorySeries series = ((CategoryChart)((XChartPanel<?>)comp).getChart()).getSeriesMap().get(SERIES_NAME);
+			final Iterator<?> xItr = series.getXData().iterator();
+			final Iterator<? extends Number> yItr = series.getYData().iterator();
 			writer.newLine();
 			writer.write(name);
 			writer.newLine();
