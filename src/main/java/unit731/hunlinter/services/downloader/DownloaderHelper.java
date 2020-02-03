@@ -55,7 +55,12 @@ public class DownloaderHelper{
 
 	private DownloaderHelper(){}
 
-	/** Extracts a list of version and whats-news */
+	/**
+	 * Extracts a list of version and whats-news
+	 *
+	 * @return	A list of pairs version-release-notes
+	 * @throws Exception	If something went wrong, or current version is already the last one
+	 */
 	public static List<Pair<Version, String>> extractNewerVersions() throws Exception{
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
 			final String response = new String(is.readAllBytes());
