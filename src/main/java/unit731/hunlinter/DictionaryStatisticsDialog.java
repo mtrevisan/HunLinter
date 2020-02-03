@@ -21,6 +21,15 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jCharts.axisChart.AxisChart;
+import org.jCharts.chartData.AxisChartDataSet;
+import org.jCharts.chartData.DataSeries;
+import org.jCharts.properties.AreaChartProperties;
+import org.jCharts.properties.AxisProperties;
+import org.jCharts.properties.ChartProperties;
+import org.jCharts.properties.DataAxisProperties;
+import org.jCharts.properties.LabelAxisProperties;
+import org.jCharts.types.ChartType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
@@ -429,8 +438,29 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
+			final List<Integer> xData = new ArrayList<>();
+			final List<Double> yData = new ArrayList<>();
+			final Iterator<Map.Entry<Integer, Long>> itr = frequencies.entrySetIterator();
+			while(itr.hasNext()){
+				final Map.Entry<Integer, Long> elem = itr.next();
+				xData.add(elem.getKey());
+				yData.add(elem.getValue().doubleValue() / totalSamples);
+			}
+
+			final DataSeries dataSeries = new DataSeries(xAxisLabels, xAxisTitle, yAxisTitle, title);
+			double[][] data = { .... };
+			Paint[] paints = ...;
+
+			final AreaChartProperties areaChartProperties= new AreaChartProperties();
+			final AxisChartDataSet axisChartDataSet= new AxisChartDataSet(data, null, paints, ChartType.BAR, areaChartProperties);
+			dataSeries.addIAxisChartDataSet(axisChartDataSet);
+			final ChartProperties chartProperties= new ChartProperties();
+			final AxisProperties axisProperties = new AxisProperties(false);
+			final LabelAxisProperties xAxisProperties = (LabelAxisProperties)axisProperties.getXAxisProperties();
+			final DataAxisProperties yAxisProperties = (DataAxisProperties)axisProperties.getYAxisProperties();
+			AxisChart axisChart= new AxisChart(dataSeries, chartProperties, axisProperties, null, 500, 300);
 			final CategoryChart chart = (CategoryChart)((XChartPanel<?>)panel).getChart();
-			addSeriesToChart(chart, frequencies, totalSamples);
+			chart.addSeries(SERIES_NAME, xData, yData);
 		}
 	}
 
@@ -442,6 +472,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 			.yAxisTitle(yAxisTitle)
 			.theme(Styler.ChartTheme.Matlab)
 			.build();
+
+		final AxisProperties axisProperties = new AxisProperties(false);
+		final LabelAxisProperties xAxisProperties = (LabelAxisProperties)axisProperties.getXAxisProperties();
+		final DataAxisProperties yAxisProperties = (DataAxisProperties)axisProperties.getYAxisProperties();
 
 		final CategoryStyler styler = chart.getStyler();
 		styler.setAvailableSpaceFill(0.98);
@@ -455,20 +489,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		styler.setToolTipsEnabled(true);
 
 		return new XChartPanel<>(chart);
-	}
-
-	//http://jcharts.sourceforge.net/usersGuide/0.7/
-	private void addSeriesToChart(final CategoryChart chart, final Frequency<Integer> freqs, final long totalCount){
-		final List<Integer> xData = new ArrayList<>();
-		final List<Double> yData = new ArrayList<>();
-		final Iterator<Map.Entry<Integer, Long>> itr = freqs.entrySetIterator();
-		while(itr.hasNext()){
-			final Map.Entry<Integer, Long> elem = itr.next();
-			xData.add(elem.getKey());
-			yData.add(elem.getValue().doubleValue() / totalCount);
-		}
-
-		chart.addSeries(SERIES_NAME, xData, yData);
 	}
 
 	private void exportToFile(final File outputFile) throws IOException{
