@@ -180,14 +180,6 @@
 			<version>${org.apache.commons.io.version}</version>
 		</dependency>
 
-		<!-- XChart -->
-		<!-- https://approximatrix.com/products/openchart2/ ? -->
-		<dependency>
-			<groupId>org.knowm.xchart</groupId>
-			<artifactId>xchart</artifactId>
-			<version>${org.knowm.xchart.version}</version>
-		</dependency>
-
 		<!-- JCharts -->
 		<!-- https://mvnrepository.com/artifact/jcharts/jcharts -->
 		<dependency>

@@ -21,12 +21,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.CategorySeries;
-import org.knowm.xchart.XChartPanel;
-import org.knowm.xchart.style.CategoryStyler;
-import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
@@ -429,6 +423,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
+	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final JPanel panel){
 		final boolean hasData = frequencies.entrySetIterator().hasNext();
 
@@ -439,6 +434,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
@@ -461,6 +457,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
+	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private void addSeriesToChart(final CategoryChart chart, final Frequency<Integer> freqs, final long totalCount){
 		final List<Integer> xData = new ArrayList<>();
 		final List<Double> yData = new ArrayList<>();
@@ -507,6 +504,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);
