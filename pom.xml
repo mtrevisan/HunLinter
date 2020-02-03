@@ -180,13 +180,14 @@
 			<version>${org.apache.commons.io.version}</version>
 		</dependency>
 
-		<!-- JCharts -->
-		<!-- https://mvnrepository.com/artifact/jcharts/jcharts -->
+		<!-- Charts4j -->
+		<!-- https://mvnrepository.com/artifact/com.googlecode.charts4j/charts4j -->
 		<dependency>
-			<groupId>jcharts</groupId>
-			<artifactId>jcharts</artifactId>
-			<version>0.7.5</version>
+			<groupId>com.googlecode.charts4j</groupId>
+			<artifactId>charts4j</artifactId>
+			<version>1.3</version>
 		</dependency>
+
 
 
 		<!-- Morfologik -->

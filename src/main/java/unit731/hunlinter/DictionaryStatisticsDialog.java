@@ -9,27 +9,35 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.googlecode.charts4j.AxisLabels;
+import com.googlecode.charts4j.AxisLabelsFactory;
+import com.googlecode.charts4j.AxisStyle;
+import com.googlecode.charts4j.AxisTextAlignment;
+import com.googlecode.charts4j.BarChart;
+import com.googlecode.charts4j.BarChartPlot;
+import com.googlecode.charts4j.Color;
+import com.googlecode.charts4j.Data;
+import com.googlecode.charts4j.DataUtil;
+import com.googlecode.charts4j.Fills;
+import com.googlecode.charts4j.GChart;
+import com.googlecode.charts4j.GCharts;
+import com.googlecode.charts4j.Plots;
 import org.apache.commons.lang3.StringUtils;
-import org.jCharts.axisChart.AxisChart;
-import org.jCharts.chartData.AxisChartDataSet;
-import org.jCharts.chartData.DataSeries;
-import org.jCharts.properties.AreaChartProperties;
-import org.jCharts.properties.AxisProperties;
-import org.jCharts.properties.ChartProperties;
-import org.jCharts.properties.DataAxisProperties;
-import org.jCharts.properties.LabelAxisProperties;
-import org.jCharts.types.ChartType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
@@ -432,63 +440,112 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
-	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final JPanel panel){
 		final boolean hasData = frequencies.entrySetIterator().hasNext();
 
 		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
-			final List<Integer> xData = new ArrayList<>();
+			final List<String> xData = new ArrayList<>();
 			final List<Double> yData = new ArrayList<>();
 			final Iterator<Map.Entry<Integer, Long>> itr = frequencies.entrySetIterator();
 			while(itr.hasNext()){
 				final Map.Entry<Integer, Long> elem = itr.next();
-				xData.add(elem.getKey());
+				xData.add(Integer.toString(elem.getKey()));
 				yData.add(elem.getValue().doubleValue() / totalSamples);
 			}
 
-			final DataSeries dataSeries = new DataSeries(xAxisLabels, xAxisTitle, yAxisTitle, title);
-			double[][] data = { .... };
-			Paint[] paints = ...;
+			final GChart chartFactions = buildData(xData, yData);
+			final JLabel graphFactions = new JLabel(new ImageIcon(ImageIO.read(new URL(chartFactions.toURLString()))));
 
-			final AreaChartProperties areaChartProperties= new AreaChartProperties();
-			final AxisChartDataSet axisChartDataSet= new AxisChartDataSet(data, null, paints, ChartType.BAR, areaChartProperties);
-			dataSeries.addIAxisChartDataSet(axisChartDataSet);
-			final ChartProperties chartProperties= new ChartProperties();
-			final AxisProperties axisProperties = new AxisProperties(false);
-			final LabelAxisProperties xAxisProperties = (LabelAxisProperties)axisProperties.getXAxisProperties();
-			final DataAxisProperties yAxisProperties = (DataAxisProperties)axisProperties.getYAxisProperties();
-			AxisChart axisChart= new AxisChart(dataSeries, chartProperties, axisProperties, null, 500, 300);
-			final CategoryChart chart = (CategoryChart)((XChartPanel<?>)panel).getChart();
-			chart.addSeries(SERIES_NAME, xData, yData);
+			//---
+
+			final Data data = Data.newData(yData);
+			final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
+			final BarChart chart = GCharts.newBarChart(plot);
+			final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
+			final AxisLabels score = AxisLabelsFactory.newAxisLabels("Score", 50.0);
+			score.setAxisStyle(axisStyle);
+			final AxisLabels year = AxisLabelsFactory.newAxisLabels("Year", 50.0);
+			year.setAxisStyle(axisStyle);
+
+			chart.addXAxisLabels(AxisLabelsFactory.newAxisLabels(xData));
+			chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 100));
+			chart.addYAxisLabels(score);
+			chart.addXAxisLabels(year);
+
+			chart.setSize(600, 450);
+			chart.setBarWidth(100);
+			chart.setSpaceWithinGroupsOfBars(0);
+			chart.setDataStacked(true);
+			chart.setTitle("Team Scores", Color.BLACK, 16);
 		}
 	}
 
-	//http://jcharts.sourceforge.net/usersGuide/0.7/
+	//https://github.com/SR-G/theadmiral/blob/master/src/main/java/net/coljac/pirates/gui/StatisticsPanel.java
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
-		final CategoryChart chart = new CategoryChartBuilder()
-			.title(title)
-			.xAxisTitle(xAxisTitle)
-			.yAxisTitle(yAxisTitle)
-			.theme(Styler.ChartTheme.Matlab)
-			.build();
+		final Data data = Data.newData(yData);
+		final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
+		final BarChart chart = GCharts.newBarChart(plot);
+		final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
+		final AxisLabels xAxis = AxisLabelsFactory.newNumericRangeAxisLabels(0., 100.);
+		xAxis.setAxisStyle(axisStyle);
+		chart.addXAxisLabels(xAxis);
+		final AxisLabels yAxis = AxisLabelsFactory.newNumericRangeAxisLabels(0., 100.);
+		yAxis.setAxisStyle(axisStyle);
+		chart.addYAxisLabels(yAxis);
 
-		final AxisProperties axisProperties = new AxisProperties(false);
-		final LabelAxisProperties xAxisProperties = (LabelAxisProperties)axisProperties.getXAxisProperties();
-		final DataAxisProperties yAxisProperties = (DataAxisProperties)axisProperties.getYAxisProperties();
+		chart.setSize(600, 450);
+//		chart.setBarWidth(100);
+		chart.setSpaceWithinGroupsOfBars(0);
+		chart.setDataStacked(true);
+		chart.setTitle(title, Color.BLACK, 16);
+		return chart;
 
-		final CategoryStyler styler = chart.getStyler();
-		styler.setAvailableSpaceFill(0.98);
-		styler.setOverlapped(true);
-		styler.setLegendVisible(false);
-		styler.setXAxisMin(0.);
-		styler.setYAxisMin(0.);
-		styler.setYAxisDecimalPattern("#%");
-		styler.setYAxisTitleVisible(false);
-		styler.setChartBackgroundColor(getBackground());
-		styler.setToolTipsEnabled(true);
 
-		return new XChartPanel<>(chart);
+//		final CategoryStyler styler = chart.getStyler();
+//		styler.setAvailableSpaceFill(0.98);
+//		styler.setOverlapped(true);
+//		styler.setLegendVisible(false);
+//		styler.setXAxisMin(0.);
+//		styler.setYAxisMin(0.);
+//		styler.setYAxisDecimalPattern("#%");
+//		styler.setYAxisTitleVisible(false);
+//		styler.setChartBackgroundColor(getBackground());
+//		styler.setToolTipsEnabled(true);
+//
+//		return new XChartPanel<>(chart);
+	}
+
+	private GChart buildData(final List<String> labels, final List<Number> values){
+		final long max = values.stream()
+			.mapToLong(v -> v.longValue())
+			.max()
+			.orElse(0l);
+
+		// final Plot plot = Plots.newPlot(Data.newData(0, 66.6, 33.3, 100));
+		final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 14, AxisTextAlignment.RIGHT);
+		final AxisLabels axisValues = AxisLabelsFactory.newNumericRangeAxisLabels(0, max + 1);
+		axisValues.setAxisStyle(axisStyle);
+		final AxisLabels axisLabels = AxisLabelsFactory.newAxisLabels(labels);
+		axisLabels.setAxisStyle(axisStyle);
+
+		final BarChartPlot plot = Plots.newBarChartPlot(DataUtil.scaleWithinRange(0, max + 1, values));
+		final BarChart chart = GCharts.newBarChart(plot);
+//		chart.setTitle("Stats", BLACK, 16);
+//		chart.addHorizontalRangeMarker(40, 60, Color.newColor(RED, 30));
+//		chart.setDataStacked(true);
+		chart.addXAxisLabels(axisValues);
+		chart.addYAxisLabels(axisLabels);
+		chart.setHorizontal(true);
+		chart.setBarWidth(19);
+		chart.setSpaceWithinGroupsOfBars(2);
+		chart.setGrid((50. / max) * 20, 600, 3, 2);
+		chart.setBackgroundFill(Fills.newSolidFill(Color.LIGHTGREY));
+//		final LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("E37600"), 100);
+//		fill.addColorAndOffset(Color.newColor("DC4800"), 0);
+//		chart.setAreaFill(fill);
+		chart.setSize(700, (values.size() + 1) * 28);
+		return chart;
 	}
 
 	private void exportToFile(final File outputFile) throws IOException{
@@ -524,7 +581,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	//http://jcharts.sourceforge.net/usersGuide/0.7/
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);
