@@ -188,14 +188,6 @@
 			<version>${org.knowm.xchart.version}</version>
 		</dependency>
 
-		<!-- JCharts -->
-		<!-- https://mvnrepository.com/artifact/jcharts/jcharts -->
-		<dependency>
-			<groupId>jcharts</groupId>
-			<artifactId>jcharts</artifactId>
-			<version>0.7.5</version>
-		</dependency>
-
 
 		<!-- Morfologik -->
 		<dependency>
