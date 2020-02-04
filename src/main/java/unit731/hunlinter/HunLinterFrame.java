@@ -1622,6 +1622,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void exit(){
 		dispose();
+
+		System.exit(0);
 	}
 
 	private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
