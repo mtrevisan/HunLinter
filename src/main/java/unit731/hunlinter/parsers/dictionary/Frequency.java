@@ -3,6 +3,7 @@ package unit731.hunlinter.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -148,6 +149,10 @@ public class Frequency<T extends Comparable<?>>{
 			.sum();
 	}
 
+	public static int getDecimals(final double x){
+		return (x != 0.? Math.max((int)Math.floor(Math.log10(1. / x)) - 1, 1): 0);
+	}
+
 	/**
 	 * Return a string representation of this frequency distribution.
 	 *
@@ -161,7 +166,7 @@ public class Frequency<T extends Comparable<?>>{
 				.append('\t')
 				.append(getCount(value))
 				.append('\t')
-				.append(DictionaryParser.PERCENT_FORMATTER_1.format(getPercentOf(value)))
+				.append(String.format(Locale.ROOT, "%." + getDecimals(getPercentOf(value)) + "f%%", getPercentOf(value) * 100.))
 				.append('\n');
 		return sb.toString();
 	}

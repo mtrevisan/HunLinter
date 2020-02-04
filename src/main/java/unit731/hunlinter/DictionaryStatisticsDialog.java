@@ -370,11 +370,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
 
 		final String formattedTotalWords = DictionaryParser.COUNTER_FORMATTER.format(totalWords);
+		double x = (double)uniqueWords / totalWords;
 		final String formattedUniqueWords = DictionaryParser.COUNTER_FORMATTER.format(uniqueWords)
-			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")";
+			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
+		x = (double)contractedWords / totalWords;
 		final String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
-			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
-		final String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
+			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
+		final String formattedLengthsMode = lengthsFrequencies.getMode().stream()
+			.map(String::valueOf)
+			.collect(Collectors.joining(LIST_SEPARATOR));
 		final String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
 			+ " (" + longestWordCharsCount + ")";
 
@@ -397,8 +401,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		final int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
+		double x = (double)compoundWords / uniqueWords;
 		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
-			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
+			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
 		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
 			.map(String::valueOf)
 			.collect(Collectors.joining(LIST_SEPARATOR));
@@ -596,7 +601,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			while(xItr.hasNext()){
 				final XYDataItem xy = (XYDataItem)xItr.next();
 				final double y = xy.getY().doubleValue();
-				final int decimals = Math.max((int)Math.floor(Math.log10(1. / y)) - 1, 1);
+				final int decimals = Frequency.getDecimals(y);
 				writer.write(String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%", xy.getX().intValue(), y * 100.));
 				writer.newLine();
 			}

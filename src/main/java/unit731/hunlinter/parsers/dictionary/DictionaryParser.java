@@ -33,14 +33,13 @@ public class DictionaryParser{
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
 	//figure space
 //	public static final char COUNTER_GROUPING_SEPARATOR = '\u2007';
-	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
+	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
 	static{
 		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
 		symbols.setGroupingSeparator(COUNTER_GROUPING_SEPARATOR);
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}
-	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));
-	public static final DecimalFormat PERCENT_FORMATTER_1 = new DecimalFormat("0.0%", DecimalFormatSymbols.getInstance(Locale.US));
+	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
 	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
