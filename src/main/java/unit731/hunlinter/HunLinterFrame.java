@@ -2159,10 +2159,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filFontMenuItemActionPerformed
 
 	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
-		if(Desktop.isDesktopSupported()){
-			final Desktop desktop = Desktop.getDesktop();
+		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
 			try{
-				desktop.browse(new URI(URL_ONLINE_HELP));
+				Desktop.getDesktop().browse(new URI(URL_ONLINE_HELP));
 			}
 			catch(final Exception e){
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser: {}", e.getMessage());
@@ -2173,10 +2172,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
 
 	private void hlpIssueReporterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpIssueReporterMenuItemActionPerformed
-		if(Desktop.isDesktopSupported()){
-			final Desktop desktop = Desktop.getDesktop();
+		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
 			try{
-				desktop.browse(new URI(URL_REPORT_ISSUE));
+				Desktop.getDesktop().browse(new URI(URL_REPORT_ISSUE));
 			}
 			catch(final Exception e){
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open issue page on browser: {}", e.getMessage());

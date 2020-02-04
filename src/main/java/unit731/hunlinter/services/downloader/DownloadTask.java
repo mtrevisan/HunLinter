@@ -29,14 +29,12 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		try{
 			listener.startCheckUpdates();
 
-			final URL url = new URL(remoteObject.downloadUrl);
-			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
-			final int responseCode = httpConnection.getResponseCode();
-			if(responseCode != HttpURLConnection.HTTP_OK)
+			if(!DownloaderHelper.hasInternetConnectivity())
 				throw new IOException("Cannot connect to server");
 
 			listener.startDownloads(remoteObject);
 
+			final URL url = new URL(remoteObject.downloadUrl);
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
 			final FileOutputStream fos = new FileOutputStream(localPath);
 			final FileChannel fileChannel = fos.getChannel();

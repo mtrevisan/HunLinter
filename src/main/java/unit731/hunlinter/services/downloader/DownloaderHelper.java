@@ -14,6 +14,7 @@ import unit731.hunlinter.services.semanticversioning.Version;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -31,6 +32,7 @@ public class DownloaderHelper{
 
 	private static final String ALREADY_UPDATED = "You already have the latest version installed";
 
+	private static final String URL_CONNECTIVITY = "https://www.google.com/";
 	private static final String URL_ONLINE_REPOSITORY_BASE = "https://api.github.com/repos/mtrevisan/HunLinter/";
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
@@ -54,6 +56,18 @@ public class DownloaderHelper{
 
 
 	private DownloaderHelper(){}
+
+	public static boolean hasInternetConnectivity(){
+		try{
+			final URL url = new URL(URL_CONNECTIVITY);
+			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
+			final int responseCode = httpConnection.getResponseCode();
+			return (responseCode == HttpURLConnection.HTTP_OK);
+		}
+		catch(final Exception e){
+			return false;
+		}
+	}
 
 	/**
 	 * Extracts a list of version and whats-news
