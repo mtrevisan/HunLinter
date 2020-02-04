@@ -63,7 +63,7 @@ public class ThesaurusMergeDialog extends JDialog{
          }
       });
 
-      mergerScrollPane.setBackground(java.awt.Color.white);
+      mergerScrollPane.setBackground(Color.WHITE);
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       mergerTextArea.setColumns(20);

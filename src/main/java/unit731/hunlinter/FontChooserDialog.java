@@ -133,7 +133,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameTextField.getDocument()
       .addDocumentListener(new ListSearchTextFieldDocumentHandler(familyNameList));
 
-      familyNameScrollPane.setBackground(java.awt.Color.white);
+      familyNameScrollPane.setBackground(Color.WHITE);
       familyNameScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
       familyNameList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -153,7 +153,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
       sampleLabel.setText("Sample:");
 
-      sampleScrollPane.setBackground(java.awt.Color.white);
+      sampleScrollPane.setBackground(Color.WHITE);
       sampleScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
       sampleTextArea.setColumns(20);

@@ -110,7 +110,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetLabel.setText("Current set:");
 
-      currentSetScrollPane.setBackground(java.awt.Color.white);
+      currentSetScrollPane.setBackground(Color.WHITE);
       currentSetScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       currentSetTextArea.setEditable(false);
