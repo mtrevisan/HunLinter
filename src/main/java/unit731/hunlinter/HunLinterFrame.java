@@ -2590,7 +2590,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		hypWordTextField.setFont(currentFont);
 		hypSyllabationOutputLabel.setFont(currentFont);
-		hypSyllabesCountOutputLabel.setFont(currentFont);
 		hypAddRuleTextField.setFont(currentFont);
 		hypAddRuleSyllabationOutputLabel.setFont(currentFont);
 
