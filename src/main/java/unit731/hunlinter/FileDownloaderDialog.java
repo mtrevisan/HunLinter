@@ -29,8 +29,8 @@ import unit731.hunlinter.services.downloader.GITFileData;
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
-	private String localPath;
-	private GITFileData remoteObject;
+	private final String localPath;
+	private final GITFileData remoteObject;
 
 	private DownloadTask task;
 

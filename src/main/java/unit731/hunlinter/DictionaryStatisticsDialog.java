@@ -307,7 +307,7 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addComponent(longestWordSyllabesOutputLabel))
             .addGap(18, 18, 18)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(18, 18, Short.MAX_VALUE)
+            .addGap(18, 18, 18)
             .addComponent(exportButton)
             .addContainerGap())
       );
@@ -569,7 +569,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			writer.newLine();
 			while(xItr.hasNext()){
 				final XYDataItem xy = (XYDataItem)xItr.next();
-				writer.write(xy.getX() + ": " + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(xy.getY()));
+				writer.write(String.format(Locale.ROOT, "%d:\t%.2f%%", xy.getX().intValue(), xy.getY().doubleValue() * 100.));
 				writer.newLine();
 			}
 		}

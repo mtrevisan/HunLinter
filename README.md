@@ -284,6 +284,8 @@ It is possible to right click on a row to bring up the popup menu and select whe
 <a name="changelog-1.10.1"></a>
 ### version 1.10.1 - 20200xxx
 - made update process stoppable
+- substituted charting library
+- reduced application footprint
 - bugfix
 
 <a name="changelog-1.10.0"></a>
