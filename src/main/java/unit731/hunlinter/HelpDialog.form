@@ -30,34 +30,46 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="managedOptionsScrollPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="lblProductNameOut" max="32767" attributes="0"/>
+                              <Component id="productNameValue" max="32767" attributes="0"/>
                               <EmptySpace min="-2" pref="144" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="lblReleaseDate" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="lblReleaseDateOut" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="releaseDate" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="releaseDateValue" max="32767" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="productVersion" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="productVersionValue" min="-2" pref="95" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="lblProductVersion" min="-2" max="-2" attributes="0"/>
+                                      <Component id="authorLabel" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="lblProductVersionOut" min="-2" pref="95" max="-2" attributes="0"/>
+                                      <Component id="authorLabelValue" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="homePageLabel" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="homePageLabelValue" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="116" max="32767" attributes="0"/>
+                              <EmptySpace pref="39" max="32767" attributes="0"/>
                           </Group>
                       </Group>
-                      <Component id="lblLogo" min="-2" pref="134" max="-2" attributes="0"/>
+                      <Component id="logo" min="-2" pref="134" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="lblCopyrightOut" alignment="1" max="32767" attributes="0"/>
+                  <Component id="copyright" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblSupportedOptionsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="supportedOptionsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -71,81 +83,111 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="lblProductNameOut" min="-2" max="-2" attributes="0"/>
+                      <Component id="productNameValue" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblProductVersion" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblProductVersionOut" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="productVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="productVersionValue" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="lblReleaseDate" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblReleaseDateOut" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="releaseDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="releaseDateValue" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="75" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="authorLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="authorLabelValue" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="homePageLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="homePageLabelValue" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="lblLogo" min="-2" pref="134" max="-2" attributes="0"/>
+                  <Component id="logo" min="-2" pref="134" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblSupportedOptionsLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="supportedOptionsLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="140" max="-2" attributes="0"/>
+              <Component id="managedOptionsScrollPane" min="-2" pref="140" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="lblCopyrightOut" min="-2" max="-2" attributes="0"/>
+              <Component id="copyright" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="lblProductVersion">
+    <Component class="javax.swing.JLabel" name="productNameValue">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="productVersion">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="lblProductVersionOut"/>
+          <ComponentRef name="productVersionValue"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Product Version:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblProductVersionOut">
+    <Component class="javax.swing.JLabel" name="productVersionValue">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblReleaseDate">
+    <Component class="javax.swing.JLabel" name="releaseDate">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="lblReleaseDateOut"/>
+          <ComponentRef name="releaseDateValue"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Release Date:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblReleaseDateOut">
+    <Component class="javax.swing.JLabel" name="releaseDateValue">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblCopyrightOut">
+    <Component class="javax.swing.JLabel" name="copyright">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="4"/>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblProductNameOut">
+    <Component class="javax.swing.JLabel" name="authorLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="…"/>
+        <Property name="text" type="java.lang.String" value="Author:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblLogo">
+    <Component class="javax.swing.JLabel" name="authorLabelValue">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Mauro Trevisan"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="homePageLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Home page:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="homePageLabelValue">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="https://github.com/mtrevisan/HunLinter"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="logo">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblSupportedOptionsLabel">
+    <Component class="javax.swing.JLabel" name="supportedOptionsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Supported options:"/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+    <Container class="javax.swing.JScrollPane" name="managedOptionsScrollPane">
       <Properties>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -155,7 +197,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextArea" name="lblManagedOptionsTextArea">
+        <Component class="javax.swing.JTextArea" name="managedOptionsTextArea">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>

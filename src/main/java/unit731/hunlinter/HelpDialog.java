@@ -17,6 +17,8 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
  * @see <a href="https://pixabay.com/en/tree-kahl-winter-aesthetic-530324/">Tree logo</a>
  * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version informations into your apps with maven</a>
  */
+//https://stackoverflow.com/questions/12449654/clickable-email-address-as-a-jlabel-in-java
+//https://stackoverflow.com/questions/527719/how-to-add-hyperlink-in-jlabel
 public class HelpDialog extends JDialog{
 
 	private static final long serialVersionUID = -9151942201399886892L;
@@ -32,8 +34,8 @@ public class HelpDialog extends JDialog{
 
 		try{
 			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
-			final ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
-			lblLogo.setIcon(icon);
+			final ImageIcon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
+			logo.setIcon(icon);
 		}
 		catch(final IOException ignored){}
 
@@ -42,10 +44,10 @@ public class HelpDialog extends JDialog{
 		final String version = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION);
 		final LocalDate buildTimestamp = (LocalDate)pomProperties.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
 
-		lblProductNameOut.setText(artifactID);
-		lblProductVersionOut.setText(version);
-		lblReleaseDateOut.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
-		lblManagedOptionsTextArea.setText(
+		productNameValue.setText(artifactID);
+		productVersionValue.setText(version);
+		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
+		managedOptionsTextArea.setText(
 			"General:\n"
 				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n\n"
 			+ "Suggestions:\n"
@@ -56,56 +58,68 @@ public class HelpDialog extends JDialog{
 				+ "\tPFX, SFX\n\n"
 			+ "Others:\n"
 				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
-		lblManagedOptionsTextArea.setCaretPosition(0);
-		lblCopyrightOut.setText("Copyright © " + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
+		managedOptionsTextArea.setCaretPosition(0);
+		copyright.setText("Copyright © " + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      lblProductVersion = new javax.swing.JLabel();
-      lblProductVersionOut = new javax.swing.JLabel();
-      lblReleaseDate = new javax.swing.JLabel();
-      lblReleaseDateOut = new javax.swing.JLabel();
-      lblCopyrightOut = new javax.swing.JLabel();
-      lblProductNameOut = new javax.swing.JLabel();
-      lblLogo = new javax.swing.JLabel();
-      lblSupportedOptionsLabel = new javax.swing.JLabel();
-      jScrollPane1 = new javax.swing.JScrollPane();
-      lblManagedOptionsTextArea = new javax.swing.JTextArea();
+      productNameValue = new javax.swing.JLabel();
+      productVersion = new javax.swing.JLabel();
+      productVersionValue = new javax.swing.JLabel();
+      releaseDate = new javax.swing.JLabel();
+      releaseDateValue = new javax.swing.JLabel();
+      copyright = new javax.swing.JLabel();
+      authorLabel = new javax.swing.JLabel();
+      authorLabelValue = new javax.swing.JLabel();
+      homePageLabel = new javax.swing.JLabel();
+      homePageLabelValue = new javax.swing.JLabel();
+      logo = new javax.swing.JLabel();
+      supportedOptionsLabel = new javax.swing.JLabel();
+      managedOptionsScrollPane = new javax.swing.JScrollPane();
+      managedOptionsTextArea = new javax.swing.JTextArea();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
       setResizable(false);
 
-      lblProductVersion.setLabelFor(lblProductVersionOut);
-      lblProductVersion.setText("Product Version:");
+      productNameValue.setText("…");
 
-      lblProductVersionOut.setText("…");
+      productVersion.setLabelFor(productVersionValue);
+      productVersion.setText("Product Version:");
 
-      lblReleaseDate.setLabelFor(lblReleaseDateOut);
-      lblReleaseDate.setText("Release Date:");
+      productVersionValue.setText("…");
 
-      lblReleaseDateOut.setText("…");
+      releaseDate.setLabelFor(releaseDateValue);
+      releaseDate.setText("Release Date:");
 
-      lblCopyrightOut.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-      lblCopyrightOut.setText("…");
+      releaseDateValue.setText("…");
 
-      lblProductNameOut.setText("…");
+      copyright.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+      copyright.setText("…");
 
-      lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+      authorLabel.setText("Author:");
 
-      lblSupportedOptionsLabel.setText("Supported options:");
+      authorLabelValue.setText("Mauro Trevisan");
 
-      jScrollPane1.setEnabled(false);
+      homePageLabel.setText("Home page:");
 
-      lblManagedOptionsTextArea.setEditable(false);
-      lblManagedOptionsTextArea.setColumns(20);
-      lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
-      lblManagedOptionsTextArea.setLineWrap(true);
-      lblManagedOptionsTextArea.setRows(1);
-      lblManagedOptionsTextArea.setTabSize(3);
-      lblManagedOptionsTextArea.setWrapStyleWord(true);
-      jScrollPane1.setViewportView(lblManagedOptionsTextArea);
+      homePageLabelValue.setText("https://github.com/mtrevisan/HunLinter");
+
+      logo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+      supportedOptionsLabel.setText("Supported options:");
+
+      managedOptionsScrollPane.setEnabled(false);
+
+      managedOptionsTextArea.setEditable(false);
+      managedOptionsTextArea.setColumns(20);
+      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      managedOptionsTextArea.setLineWrap(true);
+      managedOptionsTextArea.setRows(1);
+      managedOptionsTextArea.setTabSize(3);
+      managedOptionsTextArea.setWrapStyleWord(true);
+      managedOptionsScrollPane.setViewportView(managedOptionsTextArea);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -114,27 +128,36 @@ public class HelpDialog extends JDialog{
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-               .addComponent(jScrollPane1)
+               .addComponent(managedOptionsScrollPane)
                .addGroup(layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblProductNameOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(productNameValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(144, 144, 144))
                      .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                              .addGroup(layout.createSequentialGroup()
+                                 .addComponent(releaseDate)
+                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                 .addComponent(releaseDateValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                              .addGroup(layout.createSequentialGroup()
+                                 .addComponent(productVersion)
+                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                 .addComponent(productVersionValue, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
                            .addGroup(layout.createSequentialGroup()
-                              .addComponent(lblReleaseDate)
+                              .addComponent(authorLabel)
                               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                              .addComponent(lblReleaseDateOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                              .addComponent(authorLabelValue))
                            .addGroup(layout.createSequentialGroup()
-                              .addComponent(lblProductVersion)
+                              .addComponent(homePageLabel)
                               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                              .addComponent(lblProductVersionOut, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 116, Short.MAX_VALUE)))
-                  .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-               .addComponent(lblCopyrightOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                              .addComponent(homePageLabelValue)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)))
+                  .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(copyright, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                  .addComponent(lblSupportedOptionsLabel)
+                  .addComponent(supportedOptionsLabel)
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -144,23 +167,31 @@ public class HelpDialog extends JDialog{
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(lblProductNameOut)
+                  .addComponent(productNameValue)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                     .addComponent(lblProductVersion)
-                     .addComponent(lblProductVersionOut))
+                     .addComponent(productVersion)
+                     .addComponent(productVersionValue))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                     .addComponent(lblReleaseDate)
-                     .addComponent(lblReleaseDateOut))
-                  .addGap(75, 75, 75))
-               .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                     .addComponent(releaseDate)
+                     .addComponent(releaseDateValue))
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                     .addComponent(authorLabel)
+                     .addComponent(authorLabelValue))
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                     .addComponent(homePageLabel)
+                     .addComponent(homePageLabelValue))
+                  .addGap(30, 30, 30))
+               .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(lblSupportedOptionsLabel)
+            .addComponent(supportedOptionsLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(managedOptionsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
-            .addComponent(lblCopyrightOut)
+            .addComponent(copyright)
             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
@@ -169,15 +200,19 @@ public class HelpDialog extends JDialog{
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JScrollPane jScrollPane1;
-   private javax.swing.JLabel lblCopyrightOut;
-   private javax.swing.JLabel lblLogo;
-   private javax.swing.JTextArea lblManagedOptionsTextArea;
-   private javax.swing.JLabel lblProductNameOut;
-   private javax.swing.JLabel lblProductVersion;
-   private javax.swing.JLabel lblProductVersionOut;
-   private javax.swing.JLabel lblReleaseDate;
-   private javax.swing.JLabel lblReleaseDateOut;
-   private javax.swing.JLabel lblSupportedOptionsLabel;
+   private javax.swing.JLabel authorLabel;
+   private javax.swing.JLabel authorLabelValue;
+   private javax.swing.JLabel copyright;
+   private javax.swing.JLabel homePageLabel;
+   private javax.swing.JLabel homePageLabelValue;
+   private javax.swing.JLabel logo;
+   private javax.swing.JScrollPane managedOptionsScrollPane;
+   private javax.swing.JTextArea managedOptionsTextArea;
+   private javax.swing.JLabel productNameValue;
+   private javax.swing.JLabel productVersion;
+   private javax.swing.JLabel productVersionValue;
+   private javax.swing.JLabel releaseDate;
+   private javax.swing.JLabel releaseDateValue;
+   private javax.swing.JLabel supportedOptionsLabel;
    // End of variables declaration//GEN-END:variables
 }
