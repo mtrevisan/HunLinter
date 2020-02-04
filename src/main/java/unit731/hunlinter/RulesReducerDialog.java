@@ -87,7 +87,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       setMinimumSize(new java.awt.Dimension(547, 476));
 
       lblRule.setText("Rule:");
+      lblRule.setPreferredSize(new java.awt.Dimension(26, 17));
 
+      ruleComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
       ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             ruleComboBoxActionPerformed(evt);
@@ -110,7 +112,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetLabel.setText("Current set:");
 
-      currentSetScrollPane.setBackground(Color.WHITE);
+      currentSetScrollPane.setBackground(java.awt.Color.white);
       currentSetScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       currentSetTextArea.setEditable(false);
@@ -135,7 +137,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(lblRule)
+                  .addComponent(lblRule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(ruleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -156,7 +158,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(lblRule)
+               .addComponent(lblRule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(ruleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(reduceButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
