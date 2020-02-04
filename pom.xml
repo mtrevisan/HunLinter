@@ -186,6 +186,9 @@
 			<artifactId>jfreechart</artifactId>
 			<version>${org.jfree.jfreechart.version}</version>
 		</dependency>
+
+		<!-- Morfologik -->
+		<dependency>
 			<groupId>org.carrot2</groupId>
 			<artifactId>morfologik-tools</artifactId>
 			<version>${org.carrot2.morfologik-tools.version}</version>
