@@ -286,7 +286,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - made update process stoppable
 - substituted charting library
 - reduced application footprint
-- bugfix
+- various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>
 ### version 1.10.0 - 20200131
