@@ -2596,10 +2596,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		acoIncorrectTextField.setFont(currentFont);
 		acoCorrectTextField.setFont(currentFont);
 		acoTable.setFont(currentFont);
-
-		sexTagPanel.setFont(currentFont);
-
-		wexTagPanel.setFont(currentFont);
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){

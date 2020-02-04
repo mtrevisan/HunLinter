@@ -20,13 +20,22 @@ public class JTagPanel extends JPanel{
 
 
 	public JTagPanel(){
-		tagsChanged = null;
+		this(null);
 	}
 
 	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
+		super();
+
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
+		setBackground(UIManager.getColor("TextField.background"));
+	}
+
+	@Override
+	public void updateUI(){
+		super.updateUI();
+
 		setBackground(UIManager.getColor("TextField.background"));
 	}
 
