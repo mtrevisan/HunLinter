@@ -9,55 +9,26 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.StandardChartTheme;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.labels.CategoryItemLabelGenerator;
-import org.jfree.chart.labels.ItemLabelAnchor;
-import org.jfree.chart.labels.ItemLabelPosition;
-import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
-import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.labels.XYItemLabelGenerator;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.category.BarPainter;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.StackedBarRenderer;
-import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.ui.Layer;
-import org.jfree.chart.ui.RectangleAnchor;
-import org.jfree.chart.ui.TextAnchor;
-import org.jfree.chart.urls.StandardXYURLGenerator;
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
@@ -377,11 +348,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 			else
 				cleanupSyllabeStatistics();
 
-			fillLengthsFrequencies(statistics.getLengthsFrequencies(), totalWords, lengthsPanel);
+			fillLengthsFrequencies(statistics.getLengthsFrequencies(), totalWords, (ChartPanel)lengthsPanel);
 
-			fillLengthsFrequencies(statistics.getSyllabeLengthsFrequencies(), totalWords, syllabesPanel);
+			fillLengthsFrequencies(statistics.getSyllabeLengthsFrequencies(), totalWords, (ChartPanel)syllabesPanel);
 
-			fillLengthsFrequencies(statistics.getStressFromLastFrequencies(), totalWords, stressesPanel);
+			fillLengthsFrequencies(statistics.getStressFromLastFrequencies(), totalWords, (ChartPanel)stressesPanel);
 		}
 	}
 
@@ -462,51 +433,40 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
-	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final JPanel panel){
+	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final ChartPanel panel){
 		final boolean hasData = frequencies.entrySetIterator().hasNext();
 
 		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
-			final List<String> xData = new ArrayList<>();
-			final List<Double> yData = new ArrayList<>();
+			//extract data set
+			final XYSeries series = new XYSeries("Random Data");
 			final Iterator<Map.Entry<Integer, Long>> itr = frequencies.entrySetIterator();
 			while(itr.hasNext()){
 				final Map.Entry<Integer, Long> elem = itr.next();
-				xData.add(Integer.toString(elem.getKey()));
-				yData.add(elem.getValue().doubleValue() / totalSamples);
+				series.add(elem.getKey().doubleValue(), elem.getValue().doubleValue() / totalSamples);
 			}
+			final XYSeriesCollection dataset = new XYSeriesCollection(series);
+
+			panel.getChart().getXYPlot().setDataset(dataset);
 		}
 	}
 
-	//https://github.com/SR-G/theadmiral/blob/master/src/main/java/net/coljac/pirates/gui/StatisticsPanel.java
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
-		final XYSeries series = new XYSeries("Random Data");
-		series.add(1., 2.2 / 100.);
-		series.add(2., 4.1 / 100.);
-		series.add(3., 10.0 / 100.);
-		series.add(5., 20.4 / 100.);
-		series.add(6., 45.2 / 100.);
-		series.add(7., 50.2 / 100.);
-		series.add(8., 30.2 / 100.);
-		series.add(9., 4.4 / 100.);
-		series.add(10., 3.2 / 100.);
-		final XYSeriesCollection dataset = new XYSeriesCollection(series);
-
-		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle, dataset);
+		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
 		return new ChartPanel(chart);
 	}
 
-	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle, final XYSeriesCollection dataset){
-		final XYPlot plot = createChartPlot(dataset, xAxisTitle, yAxisTitle);
+	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
+		final XYPlot plot = createChartPlot(xAxisTitle, yAxisTitle);
 		return new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
 	}
 
-	private XYPlot createChartPlot(final XYSeriesCollection dataset, final String xAxisTitle, final String yAxisTitle){
+	private XYPlot createChartPlot(final String xAxisTitle, final String yAxisTitle){
 		final XYBarRenderer renderer = createChartRenderer();
 		final NumberAxis xAxis = createChartXAxis(xAxisTitle);
 		final NumberAxis yAxis = createChartYAxis(yAxisTitle);
 
-		final XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
+		final XYPlot plot = new XYPlot(null, xAxis, yAxis, renderer);
 		plot.setOrientation(PlotOrientation.VERTICAL);
 		//background color
 		plot.setBackgroundPaint(Color.WHITE);
