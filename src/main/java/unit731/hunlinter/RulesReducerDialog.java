@@ -26,6 +26,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.workers.RulesReducerWorker;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
+import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -87,7 +88,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       setMinimumSize(new java.awt.Dimension(547, 476));
 
       lblRule.setText("Rule:");
+      lblRule.setPreferredSize(new java.awt.Dimension(26, 17));
 
+      ruleComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
       ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             ruleComboBoxActionPerformed(evt);
@@ -135,7 +138,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(lblRule)
+                  .addComponent(lblRule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(ruleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -156,7 +159,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(lblRule)
+               .addComponent(lblRule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(ruleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(reduceButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -193,7 +196,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			.sorted()
 			.collect(Collectors.toList());
 
-		javax.swing.SwingUtilities.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			ruleComboBox.removeAllItems();
 			affixEntries.forEach(ruleComboBox::addItem);
 		});

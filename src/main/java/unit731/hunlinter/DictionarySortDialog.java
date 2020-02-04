@@ -53,7 +53,7 @@ public class DictionarySortDialog extends JDialog{
 
       lblMessage.setText("…");
 
-      entriesScrollPane.setBackground(java.awt.Color.white);
+      entriesScrollPane.setBackground(Color.WHITE);
       entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);

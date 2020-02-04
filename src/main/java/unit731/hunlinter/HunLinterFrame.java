@@ -8,6 +8,7 @@ import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.JTagPanel;
+import unit731.hunlinter.gui.JWordComboBox;
 import unit731.hunlinter.gui.JWordLabel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
@@ -112,6 +113,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.Debouncer;
@@ -193,9 +195,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
-	private JPopupMenu copyPopupMenu;
-	private JPopupMenu mergeCopyRemovePopupMenu;
-	private JPopupMenu copyRemovePopupMenu;
 
 
 	public HunLinterFrame(){
@@ -206,13 +205,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
-			copyPopupMenu = new JPopupMenu();
+			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			mergeCopyRemovePopupMenu = new JPopupMenu();
+			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow));
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
-			copyRemovePopupMenu = new JPopupMenu();
+			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
@@ -275,7 +274,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//check for updates
 		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
-			SwingUtilities.invokeLater(() -> {
+			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 					GUIUtils.addCancelByEscapeKey(dialog);
@@ -298,7 +297,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicInputLabel = new javax.swing.JLabel();
       dicInputTextField = new javax.swing.JTextField();
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      dicRuleFlagsAidComboBox = new JWordComboBox();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new JCopyableTable(){
          @Override
@@ -327,11 +326,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       openDicButton = new javax.swing.JButton();
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new javax.swing.JComboBox<>();
+      cmpInputComboBox = new JWordComboBox();
       cmpLimitLabel = new javax.swing.JLabel();
       cmpLimitComboBox = new javax.swing.JComboBox<>();
       cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      cmpRuleFlagsAidComboBox = new JWordComboBox();
       cmpScrollPane = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
       cmpInputScrollPane = new javax.swing.JScrollPane();
@@ -403,9 +402,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       sexScrollPane = new javax.swing.JScrollPane();
       sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       sexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getSexParser().modify(changeType, tags);
+         final ExceptionsParser sexParser = backbone.getSexParser();
+         sexParser.modify(changeType, tags);
          try{
-            backbone.getSexParser().save(backbone.getSentenceExceptionsFile());
+            sexParser.save(backbone.getSentenceExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
@@ -421,9 +421,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       wexScrollPane = new javax.swing.JScrollPane();
       wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       wexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getWexParser().modify(changeType, tags);
+         final ExceptionsParser wexParser = backbone.getWexParser();
+         wexParser.modify(changeType, tags);
          try{
-            backbone.getWexParser().save(backbone.getWordExceptionsFile());
+            wexParser.save(backbone.getWordExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
@@ -484,6 +485,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
+      dicInputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             dicInputTextFieldKeyReleased(evt);
@@ -558,8 +560,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicInputTextField)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+                     .addComponent(dicInputTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(dicLayeredPaneLayout.createSequentialGroup()
                   .addComponent(dicTotalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -584,7 +586,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(dicRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(dicTotalProductionsLabel)
@@ -764,7 +766,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -774,7 +776,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)))
+                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)))
             .addContainerGap())
       );
       theLayeredPaneLayout.setVerticalGroup(
@@ -807,8 +809,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
       hypSyllabationLabel.setText("Syllabation:");
+      hypSyllabationLabel.setPreferredSize(new java.awt.Dimension(58, 17));
 
       hypSyllabationOutputLabel.setText("…");
+      hypSyllabationOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
       hypSyllabesCountLabel.setText("Syllabes:");
@@ -817,8 +821,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       hypRulesLabel.setLabelFor(hypRulesOutputLabel);
       hypRulesLabel.setText("Rules:");
+      hypRulesLabel.setPreferredSize(new java.awt.Dimension(31, 17));
 
       hypRulesOutputLabel.setText("…");
+      hypRulesOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
@@ -849,8 +855,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
       hypAddRuleSyllabationLabel.setText("New syllabation:");
+      hypAddRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
 
       hypAddRuleSyllabationOutputLabel.setText("…");
+      hypAddRuleSyllabationOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
       hypAddRuleSyllabesCountLabel.setText("New syllabes:");
@@ -900,19 +908,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(hypWordLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypWordTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(hypSyllabationLabel)
-                     .addComponent(hypSyllabesCountLabel))
+                  .addComponent(hypWordTextField))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(hypSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                  .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 845, javax.swing.GroupLayout.PREFERRED_SIZE))
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(hypAddRuleLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
+                  .addComponent(hypAddRuleTextField)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
@@ -923,17 +927,21 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   .addComponent(hypAddRuleSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addGap(13, 13, 13))
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleSyllabationLabel)
+                  .addComponent(hypAddRuleSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypRulesLabel)
+                  .addComponent(hypRulesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(optionsButton)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(openHypButton)))
+                  .addComponent(openHypButton))
+               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(hypSyllabesCountLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addContainerGap())
       );
       hypLayeredPaneLayout.setVerticalGroup(
@@ -945,16 +953,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addComponent(hypWordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypSyllabationLabel)
-               .addComponent(hypSyllabationOutputLabel))
+               .addComponent(hypSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(hypSyllabesCountLabel)
-               .addComponent(hypSyllabesCountOutputLabel))
+               .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypRulesLabel)
-               .addComponent(hypRulesOutputLabel))
+               .addComponent(hypRulesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGap(18, 18, 18)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleLabel)
@@ -963,13 +971,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleSyllabationLabel)
-               .addComponent(hypAddRuleSyllabationOutputLabel))
+               .addComponent(hypAddRuleSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(optionsButton)
                .addComponent(openHypButton))
@@ -1089,7 +1097,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   .addComponent(acoIncorrectLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                   .addComponent(acoToLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(acoCorrectLabel)
@@ -1100,7 +1108,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addGroup(acoLayeredPaneLayout.createSequentialGroup()
                   .addComponent(acoCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(openAcoButton)))
             .addContainerGap())
@@ -1234,6 +1242,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
 
       wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1564,11 +1573,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(layout.createSequentialGroup()
+         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(mainTabbedPane)
-               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
       );
@@ -1622,6 +1631,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void exit(){
 		dispose();
+
+		System.exit(0);
 	}
 
 	private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
@@ -1789,7 +1800,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
-			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
 			sorter.setRowFilter(null);
@@ -1881,7 +1892,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
 			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
-			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
 		}
 		else
 			sorter.setRowFilter(null);
@@ -2380,7 +2391,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    }//GEN-LAST:event_wexAddButtonActionPerformed
 
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
-		SwingUtilities.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			try{
 				final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 				GUIUtils.addCancelByEscapeKey(dialog, new AbstractAction(){
@@ -2577,17 +2588,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		hypWordTextField.setFont(currentFont);
 		hypSyllabationOutputLabel.setFont(currentFont);
-		hypSyllabesCountOutputLabel.setFont(currentFont);
 		hypAddRuleTextField.setFont(currentFont);
 		hypAddRuleSyllabationOutputLabel.setFont(currentFont);
 
 		acoIncorrectTextField.setFont(currentFont);
 		acoCorrectTextField.setFont(currentFont);
 		acoTable.setFont(currentFont);
-
-		sexTagPanel.setFont(currentFont);
-
-		wexTagPanel.setFont(currentFont);
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
@@ -3238,7 +3244,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 
 		//create and display the form
-		EventQueue.invokeLater(() -> (new HunLinterFrame()).setVisible(true));
+		JavaHelper.executeOnEventDispatchThread(() -> (new HunLinterFrame()).setVisible(true));
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

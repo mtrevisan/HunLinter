@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunlinter.collections.bloomfilter.BloomFilterInterface;
@@ -160,7 +161,7 @@ public class DictionaryStatistics implements Closeable{
 
 	public synchronized List<String> getMostCommonSyllabes(final int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
-			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
+			.map(value -> value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.))
 			.collect(Collectors.toList());
 	}
 

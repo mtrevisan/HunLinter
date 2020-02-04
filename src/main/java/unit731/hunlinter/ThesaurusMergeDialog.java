@@ -34,10 +34,6 @@ public class ThesaurusMergeDialog extends JDialog{
 
 		initComponents();
 
-		final Font font = GUIUtils.getCurrentFont();
-		lineComboBox.setFont(font);
-		mergerTextArea.setFont(font);
-
 		synonymsEntries.stream()
 			.map(SynonymsEntry::toString)
 			.forEach(lineComboBox::addItem);
@@ -57,6 +53,7 @@ public class ThesaurusMergeDialog extends JDialog{
       lblMessage.setLabelFor(lineComboBox);
       lblMessage.setText("Select a line from the list:");
 
+      lineComboBox.setFont(GUIUtils.getCurrentFont());
       lineComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             lineComboBoxActionPerformed(evt);
@@ -67,6 +64,7 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       mergerTextArea.setColumns(20);
+      mergerTextArea.setFont(GUIUtils.getCurrentFont());
       mergerTextArea.setLineWrap(true);
       mergerTextArea.setRows(5);
       mergerTextArea.setWrapStyleWord(true);

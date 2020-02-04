@@ -1,6 +1,7 @@
 package unit731.hunlinter.gui;
 
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,14 +21,20 @@ public class JTagPanel extends JPanel{
 
 
 	public JTagPanel(){
-		tagsChanged = null;
+		this(null);
 	}
 
 	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
+		super();
+
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
-		setBackground(UIManager.getColor("TextField.background"));
+	}
+
+	@Override
+	public Color getBackground(){
+		return UIManager.getColor("TextField.background");
 	}
 
 	public void initializeTags(final List<String> tags){
@@ -74,7 +81,7 @@ public class JTagPanel extends JPanel{
 	}
 
 	public void applyFilter(final String tag){
-		EventQueue.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			if(tag == null || tag.isEmpty())
 				for(final Component component : getComponents())
 					component.setVisible(true);
@@ -108,7 +115,8 @@ public class JTagPanel extends JPanel{
 			setOpaque(false);
 
 			final JLabel textLabel = new JLabel(text);
-			textLabel.setFont(GUIUtils.getCurrentFont());
+			final Font labelFont = GUIUtils.getCurrentFont();
+			textLabel.setFont(labelFont.deriveFont(labelFont.getSize() * 4.f / 5.f));
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);

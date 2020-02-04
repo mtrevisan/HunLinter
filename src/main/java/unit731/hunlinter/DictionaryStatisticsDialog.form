@@ -132,7 +132,7 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -218,11 +218,17 @@
           <ComponentRef name="mostCommonSyllabesOutputLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Most common syllabes:"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[113, 17]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[9, 17]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersLabel">
@@ -231,11 +237,17 @@
           <ComponentRef name="longestWordCharactersOutputLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Longest word(s) (by characters):"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[158, 17]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[9, 17]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesLabel">
@@ -244,11 +256,18 @@
           <ComponentRef name="longestWordSyllabesOutputLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Longest word(s) (by syllabes):"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[146, 17]"/>
+        </Property>
+        <Property name="requestFocusEnabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[9, 17]"/>
+        </Property>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="mainTabbedPane">
