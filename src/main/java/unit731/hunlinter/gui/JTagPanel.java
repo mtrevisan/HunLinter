@@ -115,7 +115,7 @@ public class JTagPanel extends JPanel{
 
 			final JLabel textLabel = new JLabel(text);
 			final Font labelFont = GUIUtils.getCurrentFont();
-			textLabel.setFont(labelFont.deriveFont(labelFont.getSize() * 3.f / 4.f));
+			textLabel.setFont(labelFont.deriveFont(labelFont.getSize() * 4.f / 5.f));
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);

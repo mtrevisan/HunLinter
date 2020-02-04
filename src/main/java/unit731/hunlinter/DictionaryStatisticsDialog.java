@@ -76,8 +76,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
 			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsOutputLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(popupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
-				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
+			GUIUtils.addPopupMenu(popupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel,
+				longestWordCharactersOutputLabel, longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel,
+				syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
 		catch(final IOException ignored){}
 
@@ -471,7 +472,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
 		final ChartPanel panel = new ChartPanel(chart){
 			@Override
-			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save, final boolean print, final boolean zoom){
+			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save,
+					final boolean print, final boolean zoom){
 				final JPopupMenu result = new JPopupMenu("Chart:");
 				final JMenuItem propertiesItem = new JMenuItem("Properties...");
 				propertiesItem.setActionCommand("PROPERTIES");
@@ -521,7 +523,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private XYBarRenderer createChartRenderer(){
 		final XYBarRenderer renderer = new XYBarRenderer();
-		renderer.setSeriesStroke(0, new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.f, new float[]{10.f, 6.f}, 0.f));
+		renderer.setSeriesStroke(0, new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+			1.f, new float[]{10.f, 6.f}, 0.f));
 		//bar color
 		renderer.setSeriesPaint(0, Color.BLUE);
 		//solid bar color
@@ -566,26 +569,35 @@ public class DictionaryStatisticsDialog extends JDialog{
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
 			final boolean hasSyllabeStatistics = syllabeLengthsModeLabel.isEnabled();
 
-			writer.write(totalWordsLabel.getText() + TAB + StringUtils.replaceChars(totalWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.write(totalWordsLabel.getText() + TAB
+				+ StringUtils.replaceChars(totalWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
 			writer.newLine();
-			writer.write(uniqueWordsLabel.getText() + TAB + StringUtils.replaceChars(uniqueWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.write(uniqueWordsLabel.getText() + TAB
+				+ StringUtils.replaceChars(uniqueWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
 			writer.newLine();
-			writer.write(compoundWordsLabel.getText() + TAB + StringUtils.replaceChars(compoundWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.write(compoundWordsLabel.getText() + TAB
+				+ StringUtils.replaceChars(compoundWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
 			writer.newLine();
-			writer.write(contractedWordsLabel.getText() + TAB + StringUtils.replaceChars(contractedWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.write(contractedWordsLabel.getText() + TAB
+				+ StringUtils.replaceChars(contractedWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
 			writer.newLine();
-			writer.write(lengthsModeLabel.getText() + TAB + lengthsModeOutputLabel.getText());
+			writer.write(lengthsModeLabel.getText() + TAB
+				+ lengthsModeOutputLabel.getText());
 			writer.newLine();
 			if(hasSyllabeStatistics){
-				writer.write(syllabeLengthsModeLabel.getText() + TAB + syllabeLengthsModeOutputLabel.getText());
+				writer.write(syllabeLengthsModeLabel.getText() + TAB
+					+ syllabeLengthsModeOutputLabel.getText());
 				writer.newLine();
-				writer.write(mostCommonSyllabesLabel.getText() + TAB + mostCommonSyllabesOutputLabel.getText());
+				writer.write(mostCommonSyllabesLabel.getText() + TAB
+					+ mostCommonSyllabesOutputLabel.getText());
 				writer.newLine();
 			}
-			writer.write(longestWordCharactersLabel.getText() + TAB + longestWordCharactersOutputLabel.getText());
+			writer.write(longestWordCharactersLabel.getText() + TAB
+				+ longestWordCharactersOutputLabel.getText());
 			writer.newLine();
 			if(hasSyllabeStatistics){
-				writer.write(longestWordSyllabesLabel.getText() + TAB + longestWordSyllabesOutputLabel.getText());
+				writer.write(longestWordSyllabesLabel.getText() + TAB
+					+ longestWordSyllabesOutputLabel.getText());
 				writer.newLine();
 			}
 
@@ -609,7 +621,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 				final XYDataItem xy = (XYDataItem)xItr.next();
 				final double y = xy.getY().doubleValue();
 				final int decimals = Frequency.getDecimals(y);
-				writer.write(String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%", xy.getX().intValue(), y * 100.));
+				final String line = String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%",
+					xy.getX().intValue(), y * 100.);
+				writer.write(line);
 				writer.newLine();
 			}
 		}
