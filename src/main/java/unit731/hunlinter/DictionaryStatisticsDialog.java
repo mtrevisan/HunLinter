@@ -457,7 +457,33 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
-		return new ChartPanel(chart);
+		final ChartPanel panel = new ChartPanel(chart){
+			@Override
+			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save, final boolean print, final boolean zoom){
+				final JPopupMenu result = new JPopupMenu("Chart:");
+				final JMenuItem propertiesItem = new JMenuItem("Properties...");
+				propertiesItem.setActionCommand("PROPERTIES");
+				propertiesItem.addActionListener(this);
+				result.add(propertiesItem);
+
+				result.addSeparator();
+
+				final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG...");
+				saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
+				saveAsPNGItem.addActionListener(this);
+				result.add(saveAsPNGItem);
+
+				result.addSeparator();
+
+				final JMenuItem printItem = new JMenuItem("Print...");
+				printItem.setActionCommand("PRINT");
+				printItem.addActionListener(this);
+				result.add(printItem);
+
+				return result;
+			}
+		};
+		return panel;
 	}
 
 	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
