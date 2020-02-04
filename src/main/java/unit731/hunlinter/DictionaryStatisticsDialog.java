@@ -157,18 +157,25 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mostCommonSyllabesLabel.setLabelFor(mostCommonSyllabesOutputLabel);
       mostCommonSyllabesLabel.setText("Most common syllabes:");
+      mostCommonSyllabesLabel.setPreferredSize(new java.awt.Dimension(113, 17));
 
       mostCommonSyllabesOutputLabel.setText("…");
+      mostCommonSyllabesOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       longestWordCharactersLabel.setLabelFor(longestWordCharactersOutputLabel);
       longestWordCharactersLabel.setText("Longest word(s) (by characters):");
+      longestWordCharactersLabel.setPreferredSize(new java.awt.Dimension(158, 17));
 
       longestWordCharactersOutputLabel.setText("…");
+      longestWordCharactersOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       longestWordSyllabesLabel.setLabelFor(longestWordSyllabesOutputLabel);
       longestWordSyllabesLabel.setText("Longest word(s) (by syllabes):");
+      longestWordSyllabesLabel.setPreferredSize(new java.awt.Dimension(146, 17));
+      longestWordSyllabesLabel.setRequestFocusEnabled(false);
 
       longestWordSyllabesOutputLabel.setText("…");
+      longestWordSyllabesOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
       lengthsPanel.setLayout(lengthsPanelLayout);
@@ -237,11 +244,11 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(syllabeLengthsModeOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(mostCommonSyllabesLabel)
+                  .addComponent(mostCommonSyllabesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(mostCommonSyllabesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(longestWordSyllabesLabel)
+                  .addComponent(longestWordSyllabesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(longestWordSyllabesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
@@ -253,7 +260,7 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(compoundWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(longestWordCharactersLabel)
+                  .addComponent(longestWordCharactersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(longestWordCharactersOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createSequentialGroup()
@@ -295,16 +302,16 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addComponent(syllabeLengthsModeOutputLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(mostCommonSyllabesLabel)
-               .addComponent(mostCommonSyllabesOutputLabel))
+               .addComponent(mostCommonSyllabesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(mostCommonSyllabesOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(longestWordCharactersLabel)
-               .addComponent(longestWordCharactersOutputLabel))
+               .addComponent(longestWordCharactersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(longestWordCharactersOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(longestWordSyllabesLabel)
-               .addComponent(longestWordSyllabesOutputLabel))
+               .addComponent(longestWordSyllabesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(longestWordSyllabesOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGap(18, 18, 18)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
