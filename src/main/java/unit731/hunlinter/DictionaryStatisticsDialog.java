@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.BarPainter;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
@@ -511,15 +513,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 //			null, PlotOrientation.VERTICAL, false, true, false);
 
 		final XYSeries series = new XYSeries("Random Data");
-		series.add(1.0, 400.2);
-		series.add(5.0, 294.1);
-		series.add(4.0, 100.0);
-		series.add(12.5, 734.4);
-		series.add(17.3, 453.2);
-		series.add(21.2, 500.2);
-		series.add(21.9, null);
-		series.add(25.6, 734.4);
-		series.add(30.0, 453.2);
+		series.add(1., 2.2 / 100.);
+		series.add(2., 4.1 / 100.);
+		series.add(3., 10.0 / 100.);
+		series.add(5., 20.4 / 100.);
+		series.add(6., 45.2 / 100.);
+		series.add(7., 50.2 / 100.);
+		series.add(8., 30.2 / 100.);
+		series.add(9., 4.4 / 100.);
+		series.add(10., 3.2 / 100.);
 		final XYSeriesCollection dataset = new XYSeriesCollection(series);
 
 		final JFreeChart chart = ChartFactory.createXYBarChart(title, xAxisTitle, false, yAxisTitle, dataset,
@@ -532,31 +534,23 @@ public class DictionaryStatisticsDialog extends JDialog{
 		//background color
 		plot.setBackgroundPaint(Color.WHITE);
 		final XYBarRenderer renderer = (XYBarRenderer)plot.getRenderer();
+		//gridlines
+		plot.setRangeGridlinesVisible(true);
+		plot.setRangeGridlinePaint(Color.BLACK);
+		renderer.setSeriesStroke(0, new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.f, new float[]{10.f, 6.f}, 0.f));
 		//bar color
 		renderer.setSeriesPaint(0, Color.BLUE);
 		//solid bar color
 		renderer.setBarPainter(new StandardXYBarPainter());
+		//x-axis as integer starting from zero
+		final ValueAxis xAxis = plot.getDomainAxis(0);
+		xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		xAxis.setLowerBound(0.);
+		//y-axis as percent starting from zero
+		final NumberAxis yAxis = (NumberAxis)plot.getRangeAxis(0);
+		yAxis.setNumberFormatOverride(new DecimalFormat("#%"));
+		yAxis.setLowerBound(0.);
 
-//		XYItemLabelGenerator generator = new StandardXYItemLabelGenerator("{2}%");
-//		renderer.setDefaultItemLabelGenerator(generator);
-
-
-//		CategoryAxis categoryAxis = new CategoryAxis(xAxisTitle);
-//		ValueAxis valueAxis = new NumberAxis(yAxisTitle);
-//		BarRenderer renderer = new BarRenderer();
-//		ItemLabelPosition position1 = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER);
-//		renderer.setDefaultPositiveItemLabelPosition(position1);
-//		ItemLabelPosition position2 = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE6, TextAnchor.TOP_CENTER);
-//		renderer.setDefaultNegativeItemLabelPosition(position2);
-//		CategoryPlot plot = new CategoryPlot(dataset, categoryAxis, valueAxis, renderer);
-//		plot.setOrientation(PlotOrientation.VERTICAL);
-//		plot.setDataset(dataset);
-//		plot.setBackgroundPaint(Color.WHITE);
-//		plot.setRangeGridlinePaint(Color.BLACK);
-//		JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
-//		chart.setBackgroundPaint(Color.WHITE);
-//		ChartTheme currentTheme = new StandardChartTheme("JFree");
-//		currentTheme.apply(chart);
 		return new ChartPanel(chart);
 
 
