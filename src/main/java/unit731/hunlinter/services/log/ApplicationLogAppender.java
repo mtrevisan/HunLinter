@@ -40,7 +40,10 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() ->
 				JavaHelper.nullableToStream(TEXT_AREAS.get(marker))
-					.forEach(textArea -> textArea.append(message))
+					.forEach(textArea -> {
+						textArea.append(message);
+						textArea.setCaretPosition(textArea.getDocument().getLength());
+					})
 			);
 		}
 	}

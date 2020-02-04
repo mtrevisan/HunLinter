@@ -221,7 +221,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		catch(final IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
-		((DefaultCaret)parsingResultTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
 		openProjectPathFileChooser = new JFileChooser();
