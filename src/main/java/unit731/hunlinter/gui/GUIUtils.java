@@ -45,7 +45,6 @@ public class GUIUtils{
 
 	public static Font chooseBestFont(final String languageSample){
 		Font bestFont = currentFont;
-		float height = 0.f;
 		if(!canCurrentFontDisplay(languageSample)){
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
@@ -54,16 +53,24 @@ public class GUIUtils{
 			double width = 0.;
 			for(final String elem : list){
 				final Font currentFont = new Font(elem, Font.PLAIN, GUIUtils.currentFont.getSize());
-				final Rectangle2D bounds = currentFont.getStringBounds(languageSample, FRC);
+				final Rectangle2D bounds = getStringBounds(currentFont, languageSample);
 				final double w = bounds.getWidth();
 				if(w > width){
 					bestFont = currentFont;
 					width = w;
-					height = (float)bounds.getHeight();
 				}
 			}
 		}
-		return (height != 0.f? bestFont.deriveFont((float)Math.round(bestFont.getSize() * 17.f / height)): bestFont);
+		return getDefaultHeightFont(bestFont);
+	}
+
+	public static Font getDefaultHeightFont(final Font font){
+		final Rectangle2D bounds = getStringBounds(font, "I");
+		return font.deriveFont((float)Math.round(font.getSize() * 17.f / bounds.getHeight()));
+	}
+
+	private static Rectangle2D getStringBounds(final Font font, final String text){
+		return font.getStringBounds(text, FRC);
 	}
 
 	public static void extractFonts(final String languageSample){
@@ -112,10 +119,10 @@ public class GUIUtils{
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
 		if(!font.equals(currentFont)){
+			currentFont = font;
+
 			Arrays.stream(parentFrames)
 				.forEach(parentFrame -> updateComponent(parentFrame, font));
-
-			currentFont = font;
 		}
 	}
 
@@ -199,7 +206,7 @@ public class GUIUtils{
 		}
 
 		if(textToCopy != null)
-			GUIUtils.copyToClipboard(textToCopy);
+			copyToClipboard(textToCopy);
 	}
 
 	public static void copyToClipboard(final JCopyableTable table){
