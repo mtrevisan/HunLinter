@@ -506,6 +506,7 @@
                 </Property>
               </Properties>
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleFlagsAidComboBox"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
@@ -669,6 +670,7 @@
                 <Property name="editable" type="boolean" value="true"/>
               </Properties>
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
@@ -710,6 +712,7 @@
             </Component>
             <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
@@ -1418,13 +1421,8 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Component class="unit731.hunlinter.gui.JTagPanel" name="sexTagPanel">
-                  <Properties>
-                    <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="UIManager.getColor(&quot;TextField.background&quot;)" type="code"/>
-                    </Property>
-                  </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getSexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getSexParser().save(backbone.getSentenceExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;final ExceptionsParser sexParser = backbone.getSexParser();&#xd;&#xa;&#x9;sexParser.modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;sexParser.save(backbone.getSentenceExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1548,13 +1546,8 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Container class="unit731.hunlinter.gui.JTagPanel" name="wexTagPanel">
-                  <Properties>
-                    <Property name="background" type="java.awt.Color" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="UIManager.getColor(&quot;TextField.background&quot;)" type="code"/>
-                    </Property>
-                  </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;backbone.getWexParser().modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;backbone.getWexParser().save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;final ExceptionsParser wexParser = backbone.getWexParser();&#xd;&#xa;&#x9;wexParser.modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;wexParser.save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>

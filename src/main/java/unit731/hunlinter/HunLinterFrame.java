@@ -8,6 +8,7 @@ import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.JTagPanel;
+import unit731.hunlinter.gui.JWordComboBox;
 import unit731.hunlinter.gui.JWordLabel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
@@ -296,7 +297,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicInputLabel = new javax.swing.JLabel();
       dicInputTextField = new javax.swing.JTextField();
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      dicRuleFlagsAidComboBox = new JWordComboBox();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new JCopyableTable(){
          @Override
@@ -325,11 +326,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       openDicButton = new javax.swing.JButton();
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new javax.swing.JComboBox<>();
+      cmpInputComboBox = new JWordComboBox();
       cmpLimitLabel = new javax.swing.JLabel();
       cmpLimitComboBox = new javax.swing.JComboBox<>();
       cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      cmpRuleFlagsAidComboBox = new JWordComboBox();
       cmpScrollPane = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
       cmpInputScrollPane = new javax.swing.JScrollPane();
@@ -401,9 +402,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       sexScrollPane = new javax.swing.JScrollPane();
       sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       sexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getSexParser().modify(changeType, tags);
+         final ExceptionsParser sexParser = backbone.getSexParser();
+         sexParser.modify(changeType, tags);
          try{
-            backbone.getSexParser().save(backbone.getSentenceExceptionsFile());
+            sexParser.save(backbone.getSentenceExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
@@ -419,9 +421,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       wexScrollPane = new javax.swing.JScrollPane();
       wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       wexTagPanel = new JTagPanel((changeType, tags) -> {
-         backbone.getWexParser().modify(changeType, tags);
+         final ExceptionsParser wexParser = backbone.getWexParser();
+         wexParser.modify(changeType, tags);
          try{
-            backbone.getWexParser().save(backbone.getWordExceptionsFile());
+            wexParser.save(backbone.getWordExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
@@ -1154,8 +1157,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
 
       sexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-      sexTagPanel.setBackground(UIManager.getColor("TextField.background"));
       sexScrollPane.setViewportView(sexTagPanel);
 
       sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
@@ -1242,7 +1243,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-      wexTagPanel.setBackground(UIManager.getColor("TextField.background"));
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
