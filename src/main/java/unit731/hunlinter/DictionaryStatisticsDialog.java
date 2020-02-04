@@ -569,7 +569,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 			writer.newLine();
 			while(xItr.hasNext()){
 				final XYDataItem xy = (XYDataItem)xItr.next();
-				writer.write(String.format(Locale.ROOT, "%d:\t%.2f%%", xy.getX().intValue(), xy.getY().doubleValue() * 100.));
+				final double y = xy.getY().doubleValue();
+				final int decimals = Math.max((int)Math.floor(Math.log10(1. / y)) - 1, 1);
+				writer.write(String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%", xy.getX().intValue(), y * 100.));
 				writer.newLine();
 			}
 		}

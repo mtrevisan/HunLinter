@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,12 +29,13 @@ public class ThesaurusDictionary{
 	private static final String PART_OF_SPEECH_END = ")";
 
 
-	private final Comparator<String> comparator;
-	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
+	private final Map<String, ThesaurusEntry> dictionary;
 
 
 	public ThesaurusDictionary(final String language){
-		comparator = BaseBuilder.getComparator(language);
+		final Comparator<String> comparator = BaseBuilder.getComparator(language);
+		//sort the definitions in language-specific order
+		dictionary = new TreeMap<>(comparator);
 	}
 
 	public boolean add(final ThesaurusEntry entry){
@@ -115,10 +117,7 @@ public class ThesaurusDictionary{
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.values());
-		//sort the definitions in language-specific order
-		Collections.sort(list, (entry1, entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
-		return list;
+		return new ArrayList<>(dictionary.values());
 	}
 
 	public List<ThesaurusEntry> getSortedSynonyms(){
