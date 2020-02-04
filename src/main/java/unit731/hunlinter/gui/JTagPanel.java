@@ -29,14 +29,11 @@ public class JTagPanel extends JPanel{
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
-		setBackground(UIManager.getColor("TextField.background"));
 	}
 
 	@Override
-	public void updateUI(){
-		super.updateUI();
-
-		setBackground(UIManager.getColor("TextField.background"));
+	public Color getBackground(){
+		return UIManager.getColor("TextField.background");
 	}
 
 	public void initializeTags(final List<String> tags){
