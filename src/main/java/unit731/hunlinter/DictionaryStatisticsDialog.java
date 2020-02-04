@@ -475,46 +475,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 				xData.add(Integer.toString(elem.getKey()));
 				yData.add(elem.getValue().doubleValue() / totalSamples);
 			}
-
-//			final GChart chartFactions = buildData(xData, yData);
-//			final JLabel graphFactions = new JLabel(new ImageIcon(ImageIO.read(new URL(chartFactions.toURLString()))));
-//
-//			//---
-//
-//			final Data data = Data.newData(yData);
-//			final BarChartPlot plot = Plots.newBarChartPlot(data, Color.BLUE);
-//			final BarChart chart = GCharts.newBarChart(plot);
-//			final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 13, AxisTextAlignment.CENTER);
-//			final AxisLabels score = AxisLabelsFactory.newAxisLabels("Score", 50.0);
-//			score.setAxisStyle(axisStyle);
-//			final AxisLabels year = AxisLabelsFactory.newAxisLabels("Year", 50.0);
-//			year.setAxisStyle(axisStyle);
-//
-//			chart.addXAxisLabels(AxisLabelsFactory.newAxisLabels(xData));
-//			chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 100));
-//			chart.addYAxisLabels(score);
-//			chart.addXAxisLabels(year);
-//
-//			chart.setSize(600, 450);
-//			chart.setBarWidth(100);
-//			chart.setSpaceWithinGroupsOfBars(0);
-//			chart.setDataStacked(true);
-//			chart.setTitle("Team Scores", Color.BLACK, 16);
 		}
 	}
 
 	//https://github.com/SR-G/theadmiral/blob/master/src/main/java/net/coljac/pirates/gui/StatisticsPanel.java
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
-//		final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-//		dataset.setValue(46, "Gold medals", "USA");
-//		dataset.setValue(38, "Gold medals", "China");
-//		dataset.setValue(29, "Gold medals", "UK");
-//		dataset.setValue(22, "Gold medals", "Russia");
-//		dataset.setValue(13, "Gold medals", "South Korea");
-//		dataset.setValue(11, "Gold medals", "Germany");
-//		final JFreeChart chart2 = ChartFactory.createBarChart(title, xAxisTitle, yAxisTitle,
-//			null, PlotOrientation.VERTICAL, false, true, false);
-
 		final XYSeries series = new XYSeries("Random Data");
 		series.add(1., 2.2 / 100.);
 		series.add(2., 4.1 / 100.);
@@ -533,17 +498,19 @@ public class DictionaryStatisticsDialog extends JDialog{
 		renderer.setSeriesPaint(0, Color.BLUE);
 		//solid bar color
 		renderer.setBarPainter(new StandardXYBarPainter());
+		//shadow
+		renderer.setShadowVisible(false);
 		//tooltip
 //		renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
 		//x-axis as integer starting from zero
 		final NumberAxis xAxis = new NumberAxis(xAxisTitle);
-//		xAxis.setAutoRangeIncludesZero(false);
+		xAxis.setAutoRangeIncludesZero(false);
 		xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 		xAxis.setLowerBound(0.);
 		xAxis.setAutoRange(true);
 		//y-axis as percent starting from zero
 		final NumberAxis yAxis = new NumberAxis(yAxisTitle);
-//		yAxis.setAutoRangeIncludesZero(true);
+		yAxis.setAutoRangeIncludesZero(true);
 		yAxis.setNumberFormatOverride(new DecimalFormat("#%"));
 		yAxis.setLowerBound(0.);
 		yAxis.setAutoRange(true);
@@ -553,58 +520,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 		//background color
 		plot.setBackgroundPaint(Color.WHITE);
 		//gridlines
+		plot.setDomainGridlinesVisible(false);
 		plot.setRangeGridlinesVisible(true);
 		plot.setRangeGridlinePaint(Color.BLACK);
 
 		final JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
 		return new ChartPanel(chart);
-
-
-//		final CategoryStyler styler = chart.getStyler();
-//		styler.setAvailableSpaceFill(0.98);
-//		styler.setOverlapped(true);
-//		styler.setLegendVisible(false);
-//		styler.setXAxisMin(0.);
-//		styler.setYAxisMin(0.);
-//		styler.setYAxisDecimalPattern("#%");
-//		styler.setYAxisTitleVisible(false);
-//		styler.setChartBackgroundColor(getBackground());
-//		styler.setToolTipsEnabled(true);
-//
-//		return new XChartPanel<>(chart);
 	}
-
-	/*private GChart buildData(final List<String> labels, final List<Number> values){
-		final long max = values.stream()
-			.mapToLong(v -> v.longValue())
-			.max()
-			.orElse(0l);
-
-		// final Plot plot = Plots.newPlot(Data.newData(0, 66.6, 33.3, 100));
-		final AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.BLACK, 14, AxisTextAlignment.RIGHT);
-		final AxisLabels axisValues = AxisLabelsFactory.newNumericRangeAxisLabels(0, max + 1);
-		axisValues.setAxisStyle(axisStyle);
-		final AxisLabels axisLabels = AxisLabelsFactory.newAxisLabels(labels);
-		axisLabels.setAxisStyle(axisStyle);
-
-		final BarChartPlot plot = Plots.newBarChartPlot(DataUtil.scaleWithinRange(0, max + 1, values));
-		final BarChart chart = GCharts.newBarChart(plot);
-//		chart.setTitle("Stats", BLACK, 16);
-//		chart.addHorizontalRangeMarker(40, 60, Color.newColor(RED, 30));
-//		chart.setDataStacked(true);
-		chart.addXAxisLabels(axisValues);
-		chart.addYAxisLabels(axisLabels);
-		chart.setHorizontal(true);
-		chart.setBarWidth(19);
-		chart.setSpaceWithinGroupsOfBars(2);
-		chart.setGrid((50. / max) * 20, 600, 3, 2);
-		chart.setBackgroundFill(Fills.newSolidFill(Color.LIGHTGREY));
-//		final LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("E37600"), 100);
-//		fill.addColorAndOffset(Color.newColor("DC4800"), 0);
-//		chart.setAreaFill(fill);
-		chart.setSize(700, (values.size() + 1) * 28);
-		return chart;
-	}/**/
 
 	private void exportToFile(final File outputFile) throws IOException{
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
