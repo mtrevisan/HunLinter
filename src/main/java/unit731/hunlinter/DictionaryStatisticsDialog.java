@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
@@ -487,8 +486,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 		//shadow
 		renderer.setShadowVisible(false);
 		//tooltip
-		renderer.setDefaultToolTipGenerator(new StandardXYToolTipGenerator());
+		final XYToolTipGenerator xyToolTipGenerator = createChartTooltip();
+		renderer.setDefaultToolTipGenerator(xyToolTipGenerator);
 		return renderer;
+	}
+
+	private XYToolTipGenerator createChartTooltip(){
+		return (dataset, series, item) -> {
+			final Number x = dataset.getX(series, item);
+			final Number y = dataset.getY(series, item);
+			return String.format("(%d, %.1f%%)", x.intValue(), y.doubleValue() * 100.);
+		};
 	}
 
 	private NumberAxis createChartXAxis(final String xAxisTitle){
