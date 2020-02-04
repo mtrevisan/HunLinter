@@ -3,6 +3,7 @@ package unit731.hunlinter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -66,7 +67,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 				final String matchedName = targetList.getModel().getElementAt(foundIndex);
 				if(newValue.equalsIgnoreCase(matchedName) && foundIndex != targetList.getSelectedIndex())
-					SwingUtilities.invokeLater(() -> targetList.setSelectedIndex(foundIndex));
+					JavaHelper.executeOnEventDispatchThread(() -> targetList.setSelectedIndex(foundIndex));
 			}
 		}
 	}

@@ -26,6 +26,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.workers.RulesReducerWorker;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
+import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -195,7 +196,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			.sorted()
 			.collect(Collectors.toList());
 
-		javax.swing.SwingUtilities.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			ruleComboBox.removeAllItems();
 			affixEntries.forEach(ruleComboBox::addItem);
 		});

@@ -1,6 +1,7 @@
 package unit731.hunlinter.gui;
 
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -80,7 +81,7 @@ public class JTagPanel extends JPanel{
 	}
 
 	public void applyFilter(final String tag){
-		EventQueue.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			if(tag == null || tag.isEmpty())
 				for(final Component component : getComponents())
 					component.setVisible(true);

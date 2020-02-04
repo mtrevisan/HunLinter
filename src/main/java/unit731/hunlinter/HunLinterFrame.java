@@ -112,6 +112,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.Debouncer;
@@ -193,9 +194,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
-	private JPopupMenu copyPopupMenu;
-	private JPopupMenu mergeCopyRemovePopupMenu;
-	private JPopupMenu copyRemovePopupMenu;
 
 
 	public HunLinterFrame(){
@@ -206,13 +204,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
-			copyPopupMenu = new JPopupMenu();
+			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			mergeCopyRemovePopupMenu = new JPopupMenu();
+			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow));
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
-			copyRemovePopupMenu = new JPopupMenu();
+			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
@@ -223,6 +221,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		catch(final IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
+		((DefaultCaret)parsingResultTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
 		openProjectPathFileChooser = new JFileChooser();
@@ -275,7 +274,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//check for updates
 		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
-			SwingUtilities.invokeLater(() -> {
+			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 					GUIUtils.addCancelByEscapeKey(dialog);
@@ -1802,7 +1801,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
-			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
 		else
 			sorter.setRowFilter(null);
@@ -1894,7 +1893,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
 			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
-			EventQueue.invokeLater(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
 		}
 		else
 			sorter.setRowFilter(null);
@@ -2393,7 +2392,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    }//GEN-LAST:event_wexAddButtonActionPerformed
 
    private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
-		SwingUtilities.invokeLater(() -> {
+		JavaHelper.executeOnEventDispatchThread(() -> {
 			try{
 				final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
 				GUIUtils.addCancelByEscapeKey(dialog, new AbstractAction(){
@@ -3246,7 +3245,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 
 		//create and display the form
-		EventQueue.invokeLater(() -> (new HunLinterFrame()).setVisible(true));
+		JavaHelper.executeOnEventDispatchThread(() -> (new HunLinterFrame()).setVisible(true));
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
