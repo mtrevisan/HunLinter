@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,6 +29,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.data.xy.XYDataItem;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
@@ -38,6 +41,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.services.FileHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -46,7 +50,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private static final long serialVersionUID = 5762751368059394067l;
 
-	private static final String SERIES_NAME = "series";
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String TAB = "\t";
 
@@ -320,6 +323,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 			try{
 				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				exportToFile(outputFile);
+
+				FileHelper.openFolder(outputFile);
 			}
 			catch(final Exception e){
 				LOGGER.error("Cannot export statistics", e);
@@ -438,7 +443,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
 			//extract data set
-			final XYSeries series = new XYSeries("Random Data");
+			final XYSeries series = new XYSeries("frequencies");
 			final Iterator<Map.Entry<Integer, Long>> itr = frequencies.entrySetIterator();
 			while(itr.hasNext()){
 				final Map.Entry<Integer, Long> elem = itr.next();
@@ -495,7 +500,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return (dataset, series, item) -> {
 			final Number x = dataset.getX(series, item);
 			final Number y = dataset.getY(series, item);
-			return String.format("(%d, %.1f%%)", x.intValue(), y.doubleValue() * 100.);
+			return String.format(Locale.ROOT, "(%d, %.1f%%)", x.intValue(), y.doubleValue() * 100.);
 		};
 	}
 
@@ -555,19 +560,19 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);
-//		if(hasData){
-//			final String name = mainTabbedPane.getTitleAt(index);
-//			final CategorySeries series = ((CategoryChart)((XChartPanel<?>)comp).getChart()).getSeriesMap().get(SERIES_NAME);
-//			final Iterator<?> xItr = series.getXData().iterator();
-//			final Iterator<? extends Number> yItr = series.getYData().iterator();
-//			writer.newLine();
-//			writer.write(name);
-//			writer.newLine();
-//			while(xItr.hasNext()){
-//				writer.write(xItr.next() + ":" + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(yItr.next()));
-//				writer.newLine();
-//			}
-//		}
+		if(hasData){
+			final String name = mainTabbedPane.getTitleAt(index);
+			final XYDataset dataset = ((ChartPanel) comp).getChart().getXYPlot().getDataset(0);
+			final Iterator<?> xItr = ((XYSeriesCollection)dataset).getSeries(0).getItems().iterator();
+			writer.newLine();
+			writer.write(name);
+			writer.newLine();
+			while(xItr.hasNext()){
+				final XYDataItem xy = (XYDataItem)xItr.next();
+				writer.write(xy.getX() + ": " + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(xy.getY()));
+				writer.newLine();
+			}
+		}
 	}
 
 	@SuppressWarnings("unused")
