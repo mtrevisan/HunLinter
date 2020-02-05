@@ -221,7 +221,7 @@ public class FileHelper{
 
 	private static boolean executeDesktopCommand(final Desktop.Action action, final Object parameter){
 		boolean done = false;
-		final Desktop desktop = getDesktopFor(Desktop.Action.OPEN);
+		final Desktop desktop = getDesktopFor(action);
 		if(desktop != null){
 			try{
 				switch(action){
@@ -232,14 +232,14 @@ public class FileHelper{
 
 					case BROWSE:
 						if(DownloaderHelper.hasInternetConnectivity()){
-							desktop.browse(new URI((String) parameter));
+							desktop.browse(new URI((String)parameter));
 							done = true;
 						}
 						break;
 
 					case MAIL:
 						if(DownloaderHelper.hasInternetConnectivity()){
-							desktop.mail(new URI((String) parameter));
+							desktop.mail(new URI((String)parameter));
 							done = true;
 						}
 				}

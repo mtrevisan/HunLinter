@@ -212,7 +212,7 @@ public class HelpDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
 	private void authorLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorLabelValueMouseClicked
-		FileHelper.sendEmail("mailto:851903+mtrevisan@users.noreply.github.com?subject=HunLinter%20contact");
+		FileHelper.sendEmail("mailto:851903%2Bmtrevisan@users.noreply.github.com?subject=HunLinter%20request");
 	}//GEN-LAST:event_authorLabelValueMouseClicked
 
    private void homePageLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
