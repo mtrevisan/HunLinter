@@ -87,7 +87,7 @@ public class Version implements Comparable<Version>{
 
 		final String[] tokens = StringUtils.split(version, DOT, 3);
 		final String patchOnly = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX)[2];
-		if(tokens[0].length() > 1 && tokens[0].charAt(0) == '0' || tokens[1].length() > 1 && tokens[1].charAt(0) == '0' || patchOnly.length() > 1 && patchOnly.charAt(0) == '0')
+		if(hasLeadingZeroes(tokens[0]) || hasLeadingZeroes(tokens[1]) || hasLeadingZeroes(patchOnly))
 			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeroes");
 
 		major = Integer.parseInt(tokens[0]);
@@ -122,6 +122,10 @@ public class Version implements Comparable<Version>{
 			build = new String[0];
 		if(tokenizer.hasMoreElements())
 			throw new IllegalArgumentException("Argument is not a valid version");
+	}
+
+	private boolean hasLeadingZeroes(final String token){
+		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 
 	private static boolean startsWithNumber(final String str){
