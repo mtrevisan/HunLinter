@@ -172,14 +172,8 @@ public class FileHelper{
 			file = file.getParentFile();
 
 		//try using Desktop first
-		Desktop desktop;
-		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.OPEN)){
-			try{
-				desktop.open(file);
-				return true;
-			}
-			catch(final Exception ignored){}
-		}
+		if(executeDesktopCommand(Desktop.Action.OPEN, file))
+			return true;
 
 		//backup to system-specific
 		ProcessBuilder builder = null;
@@ -218,31 +212,47 @@ public class FileHelper{
 	}
 
 	public static boolean sendEmail(final String mailTo){
-		Desktop desktop;
-		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.MAIL) && DownloaderHelper.hasInternetConnectivity()){
-			try{
-				desktop.mail(new URI(mailTo));
-				return true;
-			}
-			catch(final Exception e){
-				LOGGER.error("Cannot contact email {}", mailTo, e);
-			}
-		}
-		return false;
+		return executeDesktopCommand(Desktop.Action.MAIL, mailTo);
 	}
 
 	public static boolean browseURL(final String url){
-		Desktop desktop;
-		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.BROWSE) && DownloaderHelper.hasInternetConnectivity()){
+		return executeDesktopCommand(Desktop.Action.BROWSE, url);
+	}
+
+	private static boolean executeDesktopCommand(final Desktop.Action action, final Object parameter){
+		boolean done = false;
+		final Desktop desktop = getDesktopFor(Desktop.Action.OPEN);
+		if(desktop != null){
 			try{
-				desktop.browse(new URI(url));
-				return true;
+				switch(action){
+					case OPEN:
+						desktop.open((File)parameter);
+						done = true;
+						break;
+
+					case BROWSE:
+						if(DownloaderHelper.hasInternetConnectivity()){
+							desktop.browse(new URI((String) parameter));
+							done = true;
+						}
+						break;
+
+					case MAIL:
+						if(DownloaderHelper.hasInternetConnectivity()){
+							desktop.mail(new URI((String) parameter));
+							done = true;
+						}
+				}
 			}
 			catch(final Exception e){
-				LOGGER.error("Cannot open page {}", url, e);
+				LOGGER.error("Cannot execute {} command", action, e);
 			}
 		}
-		return false;
+		return done;
+	}
+
+	private static Desktop getDesktopFor(final Desktop.Action action){
+		return (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(action)? Desktop.getDesktop(): null);
 	}
 
 	private static boolean runOSCommand(final ProcessBuilder builder) throws IOException, InterruptedException{
