@@ -92,7 +92,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.parsers.workers.CompoundRulesWorker;
-import unit731.hunlinter.parsers.workers.CorrectnessWorker;
+import unit731.hunlinter.parsers.workers.DictionaryLinterWorker;
 import unit731.hunlinter.parsers.workers.DuplicatesWorker;
 import unit731.hunlinter.parsers.workers.HyphenationCorrectnessWorker;
 import unit731.hunlinter.parsers.workers.MinimalPairsWorker;
@@ -180,7 +180,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
-	private CorrectnessWorker dicCorrectnessWorker;
+	private DictionaryLinterWorker dicDictionaryLinterWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
 	private WordCountWorker dicWordCountWorker;
@@ -256,7 +256,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
-		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
@@ -2472,7 +2472,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 
-		checkAbortion(dicCorrectnessWorker, dicCheckCorrectnessMenuItem);
+		checkAbortion(dicDictionaryLinterWorker, dicCheckCorrectnessMenuItem);
 
 		checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
 
@@ -2929,13 +2929,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void checkDictionaryCorrectness(){
-		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
+		if(dicDictionaryLinterWorker == null || dicDictionaryLinterWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
-			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(),
+			dicDictionaryLinterWorker = new DictionaryLinterWorker(backbone.getDicParser(), backbone.getChecker(),
 				backbone.getWordGenerator());
-			dicCorrectnessWorker.addPropertyChangeListener(this);
-			dicCorrectnessWorker.execute();
+			dicDictionaryLinterWorker.addPropertyChangeListener(this);
+			dicDictionaryLinterWorker.execute();
 		}
 	}
 

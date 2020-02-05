@@ -154,6 +154,9 @@
 		<!-- Morfologik -->
 		<org.carrot2.morfologik-tools.version>2.1.7</org.carrot2.morfologik-tools.version>
 
+		<!-- GraphViz -->
+		<guru.nidi.graphviz.version>0.14.1</guru.nidi.graphviz.version>
+
 		<!-- JSON -->
 		<com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
 
@@ -193,6 +196,13 @@
 			<artifactId>morfologik-tools</artifactId>
 			<version>${org.carrot2.morfologik-tools.version}</version>
 		</dependency>
+
+		<!-- GraphViz -->
+<!--		<dependency>-->
+<!--			<groupId>guru.nidi</groupId>-->
+<!--			<artifactId>graphviz-java</artifactId>-->
+<!--			<version>${guru.nidi.graphviz.version}</version>-->
+<!--		</dependency>-->
 
 		<!-- JSON -->
 		<dependency>
