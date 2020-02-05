@@ -131,7 +131,6 @@ import unit731.hunlinter.services.log.ExceptionHelper;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
  */
-//useful: https://books.google.it/books?id=oNbFfcyAtv4C&pg=PA305&lpg=PA305&dq=UIManager.getDefaults()+change+font&source=bl&ots=hfrlQ64-wB&sig=ACfU3U1NgIhgzCIdwwjxVfreM3RzUeKGFA&hl=en&sa=X&ved=2ahUKEwiTp--blrrnAhUDCuwKHcgRCYoQ6AEwCHoECAoQAQ#v=onepage&q=UIManager.getDefaults()%20change%20font&f=false
 public class HunLinterFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
