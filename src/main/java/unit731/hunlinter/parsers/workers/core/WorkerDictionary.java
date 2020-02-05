@@ -18,7 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
@@ -91,7 +91,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new HunLintException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;

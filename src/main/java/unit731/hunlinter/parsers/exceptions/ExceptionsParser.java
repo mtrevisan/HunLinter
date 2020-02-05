@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
 import javax.xml.transform.TransformerException;
@@ -64,7 +64,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new HunLintException("Invalid root element in file " + configurationFilename
+			throw new LinterException("Invalid root element in file " + configurationFilename
 				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));

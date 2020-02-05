@@ -2,7 +2,7 @@ package unit731.hunlinter.languages;
 
 import java.text.MessageFormat;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public class LetterMatcherEntry{
@@ -23,7 +23,7 @@ public class LetterMatcherEntry{
 	public void match(final Production production){
 		for(final String flag : wrongFlags)
 			if(production.hasContinuationFlag(flag))
-				throw new HunLintException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
+				throw new LinterException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}
 
 }

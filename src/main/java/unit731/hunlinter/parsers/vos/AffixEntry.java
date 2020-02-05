@@ -19,7 +19,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -71,14 +71,14 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(line, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new HunLintException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY)}));
+			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY)}));
 
 		final String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		final Matcher m = PATTERN_LINE.matcher(lineParts[3]);
 		if(!m.find())
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
@@ -109,15 +109,15 @@ public class AffixEntry{
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
-					throw new HunLintException(WRONG_CONDITION_END.format(new Object[]{line}));
+					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					throw new HunLintException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 			else{
 				if(!cond.startsWith(removal))
-					throw new HunLintException(WRONG_CONDITION_START.format(new Object[]{line}));
+					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					throw new HunLintException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 		}
 	}
@@ -212,7 +212,7 @@ public class AffixEntry{
 	public void validate(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(!filteredFields.isEmpty())
-			throw new HunLintException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
+			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
 	}
 
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
@@ -234,7 +234,7 @@ public class AffixEntry{
 
 	public String applyRule(final String word, final boolean isFullstrip){
 		if(!isFullstrip && word.length() == removingLength)
-			throw new HunLintException(CANNOT_FULL_STRIP.format(new Object[]{word}));
+			throw new LinterException(CANNOT_FULL_STRIP.format(new Object[]{word}));
 
 		return (isSuffix()?
 			word.substring(0, word.length() - removingLength) + appending:

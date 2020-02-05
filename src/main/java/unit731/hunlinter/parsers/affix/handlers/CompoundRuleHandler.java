@@ -13,7 +13,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
 
 
@@ -44,7 +44,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new HunLintException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
+					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
 				final String rule = lineParts[1];
 
@@ -52,7 +52,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new HunLintException(DUPLICATED_LINE.format(new Object[]{line}));
+					throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
 			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
@@ -64,18 +64,18 @@ public class CompoundRuleHandler implements Handler{
 
 	private void checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new HunLintException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
-			throw new HunLintException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 	}
 
 	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
-			throw new HunLintException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
+			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new HunLintException(BAD_FORMAT.format(new Object[]{line}));
+			throw new LinterException(BAD_FORMAT.format(new Object[]{line}));
 	}
 
 }

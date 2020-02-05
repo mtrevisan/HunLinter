@@ -14,7 +14,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
 
 
@@ -35,7 +35,7 @@ public class AffixHandler implements Handler{
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new HunLintException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
 			final List<AffixEntry> entries = readEntries(context, strategy, getData);
 
@@ -50,7 +50,7 @@ public class AffixHandler implements Handler{
 			final Function<AffixOption, List<String>> getData) throws IOException{
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
-			throw new HunLintException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
 
 		final BufferedReader br = context.getReader();
 		final AffixType ruleType = AffixType.createFromCode(context.getRuleType());
@@ -70,7 +70,7 @@ public class AffixHandler implements Handler{
 			checkValidity(entry, ruleType, ruleFlag);
 
 			if(entries.contains(entry))
-				throw new HunLintException(DUPLICATED_LINE.format(new Object[0]));
+				throw new LinterException(DUPLICATED_LINE.format(new Object[0]));
 
 			final boolean inserted = entries.add(entry);
 
@@ -90,9 +90,9 @@ public class AffixHandler implements Handler{
 
 	private void checkValidity(final AffixEntry entry, final AffixType ruleType, final String ruleFlag){
 		if(entry.getType() != ruleType)
-			throw new HunLintException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
+			throw new LinterException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
 		if(!ruleFlag.equals(entry.getFlag()))
-			throw new HunLintException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
+			throw new LinterException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
 
 		entry.validate();
 	}

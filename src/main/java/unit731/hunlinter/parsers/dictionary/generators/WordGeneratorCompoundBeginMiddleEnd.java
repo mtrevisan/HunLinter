@@ -10,7 +10,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 
@@ -36,7 +36,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
-			throw new HunLintException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
 		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
@@ -85,7 +85,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
-				throw new HunLintException(MISSING_WORD.format(new Object[]{entry.getKey()}));
+				throw new LinterException(MISSING_WORD.format(new Object[]{entry.getKey()}));
 	}
 
 }

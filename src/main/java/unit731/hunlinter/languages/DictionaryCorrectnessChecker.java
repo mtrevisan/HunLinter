@@ -8,7 +8,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public class DictionaryCorrectnessChecker{
@@ -41,7 +41,7 @@ public class DictionaryCorrectnessChecker{
 	public void checkProduction(final Production production){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-			throw new HunLintException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
+			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
 			morphologicalFieldCheck(production);
@@ -51,20 +51,20 @@ public class DictionaryCorrectnessChecker{
 
 	private void morphologicalFieldCheck(final Production production){
 		if(!production.hasMorphologicalFields())
-			throw new HunLintException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{production.getWord()}));
+			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{production.getWord()}));
 
 		production.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)
-				throw new HunLintException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+				throw new LinterException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField.substring(0, 3));
 			if(!rulesLoader.containsDataField(key))
-				throw new HunLintException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
-				throw new HunLintException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
+				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
 					morphologicalField}));
 		});
 	}

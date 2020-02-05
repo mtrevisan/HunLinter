@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public abstract class WorkerDictionaryBase{
@@ -102,11 +102,11 @@ public abstract class WorkerDictionaryBase{
 		}
 	}
 
-	protected HunLintException wrapException(final Exception e, final Production production){
+	protected LinterException wrapException(final Exception e, final Production production){
 		final StringBuffer sb = new StringBuffer(e.getMessage());
 		if(production.hasProductionRules())
 			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		return new HunLintException(sb.toString());
+		return new LinterException(sb.toString());
 	}
 
 }

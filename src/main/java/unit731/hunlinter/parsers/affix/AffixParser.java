@@ -24,7 +24,7 @@ import unit731.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -149,7 +149,7 @@ public class AffixParser{
 	 * @param affFile	The content of the affix file
 	 * @param configurationLanguage    The language implemented by the affix file
 	 * @throws IOException	If an I/O error occurs
-	 * @throws HunLintException   If something is wrong while parsing the file (eg. a missing rule)
+	 * @throws LinterException   If something is wrong while parsing the file (eg. a missing rule)
 	 */
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
 		data.clear();
@@ -164,7 +164,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
-					throw new HunLintException(BAD_FIRST_LINE.format(new Object[]{line}));
+					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
 				final ParsingContext context = new ParsingContext(line, br);
@@ -175,7 +175,7 @@ public class AffixParser{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(final RuntimeException e){
-						throw new HunLintException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
 					}
 				}
 			}

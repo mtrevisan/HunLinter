@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.affix;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 import java.io.File;
@@ -35,7 +35,7 @@ class AffixParserTest{
 			"CIRCUMFIX A",
 			"COMPOUNDFLAG A");
 
-		Throwable exception = Assertions.assertThrows(HunLintException.class,
+		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> affParser.parse(affFile, language));
 		Assertions.assertEquals("Same flags present in multiple options", exception.getMessage());
 	}

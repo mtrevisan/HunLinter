@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.SetHelper;
 
 import java.text.MessageFormat;
@@ -27,7 +27,7 @@ public abstract class FlagParsingStrategy{
 	protected void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new HunLintException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
 	}
 
 

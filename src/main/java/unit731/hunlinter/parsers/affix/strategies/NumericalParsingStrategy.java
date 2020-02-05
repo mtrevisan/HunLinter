@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -61,10 +61,10 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new HunLintException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new LinterException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
 		}
 		catch(final NumberFormatException e){
-			throw new HunLintException(BAD_FORMAT.format(new Object[]{flag}));
+			throw new LinterException(BAD_FORMAT.format(new Object[]{flag}));
 		}
 	}
 
@@ -92,7 +92,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		for(final String part : parts){
 			final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new HunLintException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 		}
 	}
 

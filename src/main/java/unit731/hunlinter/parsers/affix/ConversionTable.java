@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
 
 
@@ -56,10 +56,10 @@ public class ConversionTable{
 		try{
 			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new HunLintException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new HunLintException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
@@ -81,9 +81,9 @@ public class ConversionTable{
 
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{context}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!affixOption.getCode().equals(parts[0]))
-			throw new HunLintException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
+			throw new LinterException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class ConversionTable{
 	public String applySingleConversionTable(final String word){
 		final List<String> conversions = applyConversionTable(word);
 		if(conversions.size() > 1)
-			throw new HunLintException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
+			throw new LinterException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
 
 		return (!conversions.isEmpty()? conversions.get(0): word);
 	}

@@ -19,7 +19,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public class RulesReducerWorker extends WorkerDictionaryBase{
@@ -44,7 +44,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new HunLintException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 

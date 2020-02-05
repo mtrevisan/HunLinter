@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
 import javax.xml.transform.TransformerException;
@@ -57,7 +57,7 @@ public class AutoCorrectParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new HunLintException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
+			throw new LinterException("Invalid root element, expected '" + AUTO_CORRECT_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
@@ -108,16 +108,16 @@ public class AutoCorrectParser{
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains("'") || incorrect.contains("\""))
-			throw new HunLintException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new LinterException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
 		if(correct.contains("'") || correct.contains("\""))
-			throw new HunLintException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new LinterException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
 
 		boolean forceInsertion = false;
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
 		if(!duplicates.isEmpty()){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
-				throw new HunLintException(DUPLICATE_DETECTED.format(
+				throw new LinterException(DUPLICATE_DETECTED.format(
 					new Object[]{duplicates.stream().map(CorrectionEntry::toString).collect(Collectors.joining(", "))}));
 		}
 

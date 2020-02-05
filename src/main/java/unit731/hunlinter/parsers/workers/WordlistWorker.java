@@ -18,7 +18,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 
@@ -50,7 +50,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				}
 			}
 			catch(final IOException e){
-				throw new HunLintException(e.getMessage());
+				throw new LinterException(e.getMessage());
 			}
 		};
 		final Runnable completed = () -> {

@@ -26,7 +26,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -72,7 +72,7 @@ public class DictionaryEntry{
 
 		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 
 		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
@@ -279,7 +279,7 @@ public class DictionaryEntry{
 
 					final List<AffixEntry> appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new HunLintException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
 				if(rule instanceof RuleEntry){

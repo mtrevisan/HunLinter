@@ -33,7 +33,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
@@ -160,7 +160,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			long readSoFar = line.getBytes(charset).length + 2;
 
 			if(!NumberUtils.isCreatable(line))
-				throw new HunLintException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
@@ -178,7 +178,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
-					catch(final HunLintException e){
+					catch(final LinterException e){
 						LOGGER.error(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}

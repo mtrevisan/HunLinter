@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -635,7 +635,7 @@ public class RulesReducer{
 	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new HunLintException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
@@ -682,7 +682,7 @@ public class RulesReducer{
 	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new HunLintException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
 		final List<AffixEntry> entries = reducedRules.stream()
 			.skip(1)
@@ -698,7 +698,7 @@ public class RulesReducer{
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
-				throw new HunLintException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
+				throw new LinterException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
 		}
 	}
 

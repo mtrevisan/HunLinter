@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -143,7 +143,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final String derivedWord = production.getWord();
 		final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
 		if(!derivedWord.equals(unmarkedDefaultStressWord))
-			throw new HunLintException(UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
+			throw new LinterException(UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
 	}
 
 	private void variantsCheck(final Production production){
@@ -153,12 +153,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		for(final String subword : subwords){
 			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 				if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL))
-					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
+					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 				if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-					throw new HunLintException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
+					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
 						NORTHERN_PLURAL_STRESSED_RULE, subword}));
 				if(PatternHelper.find(subword, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
-					throw new HunLintException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
+					throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 
 				variants.add(LanguageVariant.VENETIAN);
 			}
@@ -167,18 +167,18 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				variants.add(LanguageVariant.NORTHERN);
 		}
 		if(variants.contains(LanguageVariant.VENETIAN) && variants.contains(LanguageVariant.NORTHERN))
-			throw new HunLintException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
+			throw new LinterException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
 	}
 
 	private void incompatibilityCheck(final Production production){
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
-			throw new HunLintException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
+			throw new LinterException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
 
 		final List<String> pos = production.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
-			throw new HunLintException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+			throw new LinterException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
 	}
 
 	private void northernPluralCheck(final Production production){
@@ -188,9 +188,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			final boolean canHaveNorthernPlural = canHaveNorthernPlural(production, rule);
 			final boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
-				throw new HunLintException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
+				throw new LinterException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
 			if(!canHaveNorthernPlural && hasNorthernPluralFlag)
-				throw new HunLintException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{NORTHERN_PLURAL_RULE,
+				throw new LinterException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{NORTHERN_PLURAL_RULE,
 					NORTHERN_PLURAL_STRESSED_RULE}));
 		}
 	}
@@ -232,7 +232,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void orthographyCheck(final String word){
 		final String correctedDerivedWord = orthography.correctOrthography(word);
 		if(!correctedDerivedWord.equals(word))
-			throw new HunLintException(MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
+			throw new LinterException(MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
 	}
 
 	@Override
@@ -247,16 +247,16 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		if(!rulesLoader.containsMultipleAccentedWords(subword)){
 			final int accents = WordVEC.countAccents(subword);
 			if(!rulesLoader.isWordCanHaveMultipleAccents() && accents > 1)
-				throw new HunLintException(MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
+				throw new LinterException(MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
 			final String appliedRuleFlag = getLastAppliedRule(production);
 			if(appliedRuleFlag != null){
 				//retrieve last applied rule
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
-					throw new HunLintException(MISSING_ACCENT.format(new Object[]{production.getWord(),
+					throw new LinterException(MISSING_ACCENT.format(new Object[]{production.getWord(),
 						appliedRuleFlag}));
 				if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
-					throw new HunLintException(ALREADY_PRESENT_ACCENT.format(new Object[]{production.getWord(),
+					throw new LinterException(ALREADY_PRESENT_ACCENT.format(new Object[]{production.getWord(),
 						appliedRuleFlag}));
 			}
 		}
@@ -275,13 +275,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
-				throw new HunLintException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
+				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
 		}
 
 		if(PatternHelper.find(subword, PATTERN_V_IU_V))
-			throw new HunLintException(WORD_CANNOT_HAVE_V_IU_V.format(new Object[]{production.getWord()}));
+			throw new LinterException(WORD_CANNOT_HAVE_V_IU_V.format(new Object[]{production.getWord()}));
 		if(PatternHelper.find(subword, PATTERN_NOT_V_IU_DIERESIS_V))
-			throw new HunLintException(WORD_CANNOT_HAVE_NOT_V_IU_DIERESIS_V.format(new Object[]{production.getWord()}));
+			throw new LinterException(WORD_CANNOT_HAVE_NOT_V_IU_DIERESIS_V.format(new Object[]{production.getWord()}));
 	}
 
 //	private void variantIncompatibilityCheck(final RuleProductionEntry production, final Set<MatcherEntry> checks){

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -114,7 +114,7 @@ public class ThesaurusParser{
 			final Function<String, Boolean> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String partOfSpeech = StringUtils.strip(posAndSyns[0]);
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
@@ -128,7 +128,7 @@ public class ThesaurusParser{
 			.distinct()
 			.toArray(String[]::new);
 		if(synonyms.length < 2)
-			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
@@ -138,7 +138,7 @@ public class ThesaurusParser{
 				.collect(StringHelper.limitingJoin(", ", 5, "…"));
 			forceInsertion = duplicatesDiscriminator.apply(duplicatesMessage);
 			if(!forceInsertion)
-				throw new HunLintException(DUPLICATE_DETECTED.format(new Object[]{duplicatesMessage}));
+				throw new LinterException(DUPLICATE_DETECTED.format(new Object[]{duplicatesMessage}));
 		}
 
 		if(duplicates.isEmpty() || forceInsertion)

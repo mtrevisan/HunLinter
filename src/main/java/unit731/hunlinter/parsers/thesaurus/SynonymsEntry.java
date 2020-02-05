@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public class SynonymsEntry implements Comparable<SynonymsEntry>{
@@ -36,11 +36,11 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(components.length < 2)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String partOfSpeech = StringUtils.strip(components[0]);
 		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')
-			throw new HunLintException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		partOfSpeeches = StringUtils.split(StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")"), ',');
 		for(int i = 0; i < partOfSpeeches.length; i ++)
@@ -53,7 +53,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 				synonyms.add(trim);
 		}
 		if(synonyms.isEmpty())
-			throw new HunLintException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
 	public SynonymsEntry merge(final String definition, final SynonymsEntry entry){

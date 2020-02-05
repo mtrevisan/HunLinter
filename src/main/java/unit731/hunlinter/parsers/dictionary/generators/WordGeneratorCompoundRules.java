@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 
@@ -40,7 +40,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)
-			throw new HunLintException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
@@ -80,7 +80,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	private void checkCompoundRuleInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs, final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new HunLintException(MISSING_WORD.format(new Object[]{component,
+				throw new LinterException(MISSING_WORD.format(new Object[]{component,
 					StringUtils.join(compoundRuleComponents)}));
 	}
 

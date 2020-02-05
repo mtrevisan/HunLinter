@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new HunLintException(UNKNOWN_TYPE.format(new Object[]{flag}));
+			throw new LinterException(UNKNOWN_TYPE.format(new Object[]{flag}));
 
 		return strategy;
 	}

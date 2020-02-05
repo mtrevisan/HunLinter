@@ -30,7 +30,7 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
@@ -109,7 +109,7 @@ public class FileHelper{
 			return Integer.parseInt(count);
 		}
 		catch(final Exception e){
-			throw new HunLintException(WRONG_FILE_FORMAT_COUNT.format(new Object[]{count}));
+			throw new LinterException(WRONG_FILE_FORMAT_COUNT.format(new Object[]{count}));
 		}
 	}
 
@@ -124,7 +124,7 @@ public class FileHelper{
 			return cs;
 		}
 		catch(final Exception e){
-			throw new HunLintException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsetName}));
+			throw new LinterException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsetName}));
 		}
 	}
 

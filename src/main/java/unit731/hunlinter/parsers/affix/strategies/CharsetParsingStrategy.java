@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{
@@ -46,7 +46,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(!canEncode(flags))
-			throw new HunLintException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
+			throw new LinterException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -64,7 +64,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	@Override
 	public void validate(final String flag){
 		if(flag == null || flag.length() != 1 || !canEncode(flag))
-			throw new HunLintException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
+			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
 	}
 
 	@Override
@@ -92,7 +92,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 
 	private void checkCompoundValidity(final String compoundRule){
 		if(!canEncode(compoundRule))
-			throw new HunLintException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
+			throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
 	}
 
 	public boolean canEncode(final String cs){

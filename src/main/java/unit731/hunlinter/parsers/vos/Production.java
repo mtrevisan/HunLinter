@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
@@ -186,7 +186,7 @@ public class Production extends DictionaryEntry{
 		//extract Part-of-Speech
 		final List<String> pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(pos.size() != 1)
-			throw new HunLintException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+			throw new LinterException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
 		final PartOfSpeechTag posTag = PartOfSpeechTag.createFromCode(pos.get(0));
 
 		//extract Inflection

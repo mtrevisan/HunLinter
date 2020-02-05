@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.affix.ConversionTable;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 
@@ -380,7 +380,7 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stemsInvalidFullstrip(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
@@ -419,7 +419,7 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stemsInvalidTwofold1(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
@@ -445,7 +445,7 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void stemsInvalidTwofold2(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
@@ -572,7 +572,7 @@ class WordGeneratorAffixTest{
 
 	@Test
 	void complexPrefixesInvalidTwofold(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",

@@ -16,7 +16,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 class WordGeneratorBase{
@@ -137,7 +137,7 @@ class WordGeneratorBase{
 			final String[] aff = affixes.get(complexPrefixes? 1: 0);
 			if(aff.length > 0){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new HunLintException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
+				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
 	}
@@ -228,7 +228,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-			throw new HunLintException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
 
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();

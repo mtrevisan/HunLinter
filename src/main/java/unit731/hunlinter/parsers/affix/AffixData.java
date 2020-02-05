@@ -22,7 +22,7 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
 
 
@@ -71,7 +71,7 @@ public class AffixData{
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new HunLintException(REPEATED_FLAG.format(new Object[0]));
+			throw new LinterException(REPEATED_FLAG.format(new Object[0]));
 	}
 
 	private Map<AffixOption, Object> extractSingleFlags(){
@@ -122,9 +122,9 @@ public class AffixData{
 
 	<T> void addData(final String key, final T value){
 		if(closed)
-			throw new HunLintException(CONTAINER_CLOSED.format(new Object[0]));
+			throw new LinterException(CONTAINER_CLOSED.format(new Object[0]));
 		if(data.containsKey(key))
-			throw new HunLintException(DUPLICATED_FLAG.format(new Object[]{key}));
+			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{key}));
 
 		if(value != null)
 			data.put(key, value);
@@ -240,8 +240,8 @@ public class AffixData{
 			try{
 				word = table.applySingleConversionTable(word);
 			}
-			catch(final HunLintException e){
-				throw new HunLintException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
+			catch(final LinterException e){
+				throw new LinterException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
 			}
 		}
 		return word;

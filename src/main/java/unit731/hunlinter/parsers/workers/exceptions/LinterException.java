@@ -1,7 +1,7 @@
 package unit731.hunlinter.parsers.workers.exceptions;
 
 
-public class HunLintException extends RuntimeException{
+public class LinterException extends RuntimeException{
 
 	public enum FixActionType{ADD, REPLACE, REMOVE}
 
@@ -11,11 +11,11 @@ public class HunLintException extends RuntimeException{
 	private final FixActionType fixActionType;
 
 
-	public HunLintException(final String description){
+	public LinterException(final String description){
 		this(description, null, null);
 	}
 
-	public HunLintException(final String description, final Runnable fix, final FixActionType fixActionType){
+	public LinterException(final String description, final Runnable fix, final FixActionType fixActionType){
 		super(description);
 
 		this.fix = fix;

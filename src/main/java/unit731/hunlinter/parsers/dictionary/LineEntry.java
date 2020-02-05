@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.services.PatternHelper;
@@ -138,7 +138,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new HunLintException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
+				throw new LinterException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
 					indexFromLast, word}));
 
 			group.add(word.charAt(index));
