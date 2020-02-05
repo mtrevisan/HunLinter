@@ -1,11 +1,11 @@
 package unit731.hunlinter.parsers.workers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -16,7 +16,6 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
-import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
@@ -45,11 +44,11 @@ public class DictionaryLinterWorker extends WorkerDictionaryBase{
 			}
 
 			//generate a graphviz-like structure and bucket it along with the production
-			final Function<Production, String> keyMapper = production -> JavaHelper.nullableToStream(production.getAppliedRules())
+			final String key = JavaHelper.nullableToStream(productions.get(0).getAppliedRules())
 				.map(AffixEntry::getFlag)
 				.collect(Collectors.joining("\t"));
-			final Map<String, List<Production>> entryBucket = SetHelper.bucket(productions, keyMapper);
-			bucket.putAll(entryBucket);
+			bucket.computeIfAbsent(key, k -> new ArrayList<>())
+				.add(productions.get(0));
 		};
 		final Runnable completed = () -> {
 			bucket.size();
