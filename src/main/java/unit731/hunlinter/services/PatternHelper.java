@@ -56,14 +56,19 @@ public class PatternHelper{
 		final Matcher matcher = pattern.matcher(text);
 		final List<String> result = new ArrayList<>();
 		while(matcher.find() && (limit < 0 || result.size() < limit)){
-			String component = null;
-			int i = 1;
-			final int size = matcher.groupCount();
-			while(component == null && i <= size)
-				component = matcher.group(i ++);
+			final String component = getNextGroup(matcher);
 			result.add(component != null? component: matcher.group());
 		}
 		return result.toArray(String[]::new);
+	}
+
+	private static String getNextGroup(final Matcher matcher){
+		String component = null;
+		int i = 1;
+		final int size = matcher.groupCount();
+		while(component == null && i <= size)
+			component = matcher.group(i ++);
+		return component;
 	}
 
 	//FIXME is there a way to optimize this find?
