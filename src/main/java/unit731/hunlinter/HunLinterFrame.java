@@ -196,6 +196,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 
+	private JMenuItem popupMergeMenuItem;
+
 
 	public HunLinterFrame(){
 		initComponents();
@@ -208,7 +210,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
-			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow));
+			popupMergeMenuItem = GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
+			popupMergeMenuItem.setEnabled(false);
+			mergeCopyRemovePopupMenu.add(popupMergeMenuItem);
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
 			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
@@ -1786,6 +1790,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void filterThesaurus(HunLinterFrame frame){
 		final String unmodifiedSearchText = StringUtils.strip(frame.theSynonymsTextField.getText());
+
+		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
+
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
 			return;
 
@@ -1806,7 +1813,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sorter.setRowFilter(null);
 	}
 
-	//FIXME prevent merge if theSynonymsTextField is empty
 	public void mergeThesaurusRow(final Component invoker){
 		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
 		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
