@@ -250,7 +250,7 @@ public class Packager{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
-			FileHelper.openFolder(projectPath.toFile());
+			FileHelper.browse(projectPath.toFile());
 		}
 		catch(final Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());

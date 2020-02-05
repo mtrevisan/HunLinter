@@ -81,11 +81,11 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
 
-				FileHelper.openFolder(outputFile);
+				FileHelper.browse(outputFile);
 
 				Files.delete(outputFile.toPath());
 			}
-			catch(final IOException e){
+			catch(final Exception e){
 				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
 			}
 		};

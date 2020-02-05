@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +31,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
 public class FileHelper{
@@ -164,25 +166,44 @@ public class FileHelper{
 		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
 	}
 
-	public static void openFolder(final File file) throws IOException{
-		if(Desktop.isDesktopSupported()){
-			final Desktop desktop = Desktop.getDesktop();
-			if(file.isFile()){
-				try{
-					desktop.browseFileDirectory(file);
-				}
-				catch(final UnsupportedOperationException e){
-					//cannot open folder and select the file, open the folder only
-					desktop.open(file.getParentFile());
-				}
-			}
-			else
+	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
+	public static boolean browse(File file) throws IOException, InterruptedException{
+		if(file.isFile())
+			file = file.getParentFile();
+
+		//try using Desktop first
+		Desktop desktop;
+		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.OPEN)){
+			try{
 				desktop.open(file);
+				return true;
+			}
+			catch(final Exception ignored){}
 		}
+
+		//backup to system-specific
+		ProcessBuilder builder = null;
+		if(SystemUtils.IS_OS_WINDOWS)
+			builder = new ProcessBuilder("explorer", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_LINUX){
+			if(runOSCommand(new ProcessBuilder("kde-open", file.getAbsolutePath())))
+				return true;
+			if(runOSCommand(new ProcessBuilder("gnome-open", file.getAbsolutePath())))
+				return true;
+			if(runOSCommand(new ProcessBuilder("xdg-open", file.getAbsolutePath())))
+				return true;
+		}
+		else if(SystemUtils.IS_OS_MAC)
+			builder = new ProcessBuilder("open", file.getAbsolutePath());
+		else
+			LOGGER.warn("Cannot issue command to open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
+
+		return (builder != null && runOSCommand(builder));
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
-	public static void openFileWithChosenEditor(final File file) throws InterruptedException, IOException{
+	public static boolean openFileWithChosenEditor(final File file) throws IOException, InterruptedException{
+		//system-specific
 		ProcessBuilder builder = null;
 		if(SystemUtils.IS_OS_WINDOWS)
 			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());
@@ -190,13 +211,47 @@ public class FileHelper{
 			builder = new ProcessBuilder("edit", file.getAbsolutePath());
 		else if(SystemUtils.IS_OS_MAC)
 			builder = new ProcessBuilder("open", file.getAbsolutePath());
+		else
+			LOGGER.warn("Cannot issue command to open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 
+		return (builder != null && runOSCommand(builder));
+	}
+
+	public static boolean sendEmail(final String mailTo){
+		Desktop desktop;
+		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.MAIL) && DownloaderHelper.hasInternetConnectivity()){
+			try{
+				desktop.mail(new URI(mailTo));
+				return true;
+			}
+			catch(final Exception e){
+				LOGGER.error("Cannot contact email {}", mailTo, e);
+			}
+		}
+		return false;
+	}
+
+	public static boolean browseURL(final String url){
+		Desktop desktop;
+		if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.BROWSE) && DownloaderHelper.hasInternetConnectivity()){
+			try{
+				desktop.browse(new URI(url));
+				return true;
+			}
+			catch(final Exception e){
+				LOGGER.error("Cannot open page {}", url, e);
+			}
+		}
+		return false;
+	}
+
+	private static boolean runOSCommand(final ProcessBuilder builder) throws IOException, InterruptedException{
+		boolean accomplished = false;
 		if(builder != null){
 			final Process process = builder.start();
-			process.waitFor();
+			accomplished = (process.waitFor() == 0);
 		}
-		else
-			LOGGER.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
+		return accomplished;
 	}
 
 	public static void moveFile(final Path source, final Path target) throws IOException{

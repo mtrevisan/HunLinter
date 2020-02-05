@@ -3,7 +3,6 @@ package unit731.hunlinter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
@@ -216,25 +216,11 @@ public class HelpDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
 	private void authorLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorLabelValueMouseClicked
-		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
-			try{
-				Desktop.getDesktop().mail(new URI("mailto:851903+mtrevisan@users.noreply.github.com?subject=HunLinter%20contact"));
-			}
-			catch(final Exception e){
-				LOGGER.error("Cannot contact author", e);
-			}
-		}
+		FileHelper.sendEmail("mailto:851903+mtrevisan@users.noreply.github.com?subject=HunLinter%20contact");
 	}//GEN-LAST:event_authorLabelValueMouseClicked
 
    private void homePageLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
-		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
-			try{
-				Desktop.getDesktop().browse(new URI(GUIUtils.removeHTMLCode(homePageLabelValue.getText())));
-			}
-			catch(final Exception e){
-				LOGGER.error("Cannot open home page", e);
-			}
-		}
+		FileHelper.browseURL(GUIUtils.removeHTMLCode(homePageLabelValue.getText()));
    }//GEN-LAST:event_homePageLabelValueMouseClicked
 
 

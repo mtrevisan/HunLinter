@@ -332,7 +332,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				final File outputFile = saveTextFileFileChooser.getSelectedFile();
 				exportToFile(outputFile);
 
-				FileHelper.openFolder(outputFile);
+				FileHelper.browse(outputFile);
 			}
 			catch(final Exception e){
 				LOGGER.error("Cannot export statistics", e);

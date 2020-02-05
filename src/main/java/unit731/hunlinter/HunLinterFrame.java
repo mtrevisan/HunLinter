@@ -30,7 +30,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.NoRouteToHostException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -54,7 +52,6 @@ import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -2180,29 +2177,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filFontMenuItemActionPerformed
 
 	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
-		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
-			try{
-				Desktop.getDesktop().browse(new URI(URL_ONLINE_HELP));
-			}
-			catch(final Exception e){
-				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser: {}", e.getMessage());
-			}
-		}
-		else
-			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open help page on browser");
+		FileHelper.browseURL(URL_ONLINE_HELP);
 	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
 
 	private void hlpIssueReporterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpIssueReporterMenuItemActionPerformed
-		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
-			try{
-				Desktop.getDesktop().browse(new URI(URL_REPORT_ISSUE));
-			}
-			catch(final Exception e){
-				LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open issue page on browser: {}", e.getMessage());
-			}
-		}
-		else
-			LOGGER.warn(Backbone.MARKER_APPLICATION, "Cannot open issue page on browser");
+		FileHelper.browseURL(URL_REPORT_ISSUE);
 	}//GEN-LAST:event_hlpIssueReporterMenuItemActionPerformed
 
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
