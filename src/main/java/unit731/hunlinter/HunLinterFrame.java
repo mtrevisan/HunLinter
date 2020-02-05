@@ -3187,10 +3187,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearAutoTextParser(){
+		//TODO
 //		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
 //		dm.setCorrections(null);
 
-		//FIXME
 //		atxMenu.setEnabled(false);
 //		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
