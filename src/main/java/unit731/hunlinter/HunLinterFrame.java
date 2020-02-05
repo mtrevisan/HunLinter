@@ -85,7 +85,6 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.parsers.workers.DictionaryProductionsBucketerWorker;
 import unit731.hunlinter.parsers.workers.PoSFSAWorker;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.AffixEntry;
@@ -182,7 +181,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private DictionaryLinterWorker dicDictionaryLinterWorker;
-	private DictionaryProductionsBucketerWorker dicDictionaryProductionsBucketerWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
 	private WordCountWorker dicWordCountWorker;

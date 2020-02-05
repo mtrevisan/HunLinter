@@ -10,8 +10,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.FileHelper;
@@ -25,8 +23,6 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 public class HelpDialog extends JDialog{
 
 	private static final long serialVersionUID = -9151942201399886892L;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(HelpDialog.class);
 
 
 	public HelpDialog(final Frame parent){
