@@ -72,7 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;
-import unit731.hunlinter.gui.HunLinterTableModel;
+import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.ProductionTableModel;
 import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.gui.ThesaurusTableModel;
@@ -136,6 +136,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
  */
+//useful: https://books.google.it/books?id=oNbFfcyAtv4C&pg=PA305&lpg=PA305&dq=UIManager.getDefaults()+change+font&source=bl&ots=hfrlQ64-wB&sig=ACfU3U1NgIhgzCIdwwjxVfreM3RzUeKGFA&hl=en&sa=X&ved=2ahUKEwiTp--blrrnAhUDCuwKHcgRCYoQ6AEwCHoECAoQAQ#v=onepage&q=UIManager.getDefaults()%20change%20font&f=false
 public class HunLinterFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
@@ -3152,7 +3153,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	public void clearOutputTable(JTable table){
-		final HunLinterTableModel<?> dm = (HunLinterTableModel<?>)table.getModel();
+		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
 	}
 

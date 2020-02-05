@@ -3,7 +3,7 @@ package unit731.hunlinter.gui;
 import java.util.List;
 
 
-public interface HunLinterTableModel<T>{
+public interface HunLinterTableModelInterface<T>{
 
 	void setProductions(List<T> list);
 

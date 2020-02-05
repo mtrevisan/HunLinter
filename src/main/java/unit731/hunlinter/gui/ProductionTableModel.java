@@ -9,7 +9,7 @@ import javax.swing.table.AbstractTableModel;
 import unit731.hunlinter.parsers.vos.Production;
 
 
-public class ProductionTableModel extends AbstractTableModel implements HunLinterTableModel<Production>{
+public class ProductionTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Production>{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 

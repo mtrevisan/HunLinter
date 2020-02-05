@@ -144,6 +144,7 @@ public class GUIUtils{
 		}
 	}
 
+
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.
 	 *
@@ -171,6 +172,7 @@ public class GUIUtils{
 		dialog.getRootPane()
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
+
 
 	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize, final JPopupMenu popupMenu,
 			final Consumer<Component> fnCallback) throws IOException{
