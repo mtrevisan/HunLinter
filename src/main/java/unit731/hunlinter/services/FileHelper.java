@@ -177,18 +177,18 @@ public class FileHelper{
 
 		//backup to system-specific
 		ProcessBuilder builder = null;
+		final String absolutePath = file.getAbsolutePath();
 		if(SystemUtils.IS_OS_WINDOWS)
-			builder = new ProcessBuilder("explorer", file.getAbsolutePath());
+			builder = new ProcessBuilder("explorer", absolutePath);
 		else if(SystemUtils.IS_OS_LINUX){
-			if(runOSCommand(new ProcessBuilder("kde-open", file.getAbsolutePath())))
-				return true;
-			if(runOSCommand(new ProcessBuilder("gnome-open", file.getAbsolutePath())))
-				return true;
-			if(runOSCommand(new ProcessBuilder("xdg-open", file.getAbsolutePath())))
+			if(runOSCommand(new ProcessBuilder("kde-open", absolutePath))
+					|| runOSCommand(new ProcessBuilder("gnome-open", absolutePath))
+					|| runOSCommand(new ProcessBuilder("xdg-open", absolutePath))
+				)
 				return true;
 		}
 		else if(SystemUtils.IS_OS_MAC)
-			builder = new ProcessBuilder("open", file.getAbsolutePath());
+			builder = new ProcessBuilder("open", absolutePath);
 		else
 			LOGGER.warn("Cannot issue command to open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 
