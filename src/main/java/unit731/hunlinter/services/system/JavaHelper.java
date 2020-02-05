@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -14,14 +15,16 @@ import java.util.stream.Stream;
 public class JavaHelper{
 
 
-	public static <T> Stream<T> nullableToStream(final T[] array){
+	public static <T> Stream<T> nullableToStream(final T... array){
 		return Optional.ofNullable(array).stream()
-			.flatMap(Arrays::stream);
+			.flatMap(Arrays::stream)
+			.filter(Objects::nonNull);
 	}
 
 	public static <T> Stream<T> nullableToStream(final Collection<T> collection){
 		return Optional.ofNullable(collection).stream()
-			.flatMap(Collection::stream);
+			.flatMap(Collection::stream)
+			.filter(Objects::nonNull);
 	}
 
 	public static void executeOnEventDispatchThread(final Runnable runnable){

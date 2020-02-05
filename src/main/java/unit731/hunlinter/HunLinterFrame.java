@@ -205,7 +205,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		//add "fontable" property
-		GUIUtils.addFontable(parsingResultTextArea,
+		GUIUtils.addFontableProperty(parsingResultTextArea,
 			dicInputTextField,
 			theTable, theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
@@ -327,8 +327,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
             .map(AffixEntry::toString)
             .orElse(null);
-            return Stream.of(production, morphologicalFields, rule1, rule2, rule3)
-            .filter(Objects::nonNull)
+            return JavaHelper.nullableToStream(production, morphologicalFields, rule1, rule2, rule3)
             .collect(Collectors.joining(TAB));
          }
       };

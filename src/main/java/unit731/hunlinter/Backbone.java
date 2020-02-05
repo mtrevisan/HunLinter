@@ -37,6 +37,7 @@ import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.filelistener.FileChangeListener;
 import unit731.hunlinter.services.filelistener.FileListenerManager;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.xml.transform.TransformerException;
 
@@ -147,8 +148,7 @@ public class Backbone implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = getSexFile();
 		final File wexFile = getWexFile();
-		final String[] uris = Stream.of(affFile, hypFile, aidFile, sexFile, wexFile)
-			.filter(Objects::nonNull)
+		final String[] uris = JavaHelper.nullableToStream(affFile, hypFile, aidFile, sexFile, wexFile)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
 		flm.register(this, uris);

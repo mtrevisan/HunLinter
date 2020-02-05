@@ -119,8 +119,8 @@ public class GUIUtils{
 		return currentFont;
 	}
 
-	public static void addFontable(final JComponent... components){
-		Arrays.stream(components)
+	public static void addFontableProperty(final JComponent... components){
+		JavaHelper.nullableToStream(components)
 			.forEach(component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
 	}
 
@@ -128,8 +128,7 @@ public class GUIUtils{
 		if(!font.equals(currentFont)){
 			currentFont = font;
 
-			Arrays.stream(parentFrames)
-				.filter(Objects::nonNull)
+			JavaHelper.nullableToStream(parentFrames)
 				.forEach(parentFrame -> updateComponent(parentFrame, font));
 		}
 	}
