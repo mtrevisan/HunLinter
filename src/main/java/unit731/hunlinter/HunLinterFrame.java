@@ -1806,6 +1806,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sorter.setRowFilter(null);
 	}
 
+	//FIXME prevent merge if theSynonymsTextField is empty
 	public void mergeThesaurusRow(final Component invoker){
 		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
 		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();

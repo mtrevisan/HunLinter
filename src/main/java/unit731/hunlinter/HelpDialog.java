@@ -3,12 +3,17 @@ package unit731.hunlinter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 
@@ -17,11 +22,11 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
  * @see <a href="https://pixabay.com/en/tree-kahl-winter-aesthetic-530324/">Tree logo</a>
  * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version informations into your apps with maven</a>
  */
-//https://stackoverflow.com/questions/12449654/clickable-email-address-as-a-jlabel-in-java
-//https://stackoverflow.com/questions/527719/how-to-add-hyperlink-in-jlabel
 public class HelpDialog extends JDialog{
 
 	private static final long serialVersionUID = -9151942201399886892L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HelpDialog.class);
 
 
 	public HelpDialog(final Frame parent){
@@ -100,11 +105,23 @@ public class HelpDialog extends JDialog{
 
       authorLabel.setText("Author:");
 
-      authorLabelValue.setText("Mauro Trevisan");
+      authorLabelValue.setText("<html><a href=#>Mauro Trevisan</a></html>");
+      authorLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      authorLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
+         public void mouseClicked(java.awt.event.MouseEvent evt) {
+            authorLabelValueMouseClicked(evt);
+         }
+      });
 
       homePageLabel.setText("Home page:");
 
-      homePageLabelValue.setText("https://github.com/mtrevisan/HunLinter");
+      homePageLabelValue.setText("<html><a href=#>https://github.com/mtrevisan/HunLinter</a></html>");
+      homePageLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+      homePageLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
+         public void mouseClicked(java.awt.event.MouseEvent evt) {
+            homePageLabelValueMouseClicked(evt);
+         }
+      });
 
       logo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
@@ -148,11 +165,11 @@ public class HelpDialog extends JDialog{
                            .addGroup(layout.createSequentialGroup()
                               .addComponent(authorLabel)
                               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                              .addComponent(authorLabelValue))
+                              .addComponent(authorLabelValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                            .addGroup(layout.createSequentialGroup()
                               .addComponent(homePageLabel)
                               .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                              .addComponent(homePageLabelValue)))
+                              .addComponent(homePageLabelValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)))
                   .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                .addComponent(copyright, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -179,11 +196,11 @@ public class HelpDialog extends JDialog{
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                      .addComponent(authorLabel)
-                     .addComponent(authorLabelValue))
+                     .addComponent(authorLabelValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                      .addComponent(homePageLabel)
-                     .addComponent(homePageLabelValue))
+                     .addComponent(homePageLabelValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                   .addGap(30, 30, 30))
                .addComponent(logo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -197,6 +214,28 @@ public class HelpDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	private void authorLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorLabelValueMouseClicked
+		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
+			try{
+				Desktop.getDesktop().mail(new URI("mailto:851903+mtrevisan@users.noreply.github.com?subject=HunLinter%20contact"));
+			}
+			catch(final Exception e){
+				LOGGER.error("Cannot contact author", e);
+			}
+		}
+	}//GEN-LAST:event_authorLabelValueMouseClicked
+
+   private void homePageLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
+		if(Desktop.isDesktopSupported() && DownloaderHelper.hasInternetConnectivity()){
+			try{
+				Desktop.getDesktop().browse(new URI(GUIUtils.removeHTMLCode(homePageLabelValue.getText())));
+			}
+			catch(final Exception e){
+				LOGGER.error("Cannot open home page", e);
+			}
+		}
+   }//GEN-LAST:event_homePageLabelValueMouseClicked
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

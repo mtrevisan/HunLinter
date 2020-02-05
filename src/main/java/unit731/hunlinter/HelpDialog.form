@@ -164,8 +164,14 @@
     </Component>
     <Component class="javax.swing.JLabel" name="authorLabelValue">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Mauro Trevisan"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;a href=#&gt;Mauro Trevisan&lt;/a&gt;&lt;/html&gt;"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="authorLabelValueMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="homePageLabel">
       <Properties>
@@ -174,8 +180,14 @@
     </Component>
     <Component class="javax.swing.JLabel" name="homePageLabelValue">
       <Properties>
-        <Property name="text" type="java.lang.String" value="https://github.com/mtrevisan/HunLinter"/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;a href=#&gt;https://github.com/mtrevisan/HunLinter&lt;/a&gt;&lt;/html&gt;"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="homePageLabelValueMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="logo">
       <Properties>
