@@ -29,8 +29,7 @@ public class AutoCorrectParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
 
-	private static final MessageFormat BAD_INCORRECT_QUOTE = new MessageFormat("Incorrect form cannot contain apostrophes or double quotes: ''{0}''");
-	private static final MessageFormat BAD_CORRECT_QUOTE = new MessageFormat("Correct form cannot contain apostrophes or double quotes: ''{0}''");
+	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: ''{1}''");
 	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
@@ -108,20 +107,20 @@ public class AutoCorrectParser{
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains("'") || incorrect.contains("\""))
-			throw new LinterException(BAD_INCORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new LinterException(BAD_QUOTE.format(new Object[]{"Incorrect", incorrect}));
 		if(correct.contains("'") || correct.contains("\""))
-			throw new LinterException(BAD_CORRECT_QUOTE.format(new Object[]{incorrect}));
+			throw new LinterException(BAD_QUOTE.format(new Object[]{"Correct", correct}));
 
-		boolean forceInsertion = false;
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
-		if(!duplicates.isEmpty()){
+		boolean forceInsertion = duplicates.isEmpty();
+		if(!forceInsertion){
 			forceInsertion = duplicatesDiscriminator.get();
 			if(!forceInsertion)
 				throw new LinterException(DUPLICATE_DETECTED.format(
 					new Object[]{duplicates.stream().map(CorrectionEntry::toString).collect(Collectors.joining(", "))}));
 		}
 
-		if(duplicates.isEmpty() || forceInsertion)
+		if(forceInsertion)
 			dictionary.add(new CorrectionEntry(incorrect, correct));
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
