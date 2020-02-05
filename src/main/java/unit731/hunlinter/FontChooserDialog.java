@@ -29,7 +29,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 	private static final long serialVersionUID = -4686780467476615109L;
 
-	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 17);
+	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
 
 
 	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{

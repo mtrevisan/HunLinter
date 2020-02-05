@@ -28,6 +28,8 @@ import unit731.hunlinter.services.PatternHelper;
 
 public class GUIUtils{
 
+	private static final String CLIENT_PROPERTY_KEY_FONTABLE = "fontable";
+
 	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
 	private static final String GRAPHEME_I = "i";
@@ -126,6 +128,11 @@ public class GUIUtils{
 		}
 	}
 
+	public static void addFontable(final JComponent... components){
+		Arrays.stream(components)
+			.forEach(component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
+	}
+
 	private static void updateComponent(final Component component, final Font font){
 		if(component != null){
 			if(component instanceof JComponent)
@@ -138,8 +145,9 @@ public class GUIUtils{
 			if(component instanceof JEditorPane)
 				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
-			if(component instanceof JTextArea || component instanceof JWordComboBox || component instanceof JTextField
-					|| component instanceof JTable || component instanceof JWordLabel)
+			if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
+				component.setFont(font);
+			else if(component instanceof JTextArea || component instanceof JTextField || component instanceof JTable)
 				component.setFont(font);
 		}
 	}

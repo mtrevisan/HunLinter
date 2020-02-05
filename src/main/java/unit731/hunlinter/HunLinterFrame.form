@@ -458,7 +458,7 @@
                           <Component id="dicRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="dicScrollPane" pref="139" max="32767" attributes="0"/>
+                      <Component id="dicScrollPane" pref="135" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="dicTotalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -501,12 +501,14 @@
             </Component>
             <Component class="javax.swing.JComboBox" name="dicRuleFlagsAidComboBox">
               <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Monospaced" size="13" style="0"/>
+                </Property>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
                 </Property>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleFlagsAidComboBox"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
@@ -646,7 +648,7 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cmpScrollPane" pref="146" max="32767" attributes="0"/>
+                          <Component id="cmpScrollPane" pref="138" max="32767" attributes="0"/>
                           <Component id="cmpInputScrollPane" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -668,9 +670,11 @@
             <Component class="javax.swing.JComboBox" name="cmpInputComboBox">
               <Properties>
                 <Property name="editable" type="boolean" value="true"/>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Monospaced" size="13" style="0"/>
+                </Property>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
@@ -711,8 +715,12 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
+              <Properties>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Monospaced" size="13" style="0"/>
+                </Property>
+              </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordComboBox()"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
@@ -1035,9 +1043,6 @@
                   <Dimension value="[9, 17]"/>
                 </Property>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
-              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabesCountLabel">
               <Properties>
@@ -1070,9 +1075,6 @@
                   <Dimension value="[9, 17]"/>
                 </Property>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
-              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleLabel">
               <Properties>
@@ -1135,9 +1137,6 @@
                   <Dimension value="[9, 17]"/>
                 </Property>
               </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JWordLabel();"/>
-              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountLabel">
               <Properties>

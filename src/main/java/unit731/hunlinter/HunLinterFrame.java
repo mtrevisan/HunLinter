@@ -8,8 +8,6 @@ import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.JTagPanel;
-import unit731.hunlinter.gui.JWordComboBox;
-import unit731.hunlinter.gui.JWordLabel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
 
@@ -206,6 +204,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
+		//add "fontable" property
+		GUIUtils.addFontable(dicInputTextField,
+			theSynonymsTextField,
+			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
+			acoIncorrectTextField, acoCorrectTextField,
+			sexTextField,
+			wexTextField);
+
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
@@ -302,7 +308,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicInputLabel = new javax.swing.JLabel();
       dicInputTextField = new javax.swing.JTextField();
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new JWordComboBox();
+      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new JCopyableTable(){
          @Override
@@ -331,11 +337,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       openDicButton = new javax.swing.JButton();
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new JWordComboBox();
+      cmpInputComboBox = new javax.swing.JComboBox<>();
       cmpLimitLabel = new javax.swing.JLabel();
       cmpLimitComboBox = new javax.swing.JComboBox<>();
       cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new JWordComboBox();
+      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       cmpScrollPane = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
       cmpInputScrollPane = new javax.swing.JScrollPane();
@@ -365,17 +371,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
       hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new JWordLabel();
+      hypSyllabationOutputLabel = new javax.swing.JLabel();
       hypSyllabesCountLabel = new javax.swing.JLabel();
       hypSyllabesCountOutputLabel = new javax.swing.JLabel();
       hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new JWordLabel();
+      hypRulesOutputLabel = new javax.swing.JLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
       hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
       hypAddRuleButton = new javax.swing.JButton();
       hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new JWordLabel();
+      hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       optionsButton = new javax.swing.JButton();
@@ -500,6 +506,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
+      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
@@ -591,7 +599,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(dicRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(dicTotalProductionsLabel)
@@ -608,6 +616,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
+      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
@@ -633,6 +642,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
       cmpRuleFlagsAidLabel.setText("Rule flags aid:");
+
+      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
 
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
@@ -709,7 +720,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addComponent(cmpRuleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+               .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
                .addComponent(cmpInputScrollPane))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(cmpLoadInputButton)
@@ -1248,6 +1259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+      wexTagPanel.setLayout(new java.awt.FlowLayout());
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
