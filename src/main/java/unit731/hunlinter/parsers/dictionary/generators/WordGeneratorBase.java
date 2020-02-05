@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -21,6 +22,8 @@ import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
+
+	private static final Comparator<Production> PRODUCTION_COMPARATOR = Comparator.comparing(prod -> prod.getLastAppliedRule().getFlag());
 
 	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
@@ -56,18 +59,21 @@ class WordGeneratorBase{
 
 		//extract suffixed productions
 		final List<Production> suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+		suffixedProductions.sort(PRODUCTION_COMPARATOR);
 		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), suffixedProductions);
 
 		List<Production> prefixedProductions = Collections.emptyList();
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+			prefixedProductions.sort(PRODUCTION_COMPARATOR);
 			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), prefixedProductions);
 		}
 
 		//extract lastfold productions
 		List<Production> twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
 		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
+		twofoldProductions.sort(PRODUCTION_COMPARATOR);
 		printProductions("Twofold productions:", twofoldProductions);
 
 		checkTwofoldCorrectness(twofoldProductions);
