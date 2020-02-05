@@ -36,7 +36,7 @@ public class TimeWatch{
 	}
 
 	public long time(){
-		return (end > 0l? end - start: 0l);
+		return (end > 0l? end - start: -1l);
 	}
 
 	public long time(final TimeUnit unit){
@@ -44,20 +44,19 @@ public class TimeWatch{
 	}
 
 	public String toStringMinuteSeconds(){
-		if(end > 0l){
-			final long delta = time(TimeUnit.SECONDS);
-
-			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-			final long mins = delta / 60l;
-			if(mins > 0)
-				sj.add(Long.toString(mins)).add(MINUTES);
-			final long secs = delta - mins * 60l;
-			if(mins == 0 || secs > 0)
-				sj.add(Long.toString(secs)).add(SECONDS);
-			return sj.toString();
-		}
-		else
+		if(end == 0l)
 			return TIMER_NOT_STOPPED;
+
+		final long delta = time(TimeUnit.SECONDS);
+
+		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		final long mins = delta / 60l;
+		if(mins > 0)
+			sj.add(Long.toString(mins)).add(MINUTES);
+		final long secs = delta - mins * 60l;
+		if(mins == 0 || secs > 0)
+			sj.add(Long.toString(secs)).add(SECONDS);
+		return sj.toString();
 	}
 
 	public String toStringMillis(){

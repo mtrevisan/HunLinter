@@ -20,10 +20,6 @@ class RBCWrapper implements ReadableByteChannel{
 		this.rbc = rbc;
 	}
 
-	public void close() throws IOException{ rbc.close(); }
-
-	public long getReadSoFar(){ return readSoFar; }
-
 	public boolean isOpen(){ return rbc.isOpen(); }
 
 	public int read(final ByteBuffer bb) throws IOException{
@@ -32,11 +28,15 @@ class RBCWrapper implements ReadableByteChannel{
 			readSoFar += n;
 
 			if(delegate != null){
-				final double progress = (expectedSize > 0? (double) readSoFar * 100. / expectedSize: -1.);
+				final double progress = (expectedSize > 0? (double)readSoFar * 100. / expectedSize: -1.);
 				delegate.rbcProgressCallback(this, progress);
 			}
 		}
 		return n;
 	}
+
+	public long getReadSoFar(){ return readSoFar; }
+
+	public void close() throws IOException{ rbc.close(); }
 
 }
