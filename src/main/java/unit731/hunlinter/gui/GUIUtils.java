@@ -147,8 +147,6 @@ public class GUIUtils{
 
 			if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 				component.setFont(font);
-			else if(component instanceof JTextArea || component instanceof JTextField || component instanceof JTable)
-				component.setFont(font);
 		}
 	}
 
