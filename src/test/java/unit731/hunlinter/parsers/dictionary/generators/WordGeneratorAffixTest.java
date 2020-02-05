@@ -773,10 +773,10 @@ class WordGeneratorAffixTest{
 		Assertions.assertEquals(createProduction("tbarkun", null, "st:bark"), words.get(8));
 		Assertions.assertEquals(createProduction("ltbarkun", null, "st:bark"), words.get(9));
 		Assertions.assertEquals(createProduction("wltbarkun", null, "st:bark"), words.get(10));
-		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words.get(11));
-		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words.get(12));
-		Assertions.assertEquals(createProduction("ltbarkn", null, "st:bark"), words.get(13));
-		Assertions.assertEquals(createProduction("wltbarkn", null, "st:bark"), words.get(14));
+		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words.get(11));
+		Assertions.assertEquals(createProduction("ltbarkn", null, "st:bark"), words.get(12));
+		Assertions.assertEquals(createProduction("wltbarkn", null, "st:bark"), words.get(13));
+		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words.get(14));
 		Assertions.assertEquals(createProduction("ybarkn", null, "st:bark"), words.get(15));
 	}
 
@@ -817,8 +817,8 @@ class WordGeneratorAffixTest{
 		//base production
 		Assertions.assertEquals(createProduction("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words.get(0));
 		//suffix productions
-		Assertions.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words.get(1));
-		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk is:sg_3"), words.get(2));
+		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk is:sg_3"), words.get(1));
+		Assertions.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words.get(2));
 		//prefix productions
 		Assertions.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ds:der_able is:plur"),
 			words.get(3));
@@ -946,10 +946,10 @@ class WordGeneratorAffixTest{
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(4));
 		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(5));
-		Assertions.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(6));
-		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(7));
-		Assertions.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(8));
-		Assertions.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(9));
+		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(6));
+		Assertions.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(7));
+		Assertions.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(8));
+		Assertions.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(9));
 
 
 		line = "Computer/BC-";
@@ -967,10 +967,10 @@ class WordGeneratorAffixTest{
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(4));
 		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(5));
-		Assertions.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(6));
-		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(7));
-		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(8));
-		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(9));
+		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(6));
+		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(7));
+		Assertions.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(8));
+		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(9));
 
 
 		line = "-/W";
@@ -1027,10 +1027,10 @@ class WordGeneratorAffixTest{
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(4));
 		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(5));
-		Assertions.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(6));
-		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(7));
-		Assertions.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(8));
-		Assertions.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(9));
+		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(6));
+		Assertions.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(7));
+		Assertions.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(8));
+		Assertions.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(9));
 
 
 		line = "Computer/BC-";
@@ -1048,10 +1048,10 @@ class WordGeneratorAffixTest{
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(4));
 		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(5));
-		Assertions.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(6));
-		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(7));
-		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(8));
-		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(9));
+		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(6));
+		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(7));
+		Assertions.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(8));
+		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(9));
 
 
 		line = "-/W";
