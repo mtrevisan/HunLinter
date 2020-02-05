@@ -119,35 +119,32 @@ public class GUIUtils{
 		return currentFont;
 	}
 
-	public static void setCurrentFont(final Font font, final Component... parentFrames){
-		if(!font.equals(currentFont)){
-			currentFont = font;
-
-			Arrays.stream(parentFrames)
-				.forEach(parentFrame -> updateComponent(parentFrame, font));
-		}
-	}
-
 	public static void addFontable(final JComponent... components){
 		Arrays.stream(components)
 			.forEach(component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
 	}
 
-	private static void updateComponent(final Component component, final Font font){
-		if(component != null){
-			if(component instanceof JComponent)
-				((JComponent)component).updateUI();
-			if(component instanceof Container){
-				final Component[] children = ((Container)component).getComponents();
-				JavaHelper.nullableToStream(children)
-					.forEach(child -> updateComponent(child, font));
-			}
-			if(component instanceof JEditorPane)
-				((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+	public static void setCurrentFont(final Font font, final Component... parentFrames){
+		if(!font.equals(currentFont)){
+			currentFont = font;
 
-			if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
-				component.setFont(font);
+			Arrays.stream(parentFrames)
+				.filter(Objects::nonNull)
+				.forEach(parentFrame -> updateComponent(parentFrame, font));
 		}
+	}
+
+	private static void updateComponent(final Component component, final Font font){
+		if(component instanceof Container){
+			final Component[] children = ((Container)component).getComponents();
+			JavaHelper.nullableToStream(children)
+				.forEach(child -> updateComponent(child, font));
+		}
+		if(component instanceof JEditorPane)
+			((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+
+		if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
+			component.setFont(font);
 	}
 
 
