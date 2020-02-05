@@ -1,0 +1,31 @@
+https://github.com/nidi3/graphviz-java
+
+https://dreampuf.github.io/GraphvizOnline/
+
+digraph G {
+    start [shape=record label="word|3" fillcolor="#F2F3F4" style=filled];
+    a [shape=record label="a|2" fillcolor="#FFFDD0" style=filled];
+    b [shape=record label="b|0" fillcolor="#D0F0C0" style=filled];
+    c [shape=record label="c|0" fillcolor="#FFFDD0" style=filled];
+    aa [shape=record label="aa|0" fillcolor="#D0F0C0" style=filled];
+    ab [shape=record label="ab|1" fillcolor="#D0F0C0" style=filled];
+    aba [shape=record label="aba|0" fillcolor="#FFFDD0" style=filled];
+
+    /*subgraph cluster_1 {
+        label = 2;
+        labeljust = r;
+        {rank=same a b c}
+      }
+    subgraph cluster_2 {
+        label = 1;
+        labeljust = r;
+        {rank=same aa ab}
+      }*/
+
+    start -> a;
+    start -> b;
+    start -> c;
+    a -> aa;
+    a -> ab;
+    ab -> aba;
+}
