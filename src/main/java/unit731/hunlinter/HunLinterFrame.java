@@ -2523,7 +2523,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
 			try{
-				packager = new Packager(projectPath != null? projectPath: packager.getProjectPath());
+				if(packager == null)
+					packager = new Packager(projectPath);
+				else
+					packager.reload();
 				final List<String> availableLanguages = packager.getAvailableLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
@@ -2541,7 +2544,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				backbone = new Backbone(packager, this);
+				if(backbone == null)
+					backbone = new Backbone(packager, this);
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
@@ -2647,9 +2651,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			openAffButton.setEnabled(backbone.getAffixFile() != null);
 			openDicButton.setEnabled(backbone.getDictionaryFile() != null);
 
-			if(rulesReducerDialog != null)
+			if(rulesReducerDialog != null){
 				//notify RulesReducerDialog
 				rulesReducerDialog.reload();
+
+				JavaHelper.executeOnEventDispatchThread(() -> rulesReducerDialog.ruleComboBoxActionPerformed(null));
+			}
 
 
 			//hyphenation file:

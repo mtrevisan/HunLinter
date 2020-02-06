@@ -431,7 +431,6 @@ public class Backbone implements FileChangeListener{
 
 		if(hunLintable != null)
 			hunLintable.loadFileInternal(null);
-		//TODO if aff file is modified, warn also the RulesReducerWorker
 	}
 
 

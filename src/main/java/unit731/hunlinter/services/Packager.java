@@ -119,9 +119,9 @@ public class Packager{
 
 
 	private final Path projectPath;
-	private final Path mainManifestPath;
-	private final List<File> manifestFiles;
-	private final List<String> languages;
+	private Path mainManifestPath;
+	private List<File> manifestFiles;
+	private List<String> languages;
 
 	private String language;
 	private final Map<String, File> configurationFiles = new HashMap<>();
@@ -131,6 +131,12 @@ public class Packager{
 		Objects.requireNonNull(projectPath);
 
 		this.projectPath = projectPath;
+
+		reload();
+	}
+
+	//Reload projectPath
+	public void reload() throws ProjectNotFoundException, IOException, SAXException{
 		if(!existDirectory(projectPath))
 			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " does not exists, cannot load project");
 

@@ -41,7 +41,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private RulesReducerWorker rulesReducerWorker;
 
 
-	public RulesReducerDialog(Backbone backbone, Frame parent){
+	public RulesReducerDialog(final Backbone backbone, final Frame parent){
 		super(parent, "Rules Reducer", true);
 
 		Objects.requireNonNull(backbone);
@@ -181,7 +181,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
    }// </editor-fold>//GEN-END:initComponents
 
 	private void init(){
-		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		final KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
@@ -189,9 +189,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
 
-		AffixData affixData = backbone.getAffixData();
-		List<RuleEntry> affixes = affixData.getRuleEntries();
-		List<String> affixEntries = affixes.stream()
+		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
+			rulesReducerWorker.cancel();
+
+		final AffixData affixData = backbone.getAffixData();
+		final List<RuleEntry> affixes = affixData.getRuleEntries();
+		final List<String> affixEntries = affixes.stream()
 			.map(affix -> (affix.isSuffix()? AffixOption.SUFFIX: AffixOption.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
 			.sorted()
 			.collect(Collectors.toList());
@@ -202,17 +205,17 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		});
 	}
 
-   private void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
-		String flag = getSelectedFlag();
+   public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+		final String flag = getSelectedFlag();
 		if(flag != null){
-			RuleEntry rule = backbone.getAffixData().getData(flag);
-			StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-			String header = sj.add(rule.getType().getOption().getCode())
+			final RuleEntry rule = backbone.getAffixData().getData(flag);
+			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+			final String header = sj.add(rule.getType().getOption().getCode())
 				.add(flag)
 				.add(Character.toString(rule.combinableChar()))
 				.add(Integer.toString(rule.getEntries().size()))
 				.toString();
-			String rules = rule.getEntries().stream()
+			final String rules = rule.getEntries().stream()
 				.map(AffixEntry::toString)
 				.collect(Collectors.joining(StringUtils.LF));
 			currentSetTextArea.setText(header + StringUtils.LF + rules);
@@ -236,14 +239,14 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
    }//GEN-LAST:event_optimizeClosedGroupCheckBoxActionPerformed
 
 	@Override
-	public void actionPerformed(ActionEvent event){
+	public void actionPerformed(final ActionEvent event){
 		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-			Runnable cancelTask = () -> {
+			final Runnable cancelTask = () -> {
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
 			};
-			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask);
 		}
 		else
@@ -251,10 +254,10 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt){
-		String propertyName = evt.getPropertyName();
+	public void propertyChange(final PropertyChangeEvent evt){
+		final String propertyName = evt.getPropertyName();
 		if("progress".equals(propertyName)){
-			int progress = (int)evt.getNewValue();
+			final int progress = (int)evt.getNewValue();
 			mainProgressBar.setValue(progress);
 		}
 		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
@@ -289,7 +292,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	private String getSelectedFlag(){
-		Object item = ruleComboBox.getSelectedItem();
+		final Object item = ruleComboBox.getSelectedItem();
 		return (item != null? StringUtils.split(item.toString())[1]: null);
 	}
 
