@@ -57,7 +57,6 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 						final StringBuffer sb = new StringBuffer(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
-						sb.append(", line ").append(row);
 						throw new LinterException(sb.toString());
 					}
 				}

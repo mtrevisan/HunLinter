@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -137,7 +138,7 @@ public class Hyphenator implements HyphenatorInterface{
 		final int wordSize = word.length();
 		final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		if(patterns != null){
-			final String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
+			final String w = HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY;
 			final int leftMin = options.getLeftMin();
 			final int rightMin = options.getRightMin();
 
