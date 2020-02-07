@@ -12,7 +12,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -134,16 +133,15 @@ public class GUIUtils{
 	}
 
 	private static void updateComponent(final Component component, final Font font){
-		if(component instanceof Container){
-			final Component[] children = ((Container)component).getComponents();
-			JavaHelper.nullableToStream(children)
-				.forEach(child -> updateComponent(child, font));
-		}
 		if(component instanceof JEditorPane)
 			((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-
 		if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 			component.setFont(font);
+		if(component instanceof Container){
+			final Component[] children = ((Container)component).getComponents();
+			for(final Component child : children)
+				updateComponent(child, font);
+		}
 	}
 
 
