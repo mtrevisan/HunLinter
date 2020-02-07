@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -133,14 +134,21 @@ public class GUIUtils{
 	}
 
 	private static void updateComponent(final Component component, final Font font){
-		if(component instanceof JEditorPane)
-			((JEditorPane)component).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-		if((component instanceof JComponent) && ((JComponent)component).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
-			component.setFont(font);
-		if(component instanceof Container){
-			final Component[] children = ((Container)component).getComponents();
-			for(final Component child : children)
-				updateComponent(child, font);
+		final Stack<Component> stack = new Stack<>();
+		stack.push(component);
+		while(!stack.isEmpty()){
+			final Component comp = stack.pop();
+
+			if(comp instanceof JEditorPane)
+				((JEditorPane)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+			if((comp instanceof JComponent) && ((JComponent)comp).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
+				comp.setFont(font);
+
+			if(comp instanceof Container){
+				final Component[] children = ((Container)comp).getComponents();
+				for(final Component child : children)
+					stack.push(child);
+			}
 		}
 	}
 
