@@ -1255,8 +1255,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
 
       wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-      wexTagPanel.setLayout(new java.awt.FlowLayout());
       wexScrollPane.setViewportView(wexTagPanel);
 
       wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
