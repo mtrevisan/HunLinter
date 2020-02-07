@@ -1544,13 +1544,11 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
-                <Container class="unit731.hunlinter.gui.JTagPanel" name="wexTagPanel">
+                <Component class="unit731.hunlinter.gui.JTagPanel" name="wexTagPanel">
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;final ExceptionsParser wexParser = backbone.getWexParser();&#xd;&#xa;&#x9;wexParser.modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;wexParser.save(backbone.getWordExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
                   </AuxValues>
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
-                </Container>
+                </Component>
               </SubComponents>
             </Container>
             <Component class="javax.swing.JLabel" name="wexCorrectionsRecordedLabel">
