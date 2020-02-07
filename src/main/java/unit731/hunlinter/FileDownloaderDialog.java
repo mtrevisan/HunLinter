@@ -188,9 +188,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(final Exception e){
-
-		}
+		catch(final Exception ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed

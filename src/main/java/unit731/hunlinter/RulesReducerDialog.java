@@ -90,7 +90,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       lblRule.setText("Rule:");
       lblRule.setPreferredSize(new java.awt.Dimension(26, 17));
 
-      ruleComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      ruleComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
       ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             ruleComboBoxActionPerformed(evt);

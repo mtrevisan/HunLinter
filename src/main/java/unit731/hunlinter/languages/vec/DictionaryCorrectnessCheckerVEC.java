@@ -48,8 +48,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static Pattern PATTERN_NON_VANISHING_EL_NOT_AT_END;
 	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
 	private static Pattern PATTERN_PHONEME_CIJJHNHIV;
-	private static Pattern PATTERN_V_IU_V = PatternHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
-	private static Pattern PATTERN_NOT_V_IU_DIERESIS_V = PatternHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü][aeiou]|[^aeiou][ïü][^aeiou]", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_V_IU_V = PatternHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = PatternHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü][aeiou]|[^aeiou][ïü][^aeiou]", Pattern.CASE_INSENSITIVE);
 	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static String PLURAL_NOUN_MASCULINE_RULE;
 	private static String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL;

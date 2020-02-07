@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.text.Style;
 
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -127,7 +128,7 @@ public class HelpDialog extends JDialog{
 
       managedOptionsTextArea.setEditable(false);
       managedOptionsTextArea.setColumns(20);
-      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
       managedOptionsTextArea.setLineWrap(true);
       managedOptionsTextArea.setRows(1);
       managedOptionsTextArea.setTabSize(3);

@@ -149,8 +149,8 @@ public class Frequency<T extends Comparable<?>>{
 			.sum();
 	}
 
-	public static int getDecimals(final double x){
-		return (x != 0.? Math.max((int)Math.floor(Math.log10(1. / x)) - 1, 1): 0);
+	public static int getDecimals(final double value){
+		return (value != 0.? Math.max((int)Math.floor(Math.log10(1. / value)) - 1, 1): 0);
 	}
 
 	/**

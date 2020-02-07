@@ -503,7 +503,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
 
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
@@ -613,7 +613,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
@@ -640,7 +640,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
       cmpRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
 
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
