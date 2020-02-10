@@ -14,6 +14,7 @@ import unit731.hunlinter.services.semanticversioning.Version;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -132,9 +133,9 @@ public class DownloaderHelper{
 	public static Map<String, Object> getApplicationProperties(){
 		if(APPLICATION_PROPERTIES == null){
 			APPLICATION_PROPERTIES = new HashMap<>();
-			try(final InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
+			try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
 				final Properties prop = new Properties();
-				prop.load(versionInfoStream);
+				prop.load(is);
 
 				APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
 				APPLICATION_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));

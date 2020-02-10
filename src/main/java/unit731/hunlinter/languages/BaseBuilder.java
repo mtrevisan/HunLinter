@@ -1,7 +1,8 @@
 package unit731.hunlinter.languages;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class BaseBuilder{
 		final Properties rulesProperties = new Properties();
 		final Class<? extends DictionaryCorrectnessChecker> cl = DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
-		try(final InputStream is = cl.getResourceAsStream("rules.properties")){
+		try(final InputStreamReader is = new InputStreamReader(cl.getResourceAsStream("rules.properties"), StandardCharsets.UTF_8)){
 			if(is != null)
 				rulesProperties.load(is);
 		}
