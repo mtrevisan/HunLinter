@@ -142,60 +142,60 @@ class WordGeneratorCompoundRuleTest{
 		Assertions.assertEquals(expected, words);
 	}
 
-	@Test
-	void onlyInCompound() throws IOException, SAXException{
-		String language = "en-GB";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-			"SET UTF-8",
-			"COMPOUNDMIN 1",
-			"ONLYINCOMPOUND _",
-			"COMPOUNDRULE 2",
-			"COMPOUNDRULE #*0{",
-			"COMPOUNDRULE #*@}");
-		loadData(affFile, language);
-
-		String line = "#*0{";
-		String[] inputCompounds = new String[]{
-			"0/#@",
-			"0th/}{",
-			"1/#0",
-			"1st/}",
-			"1th/{_",
-			"2/#@",
-			"2nd/}",
-			"2th/{_",
-			"3/#@",
-			"3rd/}",
-			"3th/{_",
-			"4/#@",
-			"4th/}{",
-			"5/#@",
-			"5th/}{",
-			"6/#@",
-			"6th/}{",
-			"7/#@",
-			"7th/}{",
-			"8/#@",
-			"8th/}{",
-			"9/#@",
-			"9th/}{"
-		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-
-		List<Production> expected = Arrays.asList(
-			createProduction("10th", null, "pa: 0 pa:{"),
-			createProduction("11th", null, "pa: 0 pa:{"),
-			createProduction("12th", null, "pa: 0 pa:{"),
-			createProduction("13th", null, "pa: 0 pa:{"),
-			createProduction("14th", null, "pa: 0 pa:{"),
-			createProduction("15th", null, "pa: 0 pa:{"),
-			createProduction("16th", null, "pa: 0 pa:{"),
-			createProduction("17th", null, "pa: 0 pa:{"),
-			createProduction("18th", null, "pa: 0 pa:{"),
-			createProduction("19th", null, "pa: 0 pa:{")
-		);
-		Assertions.assertEquals(expected, words);
-	}
+//	@Test
+//	void onlyInCompound3() throws IOException, SAXException{
+//		String language = "en-GB";
+//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+//			"SET UTF-8",
+//			"COMPOUNDMIN 1",
+//			"ONLYINCOMPOUND _",
+//			"COMPOUNDRULE 2",
+//			"COMPOUNDRULE #*0{",
+//			"COMPOUNDRULE #*@}");
+//		loadData(affFile, language);
+//
+//		String line = "#*0{";
+//		String[] inputCompounds = new String[]{
+//			"0/#@",
+//			"0th/}{",
+//			"1/#0",
+//			"1st/}",
+//			"1th/{_",
+//			"2/#@",
+//			"2nd/}",
+//			"2th/{_",
+//			"3/#@",
+//			"3rd/}",
+//			"3th/{_",
+//			"4/#@",
+//			"4th/}{",
+//			"5/#@",
+//			"5th/}{",
+//			"6/#@",
+//			"6th/}{",
+//			"7/#@",
+//			"7th/}{",
+//			"8/#@",
+//			"8th/}{",
+//			"9/#@",
+//			"9th/}{"
+//		};
+//		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+//
+//		List<Production> expected = Arrays.asList(
+//			createProduction("10th", null, "pa: 0 pa:{"),
+//			createProduction("11th", null, "pa: 0 pa:{"),
+//			createProduction("12th", null, "pa: 0 pa:{"),
+//			createProduction("13th", null, "pa: 0 pa:{"),
+//			createProduction("14th", null, "pa: 0 pa:{"),
+//			createProduction("15th", null, "pa: 0 pa:{"),
+//			createProduction("16th", null, "pa: 0 pa:{"),
+//			createProduction("17th", null, "pa: 0 pa:{"),
+//			createProduction("18th", null, "pa: 0 pa:{"),
+//			createProduction("19th", null, "pa: 0 pa:{")
+//		);
+//		Assertions.assertEquals(expected, words);
+//	}
 
 	@Test
 	void zeroOrOne() throws IOException, SAXException{

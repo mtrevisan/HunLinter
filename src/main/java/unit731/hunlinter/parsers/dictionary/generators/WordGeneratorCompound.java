@@ -78,6 +78,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					final List<Production> dicEntriesPerFlag = new ArrayList<>();
 					for(DictionaryEntry entry : input){
 						List<Production> productions = applyAffixRules(entry, true, null);
+
+//FIXME compound
+//		if(isCompound)
+//			enforceOnlyInCompound(productions);
 						List<Production> collect = new ArrayList<>();
 						for(Production prod : productions)
 							if(prod.hasContinuationFlag(flag))
@@ -179,6 +183,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		else{
 			//add boundary affixes
 			productions = applyAffixRules(p, false, null);
+
+//FIXME compound
+//		if(isCompound)
+//			enforceOnlyInCompound(productions);
 
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds

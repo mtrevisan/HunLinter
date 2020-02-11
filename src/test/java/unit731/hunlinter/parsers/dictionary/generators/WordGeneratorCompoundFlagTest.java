@@ -767,6 +767,62 @@ class WordGeneratorCompoundFlagTest{
 		Assertions.assertEquals(expected, words);
 	}
 
+	@Test
+	void onlyInCompound() throws IOException, SAXException{
+		String language = "en-GB";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"ONLYINCOMPOUND O",
+			"COMPOUNDFLAG A",
+			"SFX B Y 1",
+			"SFX B 0 s .");
+		loadData(affFile, language);
+
+		String[] inputCompounds = new String[]{
+			"foo/A",
+			"pseudo/OAB"
+		};
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+
+		List<Production> expected = Arrays.asList(
+			createProduction("foo", null, "pa:0 pa:{"),
+			createProduction("pseudofoo", null, "pa:0 pa:{"),
+			createProduction("foopseudo", null, "pa:0 pa:{"),
+			createProduction("foopseudos", null, "pa:0 pa:{")
+		);
+		Assertions.assertEquals(expected, words);
+	}
+
+//	@Test
+//	void onlyInCompound2() throws IOException, SAXException{
+//		String language = "en-GB";
+//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+//			"SET UTF-8",
+//			"ONLYINCOMPOUND O",
+//			"COMPOUNDFLAG A",
+//			"COMPOUNDPERMITFLAG P",
+//			"SFX B Y 1",
+//			"SFX B 0 s/OP .",
+//			"# obligate fogemorpheme by forbidding the stem (0) in compounds",
+//			"CHECKCOMPOUNDPATTERN 1",
+//			"CHECKCOMPOUNDPATTERN 0/B /A");
+//		loadData(affFile, language);
+//
+//		String[] inputCompounds = new String[]{
+//			"foo/A",
+//			"pseudo/AB"
+//		};
+//		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+//
+//		List<Production> expected = Arrays.asList(
+//			createProduction("foo", null, "pa:0 pa:{"),
+//			createProduction("foopseudo", null, "pa:0 pa:{"),
+//			createProduction("pseudosfoo", null, "pa:0 pa:{")
+//		);
+//		Assertions.assertEquals(expected, words);
+//	}
+
+
 	private void loadData(File affFile, String language) throws IOException, SAXException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
