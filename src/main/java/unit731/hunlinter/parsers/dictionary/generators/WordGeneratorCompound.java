@@ -70,11 +70,20 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					final Set<DictionaryEntry> input = inputs.get(flag);
-					dicEntries.put(flag, input.stream()
-						.map(entry -> applyAffixRules(entry, true, null))
-						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
-						.flatMap(List::stream)
-						.collect(Collectors.toList()));
+//					final List<Production> dicEntriesPerFlag = input.stream()
+//						.map(entry -> applyAffixRules(entry, true, null))
+//						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
+//						.flatMap(List::stream)
+//						.collect(Collectors.toList());
+					final List<Production> dicEntriesPerFlag = new ArrayList<>();
+					for(DictionaryEntry entry : input){
+						List<Production> productions = applyAffixRules(entry, true, null);
+						List<Production> collect = productions.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList());
+						for(Production production : collect){
+							dicEntriesPerFlag.add(production);
+						}
+					}
+					dicEntries.put(flag, dicEntriesPerFlag);
 				}
 				final List<Production> de = dicEntries.get(flag);
 				if(!de.isEmpty())
