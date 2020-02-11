@@ -68,6 +68,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			//expand permutation
 			final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 			for(final String flag : permutation){
+				final List<Production> dicEntriesPerFlag = new ArrayList<>();
 				if(!dicEntries.containsKey(flag)){
 					final Set<DictionaryEntry> input = inputs.get(flag);
 //					final List<Production> dicEntriesPerFlag = input.stream()
@@ -75,7 +76,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 //						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
 //						.flatMap(List::stream)
 //						.collect(Collectors.toList());
-					final List<Production> dicEntriesPerFlag = new ArrayList<>();
 					for(DictionaryEntry entry : input){
 						List<Production> productions = applyAffixRules(entry, true, null);
 						List<Production> collect = new ArrayList<>();
@@ -87,9 +87,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
-				final List<Production> de = dicEntries.get(flag);
-				if(!de.isEmpty())
-					expandedPermutationEntries.add(de);
+				if(!dicEntriesPerFlag.isEmpty())
+					expandedPermutationEntries.add(dicEntriesPerFlag);
 				else{
 					//it is not possible to compound some words, return empty list
 					entries.clear();
