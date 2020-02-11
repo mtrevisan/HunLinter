@@ -70,20 +70,23 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					final Set<DictionaryEntry> input = inputs.get(flag);
-//FIXME simplify
 //					final List<Production> dicEntriesPerFlag = input.stream()
 //						.map(entry -> applyAffixRules(entry, true, null))
 //						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
 //						.flatMap(List::stream)
 //						.collect(Collectors.toList());
 					final List<Production> dicEntriesPerFlag = new ArrayList<>();
-					for(final DictionaryEntry entry : input){
-						final List<Production> productions = applyAffixRules(entry, true, null);
-						final List<Production> collect = new ArrayList<>();
-						for(final Production prod : productions)
+					for(DictionaryEntry entry : input){
+						List<Production> productions = applyAffixRules(entry, true, null);
+
+//FIXME compound
+//		if(isCompound)
+//			enforceOnlyInCompound(productions);
+						List<Production> collect = new ArrayList<>();
+						for(Production prod : productions)
 							if(prod.hasContinuationFlag(flag))
 								collect.add(prod);
-						for(final Production production : collect)
+						for(Production production : collect)
 							dicEntriesPerFlag.add(production);
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
@@ -180,6 +183,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		else{
 			//add boundary affixes
 			productions = applyAffixRules(p, false, null);
+
+//FIXME compound
+//		if(isCompound)
+//			enforceOnlyInCompound(productions);
+
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
 				removeTwofolds(productions);

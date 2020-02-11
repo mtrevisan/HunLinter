@@ -24,6 +24,11 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	List<Production> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
+
+//FIXME compound
+//		if(isCompound)
+//			enforceOnlyInCompound(productions);
+
 		//convert using output table
 		for(final Production production : productions)
 			production.applyOutputConversionTable(affixData::applyOutputConversionTable);

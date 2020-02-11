@@ -69,7 +69,7 @@ public enum AffixOption{
 	/** Word signed with this flag (or with a signed affix) may be the last element in compound words */
 	COMPOUND_END_FLAG("COMPOUNDEND"),
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
-//	ONLY_IN_COMPOUND_FLAG("ONLYINCOMPOUND"),
+	ONLY_IN_COMPOUND_FLAG("ONLYINCOMPOUND"),
 	/**
 	 * Affixes with this flag may be present inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
 	 * at the end of compounds only).

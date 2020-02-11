@@ -158,6 +158,13 @@ class WordGeneratorBase{
 			productions.removeIf(production -> production.hasContinuationFlag(circumfixFlag));
 	}
 
+	/** Remove rules that invalidate the onlyInCompound rule */
+	private void enforceOnlyInCompound(final List<Production> productions){
+		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
+		if(onlyInCompoundFlag != null)
+			productions.removeIf(production -> !production.hasContinuationFlag(onlyInCompoundFlag));
+	}
+
 	/** Remove rules that invalidate the affix rule */
 	private void enforceNeedAffixFlag(final List<Production> productions){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
