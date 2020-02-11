@@ -5,6 +5,7 @@ import unit731.hunlinter.services.SetHelper;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -26,8 +27,10 @@ public abstract class FlagParsingStrategy{
 
 	protected void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if(notDuplicatedFlags.size() < flags.length)
-			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+		if(notDuplicatedFlags.size() < flags.length){
+			final Set<String> duplicates = new HashSet<>(SetHelper.getDuplicates(Arrays.asList(flags)));
+			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{String.join(", ", duplicates)}));
+		}
 	}
 
 

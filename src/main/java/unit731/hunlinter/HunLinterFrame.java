@@ -2126,13 +2126,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
 		final String inputCompounds = cmpInputTextArea.getText();
 
-		if(StringUtils.isNotBlank(inputText)){
+		if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
 			try{
 				//FIXME transfer into backbone
 				final List<Production> words;
 				final WordGenerator wordGenerator = backbone.getWordGenerator();
 				final AffixData affixData = backbone.getAffixData();
-				if(affixData.getCompoundFlag().equals(inputText)){
+				if(inputText.equals(affixData.getCompoundFlag())){
 					int maxCompounds = affixData.getCompoundMaxWordCount();
 					words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
 						maxCompounds);

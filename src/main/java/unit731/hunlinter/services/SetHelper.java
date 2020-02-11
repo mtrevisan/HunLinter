@@ -259,4 +259,16 @@ public class SetHelper{
 		return new ArrayList<>(compaction.values());
 	}
 
+	public static <V> List<V> getDuplicates(final List<V> list){
+		return getDuplicatesMap(list).values().stream()
+			.filter(duplicates -> duplicates.size() > 1)
+			.flatMap(Collection::stream)
+			.collect(Collectors.toList());
+	}
+
+	private static <V> Map<V, List<V>> getDuplicatesMap(final List<V> personList){
+		return personList.stream()
+			.collect(Collectors.groupingBy(Function.identity()));
+	}
+
 }
