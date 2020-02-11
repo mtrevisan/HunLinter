@@ -183,7 +183,16 @@ class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("0th", null, "pa:{")
+			createProduction("10th", null, "pa: 0 pa:{"),
+			createProduction("11th", null, "pa: 0 pa:{"),
+			createProduction("12th", null, "pa: 0 pa:{"),
+			createProduction("13th", null, "pa: 0 pa:{"),
+			createProduction("14th", null, "pa: 0 pa:{"),
+			createProduction("15th", null, "pa: 0 pa:{"),
+			createProduction("16th", null, "pa: 0 pa:{"),
+			createProduction("17th", null, "pa: 0 pa:{"),
+			createProduction("18th", null, "pa: 0 pa:{"),
+			createProduction("19th", null, "pa: 0 pa:{")
 		);
 		Assertions.assertEquals(expected, words);
 	}
