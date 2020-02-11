@@ -2524,7 +2524,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				if(packager == null)
 					packager = new Packager(projectPath);
 				else
-					packager.reload();
+					packager.reload(projectPath);
 				final List<String> availableLanguages = packager.getAvailableLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
