@@ -143,7 +143,7 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void infiniteEnGB() throws IOException, SAXException{
+	void infiniteEnglishNumbers() throws IOException, SAXException{
 		String language = "en-GB";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
