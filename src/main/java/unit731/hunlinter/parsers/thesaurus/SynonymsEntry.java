@@ -21,6 +21,9 @@ import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
+	private static final String COLUMN = ":";
+	private static final String COMMA = ",";
+
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format for thesaurus entry: ''{0}''");
 	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): ''{0}''");
@@ -100,20 +103,16 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	@Override
 	public String toString(){
-		return toLine(null);
+		return (new StringJoiner(COLUMN))
+			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(COMMA)))
+			.add(StringUtils.join(synonyms, COMMA))
+			.toString();
 	}
 
 	public String toLine(final String definition){
-		final List<String> wholeSynonyms;
-		if(definition != null){
-			wholeSynonyms = new ArrayList<>(synonyms);
-			wholeSynonyms.add(0, definition);
-		}
-		else
-			wholeSynonyms = synonyms;
 		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
-			.add(StringUtils.join(wholeSynonyms, ThesaurusEntry.PIPE))
+			.add(StringUtils.join(synonyms, ThesaurusEntry.PIPE))
 			.toString();
 	}
 

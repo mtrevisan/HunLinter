@@ -358,7 +358,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
             return Arrays.stream(synonymsByDefinition)
             .map(GUIUtils::removeHTMLCode)
-            .map(syns -> definition + ": " + syns)
+            .map(syns -> definition + " - " + syns)
             .collect(Collectors.joining("\r\n"));
          }
       };
