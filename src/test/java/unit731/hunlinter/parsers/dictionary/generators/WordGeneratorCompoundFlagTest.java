@@ -767,31 +767,31 @@ class WordGeneratorCompoundFlagTest{
 		Assertions.assertEquals(expected, words);
 	}
 
-	@Test
-	void onlyInCompound() throws IOException, SAXException{
-		String language = "en-GB";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-			"SET UTF-8",
-			"ONLYINCOMPOUND O",
-			"COMPOUNDFLAG A",
-			"SFX B Y 1",
-			"SFX B 0 s .");
-		loadData(affFile, language);
-
-		String[] inputCompounds = new String[]{
-			"foo/A",
-			"pseudo/OAB"
-		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
-
-		List<Production> expected = Arrays.asList(
-			createProduction("foo", null, "pa:0 pa:{"),
-			createProduction("pseudofoo", null, "pa:0 pa:{"),
-			createProduction("foopseudo", null, "pa:0 pa:{"),
-			createProduction("foopseudos", null, "pa:0 pa:{")
-		);
-		Assertions.assertEquals(expected, words);
-	}
+//	@Test
+//	void onlyInCompound() throws IOException, SAXException{
+//		String language = "en-GB";
+//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+//			"SET UTF-8",
+//			"ONLYINCOMPOUND O",
+//			"COMPOUNDFLAG A",
+//			"SFX B Y 1",
+//			"SFX B 0 s .");
+//		loadData(affFile, language);
+//
+//		String[] inputCompounds = new String[]{
+//			"foo/A",
+//			"pseudo/OAB"
+//		};
+//		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+//
+//		List<Production> expected = Arrays.asList(
+//			createProduction("foo", null, "pa:0 pa:{"),
+//			createProduction("pseudofoo", null, "pa:0 pa:{"),
+//			createProduction("foopseudo", null, "pa:0 pa:{"),
+//			createProduction("foopseudos", null, "pa:0 pa:{")
+//		);
+//		Assertions.assertEquals(expected, words);
+//	}
 
 //	@Test
 //	void onlyInCompound2() throws IOException, SAXException{
