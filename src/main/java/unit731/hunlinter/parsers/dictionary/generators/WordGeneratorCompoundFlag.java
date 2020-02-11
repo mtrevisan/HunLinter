@@ -91,9 +91,6 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 			final List<DictionaryEntry> inputs){
 		final List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
 			.mapToObj(index -> dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null)))
-//FIXME compound
-//		if(isCompound)
-//			enforceOnlyInCompound(productions);
 			.filter(Predicate.not(List::isEmpty))
 			.collect(Collectors.toList());
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);

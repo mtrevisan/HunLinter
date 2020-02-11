@@ -35,7 +35,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param k	taken at most k at a time
 	 * @param forbidDuplicates	Forbid duplicates
 	 */
-	public PermutationsWithRepetitions(int n, int k, boolean forbidDuplicates){
+	public PermutationsWithRepetitions(final int n, final int k, final boolean forbidDuplicates){
 		if(n < 1)
 			throw new IllegalArgumentException(ONE_ELEMENT_MINIMUM.format(new Object[0]));
 		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
@@ -57,20 +57,20 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param limit	Count limit for the results
 	 * @return	Total permutations with repetitions of <code>n</code> elements taken <code>2…maxCompounds</code> at a time
 	 */
-	public List<int[]> permutations(int limit){
+	public List<int[]> permutations(final int limit){
 		if(limit < 1)
 			throw new IllegalArgumentException(ONE_OUTPUT_MINIMUM.format(new Object[0]));
 
-		List<int[]> all = new ArrayList<>();
+		final List<int[]> all = new ArrayList<>();
 		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++)
 			all.addAll(extractAllKPermutations(kk, all.size(), limit));
 		return all;
 	}
 
-	private List<int[]> extractAllKPermutations(int kk, int currentCount, int limit){
-		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplicates);
+	private List<int[]> extractAllKPermutations(final int kk, final int currentCount, final int limit){
+		final PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplicates);
 
-		List<int[]> all = new ArrayList<>();
+		final List<int[]> all = new ArrayList<>();
 		while(pr.hasNext() && all.size() + currentCount < limit)
 			all.add(pr.next());
 		return all;
@@ -86,7 +86,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		if(!hasNext())
 			throw new NoSuchElementException("No permutations left");
 
-		int[] result = convertBase(currentIndex, n);
+		final int[] result = convertBase(currentIndex, n);
 
 		if(forbidDuplicates){
 			boolean consecutiveDuplicates = true;
@@ -107,8 +107,8 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param radix	the desired new number base
 	 * @return	The array of integers representing decimal number on new base
 	 */
-	private int[] convertBase(long decimalNumber, int radix){
-		int[] result = new int[k];
+	private int[] convertBase(long decimalNumber, final int radix){
+		final int[] result = new int[k];
 		for(int i = k - 1; decimalNumber != 0l; i --){
 			result[i] = (int)(decimalNumber % radix);
 			decimalNumber /= radix;
@@ -117,10 +117,10 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	}
 
 	/** In num = sum(i=0..k, a[i] * b^i), check if a[i] is equals to a[i - 1] for i = 1..k */
-	private boolean hasConsecutiveDuplicates(long decimalNumber, int radix){
+	private boolean hasConsecutiveDuplicates(long decimalNumber, final int radix){
 		int digit = -1;
 		while(decimalNumber != 0l){
-			int newDigit = (int)(decimalNumber % radix);
+			final int newDigit = (int)(decimalNumber % radix);
 			if(newDigit == digit)
 				return true;
 

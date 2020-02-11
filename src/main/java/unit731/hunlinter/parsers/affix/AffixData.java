@@ -39,7 +39,7 @@ public class AffixData{
 
 	private static final List<AffixOption> SINGLE_FLAG_TAGS = Arrays.asList(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG,
 		AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
-		AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
+		/*AffixOption.ONLY_IN_COMPOUND_FLAG,*/ AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
 		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG,
 		AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
 
@@ -52,7 +52,7 @@ public class AffixData{
 	void close(){
 		terminalAffixes.addAll(getStringData(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
 			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
-			AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
+			/*AffixOption.ONLY_IN_COMPOUND_FLAG,*/ AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
 			AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG, AffixOption.KEEP_CASE_FLAG,
 			AffixOption.NEED_AFFIX_FLAG));
 
@@ -278,10 +278,6 @@ public class AffixData{
 
 	public String getCompoundEndFlag(){
 		return getData(AffixOption.COMPOUND_END_FLAG);
-	}
-
-	public String getOnlyInCompoundFlag(){
-		return getData(AffixOption.ONLY_IN_COMPOUND_FLAG);
 	}
 
 	public boolean allowTwofoldAffixesInCompound(){
