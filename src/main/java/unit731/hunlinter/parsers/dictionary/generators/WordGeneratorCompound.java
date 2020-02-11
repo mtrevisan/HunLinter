@@ -78,10 +78,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					final List<Production> dicEntriesPerFlag = new ArrayList<>();
 					for(DictionaryEntry entry : input){
 						List<Production> productions = applyAffixRules(entry, true, null);
-						List<Production> collect = productions.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList());
-						for(Production production : collect){
+						List<Production> collect = new ArrayList<>();
+						for(Production prod : productions)
+							if(prod.hasContinuationFlag(flag))
+								collect.add(prod);
+						for(Production production : collect)
 							dicEntriesPerFlag.add(production);
-						}
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
