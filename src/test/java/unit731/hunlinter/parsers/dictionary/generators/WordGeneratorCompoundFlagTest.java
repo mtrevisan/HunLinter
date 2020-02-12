@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
@@ -17,7 +16,7 @@ import unit731.hunlinter.services.PermutationsWithRepetitions;
 class WordGeneratorCompoundFlagTest extends TestBase{
 
 	@Test
-	void simple() throws IOException, SAXException{
+	void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -49,7 +48,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void compoundMinLength() throws IOException, SAXException{
+	void compoundMinLength() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -74,7 +73,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void checkCompoundTriple() throws IOException, SAXException{
+	void checkCompoundTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -107,7 +106,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void simplifiedTriple() throws IOException, SAXException{
+	void simplifiedTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -132,7 +131,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void forbidWordDuplication() throws IOException, SAXException{
+	void forbidWordDuplication() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -160,7 +159,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void withAffixes() throws IOException, SAXException{
+	void withAffixes() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -215,7 +214,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void withAffixesOnefold() throws IOException, SAXException{
+	void withAffixesOnefold() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -274,7 +273,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void withAffixesTwofold() throws IOException, SAXException{
+	void withAffixesTwofold() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -342,7 +341,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void notPermitFlag() throws IOException, SAXException{
+	void notPermitFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -397,7 +396,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void permitFlag() throws IOException, SAXException{
+	void permitFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -501,7 +500,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void forbidFlag() throws IOException, SAXException{
+	void forbidFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -545,7 +544,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void checkCompoundCase() throws IOException, SAXException{
+	void checkCompoundCase() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -650,7 +649,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void compoundReplacement() throws IOException, SAXException{
+	void compoundReplacement() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -714,7 +713,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 
 	@Test
-	void forbiddenWord() throws IOException, SAXException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -756,7 +755,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 
 	@Test
-	void forceUppercase() throws IOException, SAXException{
+	void forceUppercase() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -813,7 +812,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	}
 
 	@Test
-	void onlyInCompound() throws IOException, SAXException{
+	void onlyInCompound() throws IOException{
 		String language = "en-GB";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -865,7 +864,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 	//FIXME manage CHECKCOMPOUNDPATTERN
 //	@Test
-//	void onlyInCompound2_checkCompoundPattern() throws IOException, SAXException{
+//	void onlyInCompound2_checkCompoundPattern() throws IOException{
 //		String language = "en-GB";
 //		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 //			"SET UTF-8",

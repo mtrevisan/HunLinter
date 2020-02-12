@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -17,7 +16,7 @@ import unit731.hunlinter.services.FileHelper;
 class WordGeneratorCompoundRuleTest extends TestBase{
 
 	@Test
-	void testBjörnJacke() throws IOException, SAXException{
+	void testBjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -51,7 +50,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 	@Test
-	void simple() throws IOException, SAXException{
+	void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -76,7 +75,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 	@Test
-	void infinite() throws IOException, SAXException{
+	void infinite() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -136,7 +135,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 //	@Test
-//	void onlyInCompound3() throws IOException, SAXException{
+//	void onlyInCompound3() throws IOException{
 //		String language = "en-GB";
 //		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 //			"SET UTF-8",
@@ -191,7 +190,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 //	}
 
 	@Test
-	void zeroOrOne() throws IOException, SAXException{
+	void zeroOrOne() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -220,7 +219,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 	@Test
-	void longFlag() throws IOException, SAXException{
+	void longFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -250,7 +249,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 	@Test
-	void numericalFlag() throws IOException, SAXException{
+	void numericalFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -301,7 +300,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	}
 
 	@Test
-	void forbiddenWord() throws IOException, SAXException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -322,7 +321,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 
 
 	@Test
-	void forceUppercase() throws IOException, SAXException{
+	void forceUppercase() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
