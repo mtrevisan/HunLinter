@@ -259,6 +259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
 		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(ThesaurusCorrectnessWorker.WORKER_NAME, () -> theCheckCorrectnessMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
@@ -2466,6 +2467,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				prjLoaderWorker.cancel();
 
 				dicCheckCorrectnessMenuItem.setEnabled(true);
+				theCheckCorrectnessMenuItem.setEnabled(true);
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
 
 				prjLoaderWorker = null;
@@ -2548,6 +2550,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
+			theCheckCorrectnessMenuItem.setEnabled(false);
 
 			try{
 				if(packager == null)
@@ -2659,8 +2662,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			filCreatePackageMenuItem.setEnabled(true);
 			filFontMenuItem.setEnabled(true);
 			dicCheckCorrectnessMenuItem.setEnabled(true);
+			theCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
+			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			final AffixData affixData = backbone.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
@@ -2784,6 +2789,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
 		dicMenu.setEnabled(false);
+		theMenu.setEnabled(false);
 		if((exc instanceof ProjectNotFoundException)){
 			//remove the file from the recent projects menu
 			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
@@ -2792,6 +2798,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
 		dicCheckCorrectnessMenuItem.setEnabled(false);
+		theCheckCorrectnessMenuItem.setEnabled(false);
 		dicSortDictionaryMenuItem.setEnabled(false);
 		hypCheckCorrectnessMenuItem.setEnabled(false);
 
@@ -3113,7 +3120,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void checkHyphenationCorrectness(){
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
-			dicCheckCorrectnessMenuItem.setEnabled(false);
+			hypCheckCorrectnessMenuItem.setEnabled(false);
 
 			hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
 				backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
@@ -3207,6 +3214,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.setSynonyms(null);
 
+		theMenu.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 

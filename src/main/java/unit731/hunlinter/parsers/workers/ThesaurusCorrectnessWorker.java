@@ -50,15 +50,15 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 				setProgress(++ i * 100 / size);
 			}
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "File sorted");
-
 			setProgress(100);
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed thesaurus (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception e){
 			exception = e;
 
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Thesaurus file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing thesaurus");
 
 			cancel(true);
 		}
