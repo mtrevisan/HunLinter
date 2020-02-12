@@ -56,6 +56,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 					final String[] partOfSpeeches = syn.getPartOfSpeeches();
 					for(String definition : definitions){
 						definition = ThesaurusDictionary.removeSynonymUse(definition);
+						//TODO check also that the found pos has the original entry.getDefinition()
 						if(!theParser.contains(definition, partOfSpeeches))
 							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus does not contains definition {} with part-of-speech {}", definition, Arrays.toString(partOfSpeeches));
 					}
