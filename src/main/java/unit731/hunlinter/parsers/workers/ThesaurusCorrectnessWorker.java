@@ -47,7 +47,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 			for(final ThesaurusEntry entry : dictionary){
 				//TODO check if each part of `entry`, with appropriate PoS, exists
 
-				setProgress(i * 100 / size);
+				setProgress(++ i * 100 / size);
 			}
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File sorted");
