@@ -49,16 +49,18 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 			int i = 0;
 			final int size = dictionary.size();
 			for(final ThesaurusEntry entry : dictionary){
-				//TODO check if each part of `entry`, with appropriate PoS, exists
+				final String originalDefinition = entry.getDefinition();
+				//check if each part of `entry`, with appropriate PoS, exists
 				final List<SynonymsEntry> syns = entry.getSynonyms();
 				for(final SynonymsEntry syn : syns){
 					final List<String> definitions = syn.getSynonyms();
 					final String[] partOfSpeeches = syn.getPartOfSpeeches();
 					for(String definition : definitions){
 						definition = ThesaurusDictionary.removeSynonymUse(definition);
-						//TODO check also that the found pos has the original entry.getDefinition()
-						if(!theParser.contains(definition, partOfSpeeches))
-							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus does not contains definition {} with part-of-speech {}", definition, Arrays.toString(partOfSpeeches));
+						//check also that the found pos has `originalDefenition`
+						if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
+							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus does not contains definition {} with part-of-speech {} (from entry {})",
+								definition, Arrays.toString(partOfSpeeches), originalDefinition);
 					}
 				}
 

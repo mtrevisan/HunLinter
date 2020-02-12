@@ -181,7 +181,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
-	private DictionaryLinterWorker dicDictionaryLinterWorker;
+	private DictionaryLinterWorker dicLinterWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
 	private WordCountWorker dicWordCountWorker;
@@ -190,8 +190,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private PoSFSAWorker dicPoSFSAWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private CompoundRulesWorker compoundRulesExtractorWorker;
-	private ThesaurusCorrectnessWorker theCorrectnessWorker;
-	private HyphenationCorrectnessWorker hypCorrectnessWorker;
+	private ThesaurusCorrectnessWorker theLinterWorker;
+	private HyphenationCorrectnessWorker hypLinterWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 
 	private JMenuItem popupMergeMenuItem;
@@ -258,8 +258,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
-		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(ThesaurusCorrectnessWorker.WORKER_NAME, () -> theCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(ThesaurusCorrectnessWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
@@ -282,7 +282,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				cmpLoadInputButton.setEnabled(true);
 		});
 		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME,
-			() -> hypCheckCorrectnessMenuItem.setEnabled(true));
+			() -> hypLinterMenuItem.setEnabled(true));
 
 
 		//check for updates
@@ -456,7 +456,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filSeparator = new javax.swing.JPopupMenu.Separator();
       filExitMenuItem = new javax.swing.JMenuItem();
       dicMenu = new javax.swing.JMenu();
-      dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+      dicLinterMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicRulesReducerMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
@@ -469,9 +469,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractPoSFAMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
-      theCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+      theLinterMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
-      hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+      hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
@@ -1404,16 +1404,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicMenu.setToolTipText("");
       dicMenu.setEnabled(false);
 
-      dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
-      dicCheckCorrectnessMenuItem.setMnemonic('c');
-      dicCheckCorrectnessMenuItem.setText("Check correctness");
-      dicCheckCorrectnessMenuItem.setToolTipText("");
-      dicCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      dicLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      dicLinterMenuItem.setMnemonic('c');
+      dicLinterMenuItem.setText("Check correctness");
+      dicLinterMenuItem.setToolTipText("");
+      dicLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicCheckCorrectnessMenuItemActionPerformed(evt);
+            dicLinterMenuItemActionPerformed(evt);
          }
       });
-      dicMenu.add(dicCheckCorrectnessMenuItem);
+      dicMenu.add(dicLinterMenuItem);
 
       dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
       dicSortDictionaryMenuItem.setMnemonic('s');
@@ -1509,16 +1509,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theMenu.setToolTipText("");
       theMenu.setEnabled(false);
 
-      theCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
-      theCheckCorrectnessMenuItem.setMnemonic('c');
-      theCheckCorrectnessMenuItem.setText("Check correctness");
-      theCheckCorrectnessMenuItem.setToolTipText("");
-      theCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      theLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      theLinterMenuItem.setMnemonic('c');
+      theLinterMenuItem.setText("Check correctness");
+      theLinterMenuItem.setToolTipText("");
+      theLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theCheckCorrectnessMenuItemActionPerformed(evt);
+            theLinterMenuItemActionPerformed(evt);
          }
       });
-      theMenu.add(theCheckCorrectnessMenuItem);
+      theMenu.add(theLinterMenuItem);
 
       mainMenuBar.add(theMenu);
 
@@ -1527,15 +1527,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypMenu.setToolTipText("");
       hypMenu.setEnabled(false);
 
-      hypCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
-      hypCheckCorrectnessMenuItem.setMnemonic('d');
-      hypCheckCorrectnessMenuItem.setText("Check correctness");
-      hypCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      hypLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      hypLinterMenuItem.setMnemonic('d');
+      hypLinterMenuItem.setText("Check correctness");
+      hypLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypCheckCorrectnessMenuItemActionPerformed(evt);
+            hypLinterMenuItemActionPerformed(evt);
          }
       });
-      hypMenu.add(hypCheckCorrectnessMenuItem);
+      hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
       hypStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
@@ -1749,23 +1749,23 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 
-	private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
+	private void dicLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicLinterMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkDictionaryCorrectness();
-	}//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_dicLinterMenuItemActionPerformed
 
-	private void theCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theCheckCorrectnessMenuItemActionPerformed
+	private void theLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theLinterMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkThesaurusCorrectness();
-	}//GEN-LAST:event_theCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_theLinterMenuItemActionPerformed
 
-	private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
+	private void hypLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypLinterMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkHyphenationCorrectness();
-	}//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
+	}//GEN-LAST:event_hypLinterMenuItemActionPerformed
 
 	private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -2466,8 +2466,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(answer == JOptionPane.YES_OPTION){
 				prjLoaderWorker.cancel();
 
-				dicCheckCorrectnessMenuItem.setEnabled(true);
-				theCheckCorrectnessMenuItem.setEnabled(true);
+				dicLinterMenuItem.setEnabled(true);
+				theLinterMenuItem.setEnabled(true);
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
 
 				prjLoaderWorker = null;
@@ -2500,7 +2500,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 
-		checkAbortion(dicDictionaryLinterWorker, dicCheckCorrectnessMenuItem);
+		checkAbortion(dicLinterWorker, dicLinterMenuItem);
 
 		checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
 
@@ -2513,7 +2513,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
 			cmpLoadInputButton);
 
-		checkAbortion(hypCorrectnessWorker, hypCheckCorrectnessMenuItem);
+//FIXME
+//		checkAbortion(theLinterWorker, theLinterMenuItem);
+
+		checkAbortion(hypLinterWorker, hypLinterMenuItem);
 	}
 
 	private void checkAbortion(final WorkerDictionaryBase worker, final JComponent ... componentsToEnable){
@@ -2549,8 +2552,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
-			dicCheckCorrectnessMenuItem.setEnabled(false);
-			theCheckCorrectnessMenuItem.setEnabled(false);
+			dicLinterMenuItem.setEnabled(false);
+			theLinterMenuItem.setEnabled(false);
 
 			try{
 				if(packager == null)
@@ -2661,8 +2664,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			filOpenProjectMenuItem.setEnabled(true);
 			filCreatePackageMenuItem.setEnabled(true);
 			filFontMenuItem.setEnabled(true);
-			dicCheckCorrectnessMenuItem.setEnabled(true);
-			theCheckCorrectnessMenuItem.setEnabled(true);
+			dicLinterMenuItem.setEnabled(true);
+			theLinterMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			theMenu.setEnabled(true);
@@ -2696,7 +2699,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 			//hyphenation file:
 			if(backbone.getHyphenator() != null){
-				hypCheckCorrectnessMenuItem.setEnabled(true);
+				hypLinterMenuItem.setEnabled(true);
 
 				hypMenu.setEnabled(true);
 				hypStatisticsMenuItem.setEnabled(true);
@@ -2797,10 +2800,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
-		dicCheckCorrectnessMenuItem.setEnabled(false);
-		theCheckCorrectnessMenuItem.setEnabled(false);
+		dicLinterMenuItem.setEnabled(false);
+		theLinterMenuItem.setEnabled(false);
 		dicSortDictionaryMenuItem.setEnabled(false);
-		hypCheckCorrectnessMenuItem.setEnabled(false);
+		hypLinterMenuItem.setEnabled(false);
 
 
 		//affix file:
@@ -2972,13 +2975,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void checkDictionaryCorrectness(){
-		if(dicDictionaryLinterWorker == null || dicDictionaryLinterWorker.isDone()){
-			dicCheckCorrectnessMenuItem.setEnabled(false);
+		if(dicLinterWorker == null || dicLinterWorker.isDone()){
+			dicLinterMenuItem.setEnabled(false);
 
-			dicDictionaryLinterWorker = new DictionaryLinterWorker(backbone.getDicParser(), backbone.getChecker(),
+			dicLinterWorker = new DictionaryLinterWorker(backbone.getDicParser(), backbone.getChecker(),
 				backbone.getWordGenerator());
-			dicDictionaryLinterWorker.addPropertyChangeListener(this);
-			dicDictionaryLinterWorker.execute();
+			dicLinterWorker.addPropertyChangeListener(this);
+			dicLinterWorker.execute();
 		}
 	}
 
@@ -3108,24 +3111,24 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void checkThesaurusCorrectness(){
-		if(theCorrectnessWorker == null || theCorrectnessWorker.isDone()){
-			theCheckCorrectnessMenuItem.setEnabled(false);
+		if(theLinterWorker == null || theLinterWorker.isDone()){
+			theLinterMenuItem.setEnabled(false);
 
-			theCorrectnessWorker = new ThesaurusCorrectnessWorker(backbone.getTheParser());
-			theCorrectnessWorker.addPropertyChangeListener(this);
-			theCorrectnessWorker.execute();
+			theLinterWorker = new ThesaurusCorrectnessWorker(backbone.getTheParser());
+			theLinterWorker.addPropertyChangeListener(this);
+			theLinterWorker.execute();
 		}
 	}
 
 
 	private void checkHyphenationCorrectness(){
-		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
-			hypCheckCorrectnessMenuItem.setEnabled(false);
+		if(hypLinterWorker == null || hypLinterWorker.isDone()){
+			hypLinterMenuItem.setEnabled(false);
 
-			hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
+			hypLinterWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
 				backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
-			hypCorrectnessWorker.addPropertyChangeListener(this);
-			hypCorrectnessWorker.execute();
+			hypLinterWorker.addPropertyChangeListener(this);
+			hypLinterWorker.execute();
 		}
 	}
 
@@ -3324,7 +3327,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JLabel cmpRuleFlagsAidLabel;
    private javax.swing.JScrollPane cmpScrollPane;
    private javax.swing.JTable cmpTable;
-   private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
@@ -3334,6 +3336,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JLabel dicInputLabel;
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
+   private javax.swing.JMenuItem dicLinterMenuItem;
    private javax.swing.JMenu dicMenu;
    private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
    private javax.swing.JLabel dicRuleFlagsAidLabel;
@@ -3371,9 +3374,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JLabel hypAddRuleSyllabesCountLabel;
    private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
    private javax.swing.JTextField hypAddRuleTextField;
-   private javax.swing.JMenuItem hypCheckCorrectnessMenuItem;
    private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
    private javax.swing.JLayeredPane hypLayeredPane;
+   private javax.swing.JMenuItem hypLinterMenuItem;
    private javax.swing.JMenu hypMenu;
    private javax.swing.JLabel hypRulesLabel;
    private javax.swing.JLabel hypRulesOutputLabel;
@@ -3406,8 +3409,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private unit731.hunlinter.gui.JTagPanel sexTagPanel;
    private javax.swing.JTextField sexTextField;
    private javax.swing.JButton theAddButton;
-   private javax.swing.JMenuItem theCheckCorrectnessMenuItem;
    private javax.swing.JLayeredPane theLayeredPane;
+   private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JScrollPane theScrollPane;
    private javax.swing.JLabel theSynonymsLabel;

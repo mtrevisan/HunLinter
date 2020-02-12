@@ -152,9 +152,9 @@ public class ThesaurusParser{
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
-	/* Find if there is a duplicate with the same definition and same part of speech */
-	public boolean contains(final String definition, final String[] partOfSpeeches){
-		return dictionary.contains(definition, partOfSpeeches);
+	/* Find if there is a duplicate with the same definition and same part of speech (and also a synonym) */
+	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 
 	/* Find if there is a duplicate with the same part of speech and same synonyms */

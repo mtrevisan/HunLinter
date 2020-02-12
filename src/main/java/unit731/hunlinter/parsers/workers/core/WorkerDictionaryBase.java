@@ -84,7 +84,8 @@ public abstract class WorkerDictionaryBase{
 		worker.pause();
 
 		final Object[] options = {"Abort", "Cancel"};
-		final int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
+		final int answer = JOptionPane.showOptionDialog(parentComponent,
+			"Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
 			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel(true);

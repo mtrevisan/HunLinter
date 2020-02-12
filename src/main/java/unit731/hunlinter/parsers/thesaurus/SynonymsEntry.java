@@ -37,7 +37,8 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		Objects.requireNonNull(partOfSpeechAndSynonyms);
 
 		//all entries should be in lowercase
-		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT), ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
+		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT),
+			ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(components.length < 2)
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
@@ -88,7 +89,9 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public boolean containsSynonym(final String synonym){
-		return synonyms.contains(synonym);
+		return synonyms.stream()
+			.map(ThesaurusDictionary::removeSynonymUse)
+			.anyMatch(s -> s.equals(synonym));
 	}
 
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){

@@ -78,9 +78,9 @@ public class ThesaurusDictionary{
 	}
 
 	/* Find if there is a duplicate with the same definition and same part of speech */
-	public boolean contains(final String definition, final String[] partOfSpeeches){
+	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
 		final ThesaurusEntry def = dictionary.get(definition);
-		return (def != null && def.containsPartOfSpeeches(partOfSpeeches));
+		return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
 	}
 
 	/* Find if there is a duplicate with the same part of speech and same synonyms */
