@@ -263,6 +263,7 @@ class WordGeneratorBase{
 		return (appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
+	//FIXME
 	private boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,
 			final boolean isCompound){
 		boolean shouldApply = true;
