@@ -136,6 +136,78 @@ class WordGeneratorCompoundBeginMiddleEndTest{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 154, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
+		//good:
+		/*Computer
+Computern
+Arbeit
+Arbeits-
+Computerarbeit
+Computerarbeits-
+Arbeitscomputer
+Computercomputer
+Computercomputern
+Arbeitscomputern
+Computerarbeitscomputer
+Computerarbeitscomputern
+Arbeitscomputercomputer
+Computercomputerarbeit
+Arbeitscomputerarbeit
+Arbeitsarbeitsarbeit
+Computerarbeitsarbeit
+Computerarbeits-Computer
+Computerarbeits-Computern
+Computer-Arbeit*/
+		//wrong:
+		/*computer
+computern
+arbeit
+Arbeits
+arbeits
+ComputerArbeit
+ComputernArbeit
+Computernarbeit
+ComputerArbeits
+Arbeitcomputer
+Arbeitcomputern
+ArbeitsComputer
+ArbeitsComputern
+Computerarbeitcomputer
+ComputerArbeitcomputer
+ComputerArbeitscomputer
+Computerarbeitcomputern
+ComputerArbeitcomputern
+ComputerArbeitscomputern
+Arbeitscomputerarbeits
+Arbeitscomputernarbeits
+Computerarbeits-computer
+Arbeitsnehmer
+computers
+computern
+computernarbeit
+computernArbeit
+computerArbeit
+computerArbeits
+arbeitcomputer
+arbeitsComputer
+computerarbeitcomputer
+computerArbeitcomputer
+computerArbeitscomputer
+arbeitscomputerarbeits
+computerarbeits-computer
+arbeitsnehmer
+computernarbeit
+computernArbeit
+arbeits-
+computerarbeit
+computerarbeits-
+arbeitscomputer
+arbeitscomputern
+computerarbeitscomputer
+computerarbeitscomputern
+computerarbeitscomputers
+arbeitscomputerarbeit
+computerarbeits-Computer
+computerarbeits-Computern*/
 		List<Production> expected = Arrays.asList(
 //			createProduction("Arbeitarbeit", "-A", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
 //			createProduction("Arbeitarbeits", "-PUX", "pa:Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
