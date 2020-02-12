@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 public class LanguageChooserDialog extends javax.swing.JDialog{
 
 	private final Consumer<String> onSelection;
+	private boolean languageChosen;
 
 
 	public LanguageChooserDialog(final List<String> availableLanguages, final Consumer<String> onSelection, Frame parent){
@@ -71,15 +72,20 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void languageListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_languageListValueChanged
+		languageChosen = true;
 		onSelection.accept(languageList.getSelectedValue());
 
 		dispose();
    }//GEN-LAST:event_languageListValueChanged
 
+	public boolean languageChosen(){
+   	return languageChosen;
+	}
+
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JList<String> languageList;
    private javax.swing.JScrollPane languageScrollPane;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 
 }

@@ -90,6 +90,7 @@ import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.parsers.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.parsers.workers.CompoundRulesWorker;
 import unit731.hunlinter.parsers.workers.DictionaryLinterWorker;
@@ -2534,6 +2535,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					GUIUtils.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
+
+					if(!dialog.languageChosen())
+						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
 				}
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
@@ -2551,7 +2555,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				filOpenProjectMenuItem.setEnabled(false);
 			}
-			catch(final IOException | SAXException | ProjectNotFoundException e){
+			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
 				loadFileCancelled(e);
 
 				LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
