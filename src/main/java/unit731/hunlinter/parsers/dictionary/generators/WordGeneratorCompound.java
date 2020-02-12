@@ -227,6 +227,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
 
 				final char lastChar = sb.charAt(sb.length() - 1);
+				//FIXME if nextCompound is changed, then check for duplicates
 				nextCompound = enforceNextCompoundCase(lastChar, nextCompound, lastWordCasing, nextWordCasing);
 
 				lastWordCasing = nextWordCasing;

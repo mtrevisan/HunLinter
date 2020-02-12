@@ -119,7 +119,7 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, 154, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 1086, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		//good:
 /*
