@@ -2,16 +2,11 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
@@ -19,11 +14,7 @@ import unit731.hunlinter.services.PermutationsWithRepetitions;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-class WordGeneratorCompoundFlagTest{
-
-	private AffixData affixData;
-	private WordGenerator wordGenerator;
-
+class WordGeneratorCompoundFlagTest extends TestBase{
 
 	@Test
 	void simple() throws IOException, SAXException{
@@ -888,7 +879,7 @@ class WordGeneratorCompoundFlagTest{
 //			"CHECKCOMPOUNDPATTERN 1",
 //			//avoid generation of `pseudofoo`, but allow `pseudosfoo`
 //			"CHECKCOMPOUNDPATTERN 0/B /A");
-//		loadData(affFile, language);
+//		TestHelper.loadData(affFile, language);
 //
 //		String[] inputCompounds = new String[]{
 //			"foo/A",
@@ -897,38 +888,16 @@ class WordGeneratorCompoundFlagTest{
 //		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, 2);
 //
 //		List<Production> expected = Arrays.asList(
-//			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
-//			createProduction("foopseudo", "B", "pa:foo st:foo pa:pseudo st:pseudo"),
-//			createProduction("foopseudos", "PO", "pa:foo st:foo pa:pseudos st:pseudo"),
-//			createProduction("pseudosfoo", "PO", "pa:pseudos st:pseudo pa:foo st:foo"),
-//			createProduction("pseudopseudo", "B", "pa:pseudo st:pseudo pa:pseudo st:pseudo"),
-//			createProduction("pseudopseudos", "PO", "pa:pseudo st:pseudo pa:pseudos st:pseudo"),
-//			createProduction("pseudospseudo", "BPO", "pa:pseudos st:pseudo pa:pseudo st:pseudo"),
-//			createProduction("pseudospseudos", "PO", "pa:pseudos st:pseudo pa:pseudos st:pseudo")
+//			TestHelper.createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
+//			TestHelper.createProduction("foopseudo", "B", "pa:foo st:foo pa:pseudo st:pseudo"),
+//			TestHelper.createProduction("foopseudos", "PO", "pa:foo st:foo pa:pseudos st:pseudo"),
+//			TestHelper.createProduction("pseudosfoo", "PO", "pa:pseudos st:pseudo pa:foo st:foo"),
+//			TestHelper.createProduction("pseudopseudo", "B", "pa:pseudo st:pseudo pa:pseudo st:pseudo"),
+//			TestHelper.createProduction("pseudopseudos", "PO", "pa:pseudo st:pseudo pa:pseudos st:pseudo"),
+//			TestHelper.createProduction("pseudospseudo", "BPO", "pa:pseudos st:pseudo pa:pseudo st:pseudo"),
+//			TestHelper.createProduction("pseudospseudos", "PO", "pa:pseudos st:pseudo pa:pseudos st:pseudo")
 //		);
 //		Assertions.assertEquals(expected, words);
 //	}
-
-
-	private void loadData(File affFile, String language) throws IOException, SAXException{
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile, language);
-		affixData = affParser.getAffixData();
-		wordGenerator = new WordGenerator(affixData, null);
-	}
-
-	private void loadData(File affFile, File dicFile, String language) throws IOException, SAXException{
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile, language);
-		affixData = affParser.getAffixData();
-		Charset charset = affixData.getCharset();
-		DictionaryParser dicParser = new DictionaryParser(dicFile, language, charset);
-		wordGenerator = new WordGenerator(affixData, dicParser);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
-	}
 
 }

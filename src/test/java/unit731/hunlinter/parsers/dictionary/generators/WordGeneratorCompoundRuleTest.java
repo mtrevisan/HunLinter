@@ -8,20 +8,13 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-class WordGeneratorCompoundRuleTest{
-
-	private AffixData affixData;
-	private WordGenerator wordGenerator;
-
+class WordGeneratorCompoundRuleTest extends TestBase{
 
 	@Test
 	void testBjörnJacke() throws IOException, SAXException{
@@ -349,18 +342,6 @@ class WordGeneratorCompoundRuleTest{
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
 		Assertions.assertEquals(expected, words);
-	}
-
-	private void loadData(File affFile, String language) throws IOException, SAXException{
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile, language);
-		affixData = affParser.getAffixData();
-		wordGenerator = new WordGenerator(affixData, null);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }
