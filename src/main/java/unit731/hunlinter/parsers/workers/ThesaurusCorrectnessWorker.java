@@ -50,6 +50,9 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 				setProgress(++ i * 100 / size);
 			}
 
+
+			watch.stop();
+
 			setProgress(100);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed thesaurus (in {})", watch.toStringMinuteSeconds());
