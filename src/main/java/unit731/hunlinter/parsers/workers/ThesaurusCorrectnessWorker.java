@@ -3,12 +3,16 @@ package unit731.hunlinter.parsers.workers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerData;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,6 +50,16 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 			final int size = dictionary.size();
 			for(final ThesaurusEntry entry : dictionary){
 				//TODO check if each part of `entry`, with appropriate PoS, exists
+				final List<SynonymsEntry> syns = entry.getSynonyms();
+				for(final SynonymsEntry syn : syns){
+					final List<String> definitions = syn.getSynonyms();
+					final String[] partOfSpeeches = syn.getPartOfSpeeches();
+					for(String definition : definitions){
+						definition = ThesaurusDictionary.removeSynonymUse(definition);
+						if(!theParser.contains(definition, partOfSpeeches))
+							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus does not contains definition {} with part-of-speech {}", definition, Arrays.toString(partOfSpeeches));
+					}
+				}
 
 				setProgress(++ i * 100 / size);
 			}

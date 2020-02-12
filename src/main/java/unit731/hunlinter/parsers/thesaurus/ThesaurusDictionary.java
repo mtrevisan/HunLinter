@@ -77,6 +77,12 @@ public class ThesaurusDictionary{
 		return new SynonymsEntry(sj.toString());
 	}
 
+	/* Find if there is a duplicate with the same definition and same part of speech */
+	public boolean contains(final String definition, final String[] partOfSpeeches){
+		final ThesaurusEntry def = dictionary.get(definition);
+		return (def != null && def.containsPartOfSpeeches(partOfSpeeches));
+	}
+
 	/* Find if there is a duplicate with the same part of speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
@@ -142,7 +148,7 @@ public class ThesaurusDictionary{
 			.collect(Collectors.toList());
 	}
 
-	private String removeSynonymUse(final String synonym){
+	public static String removeSynonymUse(final String synonym){
 		return PatternHelper.replaceAll(synonym, PATTERN_SYNONYM_USE, StringUtils.EMPTY);
 	}
 

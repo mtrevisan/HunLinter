@@ -79,7 +79,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return new HashSet<>(Arrays.asList(this.partOfSpeeches)).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
 	}
 
-	List<String> getSynonyms(){
+	public List<String> getSynonyms(){
 		return synonyms;
 	}
 
