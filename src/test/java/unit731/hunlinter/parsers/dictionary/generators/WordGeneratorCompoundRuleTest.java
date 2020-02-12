@@ -134,60 +134,87 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 		Assertions.assertEquals(expected, words);
 	}
 
-//	@Test
-//	void onlyInCompound3() throws IOException{
-//		String language = "en-GB";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"COMPOUNDMIN 1",
-//			"ONLYINCOMPOUND _",
-//			"COMPOUNDRULE 2",
-//			"COMPOUNDRULE #*0{",
-//			"COMPOUNDRULE #*@}");
-//		loadData(affFile, language);
-//
-//		String line = "#*0{";
-//		String[] inputCompounds = new String[]{
-//			"0/#@",
-//			"0th/}{",
-//			"1/#0",
-//			"1st/}",
-//			"1th/{_",
-//			"2/#@",
-//			"2nd/}",
-//			"2th/{_",
-//			"3/#@",
-//			"3rd/}",
-//			"3th/{_",
-//			"4/#@",
-//			"4th/}{",
-//			"5/#@",
-//			"5th/}{",
-//			"6/#@",
-//			"6th/}{",
-//			"7/#@",
-//			"7th/}{",
-//			"8/#@",
-//			"8th/}{",
-//			"9/#@",
-//			"9th/}{"
-//		};
-//		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-//
-//		List<Production> expected = Arrays.asList(
-//			createProduction("10th", null, "pa: 0 pa:{"),
-//			createProduction("11th", null, "pa: 0 pa:{"),
-//			createProduction("12th", null, "pa: 0 pa:{"),
-//			createProduction("13th", null, "pa: 0 pa:{"),
-//			createProduction("14th", null, "pa: 0 pa:{"),
-//			createProduction("15th", null, "pa: 0 pa:{"),
-//			createProduction("16th", null, "pa: 0 pa:{"),
-//			createProduction("17th", null, "pa: 0 pa:{"),
-//			createProduction("18th", null, "pa: 0 pa:{"),
-//			createProduction("19th", null, "pa: 0 pa:{")
-//		);
-//		Assertions.assertEquals(expected, words);
-//	}
+	@Test
+	void onlyInCompound3() throws IOException{
+		String language = "en-GB";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"ONLYINCOMPOUND _",
+			"COMPOUNDRULE 2",
+			"COMPOUNDRULE #*0{",
+			"COMPOUNDRULE #*@}");
+		loadData(affFile, language);
+
+		String line = "#*0{";
+		String[] inputCompounds = new String[]{
+			"0/#@",
+			"0th/}{",
+			"1/#0",
+			"1st/}",
+			"1th/{_",
+			"2/#@",
+			"2nd/}",
+			"2th/{_",
+			"3/#@",
+			"3rd/}",
+			"3th/{_",
+			"4/#@",
+			"4th/}{",
+			"5/#@",
+			"5th/}{",
+			"6/#@",
+			"6th/}{",
+			"7/#@",
+			"7th/}{",
+			"8/#@",
+			"8th/}{",
+			"9/#@",
+			"9th/}{"
+		};
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+
+		List<Production> expected = Arrays.asList(
+			createProduction("13th", "_", "pa:1 st:1 pa:3th st:3th"),
+			createProduction("15th", null, "pa:1 st:1 pa:5th st:5th"),
+			createProduction("11th", "_", "pa:1 st:1 pa:1th st:1th"),
+			createProduction("18th", null, "pa:1 st:1 pa:8th st:8th"),
+			createProduction("10th", null, "pa:1 st:1 pa:0th st:0th"),
+			createProduction("12th", "_", "pa:1 st:1 pa:2th st:2th"),
+			createProduction("14th", null, "pa:1 st:1 pa:4th st:4th"),
+			createProduction("19th", null, "pa:1 st:1 pa:9th st:9th"),
+			createProduction("16th", null, "pa:1 st:1 pa:6th st:6th"),
+			createProduction("17th", null, "pa:1 st:1 pa:7th st:7th"),
+			createProduction("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
+			createProduction("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
+			createProduction("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
+			createProduction("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
+			createProduction("010th", null, "pa:0 st:0 pa:1 st:1 pa:0th st:0th"),
+			createProduction("012th", "_", "pa:0 st:0 pa:1 st:1 pa:2th st:2th"),
+			createProduction("014th", null, "pa:0 st:0 pa:1 st:1 pa:4th st:4th"),
+			createProduction("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
+			createProduction("016th", null, "pa:0 st:0 pa:1 st:1 pa:6th st:6th"),
+			createProduction("017th", null, "pa:0 st:0 pa:1 st:1 pa:7th st:7th"),
+			createProduction("613th", "_", "pa:6 st:6 pa:1 st:1 pa:3th st:3th"),
+			createProduction("615th", null, "pa:6 st:6 pa:1 st:1 pa:5th st:5th"),
+			createProduction("611th", "_", "pa:6 st:6 pa:1 st:1 pa:1th st:1th"),
+			createProduction("618th", null, "pa:6 st:6 pa:1 st:1 pa:8th st:8th"),
+			createProduction("610th", null, "pa:6 st:6 pa:1 st:1 pa:0th st:0th"),
+			createProduction("612th", "_", "pa:6 st:6 pa:1 st:1 pa:2th st:2th"),
+			createProduction("614th", null, "pa:6 st:6 pa:1 st:1 pa:4th st:4th"),
+			createProduction("619th", null, "pa:6 st:6 pa:1 st:1 pa:9th st:9th"),
+			createProduction("616th", null, "pa:6 st:6 pa:1 st:1 pa:6th st:6th"),
+			createProduction("617th", null, "pa:6 st:6 pa:1 st:1 pa:7th st:7th"),
+			createProduction("713th", "_", "pa:7 st:7 pa:1 st:1 pa:3th st:3th"),
+			createProduction("715th", null, "pa:7 st:7 pa:1 st:1 pa:5th st:5th"),
+			createProduction("711th", "_", "pa:7 st:7 pa:1 st:1 pa:1th st:1th"),
+			createProduction("718th", null, "pa:7 st:7 pa:1 st:1 pa:8th st:8th"),
+			createProduction("710th", null, "pa:7 st:7 pa:1 st:1 pa:0th st:0th"),
+			createProduction("712th", "_", "pa:7 st:7 pa:1 st:1 pa:2th st:2th"),
+			createProduction("714th", null, "pa:7 st:7 pa:1 st:1 pa:4th st:4th")
+		);
+		Assertions.assertEquals(expected, words);
+	}
 
 	@Test
 	void zeroOrOne() throws IOException{
