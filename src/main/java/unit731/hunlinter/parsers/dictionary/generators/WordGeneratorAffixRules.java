@@ -7,6 +7,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.system.JavaHelper;
 
 
 class WordGeneratorAffixRules extends WordGeneratorBase{
@@ -41,7 +42,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private void enforceOnlyInCompound(final List<Production> productions){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null)
-			productions.removeIf(production -> production.hasContinuationFlag(onlyInCompoundFlag));
+			productions.removeIf(production -> production.hasContinuationFlag(onlyInCompoundFlag)
+				|| JavaHelper.nullableToStream(production.getAppliedRules()).anyMatch(appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)));
 	}
 
 }

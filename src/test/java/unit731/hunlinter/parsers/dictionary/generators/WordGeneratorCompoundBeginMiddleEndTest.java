@@ -65,25 +65,20 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(7, words.size());
+		Assertions.assertEquals(2, words.size());
 		//base production
 		Assertions.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
 		//suffix productions
 		//prefix productions
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(1));
-		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(2));
-		Assertions.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(3));
-		Assertions.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(4));
-		Assertions.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(5));
-		Assertions.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(6));
 
 
 		line = "Computer/BC-";
 		dicEntry = wordGenerator.createFromDictionaryLine(line);
 		words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(8, words.size());
+		Assertions.assertEquals(5, words.size());
 		//base production
 		Assertions.assertEquals(createProduction("Computer", "BC-", "st:Computer"), words.get(0));
 		//suffix productions
@@ -91,11 +86,8 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 		//prefix productions
 		//twofold productions
 		Assertions.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(2));
-		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(3));
-		Assertions.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(4));
-		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(5));
-		Assertions.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(6));
-		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(7));
+		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(3));
+		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(4));
 
 
 		line = "-/W";
@@ -130,8 +122,7 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 154, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		//good:
-		/*Computer
-Computern
+/*
 Arbeit
 Arbeits-
 Computerarbeit
@@ -151,7 +142,7 @@ Computerarbeits-Computer
 Computerarbeits-Computern
 Computer-Arbeit*/
 		//wrong:
-		/*computer
+/*computer
 computern
 arbeit
 Arbeits
