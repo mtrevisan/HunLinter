@@ -351,6 +351,61 @@ class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
+	void notPermitFlag() throws IOException, SAXException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"PFX P Y 1",
+			"PFX P 0 pre .",
+			"SFX S Y 1",
+			"SFX S 0 suf .");
+		loadData(affFile, language);
+
+
+		String line = "foo/XPS";
+		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+
+		Assertions.assertEquals(4, words.size());
+		//base production
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		//onefold productions
+		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words.get(1));
+		//twofold productions
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("prefoosuf", "", "st:foo"), words.get(3));
+		//lastfold productions
+
+
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 70, 2);
+
+		List<Production> expected = Arrays.asList(
+			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoosuf", null, "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobar", "S", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobarsuf", null, "pa:foo st:foo pa:bar st:bar"),
+			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoo", "S", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoosuf", null, "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
+		);
+		Assertions.assertEquals(expected, words);
+	}
+
+	@Test
 	void permitFlag() throws IOException, SAXException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
