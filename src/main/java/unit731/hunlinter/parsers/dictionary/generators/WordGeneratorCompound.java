@@ -3,6 +3,7 @@ package unit731.hunlinter.parsers.dictionary.generators;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -69,24 +70,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
-					final Set<DictionaryEntry> input = inputs.get(flag);
-//FIXME simplify
-//					final List<Production> dicEntriesPerFlag = input.stream()
-//						.map(entry -> applyAffixRules(entry, true, null))
-//						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
-//						.flatMap(List::stream)
-//						.collect(Collectors.toList());
-					final List<Production> dicEntriesPerFlag = new ArrayList<>();
-					for(final DictionaryEntry entry : input){
-						final List<Production> productions = applyAffixRules(entry, true, null);
-
-						final List<Production> collect = new ArrayList<>();
-						for(final Production prod : productions)
-							if(prod.hasContinuationFlag(flag))
-								collect.add(prod);
-						for(final Production production : collect)
-							dicEntriesPerFlag.add(production);
-					}
+					final List<Production> dicEntriesPerFlag = inputs.get(flag).stream()
+						.map(entry -> applyAffixRules(entry, true, null))
+						.map(productions -> productions.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
+						.flatMap(Collection::stream)
+						.collect(Collectors.toList());
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
 
