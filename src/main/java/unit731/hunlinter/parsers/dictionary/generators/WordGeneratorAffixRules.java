@@ -25,6 +25,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	List<Production> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 
+		enforceOnlyInCompound(productions);
+
 		//convert using output table
 		for(final Production production : productions)
 			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
@@ -33,6 +35,13 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
+	}
+
+	/** Remove rules that invalidate the onlyInCompound rule */
+	private void enforceOnlyInCompound(final List<Production> productions){
+		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
+		if(onlyInCompoundFlag != null)
+			productions.removeIf(production -> production.hasContinuationFlag(onlyInCompoundFlag));
 	}
 
 }

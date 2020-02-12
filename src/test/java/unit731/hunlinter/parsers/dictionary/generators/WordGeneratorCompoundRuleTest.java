@@ -344,7 +344,6 @@ class WordGeneratorCompoundRuleTest{
 			"scheu/wU"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
-//words.forEach(System.out::println);
 
 		List<Production> expected = Collections.singletonList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
