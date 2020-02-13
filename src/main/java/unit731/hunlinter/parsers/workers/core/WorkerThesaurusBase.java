@@ -1,14 +1,5 @@
 package unit731.hunlinter.parsers.workers.core;
 
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import javax.swing.*;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,22 +7,26 @@ import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 
-public abstract class WorkerDictionaryBase{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionaryBase.class);
+public abstract class WorkerThesaurusBase{
 
-
-	private WorkerDictionary worker;
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThesaurusBase.class);
 
 
-	public final void createReadWorker(final WorkerDataDictionary workerData, final BiConsumer<String, Integer> lineProcessor){
-		worker = WorkerDictionary.createReadWorker(workerData, lineProcessor);
-	}
+	private WorkerThesaurus worker;
 
-	public final void createWriteWorker(final WorkerDataDictionary workerData, final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor,
-			final File outputFile){
-		worker = WorkerDictionary.createWriteWorker(workerData, lineProcessor, outputFile);
+
+	public final void createReadWorker(final WorkerDataThesaurus workerData, final BiConsumer<String, Integer> lineProcessor){
+		worker = WorkerThesaurus.createReadWorker(workerData, lineProcessor);
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener listener){

@@ -39,10 +39,7 @@ public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
-			exception = null;
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, WORKER_NAME);
-			setProgress(0);
+			prepareProcessing(WORKER_NAME);
 
 			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
 			int i = 0;
@@ -66,19 +63,12 @@ public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 			}
 
 
-			watch.stop();
-
-			setProgress(100);
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed thesaurus (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Successfully processed thesaurus");
 		}
 		catch(final Exception e){
-			exception = e;
+			cancelWorker(e);
 
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing thesaurus");
-
-			cancel(true);
 		}
 
 		return null;

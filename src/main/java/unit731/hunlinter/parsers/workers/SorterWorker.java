@@ -49,10 +49,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
-			exception = null;
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
-			setProgress(0);
+			prepareProcessing("Sorting Dictionary file");
 
 			final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 			if(boundary != null){
@@ -87,20 +84,14 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			setProgress(100);
 		}
 		catch(final ClosedChannelException e){
-			exception = e;
+			cancelWorker(e);
 
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
-
-			cancel(true);
 		}
 		catch(final Exception e){
-			exception = e;
+			cancelWorker(e);
 
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
-
-			cancel(true);
 		}
 
 		return null;

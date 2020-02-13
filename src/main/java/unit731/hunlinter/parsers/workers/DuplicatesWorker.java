@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -104,11 +103,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
-			exception = null;
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplicates extraction (pass 1/3)");
-
-			watch.reset();
+			prepareProcessing("Opening Dictionary file for duplicates extraction (pass 1/3)");
 
 			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
@@ -116,9 +111,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			writeDuplicates(duplicates);
 
-			watch.stop();
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Duplicates extracted successfully");
 
 			if(!duplicates.isEmpty()){
 				try{
@@ -130,17 +123,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(final Exception e){
-			exception = e;
-
-			if(e instanceof ClosedChannelException)
-				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
-			else{
-				LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
-			}
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file", e);
-
-			cancel(true);
+			cancelWorker(e);
 		}
 
 		return null;
@@ -152,7 +135,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
 			DuplicatesDictionaryBaseData.getInstance());
 
-		setProgress(0);
 		final File dicFile = dicParser.getDicFile();
 		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = ParserHelper.extractLine(br);
@@ -268,7 +250,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProgress(getProgress(1., totalSize + 1));
+			setProgress(getProgress(1, totalSize + 1));
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
@@ -292,10 +274,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		}
-	}
-
-	private int getProgress(final double index, final double total){
-		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){

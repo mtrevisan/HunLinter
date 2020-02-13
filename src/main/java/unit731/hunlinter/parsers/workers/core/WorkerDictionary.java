@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.workers.core;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.LineNumberReader;
-import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -66,13 +65,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	@Override
 	protected Void doInBackground(){
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file (pass 1/2)");
-		setProgress(0);
-
-		watch.reset();
+		prepareProcessing("Opening Dictionary file (pass 1/2)");
 
 		final List<Pair<Integer, String>> lines = readLines();
-
 		if(outputFile == null)
 			readProcess(lines);
 		else
@@ -113,36 +108,16 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private void readProcess(final List<Pair<Integer, String>> lines){
 		try{
-			exception = null;
-
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 			setProgress(0);
 
 			processLines(lines);
 
-			watch.stop();
-
-			setProgress(100);
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Successfully processed dictionary file");
 		}
 		catch(final Exception e){
-			exception = e;
-
-			if(isInterruptedException(e))
-				LOGGER.info("Thread interrupted");
-			else
-				LOGGER.error("Generic error", e);
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file", new Object[]{});
-
-			cancel(true);
+			cancelWorker(e);
 		}
-	}
-
-	private boolean isInterruptedException(final Exception exc){
-		final Throwable t = (exc.getCause() != null? exc.getCause(): exc);
-		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException);
 	}
 
 	private void processLines(final List<Pair<Integer, String>> lines){
@@ -217,33 +192,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				}
 			}
 
-
-			watch.stop();
-
-			setProgress(100);
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Successfully processed dictionary file");
 		}
 		catch(final Exception e){
 			cancelWorker(e);
 		}
-	}
-
-	private void cancelWorker(final Exception e){
-		if(e instanceof ClosedChannelException)
-			LOGGER.info("Thread interrupted");
-		else if(e != null){
-			final String message = ExceptionHelper.getMessage(e);
-			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
-		}
-
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file", new Object[]{});
-
-		cancel(true);
-	}
-
-	private int getProgress(final double index, final double total){
-		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 }

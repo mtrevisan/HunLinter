@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -75,13 +74,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
-			exception = null;
+			prepareProcessing("Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
-
-			watch.reset();
-
-			setProgress(0);
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
 			try(
@@ -222,12 +216,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				.build();
 			dicParser.getSorter().sort(outputFile, options, outputFile);
 
-			watch.stop();
-
-			setProgress(100);
-
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Minimal pairs extracted successfully");
 
 			try{
 				FileHelper.openFileWithChosenEditor(outputFile);
@@ -237,24 +227,10 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(final Exception e){
-			exception = e;
-
-			if(e instanceof ClosedChannelException)
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs thread interrupted");
-			else{
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}", e.getMessage());
-			}
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file", e);
-
-			cancel(true);
+			cancelWorker(e);
 		}
 
 		return null;
-	}
-
-	private int getProgress(final double index, final double total){
-		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 }

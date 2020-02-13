@@ -51,12 +51,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
-			exception = null;
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening project");
-			setProgress(0);
-
-			watch.reset();
+			prepareProcessing("Opening project");
 
 			final List<StageFunction> stages = Arrays.asList(
 				() -> backbone.openAffixFile(packager.getAffixFile()),
@@ -76,23 +71,15 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 				setProgress((int)Math.ceil((index + 1) * 100 / stages.size()));
 			}
 
-			watch.stop();
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
+			finalizeProcessing("Project loaded successfully");
 		}
 		catch(final Exception e){
-			exception = (e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
+			cancelWorker(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
 
-			final String errorMessage = ExceptionHelper.getMessage(e);
-			LOGGER.trace("{}: {}", e.getClass().getSimpleName(), errorMessage);
-			if(e instanceof ClosedChannelException)
-				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");
-			else
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", (e.getMessage() != null? e.getMessage(): errorMessage));
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped opening project");
-
-			cancel();
+			if(!(e instanceof ClosedChannelException)){
+				final String errorMessage = ExceptionHelper.getMessage(e);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", errorMessage);
+			}
 		}
 
 		return null;
