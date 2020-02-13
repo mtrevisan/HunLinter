@@ -34,7 +34,7 @@ public class HyphenationLinterWorker extends WorkerDictionaryBase{
 
 
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-											 final WordGenerator wordGenerator){
+			final WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
