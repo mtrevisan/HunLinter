@@ -116,6 +116,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
 			.add(StringUtils.join(synonyms, ThesaurusEntry.PIPE))
+			.add(definition)
 			.toString();
 	}
 

@@ -1872,7 +1872,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				"Warning", JOptionPane.WARNING_MESSAGE);
 		else{
 			//show merge dialog
-			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(newSynonyms, synonyms.getDefinition(), filteredSynonymsEntries, null);
+			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(synonyms.getDefinition(), newSynonyms, filteredSynonymsEntries, null);
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.setVisible(true);

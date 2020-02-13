@@ -23,7 +23,7 @@ public class ThesaurusMergeDialog extends JDialog{
 	private boolean merged;
 
 
-	public ThesaurusMergeDialog(final SynonymsEntry baseSynonyms, final String definition, final List<SynonymsEntry> synonymsEntries, final Frame parent){
+	public ThesaurusMergeDialog(final String definition, final SynonymsEntry baseSynonyms, final List<SynonymsEntry> synonymsEntries, final Frame parent){
 		super(parent, "Thesaurus merger", true);
 
 		Objects.requireNonNull(synonymsEntries);
@@ -115,7 +115,7 @@ public class ThesaurusMergeDialog extends JDialog{
    private void lineComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
 		final int synonymsIndex = lineComboBox.getSelectedIndex();
 
-		final String def = baseSynonyms.containsSynonym(this.definition)? StringUtils.EMPTY: this.definition;
+		final String def = (baseSynonyms.containsSynonym(definition)? StringUtils.EMPTY: definition);
 		final SynonymsEntry selectedSynonyms = synonymsEntries.get(synonymsIndex);
 		final SynonymsEntry mergedEntry = baseSynonyms.merge(def, selectedSynonyms);
 
