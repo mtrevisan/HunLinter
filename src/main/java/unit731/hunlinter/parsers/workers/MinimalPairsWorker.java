@@ -113,7 +113,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 						}
 					}
 
-					setProgress(getProgress(readSoFar, totalSize));
+					setProcessingProgress(readSoFar, totalSize);
 				}
 			}
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file written");
@@ -177,7 +177,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 					sourceBR.reset();
 
-					setProgress(getProgress(readSoFarSource, totalSizeSource));
+					setProcessingProgress(readSoFarSource, totalSizeSource);
 				}
 			}
 			setProgress(100);

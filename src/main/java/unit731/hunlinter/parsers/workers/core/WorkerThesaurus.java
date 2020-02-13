@@ -2,7 +2,6 @@ package unit731.hunlinter.parsers.workers.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -13,34 +12,38 @@ class WorkerThesaurus extends WorkerBase<String, Integer>{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThesaurus.class);
 
 
-	public static WorkerThesaurus createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor){
-		Objects.requireNonNull(readLineProcessor);
+	public static WorkerThesaurus createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> dataProcessor){
+		Objects.requireNonNull(dataProcessor);
 
-		return new WorkerThesaurus(workerData, readLineProcessor);
+		return new WorkerThesaurus(workerData, dataProcessor);
 	}
 
-	private WorkerThesaurus(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor){
+	private WorkerThesaurus(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> dataProcessor){
 		Objects.requireNonNull(workerData);
 		workerData.validate();
 
 		this.workerData = workerData;
-		this.readLineProcessor = readLineProcessor;
+		this.readDataProcessor = dataProcessor;
 	}
 
 	@Override
 	protected Void doInBackground(){
 		prepareProcessing("Start thesaurus processing");
 
-		try{
-			//...
+		dataProcess();
 
-			finalizeProcessing("Successfully processed dictionary file");
+		return null;
+	}
+
+	private void dataProcess(){
+		try{
+			//TODO...
+
+			finalizeProcessing("Successfully processed thesaurus file");
 		}
 		catch(final Exception e){
 			cancelWorker(e);
 		}
-
-		return null;
 	}
 
 }

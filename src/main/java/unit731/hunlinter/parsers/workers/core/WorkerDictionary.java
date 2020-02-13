@@ -59,8 +59,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 		this.workerData = workerData;
 		this.outputFile = outputFile;
-		this.readLineProcessor = readLineProcessor;
-		this.writeLineProcessor = writeLineProcessor;
+		this.readDataProcessor = readLineProcessor;
+		this.writeDataProcessor = writeLineProcessor;
 	}
 
 	@Override
@@ -97,7 +97,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				if(!line.isEmpty())
 					lines.add(Pair.of(br.getLineNumber(), line));
 
-				setProgress(getProgress(readSoFar, totalSize));
+				setProcessingProgress(readSoFar, totalSize);
 			}
 		}
 		catch(final Exception e){
@@ -109,7 +109,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private void readProcess(final List<Pair<Integer, String>> lines){
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
-			setProgress(0);
 
 			processLines(lines);
 
@@ -133,9 +132,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 				processingIndex.incrementAndGet();
 
-				readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
+				readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
-				setProgress(getProgress(processingIndex.get(), totalLines));
+				setProcessingProgress(processingIndex.get(), totalLines);
 			}
 			catch(final InterruptedException e){
 				if(!workerData.isPreventExceptionRelaunch())
@@ -166,8 +165,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private void writeProcess(final List<Pair<Integer, String>> lines){
 		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 
-		setProgress(0);
-
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		final DictionaryParser dicParser = ((WorkerDataDictionary)workerData).getDicParser();
@@ -180,9 +177,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				try{
 					writtenSoFar ++;
 
-					writeLineProcessor.accept(writer, rowLine);
+					writeDataProcessor.accept(writer, rowLine);
 
-					setProgress(getProgress(writtenSoFar, totalLines));
+					setProcessingProgress(writtenSoFar, totalLines);
 				}
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());

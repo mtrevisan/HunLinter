@@ -165,7 +165,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					}
 				}
 
-				setProgress(getProgress(readSoFar, totalSize));
+				setProcessingProgress(readSoFar, totalSize);
 			}
 
 			bloomFilter.close();
@@ -221,7 +221,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						}
 					}
 
-					setProgress(getProgress(readSoFar, totalSize));
+					setProcessingProgress(readSoFar, totalSize);
 				}
 			}
 			setProgress(100);
@@ -246,11 +246,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
-			setProgress(0);
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProgress(getProgress(1, totalSize + 1));
+			setProcessingProgress(1, totalSize + 1);
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
@@ -266,8 +265,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						.collect(Collectors.joining(", ")));
 					writer.newLine();
 
-					writtenSoFar ++;
-					setProgress(getProgress(writtenSoFar, totalSize + 1));
+					setProcessingProgress(++ writtenSoFar, totalSize + 1);
 				}
 			}
 			setProgress(100);
