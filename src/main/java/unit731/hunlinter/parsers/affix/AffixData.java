@@ -65,7 +65,7 @@ public class AffixData{
 		closed = false;
 	}
 
-	/** Check that the same flag does not belongs to different tags */
+	/** Check that the same flag doesn't belongs to different tags */
 	void verify(){
 		final Map<AffixOption, Object> extractSingleFlags = extractSingleFlags();
 		final Collection<Object> flaggedData = extractSingleFlags.values();

@@ -43,7 +43,7 @@ class WordGeneratorBase{
 	 * @param isCompound	Whether the word is-a or belongs-to a compound word
 	 * @param overriddenRule	Overridden set of rule entries, optional
 	 * @return	The list of productions for the given word
-	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
+	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
 	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();

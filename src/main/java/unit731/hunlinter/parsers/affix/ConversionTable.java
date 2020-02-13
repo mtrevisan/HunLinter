@@ -101,7 +101,7 @@ public class ConversionTable{
 	}
 
 	/**
-	 * NOTE: does not include the original word!
+	 * NOTE: doesn't include the original word!
 	 *
 	 * @param word	Word to be converted
 	 * @return	The list of conversions

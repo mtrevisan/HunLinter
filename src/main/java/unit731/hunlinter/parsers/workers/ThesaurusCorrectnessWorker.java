@@ -59,7 +59,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 						definition = ThesaurusDictionary.removeSynonymUse(definition);
 						//check also that the found PoS has `originalDefinition` among its synonyms
 						if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus does not contains definition {} with part-of-speech {} (from entry {})",
+							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus doesn't contain definition {} with part-of-speech {} (from entry {})",
 								definition, Arrays.toString(partOfSpeeches), originalDefinition);
 					}
 				}

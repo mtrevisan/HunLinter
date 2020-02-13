@@ -205,7 +205,7 @@ public class Version implements Comparable<Version>{
 	/**
 	 * Compares two {@code Version} instances.
 	 * <p>
-	 * This method does not take into account the versions' build metadata. If you want to compare the versions' build metadata
+	 * This method doesn't take into account the versions' build metadata. If you want to compare the versions' build metadata
 	 * use the {@code Version.compareToWithBuilds} method.</p>
 	 *
 	 * @param other	The object to be compared.

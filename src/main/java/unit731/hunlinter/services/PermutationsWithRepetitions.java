@@ -91,7 +91,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		if(forbidDuplicates){
 			boolean consecutiveDuplicates = true;
 			while(consecutiveDuplicates && currentIndex < maximumIndex)
-				//if next does not contains consecutive duplicates, break
+				//if next doesn't contains consecutive duplicates, break
 				consecutiveDuplicates = hasConsecutiveDuplicates(++ currentIndex, n);
 		}
 		else

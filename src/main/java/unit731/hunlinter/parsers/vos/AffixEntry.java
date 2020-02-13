@@ -28,8 +28,8 @@ public class AffixEntry{
 
 	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0}");
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
-	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part does not ends with removal part: ''{0}''");
-	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part does not starts with removal part: ''{0}''");
+	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: ''{0}''");
+	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: ''{0}''");
 	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: ''{0}''");
 	//warning
 	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");

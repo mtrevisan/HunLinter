@@ -38,7 +38,7 @@ public class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT_COUNT = new MessageFormat("The file does not starts with a line counter ({0})");
+	private static final MessageFormat WRONG_FILE_FORMAT_COUNT = new MessageFormat("The file doesn''t starts with a line counter ({0})");
 	private static final MessageFormat WRONG_FILE_FORMAT_CHARSET = new MessageFormat("The file is not in an allowable charset ({0})");
 
 

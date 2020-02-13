@@ -57,7 +57,7 @@ public class ThesaurusDictionary{
 				//add definition and synonyms if definition does exists
 				foundDefinition.addSynonym(synonymsEntry);
 			else{
-				//add to list if definition does not exists
+				//add to list if definition doesn't exists
 				final ThesaurusEntry entry = ThesaurusEntry.createFromDefinitionAndSynonyms(currentDefinition, synonymsEntry);
 				dictionary.put(currentDefinition, entry);
 

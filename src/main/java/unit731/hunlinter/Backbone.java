@@ -168,7 +168,7 @@ public class Backbone implements FileChangeListener{
 			if(hunLintable != null)
 				hunLintable.clearAffixParser();
 
-			throw new FileNotFoundException("The file '" + affFile.getCanonicalPath() + "' does not exists");
+			throw new FileNotFoundException("The file '" + affFile.getCanonicalPath() + "' doesn't exists");
 		}
 
 		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());

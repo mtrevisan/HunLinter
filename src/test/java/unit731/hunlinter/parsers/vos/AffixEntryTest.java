@@ -16,7 +16,7 @@ class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("Condition part does not ends with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't ends with removal part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test
@@ -36,7 +36,7 @@ class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("Condition part does not starts with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't starts with removal part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test

@@ -14,7 +14,7 @@ import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 public class DictionaryCorrectnessChecker{
 
 	private static final MessageFormat NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = new MessageFormat("Non–affix entry contains {0}");
-	private static final MessageFormat NO_MORPHOLOGICAL_FIELD = new MessageFormat("{0} does not have any morphological fields");
+	private static final MessageFormat NO_MORPHOLOGICAL_FIELD = new MessageFormat("{0} doesn''t have any morphological fields");
 	private static final MessageFormat INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an invalid morphological field prefix: {1}");
 	private static final MessageFormat UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an unknown morphological field prefix: {1}");
 	private static final MessageFormat UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("{0} has an unknown morphological field value: {1}");

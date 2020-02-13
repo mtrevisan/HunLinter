@@ -138,7 +138,7 @@ public class Packager{
 		this.projectPath = projectPath;
 
 		if(!existDirectory(projectPath))
-			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " does not exists, cannot load project");
+			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " doesn't exists, cannot load project");
 
 		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 		if(!existFile(mainManifestPath))

@@ -18,12 +18,12 @@ import java.util.Arrays;
  * An implementation of {@link BitArray} that uses a memory-mapped file to persist all changes synchronously for the underlying
  * bit array. This is useful for stateful bit-arrays which are expensive to construct yet need the best overall performance.
  *
- * NOTE: for some reason this class does not work!!
+ * NOTE: for some reason this class doesn't work!!
  */
 public class MemoryMappedFileBitArray implements BitArray{
 
 	private static final MessageFormat EMPTY_BACKUP_FILE = new MessageFormat("Backup file cannot be empty/null");
-	private static final MessageFormat INVALID_BACKUP_FILE = new MessageFormat("Backup file does not represent a valid file");
+	private static final MessageFormat INVALID_BACKUP_FILE = new MessageFormat("Backup file doesn''t represent a valid file");
 	private static final MessageFormat INVALID_NUMBER_OF_BITS = new MessageFormat("Number of bits must be strictly positive");
 
 	/** Underlying file that represents the state of the {@link BitArray} */
