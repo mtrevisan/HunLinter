@@ -132,7 +132,7 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
 		workerData.callCancelledCallback(exception);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing", new Object[]{});
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Process stopped", new Object[]{});
 	}
 
 	protected void cancelWorker(final Exception e){
@@ -149,7 +149,7 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
 		cancel(true);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing", new Object[]{});
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Process stopped", new Object[]{});
 	}
 
 	private boolean isInterruptedException(final Exception exception){

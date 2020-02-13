@@ -208,6 +208,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
    public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
 		if(flag != null){
+			mainProgressBar.setValue(0);
+
 			final RuleEntry rule = backbone.getAffixData().getData(flag);
 			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 			final String header = sj.add(rule.getType().getOption().getCode())
