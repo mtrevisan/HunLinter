@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -20,7 +20,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
-public class HyphenationLinterWorker extends WorkerDictionaryBase{
+public class HyphenationLinterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Hyphenation correctness checking";
 
@@ -35,8 +35,11 @@ public class HyphenationLinterWorker extends WorkerDictionaryBase{
 
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator){
+		super(WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
+
 
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final RulesLoader rulesLoader = new RulesLoader(language, null);
@@ -62,13 +65,8 @@ public class HyphenationLinterWorker extends WorkerDictionaryBase{
 				}
 			});
 		};
-		final WorkerDataDictionary data = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
-		createReadWorker(data, lineProcessor);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
+		setReadDataProcessor(lineProcessor);
 	}
 
 }

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -36,25 +35,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 
-	public static WorkerDictionary createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor){
-		Objects.requireNonNull(readLineProcessor);
-
-		final WorkerDictionary worker = new WorkerDictionary(workerData);
-		worker.setReadDataProcessor(readLineProcessor);
-		return worker;
-	}
-
-	public static WorkerDictionary createWriteWorker(final WorkerDataAbstract workerData,
-			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
-		Objects.requireNonNull(writeLineProcessor);
-		Objects.requireNonNull(outputFile);
-
-		final WorkerDictionary worker = new WorkerDictionary(workerData);
-		worker.setWriteDataProcessor(writeLineProcessor, outputFile);
-		return worker;
-	}
-
-	protected WorkerDictionary(final WorkerDataAbstract workerData){
+	protected WorkerDictionary(final WorkerDataDictionary workerData){
 		Objects.requireNonNull(workerData);
 
 		this.workerData = workerData;

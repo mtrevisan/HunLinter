@@ -31,7 +31,7 @@ public class WordCountWorker extends WorkerDictionary{
 
 
 	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser));
+		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
 
 		Objects.requireNonNull(wordGenerator);
 

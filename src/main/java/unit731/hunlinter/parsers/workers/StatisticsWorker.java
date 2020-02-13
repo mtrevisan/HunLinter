@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.workers;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import java.awt.Frame;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,7 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 
-public class StatisticsWorker extends WorkerDictionaryBase{
+public class StatisticsWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Collecting statistics";
 
@@ -34,16 +34,18 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
+		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(parent);
+
 
 		final AffixData affixData = affParser.getAffixData();
 		final String language = affixData.getLanguage();
 		dicStatistics = new DictionaryStatistics(language, affixData.getCharset());
 		this.hyphenator = hyphenator;
 		orthography = BaseBuilder.getOrthography(language);
-
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
@@ -72,24 +74,15 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			dialog.setVisible(true);
 		};
 		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
-		final WorkerDataDictionary data = WorkerDataDictionary.createParallel(WORKER_NAME, dicParser);
-		data.setCompletedCallback(completed);
-		data.setCancelledCallback(cancelled);
-		createReadWorker(data, lineProcessor);
+
+		setReadDataProcessor(lineProcessor);
+		getWorkerData()
+			.withCompletedCallback(completed)
+			.withCancelledCallback(cancelled);
 	}
 
-	public boolean isPerformHyphenationStatistics(){
+	public boolean isPerformingHyphenationStatistics(){
 		return (hyphenator != null);
-	}
-
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
-	}
-
-	@Override
-	public void clear(){
-		dicStatistics.clear();
 	}
 
 }

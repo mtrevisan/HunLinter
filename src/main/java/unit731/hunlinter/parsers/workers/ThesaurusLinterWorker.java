@@ -7,16 +7,16 @@ import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDataThesaurus;
+import unit731.hunlinter.parsers.workers.core.WorkerThesaurus;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.BiConsumer;
 
 
-public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
+public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLinterWorker.class);
 
@@ -25,22 +25,10 @@ public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn't contain definition {0} with part-of-speech {1} (from entry {2})");
 
 
-	private final ThesaurusParser theParser;
-
-
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
-		Objects.requireNonNull(theParser);
+		super(WorkerDataThesaurus.createParallel(WORKER_NAME, theParser));
 
-		this.theParser = theParser;
-
-		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME);
-	}
-
-	@Override
-	protected Void doInBackground(){
-		try{
-			prepareProcessing(WORKER_NAME);
-
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
 			int i = 0;
 			final int size = dictionary.size();
@@ -61,17 +49,9 @@ public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 
 				setProgress(++ i * 100 / size);
 			}
+		};
 
-
-			finalizeProcessing("Successfully processed thesaurus");
-		}
-		catch(final Exception e){
-			cancelWorker(e);
-
-			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
-		}
-
-		return null;
+		setReadDataProcessor(lineProcessor);
 	}
 
 }

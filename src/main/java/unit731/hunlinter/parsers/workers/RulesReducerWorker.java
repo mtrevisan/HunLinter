@@ -18,11 +18,11 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
-public class RulesReducerWorker extends WorkerDictionaryBase{
+public class RulesReducerWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
@@ -36,6 +36,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
 			final DictionaryParser dicParser, final WordGenerator wordGenerator){
+		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
@@ -76,14 +78,10 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-		final WorkerDataDictionary data = WorkerDataDictionary.createParallel(WORKER_NAME, dicParser);
-		data.setCompletedCallback(completed);
-		createReadWorker(data, lineProcessor);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
+		setReadDataProcessor(lineProcessor);
+		getWorkerData()
+			.withCompletedCallback(completed);
 	}
 
 }

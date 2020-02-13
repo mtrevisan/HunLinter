@@ -321,7 +321,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
 
 			try{
-				dicInclusionTestWorker.executeInline();
+				dicInclusionTestWorker.executeSynchronously();
 			}
 			catch(final Exception e){
 				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());

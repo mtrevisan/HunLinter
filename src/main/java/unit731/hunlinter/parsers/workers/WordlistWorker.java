@@ -17,12 +17,12 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 
-public class WordlistWorker extends WorkerDictionaryBase{
+public class WordlistWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordlistWorker.class);
 
@@ -33,7 +33,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
 			final File outputFile){
-		Objects.requireNonNull(dicParser);
+		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
@@ -63,14 +64,10 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		final WorkerDataDictionary data = WorkerDataDictionary.create(WORKER_NAME, dicParser);
-		data.setCompletedCallback(completed);
-		createWriteWorker(data, lineProcessor, outputFile);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
+		setWriteDataProcessor(lineProcessor, outputFile);
+		getWorkerData()
+			.withCompletedCallback(completed);
 	}
 
 }

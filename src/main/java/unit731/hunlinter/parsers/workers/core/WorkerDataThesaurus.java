@@ -37,7 +37,7 @@ public class WorkerDataThesaurus extends WorkerDataAbstract{
 	}
 
 	private WorkerDataThesaurus(final String workerName, final ThesaurusParser theParser, final boolean parallelProcessing,
-										 final boolean preventExceptionRelaunch){
+			final boolean preventExceptionRelaunch){
 		super(workerName, parallelProcessing, preventExceptionRelaunch);
 
 		Objects.requireNonNull(theParser);

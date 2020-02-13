@@ -263,7 +263,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
-			if(dicStatisticsWorker.isPerformHyphenationStatistics())
+			if(dicStatisticsWorker.isPerformingHyphenationStatistics())
 				hypStatisticsMenuItem.setEnabled(true);
 			else
 				dicStatisticsMenuItem.setEnabled(true);
@@ -2512,7 +2512,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
 			cmpLoadInputButton);
 
-//		checkAbortion(theLinterWorker, theLinterMenuItem);
+		checkAbortion(theLinterWorker, theLinterMenuItem);
 
 		checkAbortion(hypLinterWorker, hypLinterMenuItem);
 	}

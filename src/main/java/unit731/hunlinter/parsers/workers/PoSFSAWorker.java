@@ -12,7 +12,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 
-public class PoSFSAWorker extends WorkerDictionaryBase{
+public class PoSFSAWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PoSFSAWorker.class);
 
@@ -35,7 +35,8 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		Objects.requireNonNull(dicParser);
+		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
@@ -89,14 +90,10 @@ public class PoSFSAWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
 			}
 		};
-		final WorkerDataDictionary data = WorkerDataDictionary.create(WORKER_NAME, dicParser);
-		data.setCompletedCallback(completed);
-		createWriteWorker(data, lineProcessor, outputFile);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
+		setWriteDataProcessor(lineProcessor, outputFile);
+		getWorkerData()
+			.withCompletedCallback(completed);
 	}
 
 }

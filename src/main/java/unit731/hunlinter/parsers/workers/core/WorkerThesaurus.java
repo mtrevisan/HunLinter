@@ -4,25 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 
 
-class WorkerThesaurus extends WorkerBase<String, Integer>{
+public class WorkerThesaurus extends WorkerBase<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThesaurus.class);
 
 
-	public static WorkerThesaurus createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
-
-		return new WorkerThesaurus(workerData, dataProcessor);
-	}
-
-	private WorkerThesaurus(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> dataProcessor){
+	protected WorkerThesaurus(final WorkerDataThesaurus workerData){
 		Objects.requireNonNull(workerData);
 
 		this.workerData = workerData;
-		this.readDataProcessor = dataProcessor;
 	}
 
 	@Override

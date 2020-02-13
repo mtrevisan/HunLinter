@@ -247,7 +247,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				reduceButton.setEnabled(true);
 			};
 			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			rulesReducerWorker.askUserToAbort(this, cancelTask, resumeTask);
+			GUIUtils.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask);
 		}
 		else
 			dispose();
