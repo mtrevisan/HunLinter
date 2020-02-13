@@ -11,9 +11,6 @@ import unit731.hunlinter.services.Packager;
 
 public class ProjectLoaderWorker extends WorkerProject{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectLoaderWorker.class);
-
-
 	public static final String WORKER_NAME = "Project loader";
 
 
