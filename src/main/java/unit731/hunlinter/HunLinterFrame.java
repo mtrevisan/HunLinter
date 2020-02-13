@@ -2513,7 +2513,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
 			cmpLoadInputButton);
 
-//FIXME
 //		checkAbortion(theLinterWorker, theLinterMenuItem);
 
 		checkAbortion(hypLinterWorker, hypLinterMenuItem);
@@ -2529,6 +2528,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			worker.askUserToAbort(this, cancelTask, null);
 		}
 	}
+
+//	private <S, T> void checkAbortion(final WorkerBase<S, T> worker, final JComponent ... componentsToEnable){
+//		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
+//			final Runnable cancelTask = () -> {
+//				for(final JComponent component : componentsToEnable)
+//					component.setEnabled(true);
+//			};
+////			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+//			worker.askUserToAbort(this, cancelTask, null);
+//		}
+//	}
 
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
