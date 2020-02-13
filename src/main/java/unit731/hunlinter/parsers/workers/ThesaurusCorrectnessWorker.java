@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.workers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
@@ -23,7 +22,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 
 	public static final String WORKER_NAME = "Thesaurus correctness checking";
 
-	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
+	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn't contain definition {0} with part-of-speech {1} (from entry {2})");
 
 
 	private final ThesaurusParser theParser;
@@ -59,8 +58,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 						definition = ThesaurusDictionary.removeSynonymUse(definition);
 						//check also that the found PoS has `originalDefinition` among its synonyms
 						if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-							LOGGER.info(Backbone.MARKER_APPLICATION, "Thesaurus doesn't contain definition {} with part-of-speech {} (from entry {})",
-								definition, Arrays.toString(partOfSpeeches), originalDefinition);
+							LOGGER.info(Backbone.MARKER_APPLICATION, MISSING_ENTRY.format(new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
 					}
 				}
 
