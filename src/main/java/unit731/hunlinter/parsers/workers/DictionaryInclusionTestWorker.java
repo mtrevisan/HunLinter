@@ -15,7 +15,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 
 
@@ -54,7 +54,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 				falsePositiveCount);
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
-		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);
 		createReadWorker(data, lineProcessor);

@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
@@ -76,7 +76,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}

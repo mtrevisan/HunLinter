@@ -9,7 +9,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 
 
@@ -36,7 +36,7 @@ public class DictionaryLinterWorker extends WorkerDictionaryBase{
 				}
 			}
 		};
-		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 

@@ -30,7 +30,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.text.HammingDistance;
@@ -68,7 +68,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 	}
 
@@ -82,11 +82,11 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			watch.reset();
 
 			setProgress(0);
-			final Charset charset = getCharset();
+			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
 			try(
-					final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset());
-					final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
+					final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset);
+					final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
 					){
 				String line = ParserHelper.extractLine(br);
 

@@ -32,7 +32,7 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
@@ -96,7 +96,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 	}
@@ -147,14 +147,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
-		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
+		final Charset charset = dicParser.getCharset();
+		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
+		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
 			DuplicatesDictionaryBaseData.getInstance());
 
 		setProgress(0);
 		final File dicFile = dicParser.getDicFile();
-		final Charset charset = getCharset();
-		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset())){
+		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = ParserHelper.extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + 2;
@@ -210,9 +210,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
+			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
-			final Charset charset = getCharset();
-			try(final LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
+			try(final LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 				String line = br.readLine();
 
 				long readSoFar = line.getBytes(charset).length + 2;

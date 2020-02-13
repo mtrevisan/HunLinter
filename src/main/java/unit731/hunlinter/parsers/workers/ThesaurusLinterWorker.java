@@ -8,7 +8,7 @@ import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 
 		this.theParser = theParser;
 
-		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
+		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME);
 	}
 
 	@Override

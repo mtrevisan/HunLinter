@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.workers;
 
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 
@@ -31,7 +31,7 @@ public class DictionaryReducerWorker extends WorkerDictionaryBase{
 //				}
 //			}
 		};
-		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 

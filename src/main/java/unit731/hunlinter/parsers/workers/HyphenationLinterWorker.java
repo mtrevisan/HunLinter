@@ -14,7 +14,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
@@ -62,7 +62,7 @@ public class HyphenationLinterWorker extends WorkerDictionaryBase{
 				}
 			});
 		};
-		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 

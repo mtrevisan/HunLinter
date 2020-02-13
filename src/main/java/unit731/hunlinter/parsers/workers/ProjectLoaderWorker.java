@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.workers.core.WorkerBase;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.Packager;
 
@@ -43,7 +43,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		this.packager = packager;
 		this.backbone = backbone;
 
-		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
+		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME);
 		workerData.setCompletedCallback(completed);
 		workerData.setCancelledCallback(cancelled);
 	}

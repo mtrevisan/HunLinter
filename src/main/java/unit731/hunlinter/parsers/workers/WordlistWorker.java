@@ -16,7 +16,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerData;
+import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -63,7 +63,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		final WorkerDataDictionary data = WorkerDataDictionary.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createWriteWorker(data, lineProcessor, outputFile);
 	}

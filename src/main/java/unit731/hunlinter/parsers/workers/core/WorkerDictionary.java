@@ -18,6 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.FileHelper;
@@ -38,13 +39,13 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private final File outputFile;
 
 
-	public static WorkerDictionary createReadWorker(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor){
+	public static WorkerDictionary createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor){
 		Objects.requireNonNull(readLineProcessor);
 
 		return new WorkerDictionary(workerData, readLineProcessor, null, null);
 	}
 
-	public static WorkerDictionary createWriteWorker(final WorkerData workerData,
+	public static WorkerDictionary createWriteWorker(final WorkerDataAbstract workerData,
 			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
 		Objects.requireNonNull(writeLineProcessor);
 		Objects.requireNonNull(outputFile);
@@ -52,8 +53,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		return new WorkerDictionary(workerData, null, writeLineProcessor, outputFile);
 	}
 
-	private WorkerDictionary(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor,
-			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
+	private WorkerDictionary(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor,
+				final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
 		Objects.requireNonNull(workerData);
 		workerData.validate();
 
@@ -82,8 +83,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
-		final File dicFile = getDicFile();
-		final Charset charset = getCharset();
+		final DictionaryParser dicParser = ((WorkerDataDictionary)workerData).getDicParser();
+		final File dicFile = dicParser.getDicFile();
+		final Charset charset = dicParser.getCharset();
 		final long totalSize = dicFile.length();
 		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = ParserHelper.extractLine(br);
@@ -113,7 +115,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		try{
 			exception = null;
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 			setProgress(0);
 
 			processLines(lines);
@@ -161,7 +163,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				setProgress(getProgress(processingIndex.get(), totalLines));
 			}
 			catch(final InterruptedException e){
-				if(isRelaunchException())
+				if(!workerData.isPreventExceptionRelaunch())
 					throw new RuntimeException(e);
 			}
 			catch(final Exception e){
@@ -169,7 +171,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-				if(isRelaunchException())
+				if(!workerData.isPreventExceptionRelaunch())
 					throw e;
 			}
 		};
@@ -178,7 +180,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	private void processLines(final List<Pair<Integer, String>> lines, final Consumer<Pair<Integer, String>> processor){
-		if(isParallelProcessing())
+		if(workerData.isParallelProcessing())
 			lines.parallelStream()
 				.forEach(processor);
 		else
@@ -187,13 +189,14 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	private void writeProcess(final List<Pair<Integer, String>> lines){
-		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
+		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 
 		setProgress(0);
 
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
-		final Charset charset = getCharset();
+		final DictionaryParser dicParser = ((WorkerDataDictionary)workerData).getDicParser();
+		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(final Pair<Integer, String> rowLine : lines){
 				if(isCancelled())
@@ -209,7 +212,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-					if(isRelaunchException())
+					if(!workerData.isPreventExceptionRelaunch())
 						throw e;
 				}
 			}
