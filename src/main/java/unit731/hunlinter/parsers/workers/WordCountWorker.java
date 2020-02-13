@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.workers;
 
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +20,7 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 
 
-public class WordCountWorker extends WorkerDictionaryBase{
+public class WordCountWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
 
@@ -31,8 +31,10 @@ public class WordCountWorker extends WorkerDictionaryBase{
 
 
 	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		Objects.requireNonNull(dicParser);
+		super(WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser));
+
 		Objects.requireNonNull(wordGenerator);
+
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
@@ -58,21 +60,11 @@ public class WordCountWorker extends WorkerDictionaryBase{
 				falsePositiveCount);
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
-		final WorkerDataDictionary data = WorkerDataDictionary.createParallel(WORKER_NAME, dicParser);
-		data.setCompletedCallback(completed);
-		data.setCancelledCallback(cancelled);
-		createReadWorker(data, lineProcessor);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
-	}
-
-	@Override
-	public void clear(){
-		totalProductions.set(0);
-		dictionary.clear();
+		setReadDataProcessor(lineProcessor);
+		getWorkerData()
+			.withCompletedCallback(completed)
+			.withCancelledCallback(cancelled);
 	}
 
 }

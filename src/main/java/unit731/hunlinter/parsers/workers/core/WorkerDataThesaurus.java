@@ -49,9 +49,4 @@ public class WorkerDataThesaurus extends WorkerDataAbstract{
 		return theParser;
 	}
 
-	@Override
-	public void validate() throws NullPointerException{
-		Objects.requireNonNull(theParser);
-	}
-
 }

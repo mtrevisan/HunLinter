@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -22,6 +23,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import unit731.hunlinter.FontChooserDialog;
+import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -269,6 +271,30 @@ public class GUIUtils{
 					}
 				}
 			});
+		}
+	}
+
+
+	public static void askUserToAbort(final WorkerBase<?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
+		Objects.requireNonNull(parentComponent);
+
+		worker.pause();
+
+		final Object[] options = {"Abort", "Cancel"};
+		final int answer = JOptionPane.showOptionDialog(parentComponent,
+			"Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
+			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		if(answer == JOptionPane.YES_OPTION){
+			worker.cancel(true);
+
+			Optional.ofNullable(cancelTask)
+				.ifPresent(Runnable::run);
+		}
+		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+			worker.resume();
+
+			Optional.ofNullable(resumeTask)
+				.ifPresent(Runnable::run);
 		}
 	}
 

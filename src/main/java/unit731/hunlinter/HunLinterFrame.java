@@ -87,7 +87,6 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.workers.PoSFSAWorker;
 import unit731.hunlinter.parsers.workers.ThesaurusLinterWorker;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
@@ -2518,27 +2517,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(hypLinterWorker, hypLinterMenuItem);
 	}
 
-	private void checkAbortion(final WorkerDictionaryBase worker, final JComponent ... componentsToEnable){
+	private void checkAbortion(final WorkerBase<?, ?> worker, final JComponent ... componentsToEnable){
 		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 			final Runnable cancelTask = () -> {
 				for(final JComponent component : componentsToEnable)
 					component.setEnabled(true);
 			};
 //			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			worker.askUserToAbort(this, cancelTask, null);
+			GUIUtils.askUserToAbort(worker, this, cancelTask, null);
 		}
 	}
-
-//	private <S, T> void checkAbortion(final WorkerBase<S, T> worker, final JComponent ... componentsToEnable){
-//		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-//			final Runnable cancelTask = () -> {
-//				for(final JComponent component : componentsToEnable)
-//					component.setEnabled(true);
-//			};
-////			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-//			worker.askUserToAbort(this, cancelTask, null);
-//		}
-//	}
 
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();

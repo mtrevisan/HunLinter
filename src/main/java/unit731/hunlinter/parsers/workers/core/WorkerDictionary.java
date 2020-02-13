@@ -24,7 +24,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-class WorkerDictionary extends WorkerBase<String, Integer>{
+public class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
@@ -35,13 +35,13 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
-	private final File outputFile;
-
 
 	public static WorkerDictionary createReadWorker(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor){
 		Objects.requireNonNull(readLineProcessor);
 
-		return new WorkerDictionary(workerData, readLineProcessor, null, null);
+		final WorkerDictionary worker = new WorkerDictionary(workerData);
+		worker.setReadDataProcessor(readLineProcessor);
+		return worker;
 	}
 
 	public static WorkerDictionary createWriteWorker(final WorkerDataAbstract workerData,
@@ -49,18 +49,15 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		Objects.requireNonNull(writeLineProcessor);
 		Objects.requireNonNull(outputFile);
 
-		return new WorkerDictionary(workerData, null, writeLineProcessor, outputFile);
+		final WorkerDictionary worker = new WorkerDictionary(workerData);
+		worker.setWriteDataProcessor(writeLineProcessor, outputFile);
+		return worker;
 	}
 
-	private WorkerDictionary(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> readLineProcessor,
-				final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
+	protected WorkerDictionary(final WorkerDataAbstract workerData){
 		Objects.requireNonNull(workerData);
-		workerData.validate();
 
 		this.workerData = workerData;
-		this.outputFile = outputFile;
-		this.readDataProcessor = readLineProcessor;
-		this.writeDataProcessor = writeLineProcessor;
 	}
 
 	@Override

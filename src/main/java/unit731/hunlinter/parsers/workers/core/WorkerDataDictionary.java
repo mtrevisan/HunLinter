@@ -48,11 +48,4 @@ public class WorkerDataDictionary extends WorkerDataAbstract{
 		return dicParser;
 	}
 
-	@Override
-	public void validate() throws NullPointerException{
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(dicParser.getDicFile());
-		Objects.requireNonNull(dicParser.getCharset());
-	}
-
 }

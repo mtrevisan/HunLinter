@@ -10,20 +10,23 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 
 
-public class DictionaryLinterWorker extends WorkerDictionaryBase{
+public class DictionaryLinterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Dictionary linter";
 
 
 	public DictionaryLinterWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator){
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(checker);
+		super(WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser));
 
-		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		Objects.requireNonNull(checker);
+		Objects.requireNonNull(wordGenerator);
+
+
+		final BiConsumer<String, Integer> readLineProcessor = (line, row) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
@@ -36,13 +39,8 @@ public class DictionaryLinterWorker extends WorkerDictionaryBase{
 				}
 			}
 		};
-		final WorkerDataDictionary data = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
-		createReadWorker(data, lineProcessor);
-	}
 
-	@Override
-	public String getWorkerName(){
-		return WORKER_NAME;
+		setReadDataProcessor(readLineProcessor);
 	}
 
 }

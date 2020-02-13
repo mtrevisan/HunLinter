@@ -31,8 +31,9 @@ public abstract class WorkerDataAbstract{
 			completed.run();
 	}
 
-	public final void setCompletedCallback(final Runnable completed){
+	public final WorkerDataAbstract withCompletedCallback(final Runnable completed){
 		this.completed = completed;
+		return this;
 	}
 
 	final void callCancelledCallback(final Exception exception){
@@ -40,8 +41,9 @@ public abstract class WorkerDataAbstract{
 			cancelled.accept(exception);
 	}
 
-	public final void setCancelledCallback(final Consumer<Exception> cancelled){
+	public final WorkerDataAbstract withCancelledCallback(final Consumer<Exception> cancelled){
 		this.cancelled = cancelled;
+		return this;
 	}
 
 	final boolean isParallelProcessing(){
@@ -51,7 +53,5 @@ public abstract class WorkerDataAbstract{
 	final boolean isPreventExceptionRelaunch(){
 		return preventExceptionRelaunch;
 	}
-
-	abstract void validate() throws NullPointerException;
 
 }

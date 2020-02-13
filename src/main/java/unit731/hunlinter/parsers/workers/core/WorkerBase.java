@@ -1,14 +1,19 @@
 package unit731.hunlinter.parsers.workers.core;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.nio.channels.ClosedChannelException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
@@ -20,8 +25,11 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 
 	protected WorkerDataAbstract workerData;
 
+	//read section
 	protected BiConsumer<S, T> readDataProcessor;
+	//write section
 	protected BiConsumer<BufferedWriter, Pair<Integer, S>> writeDataProcessor;
+	protected File outputFile;
 
 	private Exception exception;
 
@@ -30,8 +38,27 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public String getWorkerName(){
+	public final WorkerDataAbstract getWorkerData(){
+		return workerData;
+	}
+
+	public final String getWorkerName(){
 		return workerData.getWorkerName();
+	}
+
+	protected void setReadDataProcessor(final BiConsumer<S, T> readDataProcessor){
+		this.readDataProcessor = readDataProcessor;
+	}
+
+	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, S>> writeDataProcessor, final File outputFile){
+		this.writeDataProcessor = writeDataProcessor;
+		if(writeDataProcessor != null){
+			Objects.requireNonNull(outputFile);
+
+			this.outputFile = outputFile;
+		}
+		else
+			this.outputFile = null;
 	}
 
 	protected void prepareProcessing(final String message){
@@ -48,6 +75,21 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 
 		setProgress(100);
 		LOGGER.info(Backbone.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
+	}
+
+	public void executeAsynchronously(){
+		execute();
+	}
+
+	public void executeSynchronously() throws Exception{
+		doInBackground();
+	}
+
+	public static LinterException wrapException(final Exception e, final Production production){
+		final StringBuffer sb = new StringBuffer(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		return new LinterException(sb.toString());
 	}
 
 	protected void setProcessingProgress(final long index, final long total){

@@ -20,7 +20,6 @@ class WorkerThesaurus extends WorkerBase<String, Integer>{
 
 	private WorkerThesaurus(final WorkerDataAbstract workerData, final BiConsumer<String, Integer> dataProcessor){
 		Objects.requireNonNull(workerData);
-		workerData.validate();
 
 		this.workerData = workerData;
 		this.readDataProcessor = dataProcessor;
