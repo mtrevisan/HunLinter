@@ -20,7 +20,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
-public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
+public class HyphenationLinterWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Hyphenation correctness checking";
 
@@ -33,8 +33,8 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator){
+	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
+											 final WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 

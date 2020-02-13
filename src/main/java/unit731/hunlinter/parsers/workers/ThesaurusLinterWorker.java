@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
+public class ThesaurusLinterWorker extends WorkerBase<Void, Void>{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusCorrectnessWorker.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLinterWorker.class);
 
 	public static final String WORKER_NAME = "Thesaurus correctness checking";
 
@@ -28,7 +28,7 @@ public class ThesaurusCorrectnessWorker extends WorkerBase<Void, Void>{
 	private final ThesaurusParser theParser;
 
 
-	public ThesaurusCorrectnessWorker(final ThesaurusParser theParser){
+	public ThesaurusLinterWorker(final ThesaurusParser theParser){
 		Objects.requireNonNull(theParser);
 
 		this.theParser = theParser;

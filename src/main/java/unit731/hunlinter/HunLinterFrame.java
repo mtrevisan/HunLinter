@@ -86,7 +86,7 @@ import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.workers.PoSFSAWorker;
-import unit731.hunlinter.parsers.workers.ThesaurusCorrectnessWorker;
+import unit731.hunlinter.parsers.workers.ThesaurusLinterWorker;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionaryBase;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -96,7 +96,7 @@ import unit731.hunlinter.parsers.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.parsers.workers.CompoundRulesWorker;
 import unit731.hunlinter.parsers.workers.DictionaryLinterWorker;
 import unit731.hunlinter.parsers.workers.DuplicatesWorker;
-import unit731.hunlinter.parsers.workers.HyphenationCorrectnessWorker;
+import unit731.hunlinter.parsers.workers.HyphenationLinterWorker;
 import unit731.hunlinter.parsers.workers.MinimalPairsWorker;
 import unit731.hunlinter.parsers.workers.ProjectLoaderWorker;
 import unit731.hunlinter.parsers.workers.SorterWorker;
@@ -190,8 +190,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private PoSFSAWorker dicPoSFSAWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private CompoundRulesWorker compoundRulesExtractorWorker;
-	private ThesaurusCorrectnessWorker theLinterWorker;
-	private HyphenationCorrectnessWorker hypLinterWorker;
+	private ThesaurusLinterWorker theLinterWorker;
+	private HyphenationLinterWorker hypLinterWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 
 	private JMenuItem popupMergeMenuItem;
@@ -259,7 +259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
 		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(ThesaurusCorrectnessWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(ThesaurusLinterWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
@@ -281,7 +281,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
 		});
-		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME,
+		enableComponentFromWorker.put(HyphenationLinterWorker.WORKER_NAME,
 			() -> hypLinterMenuItem.setEnabled(true));
 
 
@@ -3114,7 +3114,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		if(theLinterWorker == null || theLinterWorker.isDone()){
 			theLinterMenuItem.setEnabled(false);
 
-			theLinterWorker = new ThesaurusCorrectnessWorker(backbone.getTheParser());
+			theLinterWorker = new ThesaurusLinterWorker(backbone.getTheParser());
 			theLinterWorker.addPropertyChangeListener(this);
 			theLinterWorker.execute();
 		}
@@ -3125,7 +3125,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		if(hypLinterWorker == null || hypLinterWorker.isDone()){
 			hypLinterMenuItem.setEnabled(false);
 
-			hypLinterWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
+			hypLinterWorker = new HyphenationLinterWorker(backbone.getAffParser().getAffixData().getLanguage(),
 				backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
 			hypLinterWorker.addPropertyChangeListener(this);
 			hypLinterWorker.execute();
