@@ -23,7 +23,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class WorkerDictionary extends WorkerBase<String, Integer>{
+public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 

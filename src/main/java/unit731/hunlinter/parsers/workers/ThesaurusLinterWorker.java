@@ -26,7 +26,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
-		super(WorkerDataThesaurus.createParallel(WORKER_NAME, theParser));
+		super((WorkerDataThesaurus)new WorkerDataThesaurus(WORKER_NAME, theParser)
+			.withParallelProcessing(true));
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();

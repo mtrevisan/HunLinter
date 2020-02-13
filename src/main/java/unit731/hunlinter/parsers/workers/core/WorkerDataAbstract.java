@@ -7,28 +7,30 @@ import java.util.function.Consumer;
 public abstract class WorkerDataAbstract{
 
 	private String workerName;
+	private boolean parallelProcessing;
+	private boolean preventExceptionRelaunch;
 	private Runnable completed;
 	private Consumer<Exception> cancelled;
 
-	boolean parallelProcessing;
-	boolean preventExceptionRelaunch;
 
-
-	WorkerDataAbstract(final String workerName, final boolean parallelProcessing, final boolean preventExceptionRelaunch){
+	WorkerDataAbstract(final String workerName){
 		Objects.requireNonNull(workerName);
 
 		this.workerName = workerName;
-		this.parallelProcessing = parallelProcessing;
-		this.preventExceptionRelaunch = preventExceptionRelaunch;
 	}
 
 	final String getWorkerName(){
 		return workerName;
 	}
 
-	final void callCompletedCallback(){
-		if(completed != null)
-			completed.run();
+	public final WorkerDataAbstract withParallelProcessing(final boolean parallelProcessing){
+		this.parallelProcessing = parallelProcessing;
+		return this;
+	}
+
+	public final WorkerDataAbstract withPreventExceptionRelaunch(final boolean preventExceptionRelaunch){
+		this.preventExceptionRelaunch = preventExceptionRelaunch;
+		return this;
 	}
 
 	public final WorkerDataAbstract withCompletedCallback(final Runnable completed){
@@ -36,14 +38,19 @@ public abstract class WorkerDataAbstract{
 		return this;
 	}
 
-	final void callCancelledCallback(final Exception exception){
-		if(cancelled != null)
-			cancelled.accept(exception);
-	}
-
 	public final WorkerDataAbstract withCancelledCallback(final Consumer<Exception> cancelled){
 		this.cancelled = cancelled;
 		return this;
+	}
+
+	final void callCompletedCallback(){
+		if(completed != null)
+			completed.run();
+	}
+
+	final void callCancelledCallback(final Exception exception){
+		if(cancelled != null)
+			cancelled.accept(exception);
 	}
 
 	final boolean isParallelProcessing(){

@@ -10,18 +10,17 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 
 
-public class SorterWorker extends WorkerBase<Void, Void>{
+public class SorterWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SorterWorker.class);
 
@@ -35,15 +34,15 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 
 	public SorterWorker(final Backbone backbone, final int lineIndex){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getDicParser());
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, backbone.getDicParser())
+			.withParallelProcessing(true)
+			.withPreventExceptionRelaunch(true));
 
 		this.backbone = backbone;
 		dicParser = backbone.getDicParser();
 		this.lineIndex = lineIndex;
 
-		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
-		comparator  = BaseBuilder.getComparator(backbone.getAffixData().getLanguage());
+		comparator = BaseBuilder.getComparator(backbone.getAffixData().getLanguage());
 	}
 
 	@Override

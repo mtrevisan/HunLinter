@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 
 
-public class WorkerThesaurus extends WorkerBase<String, Integer>{
+public class WorkerThesaurus extends WorkerAbstract<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThesaurus.class);
 

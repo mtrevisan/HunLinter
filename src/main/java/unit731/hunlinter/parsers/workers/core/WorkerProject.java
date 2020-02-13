@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class WorkerProject extends WorkerBase<String, Integer>{
+public class WorkerProject extends WorkerAbstract<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 

@@ -12,25 +12,8 @@ public class WorkerDataProject extends WorkerDataAbstract{
 	protected final Backbone backbone;
 
 
-	public static WorkerDataProject create(final String workerName, final Packager packager, final Backbone backbone){
-		return new WorkerDataProject(workerName, packager, backbone, false, false);
-	}
-
-	public static WorkerDataProject createPreventExceptionRelaunch(final String workerName, final Packager packager, final Backbone backbone){
-		return new WorkerDataProject(workerName, packager, backbone, false, true);
-	}
-
-	public static WorkerDataProject createParallel(final String workerName, final Packager packager, final Backbone backbone){
-		return new WorkerDataProject(workerName, packager, backbone, true, false);
-	}
-
-	public static WorkerDataProject createParallelPreventExceptionRelaunch(final String workerName, final Packager packager, final Backbone backbone){
-		return new WorkerDataProject(workerName, packager, backbone, true, true);
-	}
-
-	private WorkerDataProject(final String workerName, final Packager packager, final Backbone backbone, final boolean parallelProcessing,
-			final boolean preventExceptionRelaunch){
-		super(workerName, parallelProcessing, preventExceptionRelaunch);
+	public WorkerDataProject(final String workerName, final Packager packager, final Backbone backbone){
+		super(workerName);
 
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(backbone);

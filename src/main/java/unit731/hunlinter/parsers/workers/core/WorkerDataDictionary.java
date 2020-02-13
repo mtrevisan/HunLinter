@@ -9,35 +9,8 @@ public class WorkerDataDictionary extends WorkerDataAbstract{
 	private final DictionaryParser dicParser;
 
 
-	public static WorkerDataDictionary create(final String workerName, final DictionaryParser dicParser){
-		return new WorkerDataDictionary(workerName, dicParser, false, false);
-	}
-
-	public static WorkerDataDictionary createPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
-		return new WorkerDataDictionary(workerName, dicParser, false, true);
-	}
-
-	public static WorkerDataDictionary createParallel(final String workerName, final DictionaryParser dicParser){
-		return new WorkerDataDictionary(workerName, dicParser, true, false);
-	}
-
-	public static WorkerDataDictionary createParallelPreventExceptionRelaunch(final String workerName){
-		return new WorkerDataDictionary(workerName, true, true);
-	}
-
-	public static WorkerDataDictionary createParallelPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
-		return new WorkerDataDictionary(workerName, dicParser, true, true);
-	}
-
-	private WorkerDataDictionary(final String workerName, final boolean parallelProcessing, final boolean preventExceptionRelaunch){
-		super(workerName, parallelProcessing, preventExceptionRelaunch);
-
-		dicParser = null;
-	}
-
-	private WorkerDataDictionary(final String workerName, final DictionaryParser dicParser, final boolean parallelProcessing,
-			final boolean preventExceptionRelaunch){
-		super(workerName, parallelProcessing, preventExceptionRelaunch);
+	public WorkerDataDictionary(final String workerName, final DictionaryParser dicParser){
+		super(workerName);
 
 		Objects.requireNonNull(dicParser);
 

@@ -102,7 +102,7 @@ import unit731.hunlinter.parsers.workers.SorterWorker;
 import unit731.hunlinter.parsers.workers.StatisticsWorker;
 import unit731.hunlinter.parsers.workers.WordCountWorker;
 import unit731.hunlinter.parsers.workers.WordlistWorker;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
+import unit731.hunlinter.parsers.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
@@ -2517,7 +2517,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(hypLinterWorker, hypLinterMenuItem);
 	}
 
-	private void checkAbortion(final WorkerBase<?, ?> worker, final JComponent ... componentsToEnable){
+	private void checkAbortion(final WorkerAbstract<?, ?> worker, final JComponent ... componentsToEnable){
 		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 			final Runnable cancelTask = () -> {
 				for(final JComponent component : componentsToEnable)
@@ -3267,7 +3267,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
+					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

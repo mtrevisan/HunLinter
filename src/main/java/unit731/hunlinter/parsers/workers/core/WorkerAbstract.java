@@ -18,9 +18,9 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
 
-public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
+public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerBase.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
 
 	protected WorkerDataAbstract workerData;

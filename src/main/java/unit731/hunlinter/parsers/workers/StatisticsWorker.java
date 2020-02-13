@@ -34,7 +34,8 @@ public class StatisticsWorker extends WorkerDictionary{
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
-		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+			.withParallelProcessing(true));
 
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);

@@ -30,14 +30,14 @@ import unit731.hunlinter.parsers.dictionary.Duplicate;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class DuplicatesWorker extends WorkerBase<Void, Void>{
+public class DuplicatesWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
@@ -85,17 +85,20 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private final BloomFilterParameters dictionaryBaseData;
 
 
-	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
+	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final File outputFile){
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+			.withParallelProcessing(true));
+
 		Objects.requireNonNull(language);
-		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
+
 
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 	}

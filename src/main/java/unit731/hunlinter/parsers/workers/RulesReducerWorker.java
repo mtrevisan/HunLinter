@@ -36,7 +36,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
 			final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+			.withParallelProcessing(true));
 
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);

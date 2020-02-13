@@ -33,7 +33,8 @@ public class WordlistWorker extends WorkerDictionary{
 
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
 			final File outputFile){
-		super(WorkerDataDictionary.createParallel(WORKER_NAME, dicParser));
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);

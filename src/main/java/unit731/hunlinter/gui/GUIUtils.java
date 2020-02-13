@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import unit731.hunlinter.FontChooserDialog;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
+import unit731.hunlinter.parsers.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -275,7 +275,7 @@ public class GUIUtils{
 	}
 
 
-	public static void askUserToAbort(final WorkerBase<?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
+	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
 
 		worker.pause();

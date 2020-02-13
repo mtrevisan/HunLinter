@@ -28,8 +28,8 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerBase;
 import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.text.HammingDistance;
@@ -37,7 +37,7 @@ import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 
 
-public class MinimalPairsWorker extends WorkerBase<Void, Void>{
+public class MinimalPairsWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MinimalPairsWorker.class);
 
@@ -55,19 +55,23 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 
 	public MinimalPairsWorker(final String language, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
-			final WordGenerator wordGenerator, File outputFile){
+			final WordGenerator wordGenerator, final File outputFile){
+		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+			.withParallelProcessing(true)
+			.withPreventExceptionRelaunch(true));
+
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
+
 		this.dicParser = dicParser;
 		this.checker = checker;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerData = WorkerDataDictionary.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 	}
 
