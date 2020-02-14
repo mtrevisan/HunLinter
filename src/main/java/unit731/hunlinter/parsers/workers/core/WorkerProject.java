@@ -42,9 +42,9 @@ public class WorkerProject extends WorkerAbstract<String, Integer>{
 	}
 
 	private void dataProcess(){
-		final Packager packager = ((WorkerDataProject)workerData).packager;
+		final Packager packager = ((WorkerDataProject)workerData).getPackager();
 		try{
-			final Backbone backbone = ((WorkerDataProject)workerData).backbone;
+			final Backbone backbone = ((WorkerDataProject)workerData).getBackbone();
 			final List<StageFunction> stages = Arrays.asList(
 				() -> backbone.openAffixFile(packager.getAffixFile()),
 				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),

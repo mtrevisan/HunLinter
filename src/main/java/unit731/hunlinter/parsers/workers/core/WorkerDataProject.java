@@ -8,8 +8,8 @@ import java.util.Objects;
 
 public class WorkerDataProject extends WorkerDataAbstract{
 
-	protected final Packager packager;
-	protected final Backbone backbone;
+	private final Packager packager;
+	private final Backbone backbone;
 
 
 	public WorkerDataProject(final String workerName, final Packager packager, final Backbone backbone){
@@ -20,6 +20,14 @@ public class WorkerDataProject extends WorkerDataAbstract{
 
 		this.packager = packager;
 		this.backbone = backbone;
+	}
+
+	Packager getPackager(){
+		return packager;
+	}
+
+	Backbone getBackbone(){
+		return backbone;
 	}
 
 }
