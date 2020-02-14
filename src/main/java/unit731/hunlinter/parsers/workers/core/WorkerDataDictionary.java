@@ -4,7 +4,7 @@ import java.util.Objects;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 
 
-public class WorkerDataDictionary extends WorkerDataAbstract<WorkerDataDictionary>{
+public class WorkerDataDictionary extends WorkerData<WorkerDataDictionary>{
 
 	private final DictionaryParser dicParser;
 

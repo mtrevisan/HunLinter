@@ -23,7 +23,7 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
 
-	protected WorkerDataAbstract workerData;
+	protected WorkerData workerData;
 
 	//read section
 	protected BiConsumer<S, T> readDataProcessor;
@@ -31,14 +31,15 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 	protected BiConsumer<BufferedWriter, Pair<Integer, S>> writeDataProcessor;
 	protected File outputFile;
 
+	//worker exception
 	private Exception exception;
-
-	private final TimeWatch watch = TimeWatch.start();
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
+	private final TimeWatch watch = TimeWatch.start();
 
-	public final WorkerDataAbstract getWorkerData(){
+
+	public final WorkerData getWorkerData(){
 		return workerData;
 	}
 
@@ -75,10 +76,6 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
 		setProgress(100);
 		LOGGER.info(Backbone.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
-	}
-
-	public void executeAsynchronously(){
-		execute();
 	}
 
 	public void executeSynchronously() throws Exception{

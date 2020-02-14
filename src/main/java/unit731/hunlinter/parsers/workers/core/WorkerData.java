@@ -4,16 +4,18 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public abstract class WorkerDataAbstract<T>{
+public class WorkerData<T>{
 
-	private String workerName;
+	private final String workerName;
+
 	private boolean parallelProcessing;
 	private boolean preventExceptionRelaunch;
+
 	private Runnable completed;
 	private Consumer<Exception> cancelled;
 
 
-	WorkerDataAbstract(final String workerName){
+	WorkerData(final String workerName){
 		Objects.requireNonNull(workerName);
 
 		this.workerName = workerName;
@@ -33,12 +35,12 @@ public abstract class WorkerDataAbstract<T>{
 		return (T)this;
 	}
 
-	public final WorkerDataAbstract<T> withDataCompletedCallback(final Runnable completed){
+	public final WorkerData<T> withDataCompletedCallback(final Runnable completed){
 		this.completed = completed;
 		return this;
 	}
 
-	public final WorkerDataAbstract<T> withDataCancelledCallback(final Consumer<Exception> cancelled){
+	public final WorkerData<T> withDataCancelledCallback(final Consumer<Exception> cancelled){
 		this.cancelled = cancelled;
 		return this;
 	}

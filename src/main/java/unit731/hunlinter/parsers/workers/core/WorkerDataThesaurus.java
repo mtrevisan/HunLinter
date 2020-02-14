@@ -5,7 +5,7 @@ import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import java.util.Objects;
 
 
-public class WorkerDataThesaurus extends WorkerDataAbstract<WorkerDataThesaurus>{
+public class WorkerDataThesaurus extends WorkerData<WorkerDataThesaurus>{
 
 	private final ThesaurusParser theParser;
 
