@@ -126,13 +126,13 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 		}
 
 		return null;
 	}
 
-	private BloomFilterInterface<String> collectDuplicates() throws IOException{
+	private BloomFilterInterface<String> collectDuplicates() throws IOException, InterruptedException{
 		final Charset charset = dicParser.getCharset();
 		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
@@ -169,6 +169,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 
 				setProcessingProgress(readSoFar, totalSize);
+
+				waitIfPaused();
 			}
 
 			bloomFilter.close();
@@ -188,7 +190,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return duplicatesBloomFilter;
 	}
 
-	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
+	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter) throws IOException, InterruptedException{
 		final List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
@@ -225,6 +227,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 					}
 
 					setProcessingProgress(readSoFar, totalSize);
+
+					waitIfPaused();
 				}
 			}
 			setProgress(100);
@@ -245,7 +249,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result;
 	}
 
-	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException{
+	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException, InterruptedException{
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
@@ -269,6 +273,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 					writer.newLine();
 
 					setProcessingProgress(++ writtenSoFar, totalSize + 1);
+
+					waitIfPaused();
 				}
 			}
 			setProgress(100);

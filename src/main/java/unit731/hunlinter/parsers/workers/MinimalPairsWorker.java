@@ -110,6 +110,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 									final String word = production.getWord();
 									writer.write(word);
 									writer.newLine();
+
+									waitIfPaused();
 								}
 						}
 						catch(final LinterException e){
@@ -118,6 +120,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					}
 
 					setProcessingProgress(readSoFar, totalSize);
+
+					waitIfPaused();
 				}
 			}
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file written");
@@ -171,6 +175,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 									totalPairs ++;
 								}
+
+								waitIfPaused();
 							}
 						}
 					}
@@ -204,6 +210,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					destinationWriter.newLine();
 
 					setProgress((int)((index * 100.) / size));
+
+					waitIfPaused();
 				}
 			}
 
@@ -231,7 +239,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 		}
 
 		return null;

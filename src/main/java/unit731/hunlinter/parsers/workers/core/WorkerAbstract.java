@@ -122,20 +122,21 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 			firePropertyChange("paused", true, false);
 	}
 
+	/** NOTE: to be called inside `SwingWorker.doInBackground()` to allow process abortion */
 	protected void waitIfPaused() throws InterruptedException{
 		while(paused.get())
 			Thread.sleep(500l);
 	}
 
+	/** User canceled worker */
 	public void cancel(){
 		cancel(true);
 
 		workerData.callCancelledCallback(exception);
-
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Process stopped", new Object[]{});
 	}
 
-	protected void cancelWorker(final Exception e){
+	/** Worker canceled itself due to an internal exception */
+	protected void cancel(final Exception e){
 		exception = e;
 
 		if(isInterruptedException(e))

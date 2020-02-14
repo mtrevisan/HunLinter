@@ -83,12 +83,12 @@ public class SorterWorker extends WorkerDictionary{
 			setProgress(100);
 		}
 		catch(final ClosedChannelException e){
-			cancelWorker(e);
+			cancel(e);
 
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 
 			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
@@ -96,7 +96,7 @@ public class SorterWorker extends WorkerDictionary{
 		return null;
 	}
 
-	private List<File> splitDictionary(final Map.Entry<Integer, Integer> boundary) throws IOException{
+	private List<File> splitDictionary(final Map.Entry<Integer, Integer> boundary) throws IOException, InterruptedException{
 		int index = 0;
 		final List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
@@ -117,6 +117,8 @@ public class SorterWorker extends WorkerDictionary{
 				writer.newLine();
 
 				index ++;
+
+				waitIfPaused();
 			}
 
 			writer.close();

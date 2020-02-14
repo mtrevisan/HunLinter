@@ -2480,14 +2480,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//FIXME introduce a checkAbortion case?
 		if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-//			dicDuplicatesWorker.pause();
+			dicDuplicatesWorker.pause();
 
 			final Object[] options = {"Abort", "Cancel"};
 			final int answer = JOptionPane.showOptionDialog(this,
 				"Do you really want to abort the dictionary duplicates task?", "Warning!",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if(answer == JOptionPane.YES_OPTION){
-				dicDuplicatesWorker.cancel(true);
+				dicDuplicatesWorker.cancel();
 
 				dicExtractDuplicatesMenuItem.setEnabled(true);
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
@@ -2495,7 +2495,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				dicDuplicatesWorker = null;
 			}
 			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-//				dicDuplicatesWorker.resume();
+				dicDuplicatesWorker.resume();
 			}
 		}
 

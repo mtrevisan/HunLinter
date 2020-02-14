@@ -300,6 +300,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 <a name="changelog-1.10.1"></a>
 ### version 1.10.1 - 20200xxx
 - made update process stoppable
+- added linter for thesaurus
 - substituted charting library
 - reduced application footprint
 - various minor bugfixes and code revisions

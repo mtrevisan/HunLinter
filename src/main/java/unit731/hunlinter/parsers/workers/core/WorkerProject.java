@@ -56,17 +56,17 @@ public class WorkerProject extends WorkerAbstract<String, Integer>{
 				() -> backbone.openSentenceExceptionsFile(backbone.getSentenceExceptionsFile()),
 				() -> backbone.openWordExceptionsFile(backbone.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
-				waitIfPaused();
-
 				stages.get(index).execute();
 				//noinspection IntegerDivisionInFloatingPointContext
 				setProgress((int)Math.ceil((index + 1) * 100 / stages.size()));
+
+				waitIfPaused();
 			}
 
 			finalizeProcessing("Project loaded successfully");
 		}
 		catch(final Exception e){
-			cancelWorker(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
+			cancel(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
 
 			if(!(e instanceof ClosedChannelException)){
 				final String errorMessage = ExceptionHelper.getMessage(e);

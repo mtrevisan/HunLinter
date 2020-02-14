@@ -76,10 +76,12 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 					lines.add(Pair.of(br.getLineNumber(), line));
 
 				setProcessingProgress(readSoFar, totalSize);
+
+				waitIfPaused();
 			}
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 		}
 		return lines;
 	}
@@ -93,7 +95,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 			finalizeProcessing("Successfully processed dictionary file");
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 		}
 	}
 
@@ -101,18 +103,14 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 		final int totalLines = lines.size();
 		processingIndex.set(0);
 		final Consumer<Pair<Integer, String>> processor = rowLine -> {
-			if(isCancelled())
-				throw new RuntimeInterruptedException();
-
 			try{
-				while(isPaused())
-					Thread.sleep(500l);
-
 				processingIndex.incrementAndGet();
 
 				readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
 				setProcessingProgress(processingIndex.get(), totalLines);
+
+				waitIfPaused();
 			}
 			catch(final InterruptedException e){
 				if(!workerData.isPreventExceptionRelaunch())
@@ -149,15 +147,14 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(final Pair<Integer, String> rowLine : lines){
-				if(isCancelled())
-					throw new RuntimeInterruptedException();
-
 				try{
 					writtenSoFar ++;
 
 					writeDataProcessor.accept(writer, rowLine);
 
 					setProcessingProgress(writtenSoFar, totalLines);
+
+					waitIfPaused();
 				}
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
@@ -170,7 +167,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 			finalizeProcessing("Successfully processed dictionary file");
 		}
 		catch(final Exception e){
-			cancelWorker(e);
+			cancel(e);
 		}
 	}
 
