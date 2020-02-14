@@ -6,6 +6,7 @@ import java.nio.channels.ClosedChannelException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.swing.SwingWorker;
@@ -20,7 +21,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
 
-public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
+public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
@@ -28,13 +29,15 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 	protected WD workerData;
 
 	//read section
-	protected BiConsumer<S, T> readDataProcessor;
+	protected BiConsumer<T, Integer> readDataProcessor;
 	//write section
-	protected BiConsumer<BufferedWriter, Pair<Integer, S>> writeDataProcessor;
+	protected BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor;
 	protected File outputFile;
 
 	//worker exception
 	private Exception exception;
+
+	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
@@ -55,11 +58,11 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 		return workerData.getWorkerName();
 	}
 
-	protected void setReadDataProcessor(final BiConsumer<S, T> readDataProcessor){
+	protected void setReadDataProcessor(final BiConsumer<T, Integer> readDataProcessor){
 		this.readDataProcessor = readDataProcessor;
 	}
 
-	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, S>> writeDataProcessor, final File outputFile){
+	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor, final File outputFile){
 		this.writeDataProcessor = writeDataProcessor;
 		if(writeDataProcessor != null){
 			Objects.requireNonNull(outputFile);
@@ -90,9 +93,12 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 		doInBackground();
 	}
 
-	protected <V> void processData(final List<Pair<Integer, V>> entries, final Consumer<Pair<Integer, V>> processor){
+	protected void processData(final List<Pair<Integer, T>> entries){
 		try{
-			final Consumer<Pair<Integer, V>> innerProcessor = createInnerProcessor(processor);
+			final int totalData = entries.size();
+			processingIndex.set(0);
+
+			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(totalData);
 			if(workerData.isParallelProcessing())
 				entries.parallelStream()
 					.forEach(innerProcessor);
@@ -107,10 +113,12 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 		}
 	}
 
-	private <V> Consumer<Pair<Integer, V>> createInnerProcessor(final Consumer<Pair<Integer, V>> processor){
+	private Consumer<Pair<Integer, T>> createInnerProcessor(final int totalData){
 		return data -> {
 			try{
-				processor.accept(data);
+				readDataProcessor.accept(data.getValue(), data.getKey());
+
+				setProcessingProgress(processingIndex.incrementAndGet(), totalData);
 
 				waitIfPaused();
 			}

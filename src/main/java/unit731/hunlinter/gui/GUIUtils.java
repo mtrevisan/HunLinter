@@ -275,7 +275,7 @@ public class GUIUtils{
 	}
 
 
-	public static void askUserToAbort(final WorkerAbstract<?, ?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
+	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
 
 		worker.pause();

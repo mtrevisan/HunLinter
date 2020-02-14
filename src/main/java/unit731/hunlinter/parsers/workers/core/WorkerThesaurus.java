@@ -12,10 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
-public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, WorkerDataParser<ThesaurusParser>>{
-
-	private final AtomicInteger processingIndex = new AtomicInteger(0);
-
+public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataParser<ThesaurusParser>>{
 
 	protected WorkerThesaurus(final WorkerDataParser<ThesaurusParser> workerData){
 		super(workerData);
@@ -26,15 +23,8 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, Wor
 		prepareProcessing("Start thesaurus processing");
 
 		final List<Pair<Integer, ThesaurusEntry>> entries = readEntries();
-		final int totalLines = entries.size();
-		final Consumer<Pair<Integer, ThesaurusEntry>> processor = rowLine -> {
-			processingIndex.incrementAndGet();
 
-			readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
-
-			setProcessingProgress(processingIndex.get(), totalLines);
-		};
-		processData(entries, processor);
+		processData(entries);
 
 		return null;
 	}

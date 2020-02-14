@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -21,16 +19,13 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerDataParser<DictionaryParser>>{
+public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<DictionaryParser>>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 	private static final int NEWLINE_SIZE = 2;
-
-
-	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
@@ -42,6 +37,8 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 		prepareProcessing("Opening Dictionary file (pass 1/2)");
 
 		final List<Pair<Integer, String>> lines = readLines();
+
+		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 		if(outputFile == null)
 			readProcess(lines);
 		else
@@ -83,25 +80,11 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 	}
 
 	private void readProcess(final List<Pair<Integer, String>> lines){
-		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
-
-		final int totalLines = lines.size();
-		processingIndex.set(0);
-		final Consumer<Pair<Integer, String>> processor = rowLine -> {
-			processingIndex.incrementAndGet();
-
-			readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
-
-			setProcessingProgress(processingIndex.get(), totalLines);
-		};
-
-		processData(lines, processor);
+		processData(lines);
 	}
 
 	//NOTE: cannot use `processData` because the file must be ordered
 	private void writeProcess(final List<Pair<Integer, String>> lines){
-		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
-
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		final DictionaryParser dicParser = workerData.getParser();
