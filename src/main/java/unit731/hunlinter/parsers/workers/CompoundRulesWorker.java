@@ -7,7 +7,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 
 
@@ -18,7 +18,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final BiConsumer<Production, Integer> productionReader, final Runnable completed){
-		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);

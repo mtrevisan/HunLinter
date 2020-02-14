@@ -11,7 +11,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -35,7 +35,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);

@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +15,6 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
@@ -35,7 +35,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator){
-		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing(true)
 			.withRelaunchException(false));
 

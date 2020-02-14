@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 
@@ -34,7 +34,7 @@ public class SorterWorker extends WorkerDictionary{
 
 
 	public SorterWorker(final Backbone backbone, final int lineIndex){
-		super(new WorkerDataDictionary(WORKER_NAME, backbone.getDicParser())
+		super(new WorkerDataParser<>(WORKER_NAME, backbone.getDicParser())
 			.withParallelProcessing(true)
 			.withRelaunchException(false));
 

@@ -7,9 +7,7 @@ import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataThesaurus;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerThesaurus;
 
 import java.text.MessageFormat;
@@ -28,7 +26,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
-		super(new WorkerDataThesaurus(WORKER_NAME, theParser)
+		super(new WorkerDataParser<>(WORKER_NAME, theParser)
 			.withParallelProcessing(true)
 		);
 

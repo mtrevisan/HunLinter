@@ -21,7 +21,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerDataDictionary>{
+public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerDataParser<DictionaryParser>>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
@@ -33,7 +33,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 
-	protected WorkerDictionary(final WorkerDataDictionary workerData){
+	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
 	}
 
@@ -52,7 +52,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 
 	private List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
-		final DictionaryParser dicParser = workerData.getDicParser();
+		final DictionaryParser dicParser = workerData.getParser();
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 		final long totalSize = dicFile.length();
@@ -104,7 +104,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
-		final DictionaryParser dicParser = workerData.getDicParser();
+		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(final Pair<Integer, String> rowLine : lines){

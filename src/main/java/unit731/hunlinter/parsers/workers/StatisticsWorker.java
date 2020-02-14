@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.workers;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import java.awt.Frame;
 import java.util.Collections;
@@ -18,7 +19,6 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
@@ -34,7 +34,7 @@ public class StatisticsWorker extends WorkerDictionary{
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
-		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(affParser);

@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
+import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
@@ -36,7 +36,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
 			final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(flag);

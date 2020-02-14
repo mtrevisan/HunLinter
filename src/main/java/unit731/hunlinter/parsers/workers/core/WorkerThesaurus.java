@@ -1,6 +1,7 @@
 package unit731.hunlinter.parsers.workers.core;
 
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 
@@ -11,12 +12,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
-public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, WorkerDataThesaurus>{
+public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, WorkerDataParser<ThesaurusParser>>{
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 
-	protected WorkerThesaurus(final WorkerDataThesaurus workerData){
+	protected WorkerThesaurus(final WorkerDataParser<ThesaurusParser> workerData){
 		super(workerData);
 	}
 
@@ -39,7 +40,7 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, Wor
 	}
 
 	private List<Pair<Integer, ThesaurusEntry>> readEntries(){
-		final ThesaurusParser theParser = workerData.getTheParser();
+		final ThesaurusParser theParser = workerData.getParser();
 		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
 		return IntStream.range(0, dictionary.size())
 			.mapToObj(index -> Pair.of(index, dictionary.get(index)))
