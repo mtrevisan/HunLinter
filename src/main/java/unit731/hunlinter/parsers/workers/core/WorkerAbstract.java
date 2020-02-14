@@ -25,7 +25,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
 
-	protected WD workerData;
+	protected final WD workerData;
 
 	//read section
 	protected BiConsumer<Integer, T> readDataProcessor;
@@ -49,7 +49,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		this.workerData = workerData;
 	}
 
-	public final WorkerData getWorkerData(){
+	public final WorkerData<WD> getWorkerData(){
 		return workerData;
 	}
 

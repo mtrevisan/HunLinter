@@ -27,11 +27,13 @@ public class WorkerData<T>{
 
 	public final T withParallelProcessing(final boolean parallelProcessing){
 		this.parallelProcessing = parallelProcessing;
+		//noinspection unchecked
 		return (T)this;
 	}
 
 	public final T withRelaunchException(final boolean relaunchException){
 		this.relaunchException = relaunchException;
+		//noinspection unchecked
 		return (T)this;
 	}
 
