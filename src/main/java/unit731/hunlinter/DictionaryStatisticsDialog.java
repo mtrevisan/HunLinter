@@ -380,10 +380,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		final String formattedTotalWords = DictionaryParser.COUNTER_FORMATTER.format(totalWords);
 		double x = (double)uniqueWords / totalWords;
 		final String formattedUniqueWords = DictionaryParser.COUNTER_FORMATTER.format(uniqueWords)
-			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
+			+ formatFrequencyVariableDecimals(x);
 		x = (double)contractedWords / totalWords;
 		final String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
-			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
+			+ formatFrequencyVariableDecimals(x);
 		final String formattedLengthsMode = lengthsFrequencies.getMode().stream()
 			.map(String::valueOf)
 			.collect(Collectors.joining(LIST_SEPARATOR));
@@ -411,7 +411,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		double x = (double)compoundWords / uniqueWords;
 		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
-			+ String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
+			+ formatFrequencyVariableDecimals(x);
 		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
 			.map(String::valueOf)
 			.collect(Collectors.joining(LIST_SEPARATOR));
@@ -432,6 +432,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		mostCommonSyllabesOutputLabel.setEnabled(true);
 		longestWordSyllabesLabel.setEnabled(true);
 		longestWordSyllabesOutputLabel.setEnabled(true);
+	}
+
+	private String formatFrequencyVariableDecimals(final double x){
+		return String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
 	}
 
 	private void cleanupSyllabeStatistics(){
