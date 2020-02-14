@@ -33,12 +33,6 @@ public class WorkerProject extends WorkerAbstract<Void, Void, WorkerDataProject>
 	protected Void doInBackground(){
 		prepareProcessing("Opening project");
 
-		dataProcess();
-
-		return null;
-	}
-
-	private void dataProcess(){
 		final Packager packager = workerData.getPackager();
 		try{
 			final Backbone backbone = workerData.getBackbone();
@@ -70,6 +64,8 @@ public class WorkerProject extends WorkerAbstract<Void, Void, WorkerDataProject>
 				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", errorMessage);
 			}
 		}
+
+		return null;
 	}
 
 }

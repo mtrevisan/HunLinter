@@ -107,7 +107,7 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 		}
 	}
 
-	private <V> Consumer<V> createInnerProcessor(final Consumer<V> processor){
+	private <V> Consumer<Pair<Integer, V>> createInnerProcessor(final Consumer<Pair<Integer, V>> processor){
 		return data -> {
 			try{
 				processor.accept(data);
@@ -117,6 +117,14 @@ public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends Sw
 			catch(final InterruptedException e){
 				if(workerData.isRelaunchException())
 					throw new RuntimeException(e);
+			}
+			catch(final Exception e){
+				final String errorMessage = ExceptionHelper.getMessage(e);
+				LOGGER.trace("{}, line {}: {}", errorMessage, data.getKey(), data.getValue());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
+
+				if(workerData.isRelaunchException())
+					throw e;
 			}
 		};
 	}

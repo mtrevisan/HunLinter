@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.workers.exceptions.LinterException;
-import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
@@ -89,21 +88,11 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerData
 		final int totalLines = lines.size();
 		processingIndex.set(0);
 		final Consumer<Pair<Integer, String>> processor = rowLine -> {
-			try{
-				processingIndex.incrementAndGet();
+			processingIndex.incrementAndGet();
 
-				readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
+			readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
-				setProcessingProgress(processingIndex.get(), totalLines);
-			}
-			catch(final Exception e){
-				final String errorMessage = ExceptionHelper.getMessage(e);
-				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
-
-				if(workerData.isRelaunchException())
-					throw e;
-			}
+			setProcessingProgress(processingIndex.get(), totalLines);
 		};
 
 		processData(lines, processor);
