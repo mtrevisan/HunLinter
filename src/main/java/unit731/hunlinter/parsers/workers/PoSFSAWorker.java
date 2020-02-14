@@ -35,7 +35,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);
@@ -94,7 +94,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		setWriteDataProcessor(lineProcessor, outputFile);
 		getWorkerData()
-			.withCompletedCallback(completed);
+			.withDataCompletedCallback(completed);
 	}
 
 }

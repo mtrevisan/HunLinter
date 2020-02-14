@@ -6,7 +6,7 @@ import unit731.hunlinter.services.Packager;
 import java.util.Objects;
 
 
-public class WorkerDataProject extends WorkerDataAbstract{
+public class WorkerDataProject extends WorkerDataAbstract<WorkerDataProject>{
 
 	private final Packager packager;
 	private final Backbone backbone;

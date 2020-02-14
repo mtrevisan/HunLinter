@@ -36,7 +36,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
 			final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(flag);
@@ -82,7 +82,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
-			.withCompletedCallback(completed);
+			.withDataCompletedCallback(completed);
 	}
 
 }

@@ -33,7 +33,7 @@ public class WordlistWorker extends WorkerDictionary{
 
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
 			final File outputFile){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);
@@ -68,7 +68,7 @@ public class WordlistWorker extends WorkerDictionary{
 
 		setWriteDataProcessor(lineProcessor, outputFile);
 		getWorkerData()
-			.withCompletedCallback(completed);
+			.withDataCompletedCallback(completed);
 	}
 
 }

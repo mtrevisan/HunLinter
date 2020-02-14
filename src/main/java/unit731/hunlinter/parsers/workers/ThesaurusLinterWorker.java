@@ -11,7 +11,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
-		super((WorkerDataThesaurus)new WorkerDataThesaurus(WORKER_NAME, theParser)
+		super(new WorkerDataThesaurus(WORKER_NAME, theParser)
 			.withParallelProcessing(true));
 	}
 

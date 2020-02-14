@@ -18,7 +18,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final BiConsumer<Production, Integer> productionReader, final Runnable completed){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);
@@ -34,7 +34,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
-			.withCompletedCallback(completed);
+			.withDataCompletedCallback(completed);
 	}
 
 }

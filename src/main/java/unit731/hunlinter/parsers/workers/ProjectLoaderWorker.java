@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.workers;
 
-import unit731.hunlinter.parsers.workers.core.WorkerDataDictionary;
 import unit731.hunlinter.parsers.workers.core.WorkerDataProject;
 import unit731.hunlinter.parsers.workers.core.WorkerProject;
 import java.util.function.Consumer;
@@ -14,14 +13,14 @@ public class ProjectLoaderWorker extends WorkerProject{
 
 
 	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
-		super((WorkerDataProject)new WorkerDataProject(WORKER_NAME, packager, backbone)
+		super(new WorkerDataProject(WORKER_NAME, packager, backbone)
 			.withParallelProcessing(true)
 			.withPreventExceptionRelaunch(true));
 
 
 		getWorkerData()
-			.withCompletedCallback(completed)
-			.withCancelledCallback(cancelled);
+			.withDataCompletedCallback(completed)
+			.withDataCancelledCallback(cancelled);
 	}
 
 }

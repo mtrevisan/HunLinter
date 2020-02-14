@@ -20,7 +20,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 	public DictionaryLinterWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true)
 			.withPreventExceptionRelaunch(true));
 

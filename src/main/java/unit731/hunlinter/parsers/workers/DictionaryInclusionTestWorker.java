@@ -29,7 +29,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 
 	public DictionaryInclusionTestWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(language);
@@ -60,8 +60,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
-			.withCompletedCallback(completed)
-			.withCancelledCallback(cancelled);
+			.withDataCompletedCallback(completed)
+			.withDataCancelledCallback(cancelled);
 	}
 
 	public boolean isInDictionary(final String word){

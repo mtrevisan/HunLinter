@@ -34,7 +34,7 @@ public class StatisticsWorker extends WorkerDictionary{
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(affParser);
@@ -78,8 +78,8 @@ public class StatisticsWorker extends WorkerDictionary{
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
-			.withCompletedCallback(completed)
-			.withCancelledCallback(cancelled);
+			.withDataCompletedCallback(completed)
+			.withDataCancelledCallback(cancelled);
 	}
 
 	public boolean isPerformingHyphenationStatistics(){

@@ -31,7 +31,7 @@ public class WordCountWorker extends WorkerDictionary{
 
 
 	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super((WorkerDataDictionary)new WorkerDataDictionary(WORKER_NAME, dicParser)
+		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true));
 
 		Objects.requireNonNull(wordGenerator);
@@ -64,8 +64,8 @@ public class WordCountWorker extends WorkerDictionary{
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
-			.withCompletedCallback(completed)
-			.withCancelledCallback(cancelled);
+			.withDataCompletedCallback(completed)
+			.withDataCancelledCallback(cancelled);
 	}
 
 }
