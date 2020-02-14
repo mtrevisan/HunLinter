@@ -13,10 +13,9 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
-public class WorkerProject extends WorkerAbstract<String, Integer>{
+public class WorkerProject extends WorkerAbstract<Void, Void, WorkerDataProject>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 
@@ -27,9 +26,7 @@ public class WorkerProject extends WorkerAbstract<String, Integer>{
 
 
 	protected WorkerProject(final WorkerDataProject workerData){
-		Objects.requireNonNull(workerData);
-
-		this.workerData = workerData;
+		super(workerData);
 	}
 
 	@Override
@@ -42,9 +39,9 @@ public class WorkerProject extends WorkerAbstract<String, Integer>{
 	}
 
 	private void dataProcess(){
-		final Packager packager = ((WorkerDataProject)workerData).getPackager();
+		final Packager packager = workerData.getPackager();
 		try{
-			final Backbone backbone = ((WorkerDataProject)workerData).getBackbone();
+			final Backbone backbone = workerData.getBackbone();
 			final List<StageFunction> stages = Arrays.asList(
 				() -> backbone.openAffixFile(packager.getAffixFile()),
 				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),

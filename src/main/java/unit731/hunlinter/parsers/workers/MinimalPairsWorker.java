@@ -58,7 +58,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			final WordGenerator wordGenerator, final File outputFile){
 		super(new WorkerDataDictionary(WORKER_NAME, dicParser)
 			.withParallelProcessing(true)
-			.withPreventExceptionRelaunch(true));
+			.withRelaunchException(false));
 
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);

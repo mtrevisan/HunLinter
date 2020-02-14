@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -23,7 +22,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class WorkerDictionary extends WorkerAbstract<String, Integer>{
+public class WorkerDictionary extends WorkerAbstract<String, Integer, WorkerDataDictionary>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
@@ -36,9 +35,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 
 
 	protected WorkerDictionary(final WorkerDataDictionary workerData){
-		Objects.requireNonNull(workerData);
-
-		this.workerData = workerData;
+		super(workerData);
 	}
 
 	@Override
@@ -56,11 +53,11 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 
 	private List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
-		final DictionaryParser dicParser = ((WorkerDataDictionary)workerData).getDicParser();
+		final DictionaryParser dicParser = workerData.getDicParser();
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 		final long totalSize = dicFile.length();
-		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
+		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = ParserHelper.extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
@@ -87,19 +84,8 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 	}
 
 	private void readProcess(final List<Pair<Integer, String>> lines){
-		try{
-			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
+		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 
-			processLines(lines);
-
-			finalizeProcessing("Successfully processed dictionary file");
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
-	}
-
-	private void processLines(final List<Pair<Integer, String>> lines){
 		final int totalLines = lines.size();
 		processingIndex.set(0);
 		final Consumer<Pair<Integer, String>> processor = rowLine -> {
@@ -109,41 +95,27 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 				readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
 				setProcessingProgress(processingIndex.get(), totalLines);
-
-				waitIfPaused();
-			}
-			catch(final InterruptedException e){
-				if(!workerData.isPreventExceptionRelaunch())
-					throw new RuntimeException(e);
 			}
 			catch(final Exception e){
-				String errorMessage = ExceptionHelper.getMessage(e);
+				final String errorMessage = ExceptionHelper.getMessage(e);
 				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-				if(!workerData.isPreventExceptionRelaunch())
+				if(workerData.isRelaunchException())
 					throw e;
 			}
 		};
 
-		processLines(lines, processor);
+		processData(lines, processor);
 	}
 
-	private void processLines(final List<Pair<Integer, String>> lines, final Consumer<Pair<Integer, String>> processor){
-		if(workerData.isParallelProcessing())
-			lines.parallelStream()
-				.forEach(processor);
-		else
-			lines
-				.forEach(processor);
-	}
-
+	//NOTE: cannot use `processData` because the file must be ordered
 	private void writeProcess(final List<Pair<Integer, String>> lines){
 		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.getWorkerName() + " (pass 2/2)");
 
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
-		final DictionaryParser dicParser = ((WorkerDataDictionary)workerData).getDicParser();
+		final DictionaryParser dicParser = workerData.getDicParser();
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(final Pair<Integer, String> rowLine : lines){
@@ -159,7 +131,7 @@ public class WorkerDictionary extends WorkerAbstract<String, Integer>{
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-					if(!workerData.isPreventExceptionRelaunch())
+					if(workerData.isRelaunchException())
 						throw e;
 				}
 			}

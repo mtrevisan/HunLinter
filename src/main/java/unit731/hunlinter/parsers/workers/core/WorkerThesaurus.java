@@ -1,72 +1,66 @@
 package unit731.hunlinter.parsers.workers.core;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
-import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.services.log.ExceptionHelper;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
-public class WorkerThesaurus extends WorkerAbstract<String, Integer>{
+public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, Integer, WorkerDataThesaurus>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerThesaurus.class);
 
-	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn't contain definition {0} with part-of-speech {1} (from entry {2})");
+
+	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 
 	protected WorkerThesaurus(final WorkerDataThesaurus workerData){
-		Objects.requireNonNull(workerData);
-
-		this.workerData = workerData;
+		super(workerData);
 	}
 
 	@Override
 	protected Void doInBackground(){
 		prepareProcessing("Start thesaurus processing");
 
-		dataProcess();
+		final List<Pair<Integer, ThesaurusEntry>> entries = readEntries();
+		final int totalLines = entries.size();
+		final Consumer<Pair<Integer, ThesaurusEntry>> processor = rowLine -> {
+			try{
+				processingIndex.incrementAndGet();
+
+				readDataProcessor.accept(rowLine.getValue(), rowLine.getKey());
+
+				setProcessingProgress(processingIndex.get(), totalLines);
+			}
+			catch(final Exception e){
+				final String errorMessage = ExceptionHelper.getMessage(e);
+				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+
+				if(workerData.isRelaunchException())
+					throw e;
+			}
+		};
+		processData(entries, processor);
 
 		return null;
 	}
 
-	private void dataProcess(){
-		try{
-			final ThesaurusParser theParser = ((WorkerDataThesaurus)workerData).getTheParser();
-			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-			int i = 0;
-			final int size = dictionary.size();
-			for(final ThesaurusEntry entry : dictionary){
-				final String originalDefinition = entry.getDefinition();
-				//check if each part of `entry`, with appropriate PoS, exists
-				final List<SynonymsEntry> syns = entry.getSynonyms();
-				for(final SynonymsEntry syn : syns){
-					final List<String> definitions = syn.getSynonyms();
-					final String[] partOfSpeeches = syn.getPartOfSpeeches();
-					for(String definition : definitions){
-						definition = ThesaurusDictionary.removeSynonymUse(definition);
-						//check also that the found PoS has `originalDefinition` among its synonyms
-						if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-							LOGGER.info(Backbone.MARKER_APPLICATION, MISSING_ENTRY.format(new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
-
-						waitIfPaused();
-					}
-				}
-
-				setProgress(++ i * 100 / size);
-			}
-
-			finalizeProcessing("Successfully processed thesaurus file");
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
+	private List<Pair<Integer, ThesaurusEntry>> readEntries(){
+		final ThesaurusParser theParser = workerData.getTheParser();
+		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
+		return IntStream.range(0, dictionary.size())
+			.mapToObj(index -> Pair.of(index, dictionary.get(index)))
+			.collect(Collectors.toList());
 	}
 
 }

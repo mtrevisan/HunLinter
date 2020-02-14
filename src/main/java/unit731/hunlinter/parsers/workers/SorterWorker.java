@@ -36,7 +36,7 @@ public class SorterWorker extends WorkerDictionary{
 	public SorterWorker(final Backbone backbone, final int lineIndex){
 		super(new WorkerDataDictionary(WORKER_NAME, backbone.getDicParser())
 			.withParallelProcessing(true)
-			.withPreventExceptionRelaunch(true));
+			.withRelaunchException(false));
 
 		this.backbone = backbone;
 		dicParser = backbone.getDicParser();

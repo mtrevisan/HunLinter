@@ -9,7 +9,7 @@ public class WorkerData<T>{
 	private final String workerName;
 
 	private boolean parallelProcessing;
-	private boolean preventExceptionRelaunch;
+	private boolean relaunchException = true;
 
 	private Runnable completed;
 	private Consumer<Exception> cancelled;
@@ -30,8 +30,8 @@ public class WorkerData<T>{
 		return (T)this;
 	}
 
-	public final T withPreventExceptionRelaunch(final boolean preventExceptionRelaunch){
-		this.preventExceptionRelaunch = preventExceptionRelaunch;
+	public final T withRelaunchException(final boolean relaunchException){
+		this.relaunchException = relaunchException;
 		return (T)this;
 	}
 
@@ -59,8 +59,8 @@ public class WorkerData<T>{
 		return parallelProcessing;
 	}
 
-	final boolean isPreventExceptionRelaunch(){
-		return preventExceptionRelaunch;
+	final boolean isRelaunchException(){
+		return relaunchException;
 	}
 
 }

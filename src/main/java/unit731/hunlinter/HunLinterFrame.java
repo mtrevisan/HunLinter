@@ -2517,7 +2517,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		checkAbortion(hypLinterWorker, hypLinterMenuItem);
 	}
 
-	private void checkAbortion(final WorkerAbstract<?, ?> worker, final JComponent ... componentsToEnable){
+	private void checkAbortion(final WorkerAbstract<?, ?, ?> worker, final JComponent ... componentsToEnable){
 		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 			final Runnable cancelTask = () -> {
 				for(final JComponent component : componentsToEnable)
@@ -3267,7 +3267,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerName());
+					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?, ?>)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

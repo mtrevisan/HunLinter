@@ -3,9 +3,11 @@ package unit731.hunlinter.parsers.workers.core;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.channels.ClosedChannelException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javax.swing.SwingWorker;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,12 +20,12 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
 
-public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
+public abstract class WorkerAbstract<S, T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
 
-	protected WorkerData workerData;
+	protected WD workerData;
 
 	//read section
 	protected BiConsumer<S, T> readDataProcessor;
@@ -38,6 +40,12 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
 	private final TimeWatch watch = TimeWatch.start();
 
+
+	WorkerAbstract(final WD workerData){
+		Objects.requireNonNull(workerData);
+
+		this.workerData = workerData;
+	}
 
 	public final WorkerData getWorkerData(){
 		return workerData;
@@ -80,6 +88,37 @@ public abstract class WorkerAbstract<S, T> extends SwingWorker<Void, Void>{
 
 	public void executeSynchronously() throws Exception{
 		doInBackground();
+	}
+
+	protected <V> void processData(final List<Pair<Integer, V>> entries, final Consumer<Pair<Integer, V>> processor){
+		try{
+			final Consumer<Pair<Integer, V>> innerProcessor = createInnerProcessor(processor);
+			if(workerData.isParallelProcessing())
+				entries.parallelStream()
+					.forEach(innerProcessor);
+			else
+				entries
+					.forEach(innerProcessor);
+
+			finalizeProcessing("Successfully processed");
+		}
+		catch(final Exception e){
+			cancel(e);
+		}
+	}
+
+	private <V> Consumer<V> createInnerProcessor(final Consumer<V> processor){
+		return data -> {
+			try{
+				processor.accept(data);
+
+				waitIfPaused();
+			}
+			catch(final InterruptedException e){
+				if(workerData.isRelaunchException())
+					throw new RuntimeException(e);
+			}
+		};
 	}
 
 	public static LinterException wrapException(final Exception e, final Production production){

@@ -15,7 +15,7 @@ public class ProjectLoaderWorker extends WorkerProject{
 	public ProjectLoaderWorker(final Packager packager, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
 		super(new WorkerDataProject(WORKER_NAME, packager, backbone)
 			.withParallelProcessing(true)
-			.withPreventExceptionRelaunch(true));
+			.withRelaunchException(false));
 
 
 		getWorkerData()
