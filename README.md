@@ -37,19 +37,21 @@ HunLinter
 5. [How to](#how-to)
     1. [Open a project](#how-to-project)
     2. [Create an extension](#how-to-extension)
-    3. [Linter dictionary](#how-to-linter)
-    4. [Sort dictionary](#how-to-sort)
-    5. [Reduce rules](#how-to-reducer)
-    6. [Word count](#how-to-count)
-    7. [Rule flags aid](#how-to-aid)
-    8. [Dictionary statistics](#how-to-statistics)
-    9. [Dictionary duplicates](#how-to-duplicates)
-    9. [Dictionary wordlist](#how-to-wordlist)
-    10. [Create a Part-of-Speech FSA](#how-to-posfsa)
-    11. [Minimal pairs](#how-to-pairs)
-    12. [Ordering table columns](#how-to-ordering)
-    13. [Copying text](#how-to-copy)
-    14. [Rule/dictionary insertion](#how-to-insertion)
+    3. [Linter dictionary](#how-to-linter-dictionary)
+    4. [Linter thesaurus](#how-to-linter-thesaurus)
+    5. [Linter hyphenation](#how-to-linter-hyphenation)
+    6. [Sort dictionary](#how-to-sort)
+    7. [Reduce rules](#how-to-reducer)
+    8. [Word count](#how-to-count)
+    9. [Rule flags aid](#how-to-aid)
+    10. [Dictionary statistics](#how-to-statistics)
+    11. [Dictionary duplicates](#how-to-duplicates)
+    12. [Dictionary wordlist](#how-to-wordlist)
+    13. [Create a Part-of-Speech FSA](#how-to-posfsa)
+    14. [Minimal pairs](#how-to-pairs)
+    15. [Ordering table columns](#how-to-ordering)
+    16. [Copying text](#how-to-copy)
+    17. [Rule/dictionary insertion](#how-to-insertion)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
     2. [Dictionary correctness checking](#screenshots-correctness)
@@ -141,11 +143,25 @@ In order to create an extension (eg. for LibreOffice, or for Mozilla products) y
 
 Remember that the package will have the same name of the directory, but the directory itself is not included, just the content is.
 
-<a name="how-to-linter"></a>
+<a name="how-to-linter-dictionary"></a>
 ### Linter dictionary
-To linter a dictionary just select `Dictionary tools|Check correctness` or `Hyphenation tools|Check correctness.
+To linter a dictionary just select `Dictionary tools|Check correctness`.
 
 Each line is then linted following the rules of a particular language (IF the corresponding files are present in the project, e.g. for Venetan). If no such file is present a general linter is applied.
+
+<a name="how-to-linter-thesaurus"></a>
+### Linter thesaurus
+To linter the thesaurus just select `Thesaurus tools|Check correctness`.
+
+Each thesaurus entry is linted checking for the presence of each synonym as a definition (with same Part-of-Speech).
+
+In case of error it is suggested to copy _all_ the synonyms for the indicated words (and all that came out from the filtering using those two words), remove _each_ of them, and reinsert again.
+
+<a name="how-to-linter-hyphenation"></a>
+### Linter hyphenation
+To linter the hyphenation just select `Hyphenation tools|Check correctness`.
+
+Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc).
 
 <a name="how-to-sort"></a>
 ### Sort dictionary
