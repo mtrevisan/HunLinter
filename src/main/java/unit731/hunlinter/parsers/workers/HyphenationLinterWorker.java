@@ -46,7 +46,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final RulesLoader rulesLoader = new RulesLoader(language, null);
 
-		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 

@@ -118,7 +118,7 @@ public class SorterWorker extends WorkerDictionary{
 
 				index ++;
 
-				waitIfPaused();
+				sleepOnPause();
 			}
 
 			writer.close();

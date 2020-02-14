@@ -9,14 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
-import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
@@ -29,7 +28,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	protected WD workerData;
 
 	//read section
-	protected BiConsumer<T, Integer> readDataProcessor;
+	protected BiConsumer<Integer, T> readDataProcessor;
 	//write section
 	protected BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor;
 	protected File outputFile;
@@ -58,7 +57,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		return workerData.getWorkerName();
 	}
 
-	protected void setReadDataProcessor(final BiConsumer<T, Integer> readDataProcessor){
+	protected void setReadDataProcessor(final BiConsumer<Integer, T> readDataProcessor){
 		this.readDataProcessor = readDataProcessor;
 	}
 
@@ -99,12 +98,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			processingIndex.set(0);
 
 			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(totalData);
-			if(workerData.isParallelProcessing())
-				entries.parallelStream()
-					.forEach(innerProcessor);
-			else
-				entries
-					.forEach(innerProcessor);
+			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
+			stream.forEach(innerProcessor);
 
 			finalizeProcessing("Successfully processed");
 		}
@@ -116,11 +111,11 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	private Consumer<Pair<Integer, T>> createInnerProcessor(final int totalData){
 		return data -> {
 			try{
-				readDataProcessor.accept(data.getValue(), data.getKey());
+				readDataProcessor.accept(data.getKey(), data.getValue());
 
 				setProcessingProgress(processingIndex.incrementAndGet(), totalData);
 
-				waitIfPaused();
+				sleepOnPause();
 			}
 			catch(final InterruptedException e){
 				if(workerData.isRelaunchException())
@@ -135,13 +130,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 					throw e;
 			}
 		};
-	}
-
-	public static LinterException wrapException(final Exception e, final Production production){
-		final StringBuffer sb = new StringBuffer(e.getMessage());
-		if(production.hasProductionRules())
-			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		return new LinterException(sb.toString());
 	}
 
 	protected void setProcessingProgress(final long index, final long total){
@@ -175,7 +163,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 	/** NOTE: to be called inside `SwingWorker.doInBackground()` to allow process abortion */
-	protected void waitIfPaused() throws InterruptedException{
+	protected void sleepOnPause() throws InterruptedException{
 		while(paused.get())
 			Thread.sleep(500l);
 	}

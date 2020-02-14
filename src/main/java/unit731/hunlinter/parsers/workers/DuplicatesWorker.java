@@ -170,7 +170,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 				setProcessingProgress(readSoFar, totalSize);
 
-				waitIfPaused();
+				sleepOnPause();
 			}
 
 			bloomFilter.close();
@@ -228,7 +228,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 					setProcessingProgress(readSoFar, totalSize);
 
-					waitIfPaused();
+					sleepOnPause();
 				}
 			}
 			setProgress(100);
@@ -274,7 +274,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 					setProcessingProgress(++ writtenSoFar, totalSize + 1);
 
-					waitIfPaused();
+					sleepOnPause();
 				}
 			}
 			setProgress(100);

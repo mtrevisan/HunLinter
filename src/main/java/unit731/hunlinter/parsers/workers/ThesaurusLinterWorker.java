@@ -30,7 +30,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			.withParallelProcessing(true)
 		);
 
-		final BiConsumer<ThesaurusEntry, Integer> dataProcessor = (entry, row) -> {
+		final BiConsumer<Integer, ThesaurusEntry> dataProcessor = (row, entry) -> {
 			final String originalDefinition = entry.getDefinition();
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = entry.getSynonyms();

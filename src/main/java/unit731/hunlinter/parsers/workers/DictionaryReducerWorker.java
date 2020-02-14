@@ -22,7 +22,7 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 
 		Objects.requireNonNull(affixData);
 
-		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 
 //TODO

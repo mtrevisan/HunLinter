@@ -11,6 +11,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
 import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
+import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 
 public class DictionaryLinterWorker extends WorkerDictionary{
@@ -28,7 +29,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator);
 
 
-		final BiConsumer<String, Integer> readLineProcessor = (line, row) -> {
+		final BiConsumer<Integer, String> readLineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
@@ -43,6 +44,13 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		};
 
 		setReadDataProcessor(readLineProcessor);
+	}
+
+	private LinterException wrapException(final Exception e, final Production production){
+		final StringBuffer sb = new StringBuffer(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		return new LinterException(sb.toString());
 	}
 
 }

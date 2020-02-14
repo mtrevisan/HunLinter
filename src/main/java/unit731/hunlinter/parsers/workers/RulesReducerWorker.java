@@ -53,7 +53,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> originalRules = new ArrayList<>();
-		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 

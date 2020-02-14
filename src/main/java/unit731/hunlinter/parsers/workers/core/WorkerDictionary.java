@@ -70,7 +70,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 				setProcessingProgress(readSoFar, totalSize);
 
-				waitIfPaused();
+				sleepOnPause();
 			}
 		}
 		catch(final Exception e){
@@ -98,7 +98,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 					setProcessingProgress(writtenSoFar, totalLines);
 
-					waitIfPaused();
+					sleepOnPause();
 				}
 				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());

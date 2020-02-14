@@ -48,7 +48,7 @@ public class StatisticsWorker extends WorkerDictionary{
 		this.hyphenator = hyphenator;
 		orthography = BaseBuilder.getOrthography(language);
 
-		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
