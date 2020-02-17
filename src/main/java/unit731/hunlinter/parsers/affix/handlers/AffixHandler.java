@@ -14,7 +14,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
 
 

@@ -1,4 +1,4 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 
 

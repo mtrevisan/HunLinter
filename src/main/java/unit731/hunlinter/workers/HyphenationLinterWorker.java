@@ -1,11 +1,11 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
 import java.text.MessageFormat;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class HyphenationLinterWorker extends WorkerDictionary{

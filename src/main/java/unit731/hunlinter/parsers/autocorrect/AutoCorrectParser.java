@@ -10,7 +10,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
 import javax.xml.transform.TransformerException;

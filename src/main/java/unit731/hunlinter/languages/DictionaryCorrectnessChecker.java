@@ -8,7 +8,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class DictionaryCorrectnessChecker{

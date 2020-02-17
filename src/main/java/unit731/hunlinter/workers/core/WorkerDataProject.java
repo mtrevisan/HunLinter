@@ -1,4 +1,4 @@
-package unit731.hunlinter.parsers.workers.core;
+package unit731.hunlinter.workers.core;
 
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.services.Packager;

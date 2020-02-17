@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 

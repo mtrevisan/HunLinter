@@ -1,4 +1,4 @@
-package unit731.hunlinter.parsers.workers.core;
+package unit731.hunlinter.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -186,7 +186,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 		cancel(true);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Process stopped", new Object[]{});
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
 	}
 
 	private boolean isInterruptedException(final Exception exception){

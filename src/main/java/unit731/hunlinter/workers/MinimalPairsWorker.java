@@ -1,4 +1,4 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,9 +28,9 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.text.HammingDistance;
 import unit731.hunlinter.services.ParserHelper;

@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.SetHelper;
 
 import java.text.MessageFormat;

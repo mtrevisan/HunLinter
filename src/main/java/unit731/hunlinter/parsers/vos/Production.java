@@ -17,7 +17,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.JavaHelper;
 
 

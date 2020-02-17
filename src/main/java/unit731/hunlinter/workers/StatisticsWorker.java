@@ -1,9 +1,9 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.awt.Frame;
 import java.util.Collections;
 import java.util.List;

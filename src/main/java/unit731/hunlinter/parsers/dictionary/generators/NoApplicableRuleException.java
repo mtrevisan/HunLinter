@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class NoApplicableRuleException extends LinterException{

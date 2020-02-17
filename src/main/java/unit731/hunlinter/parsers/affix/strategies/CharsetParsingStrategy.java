@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{

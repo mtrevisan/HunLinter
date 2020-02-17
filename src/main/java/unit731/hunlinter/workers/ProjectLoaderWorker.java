@@ -1,7 +1,7 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
-import unit731.hunlinter.parsers.workers.core.WorkerDataProject;
-import unit731.hunlinter.parsers.workers.core.WorkerProject;
+import unit731.hunlinter.workers.core.WorkerDataProject;
+import unit731.hunlinter.workers.core.WorkerProject;
 import java.util.function.Consumer;
 import unit731.hunlinter.Backbone;
 import unit731.hunlinter.services.Packager;

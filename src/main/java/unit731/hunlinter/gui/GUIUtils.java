@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import unit731.hunlinter.FontChooserDialog;
-import unit731.hunlinter.parsers.workers.core.WorkerAbstract;
+import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 

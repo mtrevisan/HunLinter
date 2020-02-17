@@ -1,10 +1,10 @@
-package unit731.hunlinter.parsers.workers;
+package unit731.hunlinter.workers;
 
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.workers.core.WorkerDataParser;
-import unit731.hunlinter.parsers.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;

@@ -1,4 +1,4 @@
-package unit731.hunlinter.parsers.workers.exceptions;
+package unit731.hunlinter.workers.exceptions;
 
 
 public class LanguageNotChosenException extends Exception{

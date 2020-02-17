@@ -3,7 +3,7 @@ package unit731.hunlinter.parsers.affix.strategies;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
 

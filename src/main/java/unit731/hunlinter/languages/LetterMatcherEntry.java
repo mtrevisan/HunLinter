@@ -2,7 +2,7 @@ package unit731.hunlinter.languages;
 
 import java.text.MessageFormat;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class LetterMatcherEntry{

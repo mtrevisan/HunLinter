@@ -1,10 +1,10 @@
-package unit731.hunlinter.parsers.workers.core;
+package unit731.hunlinter.workers.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.Backbone;
-import unit731.hunlinter.parsers.workers.exceptions.ProjectNotFoundException;
+import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 

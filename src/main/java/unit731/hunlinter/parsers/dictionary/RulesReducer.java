@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.affix.AffixData;
