@@ -53,10 +53,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		return workerData;
 	}
 
-	public final String getWorkerName(){
-		return workerData.getWorkerName();
-	}
-
 	protected void setReadDataProcessor(final BiConsumer<Integer, T> readDataProcessor){
 		this.readDataProcessor = readDataProcessor;
 	}
@@ -101,7 +97,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 
-			finalizeProcessing("Successfully processed");
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 		}
 		catch(final Exception e){
 			cancel(e);

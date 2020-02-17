@@ -22,7 +22,7 @@ import unit731.hunlinter.parsers.workers.exceptions.LinterException;
 
 public class HyphenationLinterWorker extends WorkerDictionary{
 
-	public static final String WORKER_NAME = "Hyphenation correctness checking";
+	public static final String WORKER_NAME = "Hyphenation linter";
 
 	private static final String SLASH = "/";
 	private static final String ASTERISK = "*";

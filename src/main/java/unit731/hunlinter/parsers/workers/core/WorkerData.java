@@ -21,7 +21,7 @@ public class WorkerData<T>{
 		this.workerName = workerName;
 	}
 
-	final String getWorkerName(){
+	public final String getWorkerName(){
 		return workerName;
 	}
 

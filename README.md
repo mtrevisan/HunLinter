@@ -54,7 +54,7 @@ HunLinter
     17. [Rule/dictionary insertion](#how-to-insertion)
 6. [Screenshots](#screenshots)
     1. [Productions](#screenshots-productions)
-    2. [Dictionary correctness checking](#screenshots-correctness)
+    2. [Dictionary linter](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
     4. [Hyphenation](#screenshots-hyphenation)
     5. [Dictionary sorter](#screenshots-sorter)
@@ -242,8 +242,8 @@ Entries can be a single word followed by a slash and all the flags that have to 
 ![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Production")
 
 <a name="screenshots-correctness"></a>
-### Dictionary correctness checking
-![alt text](https://i.postimg.cc/9FX99CHq/dictionary-correctness-checking.png "Dictionary correctness checking")
+### Dictionary linter
+![alt text](https://i.postimg.cc/9FX99CHq/dictionary-correctness-checking.png "Dictionary linter")
 
 <a name="screenshots-thesaurus"></a>
 ### Thesaurus

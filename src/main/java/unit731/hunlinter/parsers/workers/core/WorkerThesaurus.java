@@ -17,7 +17,7 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 
 	@Override
 	protected Void doInBackground(){
-		prepareProcessing("Start thesaurus processing");
+		prepareProcessing("Start processing " + workerData.getWorkerName());
 
 		final List<Pair<Integer, ThesaurusEntry>> entries = readEntries();
 

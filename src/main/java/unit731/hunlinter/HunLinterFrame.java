@@ -3267,7 +3267,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerName());
+					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

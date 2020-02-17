@@ -20,7 +20,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLinterWorker.class);
 
-	public static final String WORKER_NAME = "Thesaurus correctness checking";
+	public static final String WORKER_NAME = "Thesaurus linter";
 
 	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn't contain definition {0} with part-of-speech {1} (from entry {2})");
 
