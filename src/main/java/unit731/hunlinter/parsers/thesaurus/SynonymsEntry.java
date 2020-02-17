@@ -107,7 +107,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	@Override
 	public String toString(){
 		return (new StringJoiner(COLUMN))
-			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(COMMA)))
+			.add(String.join(COMMA, partOfSpeeches))
 			.add(StringUtils.join(synonyms, COMMA))
 			.toString();
 	}

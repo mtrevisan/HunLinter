@@ -38,6 +38,7 @@ public class DownloaderHelper{
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
 
+	@SuppressWarnings("CanBeFinal")
 	private static Comparator<Pair<Version, String>> VERSION_COMPARATOR = Comparator.comparing(Pair::getKey);
 	static{
 		VERSION_COMPARATOR = VERSION_COMPARATOR.reversed();

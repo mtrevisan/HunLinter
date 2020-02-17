@@ -444,6 +444,8 @@ public class Packager{
 	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
 			final Path originPath) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+		Objects.requireNonNull(folder);
+
 		final File file = absolutizeFolder(folder, basePath, originPath);
 		final Map<String, File> children = new HashMap<>();
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){

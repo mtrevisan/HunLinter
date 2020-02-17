@@ -83,8 +83,7 @@ public class BaseBuilder{
 		final InputStream is = cl.getResourceAsStream("rules.properties");
 		if(is != null){
 			try(final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)){
-				if(isr != null)
-					rulesProperties.load(isr);
+				rulesProperties.load(isr);
 			}
 			catch(final IOException ignored){}
 		}

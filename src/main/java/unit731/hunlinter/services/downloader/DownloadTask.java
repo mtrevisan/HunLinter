@@ -25,7 +25,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception{
+	protected Void doInBackground(){
 		try{
 			listener.startCheckUpdates();
 

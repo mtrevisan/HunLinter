@@ -6,17 +6,15 @@ public interface DownloadListenerInterface{
 	/**
 	 * Called just before starting to check for updates
 	 *
-	 * @throws Exception	If an error should be raised
 	 */
-	default void startCheckUpdates() throws Exception{}
+	default void startCheckUpdates(){}
 
 	/**
 	 * All files were passed for an update check, start download
 	 *
 	 * @param fileData	The data of the file about to be downloaded
-	 * @throws Exception	If an error should be raised
 	 */
-	default void startDownloads(final GITFileData fileData) throws Exception{}
+	default void startDownloads(final GITFileData fileData){}
 
 	/**
 	 * The file was successfully downloaded and is now about to be passed through a series of validations.
@@ -27,9 +25,8 @@ public interface DownloadListenerInterface{
 	 *
 	 * @param fileData	The data of the file about to be downloaded
 	 * @param localPath	Local path of downloaded file
-	 * @throws Exception	If an error should be raised
 	 */
-	default void validatingFile(final GITFileData fileData, final String localPath) throws Exception{}
+	default void validatingFile(final GITFileData fileData, final String localPath){}
 
 	/** Called when the user blocks the downloading process */
 	default void stopped(){}

@@ -190,7 +190,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 	private boolean isInterruptedException(final Exception exception){
-		final Throwable t = (exception.getCause() != null? exception.getCause(): exception);
+		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
 		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
 	}
 

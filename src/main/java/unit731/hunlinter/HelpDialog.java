@@ -9,7 +9,6 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.text.Style;
 
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
