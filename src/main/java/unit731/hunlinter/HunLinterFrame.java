@@ -1872,6 +1872,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
+			//TODO
+			final boolean findWholeWordsOnly = theWholeWordsToggleButton.isSelected();
+			final boolean ignoreDiacritics = theIgnoreDiacriticsToggleButton.isSelected();
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
@@ -1930,7 +1933,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			//redo filtering, that is re-set the state of the button (it may have changed)
 			final String unmodifiedSearchText = theSynonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
-				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, findWholeWordsOnly, ignoreDiacritics);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 				final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 				theAddButton.setEnabled(!alreadyContained);
