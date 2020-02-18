@@ -104,21 +104,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return false;
 	}
 
-	public boolean containsPartOfSpeechesAndSynonymIgnoreDiacritics(final String[] partOfSpeeches, final String synonym){
-//		return synonyms.stream()
-//			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
-//			.anyMatch(entry -> entry.containsSynonym(synonym));
-		for(final SynonymsEntry entry : synonyms)
-			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
-				if(entry.containsSynonymIgnoreDiacritics(synonym))
-					return true;
-		return false;
-//		for(SynonymsEntry entry : synonyms)
-//			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
-//				return entry.containsSynonym(synonym);
-//		return false;
-	}
-
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));

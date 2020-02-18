@@ -153,23 +153,21 @@ public class ThesaurusParser{
 	}
 
 	/* Find if there is a duplicate with the same definition and same part of speech (and also a synonym) */
-	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym, final boolean ignoreDiacritics){
-		return dictionary.contains(definition, partOfSpeeches, synonym, ignoreDiacritics);
+	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 
 	/* Find if there is a duplicate with the same part of speech and same synonyms */
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms, final boolean ignoreDiacritics){
-		return dictionary.contains(partOfSpeeches, synonyms, ignoreDiacritics);
+	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
 	public void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
 		dictionary.deleteDefinition(definition, selectedSynonyms);
 	}
 
-	public static Pair<String[], String[]> extractComponentsForFilter(String text, final boolean ignoreDiacritics){
+	public static Pair<String[], String[]> extractComponentsForFilter(String text){
 		text = text.toLowerCase(Locale.ROOT);
-		if(ignoreDiacritics)
-			text = StringHelper.removeCombiningDiacriticalMarks(text);
 
 		//extract part of speech if present
 		final String[] pos = extractPartOfSpeechFromFilter(text);
@@ -201,8 +199,7 @@ public class ThesaurusParser{
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms, final boolean ignoreDiacritics){
-		//TODO manage ignoreDiacritics
+	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms){
 		//extract part of speech if present
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":

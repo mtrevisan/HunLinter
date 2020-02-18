@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.text.StringHelper;
 
 
 public class ThesaurusDictionary{
@@ -79,27 +78,15 @@ public class ThesaurusDictionary{
 	}
 
 	/* Find if there is a duplicate with the same definition and same part of speech */
-	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym, final boolean ignoreDiacritics){
-		if(ignoreDiacritics){
-			final ThesaurusEntry def = dictionary.get(StringHelper.removeCombiningDiacriticalMarks(definition));
-			return (def != null && def.containsPartOfSpeechesAndSynonymIgnoreDiacritics(partOfSpeeches, synonym));
-		}
-		else{
-			final ThesaurusEntry def = dictionary.get(definition);
-			return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
-		}
+	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+		final ThesaurusEntry def = dictionary.get(definition);
+		return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
 	}
 
 	/* Find if there is a duplicate with the same part of speech and same synonyms */
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms, final boolean ignoreDiacritics){
+	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
-		List<String> syns;
-		if(ignoreDiacritics)
-			syns = Arrays.asList(synonyms).stream()
-				.map(StringHelper::removeCombiningDiacriticalMarks)
-				.collect(Collectors.toList());
-		else
-			syns = Arrays.asList(synonyms);
+		final List<String> syns = Arrays.asList(synonyms);
 		return dictionary.values().stream()
 			.anyMatch(entry -> entry.contains(pos, syns));
 	}
