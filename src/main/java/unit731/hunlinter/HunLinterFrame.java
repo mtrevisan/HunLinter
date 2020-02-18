@@ -349,6 +349,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpLoadInputButton = new javax.swing.JButton();
       theLayeredPane = new javax.swing.JLayeredPane();
       theSynonymsLabel = new javax.swing.JLabel();
+      theSearchOptionsToolBar = new javax.swing.JToolBar();
       theWholeWordsToggleButton = new javax.swing.JToggleButton();
       theIgnoreDiacriticsToggleButton = new javax.swing.JToggleButton();
       theSynonymsTextField = new javax.swing.JTextField();
@@ -736,15 +737,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theSynonymsLabel.setLabelFor(theSynonymsTextField);
       theSynonymsLabel.setText("New definition:");
 
+      theSearchOptionsToolBar.setFloatable(false);
+      theSearchOptionsToolBar.setRollover(true);
+
       theWholeWordsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/whole words only.png"))); // NOI18N
       theWholeWordsToggleButton.setToolTipText("Find whole words only");
-      theWholeWordsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      theWholeWordsToggleButton.setFocusable(false);
       theWholeWordsToggleButton.setSelectedIcon(new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource("/whole words only.png")).getImage())));
+      theSearchOptionsToolBar.add(theWholeWordsToggleButton);
 
       theIgnoreDiacriticsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ignore diacritics.png"))); // NOI18N
       theIgnoreDiacriticsToggleButton.setToolTipText("Ignore diacritics");
-      theIgnoreDiacriticsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      theIgnoreDiacriticsToggleButton.setFocusable(false);
       theIgnoreDiacriticsToggleButton.setSelectedIcon(new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource("/ignore diacritics.png")).getImage())));
+      theSearchOptionsToolBar.add(theIgnoreDiacriticsToggleButton);
 
       theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -783,8 +789,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theSynonymsRecordedOutputLabel.setText("…");
 
       theLayeredPane.setLayer(theSynonymsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theWholeWordsToggleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theIgnoreDiacriticsToggleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      theLayeredPane.setLayer(theSearchOptionsToolBar, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theSynonymsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -798,15 +803,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane)
+               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(theWholeWordsToggleButton)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theIgnoreDiacriticsToggleButton)
+                  .addComponent(theSearchOptionsToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 715, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(theSynonymsTextField)
                   .addGap(18, 18, 18)
                   .addComponent(theAddButton))
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
@@ -820,17 +823,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theAddButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-               .addGroup(theLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                     .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(theWholeWordsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(theIgnoreDiacriticsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(theSynonymsLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
-                  .addGap(0, 0, Short.MAX_VALUE)))
+               .addComponent(theAddButton, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+               .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                  .addComponent(theSearchOptionsToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(theSynonymsLabel)))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theSynonymsRecordedLabel)
@@ -3436,6 +3435,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JScrollPane theScrollPane;
+   private javax.swing.JToolBar theSearchOptionsToolBar;
    private javax.swing.JLabel theSynonymsLabel;
    private javax.swing.JLabel theSynonymsRecordedLabel;
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;

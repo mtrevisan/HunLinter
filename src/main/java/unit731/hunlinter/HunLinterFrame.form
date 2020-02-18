@@ -815,15 +815,13 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="theScrollPane" max="32767" attributes="0"/>
+                          <Component id="theScrollPane" pref="909" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="theSynonymsLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="theWholeWordsToggleButton" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="theIgnoreDiacriticsToggleButton" min="-2" max="-2" attributes="0"/>
+                              <Component id="theSearchOptionsToolBar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="theSynonymsTextField" min="-2" pref="715" max="-2" attributes="0"/>
+                              <Component id="theSynonymsTextField" max="32767" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="theAddButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -842,21 +840,15 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="theAddButton" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="theSynonymsTextField" min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="theWholeWordsToggleButton" alignment="1" min="-2" pref="20" max="-2" attributes="0"/>
-                                      <Component id="theIgnoreDiacriticsToggleButton" alignment="1" min="-2" pref="20" max="-2" attributes="0"/>
-                                      <Component id="theSynonymsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="theAddButton" alignment="0" pref="25" max="32767" attributes="0"/>
+                          <Component id="theSynonymsTextField" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                              <Component id="theSearchOptionsToolBar" min="-2" pref="20" max="-2" attributes="0"/>
+                              <Component id="theSynonymsLabel" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="theScrollPane" pref="180" max="32767" attributes="0"/>
+                      <Component id="theScrollPane" pref="178" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="theSynonymsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -876,34 +868,40 @@
                 <Property name="text" type="java.lang.String" value="New definition:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JToggleButton" name="theWholeWordsToggleButton">
+            <Container class="javax.swing.JToolBar" name="theSearchOptionsToolBar">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/whole words only.png"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Find whole words only"/>
-                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-                  <Insets value="[0, 0, 0, 0]"/>
-                </Property>
-                <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource(&quot;/whole words only.png&quot;)).getImage()))" type="code"/>
-                </Property>
+                <Property name="floatable" type="boolean" value="false"/>
+                <Property name="rollover" type="boolean" value="true"/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JToggleButton" name="theIgnoreDiacriticsToggleButton">
-              <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/ignore diacritics.png"/>
-                </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Ignore diacritics"/>
-                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-                  <Insets value="[0, 0, 0, 0]"/>
-                </Property>
-                <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource(&quot;/ignore diacritics.png&quot;)).getImage()))" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JToggleButton" name="theWholeWordsToggleButton">
+                  <Properties>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/whole words only.png"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Find whole words only"/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource(&quot;/whole words only.png&quot;)).getImage()))" type="code"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JToggleButton" name="theIgnoreDiacriticsToggleButton">
+                  <Properties>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/ignore diacritics.png"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Ignore diacritics"/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource(&quot;/ignore diacritics.png&quot;)).getImage()))" type="code"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
             <Component class="javax.swing.JTextField" name="theSynonymsTextField">
               <Events>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="theSynonymsTextFieldKeyReleased"/>
