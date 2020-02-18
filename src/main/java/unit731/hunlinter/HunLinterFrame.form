@@ -525,7 +525,7 @@
             <Component class="javax.swing.JComboBox" name="dicRuleFlagsAidComboBox">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="13" style="Font.PLAIN"/>
+                  <Font name="Monospaced" size="13" style="0"/>
                 </Property>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
@@ -694,7 +694,7 @@
               <Properties>
                 <Property name="editable" type="boolean" value="true"/>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="13" style="Font.PLAIN"/>
+                  <Font name="Monospaced" size="13" style="0"/>
                 </Property>
               </Properties>
               <AuxValues>
@@ -740,7 +740,7 @@
             <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="13" style="Font.PLAIN"/>
+                  <Font name="Monospaced" size="13" style="0"/>
                 </Property>
               </Properties>
               <AuxValues>

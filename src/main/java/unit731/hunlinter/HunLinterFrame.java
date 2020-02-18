@@ -2663,10 +2663,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			filCreatePackageMenuItem.setEnabled(true);
 			filFontMenuItem.setEnabled(true);
 			dicLinterMenuItem.setEnabled(true);
-			theLinterMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
-			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			final AffixData affixData = backbone.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
@@ -2724,6 +2722,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(backbone.getTheParser().getSynonymsCount() > 0){
 				addSorterToTable(theTable, comparator, null);
 
+				theMenu.setEnabled(true);
+				theLinterMenuItem.setEnabled(true);
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
