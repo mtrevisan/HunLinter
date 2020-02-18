@@ -739,12 +739,22 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theWholeWordsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/whole words only.png"))); // NOI18N
       theWholeWordsToggleButton.setToolTipText("Find whole words only");
       theWholeWordsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      theWholeWordsToggleButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            theWholeWordsToggleButtonActionPerformed(evt);
+         }
+      });
 
       theIgnoreDiacriticsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ignore diacritics.png"))); // NOI18N
       theIgnoreDiacriticsToggleButton.setToolTipText("Ignore diacritics");
       theIgnoreDiacriticsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
       theIgnoreDiacriticsToggleButton.setOpaque(true);
       theIgnoreDiacriticsToggleButton.setPreferredSize(new java.awt.Dimension(19, 25));
+      theIgnoreDiacriticsToggleButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            theIgnoreDiacriticsToggleButtonActionPerformed(evt);
+         }
+      });
 
       theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -2474,6 +2484,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final boolean selected = hlpCheckUpdateOnStartupCheckBoxMenuItem.isSelected();
 		preferences.putBoolean(UPDATE_STARTUP_CHECK, selected);
    }//GEN-LAST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
+
+   private void theWholeWordsToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theWholeWordsToggleButtonActionPerformed
+		ImageIcon icon = new ImageIcon(getClass().getResource("/whole words only.png"));
+		if(theWholeWordsToggleButton.isSelected())
+			icon = new ImageIcon(GrayFilter.createDisabledImage(icon.getImage()));
+		theWholeWordsToggleButton.setIcon(icon);
+   }//GEN-LAST:event_theWholeWordsToggleButtonActionPerformed
+
+   private void theIgnoreDiacriticsToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theIgnoreDiacriticsToggleButtonActionPerformed
+		ImageIcon icon = new ImageIcon(getClass().getResource("/ignore diacritics.png"));
+		if(theIgnoreDiacriticsToggleButton.isSelected())
+			icon = new ImageIcon(GrayFilter.createDisabledImage(icon.getImage()));
+		theIgnoreDiacriticsToggleButton.setIcon(icon);
+   }//GEN-LAST:event_theIgnoreDiacriticsToggleButtonActionPerformed
 
 
 	@Override
