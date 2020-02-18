@@ -13,7 +13,8 @@ public class LetterMatcherEntry{
 	private final String correctRule;
 
 
-	public LetterMatcherEntry(final MessageFormat messagePattern, final String masterLetter, final String[] wrongFlags, final String correctRule){
+	public LetterMatcherEntry(final MessageFormat messagePattern, final String masterLetter, final String[] wrongFlags,
+			final String correctRule){
 		this.messagePattern = messagePattern;
 		this.masterLetter = masterLetter;
 		this.wrongFlags = wrongFlags;
