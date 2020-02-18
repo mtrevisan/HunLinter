@@ -739,22 +739,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theWholeWordsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/whole words only.png"))); // NOI18N
       theWholeWordsToggleButton.setToolTipText("Find whole words only");
       theWholeWordsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-      theWholeWordsToggleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theWholeWordsToggleButtonActionPerformed(evt);
-         }
-      });
+      theWholeWordsToggleButton.setSelectedIcon(new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource("/whole words only.png")).getImage())));
 
       theIgnoreDiacriticsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ignore diacritics.png"))); // NOI18N
       theIgnoreDiacriticsToggleButton.setToolTipText("Ignore diacritics");
       theIgnoreDiacriticsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
       theIgnoreDiacriticsToggleButton.setOpaque(true);
       theIgnoreDiacriticsToggleButton.setPreferredSize(new java.awt.Dimension(19, 25));
-      theIgnoreDiacriticsToggleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theIgnoreDiacriticsToggleButtonActionPerformed(evt);
-         }
-      });
+      theIgnoreDiacriticsToggleButton.setRequestFocusEnabled(false);
+      theIgnoreDiacriticsToggleButton.setSelectedIcon(new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource("/ignore diacritics.png")).getImage())));
 
       theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -830,14 +823,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                  .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addComponent(theAddButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addComponent(theAddButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
                   .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(theWholeWordsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                     .addComponent(theIgnoreDiacriticsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                     .addComponent(theSynonymsLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                     .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                     .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(theWholeWordsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(theIgnoreDiacriticsToggleButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(theSynonymsLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
@@ -2484,20 +2477,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final boolean selected = hlpCheckUpdateOnStartupCheckBoxMenuItem.isSelected();
 		preferences.putBoolean(UPDATE_STARTUP_CHECK, selected);
    }//GEN-LAST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
-
-   private void theWholeWordsToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theWholeWordsToggleButtonActionPerformed
-		ImageIcon icon = new ImageIcon(getClass().getResource("/whole words only.png"));
-		if(theWholeWordsToggleButton.isSelected())
-			icon = new ImageIcon(GrayFilter.createDisabledImage(icon.getImage()));
-		theWholeWordsToggleButton.setIcon(icon);
-   }//GEN-LAST:event_theWholeWordsToggleButtonActionPerformed
-
-   private void theIgnoreDiacriticsToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theIgnoreDiacriticsToggleButtonActionPerformed
-		ImageIcon icon = new ImageIcon(getClass().getResource("/ignore diacritics.png"));
-		if(theIgnoreDiacriticsToggleButton.isSelected())
-			icon = new ImageIcon(GrayFilter.createDisabledImage(icon.getImage()));
-		theIgnoreDiacriticsToggleButton.setIcon(icon);
-   }//GEN-LAST:event_theIgnoreDiacriticsToggleButtonActionPerformed
 
 
 	@Override
