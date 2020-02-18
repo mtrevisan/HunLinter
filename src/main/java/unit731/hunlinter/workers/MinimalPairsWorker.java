@@ -78,7 +78,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	@Override
 	protected Void doInBackground(){
 		try{
-			prepareProcessing("Reading Dictionary file for minimal pairs extraction (pass 1/3)");
+			prepareProcessing("Reading Dictionary file for minimal pairs extraction (step 1/3)");
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
@@ -140,7 +140,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file sorted");
 
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (pass 2/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
 			setProgress(0);
 
 			int totalPairs = 0;
@@ -195,7 +195,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (pass 3/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
 			setProgress(0);
 
 			//write result

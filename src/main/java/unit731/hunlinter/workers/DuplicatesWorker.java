@@ -106,7 +106,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	@Override
 	protected Void doInBackground(){
 		try{
-			prepareProcessing("Reading Dictionary file for duplicates extraction (pass 1/3)");
+			prepareProcessing("Reading Dictionary file for duplicates extraction (step 1/3)");
 
 			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
@@ -194,7 +194,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (step 2/3)");
 			setProgress(0);
 
 			final Charset charset = dicParser.getCharset();
@@ -244,7 +244,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			result.sort((d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
-			LOGGER.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining passes");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
 
 		return result;
 	}
@@ -252,7 +252,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException, InterruptedException{
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);

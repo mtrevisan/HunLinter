@@ -34,11 +34,11 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	@Override
 	protected Void doInBackground(){
-		prepareProcessing("Reading Dictionary file (pass 1/2)");
+		prepareProcessing("Reading Dictionary file (step 1/2)");
 
 		final List<Pair<Integer, String>> lines = readLines();
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (pass 2/2)");
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 		if(outputFile == null)
 			readProcess(lines);
 		else
