@@ -744,9 +744,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theIgnoreDiacriticsToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ignore diacritics.png"))); // NOI18N
       theIgnoreDiacriticsToggleButton.setToolTipText("Ignore diacritics");
       theIgnoreDiacriticsToggleButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-      theIgnoreDiacriticsToggleButton.setOpaque(true);
-      theIgnoreDiacriticsToggleButton.setPreferredSize(new java.awt.Dimension(19, 25));
-      theIgnoreDiacriticsToggleButton.setRequestFocusEnabled(false);
       theIgnoreDiacriticsToggleButton.setSelectedIcon(new ImageIcon(GrayFilter.createDisabledImage(new ImageIcon(getClass().getResource("/ignore diacritics.png")).getImage())));
 
       theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -807,7 +804,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addComponent(theWholeWordsToggleButton)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theIgnoreDiacriticsToggleButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(theIgnoreDiacriticsToggleButton)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 715, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
