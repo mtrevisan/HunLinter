@@ -93,9 +93,24 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return synonyms.stream()
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
-		for(SynonymsEntry entry : synonyms)
+		for(final SynonymsEntry entry : synonyms)
 			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
 				if(entry.containsSynonym(synonym))
+					return true;
+		return false;
+//		for(SynonymsEntry entry : synonyms)
+//			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
+//				return entry.containsSynonym(synonym);
+//		return false;
+	}
+
+	public boolean containsPartOfSpeechesAndSynonymIgnoreDiacritics(final String[] partOfSpeeches, final String synonym){
+//		return synonyms.stream()
+//			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
+//			.anyMatch(entry -> entry.containsSynonym(synonym));
+		for(final SynonymsEntry entry : synonyms)
+			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
+				if(entry.containsSynonymIgnoreDiacritics(synonym))
 					return true;
 		return false;
 //		for(SynonymsEntry entry : synonyms)

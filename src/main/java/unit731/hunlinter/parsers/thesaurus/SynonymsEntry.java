@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -91,6 +92,13 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	public boolean containsSynonym(final String synonym){
 		return synonyms.stream()
 			.map(ThesaurusDictionary::removeSynonymUse)
+			.anyMatch(s -> s.equals(synonym));
+	}
+
+	public boolean containsSynonymIgnoreDiacritics(final String synonym){
+		return synonyms.stream()
+			.map(ThesaurusDictionary::removeSynonymUse)
+			.map(StringHelper::removeCombiningDiacriticalMarks)
 			.anyMatch(s -> s.equals(synonym));
 	}
 
