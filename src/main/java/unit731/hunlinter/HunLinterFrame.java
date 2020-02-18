@@ -508,7 +508,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
+      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
 
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
@@ -618,7 +618,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
+      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
@@ -645,7 +645,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
       cmpRuleFlagsAidLabel.setText("Rule flags aid:");
 
-      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", Font.PLAIN, 13)); // NOI18N
+      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
 
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
@@ -1026,7 +1026,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       acoAddButton.setMnemonic('A');
       acoAddButton.setText("Add");
-      acoAddButton.setToolTipText("");
       acoAddButton.setEnabled(false);
       acoAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1166,7 +1165,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       sexAddButton.setMnemonic('A');
       sexAddButton.setText("Add");
-      sexAddButton.setToolTipText("");
       sexAddButton.setEnabled(false);
       sexAddButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1241,7 +1239,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       wexInputLabel.setLabelFor(wexTextField);
       wexInputLabel.setText("Exception:");
-      wexInputLabel.setToolTipText("");
 
       wexTextField.setToolTipText("hit `enter` to add");
       wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -1333,7 +1330,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       filMenu.setMnemonic('F');
       filMenu.setText("File");
-      filMenu.setToolTipText("");
 
       filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
@@ -1400,13 +1396,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
-      dicMenu.setToolTipText("");
       dicMenu.setEnabled(false);
 
       dicLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
       dicLinterMenuItem.setMnemonic('c');
       dicLinterMenuItem.setText("Check correctness");
-      dicLinterMenuItem.setToolTipText("");
       dicLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicLinterMenuItemActionPerformed(evt);
@@ -1417,7 +1411,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary…");
-      dicSortDictionaryMenuItem.setToolTipText("");
       dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicSortDictionaryMenuItemActionPerformed(evt);
@@ -1458,7 +1451,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates…");
-      dicExtractDuplicatesMenuItem.setToolTipText("");
       dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractDuplicatesMenuItemActionPerformed(evt);
@@ -1505,13 +1497,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       theMenu.setMnemonic('D');
       theMenu.setText("Thesaurus tools");
-      theMenu.setToolTipText("");
       theMenu.setEnabled(false);
 
       theLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
       theLinterMenuItem.setMnemonic('c');
       theLinterMenuItem.setText("Check correctness");
-      theLinterMenuItem.setToolTipText("");
       theLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             theLinterMenuItemActionPerformed(evt);
@@ -1523,7 +1513,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       hypMenu.setMnemonic('y');
       hypMenu.setText("Hyphenation tools");
-      hypMenu.setToolTipText("");
       hypMenu.setEnabled(false);
 
       hypLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N

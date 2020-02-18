@@ -11,7 +11,6 @@
           <Properties>
             <Property name="mnemonic" type="int" value="70"/>
             <Property name="text" type="java.lang.String" value="File"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new unit731.hunlinter.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentProjectsMenu.setText(&quot;Recent projects&quot;);&#xa;recentProjectsMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentProjectsMenu, 3);"/>
@@ -89,7 +88,6 @@
           <Properties>
             <Property name="mnemonic" type="int" value="68"/>
             <Property name="text" type="java.lang.String" value="Dictionary tools"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <SubComponents>
@@ -100,7 +98,6 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="99"/>
                 <Property name="text" type="java.lang.String" value="Check correctness"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicLinterMenuItemActionPerformed"/>
@@ -113,7 +110,6 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="115"/>
                 <Property name="text" type="java.lang.String" value="Sort dictionary&#x2026;"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicSortDictionaryMenuItemActionPerformed"/>
@@ -162,7 +158,6 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="100"/>
                 <Property name="text" type="java.lang.String" value="Extract duplicates&#x2026;"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractDuplicatesMenuItemActionPerformed"/>
@@ -213,7 +208,6 @@
           <Properties>
             <Property name="mnemonic" type="int" value="68"/>
             <Property name="text" type="java.lang.String" value="Thesaurus tools"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <SubComponents>
@@ -224,7 +218,6 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="99"/>
                 <Property name="text" type="java.lang.String" value="Check correctness"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="theLinterMenuItemActionPerformed"/>
@@ -236,7 +229,6 @@
           <Properties>
             <Property name="mnemonic" type="int" value="121"/>
             <Property name="text" type="java.lang.String" value="Hyphenation tools"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <SubComponents>
@@ -1294,7 +1286,6 @@
               <Properties>
                 <Property name="mnemonic" type="int" value="65"/>
                 <Property name="text" type="java.lang.String" value="Add"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -1425,7 +1416,6 @@
               <Properties>
                 <Property name="mnemonic" type="int" value="65"/>
                 <Property name="text" type="java.lang.String" value="Add"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -1536,7 +1526,6 @@
                   <ComponentRef name="wexTextField"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Exception:"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="wexTextField">
