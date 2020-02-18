@@ -1872,14 +1872,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			pair.setValue(Arrays.stream(pair.getValue()).map(StringHelper::removeCombiningDiacriticalMarks).toArray(String[]::new));
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		//TODO manage wholeWords
+		//TODO manage wholeWords and ignoreDiacritics
 		final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 		theAddButton.setEnabled(!alreadyContained);
 
 		@SuppressWarnings("unchecked")
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
-			//TODO manage wholeWords
+			//TODO manage wholeWords and ignoreDiacritics
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
@@ -1946,7 +1946,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					pair.setValue(Arrays.stream(pair.getValue()).map(StringHelper::removeCombiningDiacriticalMarks).toArray(String[]::new));
 
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-				//TODO manage wholeWords
+				//TODO manage wholeWords and ignoreDiacritics
 				final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
 				theAddButton.setEnabled(!alreadyContained);
 			}
