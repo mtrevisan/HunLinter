@@ -60,7 +60,7 @@ public class HelpDialog extends JDialog{
 			+ "Others:\n"
 				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
 		managedOptionsTextArea.setCaretPosition(0);
-		copyright.setText("Copyright © " + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
+		copyright.setText("Copyright © 2019-" + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
