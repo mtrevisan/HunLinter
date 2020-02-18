@@ -22,7 +22,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 	public static final String WORKER_NAME = "Thesaurus linter";
 
-	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn't contain definition {0} with part-of-speech {1} (from entry {2})");
+	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){

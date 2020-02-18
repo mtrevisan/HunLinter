@@ -2310,7 +2310,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			FileHelper.openFileWithChosenEditor(packager.getDictionaryFile());
 		}
 		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening dictionary file", e);
+			LOGGER.warn("Exception while reading dictionary file", e);
 		}
 	}//GEN-LAST:event_openDicButtonActionPerformed
 

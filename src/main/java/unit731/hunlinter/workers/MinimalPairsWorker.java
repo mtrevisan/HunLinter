@@ -78,7 +78,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	@Override
 	protected Void doInBackground(){
 		try{
-			prepareProcessing("Opening Dictionary file for minimal pairs extraction (pass 1/3)");
+			prepareProcessing("Reading Dictionary file for minimal pairs extraction (pass 1/3)");
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();

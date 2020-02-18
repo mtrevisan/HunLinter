@@ -106,7 +106,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	@Override
 	protected Void doInBackground(){
 		try{
-			prepareProcessing("Opening Dictionary file for duplicates extraction (pass 1/3)");
+			prepareProcessing("Reading Dictionary file for duplicates extraction (pass 1/3)");
 
 			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
