@@ -225,7 +225,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
-			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, hypSyllabationOutputLabel, hypRulesOutputLabel,
+			GUIUtils.addPopupMenu(copyPopupMenu, dicTable, theSynonymsRecordedOutputLabel, hypSyllabationOutputLabel, hypRulesOutputLabel,
 				hypAddRuleSyllabationOutputLabel);
 			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, theTable);
 			GUIUtils.addPopupMenu(copyRemovePopupMenu, acoTable);
