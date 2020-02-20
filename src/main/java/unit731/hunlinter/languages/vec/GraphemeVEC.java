@@ -1,6 +1,5 @@
 package unit731.hunlinter.languages.vec;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -35,16 +34,6 @@ class GraphemeVEC{
 	private static final Pattern ETEROPHONIC_SEQUENCE = PatternHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Pattern ETEROPHONIC_SEQUENCE_J = PatternHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
-	private static final List<Pattern> ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES = Arrays.asList(
-		PatternHelper.pattern("^(g)u(a)$")
-	);
-	private static final List<Pattern> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(
-		PatternHelper.pattern("^()i(u)$"),
-		PatternHelper.pattern("^(teñ|ko[jɉñ])i([ou]r)"),
-		PatternHelper.pattern("^([jɉ])i(og?r[aà]f|ur|aspr|eltrude)"),
-		PatternHelper.pattern("^((?:r[ae]|ar)?bo[jɉ])i(ur[ae])"),
-		PatternHelper.pattern("^(re[sŧ]e)i([ou]r[aeio]?)")
-	);
 
 
 	private GraphemeVEC(){}
@@ -91,9 +80,6 @@ class GraphemeVEC{
 	}
 
 	private static String correctUIJGraphemes(String word){
-		word = correctGrapheme(word, GRAPHEME_U, ETEROPHONIC_SEQUENCE_W_FALSE_POSITIVES, PHONEME_U_CIRCUMFLEX);
-		word = correctGrapheme(word, GRAPHEME_I, ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES, PHONEME_I_CIRCUMFLEX);
-
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);

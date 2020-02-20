@@ -25,15 +25,15 @@ public class WordVEC{
 
 	private static final String PIPE = "|";
 
-	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
+	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
-	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
+	private static final String VOWELS_UNSTRESSED = "aAeEeEiIïÏoOoOuUüÜ";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 
 	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
-	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍoOóÓòÒuUúÚ";
+	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
