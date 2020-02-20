@@ -15,8 +15,8 @@ import unit731.hunlinter.services.PatternHelper;
 
 public class OrthographyVEC extends Orthography{
 
-	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "o/", "u/", "u\\", "ù"};
-	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ó", "ú", "ú", "ú"};
+	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
+	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
 
 	private static final String[] EXTENDED_CHARS = new String[]{"dh", "jh", "lh", "nh", "th"};
 	private static final String[] TRUE_CHARS = new String[]{"đ", "ɉ", "ƚ", "ñ", "ŧ"};
@@ -24,19 +24,22 @@ public class OrthographyVEC extends Orthography{
 	private static final String[] MB_MP = new String[]{"mb", "mp"};
 	private static final String[] NB_NP = new String[]{"nb", "np"};
 
+	private static final Pattern PATTERN_IUMLAUT_C = PatternHelper.pattern("ï([^aeiouàéèíóòú])");
+	private static final Pattern PATTERN_UUMLAUT_C = PatternHelper.pattern("ü([^aeiouàéèíóòú])");
+
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = PatternHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
 
-	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéí"
-		+ GraphemeVEC.PHONEME_I_CIRCUMFLEX + "òóúh])");
-	private static final Pattern PATTERN_I_INITIAL_INTO_J = PatternHelper.pattern("^i(?=[aeiouàèéíòóú])");
-	private static final Pattern PATTERN_I_INSIDE_INTO_J = PatternHelper.pattern("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
+	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéíï"
+		+ GraphemeVEC.PHONEME_I_CIRCUMFLEX + "òóúüh])");
+	private static final Pattern PATTERN_I_INITIAL_INTO_J = PatternHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_I_INSIDE_INTO_J = PatternHelper.pattern("([aeiouàèéíïòóúü])i(?=[aeiouàèéíïòóúü])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
 		PatternHelper.pattern("b[ae]roi[aeèi]r"),
 		PatternHelper.pattern("re[sŧ]ei[ou]r[aeio]?")
 	);
-	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = PatternHelper.pattern("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
-	private static final Pattern PATTERN_LH_INITIAL_INTO_L = PatternHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = PatternHelper.pattern("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
+	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = PatternHelper.pattern("[aeiouàèéíïòóúü]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
+	private static final Pattern PATTERN_LH_INITIAL_INTO_L = PatternHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = PatternHelper.pattern("([^ʼ'aeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])|([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = PatternHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
 	private static final Pattern PATTERN_S_INTO_X = PatternHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
 		+ "ɉsvrlŧ]))");
@@ -71,6 +74,10 @@ public class OrthographyVEC extends Orthography{
 
 		//correct mb/mp occurrences into nb/np
 		correctedWord = StringUtils.replaceEach(correctedWord, MB_MP, NB_NP);
+
+		//correct ïC/üC occurrences into iC/uC
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_IUMLAUT_C, "i$1");
+		correctedWord = PatternHelper.replaceAll(correctedWord, PATTERN_UUMLAUT_C, "u$1");
 
 		correctedWord = GraphemeVEC.handleJHJWIUmlautPhonemes(correctedWord);
 
