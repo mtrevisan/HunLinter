@@ -44,6 +44,7 @@ public class Hyphenator implements HyphenatorInterface{
 	public Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level){
 		hypParser.addRule(additionalRule, level);
 		final Hyphenation hyph = hyphenate(word);
+		//FIXME what if there is an already present rule, say, `stu3a` and we overwrite it with, say, `stu4a`... we lost `stu3a` and we cannot recover it!
 		hypParser.removeRule(additionalRule, level);
 		return hyph;
 	}
