@@ -38,14 +38,21 @@ public class Hyphenator implements HyphenatorInterface{
 	 * @param word	String to hyphenate
 	 * @param additionalRule	Rule to add to the set of rules that will generate the hyphenation
 	 * @param level	The level to add the rule to
-	 * @return the hyphenation object
+	 * @return	The hyphenation object
 	 */
 	@Override
 	public Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level){
-		hypParser.addRule(additionalRule, level);
+		//FIXME return the rule that matches additionalRule removed by the breakpoints
+		final String oldRule = hypParser.addRule(additionalRule, level);
+
 		final Hyphenation hyph = hyphenate(word);
-		//FIXME what if there is an already present rule, say, `stu3a` and we overwrite it with, say, `stu4a`... we lost `stu3a` and we cannot recover it!
 		hypParser.removeRule(additionalRule, level);
+
+		//if there is an already present rule, say, `stu3a` and we overwrite it with, say, `stu4a`,
+		//the old `stu3a` is lost and it's necessary to re-add it
+		if(oldRule != null)
+			hypParser.addRule(oldRule, level);
+
 		return hyph;
 	}
 

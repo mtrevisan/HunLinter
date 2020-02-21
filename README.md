@@ -20,7 +20,7 @@ HunLinter
 - manages thesaurus, hyphenation, auto-correct, sentence exceptions, and word exception files
 - minimal pairs extraction
 - statistics
-- ... and many more!
+- &hellip; and many more!
 
 <br />
 
@@ -301,6 +301,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### version 1.10.1 - 20200xxx
 - made update process stoppable
 - added linter for thesaurus
+- fixed a bug on hyphenation: when the same rule is added (with different breakpoints), the old one is lost
 - substituted charting library
 - reduced application footprint
 - various minor bugfixes and code revisions
