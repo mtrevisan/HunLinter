@@ -34,7 +34,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	@Override
 	protected Void doInBackground(){
-		prepareProcessing("Reading Dictionary file (step 1/2)");
+		prepareProcessing("Reading dictionary file (step 1/2)");
 
 		final List<Pair<Integer, String>> lines = readLines();
 
