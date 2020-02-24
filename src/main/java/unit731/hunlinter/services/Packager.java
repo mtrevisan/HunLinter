@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.File;
@@ -181,7 +181,7 @@ public class Packager{
 			processPathsConfigurationFile();
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
 
 			LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
 		}
@@ -254,12 +254,12 @@ public class Packager{
 			if(autoTextOutputPath != null)
 				Files.delete(autoTextOutputPath);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Package created");
 
 			FileHelper.browse(projectPath.toFile());
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
 			LOGGER.error("Something very bad happened while creating package", e);
 		}

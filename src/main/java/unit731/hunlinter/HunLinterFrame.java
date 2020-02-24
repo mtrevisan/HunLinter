@@ -33,14 +33,11 @@ import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -75,6 +72,7 @@ import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -85,22 +83,14 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.workers.PoSFSAWorker;
-import unit731.hunlinter.workers.ThesaurusLinterWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
-import unit731.hunlinter.workers.CompoundRulesWorker;
-import unit731.hunlinter.workers.DictionaryLinterWorker;
-import unit731.hunlinter.workers.DuplicatesWorker;
-import unit731.hunlinter.workers.HyphenationLinterWorker;
-import unit731.hunlinter.workers.MinimalPairsWorker;
 import unit731.hunlinter.workers.ProjectLoaderWorker;
-import unit731.hunlinter.workers.SorterWorker;
 import unit731.hunlinter.workers.StatisticsWorker;
-import unit731.hunlinter.workers.WordCountWorker;
 import unit731.hunlinter.workers.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
@@ -165,7 +155,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
-	private Backbone backbone;
+	private ParserManager parserManager;
 	private Packager packager;
 	private int lastDictionarySortVisibleIndex;
 
@@ -180,18 +170,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
-	private DictionaryLinterWorker dicLinterWorker;
-	private DuplicatesWorker dicDuplicatesWorker;
-	private SorterWorker dicSorterWorker;
-	private WordCountWorker dicWordCountWorker;
-	private StatisticsWorker dicStatisticsWorker;
-	private WordlistWorker dicWordlistWorker;
-	private PoSFSAWorker dicPoSFSAWorker;
-	private MinimalPairsWorker dicMinimalPairsWorker;
-	private CompoundRulesWorker compoundRulesExtractorWorker;
-	private ThesaurusLinterWorker theLinterWorker;
-	private HyphenationLinterWorker hypLinterWorker;
-	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
+	private final WorkerManager workerManager;
 
 	private JMenuItem popupMergeMenuItem;
 
@@ -241,7 +220,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 		catch(final IOException ignored){}
 
-		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
+		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
 
 		openProjectPathFileChooser = new JFileChooser();
@@ -266,31 +245,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
-		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(ThesaurusLinterWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
-			if(dicStatisticsWorker.isPerformingHyphenationStatistics())
-				hypStatisticsMenuItem.setEnabled(true);
-			else
-				dicStatisticsMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
-			dicExtractWordlistMenuItem.setEnabled(true);
-			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(MinimalPairsWorker.WORKER_NAME, () -> dicExtractMinimalPairsMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
-			cmpInputComboBox.setEnabled(true);
-			cmpLimitComboBox.setEnabled(true);
-			cmpInputTextArea.setEnabled(true);
-			if(compoundRulesExtractorWorker.isCancelled())
-				cmpLoadInputButton.setEnabled(true);
-		});
-		enableComponentFromWorker.put(HyphenationLinterWorker.WORKER_NAME, () -> hypLinterMenuItem.setEnabled(true));
+
+		workerManager = new WorkerManager(this);
 
 
 		//check for updates
@@ -422,13 +378,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       sexScrollPane = new javax.swing.JScrollPane();
       sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       sexTagPanel = new JTagPanel((changeType, tags) -> {
-         final ExceptionsParser sexParser = backbone.getSexParser();
+         final ExceptionsParser sexParser = parserManager.getSexParser();
          sexParser.modify(changeType, tags);
          try{
-            sexParser.save(backbone.getSentenceExceptionsFile());
+            sexParser.save(parserManager.getSentenceExceptionsFile());
          }
          catch(final TransformerException e){
-            LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       });
       sexCorrectionsRecordedLabel = new javax.swing.JLabel();
@@ -441,13 +397,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       wexScrollPane = new javax.swing.JScrollPane();
       wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
       wexTagPanel = new JTagPanel((changeType, tags) -> {
-         final ExceptionsParser wexParser = backbone.getWexParser();
+         final ExceptionsParser wexParser = parserManager.getWexParser();
          wexParser.modify(changeType, tags);
          try{
-            wexParser.save(backbone.getWordExceptionsFile());
+            wexParser.save(parserManager.getWordExceptionsFile());
          }
          catch(final TransformerException e){
-            LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       });
       wexCorrectionsRecordedLabel = new javax.swing.JLabel();
@@ -1060,16 +1016,16 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                final int row = acoTable.convertRowIndexToModel(selectedRow);
                final BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
                   try{
-                     backbone.getAcoParser().setCorrection(row, incorrect, correct);
+                     parserManager.getAcoParser().setCorrection(row, incorrect, correct);
 
                      //… and save the files
-                     backbone.storeAutoCorrectFile();
+                     parserManager.storeAutoCorrectFile();
                   }
                   catch(Exception ex){
-                     LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+                     LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
                   }
                };
-               final CorrectionEntry definition = backbone.getAcoParser().getCorrectionsDictionary().get(row);
+               final CorrectionEntry definition = parserManager.getAcoParser().getCorrectionsDictionary().get(row);
                final CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, acoParent);
                GUIUtils.addCancelByEscapeKey(dialog);
                dialog.addWindowListener(new WindowAdapter(){
@@ -1653,7 +1609,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		backbone.createPackage();
+		parserManager.createPackage();
 	}//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
 	private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
@@ -1688,8 +1644,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
-					frame.backbone.getAffixData());
-				final List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(dicEntry);
+					frame.parserManager.getAffixData());
+				final List<Production> productions = frame.parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
 				final ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
@@ -1702,7 +1658,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				//check for correctness
 				int line = 0;
-				final DictionaryCorrectnessChecker checker = backbone.getChecker();
+				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
 				final TableRenderer dicCellRenderer = (TableRenderer)dicTable.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
 				for(final Production production : productions){
@@ -1717,14 +1673,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
 						String errorMessage = ExceptionHelper.getMessage(e);
 						LOGGER.trace("{}, line {}", errorMessage, line);
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
 					}
 
 					line ++;
 				}
 			}
 			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else{
@@ -1768,25 +1724,26 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
-			final String[] lines = backbone.getDictionaryLines();
-			final DictionarySortDialog dialog = new DictionarySortDialog(backbone.getDicParser(), lines,
+			final String[] lines = parserManager.getDictionaryLines();
+			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), lines,
 				lastDictionarySortVisibleIndex, this);
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					final int selectedRow = dialog.getSelectedIndex();
-					if(backbone.getDicParser().isInBoundary(selectedRow)){
-						dialog.setVisible(false);
+				if(e.getValueIsAdjusting())
+					workerManager.createSorterWorker(
+						() -> {
+							dialog.setVisible(false);
+							final int selectedRow = dialog.getSelectedIndex();
+							return (parserManager.getDicParser().isInBoundary(selectedRow)? selectedRow: null);
+						},
+						worker -> {
+							dicSortDictionaryMenuItem.setEnabled(false);
 
-						dicSortDictionaryMenuItem.setEnabled(false);
-
-
-						dicSorterWorker = new SorterWorker(backbone, selectedRow);
-						dicSorterWorker.addPropertyChangeListener(this);
-						dicSorterWorker.execute();
-					}
-				}
+							worker.addPropertyChangeListener(this);
+							worker.execute();
+						},
+						worker -> dicSortDictionaryMenuItem.setEnabled(true));
 			});
 			dialog.addWindowListener(new WindowAdapter(){
 				@Override
@@ -1841,7 +1798,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
+		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
 		theAddButton.setEnabled(!alreadyContained);
 
 		@SuppressWarnings("unchecked")
@@ -1892,14 +1849,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
 			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
-			backbone.getTheParser()
+			parserManager.getTheParser()
 				.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
 
-			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
+			dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
 
 			//… and save the files
-			backbone.storeThesaurusFiles();
+			parserManager.storeThesaurusFiles();
 
 
 			//redo filtering, that is re-set the state of the button (it may have changed)
@@ -1907,12 +1864,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-				final boolean alreadyContained = backbone.getTheParser().contains(pair.getLeft(), pair.getRight());
+				final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
 				theAddButton.setEnabled(!alreadyContained);
 			}
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 
@@ -1930,7 +1887,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = backbone.getAcoParser().contains(incorrect, correct);
+		final boolean alreadyContained = parserManager.getAcoParser().contains(incorrect, correct);
 		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
@@ -1949,7 +1906,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	public void removeSelectedRowsFromAutoCorrect(){
 		try{
 			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
-			backbone.getAcoParser().deleteCorrection(selectedRow);
+			parserManager.getAcoParser().deleteCorrection(selectedRow);
 
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 			dm.fireTableDataChanged();
@@ -1957,10 +1914,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			updateCorrectionsCounter();
 
 			//… and save the files
-			backbone.storeAutoCorrectFile();
+			parserManager.storeAutoCorrectFile();
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 
@@ -1973,7 +1930,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		formerFilterSentenceException = unmodifiedException;
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = backbone.getSexParser().contains(unmodifiedException);
+		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
 		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".") && !alreadyContained);
 
 
@@ -1989,7 +1946,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		formerFilterWordException = unmodifiedException;
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = backbone.getWexParser().contains(unmodifiedException);
+		final boolean alreadyContained = parserManager.getWexParser().contains(unmodifiedException);
 		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
 
 
@@ -2009,7 +1966,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			extractWordCount();
 		}
 		catch(final Exception e){
-			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 		}
 	}//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
@@ -2026,7 +1983,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		dicRulesReducerMenuItem.setEnabled(false);
 
-		rulesReducerDialog = new RulesReducerDialog(backbone, this);
+		rulesReducerDialog = new RulesReducerDialog(parserManager, this);
 		rulesReducerDialog.setLocationRelativeTo(this);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){
 			@Override
@@ -2052,10 +2009,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		final  String newRule = hypAddRuleTextField.getText();
 		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-		final String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
+		final String foundRule = parserManager.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
 		if(foundRule == null){
 			try{
-				backbone.storeHyphenationFile();
+				parserManager.storeHyphenationFile();
 
 				if(hypWordTextField.getText() != null){
 					formerHyphenationText = null;
@@ -2075,7 +2032,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
 		}
 	}//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
@@ -2101,14 +2058,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
-			final DuplicationResult<ThesaurusEntry> duplicationResult = backbone.getTheParser()
+			final DuplicationResult<ThesaurusEntry> duplicationResult = parserManager.getTheParser()
 				.insertSynonyms(synonyms, duplicatesDiscriminator);
 			final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
 			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
 				//if everything's ok update the table and the sorter…
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
+				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
 				dm.fireTableDataChanged();
 
 				formerFilterThesaurusText = null;
@@ -2121,7 +2078,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				updateSynonymsCounter();
 
 				//… and save the files
-				backbone.storeThesaurusFiles();
+				parserManager.storeThesaurusFiles();
 			}
 			else{
 				theSynonymsTextField.requestFocusInWindow();
@@ -2136,7 +2093,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
@@ -2157,8 +2114,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			try{
 				//FIXME transfer into backbone
 				final List<Production> words;
-				final WordGenerator wordGenerator = backbone.getWordGenerator();
-				final AffixData affixData = backbone.getAffixData();
+				final WordGenerator wordGenerator = parserManager.getWordGenerator();
+				final AffixData affixData = parserManager.getAffixData();
 				if(inputText.equals(affixData.getCompoundFlag())){
 					int maxCompounds = affixData.getCompoundMaxWordCount();
 					words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
@@ -2172,7 +2129,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				dm.setProductions(words);
 			}
 			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else
@@ -2189,11 +2146,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, this);
 
-			final String language = backbone.getAffixData().getLanguage();
+			final String language = parserManager.getAffixData().getLanguage();
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
-		FontChooserDialog dialog = new FontChooserDialog(backbone.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
+		FontChooserDialog dialog = new FontChooserDialog(parserManager.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
 			this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
@@ -2227,7 +2184,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
-			final DuplicationResult<CorrectionEntry> duplicationResult = backbone.getAcoParser()
+			final DuplicationResult<CorrectionEntry> duplicationResult = parserManager.getAcoParser()
 				.insertCorrection(incorrect, correct, duplicatesDiscriminator);
 			final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
 
@@ -2249,7 +2206,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				updateSynonymsCounter();
 
 				//… and save the files
-				backbone.storeAutoCorrectFile();
+				parserManager.storeAutoCorrectFile();
 			}
 			else{
 				acoIncorrectTextField.requestFocusInWindow();
@@ -2263,22 +2220,22 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
 	}//GEN-LAST:event_acoAddButtonActionPerformed
 
 	private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
 		final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
 			try{
-				backbone.getHypParser().setOptions(options);
+				parserManager.getHypParser().setOptions(options);
 
-				backbone.storeHyphenationFile();
+				parserManager.storeHyphenationFile();
 			}
 			catch(Exception ex){
-				LOGGER.info(Backbone.MARKER_APPLICATION, ex.getMessage());
+				LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
 			}
 		};
-		final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(backbone.getHypParser().getOptions(),
+		final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
 			acceptButtonAction, this);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
@@ -2287,7 +2244,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void openAidButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAidButtonActionPerformed
 		try{
-			FileHelper.openFileWithChosenEditor(backbone.getAidFile());
+			FileHelper.openFileWithChosenEditor(parserManager.getAidFile());
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening affix file", e);
@@ -2355,8 +2312,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void sexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sexAddButtonActionPerformed
 		try{
 			final String exception = StringUtils.strip(sexTextField.getText());
-			if(!backbone.getSexParser().contains(exception)){
-				backbone.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+			if(!parserManager.getSexParser().contains(exception)){
+				parserManager.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
 				sexTagPanel.addTag(exception);
 
 				//reset input
@@ -2365,7 +2322,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				updateSentenceExceptionsCounter();
 
-				backbone.storeSentenceExceptionFile();
+				parserManager.storeSentenceExceptionFile();
 			}
 			else{
 				sexTextField.requestFocusInWindow();
@@ -2376,7 +2333,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
 	}//GEN-LAST:event_sexAddButtonActionPerformed
 
@@ -2387,8 +2344,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private void wexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wexAddButtonActionPerformed
 		try{
 			final String exception = StringUtils.strip(wexTextField.getText());
-			if(!backbone.getWexParser().contains(exception)){
-				backbone.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+			if(!parserManager.getWexParser().contains(exception)){
+				parserManager.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
 				wexTagPanel.addTag(exception);
 
 				//reset input
@@ -2397,7 +2354,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				updateWordExceptionsCounter();
 
-				backbone.storeWordExceptionFile();
+				parserManager.storeWordExceptionFile();
 			}
 			else{
 				wexTextField.requestFocusInWindow();
@@ -2408,7 +2365,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
    }//GEN-LAST:event_wexAddButtonActionPerformed
 
@@ -2465,7 +2422,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				dicLinterMenuItem.setEnabled(true);
 				theLinterMenuItem.setEnabled(true);
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "Project loader aborted");
 
 				prjLoaderWorker = null;
 			}
@@ -2476,43 +2433,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 
-		//FIXME introduce a checkAbortion case?
-		if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-			dicDuplicatesWorker.pause();
-
-			final Object[] options = {"Abort", "Cancel"};
-			final int answer = JOptionPane.showOptionDialog(this,
-				"Do you really want to abort the dictionary duplicates task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				dicDuplicatesWorker.cancel();
-
-				dicExtractDuplicatesMenuItem.setEnabled(true);
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
-
-				dicDuplicatesWorker = null;
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				dicDuplicatesWorker.resume();
-			}
-		}
-
-		checkAbortion(dicLinterWorker, dicLinterMenuItem);
-
-		checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
-
-		checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
-
-		checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
-
-		checkAbortion(dicPoSFSAWorker, dicExtractPoSFAMenuItem);
-
-		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
-			cmpLoadInputButton);
-
-		checkAbortion(theLinterWorker, theLinterMenuItem);
-
-		checkAbortion(hypLinterWorker, hypLinterMenuItem);
+		workerManager.checkForAbortion();
 	}
 
 	private void checkAbortion(final WorkerAbstract<?, ?> worker, final JComponent ... componentsToEnable){
@@ -2531,8 +2452,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		clearResultTextArea();
 
-		if(backbone != null)
-			backbone.stopFileListener();
+		if(parserManager != null)
+			parserManager.stopFileListener();
 
 		loadFileInternal(basePath);
 	}
@@ -2576,10 +2497,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				if(backbone == null)
-					backbone = new Backbone(packager, this);
+				if(parserManager == null){
+					parserManager = new ParserManager(packager, this);
+					workerManager.setParserManager(parserManager);
+				}
 
-				prjLoaderWorker = new ProjectLoaderWorker(packager, backbone, this::loadFileCompleted, this::loadFileCancelled);
+				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
 				prjLoaderWorker.execute();
 
@@ -2588,7 +2511,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
 				loadFileCancelled(e);
 
-				LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
+				LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 
 				LOGGER.error("A bad error occurred while loading the project", e);
 			}
@@ -2645,10 +2568,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//restore default font (changed for reporting reading errors)
 		setCurrentFont();
 
-		backbone.registerFileListener();
-		backbone.startFileListener();
+		parserManager.registerFileListener();
+		parserManager.startFileListener();
 
-		final String language = backbone.getAffixData().getLanguage();
+		final String language = parserManager.getAffixData().getLanguage();
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
@@ -2664,7 +2587,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
-			final AffixData affixData = backbone.getAffixData();
+			final AffixData affixData = parserManager.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
@@ -2680,8 +2603,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				cmpInputComboBox.setSelectedItem(null);
 				dicInputTextField.requestFocusInWindow();
 			}
-			openAffButton.setEnabled(backbone.getAffixFile() != null);
-			openDicButton.setEnabled(backbone.getDictionaryFile() != null);
+			openAffButton.setEnabled(parserManager.getAffixFile() != null);
+			openDicButton.setEnabled(parserManager.getDictionaryFile() != null);
 
 			if(rulesReducerDialog != null){
 				//notify RulesReducerDialog
@@ -2692,18 +2615,18 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//hyphenation file:
-			if(backbone.getHyphenator() != null){
+			if(parserManager.getHyphenator() != null){
 				hypLinterMenuItem.setEnabled(true);
 
 				hypMenu.setEnabled(true);
 				hypStatisticsMenuItem.setEnabled(true);
 				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
-			openHypButton.setEnabled(backbone.getHyphenationFile() != null);
+			openHypButton.setEnabled(parserManager.getHyphenationFile() != null);
 
 
 			//aid file:
-			final List<String> lines = backbone.getAidParser().getLines();
+			final List<String> lines = parserManager.getAidParser().getLines();
 			final boolean aidLinesPresent = !lines.isEmpty();
 			clearAidParser();
 			if(aidLinesPresent){
@@ -2717,48 +2640,48 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//thesaurus file:
-			if(backbone.getTheParser().getSynonymsCount() > 0){
+			if(parserManager.getTheParser().getSynonymsCount() > 0){
 				addSorterToTable(theTable, comparator, null);
 
 				theMenu.setEnabled(true);
 				theLinterMenuItem.setEnabled(true);
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
+				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
 				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
 
 			//auto–correct file:
-			if(backbone.getAcoParser().getCorrectionsCounter() > 0){
+			if(parserManager.getAcoParser().getCorrectionsCounter() > 0){
 				addSorterToTable(acoTable, comparator, null);
 
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-				dm.setCorrections(backbone.getAcoParser().getCorrectionsDictionary());
+				dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
 				updateCorrectionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 			}
-			openAcoButton.setEnabled(backbone.getAutoCorrectFile() != null);
+			openAcoButton.setEnabled(parserManager.getAutoCorrectFile() != null);
 
 
 			//sentence exceptions file:
-			if(backbone.getSexParser().getExceptionsCounter() > 0){
+			if(parserManager.getSexParser().getExceptionsCounter() > 0){
 				updateSentenceExceptionsCounter();
-				final List<String> sentenceExceptions = backbone.getSexParser().getExceptionsDictionary();
+				final List<String> sentenceExceptions = parserManager.getSexParser().getExceptionsDictionary();
 				sexTagPanel.initializeTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
-			openSexButton.setEnabled(backbone.getSentenceExceptionsFile() != null);
+			openSexButton.setEnabled(parserManager.getSentenceExceptionsFile() != null);
 
 
 			//word exceptions file:
-			if(backbone.getWexParser().getExceptionsCounter() > 0){
-				final List<String> wordExceptions = backbone.getWexParser().getExceptionsDictionary();
+			if(parserManager.getWexParser().getExceptionsCounter() > 0){
+				final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
 				wexTagPanel.initializeTags(wordExceptions);
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
-			openWexButton.setEnabled(backbone.getWordExceptionsFile() != null);
+			openWexButton.setEnabled(parserManager.getWordExceptionsFile() != null);
 
 
 			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
@@ -2773,10 +2696,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			GUIUtils.setCurrentFont(lastUsedFont, this);
 		}
 		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);
 		}
@@ -2855,19 +2778,19 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCount()));
+		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getTheParser().getSynonymsCount()));
 	}
 
 	private void updateCorrectionsCounter(){
-		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getAcoParser().getCorrectionsCounter()));
+		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
 	private void updateSentenceExceptionsCounter(){
-		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSexParser().getExceptionsCounter()));
+		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
 	}
 
 	private void updateWordExceptionsCounter(){
-		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getWexParser().getExceptionsCounter()));
+		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
 	}
 
 	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
@@ -2878,7 +2801,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void hyphenate(final HunLinterFrame frame){
-		final String language = frame.backbone.getAffixData().getLanguage();
+		final String language = frame.parserManager.getAffixData().getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
@@ -2888,7 +2811,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		String count = null;
 		List<String> rules = Collections.emptyList();
 		if(StringUtils.isNotBlank(text)){
-			final Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
+			final Hyphenation hyphenation = frame.parserManager.getHyphenator().hyphenate(text);
 
 			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
 				"</html>");
@@ -2916,14 +2839,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	private void hyphenateAddRule(final HunLinterFrame frame){
-		final String language = frame.backbone.getAffixData().getLanguage();
+		final String language = frame.parserManager.getAffixData().getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
 		final String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		final HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
-			final boolean alreadyHasRule = frame.backbone.hasHyphenationRule(addedRule, level);
+			final boolean alreadyHasRule = frame.parserManager.hasHyphenationRule(addedRule, level);
 			boolean ruleMatchesText = false;
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
@@ -2932,8 +2855,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
-					final Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);
-					final Hyphenation addedRuleHyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText, addedRule,
+					final Hyphenation hyphenation = frame.parserManager.getHyphenator().hyphenate(addedRuleText);
+					final Hyphenation addedRuleHyphenation = frame.parserManager.getHyphenator().hyphenate(addedRuleText, addedRule,
 						level);
 
 					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
@@ -2971,161 +2894,173 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void checkDictionaryCorrectness(){
-		if(dicLinterWorker == null || dicLinterWorker.isDone()){
-			dicLinterMenuItem.setEnabled(false);
+		workerManager.createDictionaryLinterWorker(
+			worker -> {
+				dicLinterMenuItem.setEnabled(false);
 
-			dicLinterWorker = new DictionaryLinterWorker(backbone.getDicParser(), backbone.getChecker(),
-				backbone.getWordGenerator());
-			dicLinterWorker.addPropertyChangeListener(this);
-			dicLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicLinterMenuItem.setEnabled(true));
 	}
 
 	private void extractDictionaryDuplicates(){
-		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createDuplicatesWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractDuplicatesMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
-					backbone.getWordGenerator(), outputFile);
-				dicDuplicatesWorker.addPropertyChangeListener(this);
-				dicDuplicatesWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				dicExtractDuplicatesMenuItem.setEnabled(true);
+
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
+			});
 	}
 
 	private void extractWordCount(){
-		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
-			dicWordCountMenuItem.setEnabled(false);
+		workerManager.createWordCountWorker(
+			worker -> {
+				dicWordCountMenuItem.setEnabled(false);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getAffParser().getAffixData().getLanguage(),
-				backbone.getDicParser(), backbone.getWordGenerator());
-			dicWordCountWorker.addPropertyChangeListener(this);
-			dicWordCountWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicWordCountMenuItem.setEnabled(true));
 	}
 
 	private void extractDictionaryStatistics(final boolean performHyphenationStatistics){
-		if(dicStatisticsWorker == null || dicStatisticsWorker.isDone()){
-			if(performHyphenationStatistics)
-				hypStatisticsMenuItem.setEnabled(false);
-			else
-				dicStatisticsMenuItem.setEnabled(false);
+		workerManager.createDictionaryStatistics(
+			() -> performHyphenationStatistics,
+			worker -> {
+				if(performHyphenationStatistics)
+					hypStatisticsMenuItem.setEnabled(false);
+				else
+					dicStatisticsMenuItem.setEnabled(false);
 
-			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(),
-				(performHyphenationStatistics? backbone.getHyphenator(): null), backbone.getWordGenerator(), this);
-			dicStatisticsWorker.addPropertyChangeListener(this);
-			dicStatisticsWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				if(((StatisticsWorker)worker).isPerformingHyphenationStatistics())
+					hypStatisticsMenuItem.setEnabled(true);
+				else
+					dicStatisticsMenuItem.setEnabled(true);
+			});
 	}
 
 	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
-		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createWordlistWorker(
+			type,
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), type,
-					outputFile);
-				dicWordlistWorker.addPropertyChangeListener(this);
-				dicWordlistWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				dicExtractWordlistMenuItem.setEnabled(true);
+				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+			});
 	}
 
 	private void extractPoSFSA(){
-		if(dicPoSFSAWorker == null || dicPoSFSAWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createPoSFSAWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
+					parserManager.getAffixData().getLanguage() + ".txt").toFile(): null);
+			},
+			worker -> {
 				dicExtractPoSFAMenuItem.setEnabled(false);
 
-				File outputFile = saveResultFileChooser.getSelectedFile();
-				final String temporaryFile = outputFile.getAbsolutePath() + File.separatorChar
-					+ backbone.getAffixData().getLanguage() + ".txt";
-				outputFile = new File(temporaryFile);
-				dicPoSFSAWorker = new PoSFSAWorker(backbone.getDicParser(), backbone.getWordGenerator(),
-					outputFile);
-				dicPoSFSAWorker.addPropertyChangeListener(this);
-				dicPoSFSAWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicExtractPoSFAMenuItem.setEnabled(true));
 	}
 
 	private void extractMinimalPairs(){
-		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createMinimalPairsWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
-					backbone.getChecker(), backbone.getWordGenerator(), outputFile);
-				dicMinimalPairsWorker.addPropertyChangeListener(this);
-				dicMinimalPairsWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicExtractMinimalPairsMenuItem.setEnabled(true));
 	}
 
 	private void extractCompoundRulesInputs(){
-		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
-			cmpInputComboBox.setEnabled(false);
-			cmpLimitComboBox.setEnabled(false);
-			cmpInputTextArea.setEnabled(false);
-			cmpLoadInputButton.setEnabled(false);
+		final AffixParser affParser = parserManager.getAffParser();
+		final FlagParsingStrategy strategy = affParser.getAffixData()
+			.getFlagParsingStrategy();
+		workerManager.createCompoundRulesWorker(
+			worker -> {
+				cmpInputComboBox.setEnabled(false);
+				cmpLimitComboBox.setEnabled(false);
+				cmpInputTextArea.setEnabled(false);
+				cmpLoadInputButton.setEnabled(false);
+				cmpInputTextArea.setText(null);
 
-			cmpInputTextArea.setText(null);
-
-			final AffixParser affParser = backbone.getAffParser();
-			final AffixData affixData = affParser.getAffixData();
-			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-			final String compoundFlag = affixData.getCompoundFlag();
-			final List<Production> compounds = new ArrayList<>();
-			final BiConsumer<Production, Integer> productionReader = (production, row) -> {
-				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
-					compounds.add(production);
-			};
-			final Runnable completed = () -> {
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			compounds -> {
 				final StringJoiner sj = new StringJoiner("\n");
 				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
-			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(),
-				productionReader, completed);
-			compoundRulesExtractorWorker.addPropertyChangeListener(this);
-			compoundRulesExtractorWorker.execute();
-		}
+			},
+			worker -> {
+				cmpInputComboBox.setEnabled(true);
+				cmpLimitComboBox.setEnabled(true);
+				cmpInputTextArea.setEnabled(true);
+				if(worker.isCancelled())
+					cmpLoadInputButton.setEnabled(true);
+			});
 	}
 
 
 	private void checkThesaurusCorrectness(){
-		if(theLinterWorker == null || theLinterWorker.isDone()){
-			theLinterMenuItem.setEnabled(false);
+		workerManager.createThesaurusLinterWorker(
+			worker -> {
+				theLinterMenuItem.setEnabled(false);
 
-			theLinterWorker = new ThesaurusLinterWorker(backbone.getTheParser());
-			theLinterWorker.addPropertyChangeListener(this);
-			theLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> theLinterMenuItem.setEnabled(true));
 	}
 
 
 	private void checkHyphenationCorrectness(){
-		if(hypLinterWorker == null || hypLinterWorker.isDone()){
-			hypLinterMenuItem.setEnabled(false);
+		workerManager.createHyphenationLinterWorker(
+			worker -> {
+				hypLinterMenuItem.setEnabled(false);
 
-			hypLinterWorker = new HyphenationLinterWorker(backbone.getAffParser().getAffixData().getLanguage(),
-				backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
-			hypLinterWorker.addPropertyChangeListener(this);
-			hypLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> hypLinterMenuItem.setEnabled(true));
 	}
 
 
@@ -3265,9 +3200,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName());
-					if(menuItemEnabler != null)
-						menuItemEnabler.run();
+					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
+					workerManager.callOnEnd(workerName);
 				}
 				break;
 

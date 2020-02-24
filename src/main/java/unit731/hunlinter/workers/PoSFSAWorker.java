@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -58,7 +58,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 		};
 		final Runnable completed = () -> {
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Begin post-processing");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Begin post-processing");
 
 			try{
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
@@ -81,7 +81,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 				};
 				DictCompile.main(buildOptions);
 
-				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
 
 				FileHelper.browse(outputFile);
 

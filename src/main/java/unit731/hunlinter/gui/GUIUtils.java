@@ -191,8 +191,8 @@ public class GUIUtils{
 	}
 
 
-	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize, final JPopupMenu popupMenu,
-			final Consumer<Component> fnCallback) throws IOException{
+	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize,
+			final JPopupMenu popupMenu, final Consumer<Component> fnCallback) throws IOException{
 		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
 		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream(iconURL));
 		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
@@ -201,15 +201,18 @@ public class GUIUtils{
 		return menuItem;
 	}
 
-	public static JMenuItem createPopupMergeMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnMerge) throws IOException{
+	public static JMenuItem createPopupMergeMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnMerge)
+			throws IOException{
 		return createPopupMenu("Merge", 'M', "/popup_add.png", iconSize, popupMenu, fnMerge);
 	}
 
-	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnCopy) throws IOException{
+	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnCopy)
+			throws IOException{
 		return createPopupMenu("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
 	}
 
-	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete) throws IOException{
+	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
+			throws IOException{
 		return createPopupMenu("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
 	}
 
@@ -282,7 +285,8 @@ public class GUIUtils{
 	}
 
 
-	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable cancelTask, final Runnable resumeTask){
+	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable cancelTask,
+			final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
 
 		worker.pause();

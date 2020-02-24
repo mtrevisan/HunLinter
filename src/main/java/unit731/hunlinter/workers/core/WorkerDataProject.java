@@ -1,6 +1,6 @@
 package unit731.hunlinter.workers.core;
 
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.Packager;
 
 import java.util.Objects;
@@ -9,25 +9,25 @@ import java.util.Objects;
 public class WorkerDataProject extends WorkerData<WorkerDataProject>{
 
 	private final Packager packager;
-	private final Backbone backbone;
+	private final ParserManager parserManager;
 
 
-	public WorkerDataProject(final String workerName, final Packager packager, final Backbone backbone){
+	public WorkerDataProject(final String workerName, final Packager packager, final ParserManager parserManager){
 		super(workerName);
 
 		Objects.requireNonNull(packager);
-		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(parserManager);
 
 		this.packager = packager;
-		this.backbone = backbone;
+		this.parserManager = parserManager;
 	}
 
 	Packager getPackager(){
 		return packager;
 	}
 
-	Backbone getBackbone(){
-		return backbone;
+	ParserManager getParserManager(){
+		return parserManager;
 	}
 
 }

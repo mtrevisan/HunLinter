@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
@@ -36,18 +37,18 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private static final long serialVersionUID = -5660512112885632106L;
 
 
-	private final Backbone backbone;
+	private final ParserManager parserManager;
 
 	private RulesReducerWorker rulesReducerWorker;
 
 
-	public RulesReducerDialog(final Backbone backbone, final Frame parent){
+	public RulesReducerDialog(final ParserManager parserManager, final Frame parent){
 		super(parent, "Rules Reducer", true);
 
-		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(parent);
 
-		this.backbone = backbone;
+		this.parserManager = parserManager;
 
 		initComponents();
 
@@ -66,7 +67,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		reload();
 
-		ApplicationLogAppender.addTextArea(reducedSetTextArea, Backbone.MARKER_RULE_REDUCER);
+		ApplicationLogAppender.addTextArea(reducedSetTextArea, ParserManager.MARKER_RULE_REDUCER);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -192,7 +193,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
 			rulesReducerWorker.cancel();
 
-		final AffixData affixData = backbone.getAffixData();
+		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
 		final List<String> affixEntries = affixes.stream()
 			.map(affix -> (affix.isSuffix()? AffixOption.SUFFIX: AffixOption.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
@@ -210,7 +211,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		if(flag != null){
 			mainProgressBar.setValue(0);
 
-			final RuleEntry rule = backbone.getAffixData().getData(flag);
+			final RuleEntry rule = parserManager.getAffixData().getData(flag);
 			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 			final String header = sj.add(rule.getType().getOption().getCode())
 				.add(flag)
@@ -278,8 +279,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			try{
 				final String flag = getSelectedFlag();
 				final boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
-				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
-					backbone.getWordGenerator());
+				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(), parserManager.getDicParser(),
+					parserManager.getWordGenerator());
 				rulesReducerWorker.addPropertyChangeListener(this);
 				rulesReducerWorker.execute();
 			}
@@ -288,7 +289,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
 
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
+				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		}
 	}

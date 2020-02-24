@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.DictionaryInclusionTestWorker;
@@ -53,7 +53,7 @@ public class WordMuncher{
 				dicInclusionTestWorker.executeSynchronously();
 			}
 			catch(final Exception e){
-				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
 
 				LOGGER.error("Cannot read dictionary", e);
 			}

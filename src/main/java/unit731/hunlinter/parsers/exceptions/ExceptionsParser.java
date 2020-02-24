@@ -6,7 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
@@ -86,7 +86,7 @@ public class ExceptionsParser{
 			.filter(list -> list.size() > 1)
 			.collect(Collectors.toList());
 		for(final List<String> duplication : duplications)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
 	}
 
 	public List<String> getExceptionsDictionary(){

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.IntegerFilter;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptions;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 
@@ -215,7 +216,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			deleteRows(selectedRows);
 		}
 		catch(final Exception e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 

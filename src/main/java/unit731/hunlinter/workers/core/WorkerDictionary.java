@@ -12,7 +12,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -38,7 +38,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 		final List<Pair<Integer, String>> lines = readLines();
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 		if(outputFile == null)
 			readProcess(lines);
 		else
@@ -101,7 +101,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 					sleepOnPause();
 				}
 				catch(final Exception e){
-					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 					if(workerData.isRelaunchException())
 						throw e;
