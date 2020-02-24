@@ -33,7 +33,6 @@ import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,23 +83,14 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.workers.PoSFSAWorker;
-import unit731.hunlinter.workers.ThesaurusLinterWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
-import unit731.hunlinter.workers.CompoundRulesWorker;
-import unit731.hunlinter.workers.DictionaryLinterWorker;
-import unit731.hunlinter.workers.DuplicatesWorker;
-import unit731.hunlinter.workers.HyphenationLinterWorker;
-import unit731.hunlinter.workers.MinimalPairsWorker;
 import unit731.hunlinter.workers.ProjectLoaderWorker;
-import unit731.hunlinter.workers.SorterWorker;
 import unit731.hunlinter.workers.StatisticsWorker;
-import unit731.hunlinter.workers.WordCountWorker;
 import unit731.hunlinter.workers.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
@@ -180,18 +170,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
-	private DictionaryLinterWorker dicLinterWorker;
-	private DuplicatesWorker dicDuplicatesWorker;
-	private SorterWorker dicSorterWorker;
-	private WordCountWorker dicWordCountWorker;
-	private StatisticsWorker dicStatisticsWorker;
-	private WordlistWorker dicWordlistWorker;
-	private PoSFSAWorker dicPoSFSAWorker;
-	private MinimalPairsWorker dicMinimalPairsWorker;
-	private CompoundRulesWorker compoundRulesExtractorWorker;
-	private ThesaurusLinterWorker theLinterWorker;
-	private HyphenationLinterWorker hypLinterWorker;
-	private final WorkerManager workerManager = new WorkerManager();
+	private final WorkerManager workerManager;
 
 	private JMenuItem popupMergeMenuItem;
 
@@ -266,31 +245,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
-		workerManager.addWorker(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
-		workerManager.addWorker(ThesaurusLinterWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
-		workerManager.addWorker(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
-		workerManager.addWorker(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
-		workerManager.addWorker(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
-		workerManager.addWorker(StatisticsWorker.WORKER_NAME, () -> {
-			if(dicStatisticsWorker.isPerformingHyphenationStatistics())
-				hypStatisticsMenuItem.setEnabled(true);
-			else
-				dicStatisticsMenuItem.setEnabled(true);
-		});
-		workerManager.addWorker(WordlistWorker.WORKER_NAME, () -> {
-			dicExtractWordlistMenuItem.setEnabled(true);
-			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-		});
-		workerManager.addWorker(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
-		workerManager.addWorker(MinimalPairsWorker.WORKER_NAME, () -> dicExtractMinimalPairsMenuItem.setEnabled(true));
-		workerManager.addWorker(CompoundRulesWorker.WORKER_NAME, () -> {
-			cmpInputComboBox.setEnabled(true);
-			cmpLimitComboBox.setEnabled(true);
-			cmpInputTextArea.setEnabled(true);
-			if(compoundRulesExtractorWorker.isCancelled())
-				cmpLoadInputButton.setEnabled(true);
-		});
-		workerManager.addWorker(HyphenationLinterWorker.WORKER_NAME, () -> hypLinterMenuItem.setEnabled(true));
+
+		workerManager = new WorkerManager(this);
 
 
 		//check for updates
@@ -1774,19 +1730,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					final int selectedRow = dialog.getSelectedIndex();
-					if(parserManager.getDicParser().isInBoundary(selectedRow)){
-						dialog.setVisible(false);
+				if(e.getValueIsAdjusting())
+					workerManager.createSorterWorker(
+						() -> {
+							dialog.setVisible(false);
+							final int selectedRow = dialog.getSelectedIndex();
+							return (parserManager.getDicParser().isInBoundary(selectedRow)? selectedRow: null);
+						},
+						worker -> {
+							dicSortDictionaryMenuItem.setEnabled(false);
 
-						dicSortDictionaryMenuItem.setEnabled(false);
-
-
-						dicSorterWorker = new SorterWorker(parserManager, selectedRow);
-						dicSorterWorker.addPropertyChangeListener(this);
-						dicSorterWorker.execute();
-					}
-				}
+							worker.addPropertyChangeListener(this);
+							worker.execute();
+						},
+						worker -> dicSortDictionaryMenuItem.setEnabled(true));
 			});
 			dialog.addWindowListener(new WindowAdapter(){
 				@Override
@@ -2476,43 +2433,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		}
 
-		//FIXME introduce a checkAbortion case?
-		if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-			dicDuplicatesWorker.pause();
-
-			final Object[] options = {"Abort", "Cancel"};
-			final int answer = JOptionPane.showOptionDialog(this,
-				"Do you really want to abort the dictionary duplicates task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				dicDuplicatesWorker.cancel();
-
-				dicExtractDuplicatesMenuItem.setEnabled(true);
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
-
-				dicDuplicatesWorker = null;
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				dicDuplicatesWorker.resume();
-			}
-		}
-
-		checkAbortion(dicLinterWorker, dicLinterMenuItem);
-
-		checkAbortion(dicWordCountWorker, dicWordCountMenuItem);
-
-		checkAbortion(dicStatisticsWorker, dicStatisticsMenuItem, hypStatisticsMenuItem);
-
-		checkAbortion(dicWordlistWorker, dicExtractWordlistMenuItem, dicExtractWordlistPlainTextMenuItem);
-
-		checkAbortion(dicPoSFSAWorker, dicExtractPoSFAMenuItem);
-
-		checkAbortion(compoundRulesExtractorWorker, cmpInputComboBox, cmpLimitComboBox, cmpInputTextArea,
-			cmpLoadInputButton);
-
-		checkAbortion(theLinterWorker, theLinterMenuItem);
-
-		checkAbortion(hypLinterWorker, hypLinterMenuItem);
+		workerManager.checkForAbortion();
 	}
 
 	private void checkAbortion(final WorkerAbstract<?, ?> worker, final JComponent ... componentsToEnable){
@@ -2576,8 +2497,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				if(parserManager == null)
+				if(parserManager == null){
 					parserManager = new ParserManager(packager, this);
+					workerManager.setParserManager(parserManager);
+				}
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
@@ -2971,160 +2894,173 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	private void checkDictionaryCorrectness(){
-		if(dicLinterWorker == null || dicLinterWorker.isDone()){
-			dicLinterMenuItem.setEnabled(false);
+		workerManager.createDictionaryLinterWorker(
+			worker -> {
+				dicLinterMenuItem.setEnabled(false);
 
-			dicLinterWorker = new DictionaryLinterWorker(parserManager.getDicParser(), parserManager.getChecker(),
-				parserManager.getWordGenerator());
-			dicLinterWorker.addPropertyChangeListener(this);
-			dicLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicLinterMenuItem.setEnabled(true));
 	}
 
 	private void extractDictionaryDuplicates(){
-		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createDuplicatesWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractDuplicatesMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
-					parserManager.getWordGenerator(), outputFile);
-				dicDuplicatesWorker.addPropertyChangeListener(this);
-				dicDuplicatesWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				dicExtractDuplicatesMenuItem.setEnabled(true);
+
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
+			});
 	}
 
 	private void extractWordCount(){
-		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
-			dicWordCountMenuItem.setEnabled(false);
+		workerManager.createWordCountWorker(
+			worker -> {
+				dicWordCountMenuItem.setEnabled(false);
 
-			dicWordCountWorker = new WordCountWorker(parserManager.getAffParser().getAffixData().getLanguage(),
-				parserManager.getDicParser(), parserManager.getWordGenerator());
-			dicWordCountWorker.addPropertyChangeListener(this);
-			dicWordCountWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicWordCountMenuItem.setEnabled(true));
 	}
 
 	private void extractDictionaryStatistics(final boolean performHyphenationStatistics){
-		if(dicStatisticsWorker == null || dicStatisticsWorker.isDone()){
-			if(performHyphenationStatistics)
-				hypStatisticsMenuItem.setEnabled(false);
-			else
-				dicStatisticsMenuItem.setEnabled(false);
+		workerManager.createDictionaryStatistics(
+			() -> performHyphenationStatistics,
+			worker -> {
+				if(performHyphenationStatistics)
+					hypStatisticsMenuItem.setEnabled(false);
+				else
+					dicStatisticsMenuItem.setEnabled(false);
 
-			dicStatisticsWorker = new StatisticsWorker(parserManager.getAffParser(), parserManager.getDicParser(),
-				(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), this);
-			dicStatisticsWorker.addPropertyChangeListener(this);
-			dicStatisticsWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				if(((StatisticsWorker)worker).isPerformingHyphenationStatistics())
+					hypStatisticsMenuItem.setEnabled(true);
+				else
+					dicStatisticsMenuItem.setEnabled(true);
+			});
 	}
 
 	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
-		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createWordlistWorker(
+			type,
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(parserManager.getDicParser(), parserManager.getWordGenerator(), type,
-					outputFile);
-				dicWordlistWorker.addPropertyChangeListener(this);
-				dicWordlistWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> {
+				dicExtractWordlistMenuItem.setEnabled(true);
+				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+			});
 	}
 
 	private void extractPoSFSA(){
-		if(dicPoSFSAWorker == null || dicPoSFSAWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createPoSFSAWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
+					parserManager.getAffixData().getLanguage() + ".txt").toFile(): null);
+			},
+			worker -> {
 				dicExtractPoSFAMenuItem.setEnabled(false);
 
-				File outputFile = saveResultFileChooser.getSelectedFile();
-				final String temporaryFile = outputFile.getAbsolutePath() + File.separatorChar
-					+ parserManager.getAffixData().getLanguage() + ".txt";
-				outputFile = new File(temporaryFile);
-				dicPoSFSAWorker = new PoSFSAWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
-					outputFile);
-				dicPoSFSAWorker.addPropertyChangeListener(this);
-				dicPoSFSAWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicExtractPoSFAMenuItem.setEnabled(true));
 	}
 
 	private void extractMinimalPairs(){
-		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
-			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-			if(fileChosen == JFileChooser.APPROVE_OPTION){
+		workerManager.createMinimalPairsWorker(
+			() -> {
+				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
+			},
+			worker -> {
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
 
-				final File outputFile = saveResultFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
-					parserManager.getChecker(), parserManager.getWordGenerator(), outputFile);
-				dicMinimalPairsWorker.addPropertyChangeListener(this);
-				dicMinimalPairsWorker.execute();
-			}
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> dicExtractMinimalPairsMenuItem.setEnabled(true));
 	}
 
 	private void extractCompoundRulesInputs(){
-		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
-			cmpInputComboBox.setEnabled(false);
-			cmpLimitComboBox.setEnabled(false);
-			cmpInputTextArea.setEnabled(false);
-			cmpLoadInputButton.setEnabled(false);
-			cmpInputTextArea.setText(null);
+		final AffixParser affParser = parserManager.getAffParser();
+		final FlagParsingStrategy strategy = affParser.getAffixData()
+			.getFlagParsingStrategy();
+		workerManager.createCompoundRulesWorker(
+			worker -> {
+				cmpInputComboBox.setEnabled(false);
+				cmpLimitComboBox.setEnabled(false);
+				cmpInputTextArea.setEnabled(false);
+				cmpLoadInputButton.setEnabled(false);
+				cmpInputTextArea.setText(null);
 
-			final AffixParser affParser = parserManager.getAffParser();
-			final AffixData affixData = affParser.getAffixData();
-			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-			final String compoundFlag = affixData.getCompoundFlag();
-			final List<Production> compounds = new ArrayList<>();
-			final BiConsumer<Production, Integer> productionReader = (production, row) -> {
-				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
-					compounds.add(production);
-			};
-			final Runnable completed = () -> {
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			compounds -> {
 				final StringJoiner sj = new StringJoiner("\n");
 				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
-			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
-				productionReader, completed);
-			compoundRulesExtractorWorker.addPropertyChangeListener(this);
-			compoundRulesExtractorWorker.execute();
-		}
+			},
+			worker -> {
+				cmpInputComboBox.setEnabled(true);
+				cmpLimitComboBox.setEnabled(true);
+				cmpInputTextArea.setEnabled(true);
+				if(worker.isCancelled())
+					cmpLoadInputButton.setEnabled(true);
+			});
 	}
 
 
 	private void checkThesaurusCorrectness(){
-		if(theLinterWorker == null || theLinterWorker.isDone()){
-			theLinterMenuItem.setEnabled(false);
+		workerManager.createThesaurusLinterWorker(
+			worker -> {
+				theLinterMenuItem.setEnabled(false);
 
-			theLinterWorker = new ThesaurusLinterWorker(parserManager.getTheParser());
-			theLinterWorker.addPropertyChangeListener(this);
-			theLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> theLinterMenuItem.setEnabled(true));
 	}
 
 
 	private void checkHyphenationCorrectness(){
-		if(hypLinterWorker == null || hypLinterWorker.isDone()){
-			hypLinterMenuItem.setEnabled(false);
+		workerManager.createHyphenationLinterWorker(
+			worker -> {
+				hypLinterMenuItem.setEnabled(false);
 
-			hypLinterWorker = new HyphenationLinterWorker(parserManager.getAffParser().getAffixData().getLanguage(),
-				parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator());
-			hypLinterWorker.addPropertyChangeListener(this);
-			hypLinterWorker.execute();
-		}
+				worker.addPropertyChangeListener(this);
+				worker.execute();
+			},
+			worker -> hypLinterMenuItem.setEnabled(true));
 	}
 
 
@@ -3265,7 +3201,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
-					workerManager.onEnd(workerName);
+					workerManager.callOnEnd(workerName);
 				}
 				break;
 
