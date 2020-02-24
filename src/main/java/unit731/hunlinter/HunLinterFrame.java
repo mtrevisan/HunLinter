@@ -37,10 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -90,6 +88,7 @@ import unit731.hunlinter.workers.ThesaurusLinterWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.CompoundRulesWorker;
@@ -191,7 +190,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private CompoundRulesWorker compoundRulesExtractorWorker;
 	private ThesaurusLinterWorker theLinterWorker;
 	private HyphenationLinterWorker hypLinterWorker;
-	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
+	private final WorkerManager workerManager = new WorkerManager();
 
 	private JMenuItem popupMergeMenuItem;
 
@@ -266,31 +265,31 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
-		enableComponentFromWorker.put(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(ThesaurusLinterWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
+		workerManager.addWorker(DictionaryLinterWorker.WORKER_NAME, () -> dicLinterMenuItem.setEnabled(true));
+		workerManager.addWorker(ThesaurusLinterWorker.WORKER_NAME, () -> theLinterMenuItem.setEnabled(true));
+		workerManager.addWorker(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
+		workerManager.addWorker(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		workerManager.addWorker(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
+		workerManager.addWorker(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformingHyphenationStatistics())
 				hypStatisticsMenuItem.setEnabled(true);
 			else
 				dicStatisticsMenuItem.setEnabled(true);
 		});
-		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
+		workerManager.addWorker(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 		});
-		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(MinimalPairsWorker.WORKER_NAME, () -> dicExtractMinimalPairsMenuItem.setEnabled(true));
-		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
+		workerManager.addWorker(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
+		workerManager.addWorker(MinimalPairsWorker.WORKER_NAME, () -> dicExtractMinimalPairsMenuItem.setEnabled(true));
+		workerManager.addWorker(CompoundRulesWorker.WORKER_NAME, () -> {
 			cmpInputComboBox.setEnabled(true);
 			cmpLimitComboBox.setEnabled(true);
 			cmpInputTextArea.setEnabled(true);
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
 		});
-		enableComponentFromWorker.put(HyphenationLinterWorker.WORKER_NAME, () -> hypLinterMenuItem.setEnabled(true));
+		workerManager.addWorker(HyphenationLinterWorker.WORKER_NAME, () -> hypLinterMenuItem.setEnabled(true));
 
 
 		//check for updates
@@ -3080,7 +3079,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			cmpLimitComboBox.setEnabled(false);
 			cmpInputTextArea.setEnabled(false);
 			cmpLoadInputButton.setEnabled(false);
-
 			cmpInputTextArea.setText(null);
 
 			final AffixParser affParser = backbone.getAffParser();
@@ -3265,9 +3263,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName());
-					if(menuItemEnabler != null)
-						menuItemEnabler.run();
+					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
+					workerManager.onEnd(workerName);
 				}
 				break;
 
