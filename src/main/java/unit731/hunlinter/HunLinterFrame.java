@@ -60,7 +60,6 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
-import javax.swing.undo.UndoManager;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -283,6 +282,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(PoSFSAWorker.WORKER_NAME, () -> dicExtractPoSFAMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(MinimalPairsWorker.WORKER_NAME, () -> dicExtractMinimalPairsMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
 			cmpInputComboBox.setEnabled(true);
 			cmpLimitComboBox.setEnabled(true);
@@ -290,8 +290,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
 		});
-		enableComponentFromWorker.put(HyphenationLinterWorker.WORKER_NAME,
-			() -> hypLinterMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(HyphenationLinterWorker.WORKER_NAME, () -> hypLinterMenuItem.setEnabled(true));
 
 
 		//check for updates
@@ -2556,7 +2555,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				if(packager == null)
 					packager = new Packager(projectPath);
 				else
-					packager.reload(packager.getProjectPath());
+					packager.reload(projectPath != null? projectPath: packager.getProjectPath());
 				final List<String> availableLanguages = packager.getAvailableLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){

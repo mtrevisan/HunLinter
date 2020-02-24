@@ -33,9 +33,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	protected BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor;
 	protected File outputFile;
 
-	//worker exception
-	private Exception exception;
-
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
@@ -73,8 +70,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		LOGGER.info(Backbone.MARKER_APPLICATION, message);
 
 		watch.reset();
-
-		exception = null;
 	}
 
 	protected void finalizeProcessing(final String message){
@@ -140,8 +135,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	protected void done(){
 		if(!isCancelled())
 			workerData.callCompletedCallback();
-		else if(isCancelled())
-			workerData.callCancelledCallback(exception);
 	}
 
 	public final void pause(){
@@ -164,17 +157,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			Thread.sleep(500l);
 	}
 
-	/** User canceled worker */
-	public void cancel(){
-		cancel(true);
-
-		workerData.callCancelledCallback(exception);
-	}
-
 	/** Worker canceled itself due to an internal exception */
 	protected void cancel(final Exception e){
-		exception = e;
-
 		if(isInterruptedException(e))
 			LOGGER.info("Thread interrupted");
 		else if(e != null){
@@ -186,7 +170,16 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 		cancel(true);
 
+		workerData.callCancelledCallback(e);
+
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
+	}
+
+	/** User canceled worker */
+	public void cancel(){
+		cancel(true);
+
+		workerData.callCancelledCallback(null);
 	}
 
 	private boolean isInterruptedException(final Exception exception){

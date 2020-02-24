@@ -302,6 +302,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - made update process stoppable
 - added linter for thesaurus
 - substituted charting library
+- added undo/redo capabilities on input fields
 - reduced application footprint
 - various minor bugfixes and code revisions
 
