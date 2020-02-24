@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,6 +22,9 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 
 import unit731.hunlinter.FontChooserDialog;
 import unit731.hunlinter.workers.core.WorkerAbstract;
@@ -38,6 +42,9 @@ public class GUIUtils{
 	private static final String GRAPHEME_M = "m";
 	private static final FontRenderContext FRC = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT,
 		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+
+	private static final String KEY_UNDO = "Undo";
+	private static final String KEY_REDO = "Redo";
 
 	private static String languageSample;
 	private static final List<String> familyNamesAll = new ArrayList<>();
@@ -296,6 +303,47 @@ public class GUIUtils{
 			Optional.ofNullable(resumeTask)
 				.ifPresent(Runnable::run);
 		}
+	}
+
+	public static void addUndoManager(final JTextComponent... fields){
+		for(final JTextComponent field : fields)
+			addUndoManager(field);
+	}
+
+	public static void addUndoManager(final JTextComponent field){
+		final UndoManager undo = new UndoManager();
+
+		field.getDocument().addUndoableEditListener(evt -> undo.addEdit(evt.getEdit()));
+
+		final ActionMap actionMap = field.getActionMap();
+		//create an undo action and add it to the text component
+		actionMap.put(KEY_UNDO, new AbstractAction(KEY_UNDO){
+			public void actionPerformed(ActionEvent evt){
+				if(undo.canUndo()){
+					try{
+						undo.undo();
+					}
+					catch(final CannotUndoException e){}
+				}
+			}
+		});
+		//create a redo action and add it to the text component
+		actionMap.put(KEY_REDO, new AbstractAction(KEY_REDO){
+			public void actionPerformed(ActionEvent evt){
+				if(undo.canRedo()){
+					try{
+						undo.redo();
+					}
+					catch(final CannotRedoException e){}
+				}
+			}
+		});
+
+		final InputMap inputMap = field.getInputMap();
+		//bind the undo action to Ctrl-Z
+		inputMap.put(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK), KEY_UNDO);
+		//bind the redo action to Ctrl-Y
+		inputMap.put(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK), KEY_REDO);
 	}
 
 }

@@ -60,6 +60,7 @@ import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
+import javax.swing.undo.UndoManager;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -211,6 +212,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sexTextField,
 			wexTextField,
 			cmpInputTextArea, cmpTable);
+
+		GUIUtils.addUndoManager(dicInputTextField,
+			theSynonymsTextField,
+			hypWordTextField, hypAddRuleTextField,
+			acoIncorrectTextField, acoCorrectTextField,
+			sexTextField,
+			wexTextField,
+			cmpInputTextArea);
 
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
