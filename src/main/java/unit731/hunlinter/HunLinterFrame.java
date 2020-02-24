@@ -206,20 +206,20 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(parsingResultTextArea,
 			dicInputTextField,
+			cmpInputTextArea, cmpTable,
 			theTable, theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
 			acoTable, acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
-			wexTextField,
-			cmpInputTextArea, cmpTable);
+			wexTextField);
 
 		GUIUtils.addUndoManager(dicInputTextField,
+			cmpInputTextArea,
 			theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField,
 			acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
-			wexTextField,
-			cmpInputTextArea);
+			wexTextField);
 
 		try{
 			final int iconSize = hypRulesOutputLabel.getHeight();
