@@ -90,7 +90,6 @@ import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.ProjectLoaderWorker;
-import unit731.hunlinter.workers.StatisticsWorker;
 import unit731.hunlinter.workers.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
@@ -2890,7 +2889,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> dicLinterMenuItem.setEnabled(true));
+			worker -> dicLinterMenuItem.setEnabled(true)
+		);
 	}
 
 	private void extractDictionaryDuplicates(){
@@ -2906,11 +2906,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> {
-				dicExtractDuplicatesMenuItem.setEnabled(true);
-
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
-			});
+			worker -> dicExtractDuplicatesMenuItem.setEnabled(true)
+		);
 	}
 
 	private void extractWordCount(){
@@ -2921,27 +2918,21 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> dicWordCountMenuItem.setEnabled(true));
+			worker -> dicWordCountMenuItem.setEnabled(true)
+		);
 	}
 
 	private void extractDictionaryStatistics(final boolean performHyphenationStatistics){
+		final JMenuItem mi = (performHyphenationStatistics? hypStatisticsMenuItem: dicStatisticsMenuItem);
 		workerManager.createDictionaryStatistics(
 			() -> performHyphenationStatistics,
 			worker -> {
-				if(performHyphenationStatistics)
-					hypStatisticsMenuItem.setEnabled(false);
-				else
-					dicStatisticsMenuItem.setEnabled(false);
+				mi.setEnabled(false);
 
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> {
-				if(((StatisticsWorker)worker).isPerformingHyphenationStatistics())
-					hypStatisticsMenuItem.setEnabled(true);
-				else
-					dicStatisticsMenuItem.setEnabled(true);
-			});
+			worker -> mi.setEnabled(false));
 	}
 
 	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
@@ -2962,7 +2953,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			worker -> {
 				dicExtractWordlistMenuItem.setEnabled(true);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-			});
+			}
+		);
 	}
 
 	private void extractPoSFSA(){
@@ -2979,7 +2971,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> dicExtractPoSFAMenuItem.setEnabled(true));
+			worker -> dicExtractPoSFAMenuItem.setEnabled(true)
+		);
 	}
 
 	private void extractMinimalPairs(){
@@ -2995,7 +2988,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> dicExtractMinimalPairsMenuItem.setEnabled(true));
+			worker -> dicExtractMinimalPairsMenuItem.setEnabled(true)
+		);
 	}
 
 	private void extractCompoundRulesInputs(){
@@ -3007,8 +3001,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				cmpInputComboBox.setEnabled(false);
 				cmpLimitComboBox.setEnabled(false);
 				cmpInputTextArea.setEnabled(false);
-				cmpLoadInputButton.setEnabled(false);
 				cmpInputTextArea.setText(null);
+				cmpLoadInputButton.setEnabled(false);
 
 				worker.addPropertyChangeListener(this);
 				worker.execute();
@@ -3025,7 +3019,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				cmpInputTextArea.setEnabled(true);
 				if(worker.isCancelled())
 					cmpLoadInputButton.setEnabled(true);
-			});
+			}
+		);
 	}
 
 
@@ -3037,7 +3032,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> theLinterMenuItem.setEnabled(true));
+			worker -> theLinterMenuItem.setEnabled(true)
+		);
 	}
 
 
@@ -3049,7 +3045,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				worker.addPropertyChangeListener(this);
 				worker.execute();
 			},
-			worker -> hypLinterMenuItem.setEnabled(true));
+			worker -> hypLinterMenuItem.setEnabled(true)
+		);
 	}
 
 
