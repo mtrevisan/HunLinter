@@ -21,7 +21,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -115,7 +115,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 								}
 						}
 						catch(final LinterException e){
-							LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+							LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 						}
 					}
 
@@ -124,7 +124,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					sleepOnPause();
 				}
 			}
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file written");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
 
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -137,10 +137,10 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file sorted");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file sorted");
 
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
 			setProgress(0);
 
 			int totalPairs = 0;
@@ -192,10 +192,10 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
 			setProgress(0);
 
 			//write result
@@ -217,7 +217,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs file written");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Minimal pairs file written");
 
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
@@ -228,7 +228,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				.build();
 			dicParser.getSorter().sort(outputFile, options, outputFile);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 			finalizeProcessing("Minimal pairs extracted successfully");
 
 			try{

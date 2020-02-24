@@ -3,7 +3,7 @@ package unit731.hunlinter.workers.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
@@ -35,17 +35,17 @@ public class WorkerProject extends WorkerAbstract<Void, WorkerDataProject>{
 
 		final Packager packager = workerData.getPackager();
 		try{
-			final Backbone backbone = workerData.getBackbone();
+			final ParserManager parserManager = workerData.getParserManager();
 			final List<StageFunction> stages = Arrays.asList(
-				() -> backbone.openAffixFile(packager.getAffixFile()),
-				() -> backbone.openHyphenationFile(backbone.getHyphenationFile()),
-				backbone::getCorrectnessChecker,
-				() -> backbone.prepareDictionaryFile(backbone.getDictionaryFile()),
-				() -> backbone.openAidFile(backbone.getAidFile()),
-				() -> backbone.openThesaurusFile(backbone.getThesaurusDataFile()),
-				() -> backbone.openAutoCorrectFile(backbone.getAutoCorrectFile()),
-				() -> backbone.openSentenceExceptionsFile(backbone.getSentenceExceptionsFile()),
-				() -> backbone.openWordExceptionsFile(backbone.getWordExceptionsFile()));
+				() -> parserManager.openAffixFile(packager.getAffixFile()),
+				() -> parserManager.openHyphenationFile(parserManager.getHyphenationFile()),
+				parserManager::getCorrectnessChecker,
+				() -> parserManager.prepareDictionaryFile(parserManager.getDictionaryFile()),
+				() -> parserManager.openAidFile(parserManager.getAidFile()),
+				() -> parserManager.openThesaurusFile(parserManager.getThesaurusDataFile()),
+				() -> parserManager.openAutoCorrectFile(parserManager.getAutoCorrectFile()),
+				() -> parserManager.openSentenceExceptionsFile(parserManager.getSentenceExceptionsFile()),
+				() -> parserManager.openWordExceptionsFile(parserManager.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
 				stages.get(index).execute();
 				//noinspection IntegerDivisionInFloatingPointContext
@@ -61,7 +61,7 @@ public class WorkerProject extends WorkerAbstract<Void, WorkerDataProject>{
 
 			if(!(e instanceof ClosedChannelException)){
 				final String errorMessage = ExceptionHelper.getMessage(e);
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", errorMessage);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}", errorMessage);
 			}
 		}
 

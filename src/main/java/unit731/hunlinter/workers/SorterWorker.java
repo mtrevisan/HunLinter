@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -26,23 +26,23 @@ public class SorterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Sorting";
 
-	private final Backbone backbone;
+	private final ParserManager parserManager;
 	private final DictionaryParser dicParser;
 	private final int lineIndex;
 
 	private final Comparator<String> comparator;
 
 
-	public SorterWorker(final Backbone backbone, final int lineIndex){
-		super(new WorkerDataParser<>(WORKER_NAME, backbone.getDicParser())
+	public SorterWorker(final ParserManager parserManager, final int lineIndex){
+		super(new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser())
 			.withParallelProcessing(true)
 			.withRelaunchException(false));
 
-		this.backbone = backbone;
-		dicParser = backbone.getDicParser();
+		this.parserManager = parserManager;
+		dicParser = parserManager.getDicParser();
 		this.lineIndex = lineIndex;
 
-		comparator = BaseBuilder.getComparator(backbone.getAffixData().getLanguage());
+		comparator = BaseBuilder.getComparator(parserManager.getAffixData().getLanguage());
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class SorterWorker extends WorkerDictionary{
 
 			final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 			if(boundary != null){
-				backbone.stopFileListener();
+				parserManager.stopFileListener();
 
 				//split dictionary isolating the sorted section
 				final List<File> chunks = splitDictionary(boundary);
@@ -64,33 +64,33 @@ public class SorterWorker extends WorkerDictionary{
 				setProgress(50);
 
 				//re-merge sections
-				backbone.mergeSectionsToDictionary(chunks);
+				parserManager.mergeSectionsToDictionary(chunks);
 
 				setProgress(75);
 
 				//remove temporary files
 				chunks.forEach(File::delete);
 
-				LOGGER.info(Backbone.MARKER_APPLICATION, "File sorted");
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "File sorted");
 
 				dicParser.clear();
 
-				backbone.startFileListener();
+				parserManager.startFileListener();
 			}
 			else
-				LOGGER.info(Backbone.MARKER_APPLICATION, "File NOT sorted");
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "File NOT sorted");
 
 			setProgress(100);
 		}
 		catch(final ClosedChannelException e){
 			cancel(e);
 
-			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, "Duplicates thread interrupted");
 		}
 		catch(final Exception e){
 			cancel(e);
 
-			LOGGER.error(Backbone.MARKER_APPLICATION, e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 		}
 
 		return null;

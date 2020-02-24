@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 
 
@@ -153,7 +154,7 @@ public class CorrectionDialog extends JDialog{
          okButtonAction.accept(incorrect, correct);
       }
       catch(final Exception e){
-         LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction, e.getMessage());
+         LOGGER.info(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction, e.getMessage());
       }
 
       dispose();

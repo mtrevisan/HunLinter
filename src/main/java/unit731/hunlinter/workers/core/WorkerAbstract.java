@@ -15,7 +15,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
@@ -67,7 +67,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	protected void prepareProcessing(final String message){
 		setProgress(0);
-		LOGGER.info(Backbone.MARKER_APPLICATION, message);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
 		watch.reset();
 	}
@@ -76,7 +76,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		watch.stop();
 
 		setProgress(100);
-		LOGGER.info(Backbone.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
 	}
 
 	public void executeSynchronously() throws Exception{
@@ -115,7 +115,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			catch(final Exception e){
 				final String errorMessage = ExceptionHelper.getMessage(e);
 				LOGGER.trace("{}, line {}: {}", errorMessage, data.getKey(), data.getValue());
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
 
 				if(workerData.isRelaunchException())
 					throw e;
@@ -172,7 +172,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 		workerData.callCancelledCallback(e);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
 	}
 
 	/** User canceled worker */

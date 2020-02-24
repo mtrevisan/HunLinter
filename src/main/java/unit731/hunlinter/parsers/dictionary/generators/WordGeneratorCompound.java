@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -324,7 +324,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				dicInclusionTestWorker.executeSynchronously();
 			}
 			catch(final Exception e){
-				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
 
 				LOGGER.error("Cannot read dictionary", e);
 			}

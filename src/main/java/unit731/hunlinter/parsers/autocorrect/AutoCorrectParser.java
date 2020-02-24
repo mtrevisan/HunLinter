@@ -8,7 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
@@ -80,7 +80,7 @@ public class AutoCorrectParser{
 			.filter(list -> list.size() > 1)
 			.collect(Collectors.toList());
 		for(final List<CorrectionEntry> duplication : duplications)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in auto–correct file: incorrect form '{}', correct forms '{}'",
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in auto–correct file: incorrect form '{}', correct forms '{}'",
 				duplication.get(0).getIncorrectForm(),
 				duplication.stream().map(CorrectionEntry::getCorrectForm).collect(Collectors.toList()));
 	}

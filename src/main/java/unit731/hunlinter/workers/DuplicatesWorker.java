@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunlinter.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -164,7 +164,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 							.forEach(duplicatesBloomFilter::add);
 					}
 					catch(final LinterException e){
-						LOGGER.error(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+						LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
 
@@ -183,8 +183,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final int totalProductions = bloomFilter.getAddedElements();
 		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 		final int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		return duplicatesBloomFilter;
@@ -194,7 +194,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (step 2/3)");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting duplicates (step 2/3)");
 			setProgress(0);
 
 			final Charset charset = dicParser.getCharset();
@@ -222,7 +222,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 							}
 						}
 						catch(final Exception e){
-							LOGGER.warn(Backbone.MARKER_APPLICATION, e.getMessage());
+							LOGGER.warn(ParserManager.MARKER_APPLICATION, e.getMessage());
 						}
 					}
 
@@ -235,8 +235,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			final double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
 			duplicatesBloomFilter.clear();
@@ -244,7 +244,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			result.sort((d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
-			LOGGER.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
 
 		return result;
 	}
@@ -252,7 +252,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException, InterruptedException{
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (step 3/3)");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
@@ -279,7 +279,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		}
 	}
 

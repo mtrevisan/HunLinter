@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunlinter.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -51,7 +51,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			final int totalUniqueProductions = dictionary.getAddedElements();
 			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
 			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);

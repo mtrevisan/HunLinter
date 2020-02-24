@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.Backbone;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.LineEntry;
@@ -71,10 +71,10 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines);
 
-				reducedRules.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
+				reducedRules.forEach(rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
 			}
 			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
+				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());
 
 				e.printStackTrace();
 			}

@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.parsers;
 
 import org.xml.sax.SAXException;
 import unit731.hunlinter.interfaces.HunLintable;
@@ -41,9 +41,9 @@ import unit731.hunlinter.services.system.JavaHelper;
 import javax.xml.transform.TransformerException;
 
 
-public class Backbone implements FileChangeListener{
+public class ParserManager implements FileChangeListener{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Backbone.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ParserManager.class);
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
@@ -75,7 +75,7 @@ public class Backbone implements FileChangeListener{
 	private final Packager packager;
 
 
-	public Backbone(final Packager packager, final HunLintable hunLintable){
+	public ParserManager(final Packager packager, final HunLintable hunLintable){
 		Objects.requireNonNull(packager);
 
 		affParser = new AffixParser();
