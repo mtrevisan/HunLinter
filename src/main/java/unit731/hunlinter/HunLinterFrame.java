@@ -2436,17 +2436,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		workerManager.checkForAbortion();
 	}
 
-	private void checkAbortion(final WorkerAbstract<?, ?> worker, final JComponent ... componentsToEnable){
-		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-			final Runnable cancelTask = () -> {
-				for(final JComponent component : componentsToEnable)
-					component.setEnabled(true);
-			};
-//			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			GUIUtils.askUserToAbort(worker, this, cancelTask, null);
-		}
-	}
-
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
