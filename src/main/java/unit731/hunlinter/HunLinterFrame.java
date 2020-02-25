@@ -1885,11 +1885,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
 			.collect(Collectors.toList());
 		if(filteredSynonymsEntries.isEmpty())
-			JOptionPane.showMessageDialog(null, "No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
+			JOptionPane.showMessageDialog(null,
+				"No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
 				"Warning", JOptionPane.WARNING_MESSAGE);
 		else{
 			//show merge dialog
-			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(synonyms.getDefinition(), newSynonyms, filteredSynonymsEntries, null);
+			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(synonyms.getDefinition(), newSynonyms,
+				filteredSynonymsEntries, null);
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.setVisible(true);
@@ -1946,7 +1948,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		formerFilterIncorrectText = unmodifiedIncorrectText;
 		formerFilterCorrectText = unmodifiedCorrectText;
 
-		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText, unmodifiedCorrectText);
+		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText,
+			unmodifiedCorrectText);
 		final String incorrect = pair.getLeft();
 		final String correct = pair.getRight();
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
@@ -1960,7 +1963,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
 			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
-			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect, filterCorrect))));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect,
+				filterCorrect))));
 		}
 		else
 			sorter.setRowFilter(null);
@@ -1994,7 +1998,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
-		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".") && !alreadyContained);
+		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".")
+			&& !alreadyContained);
 
 
 		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
@@ -2120,7 +2125,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final String synonyms = theSynonymsTextField.getText();
 			final Function<String, Boolean> duplicatesDiscriminator = message -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is some duplicates with same part of speech and definition(s) '" + message + "'.\nForce insertion?", "Select one",
+					"There is some duplicates with same part of speech and definition(s) '" + message
+						+ "'.\nForce insertion?", "Select one",
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
@@ -2421,8 +2427,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				sexTextField.requestFocusInWindow();
 
 				JOptionPane.showOptionDialog(this,
-					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
-					null);
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
 		catch(final Exception e){
@@ -2453,8 +2459,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				wexTextField.requestFocusInWindow();
 
 				JOptionPane.showOptionDialog(this,
-					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
-					null);
+					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
 		catch(final Exception e){
@@ -2483,13 +2489,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final String message = "Connection failed.\r\nPlease check network connection and try again.";
 				LOGGER.warn(message);
 
-				JOptionPane.showMessageDialog(this, message, "Application update", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(this, message, "Application update",
+					JOptionPane.WARNING_MESSAGE);
 			}
 			catch(final Exception e){
 				final String message = e.getMessage();
 				LOGGER.info(message);
 
-				JOptionPane.showMessageDialog(this, message, "Application update", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(this, message, "Application update",
+					JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
@@ -2575,7 +2583,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
+				setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : "
+					+ packager.getLanguage());
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
@@ -2605,7 +2614,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
 			final String[] extractions = PatternHelper.extract(content, EXTRACTOR, 10);
-			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars().mapToObj(Character::toString).collect(Collectors.toSet()));
+			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
+				.mapToObj(Character::toString).collect(Collectors.toSet()));
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
 		}
 		catch(final IOException ignored){}
@@ -2634,7 +2644,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		acoTable.setFont(currentFont);
 	}
 
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
+	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
+			final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
