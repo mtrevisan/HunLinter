@@ -198,7 +198,7 @@ public class WordVEC{
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
 			if(idx >= 0 && PatternHelper.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
 				idx --;
-			if(idx < 0)
+			else if(idx < 0)
 				idx = lastChar;
 
 			if(idx >= 0)

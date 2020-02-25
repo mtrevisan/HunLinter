@@ -61,7 +61,7 @@ public class GUIUtils{
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 
-			final List<String> list = (!familyNamesMonospaced.isEmpty()? familyNamesMonospaced: familyNamesAll);
+			final List<String> list = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
 			double width = 0.;
 			for(final String elem : list){
 				final Font currentFont = new Font(elem, Font.PLAIN, GUIUtils.currentFont.getSize());
