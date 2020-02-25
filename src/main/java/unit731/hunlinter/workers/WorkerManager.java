@@ -53,7 +53,7 @@ public class WorkerManager{
 
 	public void createDictionaryLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = DictionaryLinterWorker.WORKER_NAME;
-		DictionaryLinterWorker worker = (DictionaryLinterWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			worker = new DictionaryLinterWorker(parserManager.getDicParser(), parserManager.getChecker(),
 				parserManager.getWordGenerator());
@@ -66,7 +66,7 @@ public class WorkerManager{
 
 	public void createWordCountWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = WordCountWorker.WORKER_NAME;
-		WordCountWorker worker = (WordCountWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			worker = new WordCountWorker(parserManager.getAffParser().getAffixData().getLanguage(),
 				parserManager.getDicParser(), parserManager.getWordGenerator());
@@ -80,7 +80,7 @@ public class WorkerManager{
 	public void createDuplicatesWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = DuplicatesWorker.WORKER_NAME;
-		DuplicatesWorker worker = (DuplicatesWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
@@ -97,7 +97,7 @@ public class WorkerManager{
 	public void createSorterWorker(final Supplier<Integer> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = SorterWorker.WORKER_NAME;
-		SorterWorker worker = (SorterWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final Integer selectedRow = preStart.get();
 			if(selectedRow != null){
@@ -112,7 +112,7 @@ public class WorkerManager{
 
 	public void createThesaurusLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = ThesaurusLinterWorker.WORKER_NAME;
-		ThesaurusLinterWorker worker = (ThesaurusLinterWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			worker = new ThesaurusLinterWorker(parserManager.getTheParser());
 			WORKERS.put(workerName, worker);
@@ -125,7 +125,7 @@ public class WorkerManager{
 	public void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = StatisticsWorker.WORKER_NAME;
-		StatisticsWorker worker = (StatisticsWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final Boolean performHyphenationStatistics = preStart.get();
 			worker = new StatisticsWorker(parserManager.getAffParser(), parserManager.getDicParser(),
@@ -140,7 +140,7 @@ public class WorkerManager{
 	public void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,
 			final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = WordlistWorker.WORKER_NAME;
-		WordlistWorker worker = (WordlistWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
@@ -157,7 +157,7 @@ public class WorkerManager{
 	public void createPoSFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = PoSFSAWorker.WORKER_NAME;
-		PoSFSAWorker worker = (PoSFSAWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
@@ -174,7 +174,7 @@ public class WorkerManager{
 	public void createMinimalPairsWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = MinimalPairsWorker.WORKER_NAME;
-		MinimalPairsWorker worker = (MinimalPairsWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
@@ -191,7 +191,7 @@ public class WorkerManager{
 	public void createHyphenationLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = HyphenationLinterWorker.WORKER_NAME;
-		HyphenationLinterWorker worker = (HyphenationLinterWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			worker = new HyphenationLinterWorker(parserManager.getAffParser().getAffixData().getLanguage(),
 				parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator());
@@ -205,7 +205,7 @@ public class WorkerManager{
 	public void createCompoundRulesWorker(final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<List<Production>> onComplete, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = CompoundRulesWorker.WORKER_NAME;
-		CompoundRulesWorker worker = (CompoundRulesWorker)WORKERS.get(workerName);
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();
