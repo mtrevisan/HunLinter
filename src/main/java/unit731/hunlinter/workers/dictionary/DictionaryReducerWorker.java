@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.dictionary;
 
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;

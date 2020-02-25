@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.affix;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

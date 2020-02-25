@@ -90,7 +90,7 @@ import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.ProjectLoaderWorker;
-import unit731.hunlinter.workers.WordlistWorker;
+import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;

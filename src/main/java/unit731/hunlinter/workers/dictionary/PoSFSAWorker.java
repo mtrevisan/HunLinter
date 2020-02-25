@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.dictionary;
 
 import morfologik.tools.DictCompile;
 import org.apache.commons.io.FilenameUtils;

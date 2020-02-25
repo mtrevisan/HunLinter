@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.dictionary;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

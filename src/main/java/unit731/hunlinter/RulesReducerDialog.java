@@ -25,7 +25,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.workers.RulesReducerWorker;
+import unit731.hunlinter.workers.affix.RulesReducerWorker;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.JavaHelper;
 

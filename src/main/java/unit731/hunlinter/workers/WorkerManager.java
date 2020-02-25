@@ -6,6 +6,16 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.core.WorkerAbstract;
+import unit731.hunlinter.workers.dictionary.CompoundRulesWorker;
+import unit731.hunlinter.workers.dictionary.DictionaryLinterWorker;
+import unit731.hunlinter.workers.dictionary.DuplicatesWorker;
+import unit731.hunlinter.workers.dictionary.MinimalPairsWorker;
+import unit731.hunlinter.workers.dictionary.PoSFSAWorker;
+import unit731.hunlinter.workers.dictionary.SorterWorker;
+import unit731.hunlinter.workers.dictionary.WordCountWorker;
+import unit731.hunlinter.workers.dictionary.WordlistWorker;
+import unit731.hunlinter.workers.hyphenation.HyphenationLinterWorker;
+import unit731.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -146,7 +156,7 @@ public class WorkerManager{
 	}
 
 	public void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,
-			final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
+												final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = WordlistWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){

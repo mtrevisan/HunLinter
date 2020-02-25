@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.thesaurus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package unit731.hunlinter.workers;
+package unit731.hunlinter.workers.hyphenation;
 
 import java.text.MessageFormat;
 
