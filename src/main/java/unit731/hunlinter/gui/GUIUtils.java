@@ -285,7 +285,7 @@ public class GUIUtils{
 	}
 
 
-	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable cancelTask,
+	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable onAbort,
 			final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
 
@@ -298,7 +298,7 @@ public class GUIUtils{
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel();
 
-			Optional.ofNullable(cancelTask)
+			Optional.ofNullable(onAbort)
 				.ifPresent(Runnable::run);
 		}
 		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){

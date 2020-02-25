@@ -51,7 +51,14 @@ public class WorkerManager{
 		}
 	}
 
-	public void createDictionaryLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
+	public void callOnEnd(final String workerName){
+		final Consumer<WorkerAbstract<?, ?>> onEnding = ON_ENDS.get(workerName);
+		if(onEnding != null)
+			onEnding.accept(WORKERS.get(workerName));
+	}
+
+	public void createDictionaryLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart,
+			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = DictionaryLinterWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
@@ -110,7 +117,8 @@ public class WorkerManager{
 		}
 	}
 
-	public void createThesaurusLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
+	public void createThesaurusLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart,
+			final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = ThesaurusLinterWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
@@ -223,12 +231,6 @@ public class WorkerManager{
 
 			onStart.accept(worker);
 		}
-	}
-
-	public void callOnEnd(final String workerName){
-		final Consumer<WorkerAbstract<?, ?>> onEnding = ON_ENDS.get(workerName);
-		if(onEnding != null)
-			onEnding.accept(WORKERS.get(workerName));
 	}
 
 }
