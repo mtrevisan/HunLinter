@@ -13,6 +13,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -153,11 +154,9 @@ public class GUIUtils{
 			if((comp instanceof JComponent) && ((JComponent)comp).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 				comp.setFont(font);
 
-			if(comp instanceof Container){
-				final Component[] children = ((Container)comp).getComponents();
-				for(final Component child : children)
-					stack.push(child);
-			}
+			if(comp instanceof Container)
+				Arrays.stream(((Container)comp).getComponents())
+					.forEach(stack::push);
 		}
 	}
 
