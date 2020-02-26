@@ -474,7 +474,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
-		final ChartPanel panel = new ChartPanel(chart){
+		return new ChartPanel(chart){
 			@Override
 			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save,
 					final boolean print, final boolean zoom){
@@ -501,7 +501,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 				return result;
 			}
 		};
-		return panel;
 	}
 
 	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){

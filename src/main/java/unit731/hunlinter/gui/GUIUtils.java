@@ -326,7 +326,7 @@ public class GUIUtils{
 					try{
 						undo.undo();
 					}
-					catch(final CannotUndoException e){}
+					catch(final CannotUndoException ignored){}
 				}
 			}
 		});
@@ -337,7 +337,7 @@ public class GUIUtils{
 					try{
 						undo.redo();
 					}
-					catch(final CannotRedoException e){}
+					catch(final CannotRedoException ignored){}
 				}
 			}
 		});

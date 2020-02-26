@@ -174,7 +174,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			LOGGER.error("{}: {}", exception.getClass().getSimpleName(), message);
 		}
 		else
-			LOGGER.error("Generic error", exception);
+			LOGGER.error("Generic error");
 
 		cancel(true);
 
