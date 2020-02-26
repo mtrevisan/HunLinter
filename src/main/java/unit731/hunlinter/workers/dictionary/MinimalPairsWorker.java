@@ -219,7 +219,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					//length varied, consider another line for minimal pair search
 				}
 
-				sourceBR.reset();
+				if(readSoFarSource < totalSizeSource)
+					sourceBR.reset();
 
 				setProcessingProgress(readSoFarSource, totalSizeSource);
 			}
