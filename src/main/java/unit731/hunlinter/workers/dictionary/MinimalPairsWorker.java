@@ -47,6 +47,9 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 	private static final String SLASH = "/";
 
+	private static final int NEWLINE_SIZE = 2;
+
+
 	private final DictionaryCorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
@@ -129,13 +132,13 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			if(!NumberUtils.isCreatable(line))
 				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
-			long readSoFar = line.getBytes(charset).length + 2;
+			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
-				readSoFar += line.getBytes(charset).length + 2;
+				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;
 
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty()){
@@ -184,7 +187,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			long readSoFarSource = 0;
 			final long totalSizeSource = outputFile.length();
 			while((sourceLine = sourceBR.readLine()) != null){
-				readSoFarSource += sourceLine.getBytes(charset).length + 2;
+				readSoFarSource += sourceLine.getBytes(charset).length + NEWLINE_SIZE;
 
 				sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
