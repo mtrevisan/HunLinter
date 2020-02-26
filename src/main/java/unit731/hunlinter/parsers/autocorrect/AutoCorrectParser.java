@@ -30,7 +30,6 @@ public class AutoCorrectParser{
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
 
 	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: ''{1}''");
-	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
@@ -112,14 +111,7 @@ public class AutoCorrectParser{
 			throw new LinterException(BAD_QUOTE.format(new Object[]{"Correct", correct}));
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
-		boolean forceInsertion = duplicates.isEmpty();
-		if(!forceInsertion){
-			forceInsertion = duplicatesDiscriminator.get();
-			if(!forceInsertion)
-				throw new LinterException(DUPLICATE_DETECTED.format(
-					new Object[]{duplicates.stream().map(CorrectionEntry::toString).collect(Collectors.joining(", "))}));
-		}
-
+		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.get());
 		if(forceInsertion)
 			dictionary.add(new CorrectionEntry(incorrect, correct));
 

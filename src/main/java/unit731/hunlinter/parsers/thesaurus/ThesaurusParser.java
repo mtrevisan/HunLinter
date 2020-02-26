@@ -37,7 +37,6 @@ public class ThesaurusParser{
 
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': was ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): was ''{0}''");
-	private static final MessageFormat DUPLICATE_DETECTED = new MessageFormat("Duplicate detected for ''{0}''");
 
 	private static final String PIPE = "|";
 
@@ -130,18 +129,16 @@ public class ThesaurusParser{
 		if(synonyms.length < 2)
 			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		boolean forceInsertion = false;
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
-		if(!duplicates.isEmpty()){
+		boolean forceInsertion = duplicates.isEmpty();
+		if(!forceInsertion){
 			final String duplicatesMessage = duplicates.stream()
 				.map(ThesaurusEntry::getDefinition)
 				.collect(StringHelper.limitingJoin(", ", 5, "…"));
 			forceInsertion = duplicatesDiscriminator.apply(duplicatesMessage);
-			if(!forceInsertion)
-				throw new LinterException(DUPLICATE_DETECTED.format(new Object[]{duplicatesMessage}));
 		}
 
-		if(duplicates.isEmpty() || forceInsertion)
+		if(forceInsertion)
 			dictionary.add(partOfSpeeches, synonyms);
 
 		return new DuplicationResult<>(duplicates, forceInsertion);

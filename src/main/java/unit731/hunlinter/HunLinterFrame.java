@@ -2132,9 +2132,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			};
 			final DuplicationResult<ThesaurusEntry> duplicationResult = parserManager.getTheParser()
 				.insertSynonyms(synonyms, duplicatesDiscriminator);
-			final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
-
-			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+			if(duplicationResult.isForceInsertion()){
 				//if everything's ok update the table and the sorter…
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
@@ -2155,7 +2153,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			else{
 				theSynonymsTextField.requestFocusInWindow();
 
-				final String duplicatedWords = duplicates.stream()
+				final String duplicatedWords = duplicationResult.getDuplicates().stream()
 					.map(ThesaurusEntry::getDefinition)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this,
@@ -2285,9 +2283,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			};
 			final DuplicationResult<CorrectionEntry> duplicationResult = parserManager.getAcoParser()
 				.insertCorrection(incorrect, correct, duplicatesDiscriminator);
-			final List<CorrectionEntry> duplicates = duplicationResult.getDuplicates();
-
-			if(duplicates.isEmpty() || duplicationResult.isForceInsertion()){
+			if(duplicationResult.isForceInsertion()){
 				//if everything's ok update the table and the sorter…
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 				dm.fireTableDataChanged();
@@ -2310,7 +2306,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			else{
 				acoIncorrectTextField.requestFocusInWindow();
 
-				final String duplicatedWords = duplicates.stream()
+				final String duplicatedWords = duplicationResult.getDuplicates().stream()
 					.map(CorrectionEntry::toString)
 					.collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   "
