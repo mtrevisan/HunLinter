@@ -104,6 +104,16 @@ public class FileHelper{
 		}
 	}
 
+	public static int countLines(final Path path){
+		int size = 0;
+		try{
+			size = Files.readAllLines(path)
+				.size();
+		}
+		catch(final IOException ignored){}
+		return size;
+	}
+
 	public static int readCount(final String count){
 		try{
 			return Integer.parseInt(count);

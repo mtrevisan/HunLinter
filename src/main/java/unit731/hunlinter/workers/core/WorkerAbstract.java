@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.log.ExceptionHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 
 
@@ -168,32 +169,24 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	 * @param exception	Exception that causes the cancellation
 	 */
 	protected void cancel(final Exception exception){
-		String cause = StringUtils.EMPTY;
-		if(isInterruptedException(exception))
-			LOGGER.info("Thread interrupted");
-		else{
+		if(!JavaHelper.isInterruptedException(exception)){
 			LOGGER.error(exception != null? ExceptionHelper.getMessage(exception): "Generic error");
 
-			cause = " with error";
+			cancel(true);
+
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
+
+			workerData.callCancelledCallback(exception);
 		}
-
-		cancel(true);
-
-		workerData.callCancelledCallback(exception);
-
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped{}", workerData.getWorkerName(), cause);
 	}
 
 	/** User canceled worker */
 	public void cancel(){
 		cancel(true);
 
-		workerData.callCancelledCallback(null);
-	}
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
-	private boolean isInterruptedException(final Exception exception){
-		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
-		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
+		workerData.callCancelledCallback(null);
 	}
 
 }

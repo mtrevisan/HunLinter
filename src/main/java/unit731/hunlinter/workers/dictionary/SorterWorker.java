@@ -82,15 +82,8 @@ public class SorterWorker extends WorkerDictionary{
 
 			setProgress(100);
 		}
-		catch(final ClosedChannelException e){
-			cancel(e);
-
-			LOGGER.warn(ParserManager.MARKER_APPLICATION, "Duplicates thread interrupted");
-		}
 		catch(final Exception e){
 			cancel(e);
-
-			LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 		}
 
 		return null;

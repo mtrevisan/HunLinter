@@ -1,10 +1,12 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.workers.core.RuntimeInterruptedException;
 
 import javax.swing.SwingUtilities;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -14,6 +16,10 @@ import java.util.stream.Stream;
 
 public class JavaHelper{
 
+	public static boolean isInterruptedException(final Exception exception){
+		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
+		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
+	}
 
 	public static <T> Stream<T> nullableToStream(final T... array){
 		return Optional.ofNullable(array).stream()

@@ -47,8 +47,6 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 	private static final String SLASH = "/";
 
-	private static final int NEWLINE_SIZE = 2;
-
 
 	private final DictionaryCorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
@@ -81,7 +79,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	@Override
 	protected Void doInBackground(){
 		try{
-			prepareProcessing("Reading dictionary file for minimal pairs extraction (step 1/3)");
+			prepareProcessing("Reading dictionary file (step 1/3)");
 
 			createSupportFile();
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
@@ -123,22 +121,20 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private void createSupportFile() throws IOException, InterruptedException{
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
+		int currentLine = 0;
+		final int totalLines = FileHelper.countLines(dicFile.toPath());
 		try(
-			final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset);
-			final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+				final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset);
+				final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
 				){
 			String line = ParserHelper.extractLine(br);
+			currentLine ++;
 
 			if(!NumberUtils.isCreatable(line))
 				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
-			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
-
-			int lineIndex = 1;
-			final long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
-				lineIndex ++;
-				readSoFar += line.getBytes(charset).length + NEWLINE_SIZE;
+				currentLine ++;
 
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty()){
@@ -156,11 +152,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 							}
 					}
 					catch(final LinterException e){
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), currentLine, line);
 					}
 				}
 
-				setProcessingProgress(readSoFar, totalSize);
+				setProcessingProgress(currentLine, totalLines);
 
 				sleepOnPause();
 			}
@@ -187,7 +183,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			long readSoFarSource = 0;
 			final long totalSizeSource = outputFile.length();
 			while((sourceLine = sourceBR.readLine()) != null){
-				readSoFarSource += sourceLine.getBytes(charset).length + NEWLINE_SIZE;
+				//FIXME find a way to have the newline size
+				readSoFarSource += sourceLine.getBytes(charset).length + 2;
 
 				sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
