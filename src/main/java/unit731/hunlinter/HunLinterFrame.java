@@ -2126,7 +2126,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final Function<String, Boolean> duplicatesDiscriminator = message -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
 					"There is some duplicates with same part–of–speech and definition(s) '" + message
-						+ "'.\nForce insertion?", "Select one",
+						+ "'.\nForce insertion?", "Duplicate detected",
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
@@ -2274,7 +2274,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final String correct = acoCorrectTextField.getText();
 			final Supplier<Boolean> duplicatesDiscriminator = () -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Select one",
+					"There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Duplicate detected",
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
