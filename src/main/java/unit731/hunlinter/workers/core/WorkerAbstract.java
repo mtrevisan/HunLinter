@@ -151,26 +151,34 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			firePropertyChange("paused", true, false);
 	}
 
-	/** NOTE: to be called inside `SwingWorker.doInBackground()` to allow process abortion */
+	/**
+	 * NOTE: this souble be called inside `SwingWorker.doInBackground()` to allow process abortion
+	 *
+	 * @throws	InterruptedException	In case of interrupted thread
+	 */
 	protected void sleepOnPause() throws InterruptedException{
 		while(paused.get())
 			Thread.sleep(500l);
 	}
 
-	/** Worker canceled itself due to an internal exception */
-	protected void cancel(final Exception e){
-		if(isInterruptedException(e))
+	/**
+	 * Worker canceled itself due to an internal exception
+	 *
+	 * @param exception	Exception that causes the cancellation
+	 */
+	protected void cancel(final Exception exception){
+		if(isInterruptedException(exception))
 			LOGGER.info("Thread interrupted");
-		else if(e != null){
-			final String message = ExceptionHelper.getMessage(e);
-			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
+		else if(exception != null){
+			final String message = ExceptionHelper.getMessage(exception);
+			LOGGER.error("{}: {}", exception.getClass().getSimpleName(), message);
 		}
 		else
-			LOGGER.error("Generic error", e);
+			LOGGER.error("Generic error", exception);
 
 		cancel(true);
 
-		workerData.callCancelledCallback(e);
+		workerData.callCancelledCallback(exception);
 
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
 	}
