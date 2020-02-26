@@ -100,7 +100,7 @@
 							</filters>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>unit731.hunlinter.HunLinterFrame</mainClass>
+									<mainClass>${main.class}</mainClass>
 									<manifestEntries>
 										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
 										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
@@ -144,6 +144,8 @@
 	</build>
 
 	<properties>
+		<main.class>unit731.hunlinter.HunLinterFrame</main.class>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>12</maven.compiler.source>
 		<maven.compiler.target>12</maven.compiler.target>
