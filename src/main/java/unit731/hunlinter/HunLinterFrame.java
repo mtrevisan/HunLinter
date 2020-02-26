@@ -2125,7 +2125,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final String synonyms = theSynonymsTextField.getText();
 			final Function<String, Boolean> duplicatesDiscriminator = message -> {
 				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is some duplicates with same part of speech and definition(s) '" + message
+					"There is some duplicates with same part–of–speech and definition(s) '" + message
 						+ "'.\nForce insertion?", "Select one",
 					JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
@@ -2156,10 +2156,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final String duplicatedWords = duplicationResult.getDuplicates().stream()
 					.map(ThesaurusEntry::getDefinition)
 					.collect(Collectors.joining(", "));
-				JOptionPane.showOptionDialog(this,
-					"Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!",
-					"Warning!", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null,
-					null);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
 			}
 		}
 		catch(final Exception e){
@@ -2309,9 +2306,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final String duplicatedWords = duplicationResult.getDuplicates().stream()
 					.map(CorrectionEntry::toString)
 					.collect(Collectors.joining(", "));
-				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   "
-						+ duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, null, null);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
 			}
 		}
 		catch(final Exception e){

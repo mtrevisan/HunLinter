@@ -174,7 +174,7 @@ public class AffixEntry{
 			new ArrayList<>());
 		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
-		//NOTE: part of speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
+		//NOTE: part–of–speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
 		final boolean containsInflectionalAffix = amf.stream()
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())
 				|| field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_PREFIX.getCode()));

@@ -25,7 +25,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	private static final String COMMA = ",";
 
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format for thesaurus entry: ''{0}''");
-	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part of speech is not in parenthesis: ''{0}''");
+	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part–of–speech is not in parenthesis: ''{0}''");
 	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): ''{0}''");
 
 

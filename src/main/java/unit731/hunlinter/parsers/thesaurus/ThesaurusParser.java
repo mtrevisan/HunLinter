@@ -104,7 +104,7 @@ public class ThesaurusParser{
 	}
 
 	/**
-	 * @param partOfSpeechAndSynonyms	The object representing all the synonyms of a word along with their part of speech
+	 * @param partOfSpeechAndSynonyms	The object representing all the synonyms of a word along with their part–of–speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
 	 * 	(return <code>true</code> to force insertion)
 	 * @return The duplication result
@@ -144,17 +144,17 @@ public class ThesaurusParser{
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	/* Find if there is a duplicate with the same part of speech */
+	/* Find if there is a duplicate with the same part–of–speech */
 	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
-	/* Find if there is a duplicate with the same definition and same part of speech (and also a synonym) */
+	/* Find if there is a duplicate with the same definition and same part–of–speech (and also a synonym) */
 	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
 		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 
-	/* Find if there is a duplicate with the same part of speech and same synonyms */
+	/* Find if there is a duplicate with the same part–of–speech and same synonyms */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}
@@ -166,7 +166,7 @@ public class ThesaurusParser{
 	public static Pair<String[], String[]> extractComponentsForFilter(String text){
 		text = text.toLowerCase(Locale.ROOT);
 
-		//extract part of speech if present
+		//extract part–of–speech if present
 		final String[] pos = extractPartOfSpeechFromFilter(text);
 
 		text = clearFilter(text);
@@ -184,7 +184,7 @@ public class ThesaurusParser{
 
 		int start = 0;
 		String[] pos = null;
-		//remove part of speech and format the search string
+		//remove part–of–speech and format the search string
 		int idx = text.indexOf(':');
 		if(idx < 0){
 			idx = text.indexOf(")|");
@@ -197,7 +197,7 @@ public class ThesaurusParser{
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms){
-		//extract part of speech if present
+		//extract part–of–speech if present
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
 			".+");
@@ -212,7 +212,7 @@ public class ThesaurusParser{
 	private static String clearFilter(String text){
 		text = StringUtils.strip(text);
 
-		//remove part of speech and format the search string
+		//remove part–of–speech and format the search string
 		int idx = text.indexOf(':');
 		if(idx >= 0){
 			text = text.substring(idx + 1);

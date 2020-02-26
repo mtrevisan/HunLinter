@@ -146,7 +146,7 @@ public class AutoCorrectParser{
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String incorrect, String correct){
-		//extract part of speech if present
+		//extract part–of–speech if present
 		final String incorrectFilter = (!incorrect.isEmpty()? incorrect: ".+");
 		final String correctFilter = (!correct.isEmpty()? correct: ".+");
 
