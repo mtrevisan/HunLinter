@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,20 +168,20 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	 * @param exception	Exception that causes the cancellation
 	 */
 	protected void cancel(final Exception exception){
+		String cause = StringUtils.EMPTY;
 		if(isInterruptedException(exception))
 			LOGGER.info("Thread interrupted");
-		else if(exception != null){
-			final String message = ExceptionHelper.getMessage(exception);
-			LOGGER.error("{}: {}", exception.getClass().getSimpleName(), message);
+		else{
+			LOGGER.error(exception != null? ExceptionHelper.getMessage(exception): "Generic error");
+
+			cause = " with error";
 		}
-		else
-			LOGGER.error("Generic error");
 
 		cancel(true);
 
 		workerData.callCancelledCallback(exception);
 
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped", workerData.getWorkerName());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped{}", workerData.getWorkerName(), cause);
 	}
 
 	/** User canceled worker */
