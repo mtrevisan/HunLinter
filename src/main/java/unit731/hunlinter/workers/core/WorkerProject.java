@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
@@ -59,7 +60,7 @@ public class WorkerProject extends WorkerAbstract<Void, WorkerDataProject>{
 		catch(final Exception e){
 			cancel(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
 
-			if(!(e instanceof ClosedChannelException)){
+			if(!JavaHelper.isInterruptedException(e)){
 				final String errorMessage = ExceptionHelper.getMessage(e);
 				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}", errorMessage);
 			}

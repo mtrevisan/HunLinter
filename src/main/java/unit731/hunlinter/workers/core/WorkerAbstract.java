@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.nio.channels.ClosedChannelException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,7 +11,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,17 +108,15 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 				sleepOnPause();
 			}
-			catch(final InterruptedException e){
-				if(workerData.isRelaunchException())
-					throw new RuntimeException(e);
-			}
 			catch(final Exception e){
-				final String errorMessage = ExceptionHelper.getMessage(e);
-				LOGGER.trace("{}, line {}: {}", errorMessage, data.getKey(), data.getValue());
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
+				if(!JavaHelper.isInterruptedException(e)){
+					final String errorMessage = ExceptionHelper.getMessage(e);
+					LOGGER.trace("{}, line {}: {}", errorMessage, data.getKey(), data.getValue());
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
+				}
 
 				if(workerData.isRelaunchException())
-					throw e;
+					throw new RuntimeException(e);
 			}
 		};
 	}

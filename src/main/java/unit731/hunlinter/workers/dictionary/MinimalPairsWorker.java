@@ -186,7 +186,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				//FIXME find a way to have the newline size
 				readSoFarSource += sourceLine.getBytes(charset).length + 2;
 
-				sourceBR.mark((int)(totalSizeSource - readSoFarSource));
+				sourceBR.mark((int)(totalSizeSource - readSoFarSource + 2));
 
 				try{
 					final String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
@@ -219,8 +219,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					//length varied, consider another line for minimal pair search
 				}
 
-				if(readSoFarSource < totalSizeSource)
-					sourceBR.reset();
+				sourceBR.reset();
 
 				setProcessingProgress(readSoFarSource, totalSizeSource);
 			}
