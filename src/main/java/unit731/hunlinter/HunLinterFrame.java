@@ -4,6 +4,9 @@ import java.awt.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.actions.AffixRulesReducerAction;
+import unit731.hunlinter.actions.DictionarySorterAction;
+import unit731.hunlinter.actions.DictionaryWordCountAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -62,6 +65,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
@@ -1365,43 +1369,27 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicMenu.setText("Dictionary tools");
       dicMenu.setEnabled(false);
 
-      dicLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this));
       dicLinterMenuItem.setMnemonic('c');
       dicLinterMenuItem.setText("Check correctness");
-      dicLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicLinterMenuItemActionPerformed(evt);
-         }
-      });
+      dicLinterMenuItem.setToolTipText("");
       dicMenu.add(dicLinterMenuItem);
 
-      dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
+      dicSortDictionaryMenuItem.setAction(new DictionarySorterAction(parserManager, workerManager, this, this));
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary…");
-      dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicSortDictionaryMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicSortDictionaryMenuItem);
 
+      dicRulesReducerMenuItem.setAction(new AffixRulesReducerAction(parserManager, this));
+      dicRulesReducerMenuItem.setMnemonic('r');
       dicRulesReducerMenuItem.setText("Rules reducer…");
-      dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicRulesReducerMenuItemActionPerformed(evt);
-         }
-      });
+      dicRulesReducerMenuItem.setToolTipText("");
       dicMenu.add(dicRulesReducerMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
-      dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
+      dicWordCountMenuItem.setAction(new DictionaryWordCountAction(workerManager, this));
       dicWordCountMenuItem.setMnemonic('w');
       dicWordCountMenuItem.setText("Word count");
-      dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicWordCountMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicWordCountMenuItem);
 
       dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
@@ -1704,20 +1692,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 
-	private void dicLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicLinterMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createDictionaryLinterWorker(
-			worker -> {
-				dicLinterMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> dicLinterMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_dicLinterMenuItemActionPerformed
-
 	private void theLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theLinterMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
@@ -1745,44 +1719,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			worker -> hypLinterMenuItem.setEnabled(true)
 		);
 	}//GEN-LAST:event_hypLinterMenuItemActionPerformed
-
-	private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		try{
-			final String[] lines = parserManager.getDictionaryLines();
-			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), lines,
-				lastDictionarySortVisibleIndex, this);
-			GUIUtils.addCancelByEscapeKey(dialog);
-			dialog.setLocationRelativeTo(this);
-			dialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting())
-					workerManager.createSorterWorker(
-						() -> {
-							dialog.setVisible(false);
-							final int selectedRow = dialog.getSelectedIndex();
-							return (parserManager.getDicParser().isInBoundary(selectedRow)? selectedRow: null);
-						},
-						worker -> {
-							dicSortDictionaryMenuItem.setEnabled(false);
-
-							worker.addPropertyChangeListener(this);
-							worker.execute();
-						},
-						worker -> dicSortDictionaryMenuItem.setEnabled(true));
-			});
-			dialog.addWindowListener(new WindowAdapter(){
-				@Override
-				public void windowDeactivated(final WindowEvent e){
-					lastDictionarySortVisibleIndex = dialog.getFirstVisibleIndex();
-				}
-			});
-			dialog.setVisible(true);
-		}
-		catch(final IOException e){
-			LOGGER.error("Something very bad happened while sorting the dictionary", e);
-		}
-	}//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
 	private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -2030,20 +1966,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		extractDictionaryStatistics(false);
 	}//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
 
-	private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createWordCountWorker(
-			worker -> {
-				dicWordCountMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> dicWordCountMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_dicWordCountMenuItemActionPerformed
-
 	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
@@ -2051,22 +1973,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
 		filOpenProjectMenuItem.setEnabled(true);
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
-
-	private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		dicRulesReducerMenuItem.setEnabled(false);
-
-		rulesReducerDialog = new RulesReducerDialog(parserManager, this);
-		rulesReducerDialog.setLocationRelativeTo(this);
-		rulesReducerDialog.addWindowListener(new WindowAdapter(){
-			@Override
-			public void windowDeactivated(final WindowEvent e){
-				dicRulesReducerMenuItem.setEnabled(true);
-			}
-		});
-		rulesReducerDialog.setVisible(true);
-	}//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
 	private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();

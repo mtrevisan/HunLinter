@@ -44,6 +44,8 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createPoSFSAWorker(
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);

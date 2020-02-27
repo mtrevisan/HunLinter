@@ -33,9 +33,6 @@ public class DictionarySorterAction extends AbstractAction{
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.sorter", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_sort.png")));
 
-		putValue(MNEMONIC_KEY, 's');
-		putValue(SHORT_DESCRIPTION, "Sort dictionary…");
-
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);
@@ -49,6 +46,8 @@ public class DictionarySorterAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		try{
 			final String[] lines = parserManager.getDictionaryLines();
 			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), lines,

@@ -21,7 +21,7 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractDuplicates", new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
 
-		putValue(MNEMONIC_KEY, 'd');
+		putValue(MNEMONIC_KEY, (int)'d');
 		putValue(SHORT_DESCRIPTION, "Extract duplicates…");
 
 		Objects.requireNonNull(workerManager);
@@ -39,6 +39,8 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createDuplicatesWorker(
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);

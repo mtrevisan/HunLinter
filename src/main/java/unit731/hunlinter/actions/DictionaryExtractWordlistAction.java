@@ -43,6 +43,8 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createWordlistWorker(
 			type,
 			() -> {

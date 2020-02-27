@@ -19,8 +19,6 @@ public class AffixRulesReducerAction extends AbstractAction{
 	public AffixRulesReducerAction(final ParserManager parserManager, final JFrame parentFrame){
 		super("affix.rulesReducer");
 
-		putValue(SHORT_DESCRIPTION, "Rules reducer…");
-
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(parentFrame);
 
@@ -30,6 +28,8 @@ public class AffixRulesReducerAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		setEnabled(false);
 
 		final RulesReducerDialog rulesReducerDialog = new RulesReducerDialog(parserManager, parentFrame);

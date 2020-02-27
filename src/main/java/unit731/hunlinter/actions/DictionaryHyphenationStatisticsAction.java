@@ -31,6 +31,8 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createDictionaryStatistics(
 			() -> performHyphenationStatistics,
 			worker -> {

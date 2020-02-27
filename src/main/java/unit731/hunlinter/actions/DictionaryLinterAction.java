@@ -17,9 +17,6 @@ public class DictionaryLinterAction extends AbstractAction{
 	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.linter", new javax.swing.ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
 
-		putValue(MNEMONIC_KEY, 'c');
-		putValue(SHORT_DESCRIPTION, "Check correctness");
-
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);
 
@@ -29,6 +26,8 @@ public class DictionaryLinterAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createDictionaryLinterWorker(
 			worker -> {
 				setEnabled(false);

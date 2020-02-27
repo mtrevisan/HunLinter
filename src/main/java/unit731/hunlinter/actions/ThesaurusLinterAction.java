@@ -17,7 +17,7 @@ public class ThesaurusLinterAction extends AbstractAction{
 	public ThesaurusLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("thesaurus.linter", new ImageIcon(ThesaurusLinterAction.class.getResource("/dictionary_correctness.png")));
 
-		putValue(MNEMONIC_KEY, 'c');
+		putValue(MNEMONIC_KEY, (int)'c');
 		putValue(SHORT_DESCRIPTION, "Check correctness");
 
 		Objects.requireNonNull(workerManager);
@@ -29,6 +29,8 @@ public class ThesaurusLinterAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
 		workerManager.createThesaurusLinterWorker(
 			worker -> {
 				setEnabled(false);
