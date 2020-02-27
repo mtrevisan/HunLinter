@@ -15,7 +15,8 @@ public class HyphenationLinterAction extends AbstractAction{
 
 
 	public HyphenationLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("hyphenation.linter", new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
+		super("hyphenation.linter",
+			new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);

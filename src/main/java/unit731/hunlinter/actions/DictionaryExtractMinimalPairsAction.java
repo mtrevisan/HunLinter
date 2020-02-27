@@ -18,7 +18,8 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final JFrame parentFrame,
+			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractMinimalPairs");
 
 		Objects.requireNonNull(workerManager);

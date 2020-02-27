@@ -18,8 +18,10 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
-		super("dictionary.extractDuplicates", new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
+	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final JFrame parentFrame,
+			final PropertyChangeListener propertyChangeListener){
+		super("dictionary.extractDuplicates",
+			new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);

@@ -21,8 +21,8 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractPosFSAAction(final ParserManager parserManager, final WorkerManager workerManager, final JFrame parentFrame,
-			final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractPosFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
+			final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
 		Objects.requireNonNull(parserManager);

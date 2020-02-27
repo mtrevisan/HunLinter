@@ -15,7 +15,8 @@ public class DictionaryLinterAction extends AbstractAction{
 
 
 	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("dictionary.linter", new javax.swing.ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
+		super("dictionary.linter",
+			new ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);

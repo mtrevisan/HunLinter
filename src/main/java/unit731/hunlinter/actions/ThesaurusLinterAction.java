@@ -15,7 +15,8 @@ public class ThesaurusLinterAction extends AbstractAction{
 
 
 	public ThesaurusLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("thesaurus.linter", new ImageIcon(ThesaurusLinterAction.class.getResource("/dictionary_correctness.png")));
+		super("thesaurus.linter",
+			new ImageIcon(ThesaurusLinterAction.class.getResource("/dictionary_correctness.png")));
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);

@@ -17,7 +17,8 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
 	public DictionaryHyphenationStatisticsAction(final boolean performHyphenationStatistics, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
-		super("dictionary.statistics", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_statistics.png")));
+		super("dictionary.statistics",
+			new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_statistics.png")));
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);

@@ -20,9 +20,10 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractWordlistAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager, final JFrame parentFrame,
-			final PropertyChangeListener propertyChangeListener){
-		super("dictionary.extractWordlist", new ImageIcon(DictionaryExtractWordlistAction.class.getResource("/dictionary_wordlist.png")));
+	public DictionaryExtractWordlistAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager,
+			final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
+		super("dictionary.extractWordlist",
+			new ImageIcon(DictionaryExtractWordlistAction.class.getResource("/dictionary_wordlist.png")));
 
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(workerManager);
