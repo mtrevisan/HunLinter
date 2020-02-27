@@ -11,7 +11,7 @@ public class ExitAction extends AbstractAction{
 
 
 	public ExitAction(final JFrame parentFrame){
-		super("menu.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
+		super("system.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
 
 		Objects.requireNonNull(parentFrame);
 

@@ -24,7 +24,7 @@ public class SelectFontAction extends AbstractAction{
 
 
 	public SelectFontAction(final ParserManager parserManager, final Preferences preferences, final JFrame parentFrame){
-		super("menu.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
+		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(preferences);

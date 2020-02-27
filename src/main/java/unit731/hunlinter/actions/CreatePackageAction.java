@@ -13,7 +13,7 @@ public class CreatePackageAction extends AbstractAction{
 
 
 	public CreatePackageAction(final ParserManager parserManager){
-		super("menu.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
+		super("system.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
 
 		Objects.requireNonNull(parserManager);
 

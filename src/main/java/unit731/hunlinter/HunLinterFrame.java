@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
+import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
 import unit731.hunlinter.actions.CreatePackageAction;
 import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
 import unit731.hunlinter.actions.DictionaryExtractMinimalPairsAction;
@@ -1475,13 +1476,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
       hlpMenu.add(hlpUpdateMenuItem);
 
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(hlpCheckUpdateOnStartupCheckBoxMenuItem, preferences));
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed(evt);
-         }
-      });
       hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
       hlpMenu.add(hlpUpdateSeparator);
 
@@ -2193,11 +2190,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			}
 		});
 	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
-
-   private void hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
-		final boolean selected = hlpCheckUpdateOnStartupCheckBoxMenuItem.isSelected();
-		preferences.putBoolean(UPDATE_STARTUP_CHECK, selected);
-   }//GEN-LAST:event_hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed
 
 
 	@Override

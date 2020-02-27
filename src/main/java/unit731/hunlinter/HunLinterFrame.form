@@ -265,14 +265,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="hlpCheckUpdateOnStartupCheckBoxMenuItem">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new CheckUpdateOnStartupAction(hlpCheckUpdateOnStartupCheckBoxMenuItem, preferences)" type="code"/>
+                </Property>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="preferences.getBoolean(UPDATE_STARTUP_CHECK, true)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Check for updates on startup"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpCheckUpdateOnStartupCheckBoxMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hlpUpdateSeparator">
             </MenuItem>

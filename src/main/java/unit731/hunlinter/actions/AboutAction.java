@@ -14,7 +14,7 @@ public class AboutAction extends AbstractAction{
 
 
 	public AboutAction(final JFrame parentFrame){
-		super("menu.about", new ImageIcon(AboutAction.class.getResource("/help_about.png")));
+		super("system.about", new ImageIcon(AboutAction.class.getResource("/help_about.png")));
 
 		Objects.requireNonNull(parentFrame);
 
