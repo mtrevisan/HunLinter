@@ -2404,12 +2404,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
 	}
 
-	private int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
-		final int index = tabbedPane.indexOfComponent(component);
-		tabbedPane.setEnabledAt(index, enabled);
-		return index;
-	}
-
 
 	private void hyphenate(final HunLinterFrame frame){
 		final String language = frame.parserManager.getAffixData().getLanguage();
@@ -2515,7 +2509,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		hypMenu.setEnabled(false);
 		hypStatisticsMenuItem.setEnabled(false);
-		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 	}
 
 	private void clearHyphenationFields(){
@@ -2537,8 +2531,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		clearDictionaryFields();
 		clearDictionaryCompoundFields();
 
-		setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
-		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
@@ -2585,7 +2579,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		dm.setSynonyms(null);
 
 		theMenu.setEnabled(false);
-		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 
 	@Override
@@ -2593,21 +2587,21 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 		dm.setCorrections(null);
 
-		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
 	@Override
 	public void clearSentenceExceptionsParser(){
 		sexTagPanel.initializeTags(null);
 
-		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
 
 	@Override
 	public void clearWordExceptionsParser(){
 		wexTagPanel.initializeTags(null);
 
-		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
 
 	@Override

@@ -243,6 +243,7 @@ public class GUIUtils{
 		clipboard.setContents(new StringSelection(textToCopy), null);
 	}
 
+
 	public static String removeHTMLCode(final String text){
 		return PatternHelper.clear(text, PATTERN_HTML_CODE);
 	}
@@ -308,6 +309,7 @@ public class GUIUtils{
 		}
 	}
 
+
 	public static void addUndoManager(final JTextComponent... fields){
 		for(final JTextComponent field : fields)
 			addUndoManager(field);
@@ -347,6 +349,13 @@ public class GUIUtils{
 		inputMap.put(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK), KEY_UNDO);
 		//bind the redo action to Ctrl-Y
 		inputMap.put(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK), KEY_REDO);
+	}
+
+
+	public static int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
+		final int index = tabbedPane.indexOfComponent(component);
+		tabbedPane.setEnabledAt(index, enabled);
+		return index;
 	}
 
 }
