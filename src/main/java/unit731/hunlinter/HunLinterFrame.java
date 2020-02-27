@@ -5,6 +5,7 @@ import java.awt.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
+import unit731.hunlinter.actions.CreatePackageAction;
 import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
 import unit731.hunlinter.actions.DictionaryExtractMinimalPairsAction;
 import unit731.hunlinter.actions.DictionaryExtractPosFSAAction;
@@ -13,6 +14,7 @@ import unit731.hunlinter.actions.DictionaryHyphenationStatisticsAction;
 import unit731.hunlinter.actions.DictionarySorterAction;
 import unit731.hunlinter.actions.DictionaryWordCountAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
+import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
@@ -162,12 +164,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
 	private final JFileChooser saveResultFileChooser;
-	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final ParserManager parserManager;
 	private final Packager packager;
-	private int lastDictionarySortVisibleIndex;
 
 	private RecentFilesMenu recentProjectsMenu;
 	private final Debouncer<HunLinterFrame> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
@@ -1319,27 +1319,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       });
       filMenu.add(filOpenProjectMenuItem);
 
-      filCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
+      filCreatePackageMenuItem.setAction(new CreatePackageAction(parserManager));
       filCreatePackageMenuItem.setMnemonic('p');
       filCreatePackageMenuItem.setText("Create package");
       filCreatePackageMenuItem.setEnabled(false);
-      filCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filCreatePackageMenuItemActionPerformed(evt);
-         }
-      });
       filMenu.add(filCreatePackageMenuItem);
       filMenu.add(filFontSeparator);
 
-      filFontMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_font.png"))); // NOI18N
+      filFontMenuItem.setAction(new SelectFontAction(parserManager, preferences, this));
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font…");
       filFontMenuItem.setEnabled(false);
-      filFontMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filFontMenuItemActionPerformed(evt);
-         }
-      });
       filMenu.add(filFontMenuItem);
       filMenu.add(filRecentProjectsSeparator);
 
@@ -1559,12 +1549,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			loadFile(baseFile.toPath());
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
-
-	private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		parserManager.createPackage();
-	}//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
 	private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1998,23 +1982,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void filFontMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filFontMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		Consumer<Font> onSelection = font -> {
-			GUIUtils.setCurrentFont(font, this);
-
-			final String language = parserManager.getAffixData().getLanguage();
-			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
-			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
-		};
-		FontChooserDialog dialog = new FontChooserDialog(parserManager.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
-			this);
-		GUIUtils.addCancelByEscapeKey(dialog);
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-	}//GEN-LAST:event_filFontMenuItemActionPerformed
-
 	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
 		FileHelper.browseURL(URL_ONLINE_HELP);
 	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
@@ -2447,13 +2414,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			openAffButton.setEnabled(parserManager.getAffixFile() != null);
 			openDicButton.setEnabled(parserManager.getDictionaryFile() != null);
 
-			if(rulesReducerDialog != null){
-				//notify RulesReducerDialog
-				rulesReducerDialog.reload();
-
-				JavaHelper.executeOnEventDispatchThread(() -> rulesReducerDialog.ruleComboBoxActionPerformed(null));
-			}
-
 
 			//hyphenation file:
 			if(parserManager.getHyphenator() != null){
@@ -2774,11 +2734,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	@Override
 	public void clearAffixParser(){
 		clearDictionaryParser();
-
-
-		if(rulesReducerDialog != null)
-			//update rule reduced dialog
-			rulesReducerDialog.reload();
 	}
 
 	@Override

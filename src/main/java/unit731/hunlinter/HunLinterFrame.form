@@ -30,31 +30,25 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filCreatePackageMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/file_package.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new CreatePackageAction(parserManager)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="112"/>
                 <Property name="text" type="java.lang.String" value="Create package"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filCreatePackageMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="filFontSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filFontMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/file_font.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new SelectFontAction(parserManager, preferences, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="102"/>
                 <Property name="text" type="java.lang.String" value="Select font&#x2026;"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filFontMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="filRecentProjectsSeparator">
             </MenuItem>

@@ -21,9 +21,6 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractDuplicates", new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
 
-		putValue(MNEMONIC_KEY, (int)'d');
-		putValue(SHORT_DESCRIPTION, "Extract duplicates…");
-
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);

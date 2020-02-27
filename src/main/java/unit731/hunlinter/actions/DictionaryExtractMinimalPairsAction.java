@@ -21,8 +21,6 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractMinimalPairs");
 
-		putValue(SHORT_DESCRIPTION, "Extract minimal pairs…");
-
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);

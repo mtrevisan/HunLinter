@@ -24,8 +24,6 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractWordlist", new ImageIcon(DictionaryExtractWordlistAction.class.getResource("/dictionary_wordlist.png")));
 
-		putValue(SHORT_DESCRIPTION, "Extract wordlist…");
-
 		Objects.requireNonNull(type);
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);

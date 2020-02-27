@@ -25,8 +25,6 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
-		putValue(SHORT_DESCRIPTION, "Extract PoS FSA…");
-
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);
