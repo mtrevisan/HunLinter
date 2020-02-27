@@ -5,8 +5,15 @@ import java.awt.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
+import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
+import unit731.hunlinter.actions.DictionaryExtractMinimalPairsAction;
+import unit731.hunlinter.actions.DictionaryExtractPosFSAAction;
+import unit731.hunlinter.actions.DictionaryExtractWordlistAction;
+import unit731.hunlinter.actions.DictionaryHyphenationStatisticsAction;
 import unit731.hunlinter.actions.DictionarySorterAction;
 import unit731.hunlinter.actions.DictionaryWordCountAction;
+import unit731.hunlinter.actions.HyphenationLinterAction;
+import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -1392,60 +1399,32 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicWordCountMenuItem.setText("Word count");
       dicMenu.add(dicWordCountMenuItem);
 
-      dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this));
       dicStatisticsMenuItem.setMnemonic('t');
       dicStatisticsMenuItem.setText("Statistics");
-      dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicStatisticsMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-      dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
+      dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this, this));
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates…");
-      dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractDuplicatesMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
-      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+      dicExtractWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this, this));
       dicExtractWordlistMenuItem.setText("Extract wordlist…");
-      dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractWordlistMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicExtractWordlistMenuItem);
 
-      dicExtractWordlistPlainTextMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS, workerManager, this, this));
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
-      dicExtractWordlistPlainTextMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractWordlistPlainTextMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
+      dicExtractPoSFAMenuItem.setAction(new DictionaryExtractPosFSAAction(parserManager, workerManager, this, this));
       dicExtractPoSFAMenuItem.setText("Extract PoS FSA…");
-      dicExtractPoSFAMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractPoSFAMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicExtractPoSFAMenuItem);
 
+      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this, this));
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
-      dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractMinimalPairsMenuItemActionPerformed(evt);
-         }
-      });
       dicMenu.add(dicExtractMinimalPairsMenuItem);
 
       mainMenuBar.add(dicMenu);
@@ -1454,14 +1433,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theMenu.setText("Thesaurus tools");
       theMenu.setEnabled(false);
 
-      theLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this));
       theLinterMenuItem.setMnemonic('c');
       theLinterMenuItem.setText("Check correctness");
-      theLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theLinterMenuItemActionPerformed(evt);
-         }
-      });
       theMenu.add(theLinterMenuItem);
 
       mainMenuBar.add(theMenu);
@@ -1470,25 +1444,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypMenu.setText("Hyphenation tools");
       hypMenu.setEnabled(false);
 
-      hypLinterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
       hypLinterMenuItem.setMnemonic('d');
       hypLinterMenuItem.setText("Check correctness");
-      hypLinterMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypLinterMenuItemActionPerformed(evt);
-         }
-      });
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
-      hypStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this));
       hypStatisticsMenuItem.setMnemonic('t');
       hypStatisticsMenuItem.setText("Statistics");
-      hypStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypStatisticsMenuItemActionPerformed(evt);
-         }
-      });
       hypMenu.add(hypStatisticsMenuItem);
 
       mainMenuBar.add(hypMenu);
@@ -1692,98 +1656,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 
-	private void theLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theLinterMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createThesaurusLinterWorker(
-			worker -> {
-				theLinterMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> theLinterMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_theLinterMenuItemActionPerformed
-
-	private void hypLinterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypLinterMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createHyphenationLinterWorker(
-			worker -> {
-				hypLinterMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> hypLinterMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_hypLinterMenuItemActionPerformed
-
-	private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createDuplicatesWorker(
-			() -> {
-				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
-			},
-			worker -> {
-				dicExtractDuplicatesMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> dicExtractDuplicatesMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
-
-	private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		extractDictionaryWordlist(WordlistWorker.WorkerType.COMPLETE);
-	}//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
-
-	private void dicExtractPoSFAMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractPoSFAMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createPoSFSAWorker(
-			() -> {
-				saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
-					parserManager.getAffixData().getLanguage() + ".txt").toFile(): null);
-			},
-			worker -> {
-				dicExtractPoSFAMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> dicExtractPoSFAMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_dicExtractPoSFAMenuItemActionPerformed
-
-	private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		workerManager.createMinimalPairsWorker(
-			() -> {
-				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
-			},
-			worker -> {
-				dicExtractMinimalPairsMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> dicExtractMinimalPairsMenuItem.setEnabled(true)
-		);
-	}//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
-
 	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
 	}
@@ -1960,12 +1832,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
-	private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		extractDictionaryStatistics(false);
-	}//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
-
 	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
@@ -1973,18 +1839,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
 		filOpenProjectMenuItem.setEnabled(true);
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
-
-	private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		extractDictionaryStatistics(true);
-	}//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
-
-	private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		extractDictionaryWordlist(WordlistWorker.WorkerType.PLAIN_WORDS);
-	}//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 
 	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		final  String newRule = hypAddRuleTextField.getText();
