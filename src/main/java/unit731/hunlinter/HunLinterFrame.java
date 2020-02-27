@@ -17,8 +17,11 @@ import unit731.hunlinter.actions.DictionarySorterAction;
 import unit731.hunlinter.actions.DictionaryWordCountAction;
 import unit731.hunlinter.actions.ExitAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
+import unit731.hunlinter.actions.IssueReporterAction;
+import unit731.hunlinter.actions.OnlineHelpAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
+import unit731.hunlinter.actions.UpdateAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -44,8 +47,6 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.NoRouteToHostException;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -66,7 +67,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.table.TableModel;
@@ -143,9 +143,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
 
-	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";
-	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";
-
 	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
@@ -166,7 +163,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private String formerFilterSentenceException;
 	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
-	private final JFileChooser saveResultFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final ParserManager parserManager;
@@ -260,9 +256,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			});
 		}
 		catch(final IOException ignored){}
-
-		saveResultFileChooser = new JFileChooser();
-		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 
 
 		//check for updates
@@ -1448,32 +1441,18 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
-      hlpOnlineHelpMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_help.png"))); // NOI18N
+      hlpOnlineHelpMenuItem.setAction(new OnlineHelpAction());
       hlpOnlineHelpMenuItem.setMnemonic('h');
       hlpOnlineHelpMenuItem.setText("Online help");
-      hlpOnlineHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpOnlineHelpMenuItemActionPerformed(evt);
-         }
-      });
       hlpMenu.add(hlpOnlineHelpMenuItem);
 
-      hlpIssueReporterMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_issue.png"))); // NOI18N
+      hlpIssueReporterMenuItem.setAction(new IssueReporterAction());
       hlpIssueReporterMenuItem.setText("Report an issue");
-      hlpIssueReporterMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpIssueReporterMenuItemActionPerformed(evt);
-         }
-      });
       hlpMenu.add(hlpIssueReporterMenuItem);
       hlpMenu.add(hlpOnlineSeparator);
 
+      hlpUpdateMenuItem.setAction(new UpdateAction(this));
       hlpUpdateMenuItem.setText("Check for Update…");
-      hlpUpdateMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpUpdateMenuItemActionPerformed(evt);
-         }
-      });
       hlpMenu.add(hlpUpdateMenuItem);
 
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(hlpCheckUpdateOnStartupCheckBoxMenuItem, preferences));
@@ -1949,14 +1928,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void hlpOnlineHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpOnlineHelpMenuItemActionPerformed
-		FileHelper.browseURL(URL_ONLINE_HELP);
-	}//GEN-LAST:event_hlpOnlineHelpMenuItemActionPerformed
-
-	private void hlpIssueReporterMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpIssueReporterMenuItemActionPerformed
-		FileHelper.browseURL(URL_REPORT_ISSUE);
-	}//GEN-LAST:event_hlpIssueReporterMenuItemActionPerformed
-
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
 	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
@@ -2156,40 +2127,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
    }//GEN-LAST:event_wexAddButtonActionPerformed
-
-   private void hlpUpdateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpUpdateMenuItemActionPerformed
-		JavaHelper.executeOnEventDispatchThread(() -> {
-			try{
-				final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
-				GUIUtils.addCancelByEscapeKey(dialog, new AbstractAction(){
-					private static final long serialVersionUID = -5644390861803492172L;
-
-					@Override
-					public void actionPerformed(ActionEvent e){
-						dialog.interrupt();
-
-						dialog.dispose();
-					}
-				});
-				dialog.setLocationRelativeTo(this);
-				dialog.setVisible(true);
-			}
-			catch(final NoRouteToHostException | UnknownHostException e){
-				final String message = "Connection failed.\r\nPlease check network connection and try again.";
-				LOGGER.warn(message);
-
-				JOptionPane.showMessageDialog(this, message, "Application update",
-					JOptionPane.WARNING_MESSAGE);
-			}
-			catch(final Exception e){
-				final String message = e.getMessage();
-				LOGGER.info(message);
-
-				JOptionPane.showMessageDialog(this, message, "Application update",
-					JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-	}//GEN-LAST:event_hlpUpdateMenuItemActionPerformed
 
 
 	@Override
@@ -2653,43 +2590,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
-	}
-
-
-	private void extractDictionaryStatistics(final boolean performHyphenationStatistics){
-		final JMenuItem mi = (performHyphenationStatistics? hypStatisticsMenuItem: dicStatisticsMenuItem);
-		workerManager.createDictionaryStatistics(
-			() -> performHyphenationStatistics,
-			worker -> {
-				mi.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> mi.setEnabled(false)
-		);
-	}
-
-	private void extractDictionaryWordlist(final WordlistWorker.WorkerType type){
-		workerManager.createWordlistWorker(
-			type,
-			() -> {
-				saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				final int fileChosen = saveResultFileChooser.showSaveDialog(this);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
-			},
-			worker -> {
-				dicExtractWordlistMenuItem.setEnabled(false);
-				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			worker -> {
-				dicExtractWordlistMenuItem.setEnabled(true);
-				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-			}
-		);
 	}
 
 

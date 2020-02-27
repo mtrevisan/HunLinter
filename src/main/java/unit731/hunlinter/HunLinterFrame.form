@@ -232,36 +232,30 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="hlpOnlineHelpMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/help_help.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OnlineHelpAction()" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="104"/>
                 <Property name="text" type="java.lang.String" value="Online help"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpOnlineHelpMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="hlpIssueReporterMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/help_issue.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new IssueReporterAction()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Report an issue"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpIssueReporterMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hlpOnlineSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="hlpUpdateMenuItem">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new UpdateAction(this)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Check for Update&#x2026;"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpUpdateMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="hlpCheckUpdateOnStartupCheckBoxMenuItem">
               <Properties>
