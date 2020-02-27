@@ -8,35 +8,37 @@ import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 
-public class DictionaryLinterAction extends AbstractAction{
+public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
+	private final boolean performHyphenationStatistics;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("dictionary.linter", new javax.swing.ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
+	public DictionaryHyphenationStatisticsAction(final boolean performHyphenationStatistics, final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+		super("dictionary.statistics", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_statistics.png")));
 
-		putValue(MNEMONIC_KEY, 'c');
-		putValue(SHORT_DESCRIPTION, "Check correctness");
+		putValue(SHORT_DESCRIPTION, "Statistics");
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);
 
+		this.performHyphenationStatistics = performHyphenationStatistics;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		workerManager.createDictionaryLinterWorker(
+		workerManager.createDictionaryStatistics(
+			() -> performHyphenationStatistics,
 			worker -> {
 				setEnabled(false);
 
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(true)
+			worker -> setEnabled(false)
 		);
 	}
 

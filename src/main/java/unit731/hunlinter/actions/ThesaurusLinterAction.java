@@ -8,14 +8,14 @@ import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 
-public class DictionaryLinterAction extends AbstractAction{
+public class ThesaurusLinterAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("dictionary.linter", new javax.swing.ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
+	public ThesaurusLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+		super("thesaurus.linter", new ImageIcon(ThesaurusLinterAction.class.getResource("/dictionary_correctness.png")));
 
 		putValue(MNEMONIC_KEY, 'c');
 		putValue(SHORT_DESCRIPTION, "Check correctness");
@@ -29,7 +29,7 @@ public class DictionaryLinterAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		workerManager.createDictionaryLinterWorker(
+		workerManager.createThesaurusLinterWorker(
 			worker -> {
 				setEnabled(false);
 

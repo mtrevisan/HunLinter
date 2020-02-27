@@ -8,17 +8,16 @@ import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 
-public class DictionaryLinterAction extends AbstractAction{
+public class DictionaryWordCountAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
-		super("dictionary.linter", new javax.swing.ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
+	public DictionaryWordCountAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+		super("dictionary.wordCount", new ImageIcon(DictionaryWordCountAction.class.getResource("/dictionary_count.png")));
 
-		putValue(MNEMONIC_KEY, 'c');
-		putValue(SHORT_DESCRIPTION, "Check correctness");
+		putValue(SHORT_DESCRIPTION, "Word count");
 
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(propertyChangeListener);
@@ -29,7 +28,7 @@ public class DictionaryLinterAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		workerManager.createDictionaryLinterWorker(
+		workerManager.createWordCountWorker(
 			worker -> {
 				setEnabled(false);
 
