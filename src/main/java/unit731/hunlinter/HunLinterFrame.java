@@ -4,6 +4,7 @@ import java.awt.*;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
 import unit731.hunlinter.actions.CreatePackageAction;
 import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
@@ -13,6 +14,7 @@ import unit731.hunlinter.actions.DictionaryExtractWordlistAction;
 import unit731.hunlinter.actions.DictionaryHyphenationStatisticsAction;
 import unit731.hunlinter.actions.DictionarySorterAction;
 import unit731.hunlinter.actions.DictionaryWordCountAction;
+import unit731.hunlinter.actions.ExitAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
@@ -1302,7 +1304,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       addWindowListener(new WindowAdapter(){
          @Override
          public void windowClosed(final WindowEvent e){
-            exit();
+            filExitMenuItem.getAction().actionPerformed(null);
          }
       });
 
@@ -1344,14 +1346,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
-      filExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
+      filExitMenuItem.setAction(new ExitAction(this));
       filExitMenuItem.setMnemonic('x');
       filExitMenuItem.setText("Exit");
-      filExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filExitMenuItemActionPerformed(evt);
-         }
-      });
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
@@ -1488,14 +1485,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
       hlpMenu.add(hlpUpdateSeparator);
 
-      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/help_about.png"))); // NOI18N
+      hlpAboutMenuItem.setAction(new AboutAction(this));
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
-      hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hlpAboutMenuItemActionPerformed(evt);
-         }
-      });
       hlpMenu.add(hlpAboutMenuItem);
 
       mainMenuBar.add(hlpMenu);
@@ -1549,27 +1541,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			loadFile(baseFile.toPath());
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
-
-	private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		exit();
-	}//GEN-LAST:event_filExitMenuItemActionPerformed
-
-	private void exit(){
-		dispose();
-
-		System.exit(0);
-	}
-
-	private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		final HelpDialog dialog = new HelpDialog(this);
-		GUIUtils.addCancelByEscapeKey(dialog);
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-	}//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
 	private void calculateProductions(final HunLinterFrame frame){
@@ -1821,7 +1792,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		recentProjectsMenu.setEnabled(false);
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
-		filOpenProjectMenuItem.setEnabled(true);
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed

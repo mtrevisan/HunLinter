@@ -4,7 +4,7 @@
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="mainMenuBar">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowClosed(final WindowEvent e){&#xa;&#x9;&#x9;exit();&#xa;&#x9;}&#xa;});&#xa;"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowClosed(final WindowEvent e){&#xa;&#x9;&#x9;filExitMenuItem.getAction().actionPerformed(null);&#xa;&#x9;}&#xa;});&#xa;"/>
       </AuxValues>
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="filMenu">
@@ -66,15 +66,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filExitMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/file_exit.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new ExitAction(this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="120"/>
                 <Property name="text" type="java.lang.String" value="Exit"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filExitMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -281,15 +278,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="hlpAboutMenuItem">
               <Properties>
-                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/help_about.png"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new AboutAction(this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="About"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hlpAboutMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
