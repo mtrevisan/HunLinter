@@ -7,8 +7,10 @@ import unit731.hunlinter.services.Packager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 
 public class OpenFileAction extends AbstractAction{
@@ -16,9 +18,21 @@ public class OpenFileAction extends AbstractAction{
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenFileAction.class);
 
 
+	private final Supplier<File> fileSupplier;
 	private final String fileKey;
 	private final Packager packager;
 
+
+	public OpenFileAction(final Supplier<File> fileSupplier, final Packager packager){
+		super("system.open");
+
+		Objects.requireNonNull(fileSupplier);
+		Objects.requireNonNull(packager);
+
+		this.fileSupplier = fileSupplier;
+		fileKey = null;
+		this.packager = packager;
+	}
 
 	public OpenFileAction(final String fileKey, final Packager packager){
 		super("system.open");
@@ -26,6 +40,7 @@ public class OpenFileAction extends AbstractAction{
 		Objects.requireNonNull(fileKey);
 		Objects.requireNonNull(packager);
 
+		fileSupplier = null;
 		this.fileKey = fileKey;
 		this.packager = packager;
 	}
@@ -33,7 +48,8 @@ public class OpenFileAction extends AbstractAction{
 	@Override
 	public void actionPerformed(final ActionEvent event){
 		try{
-			FileHelper.openFileWithChosenEditor(packager.getFile(fileKey));
+			final File file = (fileSupplier != null? fileSupplier.get(): packager.getFile(fileKey));
+			FileHelper.openFileWithChosenEditor(file);
 		}
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening sentence exceptions file", e);

@@ -119,7 +119,6 @@ import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.RecentItems;
@@ -501,13 +500,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       dicTotalProductionsOutputLabel.setText("…");
 
+      openAidButton.setAction(new OpenFileAction(() -> parserManager.getAidFile(), packager));
       openAidButton.setText("Open Aid");
       openAidButton.setEnabled(false);
-      openAidButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAidButtonActionPerformed(evt);
-         }
-      });
 
       openAffButton.setAction(new OpenFileAction(Packager.KEY_FILE_AFFIX, packager));
       openAffButton.setText("Open Affix");
@@ -1981,15 +1976,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
 	}//GEN-LAST:event_optionsButtonActionPerformed
-
-	private void openAidButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAidButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(parserManager.getAidFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening affix file", e);
-		}
-	}//GEN-LAST:event_openAidButtonActionPerformed
 
 	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
 		sexFilterDebouncer.call(this);

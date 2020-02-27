@@ -326,8 +326,7 @@ public class ParserManager implements FileChangeListener{
 
 
 	public File getAidFile(){
-		return Path.of(FOLDER_AID,
-			affParser.getAffixData().getLanguage() + EXTENSION_AID)
+		return Path.of(FOLDER_AID, affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
 
