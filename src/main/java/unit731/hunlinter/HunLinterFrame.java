@@ -2204,10 +2204,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			dicLinterMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
-			setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			final AffixData affixData = parserManager.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
-			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
 
 			//affix file:
@@ -2231,7 +2231,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				hypMenu.setEnabled(true);
 				hypStatisticsMenuItem.setEnabled(true);
-				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
 			openHypButton.setEnabled(packager.getHyphenationFile() != null);
 
@@ -2259,7 +2259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
-				setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
 
@@ -2270,7 +2270,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 				dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
 				updateCorrectionsCounter();
-				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 			}
 			openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
 
@@ -2280,7 +2280,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				updateSentenceExceptionsCounter();
 				final List<String> sentenceExceptions = parserManager.getSexParser().getExceptionsDictionary();
 				sexTagPanel.initializeTags(sentenceExceptions);
-				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
 			openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 
@@ -2290,7 +2290,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
 				wexTagPanel.initializeTags(wordExceptions);
 				updateWordExceptionsCounter();
-				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
 			openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 
@@ -2346,7 +2346,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 		hypStatisticsMenuItem.setEnabled(false);
-		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 		openHypButton.setEnabled(false);
 
 
@@ -2359,14 +2359,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 		//thesaurus file:
-		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 		formerFilterThesaurusText = null;
 		//noinspection unchecked
 		((TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter()).setRowFilter(null);
 
 
 		//auto–correct file:
-		setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 		openAcoButton.setEnabled(false);
 		formerFilterIncorrectText = null;
 		formerFilterCorrectText = null;
@@ -2375,14 +2375,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 		//sentence exceptions file:
-		setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 		openSexButton.setEnabled(false);
 		formerFilterSentenceException = null;
 		sexTagPanel.applyFilter(null);
 
 
 		//word exceptions file:
-		setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
 		wexTagPanel.applyFilter(null);
