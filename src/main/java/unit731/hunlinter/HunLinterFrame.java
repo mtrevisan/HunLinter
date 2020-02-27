@@ -2207,7 +2207,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
 			try{
-				//FIXME transfer into backbone
+				//FIXME transfer into ParserManager
 				final List<Production> words;
 				final WordGenerator wordGenerator = parserManager.getWordGenerator();
 				final AffixData affixData = parserManager.getAffixData();
