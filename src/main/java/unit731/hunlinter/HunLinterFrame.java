@@ -2141,6 +2141,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				formerFilterThesaurusText = null;
 				theSynonymsTextField.setText(null);
 				theSynonymsTextField.requestFocusInWindow();
+				popupMergeMenuItem.setEnabled(false);
 				@SuppressWarnings("unchecked")
 				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
 				sorter.setRowFilter(null);
@@ -3071,6 +3072,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		dicInputTextField.setText(null);
 		theSynonymsTextField.setText(null);
+		popupMergeMenuItem.setEnabled(false);
 	}
 
 	private void clearDictionaryCompoundFields(){
