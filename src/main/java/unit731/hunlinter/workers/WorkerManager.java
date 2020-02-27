@@ -39,14 +39,11 @@ public class WorkerManager{
 	private final Frame parentFrame;
 
 
-	public WorkerManager(final Frame parentFrame){
-		this.parentFrame = parentFrame;
-	}
-
-	public void setParserManager(final ParserManager parserManager){
+	public WorkerManager(final ParserManager parserManager, final Frame parentFrame){
 		Objects.requireNonNull(parserManager);
 
 		this.parserManager = parserManager;
+		this.parentFrame = parentFrame;
 	}
 
 	public void checkForAbortion(){

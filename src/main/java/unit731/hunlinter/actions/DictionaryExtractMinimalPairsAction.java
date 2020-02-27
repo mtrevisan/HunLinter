@@ -1,7 +1,6 @@
 package unit731.hunlinter.actions;
 
 import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.dictionary.WordlistWorker;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -12,7 +11,6 @@ import java.util.Objects;
 
 public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 
-	private final WordlistWorker.WorkerType type;
 	private final WorkerManager workerManager;
 	private final JFrame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
@@ -20,18 +18,15 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractMinimalPairsAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager, final JFrame parentFrame,
-			final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractMinimalPairs");
 
 		putValue(SHORT_DESCRIPTION, "Extract minimal pairs…");
 
-		Objects.requireNonNull(type);
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);
 
-		this.type = type;
 		this.workerManager = workerManager;
 		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;

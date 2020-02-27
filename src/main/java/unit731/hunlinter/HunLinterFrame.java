@@ -154,8 +154,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private RulesReducerDialog rulesReducerDialog;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
-	private ParserManager parserManager;
-	private Packager packager;
+	private final ParserManager parserManager;
+	private final Packager packager;
 	private int lastDictionarySortVisibleIndex;
 
 	private RecentFilesMenu recentProjectsMenu;
@@ -175,7 +175,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 	public HunLinterFrame(){
+		packager = new Packager();
+		parserManager = new ParserManager(packager, this);
+		workerManager = new WorkerManager(parserManager, this);
+
+
 		initComponents();
+
 
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
@@ -243,9 +249,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		saveResultFileChooser = new JFileChooser();
 		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-
-
-		workerManager = new WorkerManager(this);
 
 
 		//check for updates
@@ -2555,10 +2558,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			theLinterMenuItem.setEnabled(false);
 
 			try{
-				if(packager == null)
-					packager = new Packager(projectPath);
-				else
-					packager.reload(projectPath != null? projectPath: packager.getProjectPath());
+				packager.reload(projectPath != null? projectPath: packager.getProjectPath());
+
 				final List<String> availableLanguages = packager.getAvailableLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
@@ -2579,11 +2580,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					+ packager.getLanguage());
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
-
-				if(parserManager == null){
-					parserManager = new ParserManager(packager, this);
-					workerManager.setParserManager(parserManager);
-				}
 
 				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);

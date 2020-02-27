@@ -127,11 +127,6 @@ public class Packager{
 	private final Map<String, File> configurationFiles = new HashMap<>();
 
 
-	public Packager(final Path projectPath) throws IOException, SAXException, ProjectNotFoundException{
-		reload(projectPath);
-	}
-
-	//Reload projectPath
 	public void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
 		Objects.requireNonNull(projectPath);
 
