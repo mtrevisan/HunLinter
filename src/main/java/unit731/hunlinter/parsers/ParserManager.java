@@ -142,11 +142,11 @@ public class ParserManager implements FileChangeListener{
 	public void registerFileListener(){
 		flm.unregisterAll();
 
-		final File affFile = getAffixFile();
-		final File hypFile = getHyphenationFile();
+		final File affFile = packager.getAffixFile();
+		final File hypFile = packager.getHyphenationFile();
 		final File aidFile = getAidFile();
-		final File sexFile = getSexFile();
-		final File wexFile = getWexFile();
+		final File sexFile = packager.getSentenceExceptionsFile();
+		final File wexFile = packager.getWordExceptionsFile();
 		final String[] uris = JavaHelper.nullableToStream(affFile, hypFile, aidFile, sexFile, wexFile)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
@@ -299,84 +299,36 @@ public class ParserManager implements FileChangeListener{
 
 
 	public void storeHyphenationFile() throws IOException{
-		final File hypFile = getHyphenationFile();
+		final File hypFile = packager.getHyphenationFile();
 		hypParser.save(hypFile);
 	}
 
 	public void storeThesaurusFiles() throws IOException{
-		final File theIndexFile = getThesaurusIndexFile();
-		final File theDataFile = getThesaurusDataFile();
+		final File theIndexFile = packager.getThesaurusIndexFile();
+		final File theDataFile = packager.getThesaurusDataFile();
 		theParser.save(theIndexFile, theDataFile);
 	}
 
 	public void storeSentenceExceptionFile() throws TransformerException{
-		final File sexFile = getSentenceExceptionsFile();
+		final File sexFile = packager.getSentenceExceptionsFile();
 		sexParser.save(sexFile);
 	}
 
 	public void storeWordExceptionFile() throws TransformerException{
-		final File wexFile = getWordExceptionsFile();
+		final File wexFile = packager.getWordExceptionsFile();
 		wexParser.save(wexFile);
 	}
 
 	public void storeAutoCorrectFile() throws TransformerException{
-		final File acoFile = getAutoCorrectFile();
+		final File acoFile = packager.getAutoCorrectFile();
 		acoParser.save(acoFile);
 	}
 
-
-	public File getAffixFile(){
-		return packager.getAffixFile();
-	}
-
-	public File getDictionaryFile(){
-		return packager.getDictionaryFile();
-	}
 
 	public File getAidFile(){
 		return Path.of(FOLDER_AID,
 			affParser.getAffixData().getLanguage() + EXTENSION_AID)
 			.toFile();
-	}
-
-	public File getAcoFile(){
-		return packager.getAutoCorrectFile();
-	}
-
-	public File getSexFile(){
-		return packager.getSentenceExceptionsFile();
-	}
-
-	public File getWexFile(){
-		return packager.getWordExceptionsFile();
-	}
-
-	private File getThesaurusIndexFile(){
-		return packager.getThesaurusIndexFile();
-	}
-
-	public File getThesaurusDataFile(){
-		return packager.getThesaurusDataFile();
-	}
-
-	public File getHyphenationFile(){
-		return packager.getHyphenationFile();
-	}
-
-	public File getAutoCorrectFile(){
-		return packager.getAutoCorrectFile();
-	}
-
-	public File getSentenceExceptionsFile(){
-		return packager.getSentenceExceptionsFile();
-	}
-
-	public File getWordExceptionsFile(){
-		return packager.getWordExceptionsFile();
-	}
-
-	public File getAutoTextFile(){
-		return packager.getAutoTextFile();
 	}
 
 
@@ -434,7 +386,7 @@ public class ParserManager implements FileChangeListener{
 
 
 	public String[] getDictionaryLines() throws IOException{
-		final File dicFile = getDictionaryFile();
+		final File dicFile = packager.getDictionaryFile();
 		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
@@ -443,7 +395,7 @@ public class ParserManager implements FileChangeListener{
 	public void mergeSectionsToDictionary(final List<File> files) throws IOException{
 		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
 		for(File file : files){
-			Files.write(getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
+			Files.write(packager.getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
 
 			option = StandardOpenOption.APPEND;
 		}

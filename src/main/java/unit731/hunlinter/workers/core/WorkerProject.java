@@ -11,7 +11,6 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,14 +38,14 @@ public class WorkerProject extends WorkerAbstract<Void, WorkerDataProject>{
 			final ParserManager parserManager = workerData.getParserManager();
 			final List<StageFunction> stages = Arrays.asList(
 				() -> parserManager.openAffixFile(packager.getAffixFile()),
-				() -> parserManager.openHyphenationFile(parserManager.getHyphenationFile()),
+				() -> parserManager.openHyphenationFile(packager.getHyphenationFile()),
 				parserManager::getCorrectnessChecker,
-				() -> parserManager.prepareDictionaryFile(parserManager.getDictionaryFile()),
+				() -> parserManager.prepareDictionaryFile(packager.getDictionaryFile()),
 				() -> parserManager.openAidFile(parserManager.getAidFile()),
-				() -> parserManager.openThesaurusFile(parserManager.getThesaurusDataFile()),
-				() -> parserManager.openAutoCorrectFile(parserManager.getAutoCorrectFile()),
-				() -> parserManager.openSentenceExceptionsFile(parserManager.getSentenceExceptionsFile()),
-				() -> parserManager.openWordExceptionsFile(parserManager.getWordExceptionsFile()));
+				() -> parserManager.openThesaurusFile(packager.getThesaurusDataFile()),
+				() -> parserManager.openAutoCorrectFile(packager.getAutoCorrectFile()),
+				() -> parserManager.openSentenceExceptionsFile(packager.getSentenceExceptionsFile()),
+				() -> parserManager.openWordExceptionsFile(packager.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
 				stages.get(index).execute();
 				//noinspection IntegerDivisionInFloatingPointContext

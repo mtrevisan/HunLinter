@@ -19,6 +19,7 @@ import unit731.hunlinter.actions.ExitAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.IssueReporterAction;
 import unit731.hunlinter.actions.OnlineHelpAction;
+import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
@@ -390,7 +391,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          final ExceptionsParser sexParser = parserManager.getSexParser();
          sexParser.modify(changeType, tags);
          try{
-            sexParser.save(parserManager.getSentenceExceptionsFile());
+            sexParser.save(packager.getSentenceExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
@@ -409,7 +410,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          final ExceptionsParser wexParser = parserManager.getWexParser();
          wexParser.modify(changeType, tags);
          try{
-            wexParser.save(parserManager.getWordExceptionsFile());
+            wexParser.save(packager.getWordExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
@@ -508,21 +509,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          }
       });
 
+      openAffButton.setAction(new OpenFileAction(Packager.KEY_FILE_AFFIX, packager));
       openAffButton.setText("Open Affix");
       openAffButton.setEnabled(false);
-      openAffButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAffButtonActionPerformed(evt);
-         }
-      });
 
+      openDicButton.setAction(new OpenFileAction(Packager.KEY_FILE_DICTIONARY, packager));
       openDicButton.setText("Open Dictionary");
       openDicButton.setEnabled(false);
-      openDicButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openDicButtonActionPerformed(evt);
-         }
-      });
 
       dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -864,12 +857,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          }
       });
 
+      openHypButton.setAction(new OpenFileAction(Packager.KEY_FILE_HYPHENATION, packager));
       openHypButton.setText("Open Hyphenation");
-      openHypButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openHypButtonActionPerformed(evt);
-         }
-      });
+      openHypButton.setEnabled(false);
 
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1058,12 +1048,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       acoCorrectionsRecordedOutputLabel.setText("…");
 
+      openAcoButton.setAction(new OpenFileAction(Packager.KEY_FILE_AUTO_CORRECT, packager));
       openAcoButton.setText("Open AutoCorrect");
-      openAcoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openAcoButtonActionPerformed(evt);
-         }
-      });
+      openAcoButton.setEnabled(false);
 
       acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1154,12 +1141,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       sexCorrectionsRecordedOutputLabel.setText("…");
 
+      openSexButton.setAction(new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager));
       openSexButton.setText("Open Sentence Exceptions");
-      openSexButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openSexButtonActionPerformed(evt);
-         }
-      });
+      openSexButton.setEnabled(false);
 
       sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1238,12 +1222,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
       wexCorrectionsRecordedOutputLabel.setText("…");
 
+      openWexButton.setAction(new OpenFileAction(Packager.KEY_FILE_WORD_EXCEPTIONS, packager));
       openWexButton.setText("Open Word Exceptions");
-      openWexButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openWexButtonActionPerformed(evt);
-         }
-      });
+      openWexButton.setEnabled(false);
 
       wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -2010,60 +1991,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}//GEN-LAST:event_openAidButtonActionPerformed
 
-	private void openAffButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAffButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getAffixFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening affix file", e);
-		}
-	}//GEN-LAST:event_openAffButtonActionPerformed
-
-	private void openDicButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDicButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getDictionaryFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while reading dictionary file", e);
-		}
-	}//GEN-LAST:event_openDicButtonActionPerformed
-
-	private void openHypButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHypButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getHyphenationFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening hyphenation file", e);
-		}
-	}//GEN-LAST:event_openHypButtonActionPerformed
-
-	private void openAcoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openAcoButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getAutoCorrectFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening auto–correct file", e);
-		}
-	}//GEN-LAST:event_openAcoButtonActionPerformed
-
-	private void openSexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSexButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getSentenceExceptionsFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening sentence exceptions file", e);
-		}
-	}//GEN-LAST:event_openSexButtonActionPerformed
-
-	private void openWexButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openWexButtonActionPerformed
-		try{
-			FileHelper.openFileWithChosenEditor(packager.getWordExceptionsFile());
-		}
-		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening word exceptions file", e);
-		}
-	}//GEN-LAST:event_openWexButtonActionPerformed
-
 	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
 		sexFilterDebouncer.call(this);
 	}//GEN-LAST:event_sexTextFieldKeyReleased
@@ -2310,8 +2237,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				cmpInputComboBox.setSelectedItem(null);
 				dicInputTextField.requestFocusInWindow();
 			}
-			openAffButton.setEnabled(parserManager.getAffixFile() != null);
-			openDicButton.setEnabled(parserManager.getDictionaryFile() != null);
+			openAffButton.setEnabled(packager.getAffixFile() != null);
+			openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
 
 			//hyphenation file:
@@ -2322,7 +2249,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				hypStatisticsMenuItem.setEnabled(true);
 				setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
-			openHypButton.setEnabled(parserManager.getHyphenationFile() != null);
+			openHypButton.setEnabled(packager.getHyphenationFile() != null);
 
 
 			//aid file:
@@ -2361,7 +2288,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				updateCorrectionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 			}
-			openAcoButton.setEnabled(parserManager.getAutoCorrectFile() != null);
+			openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
 
 
 			//sentence exceptions file:
@@ -2371,7 +2298,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				sexTagPanel.initializeTags(sentenceExceptions);
 				setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
 			}
-			openSexButton.setEnabled(parserManager.getSentenceExceptionsFile() != null);
+			openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 
 
 			//word exceptions file:
@@ -2381,7 +2308,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				updateWordExceptionsCounter();
 				setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 			}
-			openWexButton.setEnabled(parserManager.getWordExceptionsFile() != null);
+			openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 
 
 			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
@@ -2733,6 +2660,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			default:
 		}
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

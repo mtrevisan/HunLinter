@@ -535,21 +535,21 @@
             </Component>
             <Component class="javax.swing.JButton" name="openAffButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_AFFIX, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Affix"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openAffButtonActionPerformed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="openDicButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_DICTIONARY, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Dictionary"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openDicButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -1131,11 +1131,12 @@
             </Component>
             <Component class="javax.swing.JButton" name="openHypButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_HYPHENATION, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Hyphenation"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openHypButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -1285,11 +1286,12 @@
             </Component>
             <Component class="javax.swing.JButton" name="openAcoButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_AUTO_CORRECT, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open AutoCorrect"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openAcoButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -1409,11 +1411,12 @@
             </Component>
             <Component class="javax.swing.JButton" name="openSexButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Sentence Exceptions"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openSexButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -1533,11 +1536,12 @@
             </Component>
             <Component class="javax.swing.JButton" name="openWexButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new OpenFileAction(Packager.KEY_FILE_WORD_EXCEPTIONS, packager)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open Word Exceptions"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openWexButtonActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>

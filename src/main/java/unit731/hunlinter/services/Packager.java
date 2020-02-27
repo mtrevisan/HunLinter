@@ -37,6 +37,16 @@ public class Packager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Packager.class);
 
+	public static final String KEY_FILE_AFFIX = "file.affix";
+	public static final String KEY_FILE_DICTIONARY = "file.dictionary";
+	public static final String KEY_FILE_HYPHENATION = "file.hyphenation";
+	public static final String KEY_FILE_THESAURUS_DATA = "file.thesaurus.data";
+	public static final String KEY_FILE_THESAURUS_INDEX = "file.thesaurus.index";
+	public static final String KEY_FILE_AUTO_CORRECT = "file.auto.correct";
+	public static final String KEY_FILE_SENTENCE_EXCEPTIONS = "file.sentence.exceptions";
+	public static final String KEY_FILE_WORD_EXCEPTIONS = "file.word.exceptions";
+	public static final String KEY_FILE_AUTO_TEXT = "file.auto.text";
+
 	private static final ZipManager ZIPPER = new ZipManager();
 
 	private static final String FOLDER_META_INF = "META-INF";
@@ -85,6 +95,19 @@ public class Packager{
 	private static final String FOLDER_SPLITTER = "[/\\\\]";
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
+
+	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>();
+	static{
+		KEY_FILE_MAPPER.put(KEY_FILE_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX);
+		KEY_FILE_MAPPER.put(KEY_FILE_DICTIONARY, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY);
+		KEY_FILE_MAPPER.put(KEY_FILE_HYPHENATION, CONFIGURATION_NODE_PROPERTY_HYPHENATION);
+		KEY_FILE_MAPPER.put(KEY_FILE_THESAURUS_DATA, CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA);
+		KEY_FILE_MAPPER.put(KEY_FILE_THESAURUS_INDEX, CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX);
+		KEY_FILE_MAPPER.put(KEY_FILE_AUTO_CORRECT, FILENAME_AUTO_CORRECT);
+		KEY_FILE_MAPPER.put(KEY_FILE_SENTENCE_EXCEPTIONS, FILENAME_SENTENCE_EXCEPTIONS);
+		KEY_FILE_MAPPER.put(KEY_FILE_WORD_EXCEPTIONS, FILENAME_WORD_EXCEPTIONS);
+		KEY_FILE_MAPPER.put(KEY_FILE_AUTO_TEXT, CONFIGURATION_NODE_NAME_AUTO_TEXT);
+	}
 
 	private static final class ConfigurationData{
 		final String foldersSeparator;
@@ -300,40 +323,44 @@ public class Packager{
 		return projectPath;
 	}
 
+	public File getFile(final String key){
+		return configurationFiles.get(KEY_FILE_MAPPER.get(key));
+	}
+
 	public File getAffixFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX);
+		return getFile(KEY_FILE_AFFIX);
 	}
 
 	public File getDictionaryFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY);
+		return getFile(KEY_FILE_DICTIONARY);
 	}
 
 	public File getHyphenationFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_HYPHENATION);
+		return getFile(KEY_FILE_HYPHENATION);
 	}
 
 	public File getThesaurusDataFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_THESAURUS_DATA);
+		return getFile(KEY_FILE_THESAURUS_DATA);
 	}
 
 	public File getThesaurusIndexFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_PROPERTY_THESAURUS_INDEX);
+		return getFile(KEY_FILE_THESAURUS_INDEX);
 	}
 
 	public File getAutoCorrectFile(){
-		return configurationFiles.get(FILENAME_AUTO_CORRECT);
+		return getFile(KEY_FILE_AUTO_CORRECT);
 	}
 
 	public File getSentenceExceptionsFile(){
-		return configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+		return getFile(KEY_FILE_SENTENCE_EXCEPTIONS);
 	}
 
 	public File getWordExceptionsFile(){
-		return configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
+		return getFile(KEY_FILE_WORD_EXCEPTIONS);
 	}
 
 	public File getAutoTextFile(){
-		return configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		return getFile(KEY_FILE_AUTO_TEXT);
 	}
 
 	/** Go up directories until description.xml or manifest.json is found */
