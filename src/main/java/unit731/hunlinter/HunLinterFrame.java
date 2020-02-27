@@ -1494,6 +1494,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
 
+	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+		recentProjectsMenu.clear();
+
+		recentProjectsMenu.setEnabled(false);
+		filEmptyRecentProjectsMenuItem.setEnabled(false);
+	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
+
 
 	private void calculateProductions(final HunLinterFrame frame){
 		final String inputText = StringUtils.strip(frame.dicInputTextField.getText());
@@ -1562,10 +1569,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		frame.cmpLimitComboBoxActionPerformed(null);
 	}
 
-
-	private void cmpInputComboBoxKeyReleased(){
-		compoundProductionDebouncer.call(this);
-	}
 
 	private void filterThesaurus(HunLinterFrame frame){
 		final String unmodifiedSearchText = StringUtils.strip(frame.theSynonymsTextField.getText());
@@ -1656,6 +1659,24 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}
 
+	public void removeSelectedRowsFromAutoCorrect(){
+		try{
+			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
+			parserManager.getAcoParser().deleteCorrection(selectedRow);
+
+			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+			dm.fireTableDataChanged();
+
+			updateCorrectionsCounter();
+
+			//… and save the files
+			parserManager.storeAutoCorrectFile();
+		}
+		catch(final Exception e){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		}
+	}
+
 	private void filterAutoCorrect(final HunLinterFrame frame){
 		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
 		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
@@ -1688,25 +1709,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sorter.setRowFilter(null);
 	}
 
-	public void removeSelectedRowsFromAutoCorrect(){
-		try{
-			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
-			parserManager.getAcoParser().deleteCorrection(selectedRow);
-
-			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-			dm.fireTableDataChanged();
-
-			updateCorrectionsCounter();
-
-			//… and save the files
-			parserManager.storeAutoCorrectFile();
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
-		}
-	}
-
-
 	private void filterSentenceExceptions(final HunLinterFrame frame){
 		final String unmodifiedException = StringUtils.strip(frame.sexTextField.getText());
 		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
@@ -1723,7 +1725,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
-
 	private void filterWordExceptions(final HunLinterFrame frame){
 		final String unmodifiedException = StringUtils.strip(frame.wexTextField.getText());
 		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
@@ -1738,13 +1739,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
-
-	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
-		recentProjectsMenu.clear();
-
-		recentProjectsMenu.setEnabled(false);
-		filEmptyRecentProjectsMenuItem.setEnabled(false);
-	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		final  String newRule = hypAddRuleTextField.getText();
@@ -1837,6 +1831,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void theSynonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theSynonymsTextFieldKeyReleased
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theSynonymsTextFieldKeyReleased
+
+	private void cmpInputComboBoxKeyReleased(){
+		compoundProductionDebouncer.call(this);
+	}
 
 	private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
 		final AffixParser affParser = parserManager.getAffParser();
