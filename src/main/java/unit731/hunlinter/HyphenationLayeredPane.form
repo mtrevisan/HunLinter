@@ -223,9 +223,6 @@
     <Component class="javax.swing.JLabel" name="addRuleSyllabationValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[9, 17]"/>
-        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="addRuleSyllabesCountLabel">

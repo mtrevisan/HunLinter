@@ -156,7 +156,6 @@ final int iconSize = 17;
       addRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
 
       addRuleSyllabationValueLabel.setText("…");
-      addRuleSyllabationValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       addRuleSyllabesCountLabel.setText("New syllabes:");
 
@@ -266,7 +265,7 @@ final int iconSize = 17;
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(addRuleSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(addRuleSyllabationValueLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(addRuleSyllabationValueLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(addRuleSyllabesCountLabel)
