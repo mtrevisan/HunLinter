@@ -2,7 +2,6 @@ package unit731.hunlinter;
 
 import java.awt.*;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
@@ -24,18 +23,13 @@ import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
-import unit731.hunlinter.gui.AutoCorrectTableModel;
-import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -48,15 +42,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -75,12 +66,9 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
-import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
@@ -90,7 +78,6 @@ import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.ProjectLoaderWorker;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -127,8 +114,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
-	private String formerFilterIncorrectText;
-	private String formerFilterCorrectText;
 	private String formerFilterSentenceException;
 	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
@@ -138,7 +123,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> sexFilterDebouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
@@ -161,12 +145,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
 			parsingResultTextArea,
-			acoTable, acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
 			wexTextField);
 
 		GUIUtils.addUndoManager(
-			acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
 			wexTextField);
 
@@ -218,26 +200,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
       hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
-      acoLayeredPane = new javax.swing.JLayeredPane();
-      acoIncorrectLabel = new javax.swing.JLabel();
-      acoIncorrectTextField = new javax.swing.JTextField();
-      acoToLabel = new javax.swing.JLabel();
-      acoCorrectLabel = new javax.swing.JLabel();
-      acoCorrectTextField = new javax.swing.JTextField();
-      acoAddButton = new javax.swing.JButton();
-      acoScrollPane = new javax.swing.JScrollPane();
-      acoTable = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String incorrect = (String)model.getValueAt(row, 0);
-            final String correct = (String)model.getValueAt(row, 1);
-            return incorrect + " > " + correct;
-         }
-      };
-      acoCorrectionsRecordedLabel = new javax.swing.JLabel();
-      acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openAcoButton = new javax.swing.JButton();
+      acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
       sexLayeredPane = new javax.swing.JLayeredPane();
       sexInputLabel = new javax.swing.JLabel();
       sexTextField = new javax.swing.JTextField();
@@ -330,155 +293,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
-
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
-
-      acoIncorrectLabel.setLabelFor(acoIncorrectTextField);
-      acoIncorrectLabel.setText("Incorrect form:");
-
-      acoIncorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoIncorrectTextFieldKeyReleased(evt);
-         }
-      });
-
-      acoToLabel.setText("→");
-
-      acoCorrectLabel.setLabelFor(acoCorrectTextField);
-      acoCorrectLabel.setText("Correct form:");
-
-      acoCorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoCorrectTextFieldKeyReleased(evt);
-         }
-      });
-
-      acoAddButton.setMnemonic('A');
-      acoAddButton.setText("Add");
-      acoAddButton.setEnabled(false);
-      acoAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            acoAddButtonActionPerformed(evt);
-         }
-      });
-
-      acoTable.setModel(new AutoCorrectTableModel());
-      acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
-      acoTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      acoTable.setShowHorizontalLines(false);
-      acoTable.setShowVerticalLines(false);
-      //listen for row removal
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      acoTable.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
-      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      acoTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)acoTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
-
-      JFrame acoParent = this;
-      acoTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(final MouseEvent e){
-            if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
-               final int selectedRow = acoTable.rowAtPoint(e.getPoint());
-               acoTable.setRowSelectionInterval(selectedRow, selectedRow);
-               final int row = acoTable.convertRowIndexToModel(selectedRow);
-               final BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
-                  try{
-                     parserManager.getAcoParser().setCorrection(row, incorrect, correct);
-
-                     //… and save the files
-                     parserManager.storeAutoCorrectFile();
-                  }
-                  catch(Exception ex){
-                     LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
-                  }
-               };
-               final CorrectionEntry definition = parserManager.getAcoParser().getCorrectionsDictionary().get(row);
-               final CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, acoParent);
-               GUIUtils.addCancelByEscapeKey(dialog);
-               dialog.addWindowListener(new WindowAdapter(){
-                  @Override
-                  public void windowClosed(final WindowEvent e){
-                     acoTable.clearSelection();
-                  }
-               });
-               dialog.setLocationRelativeTo(acoParent);
-               dialog.setVisible(true);
-            }
-         }
-      });
-
-      TableRenderer acoCellRenderer = new TableRenderer();
-      acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
-      acoScrollPane.setViewportView(acoTable);
-
-      acoCorrectionsRecordedLabel.setLabelFor(acoCorrectionsRecordedOutputLabel);
-      acoCorrectionsRecordedLabel.setText("Corrections recorded:");
-
-      acoCorrectionsRecordedOutputLabel.setText("…");
-
-      openAcoButton.setAction(new OpenFileAction(Packager.KEY_FILE_AUTO_CORRECT, packager));
-      openAcoButton.setText("Open AutoCorrect");
-      openAcoButton.setEnabled(false);
-
-      acoLayeredPane.setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      acoLayeredPane.setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout acoLayeredPaneLayout = new javax.swing.GroupLayout(acoLayeredPane);
-      acoLayeredPane.setLayout(acoLayeredPaneLayout);
-      acoLayeredPaneLayout.setHorizontalGroup(
-         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(acoScrollPane)
-               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(acoIncorrectLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(acoToLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(acoCorrectLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addGap(18, 18, 18)
-                  .addComponent(acoAddButton))
-               .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(acoCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openAcoButton)))
-            .addContainerGap())
-      );
-      acoLayeredPaneLayout.setVerticalGroup(
-         acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(acoLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoIncorrectLabel)
-               .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoAddButton)
-               .addComponent(acoToLabel)
-               .addComponent(acoCorrectLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(acoLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoCorrectionsRecordedLabel)
-               .addComponent(acoCorrectionsRecordedOutputLabel)
-               .addComponent(openAcoButton))
-            .addContainerGap())
-      );
-
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
 
       sexInputLabel.setLabelFor(sexTextField);
@@ -825,7 +640,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 919, Short.MAX_VALUE)
+               .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
                .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
@@ -874,56 +689,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 
-	public void removeSelectedRowsFromAutoCorrect(){
-		try{
-			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
-			parserManager.getAcoParser().deleteCorrection(selectedRow);
-
-			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-			dm.fireTableDataChanged();
-
-			updateAutoCorrectionsCounter();
-
-			//… and save the files
-			parserManager.storeAutoCorrectFile();
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
-		}
-	}
-
-	private void filterAutoCorrect(){
-		final String unmodifiedIncorrectText = StringUtils.strip(acoIncorrectTextField.getText());
-		final String unmodifiedCorrectText = StringUtils.strip(acoCorrectTextField.getText());
-		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
-			return;
-
-		formerFilterIncorrectText = unmodifiedIncorrectText;
-		formerFilterCorrectText = unmodifiedCorrectText;
-
-		final Pair<String, String> pair = AutoCorrectParser.extractComponentsForFilter(unmodifiedIncorrectText,
-			unmodifiedCorrectText);
-		final String incorrect = pair.getLeft();
-		final String correct = pair.getRight();
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getAcoParser().contains(incorrect, correct);
-		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
-			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
-
-		@SuppressWarnings("unchecked")
-		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
-		if(StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText)){
-			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
-			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
-			final RowFilter<AutoCorrectTableModel, Integer> filterCorrect = RowFilter.regexFilter(searchText.getRight(), 1);
-			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.andFilter(Arrays.asList(filterIncorrect,
-				filterCorrect))));
-		}
-		else
-			sorter.setRowFilter(null);
-	}
-
 	private void filterSentenceExceptions(){
 		final String unmodifiedException = StringUtils.strip(sexTextField.getText());
 		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
@@ -954,61 +719,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
-
-	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
-		acoFilterDebouncer.call(this);
-	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
-
-	private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
-		acoFilterDebouncer.call(this);
-	}//GEN-LAST:event_acoCorrectTextFieldKeyReleased
-
-	private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
-		try{
-			//try adding the correction
-			final String incorrect = acoIncorrectTextField.getText();
-			final String correct = acoCorrectTextField.getText();
-			final Supplier<Boolean> duplicatesDiscriminator = () -> {
-				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Duplicate detected",
-					JOptionPane.YES_NO_OPTION);
-				return (responseOption == JOptionPane.YES_OPTION);
-			};
-			final DuplicationResult<CorrectionEntry> duplicationResult = parserManager.getAcoParser()
-				.insertCorrection(incorrect, correct, duplicatesDiscriminator);
-			if(duplicationResult.isForceInsertion()){
-				//if everything's ok update the table and the sorter…
-				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-				dm.fireTableDataChanged();
-
-				formerFilterIncorrectText = null;
-				formerFilterCorrectText = null;
-				acoIncorrectTextField.setText(null);
-				acoCorrectTextField.setText(null);
-				acoAddButton.setEnabled(false);
-				acoIncorrectTextField.requestFocusInWindow();
-				@SuppressWarnings("unchecked")
-				TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
-				sorter.setRowFilter(null);
-
-				updateAutoCorrectionsCounter();
-
-				//… and save the files
-				parserManager.storeAutoCorrectFile();
-			}
-			else{
-				acoIncorrectTextField.requestFocusInWindow();
-
-				final String duplicatedWords = duplicationResult.getDuplicates().stream()
-					.map(CorrectionEntry::toString)
-					.collect(Collectors.joining(", "));
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
-			}
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-		}
-	}//GEN-LAST:event_acoAddButtonActionPerformed
 
 	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
 		sexFilterDebouncer.call(this);
@@ -1189,10 +899,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((CompoundsLayeredPane)cmpLayeredPane).setCurrentFont();
 		((ThesaurusLayeredPane)theLayeredPane).setCurrentFont();
 		((HyphenationLayeredPane)hypLayeredPane).setCurrentFont();
-
-		acoIncorrectTextField.setFont(currentFont);
-		acoCorrectTextField.setFont(currentFont);
-		acoTable.setFont(currentFont);
+		((AutoCorrectLayeredPane)acoLayeredPane).setCurrentFont();
 	}
 
 	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
@@ -1236,6 +943,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			((CompoundsLayeredPane)cmpLayeredPane).initialize();
 			((ThesaurusLayeredPane)theLayeredPane).initialize();
 			((HyphenationLayeredPane)hypLayeredPane).initialize();
+			((AutoCorrectLayeredPane)acoLayeredPane).initialize();
 
 
 			//thesaurus file:
@@ -1257,15 +965,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//auto–correct file:
-			if(parserManager.getAcoParser().getCorrectionsCounter() > 0){
-				addSorterToTable(acoTable, comparator, null);
-
-				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-				dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
-				updateAutoCorrectionsCounter();
+			if(parserManager.getAcoParser().getCorrectionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
-			}
-			openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
 
 
 			//sentence exceptions file:
@@ -1334,6 +1035,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((ThesaurusLayeredPane)theLayeredPane).clear();
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 		((HyphenationLayeredPane)hypLayeredPane).clear();
+		((AutoCorrectLayeredPane)acoLayeredPane).clear();
 
 
 		//hyphenation file:
@@ -1348,11 +1050,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//auto–correct file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
-		openAcoButton.setEnabled(false);
-		formerFilterIncorrectText = null;
-		formerFilterCorrectText = null;
-		//noinspection unchecked
-		((TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter()).setRowFilter(null);
 
 
 		//sentence exceptions file:
@@ -1367,10 +1064,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
 		wexTagPanel.applyFilter(null);
-	}
-
-	private void updateAutoCorrectionsCounter(){
-		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
 	private void updateSentenceExceptionsCounter(){
@@ -1431,8 +1124,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearAutoCorrectParser(){
-		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-		dm.setCorrections(null);
+		((AutoCorrectLayeredPane)acoLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
@@ -1512,17 +1204,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JButton acoAddButton;
-   private javax.swing.JLabel acoCorrectLabel;
-   private javax.swing.JTextField acoCorrectTextField;
-   private javax.swing.JLabel acoCorrectionsRecordedLabel;
-   private javax.swing.JLabel acoCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel acoIncorrectLabel;
-   private javax.swing.JTextField acoIncorrectTextField;
    private javax.swing.JLayeredPane acoLayeredPane;
-   private javax.swing.JScrollPane acoScrollPane;
-   private javax.swing.JTable acoTable;
-   private javax.swing.JLabel acoToLabel;
    private javax.swing.JLayeredPane cmpLayeredPane;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
@@ -1563,7 +1245,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
-   private javax.swing.JButton openAcoButton;
    private javax.swing.JButton openSexButton;
    private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
