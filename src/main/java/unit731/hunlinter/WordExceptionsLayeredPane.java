@@ -52,20 +52,20 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(wexTextField);
+		GUIUtils.addFontableProperty(textField);
 
-		GUIUtils.addUndoManager(wexTextField);
+		GUIUtils.addUndoManager(textField);
 	}
 
-	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      wexInputLabel = new javax.swing.JLabel();
-      wexTextField = new javax.swing.JTextField();
-      wexAddButton = new javax.swing.JButton();
-      wexScrollPane = new javax.swing.JScrollPane();
-      wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      wexTagPanel = new JTagPanel((changeType, tags) -> {
+      inputLabel = new javax.swing.JLabel();
+      textField = new javax.swing.JTextField();
+      addButton = new javax.swing.JButton();
+      scrollPane = new javax.swing.JScrollPane();
+      scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+      tagPanel = new JTagPanel((changeType, tags) -> {
          final ExceptionsParser wexParser = parserManager.getWexParser();
          wexParser.modify(changeType, tags);
          try{
@@ -75,47 +75,47 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
             LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       });
-      wexCorrectionsRecordedLabel = new javax.swing.JLabel();
-      wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      correctionsRecordedLabel = new javax.swing.JLabel();
+      correctionsRecordedValueLabel = new javax.swing.JLabel();
       openWexButton = new javax.swing.JButton();
 
       setPreferredSize(new java.awt.Dimension(929, 273));
 
-      wexInputLabel.setText("Exception:");
+      inputLabel.setText("Exception:");
 
-      wexTextField.setToolTipText("hit `enter` to add");
-      wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+      textField.setToolTipText("hit `enter` to add");
+      textField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
-            wexTextFieldKeyReleased(evt);
+            textFieldKeyReleased(evt);
          }
       });
 
-      wexAddButton.setMnemonic('A');
-      wexAddButton.setText("Add");
-      wexAddButton.setEnabled(false);
-      wexAddButton.addActionListener(new java.awt.event.ActionListener() {
+      addButton.setMnemonic('A');
+      addButton.setText("Add");
+      addButton.setEnabled(false);
+      addButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            wexAddButtonActionPerformed(evt);
+            addButtonActionPerformed(evt);
          }
       });
 
-      wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      wexScrollPane.setViewportView(wexTagPanel);
+      scrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+      scrollPane.setViewportView(tagPanel);
 
-      wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
+      correctionsRecordedLabel.setText("Exceptions recorded:");
 
-      wexCorrectionsRecordedOutputLabel.setText("…");
+      correctionsRecordedValueLabel.setText("…");
 
       openWexButton.setAction(new OpenFileAction(Packager.KEY_FILE_WORD_EXCEPTIONS, packager));
       openWexButton.setText("Open Word Exceptions");
       openWexButton.setEnabled(false);
 
-      setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(wexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(addButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -125,19 +125,19 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(wexScrollPane)
+               .addComponent(scrollPane)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(wexCorrectionsRecordedLabel)
+                  .addComponent(correctionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(correctionsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(openWexButton))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(wexInputLabel)
+                  .addComponent(inputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexTextField)
+                  .addComponent(textField)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(wexAddButton)))
+                  .addComponent(addButton)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -145,41 +145,41 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexInputLabel)
-               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(wexAddButton))
+               .addComponent(inputLabel)
+               .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(addButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexCorrectionsRecordedLabel)
-               .addComponent(wexCorrectionsRecordedOutputLabel)
+               .addComponent(correctionsRecordedLabel)
+               .addComponent(correctionsRecordedValueLabel)
                .addComponent(openWexButton))
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
+   private void textFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
       debouncer.call(this);
-   }//GEN-LAST:event_wexTextFieldKeyReleased
+   }//GEN-LAST:event_textFieldKeyReleased
 
-   private void wexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wexAddButtonActionPerformed
+   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
-         final String exception = StringUtils.strip(wexTextField.getText());
+         final String exception = StringUtils.strip(textField.getText());
          if(!parserManager.getWexParser().contains(exception)){
             parserManager.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
-            wexTagPanel.addTag(exception);
+            tagPanel.addTag(exception);
 
             //reset input
-            wexTextField.setText(StringUtils.EMPTY);
-            wexTagPanel.applyFilter(null);
+            textField.setText(StringUtils.EMPTY);
+            tagPanel.applyFilter(null);
 
             updateWordExceptionsCounter();
 
             parserManager.storeWordExceptionFile();
          }
          else{
-            wexTextField.requestFocusInWindow();
+            textField.requestFocusInWindow();
 
             JOptionPane.showOptionDialog(this,
                "A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION,
@@ -189,12 +189,12 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       catch(final Exception e){
          LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
-   }//GEN-LAST:event_wexAddButtonActionPerformed
+   }//GEN-LAST:event_addButtonActionPerformed
 
 	public void initialize(){
 		if(parserManager.getWexParser().getExceptionsCounter() > 0){
 			final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
-			wexTagPanel.initializeTags(wordExceptions);
+			tagPanel.initializeTags(wordExceptions);
 			updateWordExceptionsCounter();
 		}
 		openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
@@ -202,18 +202,18 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
-		wexTagPanel.setFont(currentFont);
+		tagPanel.setFont(currentFont);
 	}
 
 	public void clear(){
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
-		wexTagPanel.applyFilter(null);
-		wexTagPanel.initializeTags(null);
+		tagPanel.applyFilter(null);
+		tagPanel.initializeTags(null);
 	}
 
 	private void filterWordExceptions(){
-		final String unmodifiedException = StringUtils.strip(wexTextField.getText());
+		final String unmodifiedException = StringUtils.strip(textField.getText());
 		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
 			return;
 
@@ -221,14 +221,14 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getWexParser().contains(unmodifiedException);
-		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
+		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
 
 
-		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
+		tagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
 	private void updateWordExceptionsCounter(){
-		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
+		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
 	}
 
 
@@ -244,13 +244,13 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JButton addButton;
+   private javax.swing.JLabel correctionsRecordedLabel;
+   private javax.swing.JLabel correctionsRecordedValueLabel;
+   private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openWexButton;
-   private javax.swing.JButton wexAddButton;
-   private javax.swing.JLabel wexCorrectionsRecordedLabel;
-   private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel wexInputLabel;
-   private javax.swing.JScrollPane wexScrollPane;
-   private unit731.hunlinter.gui.JTagPanel wexTagPanel;
-   private javax.swing.JTextField wexTextField;
+   private javax.swing.JScrollPane scrollPane;
+   private unit731.hunlinter.gui.JTagPanel tagPanel;
+   private javax.swing.JTextField textField;
    // End of variables declaration//GEN-END:variables
 }

@@ -68,18 +68,18 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(dicInputTextField);
+		GUIUtils.addFontableProperty(inputTextField);
 
-		GUIUtils.addUndoManager(dicInputTextField);
+		GUIUtils.addUndoManager(inputTextField);
 
 		try{
 			//FIXME
-//			final int iconSize = hypRulesOutputLabel.getHeight();
+//			final int iconSize = hypRulesValueLabel.getHeight();
 //			final int iconSize = dicTotalProductionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(copyPopupMenu, dicTable);
+			GUIUtils.addPopupMenu(copyPopupMenu, table);
 		}
 		catch(final IOException ignored){}
 	}
@@ -87,10 +87,12 @@ final int iconSize = 17;
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      dicScrollPane = new javax.swing.JScrollPane();
-      dicTable = new JCopyableTable(){
+      inputLabel = new javax.swing.JLabel();
+      inputTextField = new javax.swing.JTextField();
+      ruleFlagsAidLabel = new javax.swing.JLabel();
+      ruleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      scrollPane = new javax.swing.JScrollPane();
+      table = new JCopyableTable(){
          @Override
          public String getValueAtRow(final int row){
             final TableModel model = getModel();
@@ -109,32 +111,39 @@ final int iconSize = 17;
             .collect(Collectors.joining(TAB));
          }
       };
-      dicTotalProductionsLabel = new javax.swing.JLabel();
-      dicTotalProductionsValueLabel = new javax.swing.JLabel();
+      totalProductionsLabel = new javax.swing.JLabel();
+      totalProductionsValueLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
       openAffButton = new javax.swing.JButton();
       openDicButton = new javax.swing.JButton();
-      dicInputLabel = new javax.swing.JLabel();
-      dicInputTextField = new javax.swing.JTextField();
 
-      dicRuleFlagsAidLabel.setText("Rule flags aid:");
+      inputLabel.setText("Dictionary entry:");
 
-      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
+      inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            inputTextFieldKeyReleased(evt);
+         }
+      });
 
-      dicTable.setModel(new ProductionTableModel());
-      dicTable.setShowHorizontalLines(false);
-      dicTable.setShowVerticalLines(false);
-      dicTable.setRowSelectionAllowed(true);
+      ruleFlagsAidLabel.setText("Rule flags aid:");
+
+      ruleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+
+      table.setModel(new ProductionTableModel());
+      table.setShowHorizontalLines(false);
+      table.setShowVerticalLines(false);
+      table.setRowSelectionAllowed(true);
       TableRenderer dicCellRenderer = new TableRenderer();
-      for(int i = 0; i < dicTable.getColumnCount(); i ++)
-      dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
+      for(int i = 0; i < table.getColumnCount(); i ++)
+      table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      dicTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)dicTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
-      dicScrollPane.setViewportView(dicTable);
+      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      scrollPane.setViewportView(table);
 
-      dicTotalProductionsLabel.setText("Total productions:");
+      totalProductionsLabel.setText("Total productions:");
 
-      dicTotalProductionsValueLabel.setText("…");
+      totalProductionsValueLabel.setText("…");
 
       openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");
@@ -148,25 +157,16 @@ final int iconSize = 17;
       openDicButton.setText("Open Dictionary");
       openDicButton.setEnabled(false);
 
-      dicInputLabel.setText("Dictionary entry:");
-
-      dicInputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
-      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            dicInputTextFieldKeyReleased(evt);
-         }
-      });
-
-      setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicTotalProductionsValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(ruleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(ruleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(totalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(totalProductionsValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
@@ -177,17 +177,17 @@ final int iconSize = 17;
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                     .addComponent(dicInputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicRuleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                     .addComponent(inputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addComponent(ruleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicInputTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
+                     .addComponent(ruleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addComponent(inputTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+               .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(dicTotalProductionsLabel)
+                  .addComponent(totalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(dicTotalProductionsValueLabel)
+                  .addComponent(totalProductionsValueLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addComponent(openAidButton)
                   .addGap(18, 18, 18)
@@ -201,18 +201,18 @@ final int iconSize = 17;
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicInputLabel)
-               .addComponent(dicInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(inputLabel)
+               .addComponent(inputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(dicRuleFlagsAidLabel))
+               .addComponent(ruleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(ruleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicTotalProductionsLabel)
-               .addComponent(dicTotalProductionsValueLabel)
+               .addComponent(totalProductionsLabel)
+               .addComponent(totalProductionsValueLabel)
                .addComponent(openAffButton)
                .addComponent(openDicButton)
                .addComponent(openAidButton))
@@ -227,7 +227,7 @@ final int iconSize = 17;
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(dicTable, comparator, comparatorAffix);
+		addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();
@@ -236,7 +236,7 @@ final int iconSize = 17;
 
 			//affix file:
 			if(!compoundRules.isEmpty())
-				dicInputTextField.requestFocusInWindow();
+				inputTextField.requestFocusInWindow();
 			openAffButton.setEnabled(packager.getAffixFile() != null);
 			openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
@@ -244,11 +244,11 @@ final int iconSize = 17;
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			final boolean aidLinesPresent = !lines.isEmpty();
-			dicRuleFlagsAidComboBox.removeAllItems();
+			ruleFlagsAidComboBox.removeAllItems();
 			if(aidLinesPresent)
-				lines.forEach(dicRuleFlagsAidComboBox::addItem);
+				lines.forEach(ruleFlagsAidComboBox::addItem);
 			//enable combo-box only if an AID file exists
-			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
 		catch(final IndexOutOfBoundsException e){
@@ -275,8 +275,8 @@ final int iconSize = 17;
 
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
-		dicInputTextField.setFont(currentFont);
-		dicTable.setFont(currentFont);
+		inputTextField.setFont(currentFont);
+		table.setFont(currentFont);
 	}
 
 	public void clear(){
@@ -287,35 +287,35 @@ final int iconSize = 17;
 
 		clearAid();
 
-		clearOutputTable(dicTable);
+		clearOutputTable(table);
 
 		formerInputText = null;
 
 		//disable menu
-		dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
-		dicInputTextField.setText(null);
-		dicInputTextField.requestFocusInWindow();
+		totalProductionsValueLabel.setText(StringUtils.EMPTY);
+		inputTextField.setText(null);
+		inputTextField.requestFocusInWindow();
 		openAidButton.setEnabled(false);
 	}
 
 	public void clearAid(){
-		dicRuleFlagsAidComboBox.removeAllItems();
+		ruleFlagsAidComboBox.removeAllItems();
 		//enable combo-box only if an AID file exists
-		dicRuleFlagsAidComboBox.setEnabled(false);
+		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
-	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+	private void inputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyReleased
 		debouncer.call(this);
-	}//GEN-LAST:event_dicInputTextFieldKeyReleased
+	}//GEN-LAST:event_inputTextFieldKeyReleased
 
 	private void calculateProductions(){
-		final String inputText = StringUtils.strip(dicInputTextField.getText());
+		final String inputText = StringUtils.strip(inputTextField.getText());
 
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
 
-		clearOutputTable(dicTable);
+		clearOutputTable(table);
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
@@ -323,19 +323,19 @@ final int iconSize = 17;
 					parserManager.getAffixData());
 				final List<Production> productions = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final ProductionTableModel dm = (ProductionTableModel)dicTable.getModel();
+				final ProductionTableModel dm = (ProductionTableModel)table.getModel();
 				dm.setProductions(productions);
 
 				//show first row
-				final Rectangle cellRect = dicTable.getCellRect(0, 0, true);
-				dicTable.scrollRectToVisible(cellRect);
+				final Rectangle cellRect = table.getCellRect(0, 0, true);
+				table.scrollRectToVisible(cellRect);
 
-				dicTotalProductionsValueLabel.setText(Integer.toString(productions.size()));
+				totalProductionsValueLabel.setText(Integer.toString(productions.size()));
 
 				//check for correctness
 				int line = 0;
 				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
-				final TableRenderer dicCellRenderer = (TableRenderer)dicTable.getColumnModel().getColumn(0).getCellRenderer();
+				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
 				for(final Production production : productions){
 					try{
@@ -360,7 +360,7 @@ final int iconSize = 17;
 			}
 		}
 		else
-			dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
+			totalProductionsValueLabel.setText(StringUtils.EMPTY);
 	}
 
 	private void clearOutputTable(final JTable table){
@@ -381,16 +381,16 @@ final int iconSize = 17;
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JLabel dicInputLabel;
-   private javax.swing.JTextField dicInputTextField;
-   private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
-   private javax.swing.JLabel dicRuleFlagsAidLabel;
-   private javax.swing.JScrollPane dicScrollPane;
-   private javax.swing.JTable dicTable;
-   private javax.swing.JLabel dicTotalProductionsLabel;
-   private javax.swing.JLabel dicTotalProductionsValueLabel;
+   private javax.swing.JLabel inputLabel;
+   private javax.swing.JTextField inputTextField;
    private javax.swing.JButton openAffButton;
    private javax.swing.JButton openAidButton;
    private javax.swing.JButton openDicButton;
+   private javax.swing.JComboBox<String> ruleFlagsAidComboBox;
+   private javax.swing.JLabel ruleFlagsAidLabel;
+   private javax.swing.JScrollPane scrollPane;
+   private javax.swing.JTable table;
+   private javax.swing.JLabel totalProductionsLabel;
+   private javax.swing.JLabel totalProductionsValueLabel;
    // End of variables declaration//GEN-END:variables
 }

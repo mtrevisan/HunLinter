@@ -65,13 +65,13 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(theTable, theSynonymsTextField);
+		GUIUtils.addFontableProperty(table, synonymsTextField);
 
-		GUIUtils.addUndoManager(theSynonymsTextField);
+		GUIUtils.addUndoManager(synonymsTextField);
 
 		try{
 			//FIXME
-//			final int iconSize = hypRulesOutputLabel.getHeight();
+//			final int iconSize = hypRulesValueLabel.getHeight();
 //			final int iconSize = dicTotalProductionsValueLabel.getHeight();
 			final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
@@ -85,20 +85,20 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
-			GUIUtils.addPopupMenu(copyPopupMenu, theSynonymsRecordedOutputLabel);
-			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, theTable);
+			GUIUtils.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
+			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
 	}
 
-	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      theSynonymsLabel = new javax.swing.JLabel();
-      theSynonymsTextField = new javax.swing.JTextField();
-      theAddButton = new javax.swing.JButton();
-      theScrollPane = new javax.swing.JScrollPane();
-      theTable = new JCopyableTable(){
+      synonymsLabel = new javax.swing.JLabel();
+      synonymsTextField = new javax.swing.JTextField();
+      addButton = new javax.swing.JButton();
+      scrollPane = new javax.swing.JScrollPane();
+      table = new JCopyableTable(){
          @Override
          public String getValueAtRow(final int row){
             final TableModel model = getModel();
@@ -111,54 +111,54 @@ public class ThesaurusLayeredPane extends JLayeredPane{
             .collect(Collectors.joining("\r\n"));
          }
       };
-      theSynonymsRecordedLabel = new javax.swing.JLabel();
-      theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
+      synonymsRecordedLabel = new javax.swing.JLabel();
+      synonymsRecordedValueLabel = new javax.swing.JLabel();
 
-      theSynonymsLabel.setText("New definition:");
+      synonymsLabel.setText("New definition:");
 
-      theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+      synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
-            theSynonymsTextFieldKeyReleased(evt);
+            synonymsTextFieldKeyReleased(evt);
          }
       });
 
-      theAddButton.setMnemonic('A');
-      theAddButton.setText("Add");
-      theAddButton.setEnabled(false);
-      theAddButton.addActionListener(new java.awt.event.ActionListener() {
+      addButton.setMnemonic('A');
+      addButton.setText("Add");
+      addButton.setEnabled(false);
+      addButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theAddButtonActionPerformed(evt);
+            addButtonActionPerformed(evt);
          }
       });
 
-      theTable.setModel(new ThesaurusTableModel());
-      theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      theTable.setShowHorizontalLines(false);
-      theTable.setShowVerticalLines(false);
-      theTable.getColumnModel().getColumn(0).setMinWidth(200);
-      theTable.getColumnModel().getColumn(0).setMaxWidth(500);
+      table.setModel(new ThesaurusTableModel());
+      table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
+      table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));
+      table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+      table.setShowHorizontalLines(false);
+      table.setShowVerticalLines(false);
+      table.getColumnModel().getColumn(0).setMinWidth(200);
+      table.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      theTable.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      theTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
-      theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
-      theScrollPane.setViewportView(theTable);
+      table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
+      scrollPane.setViewportView(table);
 
-      theSynonymsRecordedLabel.setText("Synonyms recorded:");
+      synonymsRecordedLabel.setText("Synonyms recorded:");
 
-      theSynonymsRecordedOutputLabel.setText("…");
+      synonymsRecordedValueLabel.setText("…");
 
-      setLayer(theSynonymsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(theSynonymsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(synonymsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(synonymsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(addButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(synonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(synonymsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
@@ -167,17 +167,17 @@ public class ThesaurusLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
+               .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                  .addComponent(theSynonymsLabel)
+                  .addComponent(synonymsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsTextField)
+                  .addComponent(synonymsTextField)
                   .addGap(18, 18, 18)
-                  .addComponent(theAddButton))
+                  .addComponent(addButton))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(theSynonymsRecordedLabel)
+                  .addComponent(synonymsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)))
+                  .addComponent(synonymsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -185,27 +185,27 @@ public class ThesaurusLayeredPane extends JLayeredPane{
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theSynonymsLabel)
-               .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(theAddButton))
+               .addComponent(synonymsLabel)
+               .addComponent(synonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(addButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theSynonymsRecordedLabel)
-               .addComponent(theSynonymsRecordedOutputLabel))
+               .addComponent(synonymsRecordedLabel)
+               .addComponent(synonymsRecordedValueLabel))
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void theSynonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theSynonymsTextFieldKeyReleased
+   private void synonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_synonymsTextFieldKeyReleased
       debouncer.call(this);
-   }//GEN-LAST:event_theSynonymsTextFieldKeyReleased
+   }//GEN-LAST:event_synonymsTextFieldKeyReleased
 
-   private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
+   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the synonyms
-         final String synonyms = theSynonymsTextField.getText();
+         final String synonyms = synonymsTextField.getText();
          final Function<String, Boolean> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part–of–speech and definition(s) '" + message
@@ -217,16 +217,16 @@ public class ThesaurusLayeredPane extends JLayeredPane{
          .insertSynonyms(synonyms, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
-            final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+            final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
             dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
             dm.fireTableDataChanged();
 
             formerFilterThesaurusText = null;
-            theSynonymsTextField.setText(null);
-            theSynonymsTextField.requestFocusInWindow();
+            synonymsTextField.setText(null);
+            synonymsTextField.requestFocusInWindow();
             popupMergeMenuItem.setEnabled(false);
             @SuppressWarnings("unchecked")
-            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateSynonymsCounter();
@@ -235,7 +235,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
             parserManager.storeThesaurusFiles();
          }
          else{
-            theSynonymsTextField.requestFocusInWindow();
+            synonymsTextField.requestFocusInWindow();
 
             final String duplicatedWords = duplicationResult.getDuplicates().stream()
             .map(ThesaurusEntry::getDefinition)
@@ -246,7 +246,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
       catch(final Exception e){
          LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
-   }//GEN-LAST:event_theAddButtonActionPerformed
+   }//GEN-LAST:event_addButtonActionPerformed
 
 	public void initialize(){
 		final String language = parserManager.getAffixData().getLanguage();
@@ -255,7 +255,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(theTable, comparator, comparatorAffix);
+		addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();
@@ -264,9 +264,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 			//thesaurus file:
 			if(parserManager.getTheParser().getSynonymsCount() > 0){
-				addSorterToTable(theTable, comparator, null);
+				addSorterToTable(table, comparator, null);
 
-				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
 				updateSynonymsCounter();
 			}
@@ -295,23 +295,23 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
-		theSynonymsTextField.setFont(currentFont);
-		theTable.setFont(currentFont);
+		synonymsTextField.setFont(currentFont);
+		table.setFont(currentFont);
 	}
 
 	public void clear(){
-		theSynonymsTextField.setText(null);
+		synonymsTextField.setText(null);
 		popupMergeMenuItem.setEnabled(false);
 
 		formerFilterThesaurusText = null;
 		//noinspection unchecked
-		((TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter()).setRowFilter(null);
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		((TableRowSorter<ThesaurusTableModel>)table.getRowSorter()).setRowFilter(null);
+		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		dm.setSynonyms(null);
 	}
 
 	private void filterThesaurus(){
-		final String unmodifiedSearchText = StringUtils.strip(theSynonymsTextField.getText());
+		final String unmodifiedSearchText = StringUtils.strip(synonymsTextField.getText());
 
 		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
@@ -323,10 +323,10 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
-		theAddButton.setEnabled(!alreadyContained);
+		addButton.setEnabled(!alreadyContained);
 
 		@SuppressWarnings("unchecked")
-		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)table.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
@@ -336,10 +336,10 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	}
 
 	public void mergeThesaurusRow(final Component invoker){
-		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
+		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
-		final SynonymsEntry newSynonyms = new SynonymsEntry(theSynonymsTextField.getText());
+		final SynonymsEntry newSynonyms = new SynonymsEntry(synonymsTextField.getText());
 
 		//filter synonyms with same part-of-speech
 		final List<SynonymsEntry> filteredSynonymsEntries = synonyms.getSynonyms().stream()
@@ -358,7 +358,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			dialog.setVisible(true);
 
 			if(dialog.isMerged())
-				theSynonymsTextField.setText(dialog.getMerge());
+				synonymsTextField.setText(dialog.getMerge());
 		}
 	}
 
@@ -368,8 +368,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	public void removeSelectedRowsFromThesaurus(){
 		try{
-			final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
-			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
+			final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
 			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
 			parserManager.getTheParser()
@@ -383,12 +383,12 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 			//redo filtering, that is re-set the state of the button (it may have changed)
-			final String unmodifiedSearchText = theSynonymsTextField.getText();
+			final String unmodifiedSearchText = synonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 				final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
-				theAddButton.setEnabled(!alreadyContained);
+				addButton.setEnabled(!alreadyContained);
 			}
 		}
 		catch(final Exception e){
@@ -397,7 +397,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	}
 
 	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getTheParser().getSynonymsCount()));
+		synonymsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getTheParser().getSynonymsCount()));
 	}
 
 
@@ -413,12 +413,12 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JButton theAddButton;
-   private javax.swing.JScrollPane theScrollPane;
-   private javax.swing.JLabel theSynonymsLabel;
-   private javax.swing.JLabel theSynonymsRecordedLabel;
-   private javax.swing.JLabel theSynonymsRecordedOutputLabel;
-   private javax.swing.JTextField theSynonymsTextField;
-   private javax.swing.JTable theTable;
+   private javax.swing.JButton addButton;
+   private javax.swing.JScrollPane scrollPane;
+   private javax.swing.JLabel synonymsLabel;
+   private javax.swing.JLabel synonymsRecordedLabel;
+   private javax.swing.JLabel synonymsRecordedValueLabel;
+   private javax.swing.JTextField synonymsTextField;
+   private javax.swing.JTable table;
    // End of variables declaration//GEN-END:variables
 }

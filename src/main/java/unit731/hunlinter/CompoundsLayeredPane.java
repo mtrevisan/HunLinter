@@ -75,76 +75,76 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(cmpInputTextArea, cmpTable);
+		GUIUtils.addFontableProperty(inputTextArea, table);
 
-		GUIUtils.addUndoManager(cmpInputTextArea);
+		GUIUtils.addUndoManager(inputTextArea);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new javax.swing.JComboBox<>();
-      cmpLimitLabel = new javax.swing.JLabel();
-      cmpLimitComboBox = new javax.swing.JComboBox<>();
-      cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      cmpScrollPane = new javax.swing.JScrollPane();
-      cmpTable = new javax.swing.JTable();
-      cmpInputScrollPane = new javax.swing.JScrollPane();
-      cmpInputTextArea = new javax.swing.JTextArea();
-      cmpLoadInputButton = new javax.swing.JButton();
+      inputLabel = new javax.swing.JLabel();
+      inputComboBox = new javax.swing.JComboBox<>();
+      limitLabel = new javax.swing.JLabel();
+      limitComboBox = new javax.swing.JComboBox<>();
+      ruleFlagsAidLabel = new javax.swing.JLabel();
+      ruleFlagsAidComboBox = new javax.swing.JComboBox<>();
+      scrollPane = new javax.swing.JScrollPane();
+      table = new javax.swing.JTable();
+      inputScrollPane = new javax.swing.JScrollPane();
+      inputTextArea = new javax.swing.JTextArea();
+      loadInputButton = new javax.swing.JButton();
       openAidButton = new javax.swing.JButton();
       openAffButton = new javax.swing.JButton();
       openDicButton = new javax.swing.JButton();
 
-      cmpInputLabel.setText("Compound rule:");
+      inputLabel.setText("Compound rule:");
 
-      cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
-      cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter(){
+      inputComboBox.setEditable(true);
+      inputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      inputComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter(){
          @Override
          public void keyReleased(final KeyEvent evt){
             cmpInputComboBoxKeyReleased();
          }
       });
-      cmpInputComboBox.addItemListener(new ItemListener(){
+      inputComboBox.addItemListener(new ItemListener(){
          @Override
          public void itemStateChanged(final ItemEvent evt){
             cmpInputComboBoxKeyReleased();
          }
       });
 
-      cmpLimitLabel.setText("Limit:");
+      limitLabel.setText("Limit:");
 
-      cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
+      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
+      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLimitComboBoxActionPerformed(evt);
+            limitComboBoxActionPerformed(evt);
          }
       });
 
-      cmpRuleFlagsAidLabel.setText("Rule flags aid:");
+      ruleFlagsAidLabel.setText("Rule flags aid:");
 
-      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      ruleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
 
-      cmpTable.setModel(new CompoundTableModel());
-      cmpTable.setShowHorizontalLines(false);
-      cmpTable.setShowVerticalLines(false);
+      table.setModel(new CompoundTableModel());
+      table.setShowHorizontalLines(false);
+      table.setShowVerticalLines(false);
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
-      cmpTable.setRowSelectionAllowed(true);
-      cmpScrollPane.setViewportView(cmpTable);
+      table.setRowSelectionAllowed(true);
+      scrollPane.setViewportView(table);
 
-      cmpInputTextArea.setEditable(false);
-      cmpInputTextArea.setColumns(20);
-      cmpInputScrollPane.setViewportView(cmpInputTextArea);
+      inputTextArea.setEditable(false);
+      inputTextArea.setColumns(20);
+      inputScrollPane.setViewportView(inputTextArea);
 
-      cmpLoadInputButton.setText("Load input from dictionary");
-      cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
+      loadInputButton.setText("Load input from dictionary");
+      loadInputButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLoadInputButtonActionPerformed(evt);
+            loadInputButtonActionPerformed(evt);
          }
       });
 
@@ -160,15 +160,15 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       openDicButton.setText("Open Dictionary");
       openDicButton.setEnabled(false);
 
-      setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpLimitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpLimitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpInputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(ruleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(ruleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(inputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(loadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -182,26 +182,26 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addGroup(layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputLabel)
-                     .addComponent(cmpRuleFlagsAidLabel))
+                     .addComponent(inputLabel)
+                     .addComponent(ruleFlagsAidLabel))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addComponent(ruleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                      .addGroup(layout.createSequentialGroup()
-                        .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(inputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(cmpLimitLabel)
+                        .addComponent(limitLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputScrollPane)
+                     .addComponent(inputScrollPane)
                      .addGroup(layout.createSequentialGroup()
-                        .addComponent(cmpLoadInputButton)
+                        .addComponent(loadInputButton)
                         .addGap(0, 0, Short.MAX_VALUE)))
                   .addGap(18, 18, 18)
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)
+                     .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)
                      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(openAidButton)
                         .addGap(18, 18, 18)
@@ -215,21 +215,21 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpInputLabel)
-               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitLabel))
+               .addComponent(inputLabel)
+               .addComponent(inputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(limitLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpRuleFlagsAidLabel))
+               .addComponent(ruleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(ruleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-               .addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-               .addComponent(cmpInputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
+               .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+               .addComponent(inputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpLoadInputButton)
+               .addComponent(loadInputButton)
                .addComponent(openAffButton)
                .addComponent(openDicButton)
                .addComponent(openAidButton))
@@ -242,10 +242,10 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		workerManager.checkForAbortion();
 	}
 
-   private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
-      final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
-      final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
-      final String inputCompounds = cmpInputTextArea.getText();
+   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
+      final String inputText = StringUtils.strip((String)inputComboBox.getEditor().getItem());
+      final int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
+      final String inputCompounds = inputTextArea.getText();
 
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
@@ -262,7 +262,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
                limit);
 
-            final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
+            final CompoundTableModel dm = (CompoundTableModel)table.getModel();
             dm.setProductions(words);
          }
          catch(final Exception e){
@@ -270,20 +270,20 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          }
       }
       else
-      clearOutputTable(cmpTable);
-   }//GEN-LAST:event_cmpLimitComboBoxActionPerformed
+      clearOutputTable(table);
+   }//GEN-LAST:event_limitComboBoxActionPerformed
 
-   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+   private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
       final AffixParser affParser = parserManager.getAffParser();
       final FlagParsingStrategy strategy = affParser.getAffixData()
       .getFlagParsingStrategy();
       workerManager.createCompoundRulesWorker(
          worker -> {
-            cmpInputComboBox.setEnabled(false);
-            cmpLimitComboBox.setEnabled(false);
-            cmpInputTextArea.setEnabled(false);
-            cmpInputTextArea.setText(null);
-            cmpLoadInputButton.setEnabled(false);
+            inputComboBox.setEnabled(false);
+            limitComboBox.setEnabled(false);
+            inputTextArea.setEnabled(false);
+            inputTextArea.setText(null);
+            loadInputButton.setEnabled(false);
 
             worker.addPropertyChangeListener(propertyChangeListener);
             worker.execute();
@@ -291,18 +291,18 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          compounds -> {
             final StringJoiner sj = new StringJoiner("\n");
             compounds.forEach(compound -> sj.add(compound.toString(strategy)));
-            cmpInputTextArea.setText(sj.toString());
-            cmpInputTextArea.setCaretPosition(0);
+            inputTextArea.setText(sj.toString());
+            inputTextArea.setCaretPosition(0);
          },
          worker -> {
-            cmpInputComboBox.setEnabled(true);
-            cmpLimitComboBox.setEnabled(true);
-            cmpInputTextArea.setEnabled(true);
+            inputComboBox.setEnabled(true);
+            limitComboBox.setEnabled(true);
+            inputTextArea.setEnabled(true);
             if(worker.isCancelled())
-            cmpLoadInputButton.setEnabled(true);
+            loadInputButton.setEnabled(true);
          }
       );
-   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
+   }//GEN-LAST:event_loadInputButtonActionPerformed
 
 	private void cmpInputComboBoxKeyReleased(){
 		debouncer.call(this);
@@ -315,7 +315,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(cmpTable, comparator, comparatorAffix);
+		addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();
@@ -324,13 +324,13 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 			//affix file:
 			if(!compoundRules.isEmpty()){
-				cmpInputComboBox.removeAllItems();
-				compoundRules.forEach(cmpInputComboBox::addItem);
+				inputComboBox.removeAllItems();
+				compoundRules.forEach(inputComboBox::addItem);
 				final String compoundFlag = affixData.getCompoundFlag();
 				if(compoundFlag != null)
-					cmpInputComboBox.addItem(compoundFlag);
-				cmpInputComboBox.setEnabled(true);
-				cmpInputComboBox.setSelectedItem(null);
+					inputComboBox.addItem(compoundFlag);
+				inputComboBox.setEnabled(true);
+				inputComboBox.setSelectedItem(null);
 			}
 			openAffButton.setEnabled(packager.getAffixFile() != null);
 			openDicButton.setEnabled(packager.getDictionaryFile() != null);
@@ -339,11 +339,11 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			final boolean aidLinesPresent = !lines.isEmpty();
-			cmpRuleFlagsAidComboBox.removeAllItems();
+			ruleFlagsAidComboBox.removeAllItems();
 			if(aidLinesPresent)
-				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
+				lines.forEach(ruleFlagsAidComboBox::addItem);
 			//enable combo-box only if an AID file exists
-			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
 		catch(final IndexOutOfBoundsException e){
@@ -370,28 +370,28 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
-		cmpInputTextArea.setFont(currentFont);
-		cmpTable.setFont(currentFont);
+		inputTextArea.setFont(currentFont);
+		table.setFont(currentFont);
 	}
 
 	public void clear(){
 		formerCompoundInputText = null;
 
-		cmpInputTextArea.setText(null);
-		cmpInputTextArea.setEnabled(true);
-		cmpLoadInputButton.setEnabled(true);
+		inputTextArea.setText(null);
+		inputTextArea.setEnabled(true);
+		loadInputButton.setEnabled(true);
 
 		//affix file:
-		cmpInputComboBox.removeAllItems();
-		cmpInputComboBox.setEnabled(true);
+		inputComboBox.removeAllItems();
+		inputComboBox.setEnabled(true);
 
 		clearAid();
 	}
 
 	public void clearAid(){
-		cmpRuleFlagsAidComboBox.removeAllItems();
+		ruleFlagsAidComboBox.removeAllItems();
 		//enable combo-box only if an AID file exists
-		cmpRuleFlagsAidComboBox.setEnabled(false);
+		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
 	private void clearOutputTable(final JTable table){
@@ -400,15 +400,15 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	private void calculateCompoundProductions(){
-		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
+		final String inputText = StringUtils.strip((String)inputComboBox.getEditor().getItem());
 
-		cmpLimitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
+		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
 		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
 			return;
 		formerCompoundInputText = inputText;
 
-		cmpLimitComboBoxActionPerformed(null);
+		limitComboBoxActionPerformed(null);
 	}
 
 
@@ -424,19 +424,19 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JComboBox<String> cmpInputComboBox;
-   private javax.swing.JLabel cmpInputLabel;
-   private javax.swing.JScrollPane cmpInputScrollPane;
-   private javax.swing.JTextArea cmpInputTextArea;
-   private javax.swing.JComboBox<String> cmpLimitComboBox;
-   private javax.swing.JLabel cmpLimitLabel;
-   private javax.swing.JButton cmpLoadInputButton;
-   private javax.swing.JComboBox<String> cmpRuleFlagsAidComboBox;
-   private javax.swing.JLabel cmpRuleFlagsAidLabel;
-   private javax.swing.JScrollPane cmpScrollPane;
-   private javax.swing.JTable cmpTable;
+   private javax.swing.JComboBox<String> inputComboBox;
+   private javax.swing.JLabel inputLabel;
+   private javax.swing.JScrollPane inputScrollPane;
+   private javax.swing.JTextArea inputTextArea;
+   private javax.swing.JComboBox<String> limitComboBox;
+   private javax.swing.JLabel limitLabel;
+   private javax.swing.JButton loadInputButton;
    private javax.swing.JButton openAffButton;
    private javax.swing.JButton openAidButton;
    private javax.swing.JButton openDicButton;
+   private javax.swing.JComboBox<String> ruleFlagsAidComboBox;
+   private javax.swing.JLabel ruleFlagsAidLabel;
+   private javax.swing.JScrollPane scrollPane;
+   private javax.swing.JTable table;
    // End of variables declaration//GEN-END:variables
 }

@@ -20,39 +20,39 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="hypWordLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="wordLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypWordTextField" max="32767" attributes="0"/>
+                      <Component id="wordTextField" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="hypSyllabationLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="syllabationLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypSyllabationOutputLabel" min="-2" pref="845" max="-2" attributes="0"/>
+                      <Component id="syllabationValueLabel" min="-2" pref="845" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="hypAddRuleLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="addRuleLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypAddRuleTextField" max="32767" attributes="0"/>
+                      <Component id="addRuleTextField" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="hypAddRuleLevelComboBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="addRuleLevelComboBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="hypAddRuleButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="addRuleButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="hypAddRuleSyllabesCountLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="addRuleSyllabesCountLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypAddRuleSyllabesCountOutputLabel" max="32767" attributes="0"/>
+                      <Component id="addRuleSyllabesCountValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="hypAddRuleSyllabationLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="addRuleSyllabationLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypAddRuleSyllabationOutputLabel" max="32767" attributes="0"/>
+                      <Component id="addRuleSyllabationValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="hypRulesLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="rulesLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypRulesOutputLabel" max="32767" attributes="0"/>
+                      <Component id="rulesValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="optionsButton" min="-2" max="-2" attributes="0"/>
@@ -60,9 +60,9 @@
                       <Component id="openHypButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="hypSyllabesCountLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="syllabesCountLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="hypSyllabesCountOutputLabel" max="32767" attributes="0"/>
+                      <Component id="syllabesCountValueLabel" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -74,40 +74,40 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypWordLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypWordTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="wordLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="wordTextField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypSyllabationLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypSyllabationOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabationLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabationValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="hypSyllabesCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypSyllabesCountOutputLabel" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
+                  <Component id="syllabesCountLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabesCountValueLabel" alignment="0" min="-2" pref="14" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypRulesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypRulesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="rulesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="rulesValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypAddRuleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypAddRuleTextField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypAddRuleButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypAddRuleLevelComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleLevelComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypAddRuleSyllabationLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypAddRuleSyllabationOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleSyllabationLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleSyllabationValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="hypAddRuleSyllabesCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hypAddRuleSyllabesCountOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleSyllabesCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addRuleSyllabesCountValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="48" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -120,17 +120,17 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="hypWordLabel">
+    <Component class="javax.swing.JLabel" name="wordLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Word:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="hypWordTextField">
+    <Component class="javax.swing.JTextField" name="wordTextField">
       <Events>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="hypWordTextFieldKeyReleased"/>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="wordTextFieldKeyReleased"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypSyllabationLabel">
+    <Component class="javax.swing.JLabel" name="syllabationLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Syllabation:"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -138,7 +138,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypSyllabationOutputLabel">
+    <Component class="javax.swing.JLabel" name="syllabationValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -146,17 +146,17 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypSyllabesCountLabel">
+    <Component class="javax.swing.JLabel" name="syllabesCountLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Syllabes:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypSyllabesCountOutputLabel">
+    <Component class="javax.swing.JLabel" name="syllabesCountValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypRulesLabel">
+    <Component class="javax.swing.JLabel" name="rulesLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Rules:"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -164,7 +164,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
+    <Component class="javax.swing.JLabel" name="rulesValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -172,20 +172,20 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypAddRuleLabel">
+    <Component class="javax.swing.JLabel" name="addRuleLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Add rule:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="hypAddRuleTextField">
+    <Component class="javax.swing.JTextField" name="addRuleTextField">
       <Properties>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="hypAddRuleTextFieldKeyReleased"/>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="addRuleTextFieldKeyReleased"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JComboBox" name="hypAddRuleLevelComboBox">
+    <Component class="javax.swing.JComboBox" name="addRuleLevelComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
@@ -196,23 +196,23 @@
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hypAddRuleLevelComboBoxActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addRuleLevelComboBoxActionPerformed"/>
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
     </Component>
-    <Component class="javax.swing.JButton" name="hypAddRuleButton">
+    <Component class="javax.swing.JButton" name="addRuleButton">
       <Properties>
         <Property name="mnemonic" type="int" value="65"/>
         <Property name="text" type="java.lang.String" value="Add rule"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hypAddRuleButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addRuleButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationLabel">
+    <Component class="javax.swing.JLabel" name="addRuleSyllabationLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="New syllabation:"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -220,7 +220,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypAddRuleSyllabationOutputLabel">
+    <Component class="javax.swing.JLabel" name="addRuleSyllabationValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -228,12 +228,12 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountLabel">
+    <Component class="javax.swing.JLabel" name="addRuleSyllabesCountLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="New syllabes:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="hypAddRuleSyllabesCountOutputLabel">
+    <Component class="javax.swing.JLabel" name="addRuleSyllabesCountValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>

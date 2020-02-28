@@ -73,22 +73,22 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(acoTable, acoIncorrectTextField, acoCorrectTextField);
+		GUIUtils.addFontableProperty(table, incorrectTextField, correctTextField);
 
-		GUIUtils.addUndoManager(acoIncorrectTextField, acoCorrectTextField);
+		GUIUtils.addUndoManager(incorrectTextField, correctTextField);
 	}
 
-	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      acoIncorrectLabel = new javax.swing.JLabel();
-      acoIncorrectTextField = new javax.swing.JTextField();
-      acoToLabel = new javax.swing.JLabel();
-      acoCorrectLabel = new javax.swing.JLabel();
-      acoCorrectTextField = new javax.swing.JTextField();
-      acoAddButton = new javax.swing.JButton();
-      acoScrollPane = new javax.swing.JScrollPane();
-      acoTable = new JCopyableTable(){
+      incorrectLabel = new javax.swing.JLabel();
+      incorrectTextField = new javax.swing.JTextField();
+      toLabel = new javax.swing.JLabel();
+      correctLabel = new javax.swing.JLabel();
+      correctTextField = new javax.swing.JTextField();
+      addButton = new javax.swing.JButton();
+      scrollPane = new javax.swing.JScrollPane();
+      table = new JCopyableTable(){
          @Override
          public String getValueAtRow(final int row){
             final TableModel model = getModel();
@@ -97,54 +97,54 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             return incorrect + " > " + correct;
          }
       };
-      acoCorrectionsRecordedLabel = new javax.swing.JLabel();
-      acoCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
+      correctionsRecordedLabel = new javax.swing.JLabel();
+      correctionsRecordedValueLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
 
-      acoIncorrectLabel.setText("Incorrect form:");
+      incorrectLabel.setText("Incorrect form:");
 
-      acoIncorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+      incorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoIncorrectTextFieldKeyReleased(evt);
+            incorrectTextFieldKeyReleased(evt);
          }
       });
 
-      acoToLabel.setText("→");
+      toLabel.setText("→");
 
-      acoCorrectLabel.setText("Correct form:");
+      correctLabel.setText("Correct form:");
 
-      acoCorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+      correctTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
-            acoCorrectTextFieldKeyReleased(evt);
+            correctTextFieldKeyReleased(evt);
          }
       });
 
-      acoAddButton.setMnemonic('A');
-      acoAddButton.setText("Add");
-      acoAddButton.setEnabled(false);
-      acoAddButton.addActionListener(new java.awt.event.ActionListener() {
+      addButton.setMnemonic('A');
+      addButton.setText("Add");
+      addButton.setEnabled(false);
+      addButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            acoAddButtonActionPerformed(evt);
+            addButtonActionPerformed(evt);
          }
       });
 
-      acoTable.setModel(new AutoCorrectTableModel());
-      acoTable.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)acoTable.getModel()));
-      acoTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      acoTable.setShowHorizontalLines(false);
-      acoTable.setShowVerticalLines(false);
+      table.setModel(new AutoCorrectTableModel());
+      table.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)table.getModel()));
+      table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+      table.setShowHorizontalLines(false);
+      table.setShowVerticalLines(false);
       //listen for row removal
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      acoTable.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      acoTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)acoTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
-      acoTable.addMouseListener(new MouseAdapter(){
+      table.addMouseListener(new MouseAdapter(){
          public void mouseClicked(final MouseEvent e){
             if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
-               final int selectedRow = acoTable.rowAtPoint(e.getPoint());
-               acoTable.setRowSelectionInterval(selectedRow, selectedRow);
-               final int row = acoTable.convertRowIndexToModel(selectedRow);
+               final int selectedRow = table.rowAtPoint(e.getPoint());
+               table.setRowSelectionInterval(selectedRow, selectedRow);
+               final int row = table.convertRowIndexToModel(selectedRow);
                final BiConsumer<String, String> okButtonAction = (incorrect, correct) -> {
                   try{
                      parserManager.getAcoParser().setCorrection(row, incorrect, correct);
@@ -162,7 +162,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                dialog.addWindowListener(new WindowAdapter(){
                   @Override
                   public void windowClosed(final WindowEvent e){
-                     acoTable.clearSelection();
+                     table.clearSelection();
                   }
                });
                dialog.setLocationRelativeTo(parentFrame);
@@ -172,26 +172,26 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       });
 
       TableRenderer acoCellRenderer = new TableRenderer();
-      acoTable.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
-      acoScrollPane.setViewportView(acoTable);
+      table.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
+      scrollPane.setViewportView(table);
 
-      acoCorrectionsRecordedLabel.setText("Corrections recorded:");
+      correctionsRecordedLabel.setText("Corrections recorded:");
 
-      acoCorrectionsRecordedOutputLabel.setText("…");
+      correctionsRecordedValueLabel.setText("…");
 
       openAcoButton.setAction(new OpenFileAction(Packager.KEY_FILE_AUTO_CORRECT, packager));
       openAcoButton.setText("Open AutoCorrect");
       openAcoButton.setEnabled(false);
 
-      setLayer(acoIncorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoIncorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoToLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoCorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoCorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(acoCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(incorrectLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(incorrectTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(toLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(addButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -201,23 +201,23 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(acoScrollPane)
+               .addComponent(scrollPane)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(acoIncorrectLabel)
+                  .addComponent(incorrectLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(incorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(acoToLabel)
+                  .addComponent(toLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(acoCorrectLabel)
+                  .addComponent(correctLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addComponent(correctTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
-                  .addComponent(acoAddButton))
+                  .addComponent(addButton))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(acoCorrectionsRecordedLabel)
+                  .addComponent(correctionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(correctionsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(openAcoButton)))
             .addContainerGap())
@@ -227,36 +227,36 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoIncorrectLabel)
-               .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoCorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(acoAddButton)
-               .addComponent(acoToLabel)
-               .addComponent(acoCorrectLabel))
+               .addComponent(incorrectLabel)
+               .addComponent(incorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(correctTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(addButton)
+               .addComponent(toLabel)
+               .addComponent(correctLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(acoScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(acoCorrectionsRecordedLabel)
-               .addComponent(acoCorrectionsRecordedOutputLabel)
+               .addComponent(correctionsRecordedLabel)
+               .addComponent(correctionsRecordedValueLabel)
                .addComponent(openAcoButton))
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
+   private void incorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_incorrectTextFieldKeyReleased
 		debouncer.call(this);
-   }//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
+   }//GEN-LAST:event_incorrectTextFieldKeyReleased
 
-   private void acoCorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoCorrectTextFieldKeyReleased
+   private void correctTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correctTextFieldKeyReleased
 		debouncer.call(this);
-   }//GEN-LAST:event_acoCorrectTextFieldKeyReleased
+   }//GEN-LAST:event_correctTextFieldKeyReleased
 
-   private void acoAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acoAddButtonActionPerformed
+   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the correction
-         final String incorrect = acoIncorrectTextField.getText();
-         final String correct = acoCorrectTextField.getText();
+         final String incorrect = incorrectTextField.getText();
+         final String correct = correctTextField.getText();
          final Supplier<Boolean> duplicatesDiscriminator = () -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Duplicate detected",
@@ -267,17 +267,17 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          .insertCorrection(incorrect, correct, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
-            final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+            final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
             dm.fireTableDataChanged();
 
             formerFilterIncorrectText = null;
             formerFilterCorrectText = null;
-            acoIncorrectTextField.setText(null);
-            acoCorrectTextField.setText(null);
-            acoAddButton.setEnabled(false);
-            acoIncorrectTextField.requestFocusInWindow();
+            incorrectTextField.setText(null);
+            correctTextField.setText(null);
+            addButton.setEnabled(false);
+            incorrectTextField.requestFocusInWindow();
             @SuppressWarnings("unchecked")
-            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
+            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateAutoCorrectionsCounter();
@@ -286,7 +286,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             parserManager.storeAutoCorrectFile();
          }
          else{
-            acoIncorrectTextField.requestFocusInWindow();
+            incorrectTextField.requestFocusInWindow();
 
             final String duplicatedWords = duplicationResult.getDuplicates().stream()
             .map(CorrectionEntry::toString)
@@ -297,16 +297,16 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       catch(final Exception e){
          LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
-   }//GEN-LAST:event_acoAddButtonActionPerformed
+   }//GEN-LAST:event_addButtonActionPerformed
 
 	public void initialize(){
 		if(parserManager.getAcoParser().getCorrectionsCounter() > 0){
 			final String language = parserManager.getAffixData().getLanguage();
 			final Comparator<String> comparator = Comparator.comparingInt(String::length)
 				.thenComparing(BaseBuilder.getComparator(language));
-			addSorterToTable(acoTable, comparator, null);
+			addSorterToTable(table, comparator, null);
 
-			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+			final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 			dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
 			updateAutoCorrectionsCounter();
 		}
@@ -328,9 +328,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
-		acoIncorrectTextField.setFont(currentFont);
-		acoCorrectTextField.setFont(currentFont);
-		acoTable.setFont(currentFont);
+		incorrectTextField.setFont(currentFont);
+		correctTextField.setFont(currentFont);
+		table.setFont(currentFont);
 	}
 
 	public void clear(){
@@ -339,17 +339,17 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		openAcoButton.setEnabled(false);
 		//noinspection unchecked
-		((TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter()).setRowFilter(null);
-		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+		((TableRowSorter<AutoCorrectTableModel>)table.getRowSorter()).setRowFilter(null);
+		final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 		dm.setCorrections(null);
 	}
 
 	public void removeSelectedRowsFromAutoCorrect(){
 		try{
-			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
+			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 			parserManager.getAcoParser().deleteCorrection(selectedRow);
 
-			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
+			final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 			dm.fireTableDataChanged();
 
 			updateAutoCorrectionsCounter();
@@ -363,8 +363,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	private void filterAutoCorrect(){
-		final String unmodifiedIncorrectText = StringUtils.strip(acoIncorrectTextField.getText());
-		final String unmodifiedCorrectText = StringUtils.strip(acoCorrectTextField.getText());
+		final String unmodifiedIncorrectText = StringUtils.strip(incorrectTextField.getText());
+		final String unmodifiedCorrectText = StringUtils.strip(correctTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
 			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
@@ -378,11 +378,11 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		final String correct = pair.getRight();
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getAcoParser().contains(incorrect, correct);
-		acoAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
+		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedIncorrectText) && StringUtils.isNotBlank(unmodifiedCorrectText)
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
 		@SuppressWarnings("unchecked")
-		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
+		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText)){
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
@@ -395,7 +395,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	private void updateAutoCorrectionsCounter(){
-		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
+		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
 
@@ -411,16 +411,16 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JButton acoAddButton;
-   private javax.swing.JLabel acoCorrectLabel;
-   private javax.swing.JTextField acoCorrectTextField;
-   private javax.swing.JLabel acoCorrectionsRecordedLabel;
-   private javax.swing.JLabel acoCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel acoIncorrectLabel;
-   private javax.swing.JTextField acoIncorrectTextField;
-   private javax.swing.JScrollPane acoScrollPane;
-   private javax.swing.JTable acoTable;
-   private javax.swing.JLabel acoToLabel;
+   private javax.swing.JButton addButton;
+   private javax.swing.JLabel correctLabel;
+   private javax.swing.JTextField correctTextField;
+   private javax.swing.JLabel correctionsRecordedLabel;
+   private javax.swing.JLabel correctionsRecordedValueLabel;
+   private javax.swing.JLabel incorrectLabel;
+   private javax.swing.JTextField incorrectTextField;
    private javax.swing.JButton openAcoButton;
+   private javax.swing.JScrollPane scrollPane;
+   private javax.swing.JTable table;
+   private javax.swing.JLabel toLabel;
    // End of variables declaration//GEN-END:variables
 }

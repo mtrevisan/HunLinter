@@ -29,48 +29,48 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="totalWordsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="totalWordsOutputLabel" max="32767" attributes="0"/>
+                      <Component id="totalWordsValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Component id="mainTabbedPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="lengthsModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lengthsModeOutputLabel" max="32767" attributes="0"/>
+                      <Component id="lengthsModeValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="syllabeLengthsModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="syllabeLengthsModeOutputLabel" max="32767" attributes="0"/>
+                      <Component id="syllabeLengthsModeValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="mostCommonSyllabesLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="mostCommonSyllabesOutputLabel" max="32767" attributes="0"/>
+                      <Component id="mostCommonSyllabesValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="longestWordSyllabesLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="longestWordSyllabesOutputLabel" max="32767" attributes="0"/>
+                      <Component id="longestWordSyllabesValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="uniqueWordsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="uniqueWordsOutputLabel" max="32767" attributes="0"/>
+                      <Component id="uniqueWordsValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="compoundWordsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="compoundWordsOutputLabel" max="32767" attributes="0"/>
+                      <Component id="compoundWordsValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="longestWordCharactersLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="longestWordCharactersOutputLabel" max="32767" attributes="0"/>
+                      <Component id="longestWordCharactersValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="contractedWordsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="contractedWordsOutputLabel" max="32767" attributes="0"/>
+                      <Component id="contractedWordsValueLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -88,47 +88,47 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="totalWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="totalWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalWordsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="uniqueWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="uniqueWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uniqueWordsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="compoundWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="compoundWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="compoundWordsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="contractedWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="contractedWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="contractedWordsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lengthsModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lengthsModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lengthsModeValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="syllabeLengthsModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="syllabeLengthsModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabeLengthsModeValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="mostCommonSyllabesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="mostCommonSyllabesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="mostCommonSyllabesValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="longestWordCharactersLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="longestWordCharactersOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="longestWordCharactersValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="longestWordSyllabesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="longestWordSyllabesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="longestWordSyllabesValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
@@ -143,12 +143,12 @@
     <Component class="javax.swing.JLabel" name="totalWordsLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="totalWordsOutputLabel"/>
+          <ComponentRef name="totalWordsValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Total words:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="totalWordsOutputLabel">
+    <Component class="javax.swing.JLabel" name="totalWordsValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -156,12 +156,12 @@
     <Component class="javax.swing.JLabel" name="uniqueWordsLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="uniqueWordsOutputLabel"/>
+          <ComponentRef name="uniqueWordsValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Unique words:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="uniqueWordsOutputLabel">
+    <Component class="javax.swing.JLabel" name="uniqueWordsValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -171,7 +171,7 @@
         <Property name="text" type="java.lang.String" value="Compound words:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="compoundWordsOutputLabel">
+    <Component class="javax.swing.JLabel" name="compoundWordsValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -181,7 +181,7 @@
         <Property name="text" type="java.lang.String" value="Contracted words:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="contractedWordsOutputLabel">
+    <Component class="javax.swing.JLabel" name="contractedWordsValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -189,12 +189,12 @@
     <Component class="javax.swing.JLabel" name="lengthsModeLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="lengthsModeOutputLabel"/>
+          <ComponentRef name="lengthsModeValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Mode of words&#x2bc; length:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lengthsModeOutputLabel">
+    <Component class="javax.swing.JLabel" name="lengthsModeValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -202,12 +202,12 @@
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="syllabeLengthsModeOutputLabel"/>
+          <ComponentRef name="syllabeLengthsModeValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Mode of words&#x2bc; syllabe:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="syllabeLengthsModeOutputLabel">
+    <Component class="javax.swing.JLabel" name="syllabeLengthsModeValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
@@ -215,7 +215,7 @@
     <Component class="javax.swing.JLabel" name="mostCommonSyllabesLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="mostCommonSyllabesOutputLabel"/>
+          <ComponentRef name="mostCommonSyllabesValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Most common syllabes:"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -223,7 +223,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
+    <Component class="javax.swing.JLabel" name="mostCommonSyllabesValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -234,7 +234,7 @@
     <Component class="javax.swing.JLabel" name="longestWordCharactersLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="longestWordCharactersOutputLabel"/>
+          <ComponentRef name="longestWordCharactersValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Longest word(s) (by characters):"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -242,7 +242,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
+    <Component class="javax.swing.JLabel" name="longestWordCharactersValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -253,7 +253,7 @@
     <Component class="javax.swing.JLabel" name="longestWordSyllabesLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="longestWordSyllabesOutputLabel"/>
+          <ComponentRef name="longestWordSyllabesValueLabel"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Longest word(s) (by syllabes):"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -262,7 +262,7 @@
         <Property name="requestFocusEnabled" type="boolean" value="false"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
+    <Component class="javax.swing.JLabel" name="longestWordSyllabesValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

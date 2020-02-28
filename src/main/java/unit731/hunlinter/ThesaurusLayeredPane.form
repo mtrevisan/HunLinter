@@ -19,18 +19,18 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="theScrollPane" alignment="0" pref="909" max="32767" attributes="0"/>
+                  <Component id="scrollPane" alignment="0" pref="909" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="theSynonymsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="synonymsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="theSynonymsTextField" max="32767" attributes="0"/>
+                      <Component id="synonymsTextField" max="32767" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="theAddButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="addButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="theSynonymsRecordedLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="synonymsRecordedLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="theSynonymsRecordedOutputLabel" pref="805" max="32767" attributes="0"/>
+                      <Component id="synonymsRecordedValueLabel" pref="805" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -42,16 +42,16 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="theSynonymsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="theSynonymsTextField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="theAddButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="synonymsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="synonymsTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="theScrollPane" pref="197" max="32767" attributes="0"/>
+              <Component id="scrollPane" pref="197" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="theSynonymsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="theSynonymsRecordedOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="synonymsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="synonymsRecordedValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -59,41 +59,41 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="theSynonymsLabel">
+    <Component class="javax.swing.JLabel" name="synonymsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="New definition:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="theSynonymsTextField">
+    <Component class="javax.swing.JTextField" name="synonymsTextField">
       <Events>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="theSynonymsTextFieldKeyReleased"/>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="synonymsTextFieldKeyReleased"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="theAddButton">
+    <Component class="javax.swing.JButton" name="addButton">
       <Properties>
         <Property name="mnemonic" type="int" value="65"/>
         <Property name="text" type="java.lang.String" value="Add"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="theAddButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addButtonActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="theScrollPane">
+    <Container class="javax.swing.JScrollPane" name="scrollPane">
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTable" name="theTable">
+        <Component class="javax.swing.JTable" name="table">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new ThesaurusTableModel()" type="code"/>
             </Property>
             <Property name="autoResizeMode" type="int" value="3"/>
             <Property name="rowSorter" type="javax.swing.RowSorter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new TableRowSorter&lt;&gt;((ThesaurusTableModel)theTable.getModel())" type="code"/>
+              <Connection code="new TableRowSorter&lt;&gt;((ThesaurusTableModel)table.getModel())" type="code"/>
             </Property>
             <Property name="selectionMode" type="int" value="0"/>
             <Property name="showHorizontalLines" type="boolean" value="false"/>
@@ -101,17 +101,17 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String definition = (String)model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String synonyms = (String)model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);&#xd;&#xa;&#x9;&#x9;return Arrays.stream(synonymsByDefinition)&#xd;&#xa;&#x9;&#x9;&#x9;.map(GUIUtils::removeHTMLCode)&#xd;&#xa;&#x9;&#x9;&#x9;.map(syns -&gt; definition + &quot;: &quot; + syns)&#xd;&#xa;&#x9;&#x9;&#x9;.collect(Collectors.joining(&quot;\r\n&quot;));&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="table.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;table.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);&#xd;&#xa;table.registerKeyboardAction(event -&gt; removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;table.registerKeyboardAction(event -&gt; GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
           </AuxValues>
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="theSynonymsRecordedLabel">
+    <Component class="javax.swing.JLabel" name="synonymsRecordedLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Synonyms recorded:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="theSynonymsRecordedOutputLabel">
+    <Component class="javax.swing.JLabel" name="synonymsRecordedValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
