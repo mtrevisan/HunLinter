@@ -76,15 +76,15 @@ public class ThesaurusParser{
 
 			FileHelper.readCharset(line);
 
-			while((line = br.readLine()) != null)
-				if(!line.isEmpty()){
-					final boolean added = dictionary.add(new ThesaurusEntry(line, br));
-					if(!added)
-						throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
-				}
+			while((line = br.readLine()) != null){
+				if(line.isEmpty())
+					continue;
+
+				final boolean added = dictionary.add(new ThesaurusEntry(line, br));
+				if(!added)
+					throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
+			}
 		}
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
-//6 035 792 B
 	}
 
 	private String extractLine(final LineNumberReader br) throws IOException{

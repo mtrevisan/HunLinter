@@ -42,7 +42,6 @@ import unit731.hunlinter.services.PatternHelper;
  */
 public class HyphenationParser{
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Hyphenation data file malformed, cannot determine charset for ''{0}''");
 	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
 	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
 	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
@@ -219,11 +218,11 @@ public class HyphenationParser{
 					line = convertUnicode(line);
 
 				if(isCustomRule(line))
-					parseCustomRule(level, line);
+					parseCustomRule(line, level);
 				else{
 					validateRule(line, level);
 
-					parseCommonRule(level, line);
+					parseCommonRule(line, level);
 				}
 			}
 
@@ -261,7 +260,7 @@ public class HyphenationParser{
 		return StringUtils.join(components);
 	}
 
-	private void parseCustomRule(final Level level, final String line){
+	private void parseCustomRule(final String line, final Level level){
 		final String key = PatternHelper.clear(line, PATTERN_EQUALS);
 		if(customHyphenations.get(level).containsKey(key))
 			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
@@ -269,7 +268,7 @@ public class HyphenationParser{
 		customHyphenations.get(level).put(key, line);
 	}
 
-	private void parseCommonRule(final Level level, final String line){
+	private void parseCommonRule(final String line, final Level level){
 		final String key = getKeyFromData(line);
 		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 		if(duplicatedRule)
@@ -349,8 +348,8 @@ public class HyphenationParser{
 	/**
 	 * NOTE: Calling the method {@link unit731.hunlinter.languages.Orthography#correctOrthography(String)} may be necessary
 	 *
-	 * @param rule	The rule to add
-	 * @param level	Level to add the rule to
+	 * @param rule   The rule to add
+	 * @param level   Level to add the rule to
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(final String rule, final Level level){
@@ -409,8 +408,8 @@ public class HyphenationParser{
 	/**
 	 * Line must contains exactly one hyphenation point
 	 *
-	 * @param rule	Rule to be validated
-	 * @param level	Level to add the rule to
+	 * @param rule   Rule to be validated
+	 * @param level   Level to add the rule to
 	 */
 	public static void validateRule(final String rule, final Level level){
 		validateBasicRules(rule);
