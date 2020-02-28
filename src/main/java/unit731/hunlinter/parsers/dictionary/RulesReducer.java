@@ -213,26 +213,7 @@ public class RulesReducer{
 				//order keys from longer to shorter
 				final List<String> keys = new ArrayList<>(lcss.keySet());
 				keys.sort(Comparator.comparingInt(String::length).reversed());
-
-				//add each key, remove the list from the addition
-				final List<String> additionsToBeRemoved = new ArrayList<>();
-				for(final String key : keys){
-					final int keyLength = key.length();
-					final String condition = rule.condition.substring(keyLength);
-					if(condition.isEmpty())
-						break;
-
-					final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
-					final Set<String> addition = lcss.get(key).stream()
-						.map(add -> add.substring(keyLength))
-						.collect(Collectors.toSet());
-					final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
-					if(rules.contains(newEntry)){
-						temporaryRules.add(newEntry);
-
-						additionsToBeRemoved.addAll(lcss.get(key));
-					}
-				}
+				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
 				temporaryRules.forEach(temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule));
 				rule.addition.removeAll(additionsToBeRemoved);
@@ -245,6 +226,31 @@ public class RulesReducer{
 		}
 
 		return disjointedRules;
+	}
+
+	//add each key, remove the list from the addition
+	private List<String> retrieveAdditionsToBeRemoved(final List<LineEntry> rules, final LineEntry rule, final List<LineEntry> temporaryRules,
+			final Map<String, List<String>> lcss, final List<String> keys){
+		final List<String> additionsToBeRemoved = new ArrayList<>();
+		for(final String key : keys){
+			final int keyLength = key.length();
+			final String condition = rule.condition.substring(keyLength);
+			if(condition.isEmpty())
+				break;
+
+			final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
+			final List<String> list = lcss.get(key);
+			final Set<String> addition = list.stream()
+				.map(add -> add.substring(keyLength))
+				.collect(Collectors.toSet());
+			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
+			if(rules.contains(newEntry)){
+				temporaryRules.add(newEntry);
+
+				additionsToBeRemoved.addAll(list);
+			}
+		}
+		return additionsToBeRemoved;
 	}
 
 	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
