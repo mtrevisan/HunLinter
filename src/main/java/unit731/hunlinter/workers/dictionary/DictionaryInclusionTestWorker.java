@@ -56,12 +56,12 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		final Consumer<Exception> canceled = exception -> dictionary.close();
+		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed)
-			.withDataCanceledCallback(canceled);
+			.withDataCancelledCallback(cancelled);
 	}
 
 	public boolean isInDictionary(final String word){

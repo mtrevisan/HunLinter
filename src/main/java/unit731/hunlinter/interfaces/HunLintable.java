@@ -9,10 +9,10 @@ public interface HunLintable{
 
 	default void clearAllParsers(){
 		clearAffixParser();
-		clearHyphenationParser();
 		clearDictionaryParser();
 		clearAidParser();
 		clearThesaurusParser();
+		clearHyphenationParser();
 		clearAutoCorrectParser();
 		clearSentenceExceptionsParser();
 		clearWordExceptionsParser();
@@ -21,13 +21,13 @@ public interface HunLintable{
 
 	void clearAffixParser();
 
-	void clearHyphenationParser();
-
 	void clearDictionaryParser();
 
 	void clearAidParser();
 
 	void clearThesaurusParser();
+
+	void clearHyphenationParser();
 
 	void clearAutoCorrectParser();
 

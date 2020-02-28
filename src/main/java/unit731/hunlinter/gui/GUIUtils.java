@@ -356,7 +356,8 @@ public class GUIUtils{
 	}
 
 
-	public static void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
+	public static void addSorterToTable(final JTable table, final Comparator<String> comparator,
+			final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);

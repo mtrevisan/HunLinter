@@ -480,8 +480,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			if(answer == JOptionPane.YES_OPTION){
 				prjLoaderWorker.cancel();
 
-				dicLinterMenuItem.setEnabled(true);
-				theLinterMenuItem.setEnabled(true);
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "Project loader aborted");
 
 				prjLoaderWorker = null;
@@ -510,7 +508,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	@Override
 	public void loadFileInternal(final Path projectPath){
 		//clear all
-		loadFileCanceled(null);
+		loadFileCancelled(null);
 
 		clearAllParsers();
 
@@ -518,9 +516,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
-			dicLinterMenuItem.setEnabled(false);
-			theLinterMenuItem.setEnabled(false);
-
 			try{
 				packager.reload(projectPath != null? projectPath: packager.getProjectPath());
 
@@ -545,14 +540,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCanceled);
+				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
 				prjLoaderWorker.addPropertyChangeListener(this);
 				prjLoaderWorker.execute();
 
 				filOpenProjectMenuItem.setEnabled(false);
 			}
 			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
-				loadFileCanceled(e);
+				loadFileCancelled(e);
 
 				LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 
@@ -618,36 +613,29 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			//thesaurus file:
 			if(parserManager.getTheParser().getSynonymsCount() > 0){
 				theMenu.setEnabled(true);
-				theLinterMenuItem.setEnabled(true);
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
-
 			//hyphenation file:
 			if(parserManager.getHyphenator() != null){
-				hypLinterMenuItem.setEnabled(true);
-
 				hypMenu.setEnabled(true);
-				hypStatisticsMenuItem.setEnabled(true);
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
-
 
 			//auto–correct file:
 			if(parserManager.getAcoParser().getCorrectionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 
-
 			//sentence exceptions file:
 			if(parserManager.getSexParser().getExceptionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
-
 
 			//word exceptions file:
 			if(parserManager.getWexParser().getExceptionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
 
 
+			//enable the first tab if the current one was disabled
 			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
 				mainTabbedPane.setSelectedIndex(0);
 
@@ -670,13 +658,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}
 
-	private void loadFileCanceled(final Exception exc){
-		//menu
+	private void loadFileCancelled(final Exception exc){
+		//menu:
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
-		dicMenu.setEnabled(false);
-		theMenu.setEnabled(false);
 		if((exc instanceof ProjectNotFoundException)){
 			//remove the file from the recent projects menu
 			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
@@ -684,39 +670,34 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
-		dicLinterMenuItem.setEnabled(false);
-		theLinterMenuItem.setEnabled(false);
-		dicSortDictionaryMenuItem.setEnabled(false);
-		hypLinterMenuItem.setEnabled(false);
-
 
 		((DictionaryLayeredPane)dicLayeredPane).clear();
 		((CompoundsLayeredPane)cmpLayeredPane).clear();
 		((ThesaurusLayeredPane)theLayeredPane).clear();
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 		((HyphenationLayeredPane)hypLayeredPane).clear();
 		((AutoCorrectLayeredPane)acoLayeredPane).clear();
 		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
 		((WordExceptionsLayeredPane)wexLayeredPane).clear();
 
+		clearAllParsers();
+
+		//dictionary file:
+		dicMenu.setEnabled(false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+
+		//thesaurus file:
+		theMenu.setEnabled(false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 		//hyphenation file:
 		hypMenu.setEnabled(false);
-		hypStatisticsMenuItem.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-
-
-		//aid file:
-		clearAidParser();
-
 
 		//auto–correct file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 
-
 		//sentence exceptions file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
-
 
 		//word exceptions file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
@@ -729,31 +710,19 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	@Override
-	public void clearHyphenationParser(){
-		((HyphenationLayeredPane)hypLayeredPane).clear();
-
-		hypMenu.setEnabled(false);
-		hypStatisticsMenuItem.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-	}
-
-	@Override
 	public void clearDictionaryParser(){
-		clearDictionaryFields();
+		((DictionaryLayeredPane)dicLayeredPane).clear();
 		((CompoundsLayeredPane)cmpLayeredPane).clear();
+		((ThesaurusLayeredPane)theLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
-	}
-
-	private void clearDictionaryFields(){
-		((DictionaryLayeredPane)dicLayeredPane).clear();
-		((ThesaurusLayeredPane)theLayeredPane).clear();
 	}
 
 	@Override
@@ -768,6 +737,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		theMenu.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+	}
+
+	@Override
+	public void clearHyphenationParser(){
+		((HyphenationLayeredPane)hypLayeredPane).clear();
+
+		hypMenu.setEnabled(false);
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 	}
 
 	@Override

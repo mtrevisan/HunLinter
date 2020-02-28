@@ -200,7 +200,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
    }//GEN-LAST:event_downloadButtonActionPerformed
 
 	public void interrupt(){
-		if(task != null && !task.isCanceled())
+		if(task != null && !task.isCancelled())
 			task.cancelTask();
 
 		stopped();

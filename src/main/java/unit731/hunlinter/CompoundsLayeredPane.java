@@ -295,7 +295,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             inputComboBox.setEnabled(true);
             limitComboBox.setEnabled(true);
             inputTextArea.setEnabled(true);
-            if(worker.isCanceled())
+            if(worker.isCancelled())
             loadInputButton.setEnabled(true);
          }
       );
