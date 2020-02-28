@@ -55,13 +55,11 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
-	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 	private static final String TAB = "\t";
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
-	private String formerInputText;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final Packager packager;
@@ -69,6 +67,8 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 	private final WorkerManager workerManager;
 
 	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+
+	private String formerInputText;
 
 
 
@@ -99,20 +99,6 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable);
 		}
 		catch(final IOException ignored){}
-
-
-		//check for updates
-		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
-			JavaHelper.executeOnEventDispatchThread(() -> {
-				try{
-					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
-					GUIUtils.addCancelByEscapeKey(dialog);
-					dialog.setLocationRelativeTo(this);
-					dialog.setVisible(true);
-				}
-				catch(final Exception ignored){}
-			});
-		}
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -317,7 +303,8 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 		//clear all
 		loadFileCancelled(null);
 
-		mainTabbedPane.setSelectedIndex(0);
+		//FIXME
+//		mainTabbedPane.setSelectedIndex(0);
 	}
 
 	private void setCurrentFont(){
@@ -327,12 +314,6 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 	}
 
 	private void loadFileCompleted(){
-		//restore default font (changed for reporting reading errors)
-		setCurrentFont();
-
-		parserManager.registerFileListener();
-		parserManager.startFileListener();
-
 		final String language = parserManager.getAffixData().getLanguage();
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
@@ -426,7 +407,8 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 		switch(evt.getPropertyName()){
 			case "progress":
 				final int progress = (int)evt.getNewValue();
-				mainProgressBar.setValue(progress);
+//FIXME
+//				mainProgressBar.setValue(progress);
 				break;
 
 			case "state":
