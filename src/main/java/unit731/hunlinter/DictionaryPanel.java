@@ -1,11 +1,7 @@
 package unit731.hunlinter;
 
-import java.awt.*;
-
-import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
-import unit731.hunlinter.gui.JCopyableTable;
-
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -22,36 +18,42 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
+import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.ProductionTableModel;
 import unit731.hunlinter.gui.TableRenderer;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.WorkerAbstract;
 
 
-public class DictionaryLayeredPane extends JFrame implements PropertyChangeListener{
+public class DictionaryPanel extends JPanel implements PropertyChangeListener{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryPanel.class);
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
@@ -66,13 +68,12 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 
-	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<DictionaryPanel> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
 	private String formerInputText;
 
 
-
-	public DictionaryLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager){
+	public DictionaryPanel(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
@@ -91,21 +92,18 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 		GUIUtils.addUndoManager(dicInputTextField);
 
 		try{
-			final int iconSize = dicTotalProductionsOutputLabel.getHeight();
+			final int iconSize = dicTotalProductionsValueLabel.getHeight();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
-			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable);
 		}
 		catch(final IOException ignored){}
 	}
 
+	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      dicInputLabel = new javax.swing.JLabel();
-      dicInputTextField = new javax.swing.JTextField();
       dicRuleFlagsAidLabel = new javax.swing.JLabel();
       dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
@@ -129,27 +127,13 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
          }
       };
       dicTotalProductionsLabel = new javax.swing.JLabel();
-      dicTotalProductionsOutputLabel = new javax.swing.JLabel();
+      dicTotalProductionsValueLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
       openAffButton = new javax.swing.JButton();
       openDicButton = new javax.swing.JButton();
+      dicInputLabel = new javax.swing.JLabel();
+      dicInputTextField = new javax.swing.JTextField();
 
-      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle((String)DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
-      setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
-      setMinimumSize(new java.awt.Dimension(964, 534));
-
-      dicInputLabel.setLabelFor(dicInputTextField);
-      dicInputLabel.setText("Dictionary entry:");
-
-      dicInputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
-      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            dicInputTextFieldKeyReleased(evt);
-         }
-      });
-
-      dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
       dicRuleFlagsAidLabel.setText("Rule flags aid:");
 
       dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
@@ -165,10 +149,9 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
       dicTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)dicTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
       dicScrollPane.setViewportView(dicTable);
 
-      dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
       dicTotalProductionsLabel.setText("Total productions:");
 
-      dicTotalProductionsOutputLabel.setText("…");
+      dicTotalProductionsValueLabel.setText("…");
 
       openAidButton.setAction(new OpenFileAction(() -> parserManager.getAidFile(), packager));
       openAidButton.setText("Open Aid");
@@ -182,8 +165,17 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
       openDicButton.setText("Open Dictionary");
       openDicButton.setEnabled(false);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-      getContentPane().setLayout(layout);
+      dicInputLabel.setText("Dictionary entry:");
+
+      dicInputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
+      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            dicInputTextFieldKeyReleased(evt);
+         }
+      });
+
+      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      this.setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -201,7 +193,7 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
                .addGroup(layout.createSequentialGroup()
                   .addComponent(dicTotalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(dicTotalProductionsOutputLabel)
+                  .addComponent(dicTotalProductionsValueLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addComponent(openAidButton)
                   .addGap(18, 18, 18)
@@ -226,20 +218,21 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(dicTotalProductionsLabel)
-               .addComponent(dicTotalProductionsOutputLabel)
+               .addComponent(dicTotalProductionsValueLabel)
                .addComponent(openAffButton)
                .addComponent(openDicButton)
                .addComponent(openAidButton))
             .addContainerGap())
       );
-
-      pack();
-      setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
+   private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+      productionDebouncer.call(this);
+   }//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void calculateProductions(final DictionaryLayeredPane frame){
-		final String inputText = StringUtils.strip(frame.dicInputTextField.getText());
+
+	private void calculateProductions(final DictionaryPanel frame){
+		final String inputText = StringUtils.strip(dicInputTextField.getText());
 
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
@@ -248,17 +241,17 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
-					frame.parserManager.getAffixData());
-				final List<Production> productions = frame.parserManager.getWordGenerator().applyAffixRules(dicEntry);
+					parserManager.getAffixData());
+				final List<Production> productions = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
+				final ProductionTableModel dm = (ProductionTableModel)dicTable.getModel();
 				dm.setProductions(productions);
 
 				//show first row
-				final Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
-				frame.dicTable.scrollRectToVisible(cellRect);
+				final Rectangle cellRect = dicTable.getCellRect(0, 0, true);
+				dicTable.scrollRectToVisible(cellRect);
 
-				frame.dicTotalProductionsOutputLabel.setText(Integer.toString(productions.size()));
+				dicTotalProductionsValueLabel.setText(Integer.toString(productions.size()));
 
 				//check for correctness
 				int line = 0;
@@ -288,15 +281,10 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 			}
 		}
 		else{
-			frame.clearOutputTable(frame.dicTable);
-			frame.dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
+			clearOutputTable(dicTable);
+			dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
 		}
 	}
-
-
-	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-		productionDebouncer.call(this);
-	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
 
 	public void loadFileInternal(final Path projectPath){
@@ -388,7 +376,7 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
 		formerInputText = null;
 
 		//disable menu
-		dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
+		dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
 		dicInputTextField.setText(null);
 		dicInputTextField.requestFocusInWindow();
 		//enable combo-box only if an AID file exists
@@ -443,10 +431,9 @@ public class DictionaryLayeredPane extends JFrame implements PropertyChangeListe
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JTable dicTable;
    private javax.swing.JLabel dicTotalProductionsLabel;
-   private javax.swing.JLabel dicTotalProductionsOutputLabel;
+   private javax.swing.JLabel dicTotalProductionsValueLabel;
    private javax.swing.JButton openAffButton;
    private javax.swing.JButton openAidButton;
    private javax.swing.JButton openDicButton;
    // End of variables declaration//GEN-END:variables
-
 }
