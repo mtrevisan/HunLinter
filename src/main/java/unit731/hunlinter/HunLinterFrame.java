@@ -18,11 +18,9 @@ import unit731.hunlinter.actions.ExitAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.IssueReporterAction;
 import unit731.hunlinter.actions.OnlineHelpAction;
-import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
-import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
 
@@ -41,7 +39,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +52,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.text.DefaultCaret;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,8 +62,6 @@ import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
@@ -76,9 +70,7 @@ import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
-import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.RecentItems;
@@ -108,9 +100,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final static String FONT_SIZE_PREFIX = "font.size.";
 	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
-	private static final int DEBOUNCER_INTERVAL = 600;
-
-	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -118,7 +107,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private final WorkerManager workerManager;
@@ -138,11 +126,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
-			parsingResultTextArea,
-			wexTextField);
-
-		GUIUtils.addUndoManager(
-			wexTextField);
+			parsingResultTextArea);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -194,25 +178,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
       sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
-      wexLayeredPane = new javax.swing.JLayeredPane();
-      wexInputLabel = new javax.swing.JLabel();
-      wexTextField = new javax.swing.JTextField();
-      wexAddButton = new javax.swing.JButton();
-      wexScrollPane = new javax.swing.JScrollPane();
-      wexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      wexTagPanel = new JTagPanel((changeType, tags) -> {
-         final ExceptionsParser wexParser = parserManager.getWexParser();
-         wexParser.modify(changeType, tags);
-         try{
-            wexParser.save(packager.getWordExceptionsFile());
-         }
-         catch(final TransformerException e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-         }
-      });
-      wexCorrectionsRecordedLabel = new javax.swing.JLabel();
-      wexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openWexButton = new javax.swing.JButton();
+      wexLayeredPane = new WordExceptionsLayeredPane(packager, parserManager);
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
@@ -270,86 +236,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
-
-      wexInputLabel.setLabelFor(wexTextField);
-      wexInputLabel.setText("Exception:");
-
-      wexTextField.setToolTipText("hit `enter` to add");
-      wexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            wexTextFieldKeyReleased(evt);
-         }
-      });
-
-      wexAddButton.setMnemonic('A');
-      wexAddButton.setText("Add");
-      wexAddButton.setEnabled(false);
-      wexAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            wexAddButtonActionPerformed(evt);
-         }
-      });
-
-      wexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      wexScrollPane.setViewportView(wexTagPanel);
-
-      wexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
-      wexCorrectionsRecordedLabel.setText("Exceptions recorded:");
-
-      wexCorrectionsRecordedOutputLabel.setText("…");
-
-      openWexButton.setAction(new OpenFileAction(Packager.KEY_FILE_WORD_EXCEPTIONS, packager));
-      openWexButton.setText("Open Word Exceptions");
-      openWexButton.setEnabled(false);
-
-      wexLayeredPane.setLayer(wexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(wexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      wexLayeredPane.setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout wexLayeredPaneLayout = new javax.swing.GroupLayout(wexLayeredPane);
-      wexLayeredPane.setLayout(wexLayeredPaneLayout);
-      wexLayeredPaneLayout.setHorizontalGroup(
-         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(wexScrollPane)
-               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(wexCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openWexButton))
-               .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(wexInputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(wexTextField)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(wexAddButton)))
-            .addContainerGap())
-      );
-      wexLayeredPaneLayout.setVerticalGroup(
-         wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(wexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexInputLabel)
-               .addComponent(wexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(wexAddButton))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(wexScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(wexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(wexCorrectionsRecordedLabel)
-               .addComponent(wexCorrectionsRecordedOutputLabel)
-               .addComponent(openWexButton))
-            .addContainerGap())
-      );
-
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
 
       addWindowListener(new WindowAdapter(){
@@ -534,8 +420,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-               .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
-               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(mainTabbedPane)
+               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 919, Short.MAX_VALUE)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
       );
@@ -547,7 +433,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
-            .addComponent(mainTabbedPane)
+            .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -581,54 +467,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		recentProjectsMenu.setEnabled(false);
 		filEmptyRecentProjectsMenuItem.setEnabled(false);
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
-
-
-	private void filterWordExceptions(){
-		final String unmodifiedException = StringUtils.strip(wexTextField.getText());
-		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
-			return;
-
-		formerFilterWordException = unmodifiedException;
-
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getWexParser().contains(unmodifiedException);
-		wexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
-
-
-		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
-	}
-
-	private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
-		wexFilterDebouncer.call(this);
-	}//GEN-LAST:event_wexTextFieldKeyReleased
-
-   private void wexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wexAddButtonActionPerformed
-		try{
-			final String exception = StringUtils.strip(wexTextField.getText());
-			if(!parserManager.getWexParser().contains(exception)){
-				parserManager.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
-				wexTagPanel.addTag(exception);
-
-				//reset input
-				wexTextField.setText(StringUtils.EMPTY);
-				wexTagPanel.applyFilter(null);
-
-				updateWordExceptionsCounter();
-
-				parserManager.storeWordExceptionFile();
-			}
-			else{
-				wexTextField.requestFocusInWindow();
-
-				JOptionPane.showOptionDialog(this,
-					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, null, null);
-			}
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-		}
-   }//GEN-LAST:event_wexAddButtonActionPerformed
 
 
 	@Override
@@ -747,6 +585,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((HyphenationLayeredPane)hypLayeredPane).setCurrentFont();
 		((AutoCorrectLayeredPane)acoLayeredPane).setCurrentFont();
 		((SentenceExceptionsLayeredPane)sexLayeredPane).setCurrentFont();
+		((WordExceptionsLayeredPane)wexLayeredPane).setCurrentFont();
 	}
 
 	private void loadFileCompleted(){
@@ -779,6 +618,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			((HyphenationLayeredPane)hypLayeredPane).initialize();
 			((AutoCorrectLayeredPane)acoLayeredPane).initialize();
 			((SentenceExceptionsLayeredPane)sexLayeredPane).initialize();
+			((WordExceptionsLayeredPane)wexLayeredPane).initialize();
 
 
 			//thesaurus file:
@@ -810,13 +650,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//word exceptions file:
-			if(parserManager.getWexParser().getExceptionsCounter() > 0){
-				final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
-				wexTagPanel.initializeTags(wordExceptions);
-				updateWordExceptionsCounter();
+			if(parserManager.getWexParser().getExceptionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
-			}
-			openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 
 
 			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
@@ -867,6 +702,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((HyphenationLayeredPane)hypLayeredPane).clear();
 		((AutoCorrectLayeredPane)acoLayeredPane).clear();
 		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
+		((WordExceptionsLayeredPane)wexLayeredPane).clear();
 
 
 		//hyphenation file:
@@ -889,13 +725,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//word exceptions file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
-		openWexButton.setEnabled(false);
-		formerFilterWordException = null;
-		wexTagPanel.applyFilter(null);
-	}
-
-	private void updateWordExceptionsCounter(){
-		wexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
 	}
 
 
@@ -962,7 +791,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearWordExceptionsParser(){
-		wexTagPanel.initializeTags(null);
+		((WordExceptionsLayeredPane)wexLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
@@ -1069,21 +898,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
-   private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenu theMenu;
-   private javax.swing.JButton wexAddButton;
-   private javax.swing.JLabel wexCorrectionsRecordedLabel;
-   private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel wexInputLabel;
    private javax.swing.JLayeredPane wexLayeredPane;
-   private javax.swing.JScrollPane wexScrollPane;
-   private unit731.hunlinter.gui.JTagPanel wexTagPanel;
-   private javax.swing.JTextField wexTextField;
    // End of variables declaration//GEN-END:variables
 
 }
