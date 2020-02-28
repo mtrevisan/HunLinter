@@ -113,7 +113,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	public HunLinterFrame(){
 		packager = new Packager();
 		parserManager = new ParserManager(packager, this);
-		workerManager = new WorkerManager(parserManager, this);
+		workerManager = new WorkerManager(packager, parserManager, this);
 
 
 		initComponents();

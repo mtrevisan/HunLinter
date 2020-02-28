@@ -5,6 +5,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.workers.dictionary.CompoundRulesWorker;
 import unit731.hunlinter.workers.dictionary.DictionaryLinterWorker;
@@ -35,13 +36,17 @@ public class WorkerManager{
 	private static final Map<String, WorkerAbstract<?, ?>> WORKERS = new HashMap<>();
 	private static final Map<String, Consumer<WorkerAbstract<?, ?>>> ON_ENDS = new HashMap<>();
 
-	private ParserManager parserManager;
+	private final Packager packager;
+	private final ParserManager parserManager;
 	private final Frame parentFrame;
 
 
-	public WorkerManager(final ParserManager parserManager, final Frame parentFrame){
+	public WorkerManager(final Packager packager, final ParserManager parserManager, final Frame parentFrame){
+		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parentFrame);
 
+		this.packager = packager;
 		this.parserManager = parserManager;
 		this.parentFrame = parentFrame;
 	}
@@ -62,6 +67,15 @@ public class WorkerManager{
 		final Consumer<WorkerAbstract<?, ?>> onEnding = ON_ENDS.get(workerName);
 		if(onEnding != null)
 			onEnding.accept(WORKERS.get(workerName));
+	}
+
+	public void createProjectLoaderWorker(final Runnable completed, final Consumer<Exception> cancelled){
+		final String workerName = ProjectLoaderWorker.WORKER_NAME;
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
+		if(worker == null || worker.isDone()){
+			worker = new ProjectLoaderWorker(packager, parserManager, completed, cancelled);
+			WORKERS.put(workerName, worker);
+		}
 	}
 
 	public void createDictionaryLinterWorker(final Consumer<WorkerAbstract<?, ?>> onStart,
