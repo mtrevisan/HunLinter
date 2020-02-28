@@ -408,29 +408,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
-      javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
-      dicLayeredPane.setLayout(dicLayeredPaneLayout);
-      dicLayeredPaneLayout.setHorizontalGroup(
-         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 914, Short.MAX_VALUE)
-      );
-      dicLayeredPaneLayout.setVerticalGroup(
-         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 251, Short.MAX_VALUE)
-      );
-
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
-      javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
-      cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
-      cmpLayeredPaneLayout.setHorizontalGroup(
-         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 914, Short.MAX_VALUE)
-      );
-      cmpLayeredPaneLayout.setVerticalGroup(
-         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 251, Short.MAX_VALUE)
-      );
 
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
 
