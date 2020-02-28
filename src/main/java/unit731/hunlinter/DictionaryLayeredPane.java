@@ -48,7 +48,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<DictionaryLayeredPane> debouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -306,10 +306,10 @@ final int iconSize = 17;
 	}
 
 	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-		productionDebouncer.call(this);
+		debouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void calculateProductions(final DictionaryLayeredPane frame){
+	private void calculateProductions(){
 		final String inputText = StringUtils.strip(dicInputTextField.getText());
 
 		if(formerInputText != null && formerInputText.equals(inputText))

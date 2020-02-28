@@ -33,8 +33,6 @@ import unit731.hunlinter.interfaces.HunLintable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -78,9 +76,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryLinterAction;
-import unit731.hunlinter.gui.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;
-import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.gui.ThesaurusTableModel;
 import unit731.hunlinter.gui.TableRenderer;
@@ -88,17 +84,13 @@ import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
@@ -147,7 +139,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
-	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
@@ -161,7 +152,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> compoundProductionDebouncer = new Debouncer<>(this::calculateCompoundProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
@@ -190,7 +180,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
 			parsingResultTextArea,
-			cmpInputTextArea, cmpTable,
 			theTable, theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
 			acoTable, acoIncorrectTextField, acoCorrectTextField,
@@ -198,7 +187,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			wexTextField);
 
 		GUIUtils.addUndoManager(
-			cmpInputTextArea,
 			theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField,
 			acoIncorrectTextField, acoCorrectTextField,
@@ -271,18 +259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainProgressBar = new javax.swing.JProgressBar();
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
-      cmpLayeredPane = new javax.swing.JLayeredPane();
-      cmpInputLabel = new javax.swing.JLabel();
-      cmpInputComboBox = new javax.swing.JComboBox<>();
-      cmpLimitLabel = new javax.swing.JLabel();
-      cmpLimitComboBox = new javax.swing.JComboBox<>();
-      cmpRuleFlagsAidLabel = new javax.swing.JLabel();
-      cmpRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      cmpScrollPane = new javax.swing.JScrollPane();
-      cmpTable = new javax.swing.JTable();
-      cmpInputScrollPane = new javax.swing.JScrollPane();
-      cmpInputTextArea = new javax.swing.JTextArea();
-      cmpLoadInputButton = new javax.swing.JButton();
+      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager);
       theLayeredPane = new javax.swing.JLayeredPane();
       theSynonymsLabel = new javax.swing.JLabel();
       theSynonymsTextField = new javax.swing.JTextField();
@@ -431,124 +408,31 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
+      javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
+      dicLayeredPane.setLayout(dicLayeredPaneLayout);
+      dicLayeredPaneLayout.setHorizontalGroup(
+         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 914, Short.MAX_VALUE)
+      );
+      dicLayeredPaneLayout.setVerticalGroup(
+         dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 251, Short.MAX_VALUE)
+      );
+
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
-      cmpInputLabel.setLabelFor(cmpInputComboBox);
-      cmpInputLabel.setText("Compound rule:");
-
-      cmpInputComboBox.setEditable(true);
-      cmpInputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
-      cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
-         @Override
-         public void keyReleased(java.awt.event.KeyEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
-      cmpInputComboBox.addItemListener(new ItemListener(){
-         @Override
-         public void itemStateChanged(ItemEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
-
-      cmpLimitLabel.setLabelFor(cmpLimitComboBox);
-      cmpLimitLabel.setText("Limit:");
-
-      cmpLimitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      cmpLimitComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLimitComboBoxActionPerformed(evt);
-         }
-      });
-
-      cmpRuleFlagsAidLabel.setLabelFor(cmpRuleFlagsAidComboBox);
-      cmpRuleFlagsAidLabel.setText("Rule flags aid:");
-
-      cmpRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
-
-      cmpTable.setModel(new CompoundTableModel());
-      cmpTable.setShowHorizontalLines(false);
-      cmpTable.setShowVerticalLines(false);
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
-
-      cmpTable.setRowSelectionAllowed(true);
-      cmpScrollPane.setViewportView(cmpTable);
-
-      cmpInputTextArea.setEditable(false);
-      cmpInputTextArea.setColumns(20);
-      cmpInputScrollPane.setViewportView(cmpInputTextArea);
-
-      cmpLoadInputButton.setText("Load input from dictionary");
-      cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cmpLoadInputButtonActionPerformed(evt);
-         }
-      });
-
-      cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLimitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLimitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpInputScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
       cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
       cmpLayeredPaneLayout.setHorizontalGroup(
          cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputLabel)
-                     .addComponent(cmpRuleFlagsAidLabel))
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                        .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(cmpLimitLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cmpLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(cmpInputScrollPane)
-                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                        .addComponent(cmpLoadInputButton)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                  .addGap(18, 18, 18)
-                  .addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)))
-            .addContainerGap())
+         .addGap(0, 914, Short.MAX_VALUE)
       );
       cmpLayeredPaneLayout.setVerticalGroup(
          cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpInputLabel)
-               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpLimitLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(cmpRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(cmpRuleFlagsAidLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-               .addComponent(cmpInputScrollPane))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(cmpLoadInputButton)
-            .addContainerGap())
+         .addGap(0, 251, Short.MAX_VALUE)
       );
 
-      mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
+      mainTabbedPane.addTab("Compounds", cmpLayeredPane);
 
       theSynonymsLabel.setLabelFor(theSynonymsTextField);
       theSynonymsLabel.setText("New definition:");
@@ -577,6 +461,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
+      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       theTable.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       theTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
@@ -604,7 +489,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(theLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
+               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -614,7 +499,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addGroup(theLayeredPaneLayout.createSequentialGroup()
                   .addComponent(theSynonymsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)))
+                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE)))
             .addContainerGap())
       );
       theLayeredPaneLayout.setVerticalGroup(
@@ -928,7 +813,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                   .addComponent(acoIncorrectLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(acoIncorrectTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addComponent(acoToLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(acoCorrectLabel)
@@ -939,7 +824,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
                .addGroup(acoLayeredPaneLayout.createSequentialGroup()
                   .addComponent(acoCorrectionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
+                  .addComponent(acoCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(openAcoButton)))
             .addContainerGap())
@@ -1311,8 +1196,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
+               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 919, Short.MAX_VALUE)
+               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
       );
@@ -1360,21 +1245,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 
-	private void calculateCompoundProductions(final HunLinterFrame frame){
-		final String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
-
-		cmpLimitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
-
-		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
-			return;
-		formerCompoundInputText = inputText;
-
-		frame.cmpLimitComboBoxActionPerformed(null);
-	}
-
-
-	private void filterThesaurus(HunLinterFrame frame){
-		final String unmodifiedSearchText = StringUtils.strip(frame.theSynonymsTextField.getText());
+	private void filterThesaurus(){
+		final String unmodifiedSearchText = StringUtils.strip(theSynonymsTextField.getText());
 
 		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
@@ -1389,7 +1261,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		theAddButton.setEnabled(!alreadyContained);
 
 		@SuppressWarnings("unchecked")
-		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
+		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
@@ -1480,9 +1352,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}
 
-	private void filterAutoCorrect(final HunLinterFrame frame){
-		final String unmodifiedIncorrectText = StringUtils.strip(frame.acoIncorrectTextField.getText());
-		final String unmodifiedCorrectText = StringUtils.strip(frame.acoCorrectTextField.getText());
+	private void filterAutoCorrect(){
+		final String unmodifiedIncorrectText = StringUtils.strip(acoIncorrectTextField.getText());
+		final String unmodifiedCorrectText = StringUtils.strip(acoCorrectTextField.getText());
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
 				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
@@ -1500,7 +1372,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			&& !unmodifiedIncorrectText.equals(unmodifiedCorrectText) && !alreadyContained);
 
 		@SuppressWarnings("unchecked")
-		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)frame.acoTable.getRowSorter();
+		final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedIncorrectText) || StringUtils.isNotBlank(unmodifiedCorrectText)){
 			final Pair<String, String> searchText = AutoCorrectParser.prepareTextForFilter(incorrect, correct);
 			final RowFilter<AutoCorrectTableModel, Integer> filterIncorrect = RowFilter.regexFilter(searchText.getLeft(), 0);
@@ -1512,8 +1384,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sorter.setRowFilter(null);
 	}
 
-	private void filterSentenceExceptions(final HunLinterFrame frame){
-		final String unmodifiedException = StringUtils.strip(frame.sexTextField.getText());
+	private void filterSentenceExceptions(){
+		final String unmodifiedException = StringUtils.strip(sexTextField.getText());
 		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
 			return;
 
@@ -1528,8 +1400,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
-	private void filterWordExceptions(final HunLinterFrame frame){
-		final String unmodifiedException = StringUtils.strip(frame.wexTextField.getText());
+	private void filterWordExceptions(){
+		final String unmodifiedException = StringUtils.strip(wexTextField.getText());
 		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
 			return;
 
@@ -1553,7 +1425,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				if(hypWordTextField.getText() != null){
 					formerHyphenationText = null;
-					hyphenate(this);
+					hyphenate();
 				}
 
 				hypAddRuleLevelComboBox.setEnabled(false);
@@ -1634,72 +1506,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void theSynonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theSynonymsTextFieldKeyReleased
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theSynonymsTextFieldKeyReleased
-
-	private void cmpInputComboBoxKeyReleased(){
-		compoundProductionDebouncer.call(this);
-	}
-
-	private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
-		final AffixParser affParser = parserManager.getAffParser();
-		final FlagParsingStrategy strategy = affParser.getAffixData()
-			.getFlagParsingStrategy();
-		workerManager.createCompoundRulesWorker(
-			worker -> {
-				cmpInputComboBox.setEnabled(false);
-				cmpLimitComboBox.setEnabled(false);
-				cmpInputTextArea.setEnabled(false);
-				cmpInputTextArea.setText(null);
-				cmpLoadInputButton.setEnabled(false);
-
-				worker.addPropertyChangeListener(this);
-				worker.execute();
-			},
-			compounds -> {
-				final StringJoiner sj = new StringJoiner("\n");
-				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
-				cmpInputTextArea.setText(sj.toString());
-				cmpInputTextArea.setCaretPosition(0);
-			},
-			worker -> {
-				cmpInputComboBox.setEnabled(true);
-				cmpLimitComboBox.setEnabled(true);
-				cmpInputTextArea.setEnabled(true);
-				if(worker.isCancelled())
-					cmpLoadInputButton.setEnabled(true);
-			}
-		);
-	}//GEN-LAST:event_cmpLoadInputButtonActionPerformed
-
-	private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
-		final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
-		final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
-		final String inputCompounds = cmpInputTextArea.getText();
-
-		if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
-			try{
-				//FIXME transfer into ParserManager
-				final List<Production> words;
-				final WordGenerator wordGenerator = parserManager.getWordGenerator();
-				final AffixData affixData = parserManager.getAffixData();
-				if(inputText.equals(affixData.getCompoundFlag())){
-					int maxCompounds = affixData.getCompoundMaxWordCount();
-					words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
-						maxCompounds);
-				}
-				else
-					words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
-						limit);
-
-				final CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
-				dm.setProductions(words);
-			}
-			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
-			}
-		}
-		else
-			clearOutputTable(cmpTable);
-	}//GEN-LAST:event_cmpLimitComboBoxActionPerformed
 
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
@@ -1950,9 +1756,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		parsingResultTextArea.setFont(currentFont);
 
 		((DictionaryLayeredPane)dicLayeredPane).setCurrentFont();
-
-		cmpInputTextArea.setFont(currentFont);
-		cmpTable.setFont(currentFont);
+		((CompoundsLayeredPane)cmpLayeredPane).setCurrentFont();
 
 		theSynonymsTextField.setFont(currentFont);
 		theTable.setFont(currentFont);
@@ -2005,17 +1809,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			((DictionaryLayeredPane)dicLayeredPane).initialize();
-
-			//affix file:
-			if(!compoundRules.isEmpty()){
-				cmpInputComboBox.removeAllItems();
-				compoundRules.forEach(cmpInputComboBox::addItem);
-				final String compoundFlag = affixData.getCompoundFlag();
-				if(compoundFlag != null)
-					cmpInputComboBox.addItem(compoundFlag);
-				cmpInputComboBox.setEnabled(true);
-				cmpInputComboBox.setSelectedItem(null);
-			}
+			((CompoundsLayeredPane)cmpLayeredPane).initialize();
 
 
 			//hyphenation file:
@@ -2027,16 +1821,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 			}
 			openHypButton.setEnabled(packager.getHyphenationFile() != null);
-
-
-			//aid file:
-			final List<String> lines = parserManager.getAidParser().getLines();
-			final boolean aidLinesPresent = !lines.isEmpty();
-			clearAidParser();
-			if(aidLinesPresent)
-				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
-			//enable combo-box only if an AID file exists
-			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
 
 
 			//thesaurus file:
@@ -2126,10 +1910,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 		((DictionaryLayeredPane)dicLayeredPane).clear();
-
-		//affix file:
-		cmpInputComboBox.removeAllItems();
-		cmpInputComboBox.setEnabled(false);
+		((CompoundsLayeredPane)cmpLayeredPane).clear();
 
 
 		//hyphenation file:
@@ -2141,8 +1922,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//aid file:
 		clearAidParser();
-		//enable combo-box only if an AID file exists
-		cmpRuleFlagsAidComboBox.setEnabled(false);
 
 
 		//thesaurus file:
@@ -2192,10 +1971,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 
-	private void hyphenate(final HunLinterFrame frame){
-		final String language = frame.parserManager.getAffixData().getLanguage();
+	private void hyphenate(){
+		final String language = parserManager.getAffixData().getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
-		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
+		String text = orthography.correctOrthography(hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -2203,7 +1982,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		String count = null;
 		List<String> rules = Collections.emptyList();
 		if(StringUtils.isNotBlank(text)){
-			final Hyphenation hyphenation = frame.parserManager.getHyphenator().hyphenate(text);
+			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 
 			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
 				"</html>");
@@ -2213,32 +1992,32 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			count = Long.toString(hyphenation.countSyllabes());
 			rules = hyphenation.getRules();
 
-			frame.hypAddRuleTextField.setEnabled(true);
+			hypAddRuleTextField.setEnabled(true);
 		}
 		else{
 			text = null;
 
-			frame.hypAddRuleTextField.setEnabled(false);
+			hypAddRuleTextField.setEnabled(false);
 		}
 
-		frame.hypSyllabationOutputLabel.setText(text);
-		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(StringUtils.join(rules, StringUtils.SPACE));
+		hypSyllabationOutputLabel.setText(text);
+		hypSyllabesCountOutputLabel.setText(count);
+		hypRulesOutputLabel.setText(StringUtils.join(rules, StringUtils.SPACE));
 
-		frame.hypAddRuleTextField.setText(null);
-		frame.hypAddRuleSyllabationOutputLabel.setText(null);
-		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
+		hypAddRuleTextField.setText(null);
+		hypAddRuleSyllabationOutputLabel.setText(null);
+		hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
-	private void hyphenateAddRule(final HunLinterFrame frame){
-		final String language = frame.parserManager.getAffixData().getLanguage();
+	private void hyphenateAddRule(){
+		final String language = parserManager.getAffixData().getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
-		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
-		final String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-		final HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
+		String addedRuleText = orthography.correctOrthography(hypWordTextField.getText());
+		final String addedRule = orthography.correctOrthography(hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
-			final boolean alreadyHasRule = frame.parserManager.hasHyphenationRule(addedRule, level);
+			final boolean alreadyHasRule = parserManager.hasHyphenationRule(addedRule, level);
 			boolean ruleMatchesText = false;
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
@@ -2247,8 +2026,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
-					final Hyphenation hyphenation = frame.parserManager.getHyphenator().hyphenate(addedRuleText);
-					final Hyphenation addedRuleHyphenation = frame.parserManager.getHyphenator().hyphenate(addedRuleText, addedRule,
+					final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(addedRuleText);
+					final Hyphenation addedRuleHyphenation = parserManager.getHyphenator().hyphenate(addedRuleText, addedRule,
 						level);
 
 					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
@@ -2267,21 +2046,21 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 			if(alreadyHasRule || !ruleMatchesText)
 				addedRuleText = null;
-			frame.hypAddRuleLevelComboBox.setEnabled(ruleMatchesText);
-			frame.hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
+			hypAddRuleLevelComboBox.setEnabled(ruleMatchesText);
+			hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
 		}
 		else{
 			addedRuleText = null;
 
-			frame.hypAddRuleTextField.setText(null);
-			frame.hypAddRuleLevelComboBox.setEnabled(false);
-			frame.hypAddRuleButton.setEnabled(false);
-			frame.hypAddRuleSyllabationOutputLabel.setText(null);
-			frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
+			hypAddRuleTextField.setText(null);
+			hypAddRuleLevelComboBox.setEnabled(false);
+			hypAddRuleButton.setEnabled(false);
+			hypAddRuleSyllabationOutputLabel.setText(null);
+			hypAddRuleSyllabesCountOutputLabel.setText(null);
 		}
 
-		frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
-		frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
+		hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
+		hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
 	}
 
 
@@ -2316,7 +2095,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	@Override
 	public void clearDictionaryParser(){
 		clearDictionaryFields();
-		clearDictionaryCompoundFields();
+		((CompoundsLayeredPane)cmpLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
@@ -2334,24 +2113,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		popupMergeMenuItem.setEnabled(false);
 	}
 
-	private void clearDictionaryCompoundFields(){
-		formerCompoundInputText = null;
-
-		cmpInputComboBox.setEnabled(true);
-		cmpInputTextArea.setText(null);
-		cmpInputTextArea.setEnabled(true);
-		cmpLoadInputButton.setEnabled(true);
-	}
-
-	private void clearOutputTable(final JTable table){
-		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
-		dm.clear();
-	}
-
 	@Override
 	public void clearAidParser(){
 		((DictionaryLayeredPane)dicLayeredPane).clearAid();
-		cmpRuleFlagsAidComboBox.removeAllItems();
+		((CompoundsLayeredPane)cmpLayeredPane).clearAid();
 	}
 
 	@Override
@@ -2457,18 +2222,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JScrollPane acoScrollPane;
    private javax.swing.JTable acoTable;
    private javax.swing.JLabel acoToLabel;
-   private javax.swing.JComboBox<String> cmpInputComboBox;
-   private javax.swing.JLabel cmpInputLabel;
-   private javax.swing.JScrollPane cmpInputScrollPane;
-   private javax.swing.JTextArea cmpInputTextArea;
    private javax.swing.JLayeredPane cmpLayeredPane;
-   private javax.swing.JComboBox<String> cmpLimitComboBox;
-   private javax.swing.JLabel cmpLimitLabel;
-   private javax.swing.JButton cmpLoadInputButton;
-   private javax.swing.JComboBox<String> cmpRuleFlagsAidComboBox;
-   private javax.swing.JLabel cmpRuleFlagsAidLabel;
-   private javax.swing.JScrollPane cmpScrollPane;
-   private javax.swing.JTable cmpTable;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;

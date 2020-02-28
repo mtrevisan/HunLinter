@@ -319,8 +319,8 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="mainTabbedPane" pref="0" max="32767" attributes="0"/>
-                  <Component id="parsingResultScrollPane" alignment="0" pref="934" max="32767" attributes="0"/>
+                  <Component id="mainTabbedPane" pref="919" max="32767" attributes="0"/>
+                  <Component id="parsingResultScrollPane" alignment="0" max="32767" attributes="0"/>
                   <Component id="mainProgressBar" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -386,7 +386,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="929" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="914" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -397,10 +397,13 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="cmpLayeredPane">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new CompoundsLayeredPane(packager, parserManager, workerManager)"/>
+          </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Compound rules">
-                <Property name="tabTitle" type="java.lang.String" value="Compound rules"/>
+              <JTabbedPaneConstraints tabName="Compounds">
+                <Property name="tabTitle" type="java.lang.String" value="Compounds"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -408,186 +411,15 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="cmpInputLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="cmpRuleFlagsAidLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="cmpRuleFlagsAidComboBox" max="32767" attributes="0"/>
-                                  <Group type="102" attributes="0">
-                                      <Component id="cmpInputComboBox" min="-2" pref="728" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="cmpLimitLabel" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="cmpLimitComboBox" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="cmpInputScrollPane" max="32767" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="cmpLoadInputButton" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="cmpScrollPane" min="-2" pref="443" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+                  <EmptySpace min="0" pref="914" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="cmpInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="cmpInputComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="cmpLimitComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="cmpLimitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="cmpRuleFlagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="cmpRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cmpScrollPane" pref="138" max="32767" attributes="0"/>
-                          <Component id="cmpInputScrollPane" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cmpLoadInputButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
+                  <EmptySpace min="0" pref="251" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
-          <SubComponents>
-            <Component class="javax.swing.JLabel" name="cmpInputLabel">
-              <Properties>
-                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="cmpInputComboBox"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Compound rule:"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="cmpInputComboBox">
-              <Properties>
-                <Property name="editable" type="boolean" value="true"/>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="13" style="0"/>
-                </Property>
-              </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
-            </Component>
-            <Component class="javax.swing.JLabel" name="cmpLimitLabel">
-              <Properties>
-                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="cmpLimitComboBox"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Limit:"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="cmpLimitComboBox">
-              <Properties>
-                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="5">
-                    <StringItem index="0" value="20"/>
-                    <StringItem index="1" value="50"/>
-                    <StringItem index="2" value="100"/>
-                    <StringItem index="3" value="500"/>
-                    <StringItem index="4" value="1000"/>
-                  </StringArray>
-                </Property>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmpLimitComboBoxActionPerformed"/>
-              </Events>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
-            </Component>
-            <Component class="javax.swing.JLabel" name="cmpRuleFlagsAidLabel">
-              <Properties>
-                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="cmpRuleFlagsAidComboBox"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Rule flags aid:"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
-              <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Monospaced" size="13" style="0"/>
-                </Property>
-              </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
-            </Component>
-            <Container class="javax.swing.JScrollPane" name="cmpScrollPane">
-              <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-              </AuxValues>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-              <SubComponents>
-                <Component class="javax.swing.JTable" name="cmpTable">
-                  <Properties>
-                    <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="new CompoundTableModel()" type="code"/>
-                    </Property>
-                    <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
-                      <TableColumnModel selectionModel="0"/>
-                    </Property>
-                    <Property name="showHorizontalLines" type="boolean" value="false"/>
-                    <Property name="showVerticalLines" type="boolean" value="false"/>
-                    <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
-                      <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
-                    </Property>
-                  </Properties>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);&#xd;&#xa;cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;cmpTable.setRowSelectionAllowed(true);"/>
-                  </AuxValues>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Container class="javax.swing.JScrollPane" name="cmpInputScrollPane">
-              <AuxValues>
-                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-              </AuxValues>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-              <SubComponents>
-                <Component class="javax.swing.JTextArea" name="cmpInputTextArea">
-                  <Properties>
-                    <Property name="editable" type="boolean" value="false"/>
-                    <Property name="columns" type="int" value="20"/>
-                  </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Component class="javax.swing.JButton" name="cmpLoadInputButton">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Load input from dictionary"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmpLoadInputButtonActionPerformed"/>
-              </Events>
-            </Component>
-          </SubComponents>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="theLayeredPane">
           <Constraints>
@@ -604,7 +436,7 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="theScrollPane" pref="909" max="32767" attributes="0"/>
+                          <Component id="theScrollPane" pref="894" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="theSynonymsLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -615,7 +447,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="theSynonymsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="theSynonymsRecordedOutputLabel" pref="805" max="32767" attributes="0"/>
+                              <Component id="theSynonymsRecordedOutputLabel" pref="790" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -689,7 +521,7 @@
                   </Properties>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String definition = (String)model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String synonyms = (String)model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);&#xd;&#xa;&#x9;&#x9;return Arrays.stream(synonymsByDefinition)&#xd;&#xa;&#x9;&#x9;&#x9;.map(GUIUtils::removeHTMLCode)&#xd;&#xa;&#x9;&#x9;&#x9;.map(syns -&gt; definition + &quot;: &quot; + syns)&#xd;&#xa;&#x9;&#x9;&#x9;.collect(Collectors.joining(&quot;\r\n&quot;));&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="theTable.getColumnModel().getColumn(0).setMinWidth(200);&#xd;&#xa;theTable.getColumnModel().getColumn(0).setMaxWidth(500);&#xd;&#xa;//listen for row removal&#xd;&#xa;KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;theTable.registerKeyboardAction(event -&gt; GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;TableRenderer theCellRenderer = new TableRenderer();&#xd;&#xa;theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1003,7 +835,7 @@
                               <Component id="acoIncorrectLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="acoIncorrectTextField" min="-2" pref="330" max="-2" attributes="0"/>
-                              <EmptySpace pref="11" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="acoToLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="acoCorrectLabel" min="-2" max="-2" attributes="0"/>
@@ -1015,7 +847,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="acoCorrectionsRecordedLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="acoCorrectionsRecordedOutputLabel" pref="672" max="32767" attributes="0"/>
+                              <Component id="acoCorrectionsRecordedOutputLabel" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="openAcoButton" min="-2" max="-2" attributes="0"/>
                           </Group>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.9" maxVersion="1.9">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cmpInputLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmpRuleFlagsAidLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cmpRuleFlagsAidComboBox" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="cmpInputComboBox" min="-2" pref="728" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="cmpLimitLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="cmpLimitComboBox" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cmpInputScrollPane" alignment="0" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="cmpLoadInputButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cmpScrollPane" min="-2" pref="443" max="-2" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="openAidButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="openAffButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Component id="openDicButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cmpInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmpInputComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmpLimitComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmpLimitLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cmpRuleFlagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cmpRuleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="cmpScrollPane" pref="0" max="32767" attributes="0"/>
+                  <Component id="cmpInputScrollPane" pref="155" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace pref="11" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cmpLoadInputButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openAffButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openDicButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openAidButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="cmpInputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Compound rule:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cmpInputComboBox">
+      <Properties>
+        <Property name="editable" type="boolean" value="true"/>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Monospaced" size="13" style="0"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(final KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(final ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="cmpLimitLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Limit:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cmpLimitComboBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="5">
+            <StringItem index="0" value="20"/>
+            <StringItem index="1" value="50"/>
+            <StringItem index="2" value="100"/>
+            <StringItem index="3" value="500"/>
+            <StringItem index="4" value="1000"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmpLimitComboBoxActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="cmpRuleFlagsAidLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Rule flags aid:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cmpRuleFlagsAidComboBox">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="Monospaced" size="13" style="0"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="cmpScrollPane">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTable" name="cmpTable">
+          <Properties>
+            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new CompoundTableModel()" type="code"/>
+            </Property>
+            <Property name="showHorizontalLines" type="boolean" value="false"/>
+            <Property name="showVerticalLines" type="boolean" value="false"/>
+            <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+              <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);&#xd;&#xa;cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;cmpTable.setRowSelectionAllowed(true);"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JScrollPane" name="cmpInputScrollPane">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTextArea" name="cmpInputTextArea">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="columns" type="int" value="20"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JButton" name="cmpLoadInputButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Load input from dictionary"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmpLoadInputButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="openAidButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(() -&gt; parserManager.getAidFile(), packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Aid"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="openAffButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(Packager.KEY_FILE_AFFIX, packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Affix"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="openDicButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(Packager.KEY_FILE_DICTIONARY, packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Dictionary"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
