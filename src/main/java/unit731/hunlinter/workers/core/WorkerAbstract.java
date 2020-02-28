@@ -131,7 +131,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	@Override
 	protected void done(){
-		if(!isCancelled())
+		if(!isCanceled())
 			workerData.callCompletedCallback();
 	}
 
@@ -172,7 +172,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
 
-			workerData.callCancelledCallback(exception);
+			workerData.callCanceledCallback(exception);
 		}
 	}
 
@@ -182,7 +182,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
-		workerData.callCancelledCallback(null);
+		workerData.callCanceledCallback(null);
 	}
 
 }

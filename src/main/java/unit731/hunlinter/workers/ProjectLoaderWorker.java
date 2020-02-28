@@ -12,14 +12,14 @@ public class ProjectLoaderWorker extends WorkerProject{
 	public static final String WORKER_NAME = "Project loader";
 
 
-	public ProjectLoaderWorker(final Packager packager, final ParserManager parserManager, final Runnable completed, final Consumer<Exception> cancelled){
+	public ProjectLoaderWorker(final Packager packager, final ParserManager parserManager, final Runnable completed, final Consumer<Exception> canceled){
 		super(new WorkerDataProject(WORKER_NAME, packager, parserManager)
 			.withRelaunchException(false));
 
 
 		getWorkerData()
 			.withDataCompletedCallback(completed)
-			.withDataCancelledCallback(cancelled);
+			.withDataCanceledCallback(canceled);
 	}
 
 }

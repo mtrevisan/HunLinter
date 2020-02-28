@@ -12,7 +12,7 @@ public class WorkerData<T>{
 	private boolean relaunchException = true;
 
 	private Runnable completed;
-	private Consumer<Exception> cancelled;
+	private Consumer<Exception> canceled;
 
 
 	WorkerData(final String workerName){
@@ -42,8 +42,8 @@ public class WorkerData<T>{
 		return this;
 	}
 
-	public final WorkerData<T> withDataCancelledCallback(final Consumer<Exception> cancelled){
-		this.cancelled = cancelled;
+	public final WorkerData<T> withDataCanceledCallback(final Consumer<Exception> canceled){
+		this.canceled = canceled;
 		return this;
 	}
 
@@ -52,9 +52,9 @@ public class WorkerData<T>{
 			completed.run();
 	}
 
-	final void callCancelledCallback(final Exception exception){
-		if(cancelled != null)
-			cancelled.accept(exception);
+	final void callCanceledCallback(final Exception exception){
+		if(canceled != null)
+			canceled.accept(exception);
 	}
 
 	final boolean isParallelProcessing(){

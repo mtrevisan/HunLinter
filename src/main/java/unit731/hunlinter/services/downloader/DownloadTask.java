@@ -79,7 +79,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	protected void done(){
 		setProgress(100);
 
-		if(!isCancelled()){
+		if(!isCanceled()){
 			try{
 				listener.validatingFile(remoteObject, localPath);
 

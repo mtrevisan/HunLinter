@@ -74,12 +74,12 @@ public class StatisticsWorker extends WorkerDictionary{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
+		final Consumer<Exception> canceled = exception -> dicStatistics.close();
 
 		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed)
-			.withDataCancelledCallback(cancelled);
+			.withDataCanceledCallback(canceled);
 	}
 
 	public boolean isPerformingHyphenationStatistics(){

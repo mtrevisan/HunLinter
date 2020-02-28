@@ -510,7 +510,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	@Override
 	public void loadFileInternal(final Path projectPath){
 		//clear all
-		loadFileCancelled(null);
+		loadFileCanceled(null);
 
 		clearAllParsers();
 
@@ -545,14 +545,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				temporarilyChooseAFont(packager.getAffixFile().toPath());
 
-				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
+				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCanceled);
 				prjLoaderWorker.addPropertyChangeListener(this);
 				prjLoaderWorker.execute();
 
 				filOpenProjectMenuItem.setEnabled(false);
 			}
 			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
-				loadFileCancelled(e);
+				loadFileCanceled(e);
 
 				LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
 
@@ -670,7 +670,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 	}
 
-	private void loadFileCancelled(final Exception exc){
+	private void loadFileCanceled(final Exception exc){
 		//menu
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
