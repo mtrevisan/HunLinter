@@ -648,9 +648,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				FontChooserDialog.getDefaultFont());
 			GUIUtils.setCurrentFont(lastUsedFont, this);
 		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 

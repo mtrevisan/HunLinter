@@ -307,50 +307,39 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	public void initialize(){
 		final String language = parserManager.getAffixData().getLanguage();
-
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
 		GUIUtils.addSorterToTable(table, comparator, comparatorAffix);
 
-		try{
-			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
+		final AffixData affixData = parserManager.getAffixData();
+		final Set<String> compoundRules = affixData.getCompoundRules();
 
 
-			//affix file:
-			if(!compoundRules.isEmpty()){
-				inputComboBox.removeAllItems();
-				compoundRules.forEach(inputComboBox::addItem);
-				final String compoundFlag = affixData.getCompoundFlag();
-				if(compoundFlag != null)
-					inputComboBox.addItem(compoundFlag);
-				inputComboBox.setEnabled(true);
-				inputComboBox.setSelectedItem(null);
-			}
-			openAffButton.setEnabled(packager.getAffixFile() != null);
-			openDicButton.setEnabled(packager.getDictionaryFile() != null);
-
-
-			//aid file:
-			final List<String> lines = parserManager.getAidParser().getLines();
-			final boolean aidLinesPresent = !lines.isEmpty();
-			ruleFlagsAidComboBox.removeAllItems();
-			if(aidLinesPresent)
-				lines.forEach(ruleFlagsAidComboBox::addItem);
-			//enable combo-box only if an AID file exists
-			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
-			openAidButton.setEnabled(aidLinesPresent);
+		//affix file:
+		if(!compoundRules.isEmpty()){
+			inputComboBox.removeAllItems();
+			compoundRules.forEach(inputComboBox::addItem);
+			final String compoundFlag = affixData.getCompoundFlag();
+			if(compoundFlag != null)
+				inputComboBox.addItem(compoundFlag);
+			inputComboBox.setEnabled(true);
+			inputComboBox.setSelectedItem(null);
 		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		openAffButton.setEnabled(packager.getAffixFile() != null);
+		openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
-			LOGGER.error("A bad error occurred", e);
-		}
+
+		//aid file:
+		final List<String> lines = parserManager.getAidParser().getLines();
+		final boolean aidLinesPresent = !lines.isEmpty();
+		ruleFlagsAidComboBox.removeAllItems();
+		if(aidLinesPresent)
+			lines.forEach(ruleFlagsAidComboBox::addItem);
+		//enable combo-box only if an AID file exists
+		ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
+		openAidButton.setEnabled(aidLinesPresent);
 	}
 
 	public void setCurrentFont(){
