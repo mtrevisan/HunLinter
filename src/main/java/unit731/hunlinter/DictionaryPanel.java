@@ -1,29 +1,23 @@
 package unit731.hunlinter;
 
-import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.lang3.StringUtils;
@@ -47,40 +41,31 @@ import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerAbstract;
 
 
-public class DictionaryPanel extends JPanel implements PropertyChangeListener{
+public class DictionaryPanel extends JPanel{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryPanel.class);
-
-	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
-	private final static String FONT_SIZE_PREFIX = "font.size.";
 
 	private static final String TAB = "\t";
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
 	private final Packager packager;
 	private final ParserManager parserManager;
-	private final WorkerManager workerManager;
 
 	private final Debouncer<DictionaryPanel> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
 	private String formerInputText;
 
 
-	public DictionaryPanel(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager){
+	public DictionaryPanel(final Packager packager, final ParserManager parserManager){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(workerManager);
 
 		this.packager = packager;
 		this.parserManager = parserManager;
-		this.workerManager = workerManager;
 
 
 		initComponents();
@@ -226,10 +211,89 @@ public class DictionaryPanel extends JPanel implements PropertyChangeListener{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-      productionDebouncer.call(this);
-   }//GEN-LAST:event_dicInputTextFieldKeyReleased
+	public void initialize(){
+		final String language = parserManager.getAffixData().getLanguage();
 
+		final Comparator<String> comparator = Comparator.comparingInt(String::length)
+			.thenComparing(BaseBuilder.getComparator(language));
+		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
+			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
+		addSorterToTable(dicTable, comparator, comparatorAffix);
+
+		try{
+			final AffixData affixData = parserManager.getAffixData();
+			final Set<String> compoundRules = affixData.getCompoundRules();
+
+
+			//affix file:
+			if(!compoundRules.isEmpty())
+				dicInputTextField.requestFocusInWindow();
+			openAffButton.setEnabled(packager.getAffixFile() != null);
+			openDicButton.setEnabled(packager.getDictionaryFile() != null);
+
+
+			//aid file:
+			final List<String> lines = parserManager.getAidParser().getLines();
+			final boolean aidLinesPresent = !lines.isEmpty();
+			dicRuleFlagsAidComboBox.removeAllItems();
+			if(aidLinesPresent)
+				lines.forEach(dicRuleFlagsAidComboBox::addItem);
+			//enable combo-box only if an AID file exists
+			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
+			openAidButton.setEnabled(aidLinesPresent);
+		}
+		catch(final IndexOutOfBoundsException e){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
+		}
+		catch(final Exception e){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+
+			LOGGER.error("A bad error occurred", e);
+		}
+	}
+
+	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
+		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
+		dicSorter.setComparator(0, comparator);
+		dicSorter.setComparator(1, comparator);
+		if(table.getColumnModel().getColumnCount() > 2){
+			dicSorter.setComparator(2, comparatorAffix);
+			dicSorter.setComparator(3, comparatorAffix);
+			dicSorter.setComparator(4, comparatorAffix);
+		}
+		table.setRowSorter(dicSorter);
+	}
+
+	public void clear(){
+		//affix file:
+		openAffButton.setEnabled(false);
+		openDicButton.setEnabled(false);
+
+
+		dicRuleFlagsAidComboBox.removeAllItems();
+
+		clearOutputTable(dicTable);
+
+		formerInputText = null;
+
+		//disable menu
+		dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
+		dicInputTextField.setText(null);
+		dicInputTextField.requestFocusInWindow();
+		//enable combo-box only if an AID file exists
+		dicRuleFlagsAidComboBox.setEnabled(false);
+		openAidButton.setEnabled(false);
+	}
+
+	private void clearOutputTable(final JTable table){
+		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
+		dm.clear();
+	}
+
+
+	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+		productionDebouncer.call(this);
+	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
 	private void calculateProductions(final DictionaryPanel frame){
 		final String inputText = StringUtils.strip(dicInputTextField.getText());
@@ -283,131 +347,6 @@ public class DictionaryPanel extends JPanel implements PropertyChangeListener{
 		else{
 			clearOutputTable(dicTable);
 			dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
-		}
-	}
-
-
-	public void loadFileInternal(final Path projectPath){
-		//clear all
-		loadFileCancelled(null);
-
-		//FIXME
-//		mainTabbedPane.setSelectedIndex(0);
-	}
-
-	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
-		dicInputTextField.setFont(currentFont);
-		dicTable.setFont(currentFont);
-	}
-
-	private void loadFileCompleted(){
-		final String language = parserManager.getAffixData().getLanguage();
-
-		final Comparator<String> comparator = Comparator.comparingInt(String::length)
-			.thenComparing(BaseBuilder.getComparator(language));
-		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
-			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(dicTable, comparator, comparatorAffix);
-
-		try{
-			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-
-
-			//affix file:
-			if(!compoundRules.isEmpty())
-				dicInputTextField.requestFocusInWindow();
-			openAffButton.setEnabled(packager.getAffixFile() != null);
-			openDicButton.setEnabled(packager.getDictionaryFile() != null);
-
-
-			//aid file:
-			final List<String> lines = parserManager.getAidParser().getLines();
-			final boolean aidLinesPresent = !lines.isEmpty();
-			dicRuleFlagsAidComboBox.removeAllItems();
-			if(aidLinesPresent){
-				lines.forEach(dicRuleFlagsAidComboBox::addItem);
-			}
-			//enable combo-box only if an AID file exists
-			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
-			openAidButton.setEnabled(aidLinesPresent);
-
-
-			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
-			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-				FontChooserDialog.getDefaultFont());
-			GUIUtils.setCurrentFont(lastUsedFont, this);
-		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
-
-			LOGGER.error("A bad error occurred", e);
-		}
-	}
-
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
-	}
-
-	private void loadFileCancelled(final Exception exc){
-		//affix file:
-		openAffButton.setEnabled(false);
-		openDicButton.setEnabled(false);
-
-
-		dicRuleFlagsAidComboBox.removeAllItems();
-
-		clearOutputTable(dicTable);
-
-		formerInputText = null;
-
-		//disable menu
-		dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
-		dicInputTextField.setText(null);
-		dicInputTextField.requestFocusInWindow();
-		//enable combo-box only if an AID file exists
-		dicRuleFlagsAidComboBox.setEnabled(false);
-		openAidButton.setEnabled(false);
-	}
-
-	private void clearOutputTable(final JTable table){
-		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
-		dm.clear();
-	}
-
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt){
-		switch(evt.getPropertyName()){
-			case "progress":
-				final int progress = (int)evt.getNewValue();
-//FIXME
-//				mainProgressBar.setValue(progress);
-				break;
-
-			case "state":
-				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
-					workerManager.callOnEnd(workerName);
-				}
-				break;
-
-			default:
 		}
 	}
 
