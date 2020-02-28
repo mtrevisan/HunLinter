@@ -61,8 +61,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		GUIUtils.addUndoManager(sexTextField);
 	}
 
-	@SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       sexInputLabel = new javax.swing.JLabel();

@@ -80,8 +80,7 @@ final int iconSize = 17;
 		catch(final IOException ignored){}
 	}
 
-	@SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       hypWordLabel = new javax.swing.JLabel();

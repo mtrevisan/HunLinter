@@ -80,7 +80,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		GUIUtils.addUndoManager(cmpInputTextArea);
 	}
 
-	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
@@ -149,7 +148,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          }
       });
 
-      openAidButton.setAction(new OpenFileAction(() -> parserManager.getAidFile(), packager));
+      openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");
       openAidButton.setEnabled(false);
 

@@ -595,10 +595,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		parserManager.registerFileListener();
 		parserManager.startFileListener();
 
-		final String language = parserManager.getAffixData().getLanguage();
-		final Comparator<String> comparator = Comparator.comparingInt(String::length)
-			.thenComparing(BaseBuilder.getComparator(language));
-
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
 			filCreatePackageMenuItem.setEnabled(true);
@@ -658,6 +654,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				mainTabbedPane.setSelectedIndex(0);
 
 
+			final String language = parserManager.getAffixData().getLanguage();
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?

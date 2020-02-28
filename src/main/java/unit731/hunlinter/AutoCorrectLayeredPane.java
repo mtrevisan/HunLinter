@@ -78,8 +78,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		GUIUtils.addUndoManager(acoIncorrectTextField, acoCorrectTextField);
 	}
 
-	@SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       acoIncorrectLabel = new javax.swing.JLabel();

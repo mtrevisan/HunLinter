@@ -84,7 +84,6 @@ final int iconSize = 17;
 		catch(final IOException ignored){}
 	}
 
-	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
@@ -137,7 +136,7 @@ final int iconSize = 17;
 
       dicTotalProductionsValueLabel.setText("…");
 
-      openAidButton.setAction(new OpenFileAction(() -> parserManager.getAidFile(), packager));
+      openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");
       openAidButton.setEnabled(false);
 

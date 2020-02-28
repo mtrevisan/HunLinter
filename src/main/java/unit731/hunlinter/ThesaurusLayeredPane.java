@@ -91,8 +91,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		catch(final IOException ignored){}
 	}
 
-	@SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       theSynonymsLabel = new javax.swing.JLabel();
