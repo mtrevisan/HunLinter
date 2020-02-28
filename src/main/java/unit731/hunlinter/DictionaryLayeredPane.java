@@ -1,6 +1,6 @@
 package unit731.hunlinter;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -48,10 +48,10 @@ public class DictionaryLayeredPane extends JLayeredPane{
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
+	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+
 	private final Packager packager;
 	private final ParserManager parserManager;
-
-	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
 	private String formerInputText;
 
@@ -73,7 +73,10 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		GUIUtils.addUndoManager(dicInputTextField);
 
 		try{
-			final int iconSize = dicTotalProductionsValueLabel.getHeight();
+			//FIXME
+//			final int iconSize = hypRulesOutputLabel.getHeight();
+//			final int iconSize = dicTotalProductionsValueLabel.getHeight();
+final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			GUIUtils.addPopupMenu(copyPopupMenu, dicTable);
@@ -271,13 +274,19 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		table.setRowSorter(dicSorter);
 	}
 
+	public void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
+		dicInputTextField.setFont(currentFont);
+		dicTable.setFont(currentFont);
+	}
+
 	public void clear(){
 		//affix file:
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
 
 
-		dicRuleFlagsAidComboBox.removeAllItems();
+		clearAid();
 
 		clearOutputTable(dicTable);
 
@@ -287,16 +296,14 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
 		dicInputTextField.setText(null);
 		dicInputTextField.requestFocusInWindow();
-		//enable combo-box only if an AID file exists
-		dicRuleFlagsAidComboBox.setEnabled(false);
 		openAidButton.setEnabled(false);
 	}
 
-	private void clearOutputTable(final JTable table){
-		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
-		dm.clear();
+	public void clearAid(){
+		dicRuleFlagsAidComboBox.removeAllItems();
+		//enable combo-box only if an AID file exists
+		dicRuleFlagsAidComboBox.setEnabled(false);
 	}
-
 
 	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
 		productionDebouncer.call(this);
@@ -308,6 +315,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
+
+		clearOutputTable(dicTable);
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
@@ -351,10 +360,13 @@ public class DictionaryLayeredPane extends JLayeredPane{
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
-		else{
-			clearOutputTable(dicTable);
+		else
 			dicTotalProductionsValueLabel.setText(StringUtils.EMPTY);
-		}
+	}
+
+	private void clearOutputTable(final JTable table){
+		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
+		dm.clear();
 	}
 
 

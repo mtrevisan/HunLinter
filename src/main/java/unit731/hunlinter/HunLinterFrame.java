@@ -55,7 +55,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
@@ -82,11 +81,9 @@ import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
-import unit731.hunlinter.gui.ProductionTableModel;
 import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.gui.ThesaurusTableModel;
 import unit731.hunlinter.gui.TableRenderer;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
@@ -101,7 +98,6 @@ import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
@@ -122,7 +118,6 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.PatternHelper;
 import unit731.hunlinter.services.RecentItems;
-import unit731.hunlinter.services.log.ExceptionHelper;
 
 
 /**
@@ -149,12 +144,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final static String FONT_SIZE_PREFIX = "font.size.";
 	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
-	private static final String TAB = "\t";
-
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
-	private String formerInputText;
 	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
@@ -169,7 +161,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> compoundProductionDebouncer = new Debouncer<>(this::calculateCompoundProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
@@ -197,8 +188,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(parsingResultTextArea,
-			dicInputTextField,
+		GUIUtils.addFontableProperty(
+			parsingResultTextArea,
 			cmpInputTextArea, cmpTable,
 			theTable, theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
@@ -206,7 +197,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			sexTextField,
 			wexTextField);
 
-		GUIUtils.addUndoManager(dicInputTextField,
+		GUIUtils.addUndoManager(
 			cmpInputTextArea,
 			theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField,
@@ -227,7 +218,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
 			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
-			GUIUtils.addPopupMenu(copyPopupMenu, dicTable,
+			GUIUtils.addPopupMenu(copyPopupMenu,
 				theSynonymsRecordedOutputLabel,
 				hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, theTable);
@@ -279,36 +270,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       parsingResultTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
       mainTabbedPane = new javax.swing.JTabbedPane();
-      dicLayeredPane = new javax.swing.JLayeredPane();
-      dicInputLabel = new javax.swing.JLabel();
-      dicInputTextField = new javax.swing.JTextField();
-      dicRuleFlagsAidLabel = new javax.swing.JLabel();
-      dicRuleFlagsAidComboBox = new javax.swing.JComboBox<>();
-      dicScrollPane = new javax.swing.JScrollPane();
-      dicTable = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String production = (String) model.getValueAt(row, 0);
-            final String morphologicalFields = (String) model.getValueAt(row, 1);
-            final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            return JavaHelper.nullableToStream(production, morphologicalFields, rule1, rule2, rule3)
-            .collect(Collectors.joining(TAB));
-         }
-      };
-      dicTotalProductionsLabel = new javax.swing.JLabel();
-      dicTotalProductionsOutputLabel = new javax.swing.JLabel();
-      openAidButton = new javax.swing.JButton();
-      openAffButton = new javax.swing.JButton();
-      openDicButton = new javax.swing.JButton();
+      dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
       cmpInputComboBox = new javax.swing.JComboBox<>();
@@ -469,109 +431,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
-      dicInputLabel.setLabelFor(dicInputTextField);
-      dicInputLabel.setText("Dictionary entry:");
-
-      dicInputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
-      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            dicInputTextFieldKeyReleased(evt);
-         }
-      });
-
-      dicRuleFlagsAidLabel.setLabelFor(dicRuleFlagsAidComboBox);
-      dicRuleFlagsAidLabel.setText("Rule flags aid:");
-
-      dicRuleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
-
-      dicTable.setModel(new ProductionTableModel());
-      dicTable.setShowHorizontalLines(false);
-      dicTable.setShowVerticalLines(false);
-      dicTable.setRowSelectionAllowed(true);
-      TableRenderer dicCellRenderer = new TableRenderer();
-      for(int i = 0; i < dicTable.getColumnCount(); i ++)
-      dicTable.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
-      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      dicTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)dicTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
-      dicScrollPane.setViewportView(dicTable);
-
-      dicTotalProductionsLabel.setLabelFor(dicTotalProductionsOutputLabel);
-      dicTotalProductionsLabel.setText("Total productions:");
-
-      dicTotalProductionsOutputLabel.setText("…");
-
-      openAidButton.setAction(new OpenFileAction(() -> parserManager.getAidFile(), packager));
-      openAidButton.setText("Open Aid");
-      openAidButton.setEnabled(false);
-
-      openAffButton.setAction(new OpenFileAction(Packager.KEY_FILE_AFFIX, packager));
-      openAffButton.setText("Open Affix");
-      openAffButton.setEnabled(false);
-
-      openDicButton.setAction(new OpenFileAction(Packager.KEY_FILE_DICTIONARY, packager));
-      openDicButton.setText("Open Dictionary");
-      openDicButton.setEnabled(false);
-
-      dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicTotalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
       javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
       dicLayeredPane.setLayout(dicLayeredPaneLayout);
       dicLayeredPaneLayout.setHorizontalGroup(
          dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dicLayeredPaneLayout.createSequentialGroup()
-                  .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                     .addComponent(dicInputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicRuleFlagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                     .addComponent(dicRuleFlagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                     .addComponent(dicInputTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-               .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(dicTotalProductionsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(dicTotalProductionsOutputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(openAidButton)
-                  .addGap(18, 18, 18)
-                  .addComponent(openAffButton)
-                  .addGap(18, 18, 18)
-                  .addComponent(openDicButton)))
-            .addContainerGap())
+         .addGap(0, 929, Short.MAX_VALUE)
       );
       dicLayeredPaneLayout.setVerticalGroup(
          dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(dicLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicInputLabel)
-               .addComponent(dicInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicRuleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(dicRuleFlagsAidLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(dicTotalProductionsLabel)
-               .addComponent(dicTotalProductionsOutputLabel)
-               .addComponent(openAffButton)
-               .addComponent(openDicButton)
-               .addComponent(openAidButton))
-            .addContainerGap())
+         .addGap(0, 251, Short.MAX_VALUE)
       );
 
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
@@ -721,6 +589,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
       theTable.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       theTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
@@ -1502,61 +1371,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 
-	private void calculateProductions(final HunLinterFrame frame){
-		final String inputText = StringUtils.strip(frame.dicInputTextField.getText());
-
-		if(formerInputText != null && formerInputText.equals(inputText))
-			return;
-		formerInputText = inputText;
-
-		if(StringUtils.isNotBlank(inputText)){
-			try{
-				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
-					frame.parserManager.getAffixData());
-				final List<Production> productions = frame.parserManager.getWordGenerator().applyAffixRules(dicEntry);
-
-				final ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
-				dm.setProductions(productions);
-
-				//show first row
-				final Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
-				frame.dicTable.scrollRectToVisible(cellRect);
-
-				frame.dicTotalProductionsOutputLabel.setText(Integer.toString(productions.size()));
-
-				//check for correctness
-				int line = 0;
-				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
-				final TableRenderer dicCellRenderer = (TableRenderer)dicTable.getColumnModel().getColumn(0).getCellRenderer();
-				dicCellRenderer.clearErrors();
-				for(final Production production : productions){
-					try{
-						checker.checkProduction(production);
-					}
-					catch(final Exception e){
-						dicCellRenderer.setErrorOnRow(line);
-
-						final StringBuffer sb = new StringBuffer(e.getMessage());
-						if(production.hasProductionRules())
-							sb.append(" (via ").append(production.getRulesSequence()).append(")");
-						String errorMessage = ExceptionHelper.getMessage(e);
-						LOGGER.trace("{}, line {}", errorMessage, line);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
-					}
-
-					line ++;
-				}
-			}
-			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
-			}
-		}
-		else{
-			frame.clearOutputTable(frame.dicTable);
-			frame.dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
-		}
-	}
-
 	private void calculateCompoundProductions(final HunLinterFrame frame){
 		final String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
 
@@ -1898,10 +1712,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			clearOutputTable(cmpTable);
 	}//GEN-LAST:event_cmpLimitComboBoxActionPerformed
 
-	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
-		productionDebouncer.call(this);
-	}//GEN-LAST:event_dicInputTextFieldKeyReleased
-
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
 	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
@@ -2150,8 +1960,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		final Font currentFont = GUIUtils.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
 
-		dicInputTextField.setFont(currentFont);
-		dicTable.setFont(currentFont);
+		((DictionaryLayeredPane)dicLayeredPane).setCurrentFont();
 
 		cmpInputTextArea.setFont(currentFont);
 		cmpTable.setFont(currentFont);
@@ -2190,12 +1999,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		parserManager.startFileListener();
 
 		final String language = parserManager.getAffixData().getLanguage();
-
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
-		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
-			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(dicTable, comparator, comparatorAffix);
 
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
@@ -2210,6 +2015,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
 
+			((DictionaryLayeredPane)dicLayeredPane).initialize();
+
 			//affix file:
 			if(!compoundRules.isEmpty()){
 				cmpInputComboBox.removeAllItems();
@@ -2219,10 +2026,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 					cmpInputComboBox.addItem(compoundFlag);
 				cmpInputComboBox.setEnabled(true);
 				cmpInputComboBox.setSelectedItem(null);
-				dicInputTextField.requestFocusInWindow();
 			}
-			openAffButton.setEnabled(packager.getAffixFile() != null);
-			openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
 
 			//hyphenation file:
@@ -2240,14 +2044,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final List<String> lines = parserManager.getAidParser().getLines();
 			final boolean aidLinesPresent = !lines.isEmpty();
 			clearAidParser();
-			if(aidLinesPresent){
-				lines.forEach(dicRuleFlagsAidComboBox::addItem);
+			if(aidLinesPresent)
 				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
-			}
 			//enable combo-box only if an AID file exists
-			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
-			openAidButton.setEnabled(aidLinesPresent);
 
 
 			//thesaurus file:
@@ -2336,11 +2136,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		hypLinterMenuItem.setEnabled(false);
 
 
+		((DictionaryLayeredPane)dicLayeredPane).clear();
+
 		//affix file:
 		cmpInputComboBox.removeAllItems();
 		cmpInputComboBox.setEnabled(false);
-		openAffButton.setEnabled(false);
-		openDicButton.setEnabled(false);
 
 
 		//hyphenation file:
@@ -2353,9 +2153,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//aid file:
 		clearAidParser();
 		//enable combo-box only if an AID file exists
-		dicRuleFlagsAidComboBox.setEnabled(false);
 		cmpRuleFlagsAidComboBox.setEnabled(false);
-		openAidButton.setEnabled(false);
 
 
 		//thesaurus file:
@@ -2538,17 +2336,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		dicMenu.setEnabled(false);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
-		dicInputTextField.requestFocusInWindow();
 	}
 
 	private void clearDictionaryFields(){
-		clearOutputTable(dicTable);
-		dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
-		clearOutputTable(cmpTable);
+		((DictionaryLayeredPane)dicLayeredPane).clear();
 
-		formerInputText = null;
-
-		dicInputTextField.setText(null);
 		theSynonymsTextField.setText(null);
 		popupMergeMenuItem.setEnabled(false);
 	}
@@ -2569,7 +2361,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearAidParser(){
-		dicRuleFlagsAidComboBox.removeAllItems();
+		((DictionaryLayeredPane)dicLayeredPane).clearAid();
 		cmpRuleFlagsAidComboBox.removeAllItems();
 	}
 
@@ -2694,21 +2486,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuItem dicExtractPoSFAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
-   private javax.swing.JLabel dicInputLabel;
-   private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenuItem dicLinterMenuItem;
    private javax.swing.JMenu dicMenu;
-   private javax.swing.JComboBox<String> dicRuleFlagsAidComboBox;
-   private javax.swing.JLabel dicRuleFlagsAidLabel;
    private javax.swing.JMenuItem dicRulesReducerMenuItem;
-   private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
-   private javax.swing.JTable dicTable;
-   private javax.swing.JLabel dicTotalProductionsLabel;
-   private javax.swing.JLabel dicTotalProductionsOutputLabel;
    private javax.swing.JMenuItem dicWordCountMenuItem;
    private javax.swing.JMenuItem filCreatePackageMenuItem;
    private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
@@ -2752,9 +2536,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JButton openAcoButton;
-   private javax.swing.JButton openAffButton;
-   private javax.swing.JButton openAidButton;
-   private javax.swing.JButton openDicButton;
    private javax.swing.JButton openHypButton;
    private javax.swing.JButton openSexButton;
    private javax.swing.JButton openWexButton;
