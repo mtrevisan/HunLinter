@@ -22,7 +22,6 @@ import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
-import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.interfaces.HunLintable;
@@ -55,8 +54,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import javax.xml.transform.TransformerException;
 
@@ -71,7 +68,6 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
@@ -114,7 +110,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
-	private String formerFilterSentenceException;
 	private String formerFilterWordException;
 	private final JFileChooser openProjectPathFileChooser;
 
@@ -123,7 +118,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> sexFilterDebouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
@@ -145,11 +139,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
 			parsingResultTextArea,
-			sexTextField,
 			wexTextField);
 
 		GUIUtils.addUndoManager(
-			sexTextField,
 			wexTextField);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
@@ -201,25 +193,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
       hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
-      sexLayeredPane = new javax.swing.JLayeredPane();
-      sexInputLabel = new javax.swing.JLabel();
-      sexTextField = new javax.swing.JTextField();
-      sexAddButton = new javax.swing.JButton();
-      sexScrollPane = new javax.swing.JScrollPane();
-      sexScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      sexTagPanel = new JTagPanel((changeType, tags) -> {
-         final ExceptionsParser sexParser = parserManager.getSexParser();
-         sexParser.modify(changeType, tags);
-         try{
-            sexParser.save(packager.getSentenceExceptionsFile());
-         }
-         catch(final TransformerException e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-         }
-      });
-      sexCorrectionsRecordedLabel = new javax.swing.JLabel();
-      sexCorrectionsRecordedOutputLabel = new javax.swing.JLabel();
-      openSexButton = new javax.swing.JButton();
+      sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
       wexLayeredPane = new javax.swing.JLayeredPane();
       wexInputLabel = new javax.swing.JLabel();
       wexTextField = new javax.swing.JTextField();
@@ -295,86 +269,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
-
-      sexInputLabel.setLabelFor(sexTextField);
-      sexInputLabel.setText("Exception:");
-
-      sexTextField.setToolTipText("hit `enter` to add");
-      sexTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            sexTextFieldKeyReleased(evt);
-         }
-      });
-
-      sexAddButton.setMnemonic('A');
-      sexAddButton.setText("Add");
-      sexAddButton.setEnabled(false);
-      sexAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            sexAddButtonActionPerformed(evt);
-         }
-      });
-
-      sexScrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      sexScrollPane.setViewportView(sexTagPanel);
-
-      sexCorrectionsRecordedLabel.setLabelFor(wexCorrectionsRecordedOutputLabel);
-      sexCorrectionsRecordedLabel.setText("Exceptions recorded:");
-
-      sexCorrectionsRecordedOutputLabel.setText("…");
-
-      openSexButton.setAction(new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager));
-      openSexButton.setText("Open Sentence Exceptions");
-      openSexButton.setEnabled(false);
-
-      sexLayeredPane.setLayer(sexInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexCorrectionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(sexCorrectionsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      sexLayeredPane.setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout sexLayeredPaneLayout = new javax.swing.GroupLayout(sexLayeredPane);
-      sexLayeredPane.setLayout(sexLayeredPaneLayout);
-      sexLayeredPaneLayout.setHorizontalGroup(
-         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(sexScrollPane)
-               .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(sexCorrectionsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexCorrectionsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sexLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(sexInputLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(sexTextField)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(sexAddButton)))
-            .addContainerGap())
-      );
-      sexLayeredPaneLayout.setVerticalGroup(
-         sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(sexLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(sexTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(sexInputLabel)
-               .addComponent(sexAddButton))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(sexScrollPane)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(sexLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(sexCorrectionsRecordedLabel)
-               .addComponent(sexCorrectionsRecordedOutputLabel)
-               .addComponent(openSexButton))
-            .addContainerGap())
-      );
-
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
 
       wexInputLabel.setLabelFor(wexTextField);
@@ -689,22 +583,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 
-	private void filterSentenceExceptions(){
-		final String unmodifiedException = StringUtils.strip(sexTextField.getText());
-		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
-			return;
-
-		formerFilterSentenceException = unmodifiedException;
-
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
-		sexAddButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".")
-			&& !alreadyContained);
-
-
-		sexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
-	}
-
 	private void filterWordExceptions(){
 		final String unmodifiedException = StringUtils.strip(wexTextField.getText());
 		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
@@ -719,38 +597,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
-
-	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
-		sexFilterDebouncer.call(this);
-	}//GEN-LAST:event_sexTextFieldKeyReleased
-
-	private void sexAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sexAddButtonActionPerformed
-		try{
-			final String exception = StringUtils.strip(sexTextField.getText());
-			if(!parserManager.getSexParser().contains(exception)){
-				parserManager.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
-				sexTagPanel.addTag(exception);
-
-				//reset input
-				sexTextField.setText(StringUtils.EMPTY);
-				sexTagPanel.applyFilter(null);
-
-				updateSentenceExceptionsCounter();
-
-				parserManager.storeSentenceExceptionFile();
-			}
-			else{
-				sexTextField.requestFocusInWindow();
-
-				JOptionPane.showOptionDialog(this,
-					"A duplicate is already present", "Warning!", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, null, null);
-			}
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-		}
-	}//GEN-LAST:event_sexAddButtonActionPerformed
 
 	private void wexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wexTextFieldKeyReleased
 		wexFilterDebouncer.call(this);
@@ -900,19 +746,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((ThesaurusLayeredPane)theLayeredPane).setCurrentFont();
 		((HyphenationLayeredPane)hypLayeredPane).setCurrentFont();
 		((AutoCorrectLayeredPane)acoLayeredPane).setCurrentFont();
-	}
-
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-			final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
+		((SentenceExceptionsLayeredPane)sexLayeredPane).setCurrentFont();
 	}
 
 	private void loadFileCompleted(){
@@ -944,6 +778,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			((ThesaurusLayeredPane)theLayeredPane).initialize();
 			((HyphenationLayeredPane)hypLayeredPane).initialize();
 			((AutoCorrectLayeredPane)acoLayeredPane).initialize();
+			((SentenceExceptionsLayeredPane)sexLayeredPane).initialize();
 
 
 			//thesaurus file:
@@ -970,13 +805,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 
 			//sentence exceptions file:
-			if(parserManager.getSexParser().getExceptionsCounter() > 0){
-				updateSentenceExceptionsCounter();
-				final List<String> sentenceExceptions = parserManager.getSexParser().getExceptionsDictionary();
-				sexTagPanel.initializeTags(sentenceExceptions);
+			if(parserManager.getSexParser().getExceptionsCounter() > 0)
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
-			}
-			openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 
 
 			//word exceptions file:
@@ -1036,6 +866,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 		((HyphenationLayeredPane)hypLayeredPane).clear();
 		((AutoCorrectLayeredPane)acoLayeredPane).clear();
+		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
 
 
 		//hyphenation file:
@@ -1054,9 +885,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//sentence exceptions file:
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
-		openSexButton.setEnabled(false);
-		formerFilterSentenceException = null;
-		sexTagPanel.applyFilter(null);
 
 
 		//word exceptions file:
@@ -1064,10 +892,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
 		wexTagPanel.applyFilter(null);
-	}
-
-	private void updateSentenceExceptionsCounter(){
-		sexCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
 	}
 
 	private void updateWordExceptionsCounter(){
@@ -1131,7 +955,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		sexTagPanel.initializeTags(null);
+		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
@@ -1245,18 +1069,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
-   private javax.swing.JButton openSexButton;
    private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
-   private javax.swing.JButton sexAddButton;
-   private javax.swing.JLabel sexCorrectionsRecordedLabel;
-   private javax.swing.JLabel sexCorrectionsRecordedOutputLabel;
-   private javax.swing.JLabel sexInputLabel;
    private javax.swing.JLayeredPane sexLayeredPane;
-   private javax.swing.JScrollPane sexScrollPane;
-   private unit731.hunlinter.gui.JTagPanel sexTagPanel;
-   private javax.swing.JTextField sexTextField;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenu theMenu;
