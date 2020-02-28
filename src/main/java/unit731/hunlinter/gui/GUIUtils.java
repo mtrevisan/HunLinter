@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,12 +23,15 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import unit731.hunlinter.FontChooserDialog;
+import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -349,6 +353,19 @@ public class GUIUtils{
 		inputMap.put(KeyStroke.getKeyStroke('Z', InputEvent.CTRL_DOWN_MASK), KEY_UNDO);
 		//bind the redo action to Ctrl-Y
 		inputMap.put(KeyStroke.getKeyStroke('Y', InputEvent.CTRL_DOWN_MASK), KEY_REDO);
+	}
+
+
+	public static void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
+		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
+		dicSorter.setComparator(0, comparator);
+		dicSorter.setComparator(1, comparator);
+		if(table.getColumnModel().getColumnCount() > 2){
+			dicSorter.setComparator(2, comparatorAffix);
+			dicSorter.setComparator(3, comparatorAffix);
+			dicSorter.setComparator(4, comparatorAffix);
+		}
+		table.setRowSorter(dicSorter);
 	}
 
 

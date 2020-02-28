@@ -15,12 +15,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -227,7 +225,7 @@ final int iconSize = 17;
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		addSorterToTable(table, comparator, comparatorAffix);
+		GUIUtils.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();
@@ -259,18 +257,6 @@ final int iconSize = 17;
 
 			LOGGER.error("A bad error occurred", e);
 		}
-	}
-
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
 	}
 
 	public void setCurrentFont(){

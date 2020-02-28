@@ -25,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -36,7 +35,6 @@ import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
@@ -304,26 +302,13 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			final String language = parserManager.getAffixData().getLanguage();
 			final Comparator<String> comparator = Comparator.comparingInt(String::length)
 				.thenComparing(BaseBuilder.getComparator(language));
-			addSorterToTable(table, comparator, null);
+			GUIUtils.addSorterToTable(table, comparator, null);
 
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 			dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
 			updateAutoCorrectionsCounter();
 		}
 		openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
-	}
-
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-			final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
 	}
 
 	public void setCurrentFont(){

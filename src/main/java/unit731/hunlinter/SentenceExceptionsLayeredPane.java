@@ -203,18 +203,6 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 	}
 
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
-	}
-
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		tagPanel.setFont(currentFont);
