@@ -2562,7 +2562,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		cmpLoadInputButton.setEnabled(true);
 	}
 
-	public void clearOutputTable(JTable table){
+	private void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
 	}

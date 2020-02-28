@@ -2,14 +2,10 @@ package unit731.hunlinter;
 
 import java.awt.*;
 
-import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.interfaces.HunLintable;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
@@ -21,10 +17,9 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -37,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.ProductionTableModel;
-import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -47,9 +41,6 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
-import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
-import unit731.hunlinter.workers.ProjectLoaderWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
@@ -58,7 +49,7 @@ import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 
 
-public class DictionaryLayeredPane extends JFrame implements ActionListener, PropertyChangeListener{
+public class DictionaryLayeredPane extends JFrame implements PropertyChangeListener{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
@@ -73,27 +64,26 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 	private String formerInputText;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
-	private final ParserManager parserManager;
 	private final Packager packager;
-
-	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
-
-	private ProjectLoaderWorker prjLoaderWorker;
+	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 
+	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
-	public DictionaryLayeredPane(){
-		packager = new Packager();
-		parserManager = new ParserManager(packager, this);
-		workerManager = new WorkerManager(parserManager, this);
+
+
+	public DictionaryLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager){
+		Objects.requireNonNull(packager);
+		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(workerManager);
+
+		this.packager = packager;
+		this.parserManager = parserManager;
+		this.workerManager = workerManager;
 
 
 		initComponents();
 
-
-		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
-		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 
 		//add "fontable" property
 		GUIUtils.addFontableProperty(dicInputTextField);
@@ -323,117 +313,17 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
 
-	@Override
-	public void actionPerformed(ActionEvent event){
-		//FIXME introduce a checkAbortion case?
-		if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
-			prjLoaderWorker.pause();
-
-			final Object[] options = {"Abort", "Cancel"};
-			final int answer = JOptionPane.showOptionDialog(this,
-				"Do you really want to abort the project loader task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				prjLoaderWorker.cancel();
-
-				dicLinterMenuItem.setEnabled(true);
-				theLinterMenuItem.setEnabled(true);
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Project loader aborted");
-
-				prjLoaderWorker = null;
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				prjLoaderWorker.resume();
-
-				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			}
-		}
-
-		workerManager.checkForAbortion();
-	}
-
-	private void loadFile(final Path basePath){
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		clearResultTextArea();
-
-		if(parserManager != null)
-			parserManager.stopFileListener();
-
-		loadFileInternal(basePath);
-	}
-
-	@Override
 	public void loadFileInternal(final Path projectPath){
 		//clear all
 		loadFileCancelled(null);
 
-		clearAllParsers();
-
 		mainTabbedPane.setSelectedIndex(0);
-
-
-		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
-			dicLinterMenuItem.setEnabled(false);
-			theLinterMenuItem.setEnabled(false);
-
-			try{
-				packager.reload(projectPath != null? projectPath: packager.getProjectPath());
-
-				final List<String> availableLanguages = packager.getAvailableLanguages();
-				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
-				if(availableLanguages.size() > 1){
-					//choose between available languages
-					final Consumer<String> onSelection = language::set;
-					final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
-					GUIUtils.addCancelByEscapeKey(dialog);
-					dialog.setLocationRelativeTo(this);
-					dialog.setVisible(true);
-
-					if(!dialog.languageChosen())
-						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
-				}
-				//load appropriate files based on current language
-				packager.extractConfigurationFolders(language.get());
-
-				setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : "
-					+ packager.getLanguage());
-
-				temporarilyChooseAFont(packager.getAffixFile().toPath());
-
-				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
-				prjLoaderWorker.addPropertyChangeListener(this);
-				prjLoaderWorker.execute();
-
-				filOpenProjectMenuItem.setEnabled(false);
-			}
-			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
-				loadFileCancelled(e);
-
-				LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
-
-				LOGGER.error("A bad error occurred while loading the project", e);
-			}
-		}
 	}
 
 	private void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		dicInputTextField.setFont(currentFont);
 		dicTable.setFont(currentFont);
-	}
-
-	private void addSorterToTable(final JTable table, final Comparator<String> comparator,
-			final Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
-		dicSorter.setComparator(0, comparator);
-		dicSorter.setComparator(1, comparator);
-		if(table.getColumnModel().getColumnCount() > 2){
-			dicSorter.setComparator(2, comparatorAffix);
-			dicSorter.setComparator(3, comparatorAffix);
-			dicSorter.setComparator(4, comparatorAffix);
-		}
-		table.setRowSorter(dicSorter);
 	}
 
 	private void loadFileCompleted(){
@@ -452,29 +342,13 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 		addSorterToTable(dicTable, comparator, comparatorAffix);
 
 		try{
-			filOpenProjectMenuItem.setEnabled(true);
-			filCreatePackageMenuItem.setEnabled(true);
-			filFontMenuItem.setEnabled(true);
-			dicLinterMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
-			dicMenu.setEnabled(true);
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			final AffixData affixData = parserManager.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
 
 			//affix file:
-			if(!compoundRules.isEmpty()){
-				cmpInputComboBox.removeAllItems();
-				compoundRules.forEach(cmpInputComboBox::addItem);
-				final String compoundFlag = affixData.getCompoundFlag();
-				if(compoundFlag != null)
-					cmpInputComboBox.addItem(compoundFlag);
-				cmpInputComboBox.setEnabled(true);
-				cmpInputComboBox.setSelectedItem(null);
+			if(!compoundRules.isEmpty())
 				dicInputTextField.requestFocusInWindow();
-			}
 			openAffButton.setEnabled(packager.getAffixFile() != null);
 			openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
@@ -482,19 +356,13 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			final boolean aidLinesPresent = !lines.isEmpty();
-			clearAidParser();
+			dicRuleFlagsAidComboBox.removeAllItems();
 			if(aidLinesPresent){
 				lines.forEach(dicRuleFlagsAidComboBox::addItem);
-				lines.forEach(cmpRuleFlagsAidComboBox::addItem);
 			}
 			//enable combo-box only if an AID file exists
 			dicRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
-			cmpRuleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
-
-
-			if(!mainTabbedPane.getComponentAt(mainTabbedPane.getSelectedIndex()).isEnabled())
-				mainTabbedPane.setSelectedIndex(0);
 
 
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
@@ -514,60 +382,42 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 		}
 	}
 
-	private void loadFileCancelled(final Exception exc){
-		//menu
-		if((exc instanceof ProjectNotFoundException)){
-			//remove the file from the recent projects menu
-			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
-
-			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
+	private void addSorterToTable(final JTable table, final Comparator<String> comparator, final Comparator<AffixEntry> comparatorAffix){
+		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
+		dicSorter.setComparator(0, comparator);
+		dicSorter.setComparator(1, comparator);
+		if(table.getColumnModel().getColumnCount() > 2){
+			dicSorter.setComparator(2, comparatorAffix);
+			dicSorter.setComparator(3, comparatorAffix);
+			dicSorter.setComparator(4, comparatorAffix);
 		}
+		table.setRowSorter(dicSorter);
+	}
 
-
+	private void loadFileCancelled(final Exception exc){
 		//affix file:
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
 
 
-		//aid file:
-		clearAidParser();
+		dicRuleFlagsAidComboBox.removeAllItems();
+
+		clearOutputTable(dicTable);
+
+		formerInputText = null;
+
+		//disable menu
+		dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
+		dicInputTextField.setText(null);
+		dicInputTextField.requestFocusInWindow();
 		//enable combo-box only if an AID file exists
 		dicRuleFlagsAidComboBox.setEnabled(false);
 		openAidButton.setEnabled(false);
 	}
 
-
-
-	@Override
-	public void clearAffixParser(){
-		clearDictionaryParser();
-	}
-
-	@Override
-	public void clearDictionaryParser(){
-		clearDictionaryFields();
-
-		//disable menu
-		dicInputTextField.requestFocusInWindow();
-	}
-
-	private void clearDictionaryFields(){
-		clearOutputTable(dicTable);
-		dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
-
-		formerInputText = null;
-
-		dicInputTextField.setText(null);
-	}
-
-	public void clearOutputTable(JTable table){
+	private void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
-	}
-
-	@Override
-	public void clearAidParser(){
-		dicRuleFlagsAidComboBox.removeAllItems();
 	}
 
 
