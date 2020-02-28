@@ -259,7 +259,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainProgressBar = new javax.swing.JProgressBar();
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
-      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager);
+      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
       theLayeredPane = new javax.swing.JLayeredPane();
       theSynonymsLabel = new javax.swing.JLabel();
       theSynonymsTextField = new javax.swing.JTextField();

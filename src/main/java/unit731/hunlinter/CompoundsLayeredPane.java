@@ -7,7 +7,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -40,10 +39,9 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerAbstract;
 
 
-public class CompoundsLayeredPane extends JLayeredPane implements ActionListener, PropertyChangeListener{
+public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompoundsLayeredPane.class);
 
@@ -55,18 +53,22 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	private final Packager packager;
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
+	private final PropertyChangeListener propertyChangeListener;
 
 	private String formerCompoundInputText;
 
 
-	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager){
+	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager,
+			final PropertyChangeListener propertyChangeListener){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
+		Objects.requireNonNull(propertyChangeListener);
 
 		this.packager = packager;
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
+		this.propertyChangeListener = propertyChangeListener;
 
 
 		initComponents();
@@ -241,26 +243,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		workerManager.checkForAbortion();
 	}
 
-	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
-		switch(evt.getPropertyName()){
-			case "progress":
-				final int progress = (int)evt.getNewValue();
-				mainProgressBar.setValue(progress);
-				break;
-
-			case "state":
-				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
-					workerManager.callOnEnd(workerName);
-				}
-				break;
-
-			default:
-		}
-	}
-
    private void cmpLimitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLimitComboBoxActionPerformed
       final String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
       final int limit = Integer.parseInt(cmpLimitComboBox.getItemAt(cmpLimitComboBox.getSelectedIndex()));
@@ -304,7 +286,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             cmpInputTextArea.setText(null);
             cmpLoadInputButton.setEnabled(false);
 
-            worker.addPropertyChangeListener(this);
+            worker.addPropertyChangeListener(propertyChangeListener);
             worker.execute();
          },
          compounds -> {
