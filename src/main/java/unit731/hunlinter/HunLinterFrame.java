@@ -52,13 +52,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
@@ -79,7 +76,6 @@ import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.gui.TableRenderer;
-import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -87,7 +83,6 @@ import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
 import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
@@ -96,8 +91,6 @@ import unit731.hunlinter.workers.ProjectLoaderWorker;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -133,9 +126,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 	private static final int DEBOUNCER_INTERVAL = 600;
-	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
-	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
 	private String formerFilterSentenceException;
@@ -147,8 +138,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
-	private final Debouncer<HunLinterFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> sexFilterDebouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> wexFilterDebouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
@@ -172,25 +161,14 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
 			parsingResultTextArea,
-			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
 			acoTable, acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
 			wexTextField);
 
 		GUIUtils.addUndoManager(
-			hypWordTextField, hypAddRuleTextField,
 			acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
 			wexTextField);
-
-		try{
-			final int iconSize = hypRulesOutputLabel.getHeight();
-			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(copyPopupMenu,
-				hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
-		}
-		catch(final IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -239,25 +217,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
       cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
-      hypLayeredPane = new javax.swing.JLayeredPane();
-      hypWordLabel = new javax.swing.JLabel();
-      hypWordTextField = new javax.swing.JTextField();
-      hypSyllabationLabel = new javax.swing.JLabel();
-      hypSyllabationOutputLabel = new javax.swing.JLabel();
-      hypSyllabesCountLabel = new javax.swing.JLabel();
-      hypSyllabesCountOutputLabel = new javax.swing.JLabel();
-      hypRulesLabel = new javax.swing.JLabel();
-      hypRulesOutputLabel = new javax.swing.JLabel();
-      hypAddRuleLabel = new javax.swing.JLabel();
-      hypAddRuleTextField = new javax.swing.JTextField();
-      hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
-      hypAddRuleButton = new javax.swing.JButton();
-      hypAddRuleSyllabationLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
-      hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
-      optionsButton = new javax.swing.JButton();
-      openHypButton = new javax.swing.JButton();
+      hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
       acoLayeredPane = new javax.swing.JLayeredPane();
       acoIncorrectLabel = new javax.swing.JLabel();
       acoIncorrectTextField = new javax.swing.JTextField();
@@ -370,189 +330,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
-
-      hypWordLabel.setLabelFor(hypWordTextField);
-      hypWordLabel.setText("Word:");
-
-      hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            hypWordTextFieldKeyReleased(evt);
-         }
-      });
-
-      hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
-      hypSyllabationLabel.setText("Syllabation:");
-      hypSyllabationLabel.setPreferredSize(new java.awt.Dimension(58, 17));
-
-      hypSyllabationOutputLabel.setText("…");
-      hypSyllabationOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
-
-      hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
-      hypSyllabesCountLabel.setText("Syllabes:");
-
-      hypSyllabesCountOutputLabel.setText("…");
-
-      hypRulesLabel.setLabelFor(hypRulesOutputLabel);
-      hypRulesLabel.setText("Rules:");
-      hypRulesLabel.setPreferredSize(new java.awt.Dimension(31, 17));
-
-      hypRulesOutputLabel.setText("…");
-      hypRulesOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
-
-      hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
-      hypAddRuleLabel.setText("Add rule:");
-
-      hypAddRuleTextField.setEnabled(false);
-      hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            hypAddRuleTextFieldKeyReleased(evt);
-         }
-      });
-
-      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
-      hypAddRuleLevelComboBox.setEnabled(false);
-      hypAddRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypAddRuleLevelComboBoxActionPerformed(evt);
-         }
-      });
-
-      hypAddRuleButton.setMnemonic('A');
-      hypAddRuleButton.setText("Add rule");
-      hypAddRuleButton.setEnabled(false);
-      hypAddRuleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            hypAddRuleButtonActionPerformed(evt);
-         }
-      });
-
-      hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
-      hypAddRuleSyllabationLabel.setText("New syllabation:");
-      hypAddRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
-
-      hypAddRuleSyllabationOutputLabel.setText("…");
-      hypAddRuleSyllabationOutputLabel.setPreferredSize(new java.awt.Dimension(9, 17));
-
-      hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
-      hypAddRuleSyllabesCountLabel.setText("New syllabes:");
-
-      hypAddRuleSyllabesCountOutputLabel.setText("…");
-
-      optionsButton.setText("Options");
-      optionsButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optionsButtonActionPerformed(evt);
-         }
-      });
-
-      openHypButton.setAction(new OpenFileAction(Packager.KEY_FILE_HYPHENATION, packager));
-      openHypButton.setText("Open Hyphenation");
-      openHypButton.setEnabled(false);
-
-      hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypRulesLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypRulesOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleLevelComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(hypAddRuleSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      hypLayeredPane.setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout hypLayeredPaneLayout = new javax.swing.GroupLayout(hypLayeredPane);
-      hypLayeredPane.setLayout(hypLayeredPaneLayout);
-      hypLayeredPaneLayout.setHorizontalGroup(
-         hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypWordLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypWordTextField))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 845, javax.swing.GroupLayout.PREFERRED_SIZE))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleTextField)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                  .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addGap(18, 18, 18)
-                  .addComponent(hypAddRuleButton))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleSyllabesCountLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addGap(13, 13, 13))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypAddRuleSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypRulesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(optionsButton)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addComponent(openHypButton))
-               .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(hypSyllabesCountLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-            .addContainerGap())
-      );
-      hypLayeredPaneLayout.setVerticalGroup(
-         hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(hypLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypWordLabel)
-               .addComponent(hypWordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(hypSyllabesCountLabel)
-               .addComponent(hypSyllabesCountOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypRulesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGap(18, 18, 18)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleLabel)
-               .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypAddRuleButton)
-               .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleSyllabationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(hypAddRuleSyllabesCountLabel)
-               .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(optionsButton)
-               .addComponent(openHypButton))
-            .addContainerGap())
-      );
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
 
@@ -1178,48 +955,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		wexTagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
-	private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
-		final  String newRule = hypAddRuleTextField.getText();
-		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-		final String foundRule = parserManager.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
-		if(foundRule == null){
-			try{
-				parserManager.storeHyphenationFile();
-
-				if(hypWordTextField.getText() != null){
-					formerHyphenationText = null;
-					hyphenate();
-				}
-
-				hypAddRuleLevelComboBox.setEnabled(false);
-				hypAddRuleButton.setEnabled(false);
-				hypAddRuleTextField.setText(null);
-				hypAddRuleSyllabationOutputLabel.setText(null);
-				hypAddRuleSyllabesCountOutputLabel.setText(null);
-			}
-			catch(final IOException e){
-				LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
-			}
-		}
-		else{
-			hypAddRuleTextField.requestFocusInWindow();
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
-		}
-	}//GEN-LAST:event_hypAddRuleButtonActionPerformed
-
-	private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
-		hypAddRuleDebouncer.call(this);
-	}//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
-
-	private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
-		hypAddRuleDebouncer.call(this);
-	}//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
-
-	private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
-		hypDebouncer.call(this);
-	}//GEN-LAST:event_hypWordTextFieldKeyReleased
-
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
 	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
@@ -1274,24 +1009,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
 	}//GEN-LAST:event_acoAddButtonActionPerformed
-
-	private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
-		final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
-			try{
-				parserManager.getHypParser().setOptions(options);
-
-				parserManager.storeHyphenationFile();
-			}
-			catch(Exception ex){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
-			}
-		};
-		final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
-			acceptButtonAction, this);
-		GUIUtils.addCancelByEscapeKey(dialog);
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
-	}//GEN-LAST:event_optionsButtonActionPerformed
 
 	private void sexTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sexTextFieldKeyReleased
 		sexFilterDebouncer.call(this);
@@ -1471,11 +1188,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((DictionaryLayeredPane)dicLayeredPane).setCurrentFont();
 		((CompoundsLayeredPane)cmpLayeredPane).setCurrentFont();
 		((ThesaurusLayeredPane)theLayeredPane).setCurrentFont();
-
-		hypWordTextField.setFont(currentFont);
-		hypSyllabationOutputLabel.setFont(currentFont);
-		hypAddRuleTextField.setFont(currentFont);
-		hypAddRuleSyllabationOutputLabel.setFont(currentFont);
+		((HyphenationLayeredPane)hypLayeredPane).setCurrentFont();
 
 		acoIncorrectTextField.setFont(currentFont);
 		acoCorrectTextField.setFont(currentFont);
@@ -1522,6 +1235,15 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			((DictionaryLayeredPane)dicLayeredPane).initialize();
 			((CompoundsLayeredPane)cmpLayeredPane).initialize();
 			((ThesaurusLayeredPane)theLayeredPane).initialize();
+			((HyphenationLayeredPane)hypLayeredPane).initialize();
+
+
+			//thesaurus file:
+			if(parserManager.getTheParser().getSynonymsCount() > 0){
+				theMenu.setEnabled(true);
+				theLinterMenuItem.setEnabled(true);
+				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+			}
 
 
 			//hyphenation file:
@@ -1531,15 +1253,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				hypMenu.setEnabled(true);
 				hypStatisticsMenuItem.setEnabled(true);
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
-			}
-			openHypButton.setEnabled(packager.getHyphenationFile() != null);
-
-
-			//thesaurus file:
-			if(parserManager.getTheParser().getSynonymsCount() > 0){
-				theMenu.setEnabled(true);
-				theLinterMenuItem.setEnabled(true);
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
 
@@ -1620,13 +1333,13 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		((CompoundsLayeredPane)cmpLayeredPane).clear();
 		((ThesaurusLayeredPane)theLayeredPane).clear();
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+		((HyphenationLayeredPane)hypLayeredPane).clear();
 
 
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 		hypStatisticsMenuItem.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-		openHypButton.setEnabled(false);
 
 
 		//aid file:
@@ -1669,99 +1382,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 
-	private void hyphenate(){
-		final String language = parserManager.getAffixData().getLanguage();
-		final Orthography orthography = BaseBuilder.getOrthography(language);
-		String text = orthography.correctOrthography(hypWordTextField.getText());
-		if(formerHyphenationText != null && formerHyphenationText.equals(text))
-			return;
-		formerHyphenationText = text;
-
-		String count = null;
-		List<String> rules = Collections.emptyList();
-		if(StringUtils.isNotBlank(text)){
-			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
-
-			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
-				"</html>");
-			final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
-				.toString();
-			count = Long.toString(hyphenation.countSyllabes());
-			rules = hyphenation.getRules();
-
-			hypAddRuleTextField.setEnabled(true);
-		}
-		else{
-			text = null;
-
-			hypAddRuleTextField.setEnabled(false);
-		}
-
-		hypSyllabationOutputLabel.setText(text);
-		hypSyllabesCountOutputLabel.setText(count);
-		hypRulesOutputLabel.setText(StringUtils.join(rules, StringUtils.SPACE));
-
-		hypAddRuleTextField.setText(null);
-		hypAddRuleSyllabationOutputLabel.setText(null);
-		hypAddRuleSyllabesCountOutputLabel.setText(null);
-	}
-
-	private void hyphenateAddRule(){
-		final String language = parserManager.getAffixData().getLanguage();
-		final Orthography orthography = BaseBuilder.getOrthography(language);
-		String addedRuleText = orthography.correctOrthography(hypWordTextField.getText());
-		final String addedRule = orthography.correctOrthography(hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-		final HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-		String addedRuleCount = null;
-		if(StringUtils.isNotBlank(addedRule)){
-			final boolean alreadyHasRule = parserManager.hasHyphenationRule(addedRule, level);
-			boolean ruleMatchesText = false;
-			boolean hyphenationChanged = false;
-			boolean correctHyphenation = false;
-			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule,
-					PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
-
-				if(ruleMatchesText){
-					final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(addedRuleText);
-					final Hyphenation addedRuleHyphenation = parserManager.getHyphenator().hyphenate(addedRuleText, addedRule,
-						level);
-
-					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
-						"</html>");
-					final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-					final String text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
-						.toString();
-					addedRuleText = orthography.formatHyphenation(addedRuleHyphenation.getSyllabes(), sj.get(), errorFormatter)
-						.toString();
-					addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
-
-					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = !orthography.hasSyllabationErrors(addedRuleHyphenation.getSyllabes());
-				}
-			}
-
-			if(alreadyHasRule || !ruleMatchesText)
-				addedRuleText = null;
-			hypAddRuleLevelComboBox.setEnabled(ruleMatchesText);
-			hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
-		}
-		else{
-			addedRuleText = null;
-
-			hypAddRuleTextField.setText(null);
-			hypAddRuleLevelComboBox.setEnabled(false);
-			hypAddRuleButton.setEnabled(false);
-			hypAddRuleSyllabationOutputLabel.setText(null);
-			hypAddRuleSyllabesCountOutputLabel.setText(null);
-		}
-
-		hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
-		hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
-	}
-
-
 	@Override
 	public void clearAffixParser(){
 		clearDictionaryParser();
@@ -1769,25 +1389,11 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearHyphenationParser(){
-		clearHyphenationFields();
+		((HyphenationLayeredPane)hypLayeredPane).clear();
 
 		hypMenu.setEnabled(false);
 		hypStatisticsMenuItem.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-	}
-
-	private void clearHyphenationFields(){
-		formerHyphenationText = null;
-
-		hypWordTextField.setText(null);
-		hypSyllabationOutputLabel.setText(null);
-		hypSyllabesCountOutputLabel.setText(null);
-		hypRulesOutputLabel.setText(null);
-		hypAddRuleTextField.setText(null);
-		hypAddRuleLevelComboBox.setEnabled(false);
-		hypAddRuleButton.setEnabled(false);
-		hypAddRuleSyllabationOutputLabel.setText(null);
-		hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
 	@Override
@@ -1949,35 +1555,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JPopupMenu.Separator hlpOnlineSeparator;
    private javax.swing.JMenuItem hlpUpdateMenuItem;
    private javax.swing.JPopupMenu.Separator hlpUpdateSeparator;
-   private javax.swing.JButton hypAddRuleButton;
-   private javax.swing.JLabel hypAddRuleLabel;
-   private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;
-   private javax.swing.JLabel hypAddRuleSyllabationLabel;
-   private javax.swing.JLabel hypAddRuleSyllabationOutputLabel;
-   private javax.swing.JLabel hypAddRuleSyllabesCountLabel;
-   private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
-   private javax.swing.JTextField hypAddRuleTextField;
    private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
    private javax.swing.JLayeredPane hypLayeredPane;
    private javax.swing.JMenuItem hypLinterMenuItem;
    private javax.swing.JMenu hypMenu;
-   private javax.swing.JLabel hypRulesLabel;
-   private javax.swing.JLabel hypRulesOutputLabel;
    private javax.swing.JMenuItem hypStatisticsMenuItem;
-   private javax.swing.JLabel hypSyllabationLabel;
-   private javax.swing.JLabel hypSyllabationOutputLabel;
-   private javax.swing.JLabel hypSyllabesCountLabel;
-   private javax.swing.JLabel hypSyllabesCountOutputLabel;
-   private javax.swing.JLabel hypWordLabel;
-   private javax.swing.JTextField hypWordTextField;
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JButton openAcoButton;
-   private javax.swing.JButton openHypButton;
    private javax.swing.JButton openSexButton;
    private javax.swing.JButton openWexButton;
-   private javax.swing.JButton optionsButton;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JButton sexAddButton;
