@@ -5,7 +5,6 @@ import java.awt.*;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
-import unit731.hunlinter.gui.AutoCorrectTableModel;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.interfaces.HunLintable;
 
@@ -39,7 +38,6 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.ProductionTableModel;
 import unit731.hunlinter.gui.RecentFilesMenu;
-import unit731.hunlinter.gui.ThesaurusTableModel;
 import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -60,7 +58,7 @@ import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 
 
-public class DictionaryLayeredPane extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
+public class DictionaryLayeredPane extends JFrame implements ActionListener, PropertyChangeListener{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
@@ -546,36 +544,20 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 	}
 
 	@Override
-	public void clearHyphenationParser(){
-		clearHyphenationFields();
-
-		hypMenu.setEnabled(false);
-		hypStatisticsMenuItem.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
-	}
-
-	@Override
 	public void clearDictionaryParser(){
 		clearDictionaryFields();
-		clearDictionaryCompoundFields();
 
 		//disable menu
-		dicMenu.setEnabled(false);
-		filCreatePackageMenuItem.setEnabled(false);
-		filFontMenuItem.setEnabled(false);
 		dicInputTextField.requestFocusInWindow();
 	}
 
 	private void clearDictionaryFields(){
 		clearOutputTable(dicTable);
 		dicTotalProductionsOutputLabel.setText(StringUtils.EMPTY);
-		clearOutputTable(cmpTable);
 
 		formerInputText = null;
 
 		dicInputTextField.setText(null);
-		theSynonymsTextField.setText(null);
-		popupMergeMenuItem.setEnabled(false);
 	}
 
 	public void clearOutputTable(JTable table){
@@ -586,48 +568,6 @@ public class DictionaryLayeredPane extends JFrame implements ActionListener, Pro
 	@Override
 	public void clearAidParser(){
 		dicRuleFlagsAidComboBox.removeAllItems();
-		cmpRuleFlagsAidComboBox.removeAllItems();
-	}
-
-	@Override
-	public void clearThesaurusParser(){
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-		dm.setSynonyms(null);
-
-		theMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
-	}
-
-	@Override
-	public void clearAutoCorrectParser(){
-		final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
-		dm.setCorrections(null);
-
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
-	}
-
-	@Override
-	public void clearSentenceExceptionsParser(){
-		sexTagPanel.initializeTags(null);
-
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
-	}
-
-	@Override
-	public void clearWordExceptionsParser(){
-		wexTagPanel.initializeTags(null);
-
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
-	}
-
-	@Override
-	public void clearAutoTextParser(){
-		//TODO
-//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
-//		dm.setCorrections(null);
-
-//		atxMenu.setEnabled(false);
-//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
 	}
 
 
