@@ -13,11 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +39,9 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
-public class DictionaryPanel extends JPanel{
+public class DictionaryLayeredPane extends JLayeredPane{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryPanel.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
 	private static final String TAB = "\t";
 
@@ -55,12 +51,12 @@ public class DictionaryPanel extends JPanel{
 	private final Packager packager;
 	private final ParserManager parserManager;
 
-	private final Debouncer<DictionaryPanel> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<DictionaryLayeredPane> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 
 	private String formerInputText;
 
 
-	public DictionaryPanel(final Packager packager, final ParserManager parserManager){
+	public DictionaryLayeredPane(final Packager packager, final ParserManager parserManager){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
 
@@ -158,6 +154,17 @@ public class DictionaryPanel extends JPanel{
             dicInputTextFieldKeyReleased(evt);
          }
       });
+
+      setLayer(dicRuleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicRuleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicTotalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicTotalProductionsValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
@@ -295,7 +302,7 @@ public class DictionaryPanel extends JPanel{
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void calculateProductions(final DictionaryPanel frame){
+	private void calculateProductions(final DictionaryLayeredPane frame){
 		final String inputText = StringUtils.strip(dicInputTextField.getText());
 
 		if(formerInputText != null && formerInputText.equals(inputText))
