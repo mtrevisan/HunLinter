@@ -78,7 +78,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
-import unit731.hunlinter.gui.ThesaurusTableModel;
 import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -89,7 +88,6 @@ import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
-import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
@@ -100,8 +98,6 @@ import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -139,7 +135,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
-	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
 	private String formerFilterIncorrectText;
 	private String formerFilterCorrectText;
@@ -152,7 +147,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private final Packager packager;
 
 	private RecentFilesMenu recentProjectsMenu;
-	private final Debouncer<HunLinterFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunLinterFrame> acoFilterDebouncer = new Debouncer<>(this::filterAutoCorrect, DEBOUNCER_INTERVAL);
@@ -161,8 +155,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private final WorkerManager workerManager;
-
-	private JMenuItem popupMergeMenuItem;
 
 
 	public HunLinterFrame(){
@@ -180,14 +172,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		//add "fontable" property
 		GUIUtils.addFontableProperty(
 			parsingResultTextArea,
-			theTable, theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel,
 			acoTable, acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
 			wexTextField);
 
 		GUIUtils.addUndoManager(
-			theSynonymsTextField,
 			hypWordTextField, hypAddRuleTextField,
 			acoIncorrectTextField, acoCorrectTextField,
 			sexTextField,
@@ -197,20 +187,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final int iconSize = hypRulesOutputLabel.getHeight();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
-			popupMergeMenuItem = GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
-			popupMergeMenuItem.setEnabled(false);
-			mergeCopyRemovePopupMenu.add(popupMergeMenuItem);
-			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
-			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
-			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
-			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
-			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
 			GUIUtils.addPopupMenu(copyPopupMenu,
-				theSynonymsRecordedOutputLabel,
 				hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
-			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, theTable);
-			GUIUtils.addPopupMenu(copyRemovePopupMenu, acoTable);
 		}
 		catch(final IOException ignored){}
 
@@ -260,26 +238,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
       cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
-      theLayeredPane = new javax.swing.JLayeredPane();
-      theSynonymsLabel = new javax.swing.JLabel();
-      theSynonymsTextField = new javax.swing.JTextField();
-      theAddButton = new javax.swing.JButton();
-      theScrollPane = new javax.swing.JScrollPane();
-      theTable = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String definition = (String)model.getValueAt(row, 0);
-            final String synonyms = (String)model.getValueAt(row, 1);
-            final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
-            return Arrays.stream(synonymsByDefinition)
-            .map(GUIUtils::removeHTMLCode)
-            .map(syns -> definition + ": " + syns)
-            .collect(Collectors.joining("\r\n"));
-         }
-      };
-      theSynonymsRecordedLabel = new javax.swing.JLabel();
-      theSynonymsRecordedOutputLabel = new javax.swing.JLabel();
+      theLayeredPane = new ThesaurusLayeredPane(parserManager);
       hypLayeredPane = new javax.swing.JLayeredPane();
       hypWordLabel = new javax.swing.JLabel();
       hypWordTextField = new javax.swing.JTextField();
@@ -409,94 +368,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
-
-      theSynonymsLabel.setLabelFor(theSynonymsTextField);
-      theSynonymsLabel.setText("New definition:");
-
-      theSynonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
-            theSynonymsTextFieldKeyReleased(evt);
-         }
-      });
-
-      theAddButton.setMnemonic('A');
-      theAddButton.setText("Add");
-      theAddButton.setEnabled(false);
-      theAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            theAddButtonActionPerformed(evt);
-         }
-      });
-
-      theTable.setModel(new ThesaurusTableModel());
-      theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
-      theTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      theTable.setShowHorizontalLines(false);
-      theTable.setShowVerticalLines(false);
-      theTable.getColumnModel().getColumn(0).setMinWidth(200);
-      theTable.getColumnModel().getColumn(0).setMaxWidth(500);
-      //listen for row removal
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-      theTable.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
-      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      theTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)theTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
-
-      TableRenderer theCellRenderer = new TableRenderer();
-      theTable.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
-      theScrollPane.setViewportView(theTable);
-
-      theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
-      theSynonymsRecordedLabel.setText("Synonyms recorded:");
-
-      theSynonymsRecordedOutputLabel.setText("…");
-
-      theLayeredPane.setLayer(theSynonymsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theSynonymsTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theAddButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theSynonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      theLayeredPane.setLayer(theSynonymsRecordedOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-      javax.swing.GroupLayout theLayeredPaneLayout = new javax.swing.GroupLayout(theLayeredPane);
-      theLayeredPane.setLayout(theLayeredPaneLayout);
-      theLayeredPaneLayout.setHorizontalGroup(
-         theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(theLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(theSynonymsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsTextField)
-                  .addGap(18, 18, 18)
-                  .addComponent(theAddButton))
-               .addGroup(theLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(theSynonymsRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(theSynonymsRecordedOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE)))
-            .addContainerGap())
-      );
-      theLayeredPaneLayout.setVerticalGroup(
-         theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, theLayeredPaneLayout.createSequentialGroup()
-            .addContainerGap()
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theSynonymsLabel)
-               .addComponent(theSynonymsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(theAddButton))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(theSynonymsRecordedLabel)
-               .addComponent(theSynonymsRecordedOutputLabel))
-            .addContainerGap())
-      );
-
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
 
       hypWordLabel.setLabelFor(hypWordTextField);
@@ -719,7 +591,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       acoTable.setShowHorizontalLines(false);
       acoTable.setShowVerticalLines(false);
       //listen for row removal
+      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       acoTable.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
+      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       acoTable.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)acoTable), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame acoParent = this;
@@ -1223,95 +1097,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}//GEN-LAST:event_filEmptyRecentProjectsMenuItemActionPerformed
 
 
-	private void filterThesaurus(){
-		final String unmodifiedSearchText = StringUtils.strip(theSynonymsTextField.getText());
-
-		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
-
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
-			return;
-
-		formerFilterThesaurusText = unmodifiedSearchText;
-
-		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
-		theAddButton.setEnabled(!alreadyContained);
-
-		@SuppressWarnings("unchecked")
-		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-		if(StringUtils.isNotBlank(unmodifiedSearchText)){
-			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
-			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
-		}
-		else
-			sorter.setRowFilter(null);
-	}
-
-	public void mergeThesaurusRow(final Component invoker){
-		final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
-		final SynonymsEntry newSynonyms = new SynonymsEntry(theSynonymsTextField.getText());
-
-		//filter synonyms with same part-of-speech
-		final List<SynonymsEntry> filteredSynonymsEntries = synonyms.getSynonyms().stream()
-			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
-			.collect(Collectors.toList());
-		if(filteredSynonymsEntries.isEmpty())
-			JOptionPane.showMessageDialog(null,
-				"No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
-				"Warning", JOptionPane.WARNING_MESSAGE);
-		else{
-			//show merge dialog
-			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(synonyms.getDefinition(), newSynonyms,
-				filteredSynonymsEntries, null);
-			GUIUtils.addCancelByEscapeKey(dialog);
-			dialog.setLocationRelativeTo(this);
-			dialog.setVisible(true);
-
-			if(dialog.isMerged())
-				theSynonymsTextField.setText(dialog.getMerge());
-		}
-	}
-
-	public void removeSelectedRows(final Component invoker){
-		if(invoker == theTable)
-			removeSelectedRowsFromThesaurus();
-		else if(invoker == acoTable)
-			removeSelectedRowsFromAutoCorrect();
-	}
-
-	public void removeSelectedRowsFromThesaurus(){
-		try{
-			final int selectedRow = theTable.convertRowIndexToModel(theTable.getSelectedRow());
-			final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
-			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
-			parserManager.getTheParser()
-				.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
-
-			dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
-			updateSynonymsCounter();
-
-			//… and save the files
-			parserManager.storeThesaurusFiles();
-
-
-			//redo filtering, that is re-set the state of the button (it may have changed)
-			final String unmodifiedSearchText = theSynonymsTextField.getText();
-			if(StringUtils.isNotBlank(unmodifiedSearchText)){
-				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
-				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-				final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
-				theAddButton.setEnabled(!alreadyContained);
-			}
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
-		}
-	}
-
 	public void removeSelectedRowsFromAutoCorrect(){
 		try{
 			final int selectedRow = acoTable.convertRowIndexToModel(acoTable.getSelectedRow());
@@ -1320,7 +1105,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 			dm.fireTableDataChanged();
 
-			updateCorrectionsCounter();
+			updateAutoCorrectionsCounter();
 
 			//… and save the files
 			parserManager.storeAutoCorrectFile();
@@ -1435,56 +1220,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		hypDebouncer.call(this);
 	}//GEN-LAST:event_hypWordTextFieldKeyReleased
 
-	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
-		try{
-			//try adding the synonyms
-			final String synonyms = theSynonymsTextField.getText();
-			final Function<String, Boolean> duplicatesDiscriminator = message -> {
-				final int responseOption = JOptionPane.showConfirmDialog(this,
-					"There is some duplicates with same part–of–speech and definition(s) '" + message
-						+ "'.\nForce insertion?", "Duplicate detected",
-					JOptionPane.YES_NO_OPTION);
-				return (responseOption == JOptionPane.YES_OPTION);
-			};
-			final DuplicationResult<ThesaurusEntry> duplicationResult = parserManager.getTheParser()
-				.insertSynonyms(synonyms, duplicatesDiscriminator);
-			if(duplicationResult.isForceInsertion()){
-				//if everything's ok update the table and the sorter…
-				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
-				dm.fireTableDataChanged();
-
-				formerFilterThesaurusText = null;
-				theSynonymsTextField.setText(null);
-				theSynonymsTextField.requestFocusInWindow();
-				popupMergeMenuItem.setEnabled(false);
-				@SuppressWarnings("unchecked")
-				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-				sorter.setRowFilter(null);
-
-				updateSynonymsCounter();
-
-				//… and save the files
-				parserManager.storeThesaurusFiles();
-			}
-			else{
-				theSynonymsTextField.requestFocusInWindow();
-
-				final String duplicatedWords = duplicationResult.getDuplicates().stream()
-					.map(ThesaurusEntry::getDefinition)
-					.collect(Collectors.joining(", "));
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
-			}
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-		}
-	}//GEN-LAST:event_theAddButtonActionPerformed
-
-	private void theSynonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theSynonymsTextFieldKeyReleased
-		theFilterDebouncer.call(this);
-	}//GEN-LAST:event_theSynonymsTextFieldKeyReleased
-
 	private void acoIncorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_acoIncorrectTextFieldKeyReleased
 		acoFilterDebouncer.call(this);
 	}//GEN-LAST:event_acoIncorrectTextFieldKeyReleased
@@ -1521,7 +1256,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 				TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)acoTable.getRowSorter();
 				sorter.setRowFilter(null);
 
-				updateSynonymsCounter();
+				updateAutoCorrectionsCounter();
 
 				//… and save the files
 				parserManager.storeAutoCorrectFile();
@@ -1735,9 +1470,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		((DictionaryLayeredPane)dicLayeredPane).setCurrentFont();
 		((CompoundsLayeredPane)cmpLayeredPane).setCurrentFont();
-
-		theSynonymsTextField.setFont(currentFont);
-		theTable.setFont(currentFont);
+		((ThesaurusLayeredPane)theLayeredPane).setCurrentFont();
 
 		hypWordTextField.setFont(currentFont);
 		hypSyllabationOutputLabel.setFont(currentFont);
@@ -1788,6 +1521,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 			((DictionaryLayeredPane)dicLayeredPane).initialize();
 			((CompoundsLayeredPane)cmpLayeredPane).initialize();
+			((ThesaurusLayeredPane)theLayeredPane).initialize();
 
 
 			//hyphenation file:
@@ -1803,13 +1537,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 			//thesaurus file:
 			if(parserManager.getTheParser().getSynonymsCount() > 0){
-				addSorterToTable(theTable, comparator, null);
-
 				theMenu.setEnabled(true);
 				theLinterMenuItem.setEnabled(true);
-				final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
-				updateSynonymsCounter();
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 			}
 
@@ -1820,7 +1549,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 				final AutoCorrectTableModel dm = (AutoCorrectTableModel)acoTable.getModel();
 				dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
-				updateCorrectionsCounter();
+				updateAutoCorrectionsCounter();
 				GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
 			}
 			openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
@@ -1889,6 +1618,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		((DictionaryLayeredPane)dicLayeredPane).clear();
 		((CompoundsLayeredPane)cmpLayeredPane).clear();
+		((ThesaurusLayeredPane)theLayeredPane).clear();
+		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 
 		//hyphenation file:
@@ -1900,13 +1631,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 		//aid file:
 		clearAidParser();
-
-
-		//thesaurus file:
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
-		formerFilterThesaurusText = null;
-		//noinspection unchecked
-		((TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter()).setRowFilter(null);
 
 
 		//auto–correct file:
@@ -1932,11 +1656,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		wexTagPanel.applyFilter(null);
 	}
 
-	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getTheParser().getSynonymsCount()));
-	}
-
-	private void updateCorrectionsCounter(){
+	private void updateAutoCorrectionsCounter(){
 		acoCorrectionsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
@@ -2086,9 +1806,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private void clearDictionaryFields(){
 		((DictionaryLayeredPane)dicLayeredPane).clear();
-
-		theSynonymsTextField.setText(null);
-		popupMergeMenuItem.setEnabled(false);
+		((ThesaurusLayeredPane)theLayeredPane).clear();
 	}
 
 	@Override
@@ -2099,8 +1817,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void clearThesaurusParser(){
-		final ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-		dm.setSynonyms(null);
+		((ThesaurusLayeredPane)theLayeredPane).clear();
 
 		theMenu.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
@@ -2271,16 +1988,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JScrollPane sexScrollPane;
    private unit731.hunlinter.gui.JTagPanel sexTagPanel;
    private javax.swing.JTextField sexTextField;
-   private javax.swing.JButton theAddButton;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenu theMenu;
-   private javax.swing.JScrollPane theScrollPane;
-   private javax.swing.JLabel theSynonymsLabel;
-   private javax.swing.JLabel theSynonymsRecordedLabel;
-   private javax.swing.JLabel theSynonymsRecordedOutputLabel;
-   private javax.swing.JTextField theSynonymsTextField;
-   private javax.swing.JTable theTable;
    private javax.swing.JButton wexAddButton;
    private javax.swing.JLabel wexCorrectionsRecordedLabel;
    private javax.swing.JLabel wexCorrectionsRecordedOutputLabel;
