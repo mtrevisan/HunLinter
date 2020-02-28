@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,6 +31,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.FontChooserDialog;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.core.WorkerAbstract;
@@ -51,6 +53,7 @@ public class GUIUtils{
 	private static final String KEY_UNDO = "Undo";
 	private static final String KEY_REDO = "Redo";
 
+
 	private static String languageSample;
 	private static final List<String> familyNamesAll = new ArrayList<>();
 	private static final List<String> familyNamesMonospaced = new ArrayList<>();
@@ -65,17 +68,18 @@ public class GUIUtils{
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 
-			final List<String> list = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
-			double width = 0.;
-			for(final String elem : list){
-				final Font currentFont = new Font(elem, Font.PLAIN, GUIUtils.currentFont.getSize());
-				final Rectangle2D bounds = getStringBounds(currentFont, languageSample);
-				final double w = bounds.getWidth();
-				if(w > width){
-					bestFont = currentFont;
-					width = w;
-				}
-			}
+			final Function<String, Pair<Double, Font>> widthFontPair = fontName -> {
+				final Font currentFont = new Font(fontName, Font.PLAIN, GUIUtils.currentFont.getSize());
+				final double w = getStringBounds(currentFont, languageSample)
+					.getWidth();
+				return Pair.of(w, currentFont);
+			};
+			final List<String> fontNames = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
+			bestFont = fontNames.stream()
+				.map(widthFontPair)
+				.max(Comparator.comparingDouble(Pair::getKey))
+				.map(Pair::getValue)
+				.orElse(currentFont);
 		}
 		return getDefaultHeightFont(bestFont);
 	}
