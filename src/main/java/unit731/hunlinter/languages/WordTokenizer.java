@@ -23,12 +23,13 @@ public class WordTokenizer{
 	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp", "sftp");
 	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
 	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
+	private static final String PATTERN_TIME = "(0?[1-9]|1[0-2])[:.][0-5]\\d([:.][0-5]\\d)? ?[aApP][mM]|(0?\\d|1\\d|2[0-3])[:.][0-5]\\d(?:[:.][0-5]\\d)?";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
 	private static final String PATTERN_EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
 	//https://rgxdb.com/r/29JZFQEP
 	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
 	//$2 = scheme, $4 = authority, $5 = path, $7 = query, $9 = fragment
-	private static final String PATTERN_URI_IPv4 = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
+	private static final String PATTERN_URI_IPv4 = "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
 
 	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +
 		"\u1160\u1680"
@@ -60,25 +61,13 @@ public class WordTokenizer{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
-	public static void main(String[] a){
-		String text = "as http://www.ics.uci.edu/pub/ietf/uri/#Related a";
-		final List<String> unbreakableText = new ArrayList<>();
-		boolean f = PatternHelper.pattern("(([a-zA-Z][a-zA-Z\\d+-.]*:)?(\\/\\/([a-zA-Z\\d\\-._~!$&'()*+,;=%]*(:[a-zA-Z\\d\\-._~!$&'()*+,;=:%]*)?@)?([a-zA-Z\\d-.%]+|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|(\\[[a-fA-F\\d.:]+\\]))?(:\\d*)?(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*|\\/([a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)?|[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)?(\\?[a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*)?(\\#[a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*)?)").matcher("asdf").matches();
-//		boolean f2 = PatternHelper.pattern("((?:(?[a-zA-Z][a-zA-Z\\d+-.]*):)?(?:(?:(?:\\/\\/(?:(?:((?:[a-zA-Z\\d\\-._~!$&'()*+,;=%]*)(?::(?:[a-zA-Z\\d\\-._~!$&'()*+,;=:%]*))?)@)?((?:[a-zA-Z\\d-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(\\d*))?))(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)|(\\/(?:(?:[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*))?)|([a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*))?(?:\\?([a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*))?(?:\\#([a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*))?)").matcher("asdf").matches();
-		PatternHelper.pattern(".*(([^:/?# ]+:)?(//[^/?#]*)?[^?#]*(\\?[^#]*)?(#[^ ]*)?).*").matcher(text)
-			.replaceAll(m -> {
-				unbreakableText.add(m.group());
-				return "\0\0\0";
-			});
-	}
-
 	public List<String> tokenize(String text){
 		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
 		//find all urls and emails, substitute with placeholder
 		final List<String> unbreakableText = new ArrayList<>();
-		text = PatternHelper.pattern(PATTERN_EMAIL).matcher(text)
+		text = PatternHelper.pattern(PATTERN_TIME + "|" + PATTERN_EMAIL).matcher(text)
 			.replaceAll(m -> {
 				unbreakableText.add(m.group());
 				return PLACEHOLDER;
