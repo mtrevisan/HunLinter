@@ -23,8 +23,8 @@ public class WordTokenizer{
 	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp", "sftp");
 	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
 	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
-	private static final String PATTERN_DATE_ISO8601 = "(?:[\\+-]?\\d{4}(?!\\d{2}\\b))(?:(-?)(?:(?:0[1-9]|1[0-2])(?:\\1(?:[12]\\d|0[1-9]|3[01]))?|W(?:[0-4]\\d|5[0-2])(?:-?[1-7])?|(?:00[1-9]|0[1-9]\\d|[12]\\d{2}|3(?:[0-5]\\d|6[1-6])))(?:[T\\s](?:(?:(?:[01]\\d|2[0-3])(?:(:?)[0-5]\\d)?|24\\:?00)(?:[\\.,]\\d+(?!:))?)?(?:\\2[0-5]\\d(?:[\\.,]\\d+)?)?(?:[zZ]|(?:[\\+-])(?:[01]\\d|2[0-3]):?(?:[0-5]\\d)?)?)?)?";
-	private static final String PATTERN_TIME = "(0?[1-9]|1[0-2])[:.][0-5]\\d([:.][0-5]\\d)? ?[aApP][mM]|(0?\\d|1\\d|2[0-3])[:.][0-5]\\d(?:[:.][0-5]\\d)?";
+	private static final String PATTERN_DATE_ISO8601 = "([+-]?\\d{4}(?!\\d{2}\\b))(-?((0[1-9]|1[0-2])(\\1([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))(([T\\s](([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([.,]\\d+(?!:))?)?(\\2[0-5]\\d([.,]\\d+)?)?([zZ]|([+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?";
+	private static final String PATTERN_TIME = "(0?[1-9]|1[0-2])[:.][0-5]\\d([:.][0-5]\\d)? ?[aApP][mM]|(0?\\d|1\\d|2[0-3])[:.][0-5]\\d([:.][0-5]\\d)?";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
 	private static final String PATTERN_EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
 	//https://rgxdb.com/r/29JZFQEP
