@@ -5,6 +5,7 @@ import unit731.hunlinter.services.PatternHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -24,14 +25,31 @@ public class WordTokenizer{
 	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
 	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
 	//https://rgxdb.com/try
-	private static final String PATTERN_DATE_ISO8601 = "([+-]?\\d{4}(?!\\d{2}\\b))(-?((0[1-9]|1[0-2])(\\1([12]\\d|0[1-9]|3[01]))?|W([0-4]\\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\\d|[12]\\d{2}|3([0-5]\\d|6[1-6])))(([T\\s](([01]\\d|2[0-3])((:?)[0-5]\\d)?|24\\:?00)([.,]\\d+(?!:))?)?(\\2[0-5]\\d([.,]\\d+)?)?([zZ]|([+-])([01]\\d|2[0-3]):?([0-5]\\d)?)?)?)?";
-	private static final String PATTERN_TIME = "(0?[1-9]|1[0-2])[:.][0-5]\\d([:.][0-5]\\d)? ?[aApP][mM]|(0?\\d|1\\d|2[0-3])[:.][0-5]\\d([:.][0-5]\\d)?";
+	private static final String DATE_ISO8601 = "(?:[\\+-]?\\d{4}(?!\\d{2}\\b))(?:(-?)(?:(?:0[1-9]|1[0-2])(?:\\1(?:[12]\\d|0[1-9]|3[01]))?|W(?:[0-4]\\d|5[0-2])(?:-?[1-7])?|(?:00[1-9]|0[1-9]\\d|[12]\\d{2}|3(?:[0-5]\\d|6[1-6])))(?:[T\\s](?:(?:(?:[01]\\d|2[0-3])(?:(:?)[0-5]\\d)?|24\\:?00)(?:[\\.,]\\d+(?!:))?)?(?:\\2[0-5]\\d(?:[\\.,]\\d+)?)?(?:[zZ]|(?:[\\+-])(?:[01]\\d|2[0-3]):?(?:[0-5]\\d)?)?)?)?";
+	private static final String TIME = "(?:(?:0?[1-9]|1[0-2])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)? ?[aApP][mM])|(?:(?:0?\\d|1\\d|2[0-3])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)?)";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
-	private static final String PATTERN_EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
+	private static final String EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
 	//https://rgxdb.com/r/29JZFQEP
 	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
 	//$2 = scheme, $4 = authority, $5 = path, $7 = query, $9 = fragment
-	private static final String PATTERN_URI_IPv4 = "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
+	private static final String URI_IPv4 = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
+	private static final String URI_IPv6_1 = "(?:(?:(?:[0-9A-Fa-f]{1,4}:){7}(?:[0-9A-Fa-f]{1,4}|:))|(?:(?:[0-9A-Fa-f]{1,4}:){6}(?::[0-9A-Fa-f]{1,4}|(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(?:(?:[0-9A-Fa-f]{1,4}:){5}(?:(?:(?::[0-9A-Fa-f]{1,4}){1,2})|(?::(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(?:(?:[0-9A-Fa-f]{1,4}:){4}(?:(?:(?::[0-9A-Fa-f]{1,4}){1,3})|(?:(?::[0-9A-Fa-f]{1,4}){0,1}:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(?:(?:[0-9A-Fa-f]{1,4}:){3}(?:(?:(?::[0-9A-Fa-f]{1,4}){1,4})|(?:(?::[0-9A-Fa-f]{1,4}){0,2}:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(?:(?:[0-9A-Fa-f]{1,4}:){2}(?:(?:(?::[0-9A-Fa-f]{1,4}){1,5})|(?:(?::[0-9A-Fa-f]{1,4}){0,3}:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(?:(?:[0-9A-Fa-f]{1,4}:){1}(?:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|(?:(?::[0-9A-Fa-f]{1,4}){0,4}:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(?::(?:(?:(?::[0-9A-Fa-f]{1,4}){1,7})|(?:(?::[0-9A-Fa-f]{1,4}){0,5}:(?:(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(?:%.+)?";
+	private static final String URI_IPv6_2 = "(?:(?:(?:[0-9A-Fa-f]{0,4}:){7}[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){6}:[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){5}:(?:[0-9A-Fa-f]{0,4}:)?[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){4}:(?:[0-9A-Fa-f]{0,4}:){0,2}[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){3}:(?:[0-9A-Fa-f]{0,4}:){0,3}[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){2}:(?:[0-9A-Fa-f]{0,4}:){0,4}[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){6}(?:(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2}))\\.){3}(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2})))|(?:(?:[0-9A-Fa-f]{0,4}:){0,5}:(?:(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2}))\\.){3}(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2})))|(?:::(?:[0-9A-Fa-f]{0,4}:){0,5}(?:(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2}))\\.){3}(?:(?:25[0-5])|(?:2[0-4]\\d)|(?:1\\d{2})|(?:\\d{1,2})))|(?:[0-9A-Fa-f]{0,4}::(?:[0-9A-Fa-f]{0,4}:){0,5}[0-9A-Fa-f]{0,4})|(?:::(?:[0-9A-Fa-f]{0,4}:){0,6}[0-9A-Fa-f]{0,4})|(?:(?:[0-9A-Fa-f]{0,4}:){1,7}:))";
+	private static final String URL_ENCODED_STRING = "(?:[^%]|%[0-9A-Fa-f]{2})+";
+	private static final String URL = "(?:([a-zA-Z][a-zA-Z\\d+-.]*):)?(?:\\/\\/(?:([a-zA-Z\\d\\-._~\\!$&'()*+,;=%]*)(?::([a-zA-Z\\d\\-._~\\!$&'()*+,;=:%]*))?@)?((?:[a-zA-Z\\d-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(\\d*))?((?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*)|(\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*)?|([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*))?(?:\\?([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%\\/?]*))?(?:\\#([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%\\/?]*))?";
+	private static final Pattern PATTERN_UNBREAKABLE;
+	static{
+		final StringJoiner sj = new StringJoiner("|");
+		sj.add(DATE_ISO8601)
+			.add(TIME)
+			.add(EMAIL)
+			.add(URI_IPv4)
+			.add(URI_IPv6_1)
+			.add(URI_IPv6_2)
+			.add(URL_ENCODED_STRING)
+			.add(URL);
+		PATTERN_UNBREAKABLE = PatternHelper.pattern("(" + sj.toString() + ")");
+	}
 
 	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +
 		"\u1160\u1680"
@@ -69,9 +87,9 @@ public class WordTokenizer{
 
 		//find all urls and emails, substitute with placeholder
 		final List<String> unbreakableText = new ArrayList<>();
-		text = PatternHelper.pattern(PATTERN_DATE_ISO8601 /*+ "|" + PATTERN_TIME + "|" + PATTERN_EMAIL*/).matcher(text)
+		text = PATTERN_UNBREAKABLE.matcher(text)
 			.replaceAll(m -> {
-				unbreakableText.add(m.group());
+				unbreakableText.add(m.group(1));
 				return PLACEHOLDER;
 			});
 
