@@ -229,22 +229,11 @@ public class StringHelper{
 		if(bytes < 1024l)
 			return bytes + " B";
 
-		final double factor;
-		String suffix;
-		if(bytes <= 0xFFFCCCCCCCCCCCCl >> 40){
-			factor = 0x1p10;
-			suffix = "KiB";
-		}
-		else if(bytes <= 0xFFFCCCCCCCCCCCCl >> 30){
-			factor = 0x1p20;
-			suffix = "MiB";
-		}
-		else{
-			factor = 0x1p30;
-			suffix = "GiB";
-		}
-		final double result = bytes / factor;
-		return String.format(Locale.ROOT, (result < 100? "%.1f ": "%.0f ") + suffix, result);
+		final int exponent = (int)(Math.log10((double)bytes) / Math.log10(1024.));
+		final char prefix = "KMGTPE".charAt(exponent - 1);
+		final double divisor = Math.pow(1024., exponent);
+		final double result = bytes / divisor;
+		return String.format(Locale.ROOT, (result < 100? "%.1f": "%.0f") + " %ciB", result, prefix);
 	}
 
 }
