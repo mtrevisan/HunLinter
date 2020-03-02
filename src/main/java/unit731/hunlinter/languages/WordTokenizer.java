@@ -1,6 +1,7 @@
 package unit731.hunlinter.languages;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.PatternHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +12,23 @@ import java.util.regex.Pattern;
 
 
 /**
- * Tokenizes a sentence into words. Punctuation and whitespace gets their own tokens.
+ * Tokenizes a sentence into words.
+ * Punctuation and whitespace gets their own tokens.
  * The tokenizer is a quite simple character-based one, though it knows about urls and will put them in one token,
  * if fully specified including a protocol (like {@code http://foobar.org}).
- *
- * @author Daniel Naber
  */
 public class WordTokenizer{
 
-	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp");
+	private static final String PLACEHOLDER = "\0\0\0";
+	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp", "sftp");
 	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
 	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
-	private static final Pattern PATTERN_EMAIL = Pattern.compile("(?<!:)\\b[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))\\b");
+	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
+	private static final String PATTERN_EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
+	//https://rgxdb.com/r/29JZFQEP
+	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
+	//$2 = scheme, $4 = authority, $5 = path, $7 = query, $9 = fragment
+	private static final String PATTERN_URI_IPv4 = "(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}";
 
 	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +
 		"\u1160\u1680"
@@ -54,20 +60,40 @@ public class WordTokenizer{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
+	public static void main(String[] a){
+		String text = "as http://www.ics.uci.edu/pub/ietf/uri/#Related a";
+		final List<String> unbreakableText = new ArrayList<>();
+		boolean f = PatternHelper.pattern("(([a-zA-Z][a-zA-Z\\d+-.]*:)?(\\/\\/([a-zA-Z\\d\\-._~!$&'()*+,;=%]*(:[a-zA-Z\\d\\-._~!$&'()*+,;=:%]*)?@)?([a-zA-Z\\d-.%]+|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|(\\[[a-fA-F\\d.:]+\\]))?(:\\d*)?(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*|\\/([a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)?|[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)?(\\?[a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*)?(\\#[a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*)?)").matcher("asdf").matches();
+//		boolean f2 = PatternHelper.pattern("((?:(?[a-zA-Z][a-zA-Z\\d+-.]*):)?(?:(?:(?:\\/\\/(?:(?:((?:[a-zA-Z\\d\\-._~!$&'()*+,;=%]*)(?::(?:[a-zA-Z\\d\\-._~!$&'()*+,;=:%]*))?)@)?((?:[a-zA-Z\\d-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(\\d*))?))(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*)|(\\/(?:(?:[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*))?)|([a-zA-Z\\d\\-._~!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~!$&'()*+,;=:@%]*)*))?(?:\\?([a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*))?(?:\\#([a-zA-Z\\d\\-._~!$&'()*+,;=:@%\\/?]*))?)").matcher("asdf").matches();
+		PatternHelper.pattern(".*(([^:/?# ]+:)?(//[^/?#]*)?[^?#]*(\\?[^#]*)?(#[^ ]*)?).*").matcher(text)
+			.replaceAll(m -> {
+				unbreakableText.add(m.group());
+				return "\0\0\0";
+			});
+	}
+
 	public List<String> tokenize(String text){
 		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
+
+		//find all urls and emails, substitute with placeholder
+		final List<String> unbreakableText = new ArrayList<>();
+		text = PatternHelper.pattern(PATTERN_EMAIL).matcher(text)
+			.replaceAll(m -> {
+				unbreakableText.add(m.group());
+				return PLACEHOLDER;
+			});
+
+		int index = 0;
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
-		while(st.hasMoreElements())
-			result.add(st.nextToken());
+		while(st.hasMoreElements()){
+			final String restoredSubtext = st.nextToken();
+			result.add(StringUtils.contains(restoredSubtext, PLACEHOLDER)? unbreakableText.get(index ++): restoredSubtext);
+		}
 
-		result = joinEmails(result);
-		result = joinUrls(result);
+		//restore placeholders with original
+//		result = joinUrls(result);
 		return result;
-	}
-
-	private List<String> joinEmails(final List<String> list){
-		return join(list, PATTERN_EMAIL, "@", null);
 	}
 
 	/*
@@ -109,7 +135,13 @@ public class WordTokenizer{
 		return result;
 	}
 
-	/* see RFC1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a> */
+	/**
+	 * The generic URI syntax consists of a hierarchical sequence of components referred to as the scheme, authority, path, query, and fragment.
+	 * @see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
+	 * @see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
+	 *
+	 * See RFC1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a>
+	*/
 	private List<String> joinUrls(final List<String> list){
 		final List<String> newList = new ArrayList<>();
 		boolean inUrl = false;
