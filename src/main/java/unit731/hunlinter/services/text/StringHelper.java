@@ -229,10 +229,42 @@ public class StringHelper{
 		return (b < 1024l? bytes + " B":
 			b <= 0xFFFCCCCCCCCCCCCl >> 40? String.format(Locale.ROOT, "%.1f KiB", bytes / 0x1p10):
 			b <= 0xFFFCCCCCCCCCCCCl >> 30? String.format(Locale.ROOT, "%.1f MiB", bytes / 0x1p20):
-			b <= 0xFFFCCCCCCCCCCCCl >> 20? String.format(Locale.ROOT, "%.1f GiB", bytes / 0x1p30):
-			b <= 0xFFFCCCCCCCCCCCCl >> 10? String.format(Locale.ROOT, "%.1f TiB", bytes / 0x1p40):
-			b <= 0xFFFCCCCCCCCCCCCl? String.format(Locale.ROOT, "%.1f PiB", (bytes >> 10) / 0x1p40):
-			String.format(Locale.ROOT, "%.1f EiB", (bytes >> 20) / 0x1p40));
+			String.format(Locale.ROOT, "%.1f GiB", bytes / 0x1p30));
+	}
+
+	public static String byteCountToHumanReadable2(final long bytes){
+		final long b = (bytes == Long.MIN_VALUE? Long.MAX_VALUE: Math.abs(bytes));
+
+		String format = "%.1f";
+		double result = bytes;
+		String suffix;
+		if(b < 1024l){
+			format = "%.0f";
+			suffix = "B";
+		}
+		else if(b <= 0xFFFCCCCCCCCCCCCl >> 40){
+			suffix = "KiB";
+			result /= 0x1p10;
+		}
+		else if(b <= 0xFFFCCCCCCCCCCCCl >> 30){
+			suffix = "MiB";
+			result /= 0x1p20;
+		}
+		else{
+			suffix = "GiB";
+			result /= 0x1p30;
+		}
+		return  String.format(Locale.ROOT, format + " " + suffix, result);
+	}
+
+	public static final void main(String[] a){
+		for(long bytes = 512; bytes < 0xFFFFFFFFFFFFFFFl; bytes *= 100l){
+			String str1 = byteCountToHumanReadable(bytes);
+			String str2 = byteCountToHumanReadable2(bytes);
+			System.out.println("checking " + bytes + ": " + str1 + " and " + str2);
+			if(!str1.equals(str2))
+				System.out.println("error " + bytes);
+		}
 	}
 
 }
