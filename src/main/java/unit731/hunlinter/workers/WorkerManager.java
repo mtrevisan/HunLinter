@@ -69,12 +69,14 @@ public class WorkerManager{
 			onEnding.accept(WORKERS.get(workerName));
 	}
 
-	public void createProjectLoaderWorker(final Runnable completed, final Consumer<Exception> cancelled){
+	public void createProjectLoaderWorker(final Consumer<WorkerAbstract<?, ?>> onStart, final Runnable completed, final Consumer<Exception> cancelled){
 		final String workerName = ProjectLoaderWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			worker = new ProjectLoaderWorker(packager, parserManager, completed, cancelled);
 			WORKERS.put(workerName, worker);
+
+			onStart.accept(worker);
 		}
 	}
 
