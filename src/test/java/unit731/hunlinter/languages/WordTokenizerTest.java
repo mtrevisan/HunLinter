@@ -27,6 +27,22 @@ public class WordTokenizerTest{
 		Assertions.assertEquals(Arrays.asList("QQ==", " ", "YmFzZTY0", " ", "YmFzZTY0IQ=="), tokens);
 	}
 
+//	@Test
+//	void semanticVersioning(){
+//		List<String> tokens = tokenizer.tokenize("1.2.3 1.2.3-pre 1.2.3+build 1.2.3-pre+build v1.2.3-pre+build");
+//
+//		Assertions.assertEquals(Arrays.asList("1.2.3", " ", "1.2.3-pre", " ", "1.2.3+build", " ", "1.2.3-pre+build", " ", "v1.2.3-pre+build"), tokens);
+//	}
+
+//	@Test
+//	void phoneNumber(){
+//		List<String> tokens = tokenizer.tokenize("(999) 999 9999_(999) 999-9999_999-999-9999_+9 999-999-9999_+9 (999) 999-9999_+999 (999.9) 99-999-9999" +
+//			"_999-9999");
+//
+//		Assertions.assertEquals(Arrays.asList("(999) 999 9999", "_", "(999) 999-9999", "_", "999-999-9999", "_", "+9 999-999-9999", "_", "+9 (999) 999-9999",
+//			"_", "+999 (999.9) 99-999-9999", "_", "999-9999"), tokens);
+//	}
+
 	@Test
 	void dateISO8601(){
 		List<String> tokens = tokenizer.tokenize("2009-12T12:34_2009_2009-05-19_20090519_2009123_2009-05_2009-123_2009-222_2009-001_2009-W01-1_2009-W51-1"
