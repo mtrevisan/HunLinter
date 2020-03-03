@@ -2,6 +2,7 @@ package unit731.hunlinter.languages;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ import java.util.regex.Pattern;
  */
 public class WordTokenizer{
 
-	private static final String PLACEHOLDER = "\0\0\0";
+	private static final Pattern PATTERN_PLACEHOLDER = PatternHelper.pattern("(\0*)");
+
 	//@see <a href="https://www.ietf.org/rfc/rfc4648.txt">RFC-4648</a>
 	private static final String BASE64 = "(?:[a-zA-Z0-9+\\/]{4})*(?:[a-zA-Z0-9+\\/]{3}=|[a-zA-Z0-9+\\/]{2}==|[a-zA-Z0-9+\\/]{1}===)";
 //	private static final String SEMANTIC_VERSIONING = "[Vv]?(?:(?<major>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<minor>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<patch>(?:0|[1-9](?:(?:0|[1-9])+)*))(?:-(?<prerelease>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*)))*))?(?:[+](?<build>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+)))*))?)";
@@ -79,12 +81,14 @@ public class WordTokenizer{
 		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
+		final String placeholder = findPlaceholder(text);
+
 		//find all urls and emails, substitute with placeholder
 		final List<String> unbreakableText = new ArrayList<>();
 		text = PATTERN_UNBREAKABLE.matcher(text)
 			.replaceAll(m -> {
 				unbreakableText.add(m.group(1));
-				return PLACEHOLDER;
+				return placeholder;
 			});
 
 		//restore placeholders with original
@@ -92,10 +96,22 @@ public class WordTokenizer{
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
 		while(st.hasMoreElements()){
 			final String restoredSubtext = st.nextToken();
-			result.add(StringUtils.contains(restoredSubtext, PLACEHOLDER)? unbreakableText.get(index ++): restoredSubtext);
+			result.add(StringUtils.contains(restoredSubtext, placeholder)? unbreakableText.get(index ++): restoredSubtext);
 		}
 
 		return result;
+	}
+
+	public static void main(String[] args){
+		String a2 = findPlaceholder("as\0as\0\0er errt");
+		String a0 = findPlaceholder("as");
+		String a1 = findPlaceholder("as\0as");
+		System.out.println();
+	}
+
+	private static String findPlaceholder(final String text){
+		int a = StringHelper.maxRepeating(text, '\0');
+		return "\0";
 	}
 
 	/*
