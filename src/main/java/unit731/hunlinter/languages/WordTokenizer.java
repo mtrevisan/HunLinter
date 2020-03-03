@@ -81,7 +81,8 @@ public class WordTokenizer{
 		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
-		final String placeholder = findPlaceholder(text);
+		final String placeholder = StringUtils.repeat("\0", StringUtils.EMPTY,
+			StringHelper.maxRepeating(text, '\0') + 1);
 
 		//find all urls and emails, substitute with placeholder
 		final List<String> unbreakableText = new ArrayList<>();
@@ -100,18 +101,6 @@ public class WordTokenizer{
 		}
 
 		return result;
-	}
-
-	public static void main(String[] args){
-		String a2 = findPlaceholder("as\0as\0\0er errt");
-		String a0 = findPlaceholder("as");
-		String a1 = findPlaceholder("as\0as");
-		System.out.println();
-	}
-
-	private static String findPlaceholder(final String text){
-		int a = StringHelper.maxRepeating(text, '\0');
-		return "\0";
 	}
 
 	/*
