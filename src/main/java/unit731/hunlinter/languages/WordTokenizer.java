@@ -25,6 +25,15 @@ public class WordTokenizer{
 	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
 	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
 	//https://rgxdb.com/try
+	//RFC 4648
+	private static final String BASE64 = "(?:[a-zA-Z0-9+\\/]{4})*(?:[a-zA-Z0-9+\\/]{3}=|[a-zA-Z0-9+\\/]{2}==|[a-zA-Z0-9+\\/]{1}===)";
+	private static final String SEMANTIC_VERSIONING = "(?<=^[Vv]|^)(?:(?<major>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<minor>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<patch>(?:0|[1-9](?:(?:0|[1-9])+)*))(?:-(?<prerelease>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*)))*))?(?:[+](?<build>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+)))*))?)";
+	private static final String VEHICLE_IDENTIFICATION_NUMBER = "(?<wmi>[A-HJ-NPR-Z\\d]{3})(?<vds>[A-HJ-NPR-Z\\d]{5})(?<check>[\\dX])(?<vis>(?<year>[A-HJ-NPR-Z\\d])(?<plant>[A-HJ-NPR-Z\\d])(?<seq>[A-HJ-NPR-Z\\d]{6}))";
+	private static final String ISBN10 = "(?:ISBN(?:-10)?:?\\ *((?=\\d{1,5}([ -]?)\\d{1,7}\\3?\\d{1,6}\\3?\\d)(?:\\d\\3*){9}[\\dX]))";
+	private static final String ISBN13 = "(?:ISBN(?:-13)?:?\\ *(97(?:8|9)([ -]?)(?=\\d{1,5}\\3?\\d{1,7}\\3?\\d{1,6}\\3?\\d)(?:\\d\\3*){9}\\d))";
+	private static final String MAC_ADDRESS = "(?:[0-9A-Fa-f]{2}(?:([:-])|)[0-9A-Fa-f]{2})(?:(?(1)\\2|\\.)(?:[0-9A-Fa-f]{2}([:-]?)[0-9A-Fa-f]{2})){2}";
+	private static final String UUID_GUID = "({)?(?<uuid>[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12})((?(1)}))";
+	private static final String PHONE_NUMBER = "[+]?(?=(?:[^\\dx]*\\d){7})(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?)(?:[ -]?(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?))*(?:[ ]?(?:x|ext)\\.?[ ]?\\d{1,5})?";
 	private static final String DATE_ISO8601 = "(?<!\\d)(?:[+-]?\\d{4}(?!\\d{2}\\b))(?:(-?)(?:(?:00[1-9]|0[1-9]\\d|[12]\\d{2}|3[0-5]\\d|36[0-6])|(?:3[0-6]\\d)|(?:[0-2]\\d{2})|(?:0[1-9]|1[0-2])(?:\\2(?:0[1-9]|[12]\\d|3[01]))?|(?:\\d{1,2})|W(?:[0-4]\\d|5[0-2])(?:-?[1-7])?)(?!\\d)(?:[T\\s](?:(?:(?:[01]\\d|2[0-3])(?:(:?)[0-5]\\d)?|24\\:?00)(?:[.,]\\d+(?!:))?)?(?:\\3[0-5]\\d(?:[.,]\\d+)?)?(?:[zZ]|(?:[+-])(?:[01]\\d|2[0-3]):?(?:[0-5]\\d)?)?)?)?";
 	private static final String TIME = "(?<!\\d)(?:(?:0?[1-9]|1[0-2])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)? ?[aApP][mM])|(?:(?:0?\\d|1\\d|2[0-3])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)?)";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
@@ -40,7 +49,9 @@ public class WordTokenizer{
 	private static final Pattern PATTERN_UNBREAKABLE;
 	static{
 		final StringJoiner sj = new StringJoiner("|");
-		sj.add(DATE_ISO8601)
+		sj
+			.add(BASE64)
+			.add(DATE_ISO8601)
 			.add(TIME)
 			.add(EMAIL)
 //			.add(URI_IPv4)
