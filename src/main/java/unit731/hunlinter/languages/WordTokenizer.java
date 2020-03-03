@@ -36,17 +36,18 @@ public class WordTokenizer{
 	//https://rgxdb.com/r/29JZFQEP
 	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
 	//$2 = scheme, $4 = authority, $5 = path, $7 = query, $9 = fragment
-	private static final String URL = "(?:([a-zA-Z][a-zA-Z\\d+-.]*):)?(?:(?:(?:\\/\\/(?:(?:((?:[a-zA-Z\\d\\-._~\\!$&'()*+,;=%]*)(?::(?:[a-zA-Z\\d\\-._~\\!$&'()*+,;=:%]*))?)@)?((?:[a-zA-Z\\d-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(\\d*))?))((?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*))|(\\/(?:(?:[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*))?)|([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]+(?:\\/[a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%]*)*))?(?:\\?([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%\\/?]*))?(?:\\#([a-zA-Z\\d\\-._~\\!$&'()*+,;=:@%\\/?]*))?";
+	private static final String URL = "(?:(?:[a-zA-Z][a-zA-Z\\d+-.]*):)(?|\\/\\/(?:(?:[^:]*)(?::(?:[^@]*))?@)?(?:(?:[a-zA-Z0-9-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(?:\\d*))?(?:(?:\\/[^\\/]*)*)|(?:\\/[^\\#\\?]+(?:\\/[^\\#\\?]*)*)?|(?:[^\\/]+(?:\\/[^\\#\\?]*)*))?(?:\\?(?:[^#]*))?(?:\\#(?:[^#]*))?";
 	private static final Pattern PATTERN_UNBREAKABLE;
 	static{
 		final StringJoiner sj = new StringJoiner("|");
 		sj
-			.add(BASE64)
-//			.add(SEMANTIC_VERSIONING)
-//			.add(PHONE_NUMBER)
-			.add(DATE_ISO8601)
-			.add(TIME)
-			.add(EMAIL)
+			.add("(?:(?:[a-zA-Z][a-zA-Z\\d+-.]*):)(?|\\/\\/(?:(?:[^:]*)(?::(?:[^@]*))?@)?(?:(?:[a-zA-Z0-9-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(?:\\d*))?(?:(?:\\/[^\\/]*)*)|(?:\\/[^\\#\\?]+(?:\\/[^\\#\\?]*)*)?|(?:[^\\/]+(?:\\/[^\\#\\?]*)*))?(?:\\?(?:[^#]*))?(?:\\#(?:[^#]*))?")
+//			.add(BASE64)
+////			.add(SEMANTIC_VERSIONING)
+////			.add(PHONE_NUMBER)
+//			.add(DATE_ISO8601)
+//			.add(TIME)
+//			.add(EMAIL)
 //			.add(URL)
 		;
 		PATTERN_UNBREAKABLE = PatternHelper.pattern("(" + sj.toString() + ")");

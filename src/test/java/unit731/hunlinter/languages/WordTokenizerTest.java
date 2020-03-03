@@ -74,7 +74,7 @@ public class WordTokenizerTest{
 		Assertions.assertEquals(Arrays.asList("Here", " ", "bla@blah.com", " ", "is", " ", "my", " ", "email", "."), tokens);
 	}
 
-//	@Test
+	@Test
 	void url(){
 		List<String> tokens = tokenizer.tokenize("Here www.bla.com is my url.");
 
