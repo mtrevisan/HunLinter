@@ -76,12 +76,7 @@ public class WordTokenizerTest{
 
 	@Test
 	void url(){
-		List<String> tokens = tokenizer.tokenize("Here www.bla.com is my url.");
-
-		Assertions.assertEquals(Arrays.asList("Here", " ", "www.bla.com", " ", "is", " ", "my", " ", "url", "."), tokens);
-
-
-		tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
+		List<String> tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
 
 		Assertions.assertEquals(Arrays.asList("Here", " ", "http://www.bla.com", " ", "is", " ", "another", " ", "url", "."), tokens);
 	}
