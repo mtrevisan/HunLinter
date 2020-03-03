@@ -17,15 +17,13 @@ import java.util.regex.Pattern;
  * Punctuation and whitespace gets their own tokens.
  * The tokenizer is a quite simple character-based one, though it knows about urls and will put them in one token,
  * if fully specified including a protocol (like {@code http://foobar.org}).
+ *
+ * @see <a href="https://rgxdb.com/try">Regex DB</a>
  */
 public class WordTokenizer{
 
 	private static final String PLACEHOLDER = "\0\0\0";
-	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp", "sftp");
-	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
-	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
-	//https://rgxdb.com/try
-	//RFC 4648
+	//@see <a href="https://www.ietf.org/rfc/rfc4648.txt">RFC-4648</a>
 	private static final String BASE64 = "(?:[a-zA-Z0-9+\\/]{4})*(?:[a-zA-Z0-9+\\/]{3}=|[a-zA-Z0-9+\\/]{2}==|[a-zA-Z0-9+\\/]{1}===)";
 //	private static final String SEMANTIC_VERSIONING = "[Vv]?(?:(?<major>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<minor>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<patch>(?:0|[1-9](?:(?:0|[1-9])+)*))(?:-(?<prerelease>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*)))*))?(?:[+](?<build>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+)))*))?)";
 //	private static final String PHONE_NUMBER = "[+]?(?=(?:[^\\dx]*\\d){7})(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?)(?:[ -]?(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?))*(?:[ ]?(?:x|ext)\\.?[ ]?\\d{1,5})?";
@@ -33,9 +31,7 @@ public class WordTokenizer{
 	private static final String TIME = "(?<!\\d)(?:(?:0?[1-9]|1[0-2])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)? ?[aApP][mM])|(?:(?:0?\\d|1\\d|2[0-3])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)?)";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
 	private static final String EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
-	//https://rgxdb.com/r/29JZFQEP
 	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
-	//$2 = scheme, $4 = authority, $5 = path, $7 = query, $9 = fragment
 	private static final String URL = "(?:(?:[a-zA-Z][a-zA-Z\\d+-.]*):)(?:\\/\\/(?:(?:[^:]*)(?::(?:[^@]*))?@)?(?:(?:[a-zA-Z0-9-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(?:\\d*))?(?:(?:\\/[^\\/]*)*)|(?:\\/[^\\#\\?]+(?:\\/[^\\#\\?]*)*)?|(?:[^\\/]+(?:\\/[^\\#\\?]*)*))?(?:\\?(?:[^#]*))?(?:\\#(?:[^#]*))?";
 	private static final Pattern PATTERN_UNBREAKABLE;
 	static{
@@ -64,9 +60,6 @@ public class WordTokenizer{
 		+ "—"
 		+ "\t\n\r";
 
-	private static final String DOT = ".";
-	private static final String COLUMN = ":";
-	private static final String SLASH = "/";
 	private static final String HORIZONTAL_EXPANDED_ELLIPSIS = "...";
 	private static final String HORIZONTAL_ELLIPSIS = "…";
 
@@ -94,6 +87,7 @@ public class WordTokenizer{
 				return PLACEHOLDER;
 			});
 
+		//restore placeholders with original
 		int index = 0;
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
 		while(st.hasMoreElements()){
@@ -101,8 +95,6 @@ public class WordTokenizer{
 			result.add(StringUtils.contains(restoredSubtext, PLACEHOLDER)? unbreakableText.get(index ++): restoredSubtext);
 		}
 
-		//restore placeholders with original
-//		result = joinUrls(result);
 		return result;
 	}
 
@@ -142,104 +134,6 @@ public class WordTokenizer{
 		}
 		else
 			result.addAll(list);
-		return result;
-	}
-
-	/**
-	 * The generic URI syntax consists of a hierarchical sequence of components referred to as the scheme, authority, path, query, and fragment.
-	 * @see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
-	 * @see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
-	 *
-	 * See RFC1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a>
-	*/
-	private List<String> joinUrls(final List<String> list){
-		final List<String> newList = new ArrayList<>();
-		boolean inUrl = false;
-		final StringBuilder url = new StringBuilder();
-		String urlQuote = null;
-		for(int i = 0; i < list.size(); i ++){
-			if(urlStartsAt(i, list)){
-				inUrl = true;
-				if(i - 1 >= 0)
-					urlQuote = list.get(i - 1);
-				url.append(list.get(i));
-			}
-			else if(inUrl && urlEndsAt(i, list, urlQuote)){
-				inUrl = false;
-				urlQuote = null;
-				newList.add(url.toString());
-				url.setLength(0);
-				newList.add(list.get(i));
-			}
-			else if(inUrl)
-				url.append(list.get(i));
-			else
-				newList.add(list.get(i));
-		}
-		if(url.length() > 0)
-			newList.add(url.toString());
-		return newList;
-	}
-
-	private boolean urlStartsAt(final int index, final List<String> list){
-		final String token = list.get(index);
-		if(isProtocol(token) && list.size() > index + 3){
-			final String nToken = list.get(index + 1);
-			final String nnToken = list.get(index + 2);
-			final String nnnToken = list.get(index + 3);
-			if(nToken.equals(COLUMN) && nnToken.equals(SLASH) && nnnToken.equals(SLASH))
-				return true;
-		}
-		if(list.size() > index + 1){
-			//e.g. www.mydomain.org
-			final String nToken = list.get(index);
-			final String nnToken = list.get(index + 1);
-			if(nToken.equals("www") && nnToken.equals(DOT))
-				return true;
-		}
-		if(
-			//e.g. mydomain.org/ (require slash to avoid missing errors that can be interpreted as domains)
-			list.size() > index + 3
-				//use this order so the regex only gets matched if needed
-				&& list.get(index + 1).equals(DOT)
-				&& list.get(index + 3).equals(SLASH)
-				&& DOMAIN_CHARS.matcher(token).matches()
-				&& DOMAIN_CHARS.matcher(list.get(index + 2)).matches())
-			return true;
-
-		return (
-			//e.g. sub.mydomain.org/ (require slash to avoid missing errors that can be interpreted as domains)
-			list.size() > index + 5
-			//use this order so the regex only gets matched if needed
-			&& list.get(index + 1).equals(DOT)
-			&& list.get(index + 3).equals(DOT)
-			&& list.get(index + 5).equals(SLASH)
-			&& DOMAIN_CHARS.matcher(token).matches()
-			&& DOMAIN_CHARS.matcher(list.get(index + 2)).matches()
-			&& DOMAIN_CHARS.matcher(list.get(index + 4)).matches());
-	}
-
-	private boolean isProtocol(final String token){
-		return PROTOCOLS.contains(token);
-	}
-
-	private boolean urlEndsAt(final int index, final List<String> list, final String urlQuote){
-		boolean result = false;
-		final String token = list.get(index);
-		//this is guesswork
-		if(StringUtils.isWhitespace(token) || token.equals(")") || token.equals("]"))
-			result = true;
-		else if(list.size() > index + 1){
-			final String nextToken = list.get(index + 1);
-			if((StringUtils.isWhitespace(nextToken)
-					|| StringUtils.equalsAny(nextToken, "\"", "»", "«", "‘", "’", "“", "”", "'", DOT))
-					&& (StringUtils.equalsAny(token, DOT, ",", ";", COLUMN, "!", "?") || token.equals(urlQuote)))
-				result = true;
-			else if(!URL_CHARS.matcher(token).matches())
-				result = true;
-		}
-		else if(!URL_CHARS.matcher(token).matches() || token.equals(DOT))
-			result = true;
 		return result;
 	}
 
