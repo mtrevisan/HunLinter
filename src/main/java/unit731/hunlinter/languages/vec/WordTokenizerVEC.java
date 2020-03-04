@@ -1,5 +1,6 @@
 package unit731.hunlinter.languages.vec;
 
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.WordTokenizer;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 
@@ -13,7 +14,6 @@ public class WordTokenizerVEC extends WordTokenizer{
 	private static final String UNICODE_APOSTROPHES = UNICODE_APOSTROPHE + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE;
 
 	private static final Pattern TOKENIZING_CHARACTERS;
-
 	static{
 		final String quotedTokenizingChars = Pattern.quote(DEFAULT_TOKENIZING_CHARACTERS);
 		TOKENIZING_CHARACTERS = Pattern.compile("(?i)"
@@ -32,7 +32,7 @@ public class WordTokenizerVEC extends WordTokenizer{
 
 	protected List<String> joinApostrophes(final List<String> list){
 		return join(list, TOKENIZING_CHARACTERS, UNICODE_APOSTROPHES,
-			group -> group.replaceAll(UNICODE_APOSTROPHE, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE));
+			group -> StringUtils.replace(group, UNICODE_APOSTROPHE, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE));
 	}
 
 }

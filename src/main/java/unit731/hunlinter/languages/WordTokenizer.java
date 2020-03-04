@@ -78,7 +78,6 @@ public class WordTokenizer{
 	}
 
 	public List<String> tokenize(String text){
-		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
 		final String placeholder = StringUtils.repeat("\0", StringUtils.EMPTY,
@@ -92,14 +91,19 @@ public class WordTokenizer{
 				return placeholder;
 			});
 
-		//restore placeholders with original
+		return extractTokens(text, placeholder, unbreakableText);
+	}
+
+	private List<String> extractTokens(final String text, final String placeholder, final List<String> unbreakableText){
+		final List<String> result = new ArrayList<>();
 		int index = 0;
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
 		while(st.hasMoreElements()){
-			final String restoredSubtext = st.nextToken();
-			result.add(StringUtils.contains(restoredSubtext, placeholder)? unbreakableText.get(index ++): restoredSubtext);
-		}
+			final String token = st.nextToken();
 
+			//restore placeholders with original
+			result.add(token.equals(placeholder)? unbreakableText.get(index ++): token);
+		}
 		return result;
 	}
 
