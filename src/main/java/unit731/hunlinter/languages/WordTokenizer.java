@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
-import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 /**
@@ -105,42 +102,6 @@ public class WordTokenizer{
 			//restore placeholders with original
 			result.add(token.equals(placeholder)? unbreakableText.get(index ++): token);
 		}
-		return result;
-	}
-
-	/*
-	 * NOTE: explicit check for {@code containingChars} speeds up method by factor of ~10
-	 */
-	protected List<String> join(final List<String> list, final Pattern pattern, final String containingChars,
-			final Function<String, String> groupSubstituter){
-		final String text = String.join(StringUtils.EMPTY, list);
-
-		final List<String> result = new ArrayList<>();
-		if((containingChars == null || StringUtils.containsAny(text, containingChars)) && pattern.matcher(text).find()){
-			final Matcher matcher = pattern.matcher(text);
-			int currentPosition = 0;
-			int idx = 0;
-			while(matcher.find()){
-				final int start = matcher.start();
-				final int end = matcher.end();
-				while(currentPosition < end){
-					if(currentPosition < start)
-						result.add(list.get(idx));
-					else if(currentPosition == start){
-						final String group = matcher.group();
-						result.add(groupSubstituter != null? groupSubstituter.apply(group): group);
-					}
-
-					currentPosition += list.get(idx)
-						.length();
-					idx ++;
-				}
-			}
-			if(currentPosition < text.length())
-				result.addAll(list.subList(idx, list.size()));
-		}
-		else
-			result.addAll(list);
 		return result;
 	}
 
