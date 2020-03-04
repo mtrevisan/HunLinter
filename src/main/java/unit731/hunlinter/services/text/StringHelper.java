@@ -2,6 +2,7 @@ package unit731.hunlinter.services.text;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -20,15 +20,15 @@ public class StringHelper{
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
-		/** All lower case or neutral case, e.g. "lowercase" or "123" */
+		/** All lower case or neutral case, e.g. "hello java" */
 		LOWER_CASE,
-		/** Start upper case, rest lower case, e.g. "Initcap" */
+		/** Start upper case, rest lower case, e.g. "Hello java" */
 		TITLE_CASE,
-		/** All upper case, e.g. "UPPERCASE" or "ALL4ONE" */
+		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA" */
 		ALL_CAPS,
-		/** Camel case, start lower case, e.g. "camelCase" */
+		/** Camel case, start lower case, e.g. "helloJava" */
 		CAMEL_CASE,
-		/** Pascal case, start upper case, e.g. "PascalCase" */
+		/** Pascal case, start upper case, e.g. "HelloJava" */
 		PASCAL_CASE
 	}
 
@@ -45,75 +45,23 @@ public class StringHelper{
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
-		int lower = 0;
-		int upper = 0;
-		for(final char chr : text.toCharArray())
-			if(Character.isAlphabetic(chr)){
-				if(Character.isLowerCase(chr))
-					lower ++;
-				else if(Character.isUpperCase(chr))
-					upper ++;
-			}
-		if(upper == 0)
+		final long upper = text.chars()
+			.filter(chr -> Character.isAlphabetic(chr) && Character.isUpperCase(chr))
+			.count();
+		if(upper == 0l)
 			return Casing.LOWER_CASE;
 
-		final boolean fistCapital = (Character.isUpperCase(text.charAt(0)));
-		if(fistCapital && upper == 1)
+		final boolean fistCapital = Character.isUpperCase(text.charAt(0));
+		if(fistCapital && upper == 1l)
 			return Casing.TITLE_CASE;
 
-		if(lower == 0)
+		final long lower = text.chars()
+			.filter(chr -> Character.isAlphabetic(chr) && Character.isLowerCase(chr))
+			.count();
+		if(lower == 0l)
 			return Casing.ALL_CAPS;
 
 		return (fistCapital? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
-	}
-
-	/**
-	 * Finds the length and the index at which starts the Longest Common Substring
-	 *
-	 * @param keyA	Character sequence A
-	 * @param keyB	Character sequence B
-	 * @return	The indexes of keyA and keyB of the start of the longest common substring between <code>A</code> and <code>B</code>
-	 */
-	public static Pair<Integer, Integer> longestCommonSubstring(final String keyA, final String keyB){
-		final int m = keyA.length();
-		final int n = keyB.length();
-
-		if(m < n){
-			final Pair<Integer, Integer> indexes = longestCommonSubstring(keyB, keyA);
-			return Pair.of(indexes.getRight(), indexes.getLeft());
-		}
-
-		//matrix to store result of two consecutive rows at a time
-		final int[][] len = new int[2][n];
-		int currentRow = 0;
-
-		//for a particular value of i and j, len[currRow][j] stores length of LCS in string X[0..i] and Y[0..j]
-		int lcsMaxLength = 0;
-		int lcsIndexA = -1;
-		int lcsIndexB = -1;
-		for(int i = 0; i < m; i ++){
-			for(int j = 0; j < n; j ++){
-				final int cost;
-				if(keyA.charAt(i) != keyB.charAt(j))
-					cost = 0;
-				else if(i == 0 || j == 0)
-					cost = 1;
-				else
-					cost = len[currentRow][j - 1] + 1;
-				len[1 - currentRow][j] = cost;
-
-				if(cost > lcsMaxLength){
-					lcsMaxLength = cost;
-
-					lcsIndexA = i;
-					lcsIndexB = j;
-				}
-			}
-
-			//make current row as previous row and previous row as new current row
-			currentRow = 1 - currentRow;
-		}
-		return Pair.of(lcsIndexA, lcsIndexB);
 	}
 
 	public static String longestCommonPrefix(final Collection<String> texts){
