@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 /**
@@ -112,10 +113,7 @@ public class WordTokenizer{
 	 */
 	protected List<String> join(final List<String> list, final Pattern pattern, final String containingChars,
 			final Function<String, String> groupSubstituter){
-		final StringBuilder sb = new StringBuilder();
-		for(final String item : list)
-			sb.append(item);
-		final String text = sb.toString();
+		final String text = String.join(StringUtils.EMPTY, list);
 
 		final List<String> result = new ArrayList<>();
 		if((containingChars == null || StringUtils.containsAny(text, containingChars)) && pattern.matcher(text).find()){
