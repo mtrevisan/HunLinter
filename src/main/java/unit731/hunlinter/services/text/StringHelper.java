@@ -236,17 +236,17 @@ public class StringHelper{
 		return String.format(Locale.ROOT, (result < 100? "%.1f": "%.0f") + " %ciB", result, prefix);
 	}
 
-	//Find the maximum repeating character in given string
+	//Find the maximum consecutive repeating character in given string
 	public static int maxRepeating(final String text, final char chr){
 		final int n = text.length();
 		int count = 0;
 		int currentCount = 1;
 		//traverse string except last character
 		for(int i = 0; i < n; i ++){
-			// If current character matches with next
-			if(i < n - 1 && text.charAt(i) == text.charAt(i + 1) && text.charAt(i) == chr)
+			//if current character matches with next
+			if(i < n - 1 && text.charAt(i) == chr && text.charAt(i + 1) == chr)
 				currentCount ++;
-				//if doesn't match, update result (if required) and reset count
+			//if doesn't match, update result (if required) and reset count
 			else{
 				if(currentCount > count)
 					count = currentCount;
