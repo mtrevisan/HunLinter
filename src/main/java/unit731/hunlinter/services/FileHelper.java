@@ -232,31 +232,29 @@ public class FileHelper{
 	private static boolean executeDesktopCommand(final Desktop.Action action, final Object parameter){
 		boolean done = false;
 		final Desktop desktop = getDesktopFor(action);
-		if(desktop != null){
-			try{
-				switch(action){
-					case OPEN:
-						desktop.open((File)parameter);
+		try{
+			switch(action){
+				case OPEN:
+					desktop.open((File)parameter);
+					done = true;
+					break;
+
+				case BROWSE:
+					if(DownloaderHelper.hasInternetConnectivity()){
+						desktop.browse(new URI((String)parameter));
 						done = true;
-						break;
+					}
+					break;
 
-					case BROWSE:
-						if(DownloaderHelper.hasInternetConnectivity()){
-							desktop.browse(new URI((String)parameter));
-							done = true;
-						}
-						break;
-
-					case MAIL:
-						if(DownloaderHelper.hasInternetConnectivity()){
-							desktop.mail(new URI((String)parameter));
-							done = true;
-						}
-				}
+				case MAIL:
+					if(DownloaderHelper.hasInternetConnectivity()){
+						desktop.mail(new URI((String)parameter));
+						done = true;
+					}
 			}
-			catch(final Exception e){
-				LOGGER.error("Cannot execute {} command", action, e);
-			}
+		}
+		catch(final Exception e){
+			LOGGER.error("Cannot execute {} command", action, e);
 		}
 		return done;
 	}
