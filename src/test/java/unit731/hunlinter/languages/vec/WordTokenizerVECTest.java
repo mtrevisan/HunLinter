@@ -14,17 +14,45 @@ public class WordTokenizerVECTest{
 
 
 	@Test
-	void simpleApostrophe(){
+	void simpleApostrophe1(){
 		List<String> tokens = tokenizer.tokenize("So' drio 'ndar da mé nòna.");
 
 		Assertions.assertEquals(Arrays.asList("Soʼ", " ", "drio", " ", "ʼndar", " ", "da", " ", "mé", " ", "nòna", "."), tokens);
 	}
 
 	@Test
-	void rightApostrophe(){
+	void simpleApostrophe2(){
+		List<String> tokens = tokenizer.tokenize("So'");
+
+		Assertions.assertEquals(Arrays.asList("Soʼ"), tokens);
+	}
+
+	@Test
+	void simpleApostrophe3(){
+		List<String> tokens = tokenizer.tokenize("'So' drio 'ndar da mé nòna'.");
+
+		Assertions.assertEquals(Arrays.asList("'", "Soʼ", " ", "drio", " ", "ʼndar", " ", "da", " ", "mé", " ", "nòna", "'", "."), tokens);
+	}
+
+	@Test
+	void rightApostrophe1(){
 		List<String> tokens = tokenizer.tokenize("Soʼ drio ʼndar da mé nòna.");
 
 		Assertions.assertEquals(Arrays.asList("Soʼ", " ", "drio", " ", "ʼndar", " ", "da", " ", "mé", " ", "nòna", "."), tokens);
+	}
+
+	@Test
+	void rightApostrophe2(){
+		List<String> tokens = tokenizer.tokenize("ʼndar");
+
+		Assertions.assertEquals(Arrays.asList("ʼndar"), tokens);
+	}
+
+	@Test
+	void rightApostrophe3(){
+		List<String> tokens = tokenizer.tokenize("'Soʼ drio ʼndar da mé nòna'.");
+
+		Assertions.assertEquals(Arrays.asList("'", "Soʼ", " ", "drio", " ", "ʼndar", " ", "da", " ", "mé", " ", "nòna", "'", "."), tokens);
 	}
 
 }

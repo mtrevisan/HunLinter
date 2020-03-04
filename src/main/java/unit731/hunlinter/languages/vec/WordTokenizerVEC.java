@@ -17,10 +17,10 @@ public class WordTokenizerVEC extends WordTokenizer{
 	static{
 		final String quotedTokenizingChars = Pattern.quote(DEFAULT_TOKENIZING_CHARACTERS);
 		TOKENIZING_CHARACTERS = Pattern.compile("(?i)"
-				+ "([dglƚnsv]|(?:a|[ai\u2019]n)dó|[kps]o|pu?ò|st|tan|kuan|tut|(?:[n\u2019]|in)t|tèr[sŧ]|k[uo]art|kuint|sèst|[kp]a|sen[sŧ]|komò|fra|nu|re|intor)[" + UNICODE_APOSTROPHES + "](?=[" + quotedTokenizingChars + "])"
-				+ "|"
-				+ "[" + UNICODE_APOSTROPHES + "]([^" + quotedTokenizingChars + "]+)"
-			);
+			+ "(a[lƚnv]|di|e[lƚn]|[gks][oó]|[iu]n|[lƚ][aài]|v[aàeèéiíoòóuú])[" + UNICODE_APOSTROPHES + "](?=[" + quotedTokenizingChars + "]|$)"
+			+ "|"
+			+ "[" + UNICODE_APOSTROPHES + "](a[nrsŧ]|b[iuú]|e[cdglƚmnrstv-]|i[eégklƚmnoóstv]|[kpsv]a|[lntuéíòóú]|o[klƚmnrsx]|s[eé]|à[nrs]|èc|[ñv][aàeèéiíoòóuú]|[lƚ]o)"
+		);
 	}
 
 

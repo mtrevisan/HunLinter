@@ -169,7 +169,7 @@ public class WorkerManager{
 	}
 
 	public void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,
-												final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
+			final Consumer<WorkerAbstract<?, ?>> onStart, final Consumer<WorkerAbstract<?, ?>> onEnd){
 		final String workerName = WordlistWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
