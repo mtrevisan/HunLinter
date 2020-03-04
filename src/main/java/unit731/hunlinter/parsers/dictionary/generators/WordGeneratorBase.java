@@ -187,7 +187,7 @@ class WordGeneratorBase{
 			}
 			hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
 		}
-		return hasNeedAffixFlag;
+		return (hasNeedAffixFlag || production.hasContinuationFlag(needAffixFlag));
 	}
 
 	private List<Production> applyAffixRules(final DictionaryEntry dicEntry, final List<String[]> allAffixes, final boolean isCompound,
