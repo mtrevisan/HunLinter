@@ -20,25 +20,23 @@ public class SelectFontAction extends AbstractAction{
 
 	private final ParserManager parserManager;
 	private final Preferences preferences;
-	private final JFrame parentFrame;
 
 
-	public SelectFontAction(final ParserManager parserManager, final Preferences preferences, final JFrame parentFrame){
+	public SelectFontAction(final ParserManager parserManager, final Preferences preferences){
 		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(preferences);
-		Objects.requireNonNull(parentFrame);
 
 		this.parserManager = parserManager;
 		this.preferences = preferences;
-		this.parentFrame = parentFrame;
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, parentFrame);
 

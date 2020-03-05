@@ -1,9 +1,11 @@
 package unit731.hunlinter.actions;
 
 import unit731.hunlinter.RulesReducerDialog;
+import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,17 +15,14 @@ import java.util.Objects;
 public class AffixRulesReducerAction extends AbstractAction{
 
 	private final ParserManager parserManager;
-	private final JFrame parentFrame;
 
 
-	public AffixRulesReducerAction(final ParserManager parserManager, final JFrame parentFrame){
+	public AffixRulesReducerAction(final ParserManager parserManager){
 		super("affix.rulesReducer");
 
 		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(parentFrame);
 
 		this.parserManager = parserManager;
-		this.parentFrame = parentFrame;
 	}
 
 	@Override
@@ -32,6 +31,7 @@ public class AffixRulesReducerAction extends AbstractAction{
 
 		setEnabled(false);
 
+		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 		final RulesReducerDialog rulesReducerDialog = new RulesReducerDialog(parserManager, parentFrame);
 		rulesReducerDialog.setLocationRelativeTo(parentFrame);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){

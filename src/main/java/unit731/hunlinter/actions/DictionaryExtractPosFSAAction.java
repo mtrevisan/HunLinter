@@ -1,10 +1,12 @@
 package unit731.hunlinter.actions;
 
+import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
@@ -15,24 +17,21 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
-	private final JFrame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 	private final JFileChooser saveResultFileChooser;
 
 
 	public DictionaryExtractPosFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
-			final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
+			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);
 
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
-		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 
 		saveResultFileChooser = new JFileChooser();
@@ -44,6 +43,7 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createPoSFSAWorker(
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);

@@ -1,25 +1,21 @@
 package unit731.hunlinter.actions;
 
+import unit731.hunlinter.gui.GUIUtils;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Objects;
 
 
 public class ExitAction extends AbstractAction{
 
-	private final JFrame parentFrame;
-
-
-	public ExitAction(final JFrame parentFrame){
+	public ExitAction(){
 		super("system.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
-
-		Objects.requireNonNull(parentFrame);
-
-		this.parentFrame = parentFrame;
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
+		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 		parentFrame.dispose();
 
 		System.exit(0);

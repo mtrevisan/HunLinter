@@ -8,6 +8,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -23,24 +24,21 @@ public class DictionarySorterAction extends AbstractAction{
 
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
-	private final JFrame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 	private int lastDictionarySortVisibleIndex;
 
 
-	public DictionarySorterAction(final ParserManager parserManager, final WorkerManager workerManager, final JFrame parentFrame,
+	public DictionarySorterAction(final ParserManager parserManager, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.sorter", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_sort.png")));
 
 		Objects.requireNonNull(parserManager);
 		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);
 
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
-		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
@@ -49,6 +47,7 @@ public class DictionarySorterAction extends AbstractAction{
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		try{
+			final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 			final String[] lines = parserManager.getDictionaryLines();
 			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), lines,
 				lastDictionarySortVisibleIndex, parentFrame);

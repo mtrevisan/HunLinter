@@ -36,19 +36,17 @@ public class ProjectLoaderAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final Runnable completed;
 	private final Consumer<Exception> cancelled;
-	private final JFrame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 
 	public ProjectLoaderAction(final Path projectPath, final Packager packager, final WorkerManager workerManager, final Runnable completed,
-			final Consumer<Exception> cancelled, final JFrame parentFrame, final PropertyChangeListener propertyChangeListener){
+			final Consumer<Exception> cancelled, final PropertyChangeListener propertyChangeListener){
 		super("project.load");
 
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(workerManager);
 		Objects.requireNonNull(completed);
 		Objects.requireNonNull(cancelled);
-		Objects.requireNonNull(parentFrame);
 		Objects.requireNonNull(propertyChangeListener);
 
 		this.projectPath = projectPath;
@@ -56,7 +54,6 @@ public class ProjectLoaderAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.completed = completed;
 		this.cancelled = cancelled;
-		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
@@ -64,6 +61,7 @@ public class ProjectLoaderAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createProjectLoaderWorker(
 			worker -> {
 				try{

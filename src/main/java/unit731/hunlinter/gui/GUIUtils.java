@@ -380,4 +380,12 @@ public class GUIUtils{
 		return index;
 	}
 
+
+	//Extract parent frame from menu item
+	public static Frame getParentFrame(final JMenuItem menuItem){
+		final JPopupMenu popupMenu = (JPopupMenu)menuItem.getParent();
+		final JComponent menu = (JComponent)popupMenu.getInvoker();
+		return (Frame)menu.getTopLevelAncestor();
+	}
+
 }

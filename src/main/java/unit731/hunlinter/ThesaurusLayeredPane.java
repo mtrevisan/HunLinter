@@ -225,7 +225,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
             synonymsTextField.requestFocusInWindow();
             popupMergeMenuItem.setEnabled(false);
             @SuppressWarnings("unchecked")
-            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)table.getRowSorter();
+            final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateSynonymsCounter();

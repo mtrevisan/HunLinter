@@ -263,7 +263,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filMenu.add(filCreatePackageMenuItem);
       filMenu.add(filFontSeparator);
 
-      filFontMenuItem.setAction(new SelectFontAction(parserManager, preferences, this));
+      filFontMenuItem.setAction(new SelectFontAction(parserManager, preferences));
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font…");
       filFontMenuItem.setEnabled(false);
@@ -281,7 +281,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
-      filExitMenuItem.setAction(new ExitAction(this));
+      filExitMenuItem.setAction(new ExitAction());
       filExitMenuItem.setMnemonic('x');
       filExitMenuItem.setText("Exit");
       filMenu.add(filExitMenuItem);
@@ -304,12 +304,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicLinterMenuItem.setToolTipText("");
       dicMenu.add(dicLinterMenuItem);
 
-      dicSortDictionaryMenuItem.setAction(new DictionarySorterAction(parserManager, workerManager, this, this));
+      dicSortDictionaryMenuItem.setAction(new DictionarySorterAction(parserManager, workerManager, this));
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary…");
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicRulesReducerMenuItem.setAction(new AffixRulesReducerAction(parserManager, this));
+      dicRulesReducerMenuItem.setAction(new AffixRulesReducerAction(parserManager));
       dicRulesReducerMenuItem.setMnemonic('r');
       dicRulesReducerMenuItem.setText("Rules reducer…");
       dicRulesReducerMenuItem.setToolTipText("");
@@ -327,24 +327,24 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-      dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this, this));
+      dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this));
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates…");
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
-      dicExtractWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this, this));
+      dicExtractWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this));
       dicExtractWordlistMenuItem.setText("Extract wordlist…");
       dicMenu.add(dicExtractWordlistMenuItem);
 
-      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS, workerManager, this, this));
+      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS, workerManager, this));
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
-      dicExtractPoSFAMenuItem.setAction(new DictionaryExtractPosFSAAction(parserManager, workerManager, this, this));
+      dicExtractPoSFAMenuItem.setAction(new DictionaryExtractPosFSAAction(parserManager, workerManager, this));
       dicExtractPoSFAMenuItem.setText("Extract PoS FSA…");
       dicMenu.add(dicExtractPoSFAMenuItem);
 
-      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this, this));
+      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
       dicMenu.add(dicExtractMinimalPairsMenuItem);
@@ -392,17 +392,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       hlpMenu.add(hlpIssueReporterMenuItem);
       hlpMenu.add(hlpOnlineSeparator);
 
-      hlpUpdateMenuItem.setAction(new UpdateAction(this));
+      hlpUpdateMenuItem.setAction(new UpdateAction());
       hlpUpdateMenuItem.setText("Check for Update…");
       hlpMenu.add(hlpUpdateMenuItem);
 
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(hlpCheckUpdateOnStartupCheckBoxMenuItem, preferences));
+      hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
       hlpMenu.add(hlpUpdateSeparator);
 
-      hlpAboutMenuItem.setAction(new AboutAction(this));
+      hlpAboutMenuItem.setAction(new AboutAction());
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
       hlpMenu.add(hlpAboutMenuItem);

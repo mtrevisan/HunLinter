@@ -43,7 +43,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filFontMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new SelectFontAction(parserManager, preferences, this)" type="code"/>
+                  <Connection code="new SelectFontAction(parserManager, preferences)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="102"/>
                 <Property name="text" type="java.lang.String" value="Select font&#x2026;"/>
@@ -67,7 +67,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filExitMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new ExitAction(this)" type="code"/>
+                  <Connection code="new ExitAction()" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="120"/>
                 <Property name="text" type="java.lang.String" value="Exit"/>
@@ -95,7 +95,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicSortDictionaryMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionarySorterAction(parserManager, workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionarySorterAction(parserManager, workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="115"/>
                 <Property name="text" type="java.lang.String" value="Sort dictionary&#x2026;"/>
@@ -104,7 +104,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicRulesReducerMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new AffixRulesReducerAction(parserManager, this)" type="code"/>
+                  <Connection code="new AffixRulesReducerAction(parserManager)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="114"/>
                 <Property name="text" type="java.lang.String" value="Rules reducer&#x2026;"/>
@@ -136,7 +136,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractDuplicatesMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractDuplicatesAction(workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionaryExtractDuplicatesAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="100"/>
                 <Property name="text" type="java.lang.String" value="Extract duplicates&#x2026;"/>
@@ -161,7 +161,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractPoSFAMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractPosFSAAction(parserManager, workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionaryExtractPosFSAAction(parserManager, workerManager, this)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Extract PoS FSA&#x2026;"/>
               </Properties>
@@ -169,7 +169,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractMinimalPairsAction(workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionaryExtractMinimalPairsAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="109"/>
                 <Property name="text" type="java.lang.String" value="Extract minimal pairs&#x2026;"/>
@@ -252,7 +252,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="hlpUpdateMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new UpdateAction(this)" type="code"/>
+                  <Connection code="new UpdateAction()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Check for Update&#x2026;"/>
               </Properties>
@@ -260,7 +260,7 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="hlpCheckUpdateOnStartupCheckBoxMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new CheckUpdateOnStartupAction(hlpCheckUpdateOnStartupCheckBoxMenuItem, preferences)" type="code"/>
+                  <Connection code="new CheckUpdateOnStartupAction(preferences)" type="code"/>
                 </Property>
                 <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="preferences.getBoolean(UPDATE_STARTUP_CHECK, true)" type="code"/>
@@ -273,7 +273,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="hlpAboutMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new AboutAction(this)" type="code"/>
+                  <Connection code="new AboutAction()" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="About"/>
