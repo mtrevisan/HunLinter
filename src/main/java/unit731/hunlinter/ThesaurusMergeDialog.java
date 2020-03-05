@@ -34,6 +34,8 @@ public class ThesaurusMergeDialog extends JDialog{
 
 		initComponents();
 
+		GUIUtils.addUndoManager(mergerTextArea);
+
 		synonymsEntries.stream()
 			.map(SynonymsEntry::toString)
 			.forEach(lineComboBox::addItem);
