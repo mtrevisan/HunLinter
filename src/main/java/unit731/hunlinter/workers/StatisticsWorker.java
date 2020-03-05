@@ -39,7 +39,6 @@ public class StatisticsWorker extends WorkerDictionary{
 
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(parent);
 
 
 		final AffixData affixData = affParser.getAffixData();

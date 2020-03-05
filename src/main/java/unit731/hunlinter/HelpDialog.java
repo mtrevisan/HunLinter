@@ -28,8 +28,6 @@ public class HelpDialog extends JDialog{
 	public HelpDialog(final Frame parent){
 		super(parent, "About", true);
 
-		Objects.requireNonNull(parent);
-
 		initComponents();
 
 
