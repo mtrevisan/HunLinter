@@ -79,6 +79,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				};
 				DictCompile.main(buildOptions);
 
+				Files.delete(temporaryWordlist.toPath());
+
 				finalizeProcessing("File written: " + outputFile.getAbsolutePath());
 
 				FileHelper.browse(outputFile);
