@@ -57,9 +57,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 
 			try{
-				final File temporaryWordlist = writeProcess(words);
-
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+				final File temporaryWordlist = writeProcess(filenameNoExtension, words);
+
 				final File outputInfoFile = new File(filenameNoExtension + ".info");
 				if(!outputInfoFile.exists()){
 					final Charset charset = dicParser.getCharset();
@@ -95,12 +95,13 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			.withDataCompletedCallback(completed);
 	}
 
-	private File writeProcess(final Set<String> words) throws IOException, InterruptedException{
+	private File writeProcess(final String filenameNoExtension, final Set<String> words)
+			throws IOException, InterruptedException{
 		int writtenSoFar = 0;
 		final int totalLines = words.size();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
-		final File temporaryWordlist = FileHelper.createDeleteOnExitFile("test", ".txt");
+		final File temporaryWordlist = new File(filenameNoExtension + "-tmp", ".txt");
 		try(final BufferedWriter writer = Files.newBufferedWriter(temporaryWordlist.toPath(), charset)){
 			for(final String word : words){
 				try{
