@@ -1,6 +1,7 @@
 package unit731.hunlinter.workers.dictionary;
 
 import morfologik.tools.DictCompile;
+import morfologik.tools.SerializationFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,7 +20,7 @@ import unit731.hunlinter.services.FileHelper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -71,7 +72,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 				}
 
-				buildFSA(outputFile.toString());
+				buildFSA(outputFile.toString(), filenameNoExtension + ".dict");
 
 				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
 
@@ -87,15 +88,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 			.withDataCompletedCallback(completed);
 	}
 
-	private void buildFSA(final String input){
-		final String[] buildOptions = {
-			"--overwrite",
-			"--accept-cr",
-			"--exit", "false",
-			"--format", "CFSA2",
-			"--input", input
-		};
-		DictCompile.main(buildOptions);
+	private void buildFSA(final String input, final String output) throws Exception{
+		final Path inputPath = Path.of(input);
+		final Path outputPath = Path.of(output);
+		final SerializationFormat format = SerializationFormat.CFSA2;
+		final DictCompile builder = new DictCompile(inputPath,
+			true, true, true, false, false);
+		builder.call();
 	}
 
 }

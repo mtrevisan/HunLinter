@@ -1,6 +1,7 @@
 package unit731.hunlinter.workers.dictionary;
 
 import morfologik.tools.FSACompile;
+import morfologik.tools.SerializationFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -124,16 +126,13 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		}
 	}
 
-	private void buildFSA(final String input, final String output){
-		final String[] buildOptions = {
-			"--accept-bom",
-			"--accept-cr",
-			"--exit", "false",
-			"--format", "CFSA2",
-			"--input", input,
-			"--output", output
-		};
-		FSACompile.main(buildOptions);
+	private void buildFSA(final String input, final String output) throws Exception{
+		final Path inputPath = Path.of(input);
+		final Path outputPath = Path.of(output);
+		final SerializationFormat format = SerializationFormat.CFSA2;
+		final FSACompile builder = new FSACompile(inputPath, outputPath, format,
+			true, true, false);
+		builder.call();
 	}
 
 }
