@@ -1,6 +1,8 @@
 package unit731.hunlinter.workers.dictionary;
 
-import morfologik.tools.FSACompile;
+import morfologik.fsa.FSA;
+import morfologik.fsa.builders.FSABuilder;
+import morfologik.fsa.builders.FSASerializer;
 import morfologik.tools.SerializationFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,17 +15,21 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.fsa.BinaryInput;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -130,9 +136,16 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Path inputPath = Path.of(input);
 		final Path outputPath = Path.of(output);
 		final SerializationFormat format = SerializationFormat.CFSA2;
-		final FSACompile builder = new FSACompile(inputPath, outputPath, format,
-			true, true, false);
-		builder.call();
+		final BinaryInput binaryInput = new BinaryInput(true, true, true);
+		final List<byte[]> sequences = binaryInput.readBinarySequences(input, (byte)'\n');
+
+		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
+		final FSA fsa = FSABuilder.build(sequences);
+
+		final FSASerializer serializer = format.getSerializer();
+		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
+			serializer.serialize(fsa, os);
+		}
 	}
 
 }
