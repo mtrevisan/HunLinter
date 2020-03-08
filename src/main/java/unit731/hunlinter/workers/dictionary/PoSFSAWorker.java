@@ -18,7 +18,6 @@ import unit731.hunlinter.services.FileHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -53,12 +52,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 						writer.write(StringUtils.LF);
 					}
 			}
-			catch(final IOException e){
+			catch(final Exception e){
 				throw new LinterException(e.getMessage());
 			}
 		};
 		final Runnable completed = () -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Begin post-processing");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 
 			try{
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
