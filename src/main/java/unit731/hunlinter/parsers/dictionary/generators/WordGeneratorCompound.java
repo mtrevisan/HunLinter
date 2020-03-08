@@ -244,7 +244,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private String enforceNextCompoundCase(final char lastChar, String nextCompound, final StringHelper.Casing lastWordCasing,
 			final StringHelper.Casing nextWordCasing){
 		final char nextChar = nextCompound.charAt(0);
-		if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
+		if(Character.isLetter(lastChar) && Character.isLetter(nextChar)){
 			final Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
 			//convert nextChar to lowercase/uppercase and go on
 			if(collisions != null && collisions.contains(nextWordCasing))

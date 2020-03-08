@@ -2,7 +2,6 @@ package unit731.hunlinter.services.text;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +17,8 @@ import unit731.hunlinter.services.PatternHelper;
 public class StringHelper{
 
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
+
+	private static final char UNICODE_MODIFIER_LETTER_APOSTROPHE = '\u02BC';
 
 	public enum Casing{
 		/** All lower case or neutral case, e.g. "hello java" */
@@ -41,27 +42,30 @@ public class StringHelper{
 			.count();
 	}
 
+	//Classify the casing of a given string (ignoring characters for which no upper-/lowercase distinction exists)
 	public static Casing classifyCasing(final String text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
 		final long upper = text.chars()
-			.filter(chr -> Character.isAlphabetic(chr) && Character.isUpperCase(chr))
+			.filter(chr -> Character.isLetter(chr) && Character.isUpperCase(chr))
 			.count();
 		if(upper == 0l)
 			return Casing.LOWER_CASE;
 
-		final boolean fistCapital = Character.isUpperCase(text.charAt(0));
-		if(fistCapital && upper == 1l)
+		final boolean startsWithUppercase = Character.isUpperCase(text.charAt(0));
+		if(startsWithUppercase && upper == 1l)
 			return Casing.TITLE_CASE;
 
 		final long lower = text.chars()
-			.filter(chr -> Character.isAlphabetic(chr) && Character.isLowerCase(chr))
+			//Unicode modifier letter apostrophe is considered as an uppercase letter, but shoule be regarded as caseless,
+			//so it has to be excluded
+			.filter(chr -> Character.isLetter(chr) && chr != UNICODE_MODIFIER_LETTER_APOSTROPHE && Character.isLowerCase(chr))
 			.count();
 		if(lower == 0l)
 			return Casing.ALL_CAPS;
 
-		return (fistCapital? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
+		return (startsWithUppercase? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
 	}
 
 	public static String longestCommonPrefix(final Collection<String> texts){
@@ -72,7 +76,8 @@ public class StringHelper{
 		return longestCommonAffix(texts, StringHelper::commonSuffix);
 	}
 
-	private static String longestCommonAffix(final Collection<String> texts, final BiFunction<String, String, String> commonAffix){
+	private static String longestCommonAffix(final Collection<String> texts,
+			final BiFunction<String, String, String> commonAffix){
 		String lcs = null;
 		if(!texts.isEmpty()){
 			final Iterator<String> itr = texts.iterator();
@@ -135,10 +140,12 @@ public class StringHelper{
 	}
 
 	public static String removeCombiningDiacriticalMarks(final String word){
-		return PatternHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS, StringUtils.EMPTY);
+		return PatternHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
+			StringUtils.EMPTY);
 	}
 
-	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit, final String ellipsis){
+	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit,
+			final String ellipsis){
 		return Collector.of(ArrayList::new,
 			(l, e) -> {
 				if(l.size() < limit)

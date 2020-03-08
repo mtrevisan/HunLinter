@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  *
  * @see <a href="https://rgxdb.com/try">Regex DB</a>
  */
-public class WordTokenizer{
+public class WordTokenizer implements WordTokenizerInterface{
 
 	private static final Pattern PATTERN_PLACEHOLDER = PatternHelper.pattern("(\0*)");
 
@@ -75,6 +75,7 @@ public class WordTokenizer{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
+	@Override
 	public List<String> tokenize(String text){
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 

@@ -31,7 +31,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PoSFSAWorker.class);
 
-	public static final String WORKER_NAME = "Part–of–Speech FSA";
+	public static final String WORKER_NAME = "Part–of–Speech FSA Extractor";
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
