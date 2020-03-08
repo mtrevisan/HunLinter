@@ -16,7 +16,7 @@ public class WorkerDataParser<P> extends WorkerData<WorkerDataParser<P>>{
 		this.parser = parser;
 	}
 
-	P getParser(){
+	public P getParser(){
 		return parser;
 	}
 

@@ -7,9 +7,9 @@ import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
 import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
 import unit731.hunlinter.actions.CreatePackageAction;
+import unit731.hunlinter.actions.DictionaryExtractWordlistFSAAction;
 import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
 import unit731.hunlinter.actions.DictionaryExtractMinimalPairsAction;
-import unit731.hunlinter.actions.DictionaryExtractPosFSAAction;
 import unit731.hunlinter.actions.DictionaryExtractWordlistAction;
 import unit731.hunlinter.actions.DictionaryHyphenationStatisticsAction;
 import unit731.hunlinter.actions.DictionarySorterAction;
@@ -55,6 +55,7 @@ import javax.swing.text.DefaultCaret;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
@@ -198,7 +199,8 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
-      dicExtractPoSFAMenuItem = new javax.swing.JMenuItem();
+      dicExtractDictionaryFSAMenuItem = new javax.swing.JMenuItem();
+      dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
@@ -336,13 +338,17 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractWordlistMenuItem.setText("Extract wordlist…");
       dicMenu.add(dicExtractWordlistMenuItem);
 
-      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS, workerManager, this));
+      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS_NO_DUPLICATES, workerManager, this));
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
-      dicExtractPoSFAMenuItem.setAction(new DictionaryExtractPosFSAAction(parserManager, workerManager, this));
-      dicExtractPoSFAMenuItem.setText("Extract PoS FSA…");
-      dicMenu.add(dicExtractPoSFAMenuItem);
+      dicExtractDictionaryFSAMenuItem.setAction(new DictionaryExtractWordlistFSAAction(parserManager, workerManager, this));
+      dicExtractDictionaryFSAMenuItem.setText("Extract dictionary FSA…");
+      dicMenu.add(dicExtractDictionaryFSAMenuItem);
+
+      dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction(parserManager, workerManager, this));
+      dicExtractPoSFSAMenuItem.setText("Extract PoS FSA…");
+      dicMenu.add(dicExtractPoSFSAMenuItem);
 
       dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
@@ -829,9 +835,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JLayeredPane acoLayeredPane;
    private javax.swing.JLayeredPane cmpLayeredPane;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
+   private javax.swing.JMenuItem dicExtractDictionaryFSAMenuItem;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
-   private javax.swing.JMenuItem dicExtractPoSFAMenuItem;
+   private javax.swing.JMenuItem dicExtractPoSFSAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
    private javax.swing.JLayeredPane dicLayeredPane;

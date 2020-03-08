@@ -145,7 +145,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Extract wordlist&#x2026;"/>
               </Properties>
@@ -153,15 +153,23 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistPlainTextMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS, workerManager, this, this)" type="code"/>
+                  <Connection code="new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS_NO_DUPLICATES, workerManager, this)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)&#x2026;"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dicExtractPoSFAMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="dicExtractDictionaryFSAMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new DictionaryExtractPosFSAAction(parserManager, workerManager, this)" type="code"/>
+                  <Connection code="new DictionaryExtractWordlistFSAAction(parserManager, workerManager, this)" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Extract dictionary FSA&#x2026;"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dicExtractPoSFSAMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new DictionaryExtractPoSFSAAction(parserManager, workerManager, this)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Extract PoS FSA&#x2026;"/>
               </Properties>

@@ -5,7 +5,6 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
@@ -13,7 +12,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 
-public class DictionaryExtractPosFSAAction extends AbstractAction{
+public class DictionaryExtractPoSFSAAction extends AbstractAction{
 
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
@@ -22,7 +21,7 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractPosFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
+	public DictionaryExtractPoSFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
@@ -35,7 +34,6 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 		this.propertyChangeListener = propertyChangeListener;
 
 		saveResultFileChooser = new JFileChooser();
-		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	}
 
@@ -48,7 +46,7 @@ public class DictionaryExtractPosFSAAction extends AbstractAction{
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
-					parserManager.getAffixData().getLanguage() + ".txt").toFile(): null);
+					parserManager.getAffixData().getLanguage() + "-PoS.dict").toFile(): null);
 			},
 			worker -> {
 				setEnabled(false);

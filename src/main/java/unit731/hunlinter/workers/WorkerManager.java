@@ -14,6 +14,7 @@ import unit731.hunlinter.workers.dictionary.MinimalPairsWorker;
 import unit731.hunlinter.workers.dictionary.PoSFSAWorker;
 import unit731.hunlinter.workers.dictionary.SorterWorker;
 import unit731.hunlinter.workers.dictionary.WordCountWorker;
+import unit731.hunlinter.workers.dictionary.WordlistFSAWorker;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.hyphenation.HyphenationLinterWorker;
 import unit731.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
@@ -176,6 +177,23 @@ public class WorkerManager{
 			final File outputFile = preStart.get();
 			if(outputFile != null){
 				worker = new WordlistWorker(parserManager.getDicParser(), parserManager.getWordGenerator(), type,
+					outputFile);
+				WORKERS.put(workerName, worker);
+				ON_ENDS.put(workerName, onEnd);
+
+				onStart.accept(worker);
+			}
+		}
+	}
+
+	public void createWordlistFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
+			final Consumer<WorkerAbstract<?, ?>> onEnd){
+		final String workerName = PoSFSAWorker.WORKER_NAME;
+		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
+		if(worker == null || worker.isDone()){
+			final File outputFile = preStart.get();
+			if(outputFile != null){
+				worker = new WordlistFSAWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
 					outputFile);
 				WORKERS.put(workerName, worker);
 				ON_ENDS.put(workerName, onEnd);
