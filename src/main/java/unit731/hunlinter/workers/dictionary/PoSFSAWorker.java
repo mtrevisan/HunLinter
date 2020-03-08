@@ -71,14 +71,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 				}
 
-				final String[] buildOptions = {
-					"--overwrite",
-					"--accept-cr",
-					"--exit", "false",
-					"--format", "CFSA2",
-					"--input", outputFile.toString()
-				};
-				DictCompile.main(buildOptions);
+				buildFSA(outputFile.toString());
 
 				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
 
@@ -92,6 +85,17 @@ public class PoSFSAWorker extends WorkerDictionary{
 		setWriteDataProcessor(lineProcessor, outputFile);
 		getWorkerData()
 			.withDataCompletedCallback(completed);
+	}
+
+	private void buildFSA(final String input){
+		final String[] buildOptions = {
+			"--overwrite",
+			"--accept-cr",
+			"--exit", "false",
+			"--format", "CFSA2",
+			"--input", input
+		};
+		DictCompile.main(buildOptions);
 	}
 
 }

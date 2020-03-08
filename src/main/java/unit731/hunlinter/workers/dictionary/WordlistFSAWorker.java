@@ -70,15 +70,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 				}
 
-				final String[] buildOptions = {
-					"--accept-bom",
-					"--accept-cr",
-					"--exit", "false",
-					"--format", "CFSA2",
-					"--input", temporaryWordlist.toString(),
-					"--output", filenameNoExtension + ".dict"
-				};
-				FSACompile.main(buildOptions);
+				buildFSA(temporaryWordlist.toString(), filenameNoExtension + ".dict");
 
 				Files.delete(temporaryWordlist.toPath());
 
@@ -130,6 +122,18 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			throw e;
 		}
+	}
+
+	private void buildFSA(final String input, final String output){
+		final String[] buildOptions = {
+			"--accept-bom",
+			"--accept-cr",
+			"--exit", "false",
+			"--format", "CFSA2",
+			"--input", input,
+			"--output", output
+		};
+		FSACompile.main(buildOptions);
 	}
 
 }
