@@ -1,6 +1,6 @@
 package unit731.hunlinter.workers.dictionary;
 
-import morfologik.tools.DictCompile;
+import morfologik.tools.FSACompile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -71,13 +71,14 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				}
 
 				final String[] buildOptions = {
-					"--overwrite",
+					"--accept-bom",
 					"--accept-cr",
 					"--exit", "false",
 					"--format", "CFSA2",
-					"--input", temporaryWordlist.toString()
+					"--input", temporaryWordlist.toString(),
+					"--output", filenameNoExtension + ".dict"
 				};
-				DictCompile.main(buildOptions);
+				FSACompile.main(buildOptions);
 
 				Files.delete(temporaryWordlist.toPath());
 
