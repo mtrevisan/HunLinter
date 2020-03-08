@@ -17,7 +17,7 @@ class AffixParserTest{
 	@Test
 	void verifyOk() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",
@@ -27,9 +27,9 @@ class AffixParserTest{
 	}
 
 	@Test
-	void verifyKo(){
+	void verifyKo() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",

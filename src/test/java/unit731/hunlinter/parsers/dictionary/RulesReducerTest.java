@@ -38,7 +38,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix1() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -116,7 +116,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix2() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -188,7 +188,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix3() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -288,7 +288,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix4() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -374,7 +374,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix5() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -577,7 +577,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix6() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -624,7 +624,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix7() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -680,7 +680,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix8() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -743,7 +743,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix9() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -853,7 +853,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix10() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -910,7 +910,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix11() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -976,7 +976,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix12() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1039,7 +1039,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix13() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1125,7 +1125,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix14() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1213,7 +1213,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix15() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1257,7 +1257,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix16() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1316,7 +1316,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix17() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1398,7 +1398,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix18() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1602,7 +1602,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix19() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1674,7 +1674,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix20() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1743,7 +1743,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix1() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1808,7 +1808,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix2() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1896,7 +1896,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix3() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1937,7 +1937,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix4() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1984,7 +1984,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix5() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -2028,7 +2028,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix6() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -2074,7 +2074,7 @@ class RulesReducerTest{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);

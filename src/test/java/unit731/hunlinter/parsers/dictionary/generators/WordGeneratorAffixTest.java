@@ -19,7 +19,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void affFormat() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"# Testing also whitespace and comments.",
 			"OCONV 1",
@@ -41,7 +41,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void flagUTF8() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG UTF-8",
 			"SFX A Y 1",
@@ -76,7 +76,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void flagNumerical() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"SFX 999 Y 1",
@@ -111,7 +111,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void flagASCII() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 s/123 .",
@@ -145,7 +145,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void flagDoubleASCII() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX zx Y 1",
@@ -181,7 +181,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void conditions() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 6",
 			"SFX A 0 a .",
@@ -209,7 +209,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stems1() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -239,7 +239,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stems2() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -268,7 +268,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stems3() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -299,7 +299,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stems4() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -330,7 +330,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stems5() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 a",
@@ -374,7 +374,7 @@ class WordGeneratorAffixTest extends TestBase{
 	void stemsInvalidFullstrip(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
 				"SFX A a b a");
@@ -390,7 +390,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void stemsValidFullstrip() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FULLSTRIP",
 			"SFX A Y 1",
@@ -413,7 +413,7 @@ class WordGeneratorAffixTest extends TestBase{
 	void stemsInvalidTwofold1(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"FLAG long",
 				"SFX S1 Y 1",
@@ -439,7 +439,7 @@ class WordGeneratorAffixTest extends TestBase{
 	void stemsInvalidTwofold2(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
 				"SFX A 0 a",
@@ -470,7 +470,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void complexPrefixes1() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -513,7 +513,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void complexPrefixes2() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -539,7 +539,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void complexPrefixesUTF8() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -566,7 +566,7 @@ class WordGeneratorAffixTest extends TestBase{
 	void complexPrefixesInvalidTwofold(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"COMPLEXPREFIXES",
 				"PFX A Y 1",
@@ -598,7 +598,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void needAffix3() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 1",
@@ -623,7 +623,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void needAffix5() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 2",
@@ -660,7 +660,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void circumfix1() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX A Y 1",
@@ -691,7 +691,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void circumfix2() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX A Y 1",
@@ -720,7 +720,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void circumfix3() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX a Y 4",
@@ -773,7 +773,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void morphologicalAnalisys() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"PFX P Y 1",
 			"PFX P 0 un . dp:pfx_un sp:un",
@@ -822,7 +822,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void alias1() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"AF 2",
 			"AF AB",
@@ -853,7 +853,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void escapeSlash() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 x .",
@@ -880,7 +880,7 @@ class WordGeneratorAffixTest extends TestBase{
 	@Test
 	void forbiddenWord() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORBIDDENWORD !",
 			"SFX s N 1",

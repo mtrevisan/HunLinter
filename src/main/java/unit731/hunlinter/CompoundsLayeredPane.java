@@ -286,7 +286,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             worker.execute();
          },
          compounds -> {
-            final StringJoiner sj = new StringJoiner("\n");
+            final StringJoiner sj = new StringJoiner(StringUtils.LF);
             compounds.forEach(compound -> sj.add(compound.toString(strategy)));
             inputTextArea.setText(sj.toString());
             inputTextArea.setCaretPosition(0);

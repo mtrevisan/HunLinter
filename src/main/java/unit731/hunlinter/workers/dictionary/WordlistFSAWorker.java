@@ -18,6 +18,7 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -55,9 +56,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Runnable completed = () -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 
-			writeProcess(words);
-
 			try{
+				final File temporaryWordlist = writeProcess(words);
+
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 				final File outputInfoFile = new File(filenameNoExtension + ".info");
 				if(!outputInfoFile.exists()){
@@ -74,7 +75,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 					"--accept-cr",
 					"--exit", "false",
 					"--format", "CFSA2",
-					"--input", outputFile.toString()
+					"--input", temporaryWordlist.toString()
 				};
 				DictCompile.main(buildOptions);
 
@@ -94,12 +95,13 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			.withDataCompletedCallback(completed);
 	}
 
-	private void writeProcess(final Set<String> words){
+	private File writeProcess(final Set<String> words) throws IOException, InterruptedException{
 		int writtenSoFar = 0;
 		final int totalLines = words.size();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
-		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+		final File temporaryWordlist = FileHelper.createDeleteOnExitFile("test", ".txt");
+		try(final BufferedWriter writer = Files.newBufferedWriter(temporaryWordlist.toPath(), charset)){
 			for(final String word : words){
 				try{
 					writtenSoFar ++;
@@ -118,9 +120,13 @@ public class WordlistFSAWorker extends WorkerDictionary{
 					throw e;
 				}
 			}
+
+			return temporaryWordlist;
 		}
 		catch(final Exception e){
 			cancel(e);
+
+			throw e;
 		}
 	}
 

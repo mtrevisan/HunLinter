@@ -27,6 +27,7 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +63,6 @@ public class FileHelper{
 
 
 	private FileHelper(){}
-
-	public static File createDeleteOnExitFile(final byte[] bytes, final String filename, final String extension) throws IOException{
-		final File file = File.createTempFile(filename, extension);
-		file.deleteOnExit();
-		Files.write(file.toPath(), bytes);
-		return file;
-	}
 
 	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
 			throws IOException{
@@ -153,21 +147,29 @@ public class FileHelper{
 		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
 	}
 
-	public static File getTemporaryUTF8File(final String filename, final String extension, final String... lines){
-		final StringJoiner sj = new StringJoiner("\n");
+	public static File createDeleteOnExitFile(final String filename, final String extension) throws IOException{
+		final File file = File.createTempFile(filename, extension);
+		file.deleteOnExit();
+		return file;
+	}
+
+	public static File createDeleteOnExitFile(final String filename, final String extension, final byte[] bytes)
+			throws IOException{
+		final File file = createDeleteOnExitFile(filename, extension);
+		Files.write(file.toPath(), bytes);
+		return file;
+	}
+
+	public static File createDeleteOnExitFile(final String filename, final String extension, final String... lines)
+			throws IOException{
+		final StringJoiner sj = new StringJoiner(StringUtils.LF);
 		for(final String line : lines)
 			sj.add(line);
 		final String content = sj.toString();
 
-		try{
-			final File tmpFile = File.createTempFile((filename != null? filename: "test"), extension);
-			Files.writeString(tmpFile.toPath(), content);
-			tmpFile.deleteOnExit();
-			return tmpFile;
-		}
-		catch(final IOException e){
-			throw new RuntimeException("Failed creating temporary file for content '" + content + "'", e);
-		}
+		final File file = createDeleteOnExitFile((filename != null? filename: "test"), extension);
+		Files.writeString(file.toPath(), content);
+		return file;
 	}
 
 	public static LineNumberReader createReader(final Path path, final Charset charset) throws IOException{

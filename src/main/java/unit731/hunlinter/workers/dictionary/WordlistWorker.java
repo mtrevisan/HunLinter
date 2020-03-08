@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -96,6 +98,9 @@ public class WordlistWorker extends WorkerDictionary{
 		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+			final List<String> sortedWords = new ArrayList<>(words);
+			final Comparator<String> comparator = workerData.getParser().getComparator();
+			sortedWords.sort(comparator);
 			for(final String word : words){
 				try{
 					writtenSoFar ++;

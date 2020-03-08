@@ -18,7 +18,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void simple() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDFLAG A");
@@ -50,7 +50,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void compoundMinLength() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
@@ -75,7 +75,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void checkCompoundTriple() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"COMPOUNDFLAG A");
@@ -108,7 +108,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void simplifiedTriple() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"SIMPLIFIEDTRIPLE",
@@ -133,7 +133,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void forbidWordDuplication() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDDUP",
 			"COMPOUNDMIN 2",
@@ -161,7 +161,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void withAffixes() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -216,7 +216,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void withAffixesOnefold() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -275,7 +275,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void withAffixesTwofold() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDMORESUFFIXES",
@@ -343,7 +343,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void notPermitFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -398,7 +398,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void permitFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDPERMITFLAG Y",
@@ -502,7 +502,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void forbidFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDFORBIDFLAG Z",
@@ -546,7 +546,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void checkCompoundCase() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"CHECKCOMPOUNDCASE",
@@ -651,13 +651,13 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void compoundReplacement() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDREP",
 			"COMPOUNDFLAG A",
 			"REP 1",
 			"REP í i");
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"4",
 			"szer/A",
 			"víz/A",
@@ -715,7 +715,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void forbiddenWord() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORBIDDENWORD X",
 			"COMPOUNDFLAG Y",
@@ -757,7 +757,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void forceUppercase() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORCEUCASE A",
 			"COMPOUNDFLAG C");
@@ -814,7 +814,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 	@Test
 	void onlyInCompound() throws IOException{
 		String language = "en-GB";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"ONLYINCOMPOUND O",
 			"COMPOUNDFLAG A",

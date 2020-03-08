@@ -13,7 +13,7 @@ class DictionaryEntryTest{
 	@Test
 	void parse() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX C",
 			"SFX A Y 1",

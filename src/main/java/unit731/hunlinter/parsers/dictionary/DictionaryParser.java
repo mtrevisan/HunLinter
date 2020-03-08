@@ -70,6 +70,10 @@ public class DictionaryParser{
 		return charset;
 	}
 
+	public Comparator<String> getComparator(){
+		return comparator;
+	}
+
 	public ExternalSorter getSorter(){
 		return sorter;
 	}

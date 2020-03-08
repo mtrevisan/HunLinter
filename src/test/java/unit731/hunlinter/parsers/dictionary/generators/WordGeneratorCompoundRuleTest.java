@@ -18,7 +18,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void testBjörnJacke() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw",
@@ -52,7 +52,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void simple() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -77,7 +77,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void infinite() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -137,7 +137,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void onlyInCompound3() throws IOException{
 		String language = "en-GB";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"ONLYINCOMPOUND _",
@@ -219,7 +219,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void zeroOrOne() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -248,7 +248,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void longFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"COMPOUNDMIN 1",
@@ -278,7 +278,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void numericalFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"COMPOUNDMIN 1",
@@ -310,7 +310,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	void forbiddenWordMissingRule(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"COMPOUNDRULE 1",
 				"COMPOUNDRULE vw");
@@ -329,7 +329,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void forbiddenWord() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORBIDDENWORD X",
 			"COMPOUNDRULE 1",
@@ -350,7 +350,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 	@Test
 	void forceUppercase() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORCEUCASE U",
 			"COMPOUNDRULE 1",
