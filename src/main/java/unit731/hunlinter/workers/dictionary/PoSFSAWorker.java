@@ -80,11 +80,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 				};
 				DictCompile.main(buildOptions);
 
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}.dict", filenameNoExtension);
+				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
 
 				FileHelper.browse(outputFile);
-
-				Files.delete(outputFile.toPath());
 			}
 			catch(final Exception e){
 				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);

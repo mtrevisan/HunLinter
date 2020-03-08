@@ -82,8 +82,6 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				finalizeProcessing("File written: " + outputFile.getAbsolutePath());
 
 				FileHelper.browse(outputFile);
-
-				Files.delete(outputFile.toPath());
 			}
 			catch(final Exception e){
 				LOGGER.warn("Exception while creating the FSA file for wordlist", e);
@@ -101,7 +99,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final int totalLines = words.size();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
-		final File temporaryWordlist = new File(filenameNoExtension + "-tmp", ".txt");
+		final File temporaryWordlist = new File(filenameNoExtension + "-tmp.txt");
 		try(final BufferedWriter writer = Files.newBufferedWriter(temporaryWordlist.toPath(), charset)){
 			for(final String word : words){
 				try{
