@@ -188,7 +188,7 @@ public class WorkerManager{
 
 	public void createWordlistFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?, ?>> onStart,
 			final Consumer<WorkerAbstract<?, ?>> onEnd){
-		final String workerName = PoSFSAWorker.WORKER_NAME;
+		final String workerName = WordlistFSAWorker.WORKER_NAME;
 		WorkerAbstract<?, ?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();

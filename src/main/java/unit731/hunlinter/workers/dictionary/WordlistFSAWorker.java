@@ -99,7 +99,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final int totalLines = words.size();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Charset charset = dicParser.getCharset();
-		final File temporaryWordlist = new File(filenameNoExtension + "-tmp.txt");
+		final File temporaryWordlist = new File(filenameNoExtension + ".txt");
 		try(final BufferedWriter writer = Files.newBufferedWriter(temporaryWordlist.toPath(), charset)){
 			for(final String word : words){
 				try{
