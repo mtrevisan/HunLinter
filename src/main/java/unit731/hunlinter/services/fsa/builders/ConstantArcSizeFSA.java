@@ -1,5 +1,8 @@
 package unit731.hunlinter.services.fsa.builders;
 
+import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.FSAFlags;
+
 import java.util.Collections;
 import java.util.Set;
 

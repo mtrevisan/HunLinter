@@ -1,6 +1,10 @@
 package unit731.hunlinter.services.fsa.builders;
 
 import com.carrotsearch.hppc.IntIntHashMap;
+import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.FSA5;
+import unit731.hunlinter.services.fsa.FSAFlags;
+import unit731.hunlinter.services.fsa.StateVisitor;
 
 import java.io.IOException;
 import java.io.StringWriter;

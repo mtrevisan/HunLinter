@@ -1,5 +1,7 @@
 package unit731.hunlinter.services.fsa.builders;
 
+import unit731.hunlinter.services.fsa.FSA;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;

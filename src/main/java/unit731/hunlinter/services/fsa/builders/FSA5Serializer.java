@@ -2,6 +2,10 @@ package unit731.hunlinter.services.fsa.builders;
 
 import com.carrotsearch.hppc.IntIntHashMap;
 import com.carrotsearch.hppc.IntStack;
+import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.FSA5;
+import unit731.hunlinter.services.fsa.FSAFlags;
+import unit731.hunlinter.services.fsa.FSAHeader;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -147,9 +151,7 @@ public class FSA5Serializer implements FSASerializer{
 			gtl++;
 		}
 
-		/*
-		 * Emit the header.
-		 */
+		//emit the header
 		FSAHeader.write(os, FSA5.VERSION);
 		os.write(fillerByte);
 		os.write(annotationByte);

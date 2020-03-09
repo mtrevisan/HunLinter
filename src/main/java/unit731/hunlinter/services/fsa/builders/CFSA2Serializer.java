@@ -7,6 +7,11 @@ import com.carrotsearch.hppc.IntIntHashMap;
 import com.carrotsearch.hppc.IntStack;
 import com.carrotsearch.hppc.cursors.IntCursor;
 import com.carrotsearch.hppc.cursors.IntIntCursor;
+import unit731.hunlinter.services.fsa.CFSA2;
+import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.FSAFlags;
+import unit731.hunlinter.services.fsa.FSAHeader;
+import unit731.hunlinter.services.fsa.StateVisitor;
 
 import java.io.IOException;
 import java.io.OutputStream;
