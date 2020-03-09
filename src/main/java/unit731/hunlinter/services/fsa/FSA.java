@@ -17,7 +17,7 @@ import java.util.Set;
  * Construction of Finite-State Automata and Transducers, and Their Use in the
  * Natural Language Processing</i> (PhD thesis, Technical University of Gdansk).
  */
-public abstract class FSA{
+public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @return Returns the identifier of the root node of this automaton. Returns 0 if the start node is also the end node (the automaton is empty).
