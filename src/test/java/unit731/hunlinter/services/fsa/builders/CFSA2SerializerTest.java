@@ -8,171 +8,110 @@ import unit731.hunlinter.services.fsa.FSAFlags;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 
 class CFSA2SerializerTest{
 
-	private FSASerializer createSerializer(){
-		return new CFSA2Serializer();
+	@Test
+	void testEmptyInput() throws IOException{
+		testInput(Collections.emptyList());
 	}
 
 	@Test
 	void testA() throws IOException{
-		byte[][] input = new byte[][]{{'a'},};
-
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
-
-		checkSerialization(input, s);
+		testInput(Collections.singletonList("a"));
 	}
 
 	@Test
 	void testArcsSharing() throws IOException{
-		byte[][] input = new byte[][]{{'a', 'c', 'f'}, {'a', 'd', 'g'}, {'a', 'e', 'h'}, {'b', 'd', 'g'}, {'b', 'e', 'h'},};
-
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
-
-		checkSerialization(input, s);
+		testInput(Arrays.asList("acf", "adg", "aeh", "bdg", "beh"));
 	}
 
 	@Test
 	void testFSA5SerializerSimple() throws IOException{
-		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
-
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
-
-		checkSerialization(input, s);
+		testInput(Arrays.asList("a", "aba", "ac", "b", "ba", "c"));
 	}
 
 	@Test
 	void testNotMinimal() throws IOException{
-		byte[][] input = new byte[][]{{'a', 'b', 'a'}, {'b'}, {'b', 'a'}};
-
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
-
-		checkSerialization(input, s);
+		testInput(Arrays.asList("aba", "b", "ba"));
 	}
 
 	@Test
 	void testFSA5Bug0() throws IOException{
-		checkCorrect(new String[]{"3-D+A+JJ", "3-D+A+NN", "4-F+A+NN", "z+A+NN",});
+		testInput(Arrays.asList("3-D+A+JJ", "3-D+A+NN", "4-F+A+NN", "z+A+NN"));
 	}
 
 	@Test
 	void testFSA5Bug1() throws IOException{
-		checkCorrect(new String[]{"+NP", "n+N", "n+NP",});
+		testInput(Arrays.asList("+NP", "n+N", "n+NP"));
 	}
 
-	private void checkCorrect(String[] strings) throws IOException{
-		byte[][] input = new byte[strings.length][];
-		for(int i = 0; i < strings.length; i++){
-			input[i] = strings[i].getBytes("ISO8859-1");
-		}
+	private void testInput(List<String> input) throws IOException{
+		input.sort(Comparator.naturalOrder());
 
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
+		FSA fsa = FSABuilder.build(input);
 
-		checkSerialization(input, s);
+		checkSerialization(input, fsa);
 	}
 
-	@Test
-	void testEmptyInput() throws IOException{
-		byte[][] input = new byte[][]{};
-		FSA s = FSABuilder.build(input);
-
-		checkSerialization(input, s);
-	}
 
 	@Test
 	void test_abc() throws IOException{
-		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/abc.fsa")));
+		testInput("abc.fsa");
 	}
 
 	@Test
 	void test_minimal() throws IOException{
-		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/minimal.fsa")));
+		testInput("minimal.fsa");
 	}
 
 	@Test
 	void test_minimal2() throws IOException{
-		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
+		testInput("minimal2.fsa");
 	}
 
 	@Test
 	void test_en_tst() throws IOException{
-		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/en_tst.dict")));
+		testInput("en_tst.dict");
 	}
 
-	private void testBuiltIn(FSA fsa) throws IOException{
-		final List<byte[]> sequences = new ArrayList<byte[]>();
+	private void testInput(String fsaFilename) throws IOException{
+		InputStream stream = CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/" + fsaFilename);
+		FSA fsa = FSA.read(stream);
 
-		sequences.clear();
-		for(ByteBuffer bb : fsa){
-			sequences.add(Arrays.copyOf(bb.array(), bb.remaining()));
-		}
+		List<String> sequences = new ArrayList<>();
+		for(ByteBuffer bb : fsa)
+			sequences.add(new String(bb.array()));
+		sequences.sort(Comparator.naturalOrder());
 
-		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
+		FSA root = FSABuilder.build(sequences);
 
-		final byte[][] in = sequences.toArray(new byte[sequences.size()][]);
-		FSA root = FSABuilder.build(in);
+		//check if the DFSA is correct first
+		FSATestUtils.checkCorrect(sequences, root);
 
-		// Check if the DFSA is correct first.
-		FSATestUtils.checkCorrect(in, root);
-
-		// Check serialization.
-		checkSerialization(in, root);
+		//check serialization
+		checkSerialization(sequences, root);
 	}
 
-	private void checkSerialization(byte[][] input, FSA root) throws IOException{
+	private void checkSerialization(List<String> input, FSA root) throws IOException{
 		checkSerialization0(createSerializer(), input, root);
-		if(createSerializer().getFlags().contains(FSAFlags.NUMBERS)){
+		if(createSerializer().getFlags().contains(FSAFlags.NUMBERS))
 			checkSerialization0(createSerializer().serializeWithNumbers(), input, root);
-		}
 	}
 
-	private void checkSerialization0(FSASerializer serializer, final byte[][] in, FSA root) throws IOException{
+	private void checkSerialization0(FSASerializer serializer, List<String> in, FSA root) throws IOException{
 		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
-		checkCorrect(in, fsa);
-	}
-
-	/*
-	 * Check if the FSA is correct with respect to the given input.
-	 */
-	protected void checkCorrect(byte[][] input, FSA fsa){
-		// (1) All input sequences are in the right language.
-		Set<ByteBuffer> rl = new HashSet<>();
-		for(ByteBuffer bb : fsa){
-			byte[] array = bb.array();
-			int length = bb.remaining();
-			rl.add(ByteBuffer.wrap(Arrays.copyOf(array, length)));
-		}
-
-		HashSet<ByteBuffer> uniqueInput = new HashSet<>();
-		for(byte[] sequence : input){
-			uniqueInput.add(ByteBuffer.wrap(sequence));
-		}
-
-		for(ByteBuffer sequence : uniqueInput){
-			if(!rl.remove(sequence)){
-				Assertions.fail("Not present in the right language: " + toString(sequence));
-			}
-		}
-
-		// (2) No other sequence _other_ than the input is in the right
-		// language.
-		Assertions.assertEquals(0, rl.size());
+		FSATestUtils.checkCorrect(in, fsa);
 	}
 
 	@Test
@@ -200,6 +139,10 @@ class CFSA2SerializerTest{
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);
 	}
 
+	private FSASerializer createSerializer(){
+		return new CFSA2Serializer();
+	}
+
 	private static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result) throws IOException{
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
 			buffer[depth] = fsa.getArcLabel(arc);
@@ -217,13 +160,6 @@ class CFSA2SerializerTest{
 				cnt += fsa.getRightLanguageCount(fsa.getEndNode(arc));
 			}
 		}
-	}
-
-	/** Drain bytes from a byte buffer to a string */
-	private static String toString(ByteBuffer sequence){
-		byte[] bytes = new byte[sequence.remaining()];
-		sequence.get(bytes);
-		return Arrays.toString(bytes);
 	}
 
 }

@@ -8,7 +8,7 @@ import java.util.Comparator;
 
 
 /**
- * Fast, memory-conservative finite state automaton builder, returning an in-memory {@link FSA} that is a trade-off
+ * Fast, memory-conservative Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
  * between construction speed and memory consumption.
  * Use serializers to compress the returned automaton into a more compact form.
  *
@@ -158,7 +158,7 @@ public class FSABuilder{
 	 * @param input Input sequences to build automaton from.
 	 * @return Returns the automaton encoding all input sequences.
 	 */
-	public static FSA build(final byte[][] input){
+	static FSA build(final byte[][] input){
 		final FSABuilder builder = new FSABuilder();
 		for(final byte[] chs : input)
 			builder.add(chs, 0, chs.length);
@@ -180,15 +180,15 @@ public class FSABuilder{
 		return builder.complete();
 	}
 
-	private boolean isArcLast(int arc){
+	private boolean isArcLast(final int arc){
 		return (serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_LAST) != 0;
 	}
 
-	private boolean isArcFinal(int arc){
+	private boolean isArcFinal(final int arc){
 		return (serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_FINAL) != 0;
 	}
 
-	private byte getArcLabel(int arc){
+	private byte getArcLabel(final int arc){
 		return serialized[arc + ConstantArcSizeFSA.LABEL_OFFSET];
 	}
 
@@ -260,12 +260,11 @@ public class FSABuilder{
 	private void expandAndRehash(){
 		final int[] newHashSet = new int[hashSet.length * 2];
 		final int bucketMask = (newHashSet.length - 1);
-
 		for(final int state : hashSet)
 			if(state > 0){
 				int slot = hash(state, stateLength(state)) & bucketMask;
 				for(int i = 0; newHashSet[slot] > 0; )
-					slot = (slot + (++i)) & bucketMask;
+					slot = (slot + (++ i)) & bucketMask;
 				newHashSet[slot] = state;
 			}
 		hashSet = newHashSet;

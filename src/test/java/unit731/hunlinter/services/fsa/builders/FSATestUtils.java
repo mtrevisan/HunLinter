@@ -45,8 +45,11 @@ public class FSATestUtils{
 	public static void checkCorrect(final List<String> input, final FSA fsa){
 		//(1) All input sequences are in the right language
 		final Set<ByteBuffer> rl = new HashSet<>();
-		for(final ByteBuffer bb : fsa)
-			rl.add(ByteBuffer.wrap(Arrays.copyOf(bb.array(), bb.remaining())));
+		for(final ByteBuffer bb : fsa){
+			byte[] array = bb.array();
+			int length = bb.remaining();
+			rl.add(ByteBuffer.wrap(Arrays.copyOf(array, length)));
+		}
 
 		final Set<ByteBuffer> uniqueInput = new HashSet<>();
 		for(final String sequence : input)
@@ -60,9 +63,7 @@ public class FSATestUtils{
 		Assertions.assertEquals(0, rl.size());
 	}
 
-	/*
-	 * Drain bytes from a byte buffer to a string.
-	 */
+	/* Drain bytes from a byte buffer to a string */
 	public static String toString(ByteBuffer sequence) {
 		byte [] bytes = new byte [sequence.remaining()];
 		sequence.get(bytes);
@@ -114,9 +115,6 @@ public class FSATestUtils{
 		checkIdentical(fromRoot, fsa1, fsa1.getRootNode(), new BitSet(), fsa2, fsa2.getRootNode(), new BitSet());
 	}
 
-	/*
-	 *
-	 */
 	static void checkIdentical(Deque<String> fromRoot, FSA fsa1, int node1, BitSet visited1, FSA fsa2, int node2, BitSet visited2){
 		int arc1 = fsa1.getFirstArc(node1);
 		int arc2 = fsa2.getFirstArc(node2);
