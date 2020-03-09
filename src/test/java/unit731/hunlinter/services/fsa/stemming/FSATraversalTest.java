@@ -125,7 +125,7 @@ class FSATraversalTest{
 
 	@Test
 	void testMatch() throws IOException{
-		final FSA fsa = FSA.read(this.getClass().getResourceAsStream("abc.fsa"));
+		final FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("abc.fsa"));
 		final FSATraversal traversalHelper = new FSATraversal(fsa);
 
 		MatchResult m = traversalHelper.match("ax".getBytes());
