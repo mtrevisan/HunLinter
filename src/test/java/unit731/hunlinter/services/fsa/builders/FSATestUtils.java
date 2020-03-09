@@ -23,30 +23,6 @@ import java.util.TreeSet;
 
 public class FSATestUtils{
 
-	/*
-	 * Generate a sorted list of random sequences.
-	 */
-	public static byte[][] generateRandom(int count, MinMax length, MinMax alphabet){
-		final byte[][] input = new byte[count][];
-		final Random rnd = new Random(System.currentTimeMillis());
-		for(int i = 0; i < count; i++){
-			input[i] = randomByteSequence(rnd, length, alphabet);
-		}
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		return input;
-	}
-
-	/**
-	 * Generate a random string.
-	 */
-	private static byte[] randomByteSequence(Random rnd, MinMax length, MinMax alphabet){
-		byte[] bytes = new byte[length.min + rnd.nextInt(length.range())];
-		for(int i = 0; i < bytes.length; i++){
-			bytes[i] = (byte) (alphabet.min + rnd.nextInt(alphabet.range()));
-		}
-		return bytes;
-	}
-
 	/** Check if the DFSA is correct with respect to the given input */
 	public static void checkCorrect(final byte[][] input, final FSA fsa){
 		//(1) All input sequences are in the right language
