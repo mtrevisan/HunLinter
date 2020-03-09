@@ -300,6 +300,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### version 1.10.1 - 20200xxx
 - made update process stoppable
 - added linter for thesaurus
+- added menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
 - fixed a bug on hyphenation: when the same rule is added (with different breakpoints), the old one is lost
 - substituted charting library
 - added undo/redo capabilities on input fields
