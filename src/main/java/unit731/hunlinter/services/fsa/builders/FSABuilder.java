@@ -12,7 +12,7 @@ import java.util.TreeMap;
  * memory consumption. Use serializers to compress the returned automaton into
  * more compact form.
  *
- * @see FSABinarySerializer
+ * @see FSASerializer
  */
 public class FSABuilder{
 

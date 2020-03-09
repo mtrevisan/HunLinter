@@ -1,14 +1,11 @@
 package unit731.hunlinter.services.fsa.builders;
 
-import morfologik.fsa.builders.CFSA2Serializer;
-import morfologik.fsa.builders.FSA5Serializer;
-
 
 /** The serialization and encoding format to use for compressing the automaton. */
 public enum SerializationFormat{
 	FSA5{
 		@Override
-		public FSABinarySerializer getSerializer(){
+		public FSASerializer getSerializer(){
 			return new FSA5Serializer();
 		}
 	},
@@ -21,6 +18,6 @@ public enum SerializationFormat{
 	};
 
 
-	public abstract FSABinarySerializer getSerializer();
+	public abstract FSASerializer getSerializer();
 
 }

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  *
  * @see CFSA2
  */
-public class CFSA2Serializer implements FSABinarySerializer{
+public class CFSA2Serializer implements FSASerializer{
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 

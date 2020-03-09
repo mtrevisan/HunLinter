@@ -6,7 +6,7 @@ import java.util.Set;
 
 
 /** All FSA serializers will implement this interface. */
-public interface FSABinarySerializer{
+public interface FSASerializer{
 
 	/**
 	 * Serialize a finite state automaton to an output stream.
@@ -30,7 +30,7 @@ public interface FSABinarySerializer{
 	 * @param filler The filler separator byte.
 	 * @return Returns <code>this</code> for call chaining.
 	 */
-	FSABinarySerializer withFiller(final byte filler);
+	FSASerializer withFiller(final byte filler);
 
 	/**
 	 * Sets the annotation separator (only if {@link #getFlags()} returns {@link FSAFlags#SEPARATORS}).
@@ -38,7 +38,7 @@ public interface FSABinarySerializer{
 	 * @param annotationSeparator The filler separator byte.
 	 * @return Returns <code>this</code> for call chaining.
 	 */
-	FSABinarySerializer withAnnotationSeparator(final byte annotationSeparator);
+	FSASerializer withAnnotationSeparator(final byte annotationSeparator);
 
 	/**
 	 * Enables support for right language count on nodes, speeding up perfect hash
@@ -46,6 +46,6 @@ public interface FSABinarySerializer{
 	 *
 	 * @return Returns <code>this</code> for call chaining.
 	 */
-	FSABinarySerializer withNumbers();
+	FSASerializer withNumbers();
 
 }
