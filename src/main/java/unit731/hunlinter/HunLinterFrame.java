@@ -199,9 +199,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
+      dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
+      dicFSASeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDictionaryFSAMenuItem = new javax.swing.JMenuItem();
       dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
-      dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
@@ -342,6 +343,12 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
+      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
+      dicExtractMinimalPairsMenuItem.setMnemonic('m');
+      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
+      dicMenu.add(dicExtractMinimalPairsMenuItem);
+      dicMenu.add(dicFSASeparator);
+
       dicExtractDictionaryFSAMenuItem.setAction(new DictionaryExtractWordlistFSAAction(parserManager, workerManager, this));
       dicExtractDictionaryFSAMenuItem.setText("Extract dictionary FSA…");
       dicMenu.add(dicExtractDictionaryFSAMenuItem);
@@ -349,11 +356,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction(parserManager, workerManager, this));
       dicExtractPoSFSAMenuItem.setText("Extract PoS FSA…");
       dicMenu.add(dicExtractPoSFSAMenuItem);
-
-      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
-      dicExtractMinimalPairsMenuItem.setMnemonic('m');
-      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
-      dicMenu.add(dicExtractMinimalPairsMenuItem);
 
       mainMenuBar.add(dicMenu);
 
@@ -841,6 +843,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
    private javax.swing.JMenuItem dicExtractPoSFSAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
+   private javax.swing.JPopupMenu.Separator dicFSASeparator;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenuItem dicLinterMenuItem;
    private javax.swing.JMenu dicMenu;
