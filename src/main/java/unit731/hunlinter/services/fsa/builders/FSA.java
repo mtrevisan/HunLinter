@@ -1,9 +1,5 @@
 package unit731.hunlinter.services.fsa.builders;
 
-import morfologik.fsa.CFSA;
-import morfologik.fsa.CFSA2;
-import morfologik.fsa.FSA5;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
