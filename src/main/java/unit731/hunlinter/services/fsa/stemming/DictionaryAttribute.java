@@ -183,7 +183,7 @@ public enum DictionaryAttribute{
 	OUTPUT_CONVERSION("fsa.dict.output-conversion"){
 		@Override
 		public Map<String, String> fromString(String value) throws IllegalArgumentException{
-			Map<String, String> conversionPairs = new HashMap<String, String>();
+			Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(" ");
@@ -218,7 +218,7 @@ public enum DictionaryAttribute{
 				final String[] twoStrings = stringPair.trim().split(" ");
 				if(twoStrings.length == 2){
 					if(!replacementPairs.containsKey(twoStrings[0])){
-						List<String> strList = new ArrayList<String>();
+						List<String> strList = new ArrayList<>();
 						strList.add(twoStrings[1]);
 						replacementPairs.put(twoStrings[0], strList);
 					}
@@ -251,7 +251,7 @@ public enum DictionaryAttribute{
 					char fromChar = twoChars[0].charAt(0);
 					char toChar = twoChars[1].charAt(0);
 					if(!equivalentCharacters.containsKey(fromChar)){
-						List<Character> chList = new ArrayList<Character>();
+						List<Character> chList = new ArrayList<>();
 						equivalentCharacters.put(fromChar, chList);
 					}
 					equivalentCharacters.get(fromChar).add(toChar);
@@ -312,7 +312,7 @@ public enum DictionaryAttribute{
 	private static final Map<String, DictionaryAttribute> attrsByPropertyName;
 
 	static{
-		attrsByPropertyName = new HashMap<String, DictionaryAttribute>();
+		attrsByPropertyName = new HashMap<>();
 		for(DictionaryAttribute attr : DictionaryAttribute.values()){
 			if(attrsByPropertyName.put(attr.propertyName, attr) != null){
 				throw new RuntimeException("Duplicate property key for: " + attr);
@@ -323,7 +323,7 @@ public enum DictionaryAttribute{
 	/**
 	 * Private enum instance constructor.
 	 */
-	private DictionaryAttribute(String propertyName){
+	DictionaryAttribute(String propertyName){
 		this.propertyName = propertyName;
 	}
 

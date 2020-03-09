@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class DictionaryMetadata{
 	/**
 	 * Default attribute values.
 	 */
-	private static Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
+	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
 		.frequencyIncluded(false)
 		.ignorePunctuation()
 		.ignoreNumbers()
@@ -46,7 +47,7 @@ public class DictionaryMetadata{
 	/**
 	 * Required attributes.
 	 */
-	private static EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES = EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
+	private static final EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES = EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
 
 	/**
 	 * A separator character between fields (stem, lemma, form). The character
@@ -152,11 +153,11 @@ public class DictionaryMetadata{
 	 * @see DictionaryMetadataBuilder
 	 */
 	public DictionaryMetadata(Map<DictionaryAttribute, String> attrs){
-		this.boolAttributes = new EnumMap<DictionaryAttribute, Boolean>(DictionaryAttribute.class);
-		this.attributes = new EnumMap<DictionaryAttribute, String>(DictionaryAttribute.class);
+		this.boolAttributes = new EnumMap<>(DictionaryAttribute.class);
+		this.attributes = new EnumMap<>(DictionaryAttribute.class);
 		this.attributes.putAll(attrs);
 
-		EnumMap<DictionaryAttribute, String> attributeMap = new EnumMap<DictionaryAttribute, String>(DEFAULT_ATTRIBUTES);
+		EnumMap<DictionaryAttribute, String> attributeMap = new EnumMap<>(DEFAULT_ATTRIBUTES);
 		attributeMap.putAll(attrs);
 
 		// Convert some attrs from the map to local fields for performance reasons.
@@ -336,17 +337,17 @@ public class DictionaryMetadata{
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
 	public static DictionaryMetadata read(InputStream metadataStream) throws IOException{
-		Map<DictionaryAttribute, String> map = new HashMap<DictionaryAttribute, String>();
+		Map<DictionaryAttribute, String> map = new HashMap<>();
 		final Properties properties = new Properties();
-		properties.load(new InputStreamReader(metadataStream, "UTF-8"));
+		properties.load(new InputStreamReader(metadataStream, StandardCharsets.UTF_8));
 
 		// Handle back-compatibility for encoder specification.
 		if(!properties.containsKey(DictionaryAttribute.ENCODER.propertyName)){
 			boolean hasDeprecated = properties.containsKey("fsa.dict.uses-suffixes") || properties.containsKey("fsa.dict.uses-infixes") || properties.containsKey("fsa.dict.uses-prefixes");
 
-			boolean usesSuffixes = Boolean.valueOf(properties.getProperty("fsa.dict.uses-suffixes", "true"));
-			boolean usesPrefixes = Boolean.valueOf(properties.getProperty("fsa.dict.uses-prefixes", "false"));
-			boolean usesInfixes = Boolean.valueOf(properties.getProperty("fsa.dict.uses-infixes", "false"));
+			boolean usesSuffixes = Boolean.parseBoolean(properties.getProperty("fsa.dict.uses-suffixes", "true"));
+			boolean usesPrefixes = Boolean.parseBoolean(properties.getProperty("fsa.dict.uses-prefixes", "false"));
+			boolean usesInfixes = Boolean.parseBoolean(properties.getProperty("fsa.dict.uses-infixes", "false"));
 
 			final EncoderType encoder;
 			if(usesInfixes){

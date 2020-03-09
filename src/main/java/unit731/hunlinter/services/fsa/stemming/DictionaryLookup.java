@@ -48,7 +48,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	/**
 	 * A "view" over an array implementing
 	 */
-	private final ArrayViewList<WordData> formsList = new ArrayViewList<WordData>(forms, 0, forms.length);
+	private final ArrayViewList<WordData> formsList = new ArrayViewList<>(forms, 0, forms.length);
 
 	/**
 	 * Features of the compiled dictionary.
@@ -108,7 +108,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 * @param dictionary The dictionary to use for lookups.
 	 * @throws IllegalArgumentException if FSA's root node cannot be acquired (dictionary is empty).
 	 */
-	public DictionaryLookup(Dictionary dictionary) throws IllegalArgumentException{
+	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
 		this.dictionary = dictionary;
 		this.dictionaryMetadata = dictionary.metadata;
 		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
