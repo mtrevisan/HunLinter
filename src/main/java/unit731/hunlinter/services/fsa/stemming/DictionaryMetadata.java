@@ -33,7 +33,16 @@ public class DictionaryMetadata{
 	/**
 	 * Default attribute values.
 	 */
-	private static Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder().frequencyIncluded(false).ignorePunctuation().ignoreNumbers().ignoreCamelCase().ignoreAllUppercase().ignoreDiacritics().convertCase().supportRunOnWords().toMap();
+	private static Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
+		.frequencyIncluded(false)
+		.ignorePunctuation()
+		.ignoreNumbers()
+		.ignoreCamelCase()
+		.ignoreAllUppercase()
+		.ignoreDiacritics()
+		.convertCase()
+		.supportRunOnWords()
+		.toMap();
 
 	/**
 	 * Required attributes.
@@ -294,7 +303,7 @@ public class DictionaryMetadata{
 	 * Returns the expected name of the metadata file, based on the name of the
 	 * dictionary file. The expected name is resolved by truncating any
 	 * file extension of <code>name</code> and appending
-	 * {@link morfologik.stemming.DictionaryMetadata#METADATA_FILE_EXTENSION}.
+	 * {@link DictionaryMetadata#METADATA_FILE_EXTENSION}.
 	 *
 	 * @param dictionaryFile The name of the dictionary (<code>*.dict</code>) file.
 	 * @return Returns the expected name of the metadata file.
@@ -324,10 +333,10 @@ public class DictionaryMetadata{
 	 * Read dictionary metadata from a property file (stream).
 	 *
 	 * @param metadataStream The stream with metadata.
-	 * @return Returns {@link morfologik.stemming.DictionaryMetadata} read from a the stream (property file).
+	 * @return Returns {@link DictionaryMetadata} read from a the stream (property file).
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
-	public static morfologik.stemming.DictionaryMetadata read(InputStream metadataStream) throws IOException{
+	public static DictionaryMetadata read(InputStream metadataStream) throws IOException{
 		Map<DictionaryAttribute, String> map = new HashMap<DictionaryAttribute, String>();
 		final Properties properties = new Properties();
 		properties.load(new InputStreamReader(metadataStream, "UTF-8"));
@@ -366,7 +375,7 @@ public class DictionaryMetadata{
 			map.put(DictionaryAttribute.fromPropertyName(key), properties.getProperty(key));
 		}
 
-		return new morfologik.stemming.DictionaryMetadata(map);
+		return new DictionaryMetadata(map);
 	}
 
 	/**

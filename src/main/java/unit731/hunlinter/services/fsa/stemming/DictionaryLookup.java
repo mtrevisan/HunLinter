@@ -1,18 +1,6 @@
 package unit731.hunlinter.services.fsa.stemming;
 
-import morfologik.fsa.ByteSequenceIterator;
-import morfologik.fsa.FSA;
-import morfologik.fsa.FSATraversal;
-import morfologik.fsa.MatchResult;
-import morfologik.stemming.ArrayViewList;
-import morfologik.stemming.BufferUtils;
-import morfologik.stemming.Dictionary;
-import morfologik.stemming.DictionaryIterator;
-import morfologik.stemming.DictionaryMetadata;
-import morfologik.stemming.ISequenceEncoder;
-import morfologik.stemming.IStemmer;
-import morfologik.stemming.UnmappableInputException;
-import morfologik.stemming.WordData;
+import unit731.hunlinter.services.fsa.FSA;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -23,8 +11,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static morfologik.fsa.MatchResult.SEQUENCE_IS_A_PREFIX;
 
 
 /**
@@ -67,9 +53,9 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	/**
 	 * Features of the compiled dictionary.
 	 *
-	 * @see morfologik.stemming.DictionaryMetadata
+	 * @see DictionaryMetadata
 	 */
-	private final morfologik.stemming.DictionaryMetadata dictionaryMetadata;
+	private final DictionaryMetadata dictionaryMetadata;
 
 	/**
 	 * Charset encoder for the FSA.
@@ -109,9 +95,9 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	private final MatchResult matchResult = new MatchResult();
 
 	/**
-	 * The {@link morfologik.stemming.Dictionary} this lookup is using.
+	 * The {@link Dictionary} this lookup is using.
 	 */
-	private final morfologik.stemming.Dictionary dictionary;
+	private final Dictionary dictionary;
 
 	private final ISequenceEncoder sequenceEncoder;
 
@@ -122,7 +108,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 * @param dictionary The dictionary to use for lookups.
 	 * @throws IllegalArgumentException if FSA's root node cannot be acquired (dictionary is empty).
 	 */
-	public DictionaryLookup(morfologik.stemming.Dictionary dictionary) throws IllegalArgumentException{
+	public DictionaryLookup(Dictionary dictionary) throws IllegalArgumentException{
 		this.dictionary = dictionary;
 		this.dictionaryMetadata = dictionary.metadata;
 		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
@@ -158,7 +144,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 		formsList.wrap(forms, 0, 0);
 
 		// Encode word characters into bytes in the same encoding as the FSA's.
-		charBuffer = morfologik.stemming.BufferUtils.clearAndEnsureCapacity(charBuffer, word.length());
+		charBuffer = BufferUtils.clearAndEnsureCapacity(charBuffer, word.length());
 		for(int i = 0; i < word.length(); i++){
 			char chr = word.charAt(i);
 			if(chr == separatorChar){
@@ -169,7 +155,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 		}
 		charBuffer.flip();
 		try{
-			byteBuffer = morfologik.stemming.BufferUtils.charsToBytes(encoder, charBuffer, byteBuffer);
+			byteBuffer = BufferUtils.charsToBytes(encoder, charBuffer, byteBuffer);
 		}catch(UnmappableInputException e){
 			// This should be a rare occurrence, but if it happens it means there is no way
 			// the dictionary can contain the input word.
@@ -290,7 +276,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 
 	/**
 	 * Return an iterator over all {@link WordData} entries available in the
-	 * embedded {@link morfologik.stemming.Dictionary}.
+	 * embedded {@link Dictionary}.
 	 */
 	@Override
 	public Iterator<WordData> iterator(){
@@ -298,7 +284,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	}
 
 	/**
-	 * @return Return the {@link morfologik.stemming.Dictionary} used by this object.
+	 * @return Return the {@link Dictionary} used by this object.
 	 */
 	public Dictionary getDictionary(){
 		return dictionary;
