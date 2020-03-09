@@ -118,9 +118,9 @@ class CFSA2SerializerTest{
 	void testAutomatonWithNodeNumbers() throws IOException{
 		Assertions.assertTrue(createSerializer().getFlags().contains(FSAFlags.NUMBERS));
 
-		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
+		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
+		input.sort(Comparator.naturalOrder());
 
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
 		FSA s = FSABuilder.build(input);
 
 		final byte[] fsaData = createSerializer().serializeWithNumbers().serialize(s, new ByteArrayOutputStream()).toByteArray();

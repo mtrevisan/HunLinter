@@ -10,7 +10,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,14 +81,12 @@ public class FSATestUtils{
 			private StringBuilder b = new StringBuilder();
 
 			public boolean accept(int state){
-				List<byte[]> rightLanguage = allSequences(fsa, state);
-				Collections.sort(rightLanguage, FSABuilder.LEXICAL_ORDERING);
+				List<String> rightLanguage = allSequences(fsa, state);
+				rightLanguage.sort(Comparator.naturalOrder());
 
 				b.setLength(0);
-				for(byte[] seq : rightLanguage){
-					b.append(Arrays.toString(seq));
-					b.append(',');
-				}
+				for(String seq : rightLanguage)
+					b.append(seq).append(',');
 
 				String full = b.toString();
 				Assertions.assertFalse(stateLanguages.containsKey(full), "State exists: " + state + " " + full + " " + stateLanguages.get(full));
@@ -99,11 +97,10 @@ public class FSATestUtils{
 		});
 	}
 
-	static List<byte[]> allSequences(FSA fsa, int state){
-		List<byte[]> seq = new ArrayList<byte[]>();
-		for(ByteBuffer bb : fsa.getSequences(state)){
-			seq.add(Arrays.copyOf(bb.array(), bb.remaining()));
-		}
+	static List<String> allSequences(FSA fsa, int state){
+		List<String> seq = new ArrayList<>();
+		for(ByteBuffer bb : fsa.getSequences(state))
+			seq.add(new String(bb.array()));
 		return seq;
 	}
 

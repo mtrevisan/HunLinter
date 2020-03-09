@@ -44,13 +44,13 @@ class FSABuilderTest{
 
 	@Test
 	void testLexicographicOrder(){
-		byte[][] input = {{0}, {1}, {(byte)0xff}};
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
+		List<String> input = Arrays.asList(String.valueOf(0), String.valueOf(1), String.valueOf(0xFF));
+		input.sort(Comparator.naturalOrder());
 
 		//check if lexical ordering is consistent with absolute byte value
-		Assertions.assertEquals(0, input[0][0]);
-		Assertions.assertEquals(1, input[1][0]);
-		Assertions.assertEquals((byte)0xFF, input[2][0]);
+		Assertions.assertEquals(String.valueOf(0), input.get(0));
+		Assertions.assertEquals(String.valueOf(1), input.get(1));
+		Assertions.assertEquals(String.valueOf(0xFF), input.get(2));
 
 		FSA fsa = FSABuilder.build(input);
 
