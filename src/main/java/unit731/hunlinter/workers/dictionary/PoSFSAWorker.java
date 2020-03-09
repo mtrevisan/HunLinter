@@ -21,7 +21,6 @@ import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
 import unit731.hunlinter.services.fsa.tools.SerializationFormat;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
 import java.io.BufferedInputStream;
@@ -37,11 +36,14 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 
@@ -60,20 +62,15 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(outputFile);
 
 
+		final Set<String> words = new HashSet<>();
 		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
-			try{
-				for(final Production production : productions)
-					for(final String text : production.toStringPoSFSA()){
-						writer.write(text);
-						writer.write(StringUtils.LF);
-					}
-			}
-			catch(final Exception e){
-				throw new LinterException(e.getMessage());
-			}
+			productions.stream()
+				.map(Production::toStringPoSFSA)
+				.flatMap(List::stream)
+				.forEach(words::add);
 		};
 		final Runnable completed = () -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
@@ -90,7 +87,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 				}
 
-				buildFSA(outputFile.toString(), filenameNoExtension + ".dict");
+				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
 
 				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
 
@@ -130,12 +127,15 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 		if(!words.isEmpty()){
+			//lexical order
+			Collections.sort(words);
+
 			Iterator<String> i = words.iterator();
 			byte[] row = i.next().getBytes(StandardCharsets.UTF_8);
 			final int separatorCount = countOf(separator, row);
 
 			if(separatorCount < 1 || separatorCount > 2){
-				String separatorCharacter = (Character.isJavaIdentifierPart(metadata.getSeparatorAsChar())? "'" + Character.toString(metadata.getSeparatorAsChar()) + "'": "0x" + Integer.toHexString((int) separator & 0xff));
+				String separatorCharacter = (Character.isJavaIdentifierPart(metadata.getSeparatorAsChar())? "'" + metadata.getSeparatorAsChar() + "'": "0x" + Integer.toHexString((int) separator & 0xff));
 				throw new IllegalArgumentException("Invalid input. Each row must consist of [base,inflected,tag?] columns, where ',' is a separator character"
 					+ " (declared as: " + separatorCharacter + "). This row contains " + separatorCount + " separator characters: " + new String(row, charsetDecoder.charset()));
 			}

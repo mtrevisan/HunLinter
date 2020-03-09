@@ -77,7 +77,8 @@ public class Dictionary{
 		try{
 			String external = dictURL.toExternalForm();
 			expectedMetadataURL = new URL(DictionaryMetadata.getExpectedMetadataFileName(external));
-		}catch(MalformedURLException e){
+		}
+		catch(MalformedURLException e){
 			throw new IOException("Couldn't construct relative feature map URL for: " + dictURL, e);
 		}
 

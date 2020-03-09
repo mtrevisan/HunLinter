@@ -2,6 +2,7 @@ package unit731.hunlinter.services.fsa.builders;
 
 import unit731.hunlinter.services.fsa.FSA;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
@@ -258,10 +259,11 @@ public class FSABuilder{
 	 * @param input Input sequences to build automaton from.
 	 * @return Returns the automaton encoding all input sequences.
 	 */
-	public static FSA build(Iterable<byte[]> input){
+	public static FSA build(Iterable<String> input){
 		final FSABuilder builder = new FSABuilder();
 
-		for(byte[] chs : input){
+		for(String line : input){
+			byte[] chs = line.getBytes(StandardCharsets.UTF_8);
 			builder.add(chs, 0, chs.length);
 		}
 

@@ -1,0 +1,6 @@
+# Dictionary properties.
+
+fsa.dict.separator=+
+fsa.dict.encoding=iso8859-1
+
+fsa.dict.encoder=none

@@ -18,7 +18,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,17 +66,17 @@ public class DictionaryMetadata{
 	/**
 	 * Replacement pairs for non-obvious candidate search in a speller dictionary.
 	 */
-	private LinkedHashMap<String, List<String>> replacementPairs = new LinkedHashMap<>();
+	private Map<String, List<String>> replacementPairs = new HashMap<>();
 
 	/**
 	 * Conversion pairs for input conversion, for example to replace ligatures.
 	 */
-	private LinkedHashMap<String, String> inputConversion = new LinkedHashMap<>();
+	private Map<String, String> inputConversion = new HashMap<>();
 
 	/**
 	 * Conversion pairs for output conversion, for example to replace ligatures.
 	 */
-	private LinkedHashMap<String, String> outputConversion = new LinkedHashMap<>();
+	private Map<String, String> outputConversion = new HashMap<>();
 
 	/**
 	 * Equivalent characters (treated similarly as equivalent chars with and without
@@ -85,7 +84,7 @@ public class DictionaryMetadata{
 	 * <p>
 	 * This implements a feature similar to hunspell MAP in the affix file.
 	 */
-	private LinkedHashMap<Character, List<Character>> equivalentChars = new LinkedHashMap<>();
+	private Map<Character, List<Character>> equivalentChars = new HashMap<>();
 
 	/**
 	 * All attributes.
@@ -121,13 +120,13 @@ public class DictionaryMetadata{
 
 	public Locale getLocale(){ return locale; }
 
-	public LinkedHashMap<String, String> getInputConversionPairs(){ return inputConversion; }
+	public Map<String, String> getInputConversionPairs(){ return inputConversion; }
 
-	public LinkedHashMap<String, String> getOutputConversionPairs(){ return outputConversion; }
+	public Map<String, String> getOutputConversionPairs(){ return outputConversion; }
 
-	public LinkedHashMap<String, List<String>> getReplacementPairs(){ return replacementPairs; }
+	public Map<String, List<String>> getReplacementPairs(){ return replacementPairs; }
 
-	public LinkedHashMap<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
+	public Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
 
 	// Dynamically fetched.
 	public boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
@@ -190,25 +189,25 @@ public class DictionaryMetadata{
 					break;
 
 				case INPUT_CONVERSION:{
-					@SuppressWarnings("unchecked") LinkedHashMap<String, String> gvalue = (LinkedHashMap<String, String>) value;
+					@SuppressWarnings("unchecked") Map<String, String> gvalue = (Map<String, String>) value;
 					this.inputConversion = gvalue;
 				}
 				break;
 
 				case OUTPUT_CONVERSION:{
-					@SuppressWarnings("unchecked") LinkedHashMap<String, String> gvalue = (LinkedHashMap<String, String>) value;
+					@SuppressWarnings("unchecked") Map<String, String> gvalue = (Map<String, String>) value;
 					this.outputConversion = gvalue;
 				}
 				break;
 
 				case REPLACEMENT_PAIRS:{
-					@SuppressWarnings("unchecked") LinkedHashMap<String, List<String>> gvalue = (LinkedHashMap<String, List<String>>) value;
+					@SuppressWarnings("unchecked") Map<String, List<String>> gvalue = (Map<String, List<String>>) value;
 					this.replacementPairs = gvalue;
 				}
 				break;
 
 				case EQUIVALENT_CHARS:{
-					@SuppressWarnings("unchecked") LinkedHashMap<Character, List<Character>> gvalue = (LinkedHashMap<Character, List<Character>>) value;
+					@SuppressWarnings("unchecked") Map<Character, List<Character>> gvalue = (Map<Character, List<Character>>) value;
 					this.equivalentChars = gvalue;
 				}
 				break;

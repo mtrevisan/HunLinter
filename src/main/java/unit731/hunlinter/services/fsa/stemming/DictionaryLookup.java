@@ -9,7 +9,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -262,7 +261,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 * @param replacements A map of replacements (from-&gt;to).
 	 * @return new string with all replacements applied.
 	 */
-	public static String applyReplacements(CharSequence word, LinkedHashMap<String, String> replacements){
+	public static String applyReplacements(CharSequence word, Map<String, String> replacements){
 		// quite horrible from performance point of view; this should really be a transducer.
 		StringBuilder sb = new StringBuilder(word);
 		for(final Map.Entry<String, String> e : replacements.entrySet()){

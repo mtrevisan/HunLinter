@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -154,8 +153,8 @@ public enum DictionaryAttribute{
 	 */
 	INPUT_CONVERSION("fsa.dict.input-conversion"){
 		@Override
-		public LinkedHashMap<String, String> fromString(String value) throws IllegalArgumentException{
-			LinkedHashMap<String, String> conversionPairs = new LinkedHashMap<>();
+		public Map<String, String> fromString(String value) throws IllegalArgumentException{
+			Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(" ");
@@ -183,8 +182,8 @@ public enum DictionaryAttribute{
 	 */
 	OUTPUT_CONVERSION("fsa.dict.output-conversion"){
 		@Override
-		public LinkedHashMap<String, String> fromString(String value) throws IllegalArgumentException{
-			LinkedHashMap<String, String> conversionPairs = new LinkedHashMap<String, String>();
+		public Map<String, String> fromString(String value) throws IllegalArgumentException{
+			Map<String, String> conversionPairs = new HashMap<String, String>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(" ");
@@ -212,8 +211,8 @@ public enum DictionaryAttribute{
 	 */
 	REPLACEMENT_PAIRS("fsa.dict.speller.replacement-pairs"){
 		@Override
-		public LinkedHashMap<String, List<String>> fromString(String value) throws IllegalArgumentException{
-			LinkedHashMap<String, List<String>> replacementPairs = new LinkedHashMap<>();
+		public Map<String, List<String>> fromString(String value) throws IllegalArgumentException{
+			Map<String, List<String>> replacementPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(" ");
@@ -243,8 +242,8 @@ public enum DictionaryAttribute{
 	 */
 	EQUIVALENT_CHARS("fsa.dict.speller.equivalent-chars"){
 		@Override
-		public LinkedHashMap<Character, List<Character>> fromString(String value) throws IllegalArgumentException{
-			LinkedHashMap<Character, List<Character>> equivalentCharacters = new LinkedHashMap<>();
+		public Map<Character, List<Character>> fromString(String value) throws IllegalArgumentException{
+			Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
 			final String[] eqChars = value.split(",\\s*");
 			for(final String characterPair : eqChars){
 				final String[] twoChars = characterPair.trim().split(" ");
