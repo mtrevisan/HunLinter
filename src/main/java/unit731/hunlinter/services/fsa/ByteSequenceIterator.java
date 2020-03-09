@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

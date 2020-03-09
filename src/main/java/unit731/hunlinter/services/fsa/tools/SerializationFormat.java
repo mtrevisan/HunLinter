@@ -1,4 +1,8 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa.tools;
+
+import unit731.hunlinter.services.fsa.builders.CFSA2Serializer;
+import unit731.hunlinter.services.fsa.builders.FSA5Serializer;
+import unit731.hunlinter.services.fsa.builders.FSASerializer;
 
 
 /** The serialization and encoding format to use for compressing the automaton. */
