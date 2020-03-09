@@ -27,7 +27,7 @@ public class FSATestUtils{
 	 */
 	public static byte[][] generateRandom(int count, MinMax length, MinMax alphabet){
 		final byte[][] input = new byte[count][];
-		final Random rnd = new Random(randomLong());
+		final Random rnd = new Random(System.currentTimeMillis());
 		for(int i = 0; i < count; i++){
 			input[i] = randomByteSequence(rnd, length, alphabet);
 		}

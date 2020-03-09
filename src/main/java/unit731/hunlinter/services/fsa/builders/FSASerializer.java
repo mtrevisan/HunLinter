@@ -49,6 +49,6 @@ public interface FSASerializer{
 	 *
 	 * @return Returns <code>this</code> for call chaining.
 	 */
-	FSASerializer withNumbers();
+	FSASerializer serializeWithNumbers();
 
 }

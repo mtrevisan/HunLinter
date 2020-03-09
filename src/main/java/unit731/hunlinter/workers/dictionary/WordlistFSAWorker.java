@@ -12,8 +12,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.fsa.FSA;
-import unit731.hunlinter.services.fsa.tools.SerializationFormat;
-import unit731.hunlinter.services.fsa.builders.FSASerializer;
+import unit731.hunlinter.services.fsa.builders.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -96,11 +95,10 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		Collections.sort(words);
 
 		final Path outputPath = Path.of(output);
-		final SerializationFormat format = SerializationFormat.CFSA2;
 
 		final FSA fsa = FSABuilder.build(words);
 
-		final FSASerializer serializer = format.getSerializer();
+		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
 			serializer.serialize(fsa, os);
 		}

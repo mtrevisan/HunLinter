@@ -24,11 +24,11 @@ import java.util.TreeSet;
 
 
 /**
- * Serializes in-memory {@link FSA} graphs to {@link CFSA2}.
+ * Serializes in-memory {@link FSA} graphs to {@link CFSA2 Compact Finite State Automata, version 2}.
  *
  * <p>
  * It is possible to serialize the automaton with numbers required for perfect
- * hashing. See {@link #withNumbers()} method.
+ * hashing. See {@link #serializeWithNumbers()} method.
  * </p>
  *
  * @see CFSA2
@@ -38,7 +38,8 @@ public class CFSA2Serializer implements FSASerializer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
 
 	/** Supported flags */
-	private final static EnumSet<FSAFlags> flags = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
+	private final static EnumSet<FSAFlags> flags = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
+		FSAFlags.NEXTBIT);
 
 	/** No-state id */
 	private final static int NO_STATE = -1;
@@ -46,22 +47,18 @@ public class CFSA2Serializer implements FSASerializer{
 	/**
 	 * <code>true</code> if we should serialize with numbers.
 	 *
-	 * @see #withNumbers()
+	 * @see #serializeWithNumbers()
 	 */
-	private boolean withNumbers;
+	private boolean serializeWithNumbers;
 
 	/** A hash map of [state, offset] pairs */
 	private IntIntHashMap offsets = new IntIntHashMap();
-
 	/** A hash map of [state, right-language-count] pairs */
 	private IntIntHashMap numbers = new IntIntHashMap();
-
 	/** Scratch array for serializing vints */
 	private final byte[] scratch = new byte[5];
-
 	/** The most frequent labels for integrating with the flags field */
 	private byte[] labelsIndex;
-
 	/**
 	 * Inverted index of labels to be integrated with flags field. A label at
 	 * index <code>i<code> has the index or zero (no integration).
@@ -76,8 +73,8 @@ public class CFSA2Serializer implements FSASerializer{
 	 *
 	 * @return Returns the same object for easier call chaining.
 	 */
-	public CFSA2Serializer withNumbers(){
-		withNumbers = true;
+	public CFSA2Serializer serializeWithNumbers(){
+		serializeWithNumbers = true;
 		return this;
 	}
 
@@ -85,7 +82,7 @@ public class CFSA2Serializer implements FSASerializer{
 	 * Serializes any {@link FSA} to {@link CFSA2} stream.
 	 *
 	 * @return Returns <code>os</code> for chaining.
-	 * @see #withNumbers()
+	 * @see #serializeWithNumbers()
 	 */
 	@Override
 	public <T extends OutputStream> T serialize(final FSA fsa, final T os) throws IOException{
@@ -93,7 +90,7 @@ public class CFSA2Serializer implements FSASerializer{
 		computeLabelsIndex(fsa);
 
 		//calculate the number of bytes required for the node data, if serializing with numbers
-		if(withNumbers)
+		if(serializeWithNumbers)
 			this.numbers = FSAUtils.rightLanguageForAllStates(fsa);
 
 		//linearize all the states, optimizing their layout
@@ -103,7 +100,7 @@ public class CFSA2Serializer implements FSASerializer{
 		FSAHeader.write(os, CFSA2.VERSION);
 
 		final EnumSet<FSAFlags> fsaFlags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
-		if(withNumbers)
+		if(serializeWithNumbers)
 			fsaFlags.add(FSAFlags.NUMBERS);
 
 		final short sflags = FSAFlags.asShort(fsaFlags);
@@ -332,7 +329,7 @@ public class CFSA2Serializer implements FSASerializer{
 			else
 				assert offsets.get(state) == offset: state + " " + offsets.get(state) + " " + offset;
 
-			offset += emitNodeData(os, withNumbers? numbers.get(state): 0);
+			offset += emitNodeData(os, serializeWithNumbers? numbers.get(state): 0);
 			offset += emitNodeArcs(fsa, os, state, nextState);
 		}
 
@@ -402,7 +399,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	private int emitNodeData(final OutputStream os, final int number) throws IOException{
 		int size = 0;
-		if(withNumbers){
+		if(serializeWithNumbers){
 			size = writeVInt(scratch, 0, number);
 			if(os != null)
 				os.write(scratch, 0, size);

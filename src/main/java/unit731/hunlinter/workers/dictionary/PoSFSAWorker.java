@@ -11,14 +11,13 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.builders.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
-import unit731.hunlinter.services.fsa.builders.FSASerializer;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
-import unit731.hunlinter.services.fsa.tools.SerializationFormat;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.services.FileHelper;
@@ -106,7 +105,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private void buildFSA(final List<String> words, final String input, final String output) throws Exception{
 		final Path inputPath = Path.of(input);
 		final Path outputPath = Path.of(output);
-		final SerializationFormat format = SerializationFormat.CFSA2;
 
 		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(inputPath);
 
@@ -121,7 +119,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 			metadata = DictionaryMetadata.read(is);
 		}
 
-		final CharsetDecoder charsetDecoder = metadata.getDecoder().onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
+		final CharsetDecoder charsetDecoder = metadata.getDecoder()
+			.onMalformedInput(CodingErrorAction.REPORT)
+			.onUnmappableCharacter(CodingErrorAction.REPORT);
 
 		final byte separator = metadata.getSeparator();
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
@@ -195,7 +195,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Collections.sort(words);
 		final FSA fsa = FSABuilder.build(words);
 
-		final FSASerializer serializer = format.getSerializer();
+		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
 			serializer.serialize(fsa, os);
 		}

@@ -136,7 +136,7 @@ public class CFSA2SerializerTest{
 	private void checkSerialization(byte[][] input, FSA root) throws IOException{
 		checkSerialization0(createSerializer(), input, root);
 		if(createSerializer().getFlags().contains(FSAFlags.NUMBERS)){
-			checkSerialization0(createSerializer().withNumbers(), input, root);
+			checkSerialization0(createSerializer().serializeWithNumbers(), input, root);
 		}
 	}
 
@@ -184,7 +184,7 @@ public class CFSA2SerializerTest{
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
 		FSA s = FSABuilder.build(input);
 
-		final byte[] fsaData = createSerializer().withNumbers().serialize(s, new ByteArrayOutputStream()).toByteArray();
+		final byte[] fsaData = createSerializer().serializeWithNumbers().serialize(s, new ByteArrayOutputStream()).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
 
