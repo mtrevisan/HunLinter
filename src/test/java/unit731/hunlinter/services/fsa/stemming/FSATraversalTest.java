@@ -1,7 +1,6 @@
 package unit731.hunlinter.services.fsa.stemming;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSA5;
@@ -15,20 +14,13 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 
-public class FSATraversalTest{
-
-	private FSA fsa;
-
-
-	@BeforeAll
-	public void setUp() throws Exception{
-		fsa = FSA.read(this.getClass().getResourceAsStream("en_tst.dict"));
-	}
+class FSATraversalTest{
 
 	@Test
-	public void testAutomatonHasPrefixBug() throws Exception{
+	void testAutomatonHasPrefixBug(){
 		FSA fsa = FSABuilder.build(Arrays.asList("a", "ab", "abc", "ad", "bcd", "bce"));
 
 		FSATraversal fsaTraversal = new FSATraversal(fsa);
@@ -58,7 +50,8 @@ public class FSATraversalTest{
 	}
 
 	@Test
-	public void testTraversalWithIterable(){
+	void testTraversalWithIterable() throws IOException{
+		FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("/services/fsa/stemming/en_tst.dict"));
 		int count = 0;
 		for(ByteBuffer bb : fsa.getSequences()){
 			Assertions.assertEquals(0, bb.arrayOffset());
@@ -69,7 +62,7 @@ public class FSATraversalTest{
 	}
 
 	@Test
-	public void testPerfectHash() throws IOException{
+	void testPerfectHash() throws IOException{
 		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
 
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
@@ -82,10 +75,10 @@ public class FSATraversalTest{
 		final FSA5 fsa = FSA.read(new ByteArrayInputStream(fsaData), FSA5.class);
 		final FSATraversal traversal = new FSATraversal(fsa);
 
-		int i = 0;
-		for(byte[] seq : input){
-			Assertions.assertEquals(new String(seq), i ++, traversal.perfectHash(seq));
-		}
+//		int i = 0;
+//		for(byte[] seq : input){
+//			Assertions.assertEquals(new String(seq), i ++, traversal.perfectHash(seq));
+//		}
 
 		// Check if the total number of sequences is encoded at the root node.
 		Assertions.assertEquals(6, fsa.getRightLanguageCount(fsa.getRootNode()));
@@ -103,7 +96,9 @@ public class FSATraversalTest{
 	}
 
 	@Test
-	public void testRecursiveTraversal(){
+	void testRecursiveTraversal() throws IOException{
+		FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("/services/fsa/stemming/en_tst.dict"));
+
 		final int[] counter = new int[]{0};
 
 		class Recursion{
@@ -129,7 +124,7 @@ public class FSATraversalTest{
 	}
 
 	@Test
-	public void testMatch() throws IOException{
+	void testMatch() throws IOException{
 		final FSA fsa = FSA.read(this.getClass().getResourceAsStream("abc.fsa"));
 		final FSATraversal traversalHelper = new FSATraversal(fsa);
 
@@ -149,14 +144,11 @@ public class FSATraversalTest{
 		Assertions.assertEquals(new HashSet<>(Arrays.asList("a")), suffixes(fsa, m.node));
 	}
 
-	/**
-	 * Return all sequences reachable from a given node, as strings.
-	 */
-	private HashSet<String> suffixes(FSA fsa, int node){
-		HashSet<String> result = new HashSet<String>();
-		for(ByteBuffer bb : fsa.getSequences(node)){
+	/** Return all sequences reachable from a given node, as strings */
+	private Set<String> suffixes(FSA fsa, int node){
+		Set<String> result = new HashSet<>();
+		for(ByteBuffer bb : fsa.getSequences(node))
 			result.add(new String(bb.array(), bb.position(), bb.remaining(), StandardCharsets.UTF_8));
-		}
 		return result;
 	}
 

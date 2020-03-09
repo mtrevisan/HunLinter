@@ -158,7 +158,7 @@ public class FSABuilder{
 	 * @param input Input sequences to build automaton from.
 	 * @return Returns the automaton encoding all input sequences.
 	 */
-	static FSA build(byte[][] input){
+	public static FSA build(final byte[][] input){
 		final FSABuilder builder = new FSABuilder();
 		for(final byte[] chs : input)
 			builder.add(chs, 0, chs.length);
