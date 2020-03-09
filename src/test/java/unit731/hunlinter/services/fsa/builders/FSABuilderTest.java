@@ -1,54 +1,50 @@
 package unit731.hunlinter.services.fsa.builders;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 class FSABuilderTest{
 
-	private static byte[][] input;
-	private static byte[][] input2;
-
-
-	@BeforeAll
-	static void prepareByteInput(){
-		input = FSATestUtils.generateRandom(25000, new MinMax(1, 20), new MinMax(0, 255));
-		input2 = FSATestUtils.generateRandom(40, new MinMax(1, 20), new MinMax(0, 3));
-	}
-
 	@Test
 	void testEmptyInput(){
-		byte[][] input = {};
-		FSATestUtils.checkCorrect(input, FSABuilder.build(input));
+		List<String> input = Collections.emptyList();
+
+		FSA fsa = FSABuilder.build(input);
+
+		FSATestUtils.checkCorrect(input, fsa);
 	}
 
 	@Test
 	void testHashResizeBug(){
-		byte[][] input = {{0, 1}, {0, 2}, {1, 1}, {2, 1},};
+		List<String> input = Arrays.asList("01", "02", "11", "21");
 
 		FSA fsa = FSABuilder.build(input);
-		FSATestUtils.checkCorrect(input, FSABuilder.build(input));
+
+		FSATestUtils.checkCorrect(input, fsa);
 		FSATestUtils.checkMinimal(fsa);
 	}
 
 	@Test
 	void testSmallInput(){
-		byte[][] input = {
-			"abc".getBytes(StandardCharsets.UTF_8),
-			"bbc".getBytes(StandardCharsets.UTF_8),
-			"d".getBytes(StandardCharsets.UTF_8)
-		};
-		FSATestUtils.checkCorrect(input, FSABuilder.build(input));
+		List<String> input = Arrays.asList("abc", "bbc", "d");
+
+		FSA fsa = FSABuilder.build(input);
+
+		FSATestUtils.checkCorrect(input, fsa);
 	}
 
 	@Test
 	void testLexicographicOrder(){
-		byte[][] input = {{0}, {1}, {(byte) 0xff},};
+		byte[][] input = {{0}, {1}, {(byte)0xff}};
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
 
 		//check if lexical ordering is consistent with absolute byte value
@@ -56,8 +52,9 @@ class FSABuilderTest{
 		Assertions.assertEquals(1, input[1][0]);
 		Assertions.assertEquals((byte)0xFF, input[2][0]);
 
-		final FSA fsa;
-		FSATestUtils.checkCorrect(input, fsa = FSABuilder.build(input));
+		FSA fsa = FSABuilder.build(input);
+
+		FSATestUtils.checkCorrect(input, fsa);
 
 		int arc = fsa.getFirstArc(fsa.getRootNode());
 		Assertions.assertEquals(0, fsa.getArcLabel(arc));
@@ -69,15 +66,14 @@ class FSABuilderTest{
 
 	@Test
 	void testRandom25000_largerAlphabet(){
-		FSA fsa = FSABuilder.build(input);
-		FSATestUtils.checkCorrect(input, fsa);
-		FSATestUtils.checkMinimal(fsa);
-	}
+		List<String> input = new ArrayList<>(25_000);
+		for(int i = 0; i < 25_000; i ++)
+			input.add(RandomStringUtils.randomAlphanumeric(1, 20));
+		input.sort(Comparator.naturalOrder());
 
-	@Test
-	void testRandom25000_smallAlphabet(){
-		FSA fsa = FSABuilder.build(input2);
-		FSATestUtils.checkCorrect(input2, fsa);
+		FSA fsa = FSABuilder.build(input);
+
+		FSATestUtils.checkCorrect(input, fsa);
 		FSATestUtils.checkMinimal(fsa);
 	}
 

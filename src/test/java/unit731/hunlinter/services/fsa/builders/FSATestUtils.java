@@ -5,6 +5,7 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.StateVisitor;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,28 +47,41 @@ public class FSATestUtils{
 		return bytes;
 	}
 
-	/*
-	 * Check if the DFSA is correct with respect to the given input.
-	 */
-	public static void checkCorrect(byte[][] input, FSA fsa){
-		// (1) All input sequences are in the right language.
-		Set<ByteBuffer> rl = new HashSet<ByteBuffer>();
-		for(ByteBuffer bb : fsa){
+	/** Check if the DFSA is correct with respect to the given input */
+	public static void checkCorrect(final byte[][] input, final FSA fsa){
+		//(1) All input sequences are in the right language
+		final Set<ByteBuffer> rl = new HashSet<>();
+		for(final ByteBuffer bb : fsa)
 			rl.add(ByteBuffer.wrap(Arrays.copyOf(bb.array(), bb.remaining())));
-		}
 
-		HashSet<ByteBuffer> uniqueInput = new HashSet<ByteBuffer>();
-		for(byte[] sequence : input){
+		final Set<ByteBuffer> uniqueInput = new HashSet<>();
+		for(final byte[] sequence : input)
 			uniqueInput.add(ByteBuffer.wrap(sequence));
-		}
 
-		for(ByteBuffer sequence : uniqueInput){
-			if(!rl.remove(sequence)){
+		for(final ByteBuffer sequence : uniqueInput)
+			if(!rl.remove(sequence))
 				Assertions.fail("Not present in the right language: " + toString(sequence));
-			}
-		}
 
-		// (2) No other sequence _other_ than the input is in the right language.
+		//(2) No other sequence _other_ than the input is in the right language
+		Assertions.assertEquals(0, rl.size());
+	}
+
+	/** Check if the DFSA is correct with respect to the given input */
+	public static void checkCorrect(final List<String> input, final FSA fsa){
+		//(1) All input sequences are in the right language
+		final Set<ByteBuffer> rl = new HashSet<>();
+		for(final ByteBuffer bb : fsa)
+			rl.add(ByteBuffer.wrap(Arrays.copyOf(bb.array(), bb.remaining())));
+
+		final Set<ByteBuffer> uniqueInput = new HashSet<>();
+		for(final String sequence : input)
+			uniqueInput.add(ByteBuffer.wrap(sequence.getBytes(StandardCharsets.UTF_8)));
+
+		for(final ByteBuffer sequence : uniqueInput)
+			if(!rl.remove(sequence))
+				Assertions.fail("Not present in the right language: " + toString(sequence));
+
+		//(2) No other sequence _other_ than the input is in the right language
 		Assertions.assertEquals(0, rl.size());
 	}
 
@@ -81,8 +95,8 @@ public class FSATestUtils{
 	}
 
 	/*
-	 * Check if the DFSA reachable from a given state is minimal. This means no
-	 * two states have the same right language.
+	 * Check if the DFSA reachable from a given state is minimal.
+	 * This means no * two states have the same right language.
 	 */
 	public static void checkMinimal(final FSA fsa){
 		final Map<String, Integer> stateLanguages = new HashMap<String, Integer>();
