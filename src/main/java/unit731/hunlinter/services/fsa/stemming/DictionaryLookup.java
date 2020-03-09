@@ -1,5 +1,6 @@
 package unit731.hunlinter.services.fsa.stemming;
 
+import unit731.hunlinter.services.fsa.ByteSequenceIterator;
 import unit731.hunlinter.services.fsa.FSA;
 
 import java.nio.ByteBuffer;
@@ -156,7 +157,8 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 		charBuffer.flip();
 		try{
 			byteBuffer = BufferUtils.charsToBytes(encoder, charBuffer, byteBuffer);
-		}catch(UnmappableInputException e){
+		}
+		catch(Exception e){
 			// This should be a rare occurrence, but if it happens it means there is no way
 			// the dictionary can contain the input word.
 			return formsList;
@@ -165,7 +167,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 		// Try to find a partial match in the dictionary.
 		final MatchResult match = matcher.match(matchResult, byteBuffer.array(), 0, byteBuffer.remaining(), rootNode);
 
-		if(match.kind == SEQUENCE_IS_A_PREFIX){
+		if(match.kind == MatchResult.SEQUENCE_IS_A_PREFIX){
 			/*
 			 * The entire sequence exists in the dictionary. A separator should
 			 * be the next symbol.

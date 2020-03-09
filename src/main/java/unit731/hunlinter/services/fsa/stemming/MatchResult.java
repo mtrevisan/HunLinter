@@ -2,7 +2,7 @@ package unit731.hunlinter.services.fsa.stemming;
 
 
 /**
- * A matching result returned from {@link morfologik.fsa.FSATraversal}.
+ * A matching result returned from {@link FSATraversal}.
  *
  * @see FSATraversal
  */
@@ -29,7 +29,7 @@ public class MatchResult{
 	 * used to build the automaton is a prefix of the input sequence, but the
 	 * input sequence contains a non-existent suffix.
 	 *
-	 * <p>{@link morfologik.fsa.MatchResult#index} will contain an index of the
+	 * <p>{@link MatchResult#index} will contain an index of the
 	 * first character of the input sequence not present in the
 	 * dictionary.</p>
 	 */
@@ -37,7 +37,7 @@ public class MatchResult{
 
 	/**
 	 * The sequence is a prefix of at least one sequence in the automaton.
-	 * {@link morfologik.fsa.MatchResult#node} returns the node from which all sequences
+	 * {@link MatchResult#node} returns the node from which all sequences
 	 * with the given prefix start in the automaton.
 	 */
 	public static final int SEQUENCE_IS_A_PREFIX = -4;

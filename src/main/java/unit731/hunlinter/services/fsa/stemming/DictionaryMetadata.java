@@ -53,7 +53,7 @@ public class DictionaryMetadata{
 	 * A separator character between fields (stem, lemma, form). The character
 	 * must be within byte range (FSA uses bytes internally).
 	 */
-	private byte separator;
+	protected byte separator;
 	private char separatorChar;
 
 	/**

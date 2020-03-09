@@ -1,6 +1,5 @@
 package unit731.hunlinter.workers.dictionary;
 
-import morfologik.stemming.ISequenceEncoder;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,6 +17,7 @@ import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
+import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
 import unit731.hunlinter.services.fsa.tools.SerializationFormat;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -129,18 +130,21 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 		if(!words.isEmpty()){
-			Iterator<byte[]> i = words.iterator();
-			byte[] row = i.next();
+			Iterator<String> i = words.iterator();
+			byte[] row = i.next().getBytes(StandardCharsets.UTF_8);
 			final int separatorCount = countOf(separator, row);
 
-			if(separatorCount < 1 || separatorCount > 2)
-				throw new IllegalArgumentException("Invalid input. Each row must consist of [base,inflected,tag?] columns, where ',' is a separator character (declared as: %s). This row contains %d separator characters: %s", Character.isJavaIdentifierPart(metadata.getSeparatorAsChar())? "'" + Character.toString(metadata.getSeparatorAsChar()) + "'": "0x" + Integer.toHexString((int) separator & 0xff), separatorCount, new String(row, charsetDecoder.charset()));
+			if(separatorCount < 1 || separatorCount > 2){
+				String separatorCharacter = (Character.isJavaIdentifierPart(metadata.getSeparatorAsChar())? "'" + Character.toString(metadata.getSeparatorAsChar()) + "'": "0x" + Integer.toHexString((int) separator & 0xff));
+				throw new IllegalArgumentException("Invalid input. Each row must consist of [base,inflected,tag?] columns, where ',' is a separator character"
+					+ " (declared as: " + separatorCharacter + "). This row contains " + separatorCount + " separator characters: " + new String(row, charsetDecoder.charset()));
+			}
 
 			while(i.hasNext()){
-				row = i.next();
+				row = i.next().getBytes(StandardCharsets.UTF_8);
 				final int count = countOf(separator, row);
 				if(count != separatorCount)
-					throw new IllegalArgumentException("The number of separators (%d) is inconsistent with previous lines: %s", count, new String(row, charsetDecoder.charset()));
+					throw new IllegalArgumentException("The number of separators (" + count + ") is inconsistent with previous lines: " + new String(row, charsetDecoder.charset()));
 			}
 		}
 
@@ -150,7 +154,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
 		for(int i = 0, max = words.size(); i < max; i++){
-			final byte[] row = words.get(i);
+			final byte[] row = words.get(i).getBytes(StandardCharsets.UTF_8);
 			final int sep1 = indexOf(separator, row, 0);
 			int sep2 = indexOf(separator, row, sep1 + 1);
 			if(sep2 < 0)
@@ -184,7 +188,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 			assembled.flip();
 
-			words.set(i, BufferUtils.toArray(assembled));
+			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
 		}
 
 		//lexical order
