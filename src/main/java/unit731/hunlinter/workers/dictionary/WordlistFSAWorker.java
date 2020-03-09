@@ -15,19 +15,17 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.fsa.BinaryInput;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,7 +64,6 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			try{
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-				final File temporaryWordlist = writeProcess(filenameNoExtension, words);
 
 				final File outputInfoFile = new File(filenameNoExtension + ".info");
 				if(!outputInfoFile.exists()){
@@ -78,9 +75,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 				}
 
-				buildFSA(temporaryWordlist.toString(), filenameNoExtension + ".dict");
-
-				Files.delete(temporaryWordlist.toPath());
+				buildFSA(new ArrayList<>(words), filenameNoExtension + ".dict");
 
 				finalizeProcessing("File written: " + outputFile.getAbsolutePath());
 
@@ -96,51 +91,14 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			.withDataCompletedCallback(completed);
 	}
 
-	private File writeProcess(final String filenameNoExtension, final Set<String> words)
-			throws IOException, InterruptedException{
-		int writtenSoFar = 0;
-		final int totalLines = words.size();
-		final DictionaryParser dicParser = workerData.getParser();
-		final Charset charset = dicParser.getCharset();
-		final File temporaryWordlist = new File(filenameNoExtension + ".txt");
-		try(final BufferedWriter writer = Files.newBufferedWriter(temporaryWordlist.toPath(), charset)){
-			for(final String word : words){
-				try{
-					writtenSoFar ++;
+	private void buildFSA(final List<String> words, final String output) throws Exception{
+		//lexical order
+		Collections.sort(words);
 
-					writer.write(word);
-					writer.write(StringUtils.LF);
-
-					setProcessingProgress(writtenSoFar, totalLines);
-
-					sleepOnPause();
-				}
-				catch(final Exception e){
-					if(!JavaHelper.isInterruptedException(e))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}: {}", e.getMessage(), word);
-
-					throw e;
-				}
-			}
-
-			return temporaryWordlist;
-		}
-		catch(final Exception e){
-			cancel(e);
-
-			throw e;
-		}
-	}
-
-	private void buildFSA(final String input, final String output) throws Exception{
-		final Path inputPath = Path.of(input);
 		final Path outputPath = Path.of(output);
 		final SerializationFormat format = SerializationFormat.CFSA2;
-		final BinaryInput binaryInput = new BinaryInput(true, true, true);
-		final List<byte[]> sequences = binaryInput.readBinarySequences(input, (byte)'\n');
 
-		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
-		final FSA fsa = FSABuilder.build(sequences);
+		final FSA fsa = FSABuilder.build(words);
 
 		final FSASerializer serializer = format.getSerializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){

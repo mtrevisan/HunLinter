@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +50,11 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 	private List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
 		final DictionaryParser dicParser = workerData.getParser();
-		final File dicFile = dicParser.getDicFile();
+		final Path dicPath = dicParser.getDicFile().toPath();
 		final Charset charset = dicParser.getCharset();
 		int currentLine = 0;
-		final int totalLines = FileHelper.countLines(dicFile.toPath());
-		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
+		final int totalLines = FileHelper.countLines(dicPath);
+		try(final LineNumberReader br = FileHelper.createReader(dicPath, charset)){
 			String line = ParserHelper.extractLine(br);
 			currentLine ++;
 

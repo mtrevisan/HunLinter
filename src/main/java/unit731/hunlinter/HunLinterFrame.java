@@ -55,7 +55,7 @@ import javax.swing.text.DefaultCaret;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction2;
+import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
@@ -346,7 +346,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
       dicExtractDictionaryFSAMenuItem.setText("Extract dictionary FSA…");
       dicMenu.add(dicExtractDictionaryFSAMenuItem);
 
-      dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction2(parserManager, workerManager, this));
+      dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction(parserManager, workerManager, this));
       dicExtractPoSFSAMenuItem.setText("Extract PoS FSA…");
       dicMenu.add(dicExtractPoSFSAMenuItem);
 

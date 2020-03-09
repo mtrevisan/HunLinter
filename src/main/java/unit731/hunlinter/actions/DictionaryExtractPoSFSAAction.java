@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 
-public class DictionaryExtractPoSFSAAction2 extends AbstractAction{
+public class DictionaryExtractPoSFSAAction extends AbstractAction{
 
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
@@ -21,8 +21,8 @@ public class DictionaryExtractPoSFSAAction2 extends AbstractAction{
 	private final JFileChooser saveResultFileChooser;
 
 
-	public DictionaryExtractPoSFSAAction2(final ParserManager parserManager, final WorkerManager workerManager,
-													  final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractPoSFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
+													 final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
 		Objects.requireNonNull(parserManager);
