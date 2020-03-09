@@ -1,6 +1,5 @@
 package unit731.hunlinter.workers.dictionary;
 
-import morfologik.fsa.FSA;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,10 +11,10 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.tools.SerializationFormat;
 import unit731.hunlinter.services.fsa.builders.FSASerializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
-import unit731.hunlinter.services.fsa.builders.SerializationFormat;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
