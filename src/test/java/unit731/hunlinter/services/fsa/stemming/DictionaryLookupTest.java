@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class DictionaryLookupTest{
+class DictionaryLookupTest{
 
 	@Test
-	public void testApplyReplacements(){
+	void testApplyReplacements(){
 		Map<String, String> conversion = new HashMap<>();
 		conversion.put("'", "`");
 		conversion.put("fi", "ﬁ");
@@ -34,7 +34,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testRemovedEncoderProperties(){
+	void testRemovedEncoderProperties(){
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-removed-props.dict");
 		Throwable exception = Assertions.assertThrows(IOException.class,
 			() -> new DictionaryLookup(Dictionary.read(url)));
@@ -42,7 +42,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testPrefixDictionaries() throws IOException{
+	void testPrefixDictionaries() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-prefix.dict");
 		final IStemmer s = new DictionaryLookup(Dictionary.read(url));
 
@@ -54,7 +54,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testInputConversion() throws IOException{
+	void testInputConversion() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-prefix.dict");
 		final IStemmer s = new DictionaryLookup(Dictionary.read(url));
 
@@ -64,7 +64,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testInfixDictionaries() throws IOException{
+	void testInfixDictionaries() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-infix.dict");
 		final IStemmer s = new DictionaryLookup(Dictionary.read(url));
 
@@ -80,7 +80,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testWordDataIterator() throws IOException{
+	void testWordDataIterator() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-infix.dict");
 		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 
@@ -95,7 +95,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testWordDataCloning() throws IOException{
+	void testWordDataCloning() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-infix.dict");
 		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 
@@ -130,7 +130,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testMultibyteEncodingUTF8() throws IOException{
+	void testMultibyteEncodingUTF8() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-diacritics-utf8.dict");
 		Dictionary read = Dictionary.read(url);
 		final IStemmer s = new DictionaryLookup(read);
@@ -140,7 +140,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testSynthesis() throws IOException{
+	void testSynthesis() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-synth.dict");
 		final IStemmer s = new DictionaryLookup(Dictionary.read(url));
 
@@ -153,7 +153,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testInputWithSeparators() throws IOException{
+	void testInputWithSeparators() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-separators.dict");
 		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 
@@ -177,7 +177,7 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testSeparatorInLookupTerm() throws IOException{
+	void testSeparatorInLookupTerm() throws IOException{
 		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/stemming/test-separator-in-lookup.fsa"));
 
 		DictionaryMetadata metadata = new DictionaryMetadataBuilder().separator('+').encoding("iso8859-1").encoder(EncoderType.INFIX).build();
@@ -187,19 +187,19 @@ public class DictionaryLookupTest{
 	}
 
 	@Test
-	public void testGetSeparator() throws IOException{
+	void testGetSeparator() throws IOException{
 		final URL url = this.getClass().getResource("/services/fsa/stemming/test-separators.dict");
 		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 		Assertions.assertEquals('+', s.getSeparatorChar());
 	}
 
-	public static String asString(CharSequence s){
+	private static String asString(CharSequence s){
 		if(s == null)
 			return null;
 		return s.toString();
 	}
 
-	public static String[] stem(IStemmer s, String word){
+	private static String[] stem(IStemmer s, String word){
 		ArrayList<String> result = new ArrayList<String>();
 		for(WordData wd : s.lookup(word)){
 			result.add(asString(wd.getStem()));
@@ -208,7 +208,7 @@ public class DictionaryLookupTest{
 		return result.toArray(new String[result.size()]);
 	}
 
-	public static void assertNoStemFor(IStemmer s, String word){
+	private static void assertNoStemFor(IStemmer s, String word){
 		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
 	}
 

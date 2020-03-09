@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Set;
 
 
-public class CFSA2SerializerTest{
+class CFSA2SerializerTest{
 
 	private FSASerializer createSerializer(){
 		return new CFSA2Serializer();
 	}
 
 	@Test
-	public void testA() throws IOException{
+	void testA() throws IOException{
 		byte[][] input = new byte[][]{{'a'},};
 
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
@@ -34,7 +34,7 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testArcsSharing() throws IOException{
+	void testArcsSharing() throws IOException{
 		byte[][] input = new byte[][]{{'a', 'c', 'f'}, {'a', 'd', 'g'}, {'a', 'e', 'h'}, {'b', 'd', 'g'}, {'b', 'e', 'h'},};
 
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
@@ -44,7 +44,7 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testFSA5SerializerSimple() throws IOException{
+	void testFSA5SerializerSimple() throws IOException{
 		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
 
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
@@ -54,7 +54,7 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testNotMinimal() throws IOException{
+	void testNotMinimal() throws IOException{
 		byte[][] input = new byte[][]{{'a', 'b', 'a'}, {'b'}, {'b', 'a'}};
 
 		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
@@ -64,12 +64,12 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testFSA5Bug0() throws IOException{
+	void testFSA5Bug0() throws IOException{
 		checkCorrect(new String[]{"3-D+A+JJ", "3-D+A+NN", "4-F+A+NN", "z+A+NN",});
 	}
 
 	@Test
-	public void testFSA5Bug1() throws IOException{
+	void testFSA5Bug1() throws IOException{
 		checkCorrect(new String[]{"+NP", "n+N", "n+NP",});
 	}
 
@@ -86,7 +86,7 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testEmptyInput() throws IOException{
+	void testEmptyInput() throws IOException{
 		byte[][] input = new byte[][]{};
 		FSA s = FSABuilder.build(input);
 
@@ -94,22 +94,22 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void test_abc() throws IOException{
+	void test_abc() throws IOException{
 		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/abc.fsa")));
 	}
 
 	@Test
-	public void test_minimal() throws IOException{
+	void test_minimal() throws IOException{
 		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/minimal.fsa")));
 	}
 
 	@Test
-	public void test_minimal2() throws IOException{
+	void test_minimal2() throws IOException{
 		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
 	}
 
 	@Test
-	public void test_en_tst() throws IOException{
+	void test_en_tst() throws IOException{
 		testBuiltIn(FSA.read(CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/en_tst.dict")));
 	}
 
@@ -176,7 +176,7 @@ public class CFSA2SerializerTest{
 	}
 
 	@Test
-	public void testAutomatonWithNodeNumbers() throws IOException{
+	void testAutomatonWithNodeNumbers() throws IOException{
 		Assertions.assertTrue(createSerializer().getFlags().contains(FSAFlags.NUMBERS));
 
 		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
@@ -200,7 +200,7 @@ public class CFSA2SerializerTest{
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);
 	}
 
-	public static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result) throws IOException{
+	private static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result) throws IOException{
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
 			buffer[depth] = fsa.getArcLabel(arc);
 
@@ -219,10 +219,8 @@ public class CFSA2SerializerTest{
 		}
 	}
 
-	/*
-	 * Drain bytes from a byte buffer to a string.
-	 */
-	public static String toString(ByteBuffer sequence){
+	/** Drain bytes from a byte buffer to a string */
+	private static String toString(ByteBuffer sequence){
 		byte[] bytes = new byte[sequence.remaining()];
 		sequence.get(bytes);
 		return Arrays.toString(bytes);

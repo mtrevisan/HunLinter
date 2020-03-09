@@ -3,12 +3,8 @@ package unit731.hunlinter.services.fsa.stemming;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
-import unit731.hunlinter.services.fsa.FSA5;
-import unit731.hunlinter.services.fsa.builders.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -62,40 +58,6 @@ class FSATraversalTest{
 	}
 
 	@Test
-	void testPerfectHash() throws IOException{
-		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'},};
-
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
-		FSA s = FSABuilder.build(input);
-
-		final byte[] fsaData = new CFSA2Serializer()
-			.serialize(s, new ByteArrayOutputStream())
-			.toByteArray();
-
-		final FSA5 fsa = FSA.read(new ByteArrayInputStream(fsaData), FSA5.class);
-		final FSATraversal traversal = new FSATraversal(fsa);
-
-//		int i = 0;
-//		for(byte[] seq : input){
-//			Assertions.assertEquals(new String(seq), i ++, traversal.perfectHash(seq));
-//		}
-
-		// Check if the total number of sequences is encoded at the root node.
-		Assertions.assertEquals(6, fsa.getRightLanguageCount(fsa.getRootNode()));
-
-		// Check sub/super sequence scenarios.
-		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, traversal.perfectHash("abax".getBytes(StandardCharsets.UTF_8)));
-		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, traversal.perfectHash("abx".getBytes(StandardCharsets.UTF_8)));
-		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, traversal.perfectHash("ab".getBytes(StandardCharsets.UTF_8)));
-		Assertions.assertEquals(MatchResult.NO_MATCH, traversal.perfectHash("d".getBytes(StandardCharsets.UTF_8)));
-		Assertions.assertEquals(MatchResult.NO_MATCH, traversal.perfectHash(new byte[]{0}));
-
-		Assertions.assertTrue(MatchResult.AUTOMATON_HAS_PREFIX < 0);
-		Assertions.assertTrue(MatchResult.SEQUENCE_IS_A_PREFIX < 0);
-		Assertions.assertTrue(MatchResult.NO_MATCH < 0);
-	}
-
-	@Test
 	void testRecursiveTraversal() throws IOException{
 		FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("/services/fsa/stemming/en_tst.dict"));
 
@@ -125,7 +87,7 @@ class FSATraversalTest{
 
 	@Test
 	void testMatch() throws IOException{
-		final FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("abc.fsa"));
+		final FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("/services/fsa/stemming/abc.fsa"));
 		final FSATraversal traversalHelper = new FSATraversal(fsa);
 
 		MatchResult m = traversalHelper.match("ax".getBytes());

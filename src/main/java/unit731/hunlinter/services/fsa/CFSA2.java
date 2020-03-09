@@ -87,20 +87,13 @@ import java.util.Set;
 
 public class CFSA2 extends FSA{
 
-	/**
-	 * Automaton header version value.
-	 */
-	public static final byte VERSION = (byte) 0xc6;
+	/** Automaton header version value */
+	public static final byte VERSION = (byte)0xc6;
 
-	/**
-	 * The target node of this arc follows the last arc of the current state
-	 * (no goto field).
-	 */
+	/** The target node of this arc follows the last arc of the current state (no goto field) */
 	public static final int BIT_TARGET_NEXT = 1 << 7;
 
-	/**
-	 * The arc is the last one from the current node's arcs list.
-	 */
+	/** The arc is the last one from the current node's arcs list */
 	public static final int BIT_LAST_ARC = 1 << 6;
 
 	/**
@@ -109,19 +102,13 @@ public class CFSA2 extends FSA{
 	 */
 	public static final int BIT_FINAL_ARC = 1 << 5;
 
-	/**
-	 * The count of bits assigned to storing an indexed label.
-	 */
+	/** The count of bits assigned to storing an indexed label */
 	static final int LABEL_INDEX_BITS = 5;
 
-	/**
-	 * Masks only the M bits of a flag byte.
-	 */
+	/** Masks only the M bits of a flag byte */
 	static final int LABEL_INDEX_MASK = (1 << LABEL_INDEX_BITS) - 1;
 
-	/**
-	 * Maximum size of the labels index.
-	 */
+	/** Maximum size of the labels index */
 	public static final int LABEL_INDEX_SIZE = (1 << LABEL_INDEX_BITS) - 1;
 
 	/**
@@ -131,29 +118,19 @@ public class CFSA2 extends FSA{
 	 */
 	public byte[] arcs;
 
-	/**
-	 * Flags for this automaton version.
-	 */
+	/** Flags for this automaton version */
 	private final EnumSet<FSAFlags> flags;
 
-	/**
-	 * Label mapping for M-indexed labels.
-	 */
+	/** Label mapping for M-indexed labels */
 	public final byte[] labelMapping;
 
-	/**
-	 * If <code>true</code> states are prepended with numbers.
-	 */
+	/** If <code>true</code> states are prepended with numbers */
 	private final boolean hasNumbers;
 
-	/**
-	 * Epsilon node's offset.
-	 */
+	/** Epsilon node's offset */
 	private final int epsilon = 0;
 
-	/**
-	 * Reads an automaton from a byte stream.
-	 */
+	/** Reads an automaton from a byte stream */
 	CFSA2(InputStream stream) throws IOException{
 		DataInputStream in = new DataInputStream(stream);
 
