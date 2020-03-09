@@ -1,9 +1,6 @@
 package unit731.hunlinter.workers.dictionary;
 
 import morfologik.fsa.FSA;
-import morfologik.fsa.builders.FSABuilder;
-import morfologik.fsa.builders.FSASerializer;
-import morfologik.tools.SerializationFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,6 +12,9 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.fsa.builders.FSABinarySerializer;
+import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.fsa.builders.SerializationFormat;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -100,7 +100,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 		final FSA fsa = FSABuilder.build(words);
 
-		final FSASerializer serializer = format.getSerializer();
+		final FSABinarySerializer serializer = format.getSerializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
 			serializer.serialize(fsa, os);
 		}

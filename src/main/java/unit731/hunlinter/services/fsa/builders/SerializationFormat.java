@@ -8,19 +8,19 @@ import morfologik.fsa.builders.FSA5Serializer;
 public enum SerializationFormat{
 	FSA5{
 		@Override
-		FSABinarySerializer getSerializer(){
+		public FSABinarySerializer getSerializer(){
 			return new FSA5Serializer();
 		}
 	},
 
 	CFSA2{
 		@Override
-		CFSA2Serializer getSerializer(){
+		public CFSA2Serializer getSerializer(){
 			return new CFSA2Serializer();
 		}
 	};
 
 
-	abstract FSABinarySerializer getSerializer();
+	public abstract FSABinarySerializer getSerializer();
 
 }

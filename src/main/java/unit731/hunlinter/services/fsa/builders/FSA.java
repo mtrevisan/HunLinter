@@ -1,12 +1,8 @@
 package unit731.hunlinter.services.fsa.builders;
 
-import morfologik.fsa.ByteSequenceIterator;
 import morfologik.fsa.CFSA;
 import morfologik.fsa.CFSA2;
 import morfologik.fsa.FSA5;
-import morfologik.fsa.FSAFlags;
-import morfologik.fsa.FSAHeader;
-import morfologik.fsa.StateVisitor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
