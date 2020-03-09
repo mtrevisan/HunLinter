@@ -52,7 +52,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private boolean serializeWithNumbers;
 
 	/** A hash map of [state, offset] pairs */
-	private IntIntHashMap offsets = new IntIntHashMap();
+	private final IntIntHashMap offsets = new IntIntHashMap();
 	/** A hash map of [state, right-language-count] pairs */
 	private IntIntHashMap numbers = new IntIntHashMap();
 	/** Scratch array for serializing vints */
@@ -91,7 +91,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 		//calculate the number of bytes required for the node data, if serializing with numbers
 		if(serializeWithNumbers)
-			this.numbers = FSAUtils.rightLanguageForAllStates(fsa);
+			numbers = FSAUtils.rightLanguageForAllStates(fsa);
 
 		//linearize all the states, optimizing their layout
 		final IntArrayList linearized = linearize(fsa);
@@ -135,7 +135,7 @@ public class CFSA2Serializer implements FSASerializer{
 			return (countDiff == 0? o1.a - o2.a: countDiff);
 		};
 
-		final TreeSet<FSAUtils.IntIntHolder> labelAndCount = new TreeSet<FSAUtils.IntIntHolder>(comparator);
+		final TreeSet<FSAUtils.IntIntHolder> labelAndCount = new TreeSet<>(comparator);
 		for(int label = 0; label < countByValue.length; label ++)
 			if(countByValue[label] > 0)
 				labelAndCount.add(new FSAUtils.IntIntHolder(label, countByValue[label]));
@@ -256,7 +256,7 @@ public class CFSA2Serializer implements FSASerializer{
 			return (v == 0? o1.b - o2.b: v);
 		};
 
-		final PriorityQueue<FSAUtils.IntIntHolder> stateInlink = new PriorityQueue<FSAUtils.IntIntHolder>(1, comparator);
+		final PriorityQueue<FSAUtils.IntIntHolder> stateInlink = new PriorityQueue<>(1, comparator);
 		final FSAUtils.IntIntHolder scratch = new FSAUtils.IntIntHolder();
 		for(final IntIntCursor c : inlinkCount)
 			if(c.value > minInlinkCount){

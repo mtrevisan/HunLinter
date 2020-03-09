@@ -8,10 +8,9 @@ import java.util.Comparator;
 
 
 /**
- * Fast, memory-conservative finite state automaton builder, returning an
- * in-memory {@link FSA} that is a tradeoff between construction speed and
- * memory consumption. Use serializers to compress the returned automaton into
- * more compact form.
+ * Fast, memory-conservative finite state automaton builder, returning an in-memory {@link FSA} that is a trade-off
+ * between construction speed and memory consumption.
+ * Use serializers to compress the returned automaton into a more compact form.
  *
  * @see FSASerializer
  */
@@ -53,7 +52,7 @@ public class FSABuilder{
 	 * An epsilon state. The first and only arc of this state points either to the
 	 * root or to the terminal state, indicating an empty automaton.
 	 */
-	private int epsilon;
+	private final int epsilon;
 	/**
 	 * Hash set of state addresses in {@link #serialized}, hashed by
 	 * {@link #hash(int, int)}. Zero reserved for an unoccupied slot.
@@ -100,7 +99,8 @@ public class FSABuilder{
 	private void add(final byte[] sequence, final int start, final int len){
 		assert serialized != null : "Automaton already built.";
 		assert previous == null || len == 0 || compare(previous, 0, previousLength, sequence, start, len) <= 0 : "Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= " + Arrays.toString(Arrays.copyOfRange(sequence, start, len));
-		assert setPrevious(sequence, start, len);
+
+		setPrevious(sequence, start, len);
 
 		//determine common prefix length
 		final int commonPrefix = commonPrefix(sequence, start, len);
@@ -261,15 +261,13 @@ public class FSABuilder{
 		final int[] newHashSet = new int[hashSet.length * 2];
 		final int bucketMask = (newHashSet.length - 1);
 
-		for(int j = 0; j < hashSet.length; j ++){
-			final int state = hashSet[j];
+		for(final int state : hashSet)
 			if(state > 0){
 				int slot = hash(state, stateLength(state)) & bucketMask;
 				for(int i = 0; newHashSet[slot] > 0; )
-					slot = (slot + (++ i)) & bucketMask;
+					slot = (slot + (++i)) & bucketMask;
 				newHashSet[slot] = state;
 			}
-		}
 		hashSet = newHashSet;
 	}
 
@@ -352,13 +350,12 @@ public class FSABuilder{
 	}
 
 	/** Copy <code>current</code> into an internal buffer */
-	private boolean setPrevious(byte[] sequence, int start, int length){
+	private void setPrevious(final byte[] sequence, final int start, final int length){
 		if(previous == null || previous.length < length)
 			previous = new byte[length];
 
 		System.arraycopy(sequence, start, previous, 0, length);
 		previousLength = length;
-		return true;
 	}
 
 	/**
