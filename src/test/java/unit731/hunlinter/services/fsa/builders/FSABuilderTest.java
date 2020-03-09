@@ -44,24 +44,24 @@ class FSABuilderTest{
 
 	@Test
 	void testLexicographicOrder(){
-		List<String> input = Arrays.asList(String.valueOf(0), String.valueOf(1), String.valueOf(0xFF));
+		List<String> input = Arrays.asList(Character.toString(0), Character.toString(1), Character.toString(0xFF));
 		input.sort(Comparator.naturalOrder());
 
 		//check if lexical ordering is consistent with absolute byte value
-		Assertions.assertEquals(String.valueOf(0), input.get(0));
-		Assertions.assertEquals(String.valueOf(1), input.get(1));
-		Assertions.assertEquals(String.valueOf(0xFF), input.get(2));
+		Assertions.assertEquals(Character.toString(0), input.get(0));
+		Assertions.assertEquals(Character.toString(1), input.get(1));
+		Assertions.assertEquals(Character.toString(0xFF), input.get(2));
 
 		FSA fsa = FSABuilder.build(input);
 
 		FSATestUtils.checkCorrect(input, fsa);
 
 		int arc = fsa.getFirstArc(fsa.getRootNode());
-		Assertions.assertEquals(0, fsa.getArcLabel(arc));
+		Assertions.assertEquals(Character.toString(0), Character.toString(fsa.getArcLabel(arc)));
 		arc = fsa.getNextArc(arc);
-		Assertions.assertEquals(1, fsa.getArcLabel(arc));
+		Assertions.assertEquals(Character.toString(1), Character.toString(fsa.getArcLabel(arc)));
 		arc = fsa.getNextArc(arc);
-		Assertions.assertEquals((byte)0xFF, fsa.getArcLabel(arc));
+		Assertions.assertEquals(0xFF, Character.toString(fsa.getArcLabel(arc)));
 	}
 
 	@Test
