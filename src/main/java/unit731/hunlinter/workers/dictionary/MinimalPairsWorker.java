@@ -156,7 +156,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					}
 				}
 
-				setProcessingProgress(currentLine, totalLines);
+				setProgress(currentLine, totalLines);
 
 				sleepOnPause();
 			}
@@ -221,7 +221,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				sourceBR.reset();
 
-				setProcessingProgress(readSoFarSource, totalSizeSource);
+				setProgress(readSoFarSource, totalSizeSource);
 			}
 		}
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));

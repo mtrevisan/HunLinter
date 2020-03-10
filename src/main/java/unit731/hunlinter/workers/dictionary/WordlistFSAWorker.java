@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 
 public class WordlistFSAWorker extends WorkerDictionary{
@@ -96,14 +95,14 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		//lexical order
 		Collections.sort(words);
 
-		final Path outputPath = Path.of(output);
-
-		List<byte[]> input = words.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
-			.collect(Collectors.toList());
 		final FSABuilder builder = new FSABuilder();
-		final FSA fsa = builder.build(input);
+		for(final String word : words){
+			final byte[] chs = word.getBytes(StandardCharsets.UTF_8);
+			builder.add(chs);
+		}
+		final FSA fsa = builder.complete();
 
+		final Path outputPath = Path.of(output);
 		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
 			serializer.serialize(fsa, os);

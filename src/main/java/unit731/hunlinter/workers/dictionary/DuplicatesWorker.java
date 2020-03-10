@@ -168,7 +168,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					}
 				}
 
-				setProcessingProgress(readSoFar, totalSize);
+				setProgress(readSoFar, totalSize);
 
 				sleepOnPause();
 			}
@@ -226,7 +226,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						}
 					}
 
-					setProcessingProgress(readSoFar, totalSize);
+					setProgress(readSoFar, totalSize);
 
 					sleepOnPause();
 				}
@@ -256,7 +256,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProcessingProgress(1, totalSize + 1);
+			setProgress(1, totalSize + 1);
 			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
@@ -272,7 +272,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						.collect(Collectors.joining(", ")));
 					writer.newLine();
 
-					setProcessingProgress(++ writtenSoFar, totalSize + 1);
+					setProgress(++ writtenSoFar, totalSize + 1);
 
 					sleepOnPause();
 				}

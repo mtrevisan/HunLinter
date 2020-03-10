@@ -1,7 +1,6 @@
 package unit731.hunlinter.workers.core;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -34,15 +33,16 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	@Override
 	protected Void doInBackground(){
+		//TODO find a way to add steps at runtime
 		prepareProcessing("Reading dictionary file (step 1/2)");
 
 		final List<Pair<Integer, String>> lines = readLines();
 
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 		if(outputFile == null)
-			readProcess(lines);
+			executeReadProcess(lines);
 		else
-			writeProcess(lines);
+			executeWriteProcess(lines);
 
 		return null;
 	}
@@ -68,7 +68,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 				if(!line.isEmpty())
 					lines.add(Pair.of(br.getLineNumber(), line));
 
-				setProcessingProgress(currentLine, totalLines);
+				setProgress(currentLine, totalLines);
 
 				sleepOnPause();
 			}
@@ -79,12 +79,12 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		return lines;
 	}
 
-	private void readProcess(final List<Pair<Integer, String>> lines){
+	private void executeReadProcess(final List<Pair<Integer, String>> lines){
 		processData(lines);
 	}
 
 	//NOTE: cannot use `processData` because the file must be ordered
-	private void writeProcess(final List<Pair<Integer, String>> lines){
+	private void executeWriteProcess(final List<Pair<Integer, String>> lines){
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		final DictionaryParser dicParser = workerData.getParser();
@@ -96,7 +96,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 					writeDataProcessor.accept(writer, rowLine);
 
-					setProcessingProgress(writtenSoFar, totalLines);
+					setProgress(writtenSoFar, totalLines);
 
 					sleepOnPause();
 				}

@@ -54,7 +54,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		this.readDataProcessor = readDataProcessor;
 	}
 
-	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor, final File outputFile){
+	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor,
+			final File outputFile){
 		this.writeDataProcessor = writeDataProcessor;
 		if(writeDataProcessor != null){
 			Objects.requireNonNull(outputFile);
@@ -104,7 +105,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			try{
 				readDataProcessor.accept(data.getKey(), data.getValue());
 
-				setProcessingProgress(processingIndex.incrementAndGet(), totalData);
+				setProgress(processingIndex.incrementAndGet(), totalData);
 
 				sleepOnPause();
 			}
@@ -121,11 +122,12 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		};
 	}
 
-	protected void setProcessingProgress(final long index, final long total){
-		setProgress(getProgress(index, total));
+	protected void setProgress(final long index, final long total){
+		final int progress = calculateProgress(index, total);
+		setProgress(progress);
 	}
 
-	private int getProgress(final long index, final long total){
+	private int calculateProgress(final long index, final long total){
 		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 

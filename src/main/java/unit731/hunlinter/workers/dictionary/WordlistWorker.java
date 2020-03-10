@@ -108,7 +108,7 @@ public class WordlistWorker extends WorkerDictionary{
 					writer.write(word);
 					writer.write(StringUtils.LF);
 
-					setProcessingProgress(writtenSoFar, totalLines);
+					setProgress(writtenSoFar, totalLines);
 
 					sleepOnPause();
 				}

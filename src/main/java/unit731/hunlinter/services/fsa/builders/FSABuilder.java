@@ -2,6 +2,7 @@ package unit731.hunlinter.services.fsa.builders;
 
 import unit731.hunlinter.services.fsa.FSA;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -87,7 +88,7 @@ public class FSABuilder{
 	}
 
 	/**
-	 * Build a minimal, deterministic automaton from an iterable list of string sequences.
+	 * Build a minimal, deterministic automaton from an iterable list of byte sequences.
 	 *
 	 * @param input	Input sequences to build automaton from.
 	 * @return	The automaton encoding of all input sequences.
@@ -99,12 +100,20 @@ public class FSABuilder{
 	}
 
 	/**
+	 * Add a single string to the FSA.
+	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
+	 */
+	public final void add(final String sequence){
+		add(sequence.getBytes(StandardCharsets.UTF_8));
+	}
+
+	/**
 	 * Add a single sequence of bytes to the FSA.
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
 	 *
 	 * @param sequence The array holding input sequence of bytes.
 	 */
-	protected final void add(final byte[] sequence){
+	public final void add(final byte[] sequence){
 		assert serialized != null : "Automaton already built.";
 		assert previous == null || sequence.length == 0 || compare(previous, previousLength, sequence, sequence.length) <= 0 :
 			"Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= "
@@ -142,10 +151,8 @@ public class FSABuilder{
 		activePathLen = len;
 	}
 
-	/**
-	 * @return Finalizes the construction of the automaton and returns it.
-	 */
-	protected final FSA complete(){
+	/** Finalizes the construction of the automaton and returns it */
+	public final FSA complete(){
 		add(new byte[0]);
 
 		if(nextArcOffset[0] - activePath[0] == 0)
