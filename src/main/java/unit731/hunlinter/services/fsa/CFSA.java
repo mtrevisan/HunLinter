@@ -33,7 +33,7 @@ import java.util.Set;
  *     3 | | | | | | | | | +------ 'a'
  *       +-+-+-+-+-+-+-+-+/
  *       +-+-+-+-+-+-+-+-+\
- *     4 | | | | | | | | | +------ version (fixed 0xc5)
+ *     4 | | | | | | | | | +------ version (fixed 0xC5)
  *       +-+-+-+-+-+-+-+-+/
  *       +-+-+-+-+-+-+-+-+\
  *     5 | | | | | | | | | +------ filler character
@@ -178,14 +178,14 @@ public class CFSA extends FSA{
 		 * ctl and goto fields accordingly.
 		 */
 		flags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
-		if((hgtl & 0xf0) != 0){
-			this.nodeDataLength = (hgtl >>> 4) & 0x0f;
-			this.gtl = hgtl & 0x0f;
+		if((hgtl & 0xF0) != 0){
+			this.nodeDataLength = (hgtl >>> 4) & 0x0F;
+			this.gtl = hgtl & 0x0F;
 			flags.add(FSAFlags.NUMBERS);
 		}
 		else{
 			this.nodeDataLength = 0;
-			this.gtl = hgtl & 0x0f;
+			this.gtl = hgtl & 0x0F;
 		}
 
 		/*
@@ -264,7 +264,7 @@ public class CFSA extends FSA{
 	@Override
 	public byte getArcLabel(int arc){
 		if(isNextSet(arc) && isLabelCompressed(arc)){
-			return this.labelMapping[(arcs[arc] >>> 3) & 0x1f];
+			return this.labelMapping[(arcs[arc] >>> 3) & 0x1F];
 		}
 		else{
 			return arcs[arc + 1];
@@ -350,9 +350,9 @@ public class CFSA extends FSA{
 			 */
 			int r = 0;
 			for(int i = gtl; --i >= 1; ){
-				r = r << 8 | (arcs[arc + 1 + i] & 0xff);
+				r = r << 8 | (arcs[arc + 1 + i] & 0xFF);
 			}
-			r = r << 8 | (arcs[arc] & 0xff);
+			r = r << 8 | (arcs[arc] & 0xFF);
 			return r >>> 3;
 		}
 	}

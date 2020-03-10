@@ -153,14 +153,14 @@ public class FSA5 extends FSA{
 		 * ctl and goto fields accordingly.
 		 */
 		flags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
-		if((hgtl & 0xf0) != 0){
+		if((hgtl & 0xF0) != 0){
 			flags.add(FSAFlags.NUMBERS);
 		}
 
 		flags = Collections.unmodifiableSet(flags);
 
-		this.nodeDataLength = (hgtl >>> 4) & 0x0f;
-		this.gtl = hgtl & 0x0f;
+		this.nodeDataLength = (hgtl >>> 4) & 0x0F;
+		this.gtl = hgtl & 0x0F;
 
 		arcs = readRemaining(in);
 	}
@@ -294,7 +294,7 @@ public class FSA5 extends FSA{
 	static final int decodeFromBytes(final byte[] arcs, final int start, final int n){
 		int r = 0;
 		for(int i = n; --i >= 0; ){
-			r = r << 8 | (arcs[start + i] & 0xff);
+			r = r << 8 | (arcs[start + i] & 0xFF);
 		}
 		return r;
 	}

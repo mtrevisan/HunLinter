@@ -31,7 +31,7 @@ public class FSAHeader{
 	 * @throws IOException If the stream ends prematurely or if it contains invalid data.
 	 */
 	public static FSAHeader read(final InputStream in) throws IOException{
-		if(in.read() != ((FSA_MAGIC >>> 24)) || in.read() != ((FSA_MAGIC >>> 16) & 0xff) || in.read() != ((FSA_MAGIC >>> 8) & 0xff) || in.read() != ((FSA_MAGIC) & 0xff))
+		if(in.read() != ((FSA_MAGIC >>> 24)) || in.read() != ((FSA_MAGIC >>> 16) & 0xFF) || in.read() != ((FSA_MAGIC >>> 8) & 0xFF) || in.read() != ((FSA_MAGIC) & 0xFF))
 			throw new IOException("Invalid file header, probably not an FSA.");
 
 		final int version = in.read();

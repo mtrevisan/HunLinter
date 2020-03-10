@@ -125,7 +125,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 		fsa.visitAllStates(state -> {
 			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
-				countByValue[fsa.getArcLabel(arc) & 0xff] ++;
+				countByValue[fsa.getArcLabel(arc) & 0xFF] ++;
 			return true;
 		});
 
@@ -373,7 +373,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private int emitArc(final OutputStream os, final int flags, final byte label, final int targetOffset) throws IOException{
 		int length = 0;
 
-		int labelIndex = labelsInvIndex[label & 0xff];
+		int labelIndex = labelsInvIndex[label & 0xFF];
 		if(labelIndex > 0){
 			if(os != null)
 				os.write(flags | labelIndex);

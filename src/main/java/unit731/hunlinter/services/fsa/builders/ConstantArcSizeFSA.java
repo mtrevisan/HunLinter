@@ -87,7 +87,7 @@ public class ConstantArcSizeFSA extends FSA{
 	/** Fills the target state address of an arc */
 	private int getArcTarget(int arc){
 		arc += ADDRESS_OFFSET;
-		return (data[arc]) << 24 | (data[arc + 1] & 0xff) << 16 | (data[arc + 2] & 0xff) << 8 | (data[arc + 3] & 0xff);
+		return (data[arc]) << 24 | (data[arc + 1] & 0xFF) << 16 | (data[arc + 2] & 0xFF) << 8 | (data[arc + 3] & 0xFF);
 	}
 
 	@Override

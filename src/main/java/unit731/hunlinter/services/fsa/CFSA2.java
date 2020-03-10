@@ -34,7 +34,7 @@ import java.util.Set;
  *     3 | | | | | | | | | +------ 'a'
  *       +-+-+-+-+-+-+-+-+/
  *       +-+-+-+-+-+-+-+-+\
- *     4 | | | | | | | | | +------ version (fixed 0xc6)
+ *     4 | | | | | | | | | +------ version (fixed 0xC6)
  *       +-+-+-+-+-+-+-+-+/
  *       +-+-+-+-+-+-+-+-+\
  *     5 | | | | | | | | | +----\
@@ -88,7 +88,7 @@ import java.util.Set;
 public class CFSA2 extends FSA{
 
 	/** Automaton header version value */
-	public static final byte VERSION = (byte)0xc6;
+	public static final byte VERSION = (byte)0xC6;
 
 	/** The target node of this arc follows the last arc of the current state (no goto field) */
 	public static final int BIT_TARGET_NEXT = 1 << 7;
@@ -152,7 +152,7 @@ public class CFSA2 extends FSA{
 		/*
 		 * Read mapping dictionary.
 		 */
-		int labelMappingSize = in.readByte() & 0xff;
+		int labelMappingSize = in.readByte() & 0xFF;
 		labelMapping = new byte[labelMappingSize];
 		in.readFully(labelMapping);
 
