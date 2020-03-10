@@ -1,5 +1,7 @@
 package unit731.hunlinter.services.fsa.stemming;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.charset.Charset;
 import java.util.EnumMap;
 import java.util.List;
@@ -103,7 +105,7 @@ public class DictionaryMetadataBuilder{
 			for(String v : e.getValue()){
 				if(builder.length() > 0)
 					builder.append(", ");
-				builder.append(k).append(" ").append(v);
+				builder.append(k).append(StringUtils.SPACE).append(v);
 			}
 		}
 		this.attrs.put(DictionaryAttribute.REPLACEMENT_PAIRS, builder.toString());
@@ -117,7 +119,7 @@ public class DictionaryMetadataBuilder{
 			for(Character v : e.getValue()){
 				if(builder.length() > 0)
 					builder.append(", ");
-				builder.append(k).append(" ").append(v);
+				builder.append(k).append(StringUtils.SPACE).append(v);
 			}
 		}
 		this.attrs.put(DictionaryAttribute.EQUIVALENT_CHARS, builder.toString());
@@ -130,7 +132,7 @@ public class DictionaryMetadataBuilder{
 			String k = e.getKey();
 			if(builder.length() > 0)
 				builder.append(", ");
-			builder.append(k).append(" ").append(conversionPairs.get(k));
+			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
 		}
 		this.attrs.put(DictionaryAttribute.INPUT_CONVERSION, builder.toString());
 		return this;
@@ -142,7 +144,7 @@ public class DictionaryMetadataBuilder{
 			String k = e.getKey();
 			if(builder.length() > 0)
 				builder.append(", ");
-			builder.append(k).append(" ").append(conversionPairs.get(k));
+			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
 		}
 		this.attrs.put(DictionaryAttribute.OUTPUT_CONVERSION, builder.toString());
 		return this;

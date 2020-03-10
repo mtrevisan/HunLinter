@@ -1,5 +1,7 @@
 package unit731.hunlinter.services.fsa.stemming;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,7 +159,7 @@ public enum DictionaryAttribute{
 			Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
-				final String[] twoStrings = stringPair.trim().split(" ");
+				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length == 2){
 					if(!conversionPairs.containsKey(twoStrings[0])){
 						conversionPairs.put(twoStrings[0], twoStrings[1]);
@@ -186,7 +188,7 @@ public enum DictionaryAttribute{
 			Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
-				final String[] twoStrings = stringPair.trim().split(" ");
+				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length == 2){
 					if(!conversionPairs.containsKey(twoStrings[0])){
 						conversionPairs.put(twoStrings[0], twoStrings[1]);
@@ -215,7 +217,7 @@ public enum DictionaryAttribute{
 			Map<String, List<String>> replacementPairs = new HashMap<>();
 			final String[] replacements = value.split(",\\s*");
 			for(final String stringPair : replacements){
-				final String[] twoStrings = stringPair.trim().split(" ");
+				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length == 2){
 					if(!replacementPairs.containsKey(twoStrings[0])){
 						List<String> strList = new ArrayList<>();
@@ -246,7 +248,7 @@ public enum DictionaryAttribute{
 			Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
 			final String[] eqChars = value.split(",\\s*");
 			for(final String characterPair : eqChars){
-				final String[] twoChars = characterPair.trim().split(" ");
+				final String[] twoChars = characterPair.trim().split(StringUtils.SPACE);
 				if(twoChars.length == 2 && twoChars[0].length() == 1 && twoChars[1].length() == 1){
 					char fromChar = twoChars[0].charAt(0);
 					char toChar = twoChars[1].charAt(0);
