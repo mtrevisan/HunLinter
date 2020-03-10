@@ -27,10 +27,10 @@ class FSABuilderTest{
 	@Test
 	void testHashResizeBug(){
 		List<String> input = Arrays.asList("01", "02", "11", "21");
-
 		List<byte[]> in = input.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
+
 		FSA fsa = FSABuilder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
@@ -40,10 +40,10 @@ class FSABuilderTest{
 	@Test
 	void testSmallInput(){
 		List<String> input = Arrays.asList("abc", "bbc", "d");
-
 		List<byte[]> in = input.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
+
 		FSA fsa = FSABuilder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
@@ -51,13 +51,13 @@ class FSABuilderTest{
 
 	@Test
 	void testLexicographicOrder(){
-		byte[][] input = {{0}, {1}, {(byte)0xFF}};
-		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
+		List<byte[]> input = Arrays.asList(new byte[]{0}, new byte[]{1}, new byte[]{(byte)0xFF});
+		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
 
 		//check if lexical ordering is consistent with absolute byte value
-		Assertions.assertEquals(0, input[0][0]);
-		Assertions.assertEquals(1, input[1][0]);
-		Assertions.assertEquals((byte)0xFF, input[2][0]);
+		Assertions.assertEquals(0, input.get(0)[0]);
+		Assertions.assertEquals(1, input.get(1)[0]);
+		Assertions.assertEquals((byte)0xFF, input.get(2)[0]);
 
 		FSA fsa = FSABuilder.build(input);
 

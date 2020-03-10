@@ -101,20 +101,6 @@ public class FSABuilder{
 	}
 
 	/**
-	 * Build a minimal, deterministic automaton from a sorted list of byte
-	 * sequences.
-	 *
-	 * @param input Input sequences to build automaton from.
-	 * @return Returns the automaton encoding all input sequences.
-	 */
-	static FSA build(final byte[][] input){
-		final FSABuilder builder = new FSABuilder();
-		for(final byte[] chs : input)
-			builder.add(chs, 0, chs.length);
-		return builder.complete();
-	}
-
-	/**
 	 * Add a single sequence of bytes to the FSA.
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
 	 *
