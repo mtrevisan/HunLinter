@@ -52,8 +52,7 @@ public class TrimInfixAndSuffixEncoder implements ISequenceEncoder{
 		// For now, naive loop should do.
 
 		// There can be only two positions for the infix to delete:
-		// 1) we remove leading bytes, even if they are partially matching (but a longer match
-		//    exists somewhere later on).
+		// 1) we remove leading bytes, even if they are partially matching (but a longer match exists somewhere later on).
 		// 2) we leave max. matching prefix and remove non-matching bytes that follow.
 		int maxInfixIndex = 0;
 		int maxSubsequenceLength = BufferUtils.sharedPrefixLength(source, target);

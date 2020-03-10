@@ -26,14 +26,14 @@ public class FSATraversal{
 	 * that {@link FSA} is built with {@link FSAFlags#NUMBERS} and corresponds to the sequential
 	 * order of input sequences used at automaton construction time.
 	 *
-	 * @param sequence The byte sequence to calculate perfect hash for.
-	 * @param start    Start index in the sequence array.
-	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
-	 * @return Returns a unique integer assigned to the input sequence in the automaton (reflecting
-	 * the number of that sequence in the input used to build the automaton). Returns a negative
-	 * integer if the input sequence was not part of the input from which the automaton was created.
-	 * The type of mismatch is a constant defined in {@link MatchResult}.
+	 * @param sequence	The byte sequence to calculate perfect hash for.
+	 * @param start	Start index in the sequence array.
+	 * @param length	Length of the byte sequence, must be at least 1.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @return	A unique integer assigned to the input sequence in the automaton (reflecting
+	 * 	the number of that sequence in the input used to build the automaton). Returns a negative
+	 * 	integer if the input sequence was not part of the input from which the automaton was created.
+	 * 	The type of mismatch is a constant defined in {@link MatchResult}.
 	 */
 	public int perfectHash(byte[] sequence, int start, int length, int node){
 		assert fsa.getFlags().contains(FSAFlags.NUMBERS): "FSA not built with NUMBERS option.";
@@ -110,13 +110,13 @@ public class FSATraversal{
 	 * a reusable {@link MatchResult} object so that no intermediate garbage is
 	 * produced.
 	 *
-	 * @param reuse    The {@link MatchResult} to reuse.
-	 * @param sequence Input sequence to look for in the automaton.
-	 * @param start    Start index in the sequence array.
-	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
-	 * @return The same object as <code>reuse</code>, but with updated match {@link MatchResult#kind}
-	 * and other relevant fields.
+	 * @param reuse	The {@link MatchResult} to reuse.
+	 * @param sequence	Input sequence to look for in the automaton.
+	 * @param start	Start index in the sequence array.
+	 * @param length	Length of the byte sequence, must be at least 1.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @return	The same object as <code>reuse</code>, but with updated match {@link MatchResult#kind}
+	 * 	and other relevant fields.
 	 */
 	public MatchResult match(MatchResult reuse, byte[] sequence, int start, int length, int node){
 		if(node == 0){
@@ -164,11 +164,11 @@ public class FSATraversal{
 	 * Finds a matching path in the dictionary for a given sequence of labels from
 	 * <code>sequence</code> and starting at node <code>node</code>.
 	 *
-	 * @param sequence Input sequence to look for in the automaton.
-	 * @param start    Start index in the sequence array.
-	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
-	 * @return {@link MatchResult} with updated match {@link MatchResult#kind}.
+	 * @param sequence	Input sequence to look for in the automaton.
+	 * @param start	Start index in the sequence array.
+	 * @param length	Length of the byte sequence, must be at least 1.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @return	{@link MatchResult} with updated match {@link MatchResult#kind}.
 	 * @see #match(byte[], int)
 	 */
 	public MatchResult match(byte[] sequence, int start, int length, int node){
@@ -176,9 +176,9 @@ public class FSATraversal{
 	}
 
 	/**
-	 * @param sequence Input sequence to look for in the automaton.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
-	 * @return {@link MatchResult} with updated match {@link MatchResult#kind}.
+	 * @param sequence	Input sequence to look for in the automaton.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @return	{@link MatchResult} with updated match {@link MatchResult#kind}.
 	 * @see #match(byte[], int)
 	 */
 	public MatchResult match(byte[] sequence, int node){

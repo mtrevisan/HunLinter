@@ -37,11 +37,9 @@ public class Dictionary{
 	 * It is strongly recommended to use static methods in this class for
 	 * reading dictionaries.
 	 *
-	 * @param fsa      An instantiated {@link FSA} instance.
-	 * @param metadata A map of attributes describing the compression format and
-	 *                 other settings not contained in the FSA automaton. For an
-	 *                 explanation of available attributes and their possible values,
-	 *                 see {@link DictionaryMetadata}.
+	 * @param fsa	An instantiated {@link FSA} instance.
+	 * @param metadata	A map of attributes describing the compression format and other settings not contained in the FSA automaton. For an
+	 *		explanation of available attributes and their possible values, see {@link DictionaryMetadata}.
 	 */
 	public Dictionary(FSA fsa, DictionaryMetadata metadata){
 		this.fsa = fsa;
@@ -91,10 +89,10 @@ public class Dictionary{
 	 * Attempts to load a dictionary from opened streams of FSA dictionary data
 	 * and associated metadata. Input streams are not closed automatically.
 	 *
-	 * @param fsaStream      The stream with FSA data
-	 * @param metadataStream The stream with metadata
-	 * @return Returns an instantiated {@link Dictionary}.
-	 * @throws IOException if an I/O error occurs.
+	 * @param fsaStream	The stream with FSA data
+	 * @param metadataStream	The stream with metadata
+	 * @return	An instantiated {@link Dictionary}.
+	 * @throws IOException	If an I/O error occurs.
 	 */
 	public static Dictionary read(InputStream fsaStream, InputStream metadataStream) throws IOException{
 		return new Dictionary(FSA.read(fsaStream), DictionaryMetadata.read(metadataStream));

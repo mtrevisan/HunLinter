@@ -107,9 +107,8 @@ public class WordData implements Cloneable{
 	 * upon returning from this method. If the buffer is null or not large
 	 * enough to hold the result, a new buffer is allocated.
 	 *
-	 * @param target Target byte buffer to copy the stem buffer to or
-	 *               <code>null</code> if a new buffer should be allocated.
-	 * @return Returns <code>target</code> or the new reallocated buffer.
+	 * @param target	Target byte buffer to copy the stem buffer to or <code>null</code> if a new buffer should be allocated.
+	 * @return	<code>target</code> or the new reallocated buffer.
 	 */
 	public ByteBuffer getStemBytes(ByteBuffer target){
 		target = BufferUtils.clearAndEnsureCapacity(target, stemBuffer.remaining());
@@ -127,9 +126,8 @@ public class WordData implements Cloneable{
 	 * upon returning from this method. If the buffer is null or not large
 	 * enough to hold the result, a new buffer is allocated.
 	 *
-	 * @param target Target byte buffer to copy the tag buffer to or
-	 *               <code>null</code> if a new buffer should be allocated.
-	 * @return Returns <code>target</code> or the new reallocated buffer.
+	 * @param target	Target byte buffer to copy the tag buffer to or <code>null</code> if a new buffer should be allocated.
+	 * @return	<code>target</code> or the new reallocated buffer.
 	 */
 	public ByteBuffer getTagBytes(ByteBuffer target){
 		target = BufferUtils.clearAndEnsureCapacity(target, tagBuffer.remaining());
@@ -148,9 +146,8 @@ public class WordData implements Cloneable{
 	 * upon returning from this method. If the buffer is null or not large
 	 * enough to hold the result, a new buffer is allocated.
 	 *
-	 * @param target Target byte buffer to copy the word buffer to or
-	 *               <code>null</code> if a new buffer should be allocated.
-	 * @return Returns <code>target</code> or the new reallocated buffer.
+	 * @param target	Target byte buffer to copy the word buffer to or <code>null</code> if a new buffer should be allocated.
+	 * @return	<code>target</code> or the new reallocated buffer.
 	 */
 	public ByteBuffer getWordBytes(ByteBuffer target){
 		target = BufferUtils.clearAndEnsureCapacity(target, wordBuffer.remaining());

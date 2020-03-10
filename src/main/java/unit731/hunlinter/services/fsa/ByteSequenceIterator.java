@@ -49,8 +49,8 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	/**
 	 * Create an instance of the iterator for a given node.
 	 *
-	 * @param fsa  The automaton to iterate over.
-	 * @param node The starting node's identifier (can be the {@link FSA#getRootNode()}).
+	 * @param fsa	The automaton to iterate over.
+	 * @param node	The starting node's identifier (can be the {@link FSA#getRootNode()}).
 	 */
 	public ByteSequenceIterator(final FSA fsa, final int node){
 		this.fsa = fsa;

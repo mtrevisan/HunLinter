@@ -287,10 +287,9 @@ public enum DictionaryAttribute{
 	/**
 	 * Converts a string to the given attribute's value.
 	 *
-	 * @param value The value to convert to an attribute value.
-	 * @return Returns the attribute's value converted from a string.
-	 * @throws IllegalArgumentException If the input string cannot be converted to the attribute's
-	 *                                  value.
+	 * @param value	The value to convert to an attribute value.
+	 * @return	The attribute's value converted from a string.
+	 * @throws IllegalArgumentException	If the input string cannot be converted to the attribute's value.
 	 */
 	public Object fromString(String value) throws IllegalArgumentException{
 		return value;

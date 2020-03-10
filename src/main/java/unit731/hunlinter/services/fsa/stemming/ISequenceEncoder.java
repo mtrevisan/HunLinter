@@ -19,10 +19,10 @@ public interface ISequenceEncoder{
 	 * Encodes <code>target</code> relative to <code>source</code>,
 	 * optionally reusing the provided {@link ByteBuffer}.
 	 *
-	 * @param reuse  Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
-	 * @param source The source byte sequence.
-	 * @param target The target byte sequence to encode relative to <code>source</code>
-	 * @return Returns the {@link ByteBuffer} with encoded <code>target</code>.
+	 * @param reuse	Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
+	 * @param source	The source byte sequence.
+	 * @param target	The target byte sequence to encode relative to <code>source</code>
+	 * @return	The {@link ByteBuffer} with encoded <code>target</code>.
 	 */
 	ByteBuffer encode(ByteBuffer reuse, ByteBuffer source, ByteBuffer target);
 
@@ -30,10 +30,10 @@ public interface ISequenceEncoder{
 	 * Decodes <code>encoded</code> relative to <code>source</code>,
 	 * optionally reusing the provided {@link ByteBuffer}.
 	 *
-	 * @param reuse   Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
-	 * @param source  The source byte sequence.
-	 * @param encoded The {@linkplain #encode previously encoded} byte sequence.
-	 * @return Returns the {@link ByteBuffer} with decoded <code>target</code>.
+	 * @param reuse	Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
+	 * @param source	The source byte sequence.
+	 * @param encoded	The {@linkplain #encode previously encoded} byte sequence.
+	 * @return	The {@link ByteBuffer} with decoded <code>target</code>.
 	 */
 	ByteBuffer decode(ByteBuffer reuse, ByteBuffer source, ByteBuffer encoded);
 

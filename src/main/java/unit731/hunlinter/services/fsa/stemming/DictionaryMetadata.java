@@ -283,10 +283,9 @@ public class DictionaryMetadata{
 	}
 
 	/**
-	 * @return Returns the {@link #separator} byte converted to a single
-	 * <code>char</code>.
-	 * @throws RuntimeException if this conversion is for some reason impossible (the byte is a
-	 *                          surrogate pair, FSA's {@link #encoding} is not available).
+	 * @return	The {@link #separator} byte converted to a single <code>char</code>.
+	 * @throws RuntimeException	If this conversion is for some reason impossible (the byte is a
+	 *		surrogate pair, FSA's {@link #encoding} is not available).
 	 */
 	public char getSeparatorAsChar(){
 		return separatorChar;

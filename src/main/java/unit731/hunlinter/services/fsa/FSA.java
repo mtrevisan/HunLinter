@@ -39,9 +39,9 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	public abstract int getNextArc(final int arc);
 
 	/**
-	 * @param node  Identifier of the node.
-	 * @param label The arc's label.
-	 * @return Returns the identifier of an arc leaving <code>node</code> and labeled with <code>label</code>.
+	 * @param node	Identifier of the node.
+	 * @param label	The arc's label.
+	 * @return	The identifier of an arc leaving <code>node</code> and labeled with <code>label</code>.
 	 * 	An identifier equal to 0 means the node has no outgoing arc labeled <code>label</code>.
 	 */
 	public abstract int getArc(final int node, final byte label);
@@ -90,13 +90,11 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	}
 
 	/**
-	 * @param node Identifier of the node.
-	 * @return Returns the number of sequences reachable from the given state if
-	 * the automaton was compiled with {@link FSAFlags#NUMBERS}. The size
-	 * of the right language of the state, in other words.
-	 * @throws UnsupportedOperationException If the automaton was not compiled with {@link FSAFlags#NUMBERS}.
-	 *                                       The value can then be computed by manual count of
-	 *                                       {@link #getSequences}.
+	 * @param node	Identifier of the node.
+	 * @return	The number of sequences reachable from the given state if the automaton was compiled with {@link FSAFlags#NUMBERS}. The size
+	 * 	of the right language of the state, in other words.
+	 * @throws UnsupportedOperationException	If the automaton was not compiled with {@link FSAFlags#NUMBERS}.
+	 *		The value can then be computed by manual count of {@link #getSequences}.
 	 */
 	public int getRightLanguageCount(final int node){
 		throw new UnsupportedOperationException("Automaton not compiled with " + FSAFlags.NUMBERS);

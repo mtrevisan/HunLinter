@@ -257,9 +257,9 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 * Useful if the word needs to be normalized somehow (i.e., ligatures,
 	 * apostrophes and such).
 	 *
-	 * @param word         The word to apply replacements to.
-	 * @param replacements A map of replacements (from-&gt;to).
-	 * @return new string with all replacements applied.
+	 * @param word	The word to apply replacements to.
+	 * @param replacements	A map of replacements (from-&gt;to).
+	 * @return	A new string with all replacements applied.
 	 */
 	public static String applyReplacements(CharSequence word, Map<String, String> replacements){
 		// quite horrible from performance point of view; this should really be a transducer.
