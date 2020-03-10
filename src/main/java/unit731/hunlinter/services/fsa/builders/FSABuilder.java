@@ -60,7 +60,7 @@ public class FSABuilder{
 	/** Number of entries currently stored in {@link #hashSet} */
 	private int hashSize;
 	/**
-	 * Previous sequence added to the automaton in {@link #add(byte[], int, int)}.
+	 * Previous sequence added to the automaton in {@link #add(byte[])}.
 	 * Used in assertions only.
 	 */
 	private byte[] previous;
@@ -95,7 +95,7 @@ public class FSABuilder{
 	 */
 	public FSA build(final Iterable<byte[]> input){
 		for(final byte[] chs : input)
-			add(chs, 0, chs.length);
+			add(chs);
 		return complete();
 	}
 
@@ -104,10 +104,11 @@ public class FSABuilder{
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
 	 *
 	 * @param sequence The array holding input sequence of bytes.
-	 * @param start    Starting offset (inclusive)
-	 * @param len      Length of the input sequence (at least 1 byte).
 	 */
-	private void add(final byte[] sequence, final int start, final int len){
+	protected final void add(final byte[] sequence){
+		final int start = 0;
+		final int len = sequence.length;
+
 		assert serialized != null : "Automaton already built.";
 		assert previous == null || len == 0 || compare(previous, 0, previousLength, sequence, start, len) <= 0 :
 			"Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= "
@@ -146,8 +147,8 @@ public class FSABuilder{
 	/**
 	 * @return Finalizes the construction of the automaton and returns it.
 	 */
-	private FSA complete(){
-		add(new byte[0], 0, 0);
+	protected final FSA complete(){
+		add(new byte[0]);
 
 		if(nextArcOffset[0] - activePath[0] == 0)
 			//an empty FSA
