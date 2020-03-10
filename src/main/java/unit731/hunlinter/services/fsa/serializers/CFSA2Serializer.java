@@ -38,11 +38,12 @@ public class CFSA2Serializer implements FSASerializer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
 
 	/** Supported flags */
-	private final static EnumSet<FSAFlags> flags = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
+	private final static EnumSet<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
 		FSAFlags.NEXTBIT);
 
 	/** No-state id */
 	private final static int NO_STATE = -1;
+
 
 	/**
 	 * <code>true</code> if we should serialize with numbers.
@@ -59,11 +60,8 @@ public class CFSA2Serializer implements FSASerializer{
 	private final byte[] scratch = new byte[5];
 	/** The most frequent labels for integrating with the flags field */
 	private byte[] labelsIndex;
-	/**
-	 * Inverted index of labels to be integrated with flags field. A label at
-	 * index <code>i<code> has the index or zero (no integration).
-	 */
-	private int[] labelsInvIndex;
+	/** Inverted index of labels to be integrated with flags field. A label at index <code>i<code> has the index or zero (no integration) */
+	private int[] invertedLabelsIndex;
 
 
 	/**
@@ -141,11 +139,11 @@ public class CFSA2Serializer implements FSASerializer{
 				labelAndCount.add(new FSAUtils.IntIntHolder(label, countByValue[label]));
 
 		labelsIndex = new byte[1 + Math.min(labelAndCount.size(), CFSA2.LABEL_INDEX_SIZE)];
-		labelsInvIndex = new int[256];
+		invertedLabelsIndex = new int[256];
 		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); i --){
 			FSAUtils.IntIntHolder p = labelAndCount.first();
 			labelAndCount.remove(p);
-			labelsInvIndex[p.a] = i;
+			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte) p.a;
 		}
 	}
@@ -153,7 +151,7 @@ public class CFSA2Serializer implements FSASerializer{
 	/** Return supported flags */
 	@Override
 	public Set<FSAFlags> getFlags(){
-		return flags;
+		return SUPPORTED_FLAGS;
 	}
 
 	/** Linearization of states */
@@ -373,7 +371,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private int emitArc(final OutputStream os, final int flags, final byte label, final int targetOffset) throws IOException{
 		int length = 0;
 
-		int labelIndex = labelsInvIndex[label & 0xFF];
+		int labelIndex = invertedLabelsIndex[label & 0xFF];
 		if(labelIndex > 0){
 			if(os != null)
 				os.write(flags | labelIndex);

@@ -12,7 +12,7 @@ import java.util.Set;
 public interface FSASerializer{
 
 	/**
-	 * Serialize a finite state automaton to an output stream.
+	 * Serialize a Finite State Automaton to an output stream.
 	 *
 	 * @param fsa The automaton to serialize.
 	 * @param os The output stream to serialize to.
