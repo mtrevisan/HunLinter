@@ -71,7 +71,7 @@ public class FSATestUtils{
 
 	/*
 	 * Check if the DFSA reachable from a given state is minimal.
-	 * This means no * two states have the same right language.
+	 * This means no two states have the same right language.
 	 */
 	public static void checkMinimal(final FSA fsa){
 		final Map<String, Integer> stateLanguages = new HashMap<String, Integer>();
@@ -86,7 +86,6 @@ public class FSATestUtils{
 				b.setLength(0);
 				for(byte[] seq : rightLanguage)
 					b.append(seq).append(',');
-
 				String full = b.toString();
 				Assertions.assertFalse(stateLanguages.containsKey(full), "State exists: " + state + " " + full + " " + stateLanguages.get(full));
 				stateLanguages.put(full, state);
