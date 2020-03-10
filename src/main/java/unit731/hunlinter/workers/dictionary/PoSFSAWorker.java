@@ -11,7 +11,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.fsa.FSA;
-import unit731.hunlinter.services.fsa.builders.CFSA2Serializer;
+import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.Dictionary;

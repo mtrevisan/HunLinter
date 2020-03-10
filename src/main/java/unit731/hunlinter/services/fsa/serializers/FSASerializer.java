@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa.serializers;
 
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;

@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa.serializers;
 
 import com.carrotsearch.hppc.BoundedProportionalArraySizingStrategy;
 import com.carrotsearch.hppc.IntArrayList;

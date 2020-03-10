@@ -9,9 +9,6 @@ import java.util.Comparator;
 /**
  * Fast, memory-conservative Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
  * between construction speed and memory consumption.
- * Use serializers to compress the returned automaton into a more compact form.
- *
- * @see FSASerializer
  */
 public class FSABuilder{
 
@@ -24,7 +21,7 @@ public class FSABuilder{
 
 	/** A comparator comparing full byte arrays. Unsigned byte comparisons ('C'-locale) */
 	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) ->
-		compare(o1, 0, o1.length, o2, 0, o2.length);
+		compare(o1, o1.length, o2, o2.length);
 
 
 	/** Internal serialized FSA buffer expand ratio */
@@ -106,18 +103,16 @@ public class FSABuilder{
 	 * @param sequence The array holding input sequence of bytes.
 	 */
 	protected final void add(final byte[] sequence){
-		final int start = 0;
-		final int len = sequence.length;
-
 		assert serialized != null : "Automaton already built.";
-		assert previous == null || len == 0 || compare(previous, 0, previousLength, sequence, start, len) <= 0 :
+		assert previous == null || sequence.length == 0 || compare(previous, previousLength, sequence, sequence.length) <= 0 :
 			"Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= "
-			+ Arrays.toString(Arrays.copyOfRange(sequence, start, len));
+			+ Arrays.toString(Arrays.copyOfRange(sequence, 0, sequence.length));
 
-		setPrevious(sequence, start, len);
+		final int len = sequence.length;
+		setPrevious(sequence, len);
 
 		//determine common prefix length
-		final int commonPrefix = commonPrefix(sequence, start, len);
+		final int commonPrefix = commonPrefix(sequence, len);
 
 		//make room for extra states on active path, if needed
 		expandActivePath(len);
@@ -130,6 +125,7 @@ public class FSABuilder{
 		}
 
 		//create arcs to new suffix states
+		final int start = 0;
 		for(int i = commonPrefix + 1, j = start + commonPrefix; i <= len; i ++){
 			final int p = nextArcOffset[i - 1];
 
@@ -198,10 +194,11 @@ public class FSABuilder{
 	/**
 	 * @return The number of common prefix characters with the previous sequence.
 	 */
-	private int commonPrefix(final byte[] sequence, int start, final int len){
+	private int commonPrefix(final byte[] sequence, final int len){
 		//empty root state case
 		final int max = Math.min(len, activePathLen);
 		int index;
+		int start = 0;
 		for(index = 0; index < max; index ++){
 			final int lastArc = nextArcOffset[index] - ConstantArcSizeFSA.ARC_SIZE;
 			if(sequence[start ++] != getArcLabel(lastArc))
@@ -335,11 +332,11 @@ public class FSABuilder{
 	}
 
 	/** Copy <code>current</code> into an internal buffer */
-	private void setPrevious(final byte[] sequence, final int start, final int length){
+	private void setPrevious(final byte[] sequence, final int length){
 		if(previous == null || previous.length < length)
 			previous = new byte[length];
 
-		System.arraycopy(sequence, start, previous, 0, length);
+		System.arraycopy(sequence, 0, previous, 0, length);
 		previousLength = length;
 	}
 
@@ -347,7 +344,9 @@ public class FSABuilder{
 	 * Lexicographic order of input sequences. By default, consistent with the "C"
 	 * sort (absolute value of bytes, 0-255).
 	 */
-	private static int compare(final byte[] s1, int start1, final int len1, final byte[] s2, int start2, final int len2){
+	private static int compare(final byte[] s1, final int len1, final byte[] s2, final int len2){
+		int start1 = 0;
+		int start2 = 0;
 		final int max = Math.min(len1, len2);
 		for(int i = 0; i < max; i ++){
 			final byte c1 = s1[start1 ++];

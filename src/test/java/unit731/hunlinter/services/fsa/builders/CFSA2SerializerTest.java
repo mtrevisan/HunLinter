@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
+import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
+import unit731.hunlinter.services.fsa.serializers.FSASerializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
