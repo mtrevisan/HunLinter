@@ -98,7 +98,7 @@ public class FSATestUtils{
 	static List<byte[]> allSequences(FSA fsa, int state){
 		List<byte[]> seq = new ArrayList<>();
 		for(ByteBuffer bb : fsa.getSequences(state))
-			seq.add(bb.array());
+			seq.add(Arrays.copyOf(bb.array(), bb.remaining()));
 		return seq;
 	}
 
