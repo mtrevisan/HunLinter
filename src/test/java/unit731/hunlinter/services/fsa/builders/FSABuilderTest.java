@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -52,30 +51,24 @@ class FSABuilderTest{
 
 	@Test
 	void testLexicographicOrder(){
-		final String str1 = Character.toString(0);
-		final String str2 = Character.toString(1);
-		final String str3 = Character.toString(0xFF);
-		List<String> input = Arrays.asList(str1, str2, str3);
-		input.sort(Comparator.naturalOrder());
+		byte[][] input = {{0}, {1}, {(byte)0xFF}};
+		Arrays.sort(input, FSABuilder.LEXICAL_ORDERING);
 
 		//check if lexical ordering is consistent with absolute byte value
-		Assertions.assertEquals(str1, input.get(0));
-		Assertions.assertEquals(str2, input.get(1));
-		Assertions.assertEquals(str3, input.get(2));
+		Assertions.assertEquals(0, input[0][0]);
+		Assertions.assertEquals(1, input[1][0]);
+		Assertions.assertEquals((byte)0xFF, input[2][0]);
 
-		List<byte[]> in = input.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
-			.collect(Collectors.toList());
-		FSA fsa = FSABuilder.build(in);
+		FSA fsa = FSABuilder.build(input);
 
-		FSATestUtils.checkCorrect(in, fsa);
+		FSATestUtils.checkCorrect(input, fsa);
 
 		int arc = fsa.getFirstArc(fsa.getRootNode());
-		Assertions.assertEquals(str1, Character.toString(fsa.getArcLabel(arc)));
+		Assertions.assertEquals(0, fsa.getArcLabel(arc));
 		arc = fsa.getNextArc(arc);
-		Assertions.assertEquals(str2, Character.toString(fsa.getArcLabel(arc)));
+		Assertions.assertEquals(1, fsa.getArcLabel(arc));
 		arc = fsa.getNextArc(arc);
-		Assertions.assertEquals(str3, Character.toString(fsa.getArcLabel(arc) & 0xFF));
+		Assertions.assertEquals((byte)0xFF, fsa.getArcLabel(arc));
 	}
 
 	@Test
