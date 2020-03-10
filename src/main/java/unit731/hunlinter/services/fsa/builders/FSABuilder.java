@@ -162,11 +162,11 @@ public class FSABuilder{
 	}
 
 	private boolean isArcLast(final int arc){
-		return (serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_LAST) != 0;
+		return ((serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_LAST) != 0);
 	}
 
 	private boolean isArcFinal(final int arc){
-		return (serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_FINAL) != 0;
+		return ((serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_FINAL) != 0);
 	}
 
 	private byte getArcLabel(final int arc){
