@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -26,9 +28,16 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
+	private final List<Function<?, ?>> steps = new ArrayList<>();
+
 
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
+	}
+
+	//NOTE: if it's the first step, then its input must be Void, otherwise must be the output of the previous step
+	public <I> void addStep(final Function<I, ?> stepFunction){
+		steps.add(stepFunction);
 	}
 
 	@Override
