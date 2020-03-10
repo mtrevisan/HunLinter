@@ -153,7 +153,7 @@ public class SerializerTestBase{
 		FSASerializer serializer = createSerializer();
 		checkSerialization0(serializer, input, root);
 		if(serializer.getFlags().contains(FSAFlags.NUMBERS))
-			checkSerialization0(serializer.withNumbers(), input, root);
+			checkSerialization0(serializer.serializeWithNumbers(), input, root);
 	}
 
 	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
@@ -177,7 +177,7 @@ public class SerializerTestBase{
 		FSA s = builder.build(in);
 
 		byte[] fsaData = createSerializer()
-			.withNumbers()
+			.serializeWithNumbers()
 			.serialize(s, new ByteArrayOutputStream())
 			.toByteArray();
 
@@ -193,15 +193,6 @@ public class SerializerTestBase{
 
 		Collections.sort(result);
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);
-	}
-
-	/*
-	 * Drain bytes from a byte buffer to a string.
-	 */
-	public static String toString(ByteBuffer sequence){
-		byte[] bytes = new byte[sequence.remaining()];
-		sequence.get(bytes);
-		return Arrays.toString(bytes);
 	}
 
 }
