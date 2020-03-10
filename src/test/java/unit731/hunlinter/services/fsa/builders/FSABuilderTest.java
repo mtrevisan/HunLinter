@@ -3,6 +3,7 @@ package unit731.hunlinter.services.fsa.builders;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.FSATestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

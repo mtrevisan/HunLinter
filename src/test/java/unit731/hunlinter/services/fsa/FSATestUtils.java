@@ -1,8 +1,9 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa;
 
 import org.junit.jupiter.api.Assertions;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.StateVisitor;
+import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;

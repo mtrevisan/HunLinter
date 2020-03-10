@@ -1,12 +1,12 @@
-package unit731.hunlinter.services.fsa.builders;
+package unit731.hunlinter.services.fsa.serializers;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
-import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
-import unit731.hunlinter.services.fsa.serializers.FSASerializer;
+import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.fsa.FSATestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
