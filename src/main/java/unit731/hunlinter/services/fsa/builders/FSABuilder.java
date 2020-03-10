@@ -10,7 +10,7 @@ import java.util.Comparator;
  * Fast, memory-conservative Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
  * between construction speed and memory consumption.
  *
- * @see "org.carrot2.morfologik-parent", 2.1.8-SNAPSHOT, 2020-01-02
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class FSABuilder{
 

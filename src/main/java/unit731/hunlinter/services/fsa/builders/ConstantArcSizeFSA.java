@@ -11,7 +11,7 @@ import java.util.Set;
  * An FSA with constant-size arc representation produced directly by {@link FSABuilder}.
  *
  * @see FSABuilder
- * @see "org.carrot2.morfologik-parent", 2.1.8-SNAPSHOT, 2020-01-02
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class ConstantArcSizeFSA extends FSA{
 
