@@ -112,7 +112,7 @@ class FSABuilderTest{
 	private byte[] randomByteSequence(Random rnd, int lengthMin, int lengthMax, int alphabetMin, int alphabetMax){
 		byte[] bytes = new byte[lengthMin + rnd.nextInt(lengthMax - lengthMin + 1)];
 		for(int i = 0; i < bytes.length; i ++)
-			bytes[i] = (byte) (alphabetMin + rnd.nextInt(alphabetMax - alphabetMin + 1));
+			bytes[i] = (byte)(alphabetMin + rnd.nextInt(alphabetMax - alphabetMin + 1));
 		return bytes;
 	}
 
