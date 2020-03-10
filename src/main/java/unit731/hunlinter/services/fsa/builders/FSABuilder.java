@@ -88,6 +88,33 @@ public class FSABuilder{
 	}
 
 	/**
+	 * Build a minimal, deterministic automaton from an iterable list of string sequences.
+	 *
+	 * @param input	Input sequences to build automaton from.
+	 * @return	The automaton encoding of all input sequences.
+	 */
+	public static FSA build(final Iterable<byte[]> input){
+		final FSABuilder builder = new FSABuilder();
+		for(final byte[] chs : input)
+			builder.add(chs, 0, chs.length);
+		return builder.complete();
+	}
+
+	/**
+	 * Build a minimal, deterministic automaton from a sorted list of byte
+	 * sequences.
+	 *
+	 * @param input Input sequences to build automaton from.
+	 * @return Returns the automaton encoding all input sequences.
+	 */
+	static FSA build(final byte[][] input){
+		final FSABuilder builder = new FSABuilder();
+		for(final byte[] chs : input)
+			builder.add(chs, 0, chs.length);
+		return builder.complete();
+	}
+
+	/**
 	 * Add a single sequence of bytes to the FSA.
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
 	 *
@@ -97,7 +124,9 @@ public class FSABuilder{
 	 */
 	private void add(final byte[] sequence, final int start, final int len){
 		assert serialized != null : "Automaton already built.";
-		assert previous == null || len == 0 || compare(previous, 0, previousLength, sequence, start, len) <= 0 : "Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= " + Arrays.toString(Arrays.copyOfRange(sequence, start, len));
+		assert previous == null || len == 0 || compare(previous, 0, previousLength, sequence, start, len) <= 0 :
+			"Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= "
+			+ Arrays.toString(Arrays.copyOfRange(sequence, start, len));
 
 		setPrevious(sequence, start, len);
 
@@ -150,33 +179,6 @@ public class FSABuilder{
 		return fsa;
 	}
 
-	/**
-	 * Build a minimal, deterministic automaton from a sorted list of byte
-	 * sequences.
-	 *
-	 * @param input Input sequences to build automaton from.
-	 * @return Returns the automaton encoding all input sequences.
-	 */
-	static FSA build(final byte[][] input){
-		final FSABuilder builder = new FSABuilder();
-		for(final byte[] chs : input)
-			builder.add(chs, 0, chs.length);
-		return builder.complete();
-	}
-
-	/**
-	 * Build a minimal, deterministic automaton from an iterable list of string sequences.
-	 *
-	 * @param input	Input sequences to build automaton from.
-	 * @return	The automaton encoding of all input sequences.
-	 */
-	public static FSA build(final Iterable<byte[]> input){
-		final FSABuilder builder = new FSABuilder();
-		for(final byte[] chs : input)
-			builder.add(chs, 0, chs.length);
-		return builder.complete();
-	}
-
 	private boolean isArcLast(final int arc){
 		return (serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_LAST) != 0;
 	}
@@ -213,13 +215,13 @@ public class FSABuilder{
 	private int commonPrefix(final byte[] sequence, int start, final int len){
 		//empty root state case
 		final int max = Math.min(len, activePathLen);
-		int i;
-		for(i = 0; i < max; i ++){
-			final int lastArc = nextArcOffset[i] - ConstantArcSizeFSA.ARC_SIZE;
+		int index;
+		for(index = 0; index < max; index ++){
+			final int lastArc = nextArcOffset[index] - ConstantArcSizeFSA.ARC_SIZE;
 			if(sequence[start ++] != getArcLabel(lastArc))
 				break;
 		}
-		return i;
+		return index;
 	}
 
 	/**
@@ -230,23 +232,24 @@ public class FSABuilder{
 	private int freezeState(final int activePathIndex){
 		final int start = activePath[activePathIndex];
 		final int end = nextArcOffset[activePathIndex];
-		final int len = end - start;
+		final int length = end - start;
 
 		//set the last arc flag on the current active path's state
 		serialized[end - ConstantArcSizeFSA.ARC_SIZE + ConstantArcSizeFSA.FLAGS_OFFSET] |= ConstantArcSizeFSA.BIT_ARC_LAST;
 
 		//try to locate a state with an identical content in the hash set
 		final int bucketMask = (hashSet.length - 1);
-		int slot = hash(start, len) & bucketMask;
+		int slot = hash(start, length) & bucketMask;
 		for(int i = 0; ; ){
 			int state = hashSet[slot];
 			if(state == 0){
 				state = hashSet[slot] = serialize(activePathIndex);
 				if(++ hashSize > hashSet.length / 2)
 					expandAndRehash();
+
 				return state;
 			}
-			else if(equivalent(state, start, len))
+			else if(equivalent(state, start, length))
 				return state;
 
 			slot = (slot + (++ i)) & bucketMask;
@@ -277,7 +280,7 @@ public class FSABuilder{
 
 	/** Return <code>true</code> if two regions in {@link #serialized} are identical */
 	private boolean equivalent(int start1, int start2, int len){
-		if(start1 + len > size || start2 + len > size)
+		if(Math.max(start1, start2) + len > size)
 			return false;
 
 		while(len -- > 0)
