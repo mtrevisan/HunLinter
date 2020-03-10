@@ -23,7 +23,8 @@ class FSATraversalTest{
 		List<byte[]> input = words.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
-		FSA fsa = FSABuilder.build(input);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(input);
 
 		FSATraversal fsaTraversal = new FSATraversal(fsa);
 		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("a".getBytes(StandardCharsets.UTF_8)).kind);

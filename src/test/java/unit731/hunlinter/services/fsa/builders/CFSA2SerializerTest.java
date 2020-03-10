@@ -63,7 +63,8 @@ class CFSA2SerializerTest{
 		List<byte[]> in = input.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
-		FSA fsa = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(in);
 
 		checkSerialization(in, fsa);
 	}
@@ -91,20 +92,21 @@ class CFSA2SerializerTest{
 
 	private void testInput(String fsaFilename) throws IOException{
 		InputStream stream = CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/" + fsaFilename);
-		FSA fsa = FSA.read(stream);
+		FSA fsa1 = FSA.read(stream);
 
-		List<byte[]> sequences = new ArrayList<>();
-		for(ByteBuffer bb : fsa)
-			sequences.add(bb.array());
-		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
+		List<byte[]> input = new ArrayList<>();
+		for(ByteBuffer bb : fsa1)
+			input.add(bb.array());
+		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
 
-		FSA root = FSABuilder.build(sequences);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa2 = builder.build(input);
 
 		//check if the DFSA is correct first
-		FSATestUtils.checkCorrect(sequences, root);
+		FSATestUtils.checkCorrect(input, fsa2);
 
 		//check serialization
-		checkSerialization(sequences, root);
+		checkSerialization(input, fsa2);
 	}
 
 	private void checkSerialization(List<byte[]> input, FSA root) throws IOException{
@@ -130,19 +132,20 @@ class CFSA2SerializerTest{
 		List<byte[]> in = input.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
-		FSA s = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa1 = builder.build(in);
 
-		final byte[] fsaData = createSerializer().serializeWithNumbers().serialize(s, new ByteArrayOutputStream()).toByteArray();
+		byte[] fsaData = createSerializer().serializeWithNumbers().serialize(fsa1, new ByteArrayOutputStream()).toByteArray();
 
-		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
+		FSA fsa2 = FSA.read(new ByteArrayInputStream(fsaData));
 
 		// Ensure we have the NUMBERS flag set.
-		Assertions.assertTrue(fsa.getFlags().contains(FSAFlags.NUMBERS));
+		Assertions.assertTrue(fsa2.getFlags().contains(FSAFlags.NUMBERS));
 
 		// Get all numbers from nodes.
 		byte[] buffer = new byte[128];
 		ArrayList<String> result = new ArrayList<>();
-		walkNode(buffer, 0, fsa, fsa.getRootNode(), 0, result);
+		walkNode(buffer, 0, fsa2, fsa2.getRootNode(), 0, result);
 
 		Collections.sort(result);
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);

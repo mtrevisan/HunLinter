@@ -19,7 +19,8 @@ class FSABuilderTest{
 	void testEmptyInput(){
 		List<byte[]> input = Collections.emptyList();
 
-		FSA fsa = FSABuilder.build(input);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(input);
 
 		FSATestUtils.checkCorrect(input, fsa);
 	}
@@ -31,7 +32,8 @@ class FSABuilderTest{
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
 
-		FSA fsa = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
@@ -44,7 +46,8 @@ class FSABuilderTest{
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
 
-		FSA fsa = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 	}
@@ -59,7 +62,8 @@ class FSABuilderTest{
 		Assertions.assertEquals(1, input.get(1)[0]);
 		Assertions.assertEquals((byte)0xFF, input.get(2)[0]);
 
-		FSA fsa = FSABuilder.build(input);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(input);
 
 		FSATestUtils.checkCorrect(input, fsa);
 
@@ -75,7 +79,8 @@ class FSABuilderTest{
 	void testRandom25000_largerAlphabet(){
 		List<byte[]> in = generateRandom(25_000, 1, 20, 0, 255);
 
-		FSA fsa = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
@@ -85,7 +90,8 @@ class FSABuilderTest{
 	public void testRandom25000_smallAlphabet(){
 		List<byte[]> in = generateRandom(40, 1, 20, 0, 3);
 
-		FSA fsa = FSABuilder.build(in);
+		FSABuilder builder = new FSABuilder();
+		FSA fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);

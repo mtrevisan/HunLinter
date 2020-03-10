@@ -197,7 +197,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		List<byte[]> in = words.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
-		final FSA fsa = FSABuilder.build(in);
+		final FSABuilder builder = new FSABuilder();
+		final FSA fsa = builder.build(in);
 
 		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){

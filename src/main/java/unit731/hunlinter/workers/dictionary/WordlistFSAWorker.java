@@ -101,7 +101,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		List<byte[]> input = words.stream()
 			.map(word -> word.getBytes(StandardCharsets.UTF_8))
 			.collect(Collectors.toList());
-		final FSA fsa = FSABuilder.build(input);
+		final FSABuilder builder = new FSABuilder();
+		final FSA fsa = builder.build(input);
 
 		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
