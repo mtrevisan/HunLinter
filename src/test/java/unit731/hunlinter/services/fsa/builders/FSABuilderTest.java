@@ -5,18 +5,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 class FSABuilderTest{
 
 	@Test
 	void testEmptyInput(){
-		List<String> input = Collections.emptyList();
+		List<byte[]> input = Collections.emptyList();
 
 		FSA fsa = FSABuilder.build(input);
 
@@ -27,9 +29,12 @@ class FSABuilderTest{
 	void testHashResizeBug(){
 		List<String> input = Arrays.asList("01", "02", "11", "21");
 
-		FSA fsa = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(in);
 
-		FSATestUtils.checkCorrect(input, fsa);
+		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
 	}
 
@@ -37,9 +42,12 @@ class FSABuilderTest{
 	void testSmallInput(){
 		List<String> input = Arrays.asList("abc", "bbc", "d");
 
-		FSA fsa = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(in);
 
-		FSATestUtils.checkCorrect(input, fsa);
+		FSATestUtils.checkCorrect(in, fsa);
 	}
 
 	@Test
@@ -55,9 +63,12 @@ class FSABuilderTest{
 		Assertions.assertEquals(str2, input.get(1));
 		Assertions.assertEquals(str3, input.get(2));
 
-		FSA fsa = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(in);
 
-		FSATestUtils.checkCorrect(input, fsa);
+		FSATestUtils.checkCorrect(in, fsa);
 
 		int arc = fsa.getFirstArc(fsa.getRootNode());
 		Assertions.assertEquals(str1, Character.toString(fsa.getArcLabel(arc)));
@@ -74,9 +85,12 @@ class FSABuilderTest{
 			input.add(RandomStringUtils.randomAlphanumeric(1, 20));
 		input.sort(Comparator.naturalOrder());
 
-		FSA fsa = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(in);
 
-		FSATestUtils.checkCorrect(input, fsa);
+		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
 	}
 

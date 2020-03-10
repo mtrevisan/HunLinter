@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 
 public class PoSFSAWorker extends WorkerDictionary{
@@ -193,7 +194,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		//lexical order
 		Collections.sort(words);
-		final FSA fsa = FSABuilder.build(words);
+		List<byte[]> in = words.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		final FSA fsa = FSABuilder.build(in);
 
 		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){

@@ -1,5 +1,6 @@
 package unit731.hunlinter.services.fsa.builders;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
@@ -10,11 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 class CFSA2SerializerTest{
@@ -57,9 +60,12 @@ class CFSA2SerializerTest{
 	private void testInput(List<String> input) throws IOException{
 		input.sort(Comparator.naturalOrder());
 
-		FSA fsa = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(in);
 
-		checkSerialization(input, fsa);
+		checkSerialization(in, fsa);
 	}
 
 
@@ -87,10 +93,10 @@ class CFSA2SerializerTest{
 		InputStream stream = CFSA2SerializerTest.class.getResourceAsStream("/services/fsa/builders/" + fsaFilename);
 		FSA fsa = FSA.read(stream);
 
-		List<String> sequences = new ArrayList<>();
+		List<byte[]> sequences = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
-			sequences.add(new String(bb.array()));
-		sequences.sort(Comparator.naturalOrder());
+			sequences.add(bb.array());
+		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
 
 		FSA root = FSABuilder.build(sequences);
 
@@ -101,13 +107,13 @@ class CFSA2SerializerTest{
 		checkSerialization(sequences, root);
 	}
 
-	private void checkSerialization(List<String> input, FSA root) throws IOException{
+	private void checkSerialization(List<byte[]> input, FSA root) throws IOException{
 		checkSerialization0(createSerializer(), input, root);
 		if(createSerializer().getFlags().contains(FSAFlags.NUMBERS))
 			checkSerialization0(createSerializer().serializeWithNumbers(), input, root);
 	}
 
-	private void checkSerialization0(FSASerializer serializer, List<String> in, FSA root) throws IOException{
+	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
 		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
@@ -121,7 +127,10 @@ class CFSA2SerializerTest{
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
 		input.sort(Comparator.naturalOrder());
 
-		FSA s = FSABuilder.build(input);
+		List<byte[]> in = input.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA s = FSABuilder.build(in);
 
 		final byte[] fsaData = createSerializer().serializeWithNumbers().serialize(s, new ByteArrayOutputStream()).toByteArray();
 
@@ -132,7 +141,7 @@ class CFSA2SerializerTest{
 
 		// Get all numbers from nodes.
 		byte[] buffer = new byte[128];
-		final ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		walkNode(buffer, 0, fsa, fsa.getRootNode(), 0, result);
 
 		Collections.sort(result);
@@ -147,13 +156,11 @@ class CFSA2SerializerTest{
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
 			buffer[depth] = fsa.getArcLabel(arc);
 
-			if(fsa.isArcFinal(arc) || fsa.isArcTerminal(arc)){
-				result.add(cnt + " " + new String(buffer, 0, depth + 1, "UTF-8"));
-			}
+			if(fsa.isArcFinal(arc) || fsa.isArcTerminal(arc))
+				result.add(cnt + StringUtils.SPACE + new String(buffer, 0, depth + 1, StandardCharsets.UTF_8));
 
-			if(fsa.isArcFinal(arc)){
-				cnt++;
-			}
+			if(fsa.isArcFinal(arc))
+				cnt ++;
 
 			if(!fsa.isArcTerminal(arc)){
 				walkNode(buffer, depth + 1, fsa, fsa.getEndNode(arc), cnt, result);

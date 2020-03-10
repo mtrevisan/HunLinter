@@ -10,14 +10,20 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 class FSATraversalTest{
 
 	@Test
 	void testAutomatonHasPrefixBug(){
-		FSA fsa = FSABuilder.build(Arrays.asList("a", "ab", "abc", "ad", "bcd", "bce"));
+		List<String> words = Arrays.asList("a", "ab", "abc", "ad", "bcd", "bce");
+		List<byte[]> input = words.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		FSA fsa = FSABuilder.build(input);
 
 		FSATraversal fsaTraversal = new FSATraversal(fsa);
 		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("a".getBytes(StandardCharsets.UTF_8)).kind);

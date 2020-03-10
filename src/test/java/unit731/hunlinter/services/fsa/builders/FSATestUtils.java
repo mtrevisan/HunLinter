@@ -5,12 +5,11 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.StateVisitor;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +41,7 @@ public class FSATestUtils{
 	}
 
 	/** Check if the DFSA is correct with respect to the given input */
-	public static void checkCorrect(final List<String> input, final FSA fsa){
+	public static void checkCorrect(final List<byte[]> input, final FSA fsa){
 		//(1) All input sequences are in the right language
 		final Set<ByteBuffer> rl = new HashSet<>();
 		for(final ByteBuffer bb : fsa){
@@ -52,8 +51,8 @@ public class FSATestUtils{
 		}
 
 		final Set<ByteBuffer> uniqueInput = new HashSet<>();
-		for(final String sequence : input)
-			uniqueInput.add(ByteBuffer.wrap(sequence.getBytes(StandardCharsets.UTF_8)));
+		for(final byte[] sequence : input)
+			uniqueInput.add(ByteBuffer.wrap(sequence));
 
 		for(final ByteBuffer sequence : uniqueInput)
 			if(!rl.remove(sequence))
@@ -81,11 +80,11 @@ public class FSATestUtils{
 			private StringBuilder b = new StringBuilder();
 
 			public boolean accept(int state){
-				List<String> rightLanguage = allSequences(fsa, state);
-				rightLanguage.sort(Comparator.naturalOrder());
+				List<byte[]> rightLanguage = allSequences(fsa, state);
+				Collections.sort(rightLanguage, FSABuilder.LEXICAL_ORDERING);
 
 				b.setLength(0);
-				for(String seq : rightLanguage)
+				for(byte[] seq : rightLanguage)
 					b.append(seq).append(',');
 
 				String full = b.toString();
@@ -97,10 +96,10 @@ public class FSATestUtils{
 		});
 	}
 
-	static List<String> allSequences(FSA fsa, int state){
-		List<String> seq = new ArrayList<>();
+	static List<byte[]> allSequences(FSA fsa, int state){
+		List<byte[]> seq = new ArrayList<>();
 		for(ByteBuffer bb : fsa.getSequences(state))
-			seq.add(new String(bb.array()));
+			seq.add(bb.array());
 		return seq;
 	}
 

@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 
 public class WordlistFSAWorker extends WorkerDictionary{
@@ -96,7 +98,10 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 		final Path outputPath = Path.of(output);
 
-		final FSA fsa = FSABuilder.build(words);
+		List<byte[]> input = words.stream()
+			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.collect(Collectors.toList());
+		final FSA fsa = FSABuilder.build(input);
 
 		final CFSA2Serializer serializer = new CFSA2Serializer();
 		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
