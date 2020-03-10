@@ -60,7 +60,10 @@ public class CFSA2Serializer implements FSASerializer{
 	private final byte[] scratch = new byte[5];
 	/** The most frequent labels for integrating with the flags field */
 	private byte[] labelsIndex;
-	/** Inverted index of labels to be integrated with flags field. A label at index <code>i<code> has the index or zero (no integration) */
+	/**
+	 * Inverted index of labels to be integrated with flags field. A label at index <code>i<code> has the index or zero
+	 * (no integration)
+	 */
 	private int[] invertedLabelsIndex;
 
 
@@ -163,7 +166,8 @@ public class CFSA2Serializer implements FSASerializer{
 		final IntIntHashMap inlinkCount = computeInlinkCount(fsa);
 
 		/** An array of ordered states for serialization. */
-		final IntArrayList linearized = new IntArrayList(0, new BoundedProportionalArraySizingStrategy(1000, 10000, 1.5f));
+		final IntArrayList linearized = new IntArrayList(0,
+			new BoundedProportionalArraySizingStrategy(1000, 10000, 1.5f));
 
 		/**
 		 * Determine which states should be linearized first (at fixed positions) so as to
@@ -181,7 +185,10 @@ public class CFSA2Serializer implements FSASerializer{
 		sublist.buffer = states;
 		sublist.elementsCount = states.length;
 
-		/** Probe the initial region a little bit, looking for optimal cut. It can't be binary search because the result isn't monotonic */
+		/**
+		 * Probe the initial region a little bit, looking for optimal cut. It can't be binary search because the result isn't
+		 * monotonic
+		 */
 		LOGGER.trace("Compacting, initial output size: {}", serializedSize);
 		int cutAt = 0;
 		for(int cut = Math.min(25, states.length); cut <= Math.min(150, states.length); cut += 25){
@@ -205,7 +212,8 @@ public class CFSA2Serializer implements FSASerializer{
 	 * Linearize all states, putting <code>states</code> in front of the automaton
 	 * and calculating stable state offsets.
 	 */
-	private int linearizeAndCalculateOffsets(final FSA fsa, final IntArrayList states, final IntArrayList linearized, final IntIntHashMap offsets) throws IOException{
+	private int linearizeAndCalculateOffsets(final FSA fsa, final IntArrayList states, final IntArrayList linearized,
+			final IntIntHashMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final IntStack nodes = new IntStack();
 		linearized.clear();
@@ -236,7 +244,8 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Add a state to linearized list */
-	private void linearizeState(final FSA fsa, final IntStack nodes, final IntArrayList linearized, final BitSet visited, final int node){
+	private void linearizeState(final FSA fsa, final IntStack nodes, final IntArrayList linearized, final BitSet visited,
+			final int node){
 		linearized.add(node);
 		visited.set(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
