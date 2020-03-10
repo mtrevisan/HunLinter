@@ -85,7 +85,7 @@ public class FSATestUtils{
 
 				b.setLength(0);
 				for(byte[] seq : rightLanguage)
-					b.append(seq).append(',');
+					b.append(Arrays.toString(seq)).append(',');
 				String full = b.toString();
 				Assertions.assertFalse(stateLanguages.containsKey(full), "State exists: " + state + " " + full + " " + stateLanguages.get(full));
 				stateLanguages.put(full, state);
