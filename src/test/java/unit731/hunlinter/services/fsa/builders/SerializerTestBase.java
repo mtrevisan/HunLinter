@@ -134,33 +134,30 @@ public class SerializerTestBase{
 	}
 
 	private void testBuiltIn(FSA fsa) throws IOException{
-		final List<byte[]> sequences = new ArrayList<>();
-
-		sequences.clear();
+		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
-			sequences.add(Arrays.copyOf(bb.array(), bb.remaining()));
+			input.add(Arrays.copyOf(bb.array(), bb.remaining()));
+		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
 
-		Collections.sort(sequences, FSABuilder.LEXICAL_ORDERING);
-
-		List<byte[]> in = sequences.toArray(new byte[sequences.size()][]);
 		FSABuilder builder = new FSABuilder();
-		FSA root = builder.build(in);
+		FSA root = builder.build(input);
 
 		//check if the DFSA is correct first
-		FSATestUtils.checkCorrect(in, root);
+		FSATestUtils.checkCorrect(input, root);
 
 		//check serialization
-		checkSerialization(in, root);
+		checkSerialization(input, root);
 	}
 
 	private void checkSerialization(List<byte[]> input, FSA root) throws IOException{
-		checkSerialization0(createSerializer(), input, root);
-		if(createSerializer().getFlags().contains(FSAFlags.NUMBERS))
-			checkSerialization0(createSerializer().withNumbers(), input, root);
+		FSASerializer serializer = createSerializer();
+		checkSerialization0(serializer, input, root);
+		if(serializer.getFlags().contains(FSAFlags.NUMBERS))
+			checkSerialization0(serializer.withNumbers(), input, root);
 	}
 
 	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
-		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
+		byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
 		FSATestUtils.checkCorrect(in, fsa);
@@ -179,7 +176,7 @@ public class SerializerTestBase{
 		FSABuilder builder = new FSABuilder();
 		FSA s = builder.build(in);
 
-		final byte[] fsaData = createSerializer()
+		byte[] fsaData = createSerializer()
 			.withNumbers()
 			.serialize(s, new ByteArrayOutputStream())
 			.toByteArray();
@@ -191,7 +188,7 @@ public class SerializerTestBase{
 
 		//get all numbers from nodes
 		byte[] buffer = new byte[128];
-		final ArrayList<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		FSATestUtils.walkNode(buffer, 0, fsa, fsa.getRootNode(), 0, result);
 
 		Collections.sort(result);
