@@ -1,11 +1,14 @@
 package unit731.hunlinter.services.fsa;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.StateVisitor;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +24,23 @@ import java.util.TreeSet;
 
 
 public class FSATestUtils{
+
+	public static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result) throws IOException{
+		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
+			buffer[depth] = fsa.getArcLabel(arc);
+
+			if(fsa.isArcFinal(arc) || fsa.isArcTerminal(arc))
+				result.add(cnt + StringUtils.SPACE + new String(buffer, 0, depth + 1, StandardCharsets.UTF_8));
+
+			if(fsa.isArcFinal(arc))
+				cnt ++;
+
+			if(!fsa.isArcTerminal(arc)){
+				walkNode(buffer, depth + 1, fsa, fsa.getEndNode(arc), cnt, result);
+				cnt += fsa.getRightLanguageCount(fsa.getEndNode(arc));
+			}
+		}
+	}
 
 	/** Check if the DFSA is correct with respect to the given input */
 	public static void checkCorrect(final byte[][] input, final FSA fsa){

@@ -1,6 +1,5 @@
 package unit731.hunlinter.services.fsa.serializers;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
@@ -147,7 +146,7 @@ class CFSA2SerializerTest{
 		// Get all numbers from nodes.
 		byte[] buffer = new byte[128];
 		ArrayList<String> result = new ArrayList<>();
-		walkNode(buffer, 0, fsa2, fsa2.getRootNode(), 0, result);
+		FSATestUtils.walkNode(buffer, 0, fsa2, fsa2.getRootNode(), 0, result);
 
 		Collections.sort(result);
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);
@@ -155,23 +154,6 @@ class CFSA2SerializerTest{
 
 	private FSASerializer createSerializer(){
 		return new CFSA2Serializer();
-	}
-
-	private static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result) throws IOException{
-		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
-			buffer[depth] = fsa.getArcLabel(arc);
-
-			if(fsa.isArcFinal(arc) || fsa.isArcTerminal(arc))
-				result.add(cnt + StringUtils.SPACE + new String(buffer, 0, depth + 1, StandardCharsets.UTF_8));
-
-			if(fsa.isArcFinal(arc))
-				cnt ++;
-
-			if(!fsa.isArcTerminal(arc)){
-				walkNode(buffer, depth + 1, fsa, fsa.getEndNode(arc), cnt, result);
-				cnt += fsa.getRightLanguageCount(fsa.getEndNode(arc));
-			}
-		}
 	}
 
 }
