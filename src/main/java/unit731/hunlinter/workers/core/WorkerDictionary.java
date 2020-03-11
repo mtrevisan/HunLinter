@@ -75,13 +75,12 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		return lines;
 	}
 
-	protected Void executeReadProcess(final List<Pair<Integer, String>> lines){
+	protected void executeReadProcess(final List<Pair<Integer, String>> lines){
 		processData(lines);
-		return null;
 	}
 
 	//NOTE: cannot use `processData` because the file must be ordered
-	protected Void executeWriteProcess(final List<Pair<Integer, String>> lines){
+	protected void executeWriteProcess(final List<Pair<Integer, String>> lines){
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		final DictionaryParser dicParser = workerData.getParser();
@@ -109,9 +108,8 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 			finalizeProcessing("Successfully processed dictionary file");
 		}
 		catch(final Exception e){
-			cancel(e);
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 }

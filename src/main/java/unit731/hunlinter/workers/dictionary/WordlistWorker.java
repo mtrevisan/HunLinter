@@ -92,7 +92,10 @@ public class WordlistWorker extends WorkerDictionary{
 		};
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
-			return executeReadProcess(param);
+
+			executeWriteProcess(param);
+
+			return null;
 		};
 		setProcessor(step1.andThen(step2));
 	}
