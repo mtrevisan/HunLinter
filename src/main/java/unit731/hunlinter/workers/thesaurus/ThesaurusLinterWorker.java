@@ -1,5 +1,6 @@
 package unit731.hunlinter.workers.thesaurus;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -14,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 
 public class ThesaurusLinterWorker extends WorkerThesaurus{
@@ -41,11 +43,25 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
+						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(
+							new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
 				}
 			}
 		};
-		setReadDataProcessor(dataProcessor);
+
+		final Function<Void, List<Pair<Integer, ThesaurusEntry>>> step1 = ignored -> {
+			prepareProcessing("Reading thesaurus file (step 1/2)");
+
+			return readEntries();
+		};
+		final Function<List<Pair<Integer, ThesaurusEntry>>, Void> step2 = entries -> {
+			prepareProcessing("Start processing " + workerData.getWorkerName());
+
+			processData(dataProcessor, entries);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 }

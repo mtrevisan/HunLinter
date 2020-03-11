@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -18,8 +16,6 @@ import unit731.hunlinter.services.ParserHelper;
 
 
 public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<DictionaryParser>>{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 

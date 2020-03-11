@@ -61,7 +61,6 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
-		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
@@ -74,7 +73,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processData(param);
+			processData(lineProcessor, param);
 
 			return null;
 		};

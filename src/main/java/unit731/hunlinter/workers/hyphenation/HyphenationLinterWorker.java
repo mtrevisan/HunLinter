@@ -2,14 +2,20 @@ package unit731.hunlinter.workers.hyphenation;
 
 import java.text.MessageFormat;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -21,6 +27,8 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class HyphenationLinterWorker extends WorkerDictionary{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLinterWorker.class);
 
 	public static final String WORKER_NAME = "Hyphenation linter";
 
@@ -68,7 +76,18 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 			});
 		};
 
-		setReadDataProcessor(lineProcessor);
+		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/2)");
+			return readLines();
+		};
+		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+
+			processData(lineProcessor, lines);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 }

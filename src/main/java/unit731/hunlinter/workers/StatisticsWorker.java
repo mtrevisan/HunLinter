@@ -1,7 +1,11 @@
 package unit731.hunlinter.workers;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.awt.Frame;
@@ -10,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
 import unit731.hunlinter.DictionaryStatisticsDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -24,6 +30,8 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 
 public class StatisticsWorker extends WorkerDictionary{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsWorker.class);
 
 	public static final String WORKER_NAME = "Collecting statistics";
 
@@ -75,10 +83,23 @@ public class StatisticsWorker extends WorkerDictionary{
 		};
 		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
 
-		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
+
+		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/2)");
+
+			return readLines();
+		};
+		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+
+			processData(lineProcessor, lines);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 	public boolean isPerformingHyphenationStatistics(){

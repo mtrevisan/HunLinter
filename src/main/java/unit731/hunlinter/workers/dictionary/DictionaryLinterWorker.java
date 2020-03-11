@@ -36,7 +36,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator);
 
 
-		final BiConsumer<Integer, String> readLineProcessor = (row, line) -> {
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
@@ -50,17 +50,15 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			}
 		};
 
-		setReadDataProcessor(readLineProcessor);
-
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
+		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processData(param);
+			processData(lineProcessor, lines);
 
 			return null;
 		};

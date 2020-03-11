@@ -40,7 +40,6 @@ public class CompoundRulesWorker extends WorkerDictionary{
 				productionReader.accept(production, row);
 		};
 
-		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed);
 
@@ -52,7 +51,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processData(param);
+			processData(lineProcessor, param);
 
 			return null;
 		};

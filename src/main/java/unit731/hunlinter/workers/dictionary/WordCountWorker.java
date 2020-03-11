@@ -65,7 +65,6 @@ public class WordCountWorker extends WorkerDictionary{
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
-		setReadDataProcessor(lineProcessor);
 		getWorkerData()
 			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
@@ -78,7 +77,7 @@ public class WordCountWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processData(lines);
+			processData(lineProcessor, lines);
 
 			return null;
 		};

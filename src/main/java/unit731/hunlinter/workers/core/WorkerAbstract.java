@@ -28,8 +28,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	protected final WD workerData;
 
-	//read section
-	protected BiConsumer<Integer, T> readDataProcessor;
 	//write section
 	protected BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor;
 	protected File outputFile;
@@ -55,10 +53,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	public final WorkerData<WD> getWorkerData(){
 		return workerData;
-	}
-
-	protected void setReadDataProcessor(final BiConsumer<Integer, T> readDataProcessor){
-		this.readDataProcessor = readDataProcessor;
 	}
 
 	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor,
@@ -92,12 +86,12 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		doInBackground();
 	}
 
-	protected void processData(final List<Pair<Integer, T>> entries){
+	protected void processData(final BiConsumer<Integer, T> readDataProcessor, final List<Pair<Integer, T>> entries){
 		try{
 			final int totalEntries = entries.size();
 			processingIndex.set(0);
 
-			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(totalEntries);
+			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(readDataProcessor, totalEntries);
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 
@@ -108,7 +102,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		}
 	}
 
-	private Consumer<Pair<Integer, T>> createInnerProcessor(final int totalData){
+	private Consumer<Pair<Integer, T>> createInnerProcessor(final BiConsumer<Integer, T> readDataProcessor, final int totalData){
 		return data -> {
 			try{
 				readDataProcessor.accept(data.getKey(), data.getValue());

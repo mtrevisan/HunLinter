@@ -17,16 +17,16 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 
 	@Override
 	protected Void doInBackground(){
-		prepareProcessing("Start processing " + workerData.getWorkerName());
-
-		final List<Pair<Integer, ThesaurusEntry>> entries = readEntries();
-
-		processData(entries);
-
+		try{
+			processor.apply(null);
+		}
+		catch(final Exception e){
+			cancel(e);
+		}
 		return null;
 	}
 
-	private List<Pair<Integer, ThesaurusEntry>> readEntries(){
+	protected List<Pair<Integer, ThesaurusEntry>> readEntries(){
 		final ThesaurusParser theParser = workerData.getParser();
 		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
 		return IntStream.range(0, dictionary.size())
