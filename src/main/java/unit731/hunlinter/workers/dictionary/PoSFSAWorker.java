@@ -1,7 +1,5 @@
 package unit731.hunlinter.workers.dictionary;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +16,12 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.services.FileHelper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -44,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,8 +63,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 		final Set<String> words = new HashSet<>();
-		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
+		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			productions.stream()
@@ -75,47 +72,87 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.flatMap(List::stream)
 				.forEach(words::add);
 		};
-		final Runnable completed = () -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
-
-			try{
-				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-				final File outputInfoFile = new File(filenameNoExtension + ".info");
-				if(!outputInfoFile.exists()){
-					final List<String> content = Arrays.asList(
-						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
-						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-						"fsa.dict.encoder=prefix");
-					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-				}
-
-				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
-
-				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
-
-				FileHelper.browse(outputFile);
-			}
-			catch(final Exception e){
-				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
-			}
+		final FSABuilder builder = new FSABuilder();
+		final Consumer<String> fsaProcessor = word -> {
+			final byte[] chs = word.getBytes(StandardCharsets.UTF_8);
+			builder.add(chs);
 		};
+//		final Runnable completed = () -> {
+//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+//
+//			try{
+//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+//				final File outputInfoFile = new File(filenameNoExtension + ".info");
+//				if(!outputInfoFile.exists()){
+//					final List<String> content = Arrays.asList(
+//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+//						"fsa.dict.encoder=prefix");
+//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+//				}
+//
+//				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
+//
+//				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
+//
+//				FileHelper.browse(outputFile);
+//			}
+//			catch(final Exception e){
+//				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
+//			}
+//		};
 
 		getWorkerData()
-			.withDataCompletedCallback(completed);
+//			.withDataCompletedCallback(completed)
+			.withRelaunchException(true);
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+		final Function<List<Pair<Integer, String>>, Set<String>> step2 = lines -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
 
-			executeWriteProcess(lineProcessor, param, outputFile, charset);
+			executeReadProcess(lineProcessor, lines);
+
+			return words;
+		};
+		final Function<Set<String>, FSA> step3 = uniqueWordsSet -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+
+			//lexical order
+			final List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
+			Collections.sort(uniqueWords);
+
+			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
+
+			return builder.complete();
+		};
+		final Function<FSA, File> step4 = fsa -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
+
+			//FIXME
+			final CFSA2Serializer serializer = new CFSA2Serializer();
+			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
+				serializer.serialize(fsa, os);
+
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+
+				return null;
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
+		};
+		final Function<File, Void> step5 = file -> {
+			finalizeProcessing("File written: " + file.getAbsolutePath());
+
+			WorkerManager.openFolderStep(LOGGER).apply(file);
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
 	private void buildFSA(final List<String> words, final String input, final String output) throws Exception{

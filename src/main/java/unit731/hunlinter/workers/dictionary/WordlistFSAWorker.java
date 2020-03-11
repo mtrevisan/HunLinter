@@ -90,7 +90,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //		};
 //
 		getWorkerData()
-//			.withDataCompletedCallback(completed);
+//			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
