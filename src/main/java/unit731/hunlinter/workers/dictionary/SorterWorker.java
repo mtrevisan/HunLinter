@@ -87,6 +87,8 @@ public class SorterWorker extends WorkerDictionary{
 
 			dicParser.clear();
 
+			setProgress(100);
+
 			return null;
 		};
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));

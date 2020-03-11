@@ -34,25 +34,11 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	@Override
 	protected Void doInBackground(){
-		if(processor != null){
-			try{
-				processor.apply(null);
-			}
-			catch(final Exception e){
-				cancel(e);
-			}
+		try{
+			processor.apply(null);
 		}
-		else{
-			//TODO find a way to add steps at runtime
-			prepareProcessing("Reading dictionary file (step 1/2)");
-
-			final List<Pair<Integer, String>> lines = readLines();
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
-			if(outputFile == null)
-				executeReadProcess(lines);
-			else
-				executeWriteProcess(lines);
+		catch(final Exception e){
+			cancel(e);
 		}
 		return null;
 	}
