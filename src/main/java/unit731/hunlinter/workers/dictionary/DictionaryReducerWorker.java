@@ -48,10 +48,12 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
+
 			return readLines();
 		};
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+
 			return executeReadProcess(param);
 		};
 		setProcessor(step1.andThen(step2));
