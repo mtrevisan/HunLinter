@@ -422,7 +422,7 @@ public class CFSA2Serializer implements FSASerializer{
 		assert value >= 0: "Can't v-code negative ints.";
 
 		while(value > 0x7F){
-			array[offset ++] = (byte)(0x80 | value & 0x7F);
+			array[offset ++] = (byte)(0x80 | (value & 0x7F));
 			value >>= 7;
 		}
 		array[offset ++] = (byte)value;

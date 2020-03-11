@@ -84,7 +84,6 @@ import java.util.Set;
  *       +-+-+-+-+-+-+-+-+/
  * </pre>
  */
-
 public class CFSA2 extends FSA{
 
 	/** Automaton header version value */
@@ -132,34 +131,27 @@ public class CFSA2 extends FSA{
 
 
 	/** Reads an automaton from a byte stream */
-	CFSA2(InputStream stream) throws IOException{
-		DataInputStream in = new DataInputStream(stream);
+	CFSA2(final InputStream stream) throws IOException{
+		final DataInputStream in = new DataInputStream(stream);
 
-		// Read flags.
-		short flagBits = in.readShort();
+		//read flags
+		final short flagBits = in.readShort();
 		flags = EnumSet.noneOf(FSAFlags.class);
-		for(FSAFlags f : FSAFlags.values()){
-			if(f.isSet(flagBits)){
+		for(final FSAFlags f : FSAFlags.values())
+			if(f.isSet(flagBits))
 				flags.add(f);
-			}
-		}
 
-		if(flagBits != FSAFlags.asShort(flags)){
+		if(flagBits != FSAFlags.asShort(flags))
 			throw new IOException("Unrecognized flags: 0x" + Integer.toHexString(flagBits));
-		}
 
 		this.hasNumbers = flags.contains(FSAFlags.NUMBERS);
 
-		/*
-		 * Read mapping dictionary.
-		 */
-		int labelMappingSize = in.readByte() & 0xFF;
+		//read mapping dictionary
+		final int labelMappingSize = in.readByte() & 0xFF;
 		labelMapping = new byte[labelMappingSize];
 		in.readFully(labelMapping);
 
-		/*
-		 * Read arcs' data.
-		 */
+		//read arcs' data
 		arcs = readRemaining(in);
 	}
 
@@ -176,40 +168,28 @@ public class CFSA2 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int getFirstArc(int node){
-		if(hasNumbers){
-			return skipVInt(node);
-		}
-		else{
-			return node;
-		}
+	public final int getFirstArc(final int node){
+		return (hasNumbers? skipVInt(node): node);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int getNextArc(int arc){
-		if(isArcLast(arc)){
-			return 0;
-		}
-		else{
-			return skipArc(arc);
-		}
+	public final int getNextArc(final int arc){
+		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getArc(int node, byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc)){
-			if(getArcLabel(arc) == label){
+	public int getArc(final int node, final byte label){
+		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
+			if(getArcLabel(arc) == label)
 				return arc;
-			}
-		}
 
-		// An arc labeled with "label" not found.
+		//an arc labeled with "label" not found
 		return 0;
 	}
 
@@ -217,10 +197,12 @@ public class CFSA2 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getEndNode(int arc){
+	public int getEndNode(final int arc){
 		final int nodeOffset = getDestinationNodeOffset(arc);
-		assert nodeOffset != 0: "Can't follow a terminal arc: " + arc;
-		assert nodeOffset < arcs.length: "Node out of bounds.";
+
+		assert nodeOffset != 0 : "Can't follow a terminal arc: " + arc;
+		assert nodeOffset < arcs.length : "Node out of bounds.";
+
 		return nodeOffset;
 	}
 
@@ -228,22 +210,18 @@ public class CFSA2 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public byte getArcLabel(int arc){
-		int index = arcs[arc] & LABEL_INDEX_MASK;
-		if(index > 0){
-			return this.labelMapping[index];
-		}
-		else{
-			return arcs[arc + 1];
-		}
+	public byte getArcLabel(final int arc){
+		final int index = arcs[arc] & LABEL_INDEX_MASK;
+		return (index > 0? labelMapping[index]: arcs[arc + 1]);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getRightLanguageCount(int node){
-		assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
+	public int getRightLanguageCount(final int node){
+		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
+
 		return readVInt(arcs, node);
 	}
 
@@ -251,16 +229,16 @@ public class CFSA2 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isArcFinal(int arc){
-		return (arcs[arc] & BIT_FINAL_ARC) != 0;
+	public boolean isArcFinal(final int arc){
+		return ((arcs[arc] & BIT_FINAL_ARC) != 0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isArcTerminal(int arc){
-		return (0 == getDestinationNodeOffset(arc));
+	public boolean isArcTerminal(final int arc){
+		return (getDestinationNodeOffset(arc) == 0);
 	}
 
 	/**
@@ -270,8 +248,8 @@ public class CFSA2 extends FSA{
 	 * @return Returns true if the argument is the last arc of a node.
 	 * @see #BIT_LAST_ARC
 	 */
-	public boolean isArcLast(int arc){
-		return (arcs[arc] & BIT_LAST_ARC) != 0;
+	public boolean isArcLast(final int arc){
+		return ((arcs[arc] & BIT_LAST_ARC) != 0);
 	}
 
 	/**
@@ -279,8 +257,8 @@ public class CFSA2 extends FSA{
 	 * @return Returns true if {@link #BIT_TARGET_NEXT} is set for this arc.
 	 * @see #BIT_TARGET_NEXT
 	 */
-	public boolean isNextSet(int arc){
-		return (arcs[arc] & BIT_TARGET_NEXT) != 0;
+	public boolean isNextSet(final int arc){
+		return ((arcs[arc] & BIT_TARGET_NEXT) != 0);
 	}
 
 	/**
@@ -295,75 +273,58 @@ public class CFSA2 extends FSA{
 	 */
 	final int getDestinationNodeOffset(int arc){
 		if(isNextSet(arc)){
-			/* Follow until the last arc of this state. */
-			while(!isArcLast(arc)){
+			//follow until the last arc of this state
+			while(!isArcLast(arc))
 				arc = getNextArc(arc);
-			}
 
-			/* And return the byte right after it. */
+			//and return the byte right after it
 			return skipArc(arc);
 		}
-		else{
-			/*
-			 * The destination node address is v-coded. v-code starts either
-			 * at the next byte (label indexed) or after the next byte (label explicit).
-			 */
+		else
+			//the destination node address is v-coded. v-code starts either at the next byte (label indexed)
+			//or after the next byte (label explicit)
 			return readVInt(arcs, arc + ((arcs[arc] & LABEL_INDEX_MASK) == 0? 2: 1));
-		}
 	}
 
-	/**
-	 * Read the arc's layout and skip as many bytes, as needed, to skip it.
-	 */
+	/** Read the arc's layout and skip as many bytes, as needed, to skip it */
 	private int skipArc(int offset){
-		int flag = arcs[offset++];
+		final int flag = arcs[offset ++];
 
-		// Explicit label?
-		if((flag & LABEL_INDEX_MASK) == 0){
-			offset++;
-		}
+		//explicit label?
+		if((flag & LABEL_INDEX_MASK) == 0)
+			offset ++;
 
-		// Explicit goto?
-		if((flag & BIT_TARGET_NEXT) == 0){
+		//explicit goto?
+		if((flag & BIT_TARGET_NEXT) == 0)
 			offset = skipVInt(offset);
-		}
 
 		assert offset < this.arcs.length;
+
 		return offset;
 	}
 
-	/**
-	 * Read a v-int.
-	 */
-	static int readVInt(byte[] array, int offset){
+	/** Read a v-int */
+	static int readVInt(final byte[] array, int offset){
 		byte b = array[offset];
 		int value = b & 0x7F;
-
 		for(int shift = 7; b < 0; shift += 7){
-			b = array[++offset];
+			b = array[++ offset];
 			value |= (b & 0x7F) << shift;
 		}
-
 		return value;
 	}
 
-	/**
-	 * Return the byte-length of a v-coded int.
-	 */
+	/** Return the byte-length of a v-coded int */
 	static int vIntLength(int value){
 		assert value >= 0: "Can't v-code negative ints.";
 
 		int bytes;
-		for(bytes = 1; value >= 0x80; bytes++){
+		for(bytes = 1; value >= 0x80; bytes ++)
 			value >>= 7;
-		}
-
 		return bytes;
 	}
 
-	/**
-	 * Skip a v-int.
-	 */
+	/** Skip a v-int */
 	private int skipVInt(int offset){
 		//do nothing
 		while(arcs[offset ++] < 0){}
