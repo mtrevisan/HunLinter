@@ -94,7 +94,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processData(lineProcessor, lines);
+			executeReadProcess(lineProcessor, lines);
 
 			return null;
 		};

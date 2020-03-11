@@ -2,7 +2,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
@@ -49,14 +48,7 @@ public class WordMuncher{
 		if(dicInclusionTestWorker == null){
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
 
-			try{
-				dicInclusionTestWorker.executeSynchronously();
-			}
-			catch(final Exception e){
-				LOGGER.error(ParserManager.MARKER_APPLICATION, "Cannot read dictionary: {}", e.getMessage());
-
-				LOGGER.error("Cannot read dictionary", e);
-			}
+			dicInclusionTestWorker.executeSynchronously();
 		}
 	}
 

@@ -2,6 +2,8 @@ package unit731.hunlinter.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
@@ -28,17 +31,13 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	protected final WD workerData;
 
-	//write section
-	protected BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor;
-	protected File outputFile;
-
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 	private final TimeWatch watch = TimeWatch.start();
 
-	protected Function<?, ?> processor;
+	private Function<?, ?> processor;
 
 
 	WorkerAbstract(final WD workerData){
@@ -55,16 +54,15 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		return workerData;
 	}
 
-	protected void setWriteDataProcessor(final BiConsumer<BufferedWriter, Pair<Integer, T>> writeDataProcessor,
-			final File outputFile){
-		this.writeDataProcessor = writeDataProcessor;
-		if(writeDataProcessor != null){
-			Objects.requireNonNull(outputFile);
-
-			this.outputFile = outputFile;
+	@Override
+	protected Void doInBackground(){
+		try{
+			processor.apply(null);
 		}
-		else
-			this.outputFile = null;
+		catch(final Exception e){
+			cancel(e);
+		}
+		return null;
 	}
 
 	protected Void prepareProcessing(final String message){
@@ -82,16 +80,16 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
 	}
 
-	public void executeSynchronously() throws Exception{
+	public void executeSynchronously(){
 		doInBackground();
 	}
 
-	protected void processData(final BiConsumer<Integer, T> readDataProcessor, final List<Pair<Integer, T>> entries){
+	protected void executeReadProcess(final BiConsumer<Integer, T> dataProcessor, final List<Pair<Integer, T>> entries){
 		try{
 			final int totalEntries = entries.size();
 			processingIndex.set(0);
 
-			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(readDataProcessor, totalEntries);
+			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 
@@ -102,10 +100,10 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		}
 	}
 
-	private Consumer<Pair<Integer, T>> createInnerProcessor(final BiConsumer<Integer, T> readDataProcessor, final int totalData){
+	private Consumer<Pair<Integer, T>> createInnerProcessor(final BiConsumer<Integer, T> dataProcessor, final int totalData){
 		return data -> {
 			try{
-				readDataProcessor.accept(data.getKey(), data.getValue());
+				dataProcessor.accept(data.getKey(), data.getValue());
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 
@@ -123,6 +121,37 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			}
 		};
 	}
+
+	protected void executeWriteProcess(final BiConsumer<BufferedWriter, Pair<Integer, String>> dataProcessor,
+			final List<Pair<Integer, String>> lines, final File outputFile, final Charset charset){
+		int writtenSoFar = 0;
+		final int totalLines = lines.size();
+		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+			for(final Pair<Integer, String> line : lines){
+				try{
+					writtenSoFar ++;
+
+					dataProcessor.accept(writer, line);
+
+					setProgress(writtenSoFar, totalLines);
+
+					sleepOnPause();
+				}
+				catch(final Exception e){
+					if(!JavaHelper.isInterruptedException(e))
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), line.getKey(), line.getValue());
+
+					throw e;
+				}
+			}
+
+			finalizeProcessing("Successfully processed dictionary file");
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+
 
 	protected void setProgress(final long index, final long total){
 		final int progress = calculateProgress(index, total);

@@ -24,17 +24,6 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		super(workerData);
 	}
 
-	@Override
-	protected Void doInBackground(){
-		try{
-			processor.apply(null);
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
-		return null;
-	}
-
 	protected List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
 		final DictionaryParser dicParser = workerData.getParser();

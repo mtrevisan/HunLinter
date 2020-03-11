@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -60,6 +61,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
+
+		final Charset charset = dicParser.getCharset();
 
 
 		final Set<String> words = new HashSet<>();
@@ -79,7 +82,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 				final File outputInfoFile = new File(filenameNoExtension + ".info");
 				if(!outputInfoFile.exists()){
-					final Charset charset = dicParser.getCharset();
 					final List<String> content = Arrays.asList(
 						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
 						"fsa.dict.encoding=" + charset.name().toLowerCase(),
@@ -98,9 +100,21 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 		};
 
-		setWriteDataProcessor(lineProcessor, outputFile);
 		getWorkerData()
 			.withDataCompletedCallback(completed);
+
+		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/2)");
+			return readLines();
+		};
+		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+
+			executeWriteProcess(lineProcessor, param, outputFile, charset);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 	private void buildFSA(final List<String> words, final String input, final String output) throws Exception{

@@ -57,7 +57,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		final Function<List<Pair<Integer, ThesaurusEntry>>, Void> step2 = entries -> {
 			prepareProcessing("Start processing " + workerData.getWorkerName());
 
-			processData(dataProcessor, entries);
+			executeReadProcess(dataProcessor, entries);
 
 			return null;
 		};

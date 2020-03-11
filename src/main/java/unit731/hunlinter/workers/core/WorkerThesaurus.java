@@ -15,17 +15,6 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 		super(workerData);
 	}
 
-	@Override
-	protected Void doInBackground(){
-		try{
-			processor.apply(null);
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
-		return null;
-	}
-
 	protected List<Pair<Integer, ThesaurusEntry>> readEntries(){
 		final ThesaurusParser theParser = workerData.getParser();
 		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();

@@ -91,14 +91,14 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			setProgress(0);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
 
-			return extractMinimalPairs();
+			return extractMinimalPairs(outputFile);
 		};
 		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
 			setProgress(0);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
 
 			createMinimalPairsFile(outputFile, minimalPairs);
-			sortMinimalPairs();
+			sortMinimalPairs(outputFile);
 
 			setProgress(100);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
@@ -175,7 +175,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		}
 	}
 
-	private Map<String, List<String>> extractMinimalPairs(){
+	private Map<String, List<String>> extractMinimalPairs(final File outputFile){
 		final Charset charset = dicParser.getCharset();
 		int totalPairs = 0;
 		final Map<String, List<String>> minimalPairs = new HashMap<>();
@@ -233,8 +233,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return minimalPairs;
 	}
 
-	private void createMinimalPairsFile(final File minimalPairsFile, final Map<String, List<String>> minimalPairs){
-		try(final BufferedWriter destinationWriter = Files.newBufferedWriter(minimalPairsFile.toPath(), dicParser.getCharset())){
+	private void createMinimalPairsFile(final File file, final Map<String, List<String>> minimalPairs){
+		try(final BufferedWriter destinationWriter = Files.newBufferedWriter(file.toPath(), dicParser.getCharset())){
 			int index = 0;
 			final int size = minimalPairs.size();
 			for(final Map.Entry<String, List<String>> entry : minimalPairs.entrySet()){
@@ -254,7 +254,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		}
 	}
 
-	private void sortMinimalPairs(){
+	private void sortMinimalPairs(final File file){
 		//sort file alphabetically:
 		final ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(dicParser.getCharset())
@@ -263,7 +263,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			.removeDuplicates(true)
 			.build();
 		try{
-			dicParser.getSorter().sort(outputFile, options, outputFile);
+			dicParser.getSorter().sort(file, options, file);
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

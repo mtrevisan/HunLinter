@@ -47,6 +47,8 @@ public class WordlistWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
+		final Charset charset = dicParser.getCharset();
+
 
 		final Set<String> words = new HashSet<>();
 		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
@@ -74,7 +76,7 @@ public class WordlistWorker extends WorkerDictionary{
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES){
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "Write file: {}", outputFile.getAbsolutePath());
 
-				writeProcess(words);
+				writeProcess(outputFile, words);
 			}
 
 			finalizeProcessing("File written: " + outputFile.getAbsolutePath());
@@ -82,7 +84,6 @@ public class WordlistWorker extends WorkerDictionary{
 			WorkerManager.openFileStep(LOGGER).apply(outputFile);
 		};
 
-		setWriteDataProcessor(lineProcessor, outputFile);
 		getWorkerData()
 			.withDataCompletedCallback(completed);
 
@@ -93,14 +94,14 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			executeWriteProcess(param);
+			executeWriteProcess(lineProcessor, param, outputFile, charset);
 
 			return null;
 		};
 		setProcessor(step1.andThen(step2));
 	}
 
-	private void writeProcess(final Set<String> words){
+	private void writeProcess(final File outputFile, final Set<String> words){
 		int writtenSoFar = 0;
 		final int totalLines = words.size();
 		final DictionaryParser dicParser = workerData.getParser();
@@ -130,38 +131,6 @@ public class WordlistWorker extends WorkerDictionary{
 		}
 		catch(final Exception e){
 			cancel(e);
-		}
-	}
-
-	//NOTE: cannot use `processData` because the file must be ordered
-	private void executeWriteProcess(final List<Pair<Integer, String>> entries){
-		int writtenSoFar = 0;
-		final int totalEntries = entries.size();
-		final DictionaryParser dicParser = workerData.getParser();
-		final Charset charset = dicParser.getCharset();
-		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			for(final Pair<Integer, String> entry : entries){
-				try{
-					writtenSoFar ++;
-
-					writeDataProcessor.accept(writer, entry);
-
-					setProgress(writtenSoFar, totalEntries);
-
-					sleepOnPause();
-				}
-				catch(final Exception e){
-					if(!JavaHelper.isInterruptedException(e))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), entry.getKey(), entry.getValue());
-
-					throw e;
-				}
-			}
-
-			finalizeProcessing("Successfully processed dictionary file");
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
 		}
 	}
 
