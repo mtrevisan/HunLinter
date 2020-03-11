@@ -133,4 +133,36 @@ public class WordlistWorker extends WorkerDictionary{
 		}
 	}
 
+	//NOTE: cannot use `processData` because the file must be ordered
+	private void executeWriteProcess(final List<Pair<Integer, String>> entries){
+		int writtenSoFar = 0;
+		final int totalEntries = entries.size();
+		final DictionaryParser dicParser = workerData.getParser();
+		final Charset charset = dicParser.getCharset();
+		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+			for(final Pair<Integer, String> entry : entries){
+				try{
+					writtenSoFar ++;
+
+					writeDataProcessor.accept(writer, entry);
+
+					setProgress(writtenSoFar, totalEntries);
+
+					sleepOnPause();
+				}
+				catch(final Exception e){
+					if(!JavaHelper.isInterruptedException(e))
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), entry.getKey(), entry.getValue());
+
+					throw e;
+				}
+			}
+
+			finalizeProcessing("Successfully processed dictionary file");
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+
 }

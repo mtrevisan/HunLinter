@@ -94,10 +94,10 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	protected void processData(final List<Pair<Integer, T>> entries){
 		try{
-			final int totalData = entries.size();
+			final int totalEntries = entries.size();
 			processingIndex.set(0);
 
-			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(totalData);
+			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(totalEntries);
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 

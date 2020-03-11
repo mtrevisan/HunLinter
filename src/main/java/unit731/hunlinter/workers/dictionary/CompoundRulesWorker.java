@@ -52,7 +52,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			executeReadProcess(param);
+			processData(param);
 
 			return null;
 		};
