@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,35 +27,37 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
-	private final List<Function<?, ?>> steps = new ArrayList<>();
-
 
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
 	}
 
-	//NOTE: if it's the first step, then its input must be Void, otherwise must be the output of the previous step
-	public <I> void addStep(final Function<I, ?> stepFunction){
-		steps.add(stepFunction);
-	}
-
 	@Override
 	protected Void doInBackground(){
-		//TODO find a way to add steps at runtime
-		prepareProcessing("Reading dictionary file (step 1/2)");
+		if(processor != null){
+			try{
+				processor.apply(null);
+			}
+			catch(final Exception e){
+				cancel(e);
+			}
+		}
+		else{
+			//TODO find a way to add steps at runtime
+			prepareProcessing("Reading dictionary file (step 1/2)");
 
-		final List<Pair<Integer, String>> lines = readLines();
+			final List<Pair<Integer, String>> lines = readLines();
 
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
-		if(outputFile == null)
-			executeReadProcess(lines);
-		else
-			executeWriteProcess(lines);
-
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+			if(outputFile == null)
+				executeReadProcess(lines);
+			else
+				executeWriteProcess(lines);
+		}
 		return null;
 	}
 
-	private List<Pair<Integer, String>> readLines(){
+	protected List<Pair<Integer, String>> readLines(){
 		final List<Pair<Integer, String>> lines = new ArrayList<>();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Path dicPath = dicParser.getDicFile().toPath();
@@ -88,12 +89,13 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		return lines;
 	}
 
-	private void executeReadProcess(final List<Pair<Integer, String>> lines){
+	protected Void executeReadProcess(final List<Pair<Integer, String>> lines){
 		processData(lines);
+		return null;
 	}
 
 	//NOTE: cannot use `processData` because the file must be ordered
-	private void executeWriteProcess(final List<Pair<Integer, String>> lines){
+	protected Void executeWriteProcess(final List<Pair<Integer, String>> lines){
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		final DictionaryParser dicParser = workerData.getParser();
@@ -123,6 +125,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		catch(final Exception e){
 			cancel(e);
 		}
+		return null;
 	}
 
 }

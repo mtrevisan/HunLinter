@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +80,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
-	private final File outputFile;
 
 	private final Comparator<String> comparator;
 	private final BloomFilterParameters dictionaryBaseData;
@@ -97,42 +97,36 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
-		this.outputFile = outputFile;
 
 		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-	}
 
-	@Override
-	protected Void doInBackground(){
-		try{
+		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
-			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
-
-			final List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
-
-			writeDuplicates(duplicates);
+			return collectDuplicates();
+		};
+		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = this::extractDuplicates;
+		final Function<List<Duplicate>, File> step3 = duplicates -> {
+			writeDuplicates(outputFile, duplicates);
 
 			finalizeProcessing("Duplicates extracted successfully");
-
-			if(!duplicates.isEmpty()){
-				try{
-					FileHelper.openFileWithChosenEditor(outputFile);
-				}
-				catch(final IOException | InterruptedException e){
-					LOGGER.warn("Exception while opening the resulting file", e);
-				}
+			return outputFile;
+		};
+		final Function<File, Void> step4 = file -> {
+			try{
+				FileHelper.openFileWithChosenEditor(file);
 			}
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
+			catch(final IOException | InterruptedException e){
+				LOGGER.warn("Exception while opening the resulting file", e);
+			}
 
-		return null;
+			return null;
+		};
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private BloomFilterInterface<String> collectDuplicates() throws IOException, InterruptedException{
+	private BloomFilterInterface<String> collectDuplicates(){
 		final Charset charset = dicParser.getCharset();
 		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
@@ -174,23 +168,26 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 
 			bloomFilter.close();
+			bloomFilter.clear();
 			duplicatesBloomFilter.close();
+
+			setProgress(100);
+
+			final int totalProductions = bloomFilter.getAddedElements();
+			final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+			final int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
+
+			return duplicatesBloomFilter;
 		}
-		bloomFilter.clear();
-
-		setProgress(100);
-
-		final int totalProductions = bloomFilter.getAddedElements();
-		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-		final int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
-			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
-
-		return duplicatesBloomFilter;
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
-	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter) throws IOException, InterruptedException{
+	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
 		final List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
@@ -231,6 +228,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 					sleepOnPause();
 				}
 			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
 			setProgress(100);
 
 			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
@@ -249,7 +249,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result;
 	}
 
-	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException, InterruptedException{
+	private void writeDuplicates(final File duplicatesFile, final List<Duplicate> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
@@ -257,7 +257,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress(1, totalSize + 1);
-			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
+			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
 					final String origin = prod.getWord() + prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
@@ -277,9 +277,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 					sleepOnPause();
 				}
 			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
 			setProgress(100);
 
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());
 		}
 	}
 

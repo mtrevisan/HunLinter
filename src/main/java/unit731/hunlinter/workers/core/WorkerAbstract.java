@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
@@ -39,11 +40,17 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 	private final TimeWatch watch = TimeWatch.start();
 
+	protected Function<?, ?> processor;
+
 
 	WorkerAbstract(final WD workerData){
 		Objects.requireNonNull(workerData);
 
 		this.workerData = workerData;
+	}
+
+	public final void setProcessor(final Function<?, ?> processor){
+		this.processor = processor;
 	}
 
 	public final WorkerData<WD> getWorkerData(){
@@ -66,11 +73,12 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			this.outputFile = null;
 	}
 
-	protected void prepareProcessing(final String message){
+	protected Void prepareProcessing(final String message){
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
 		watch.reset();
+		return null;
 	}
 
 	protected void finalizeProcessing(final String message){

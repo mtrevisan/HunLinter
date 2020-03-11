@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -62,6 +65,18 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 		getWorkerData()
 			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
+
+		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/2)");
+
+			return readLines();
+		};
+		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+
+			return executeReadProcess(param);
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 	public boolean isInDictionary(final String word){

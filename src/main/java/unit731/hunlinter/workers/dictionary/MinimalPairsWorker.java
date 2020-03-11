@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -51,7 +52,6 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private final DictionaryCorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
-	private final File outputFile;
 	private final Comparator<String> comparator;
 
 
@@ -71,32 +71,33 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		this.dicParser = dicParser;
 		this.checker = checker;
 		this.wordGenerator = wordGenerator;
-		this.outputFile = outputFile;
 
 		comparator = BaseBuilder.getComparator(language);
-	}
 
-	@Override
-	protected Void doInBackground(){
-		try{
+		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
-			createSupportFile();
+			createSupportFile(outputFile);
+
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
 
-			sortSupportFile();
+			sortSupportFile(outputFile);
+
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file sorted");
 
-
+			return outputFile;
+		};
+		final Function<File, Map<String, List<String>>> step2 = supportFile -> {
 			setProgress(0);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
-			final Map<String, List<String>> minimalPairs = extractMinimalPairs();
 
-
+			return extractMinimalPairs();
+		};
+		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
 			setProgress(0);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
 
-			createMinimalPairsFile(minimalPairs);
+			createMinimalPairsFile(outputFile, minimalPairs);
 			sortMinimalPairs();
 
 			setProgress(100);
@@ -104,28 +105,29 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 			finalizeProcessing("Minimal pairs extracted successfully");
 
+			return outputFile;
+		};
+		final Function<File, Void> step4 = file -> {
 			try{
-				FileHelper.openFileWithChosenEditor(outputFile);
+				FileHelper.openFileWithChosenEditor(file);
 			}
 			catch(final IOException | InterruptedException e){
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
-		}
-		catch(final Exception e){
-			cancel(e);
-		}
 
-		return null;
+			return null;
+		};
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private void createSupportFile() throws IOException, InterruptedException{
+	private void createSupportFile(final File supportFile){
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
 		int currentLine = 0;
 		final int totalLines = FileHelper.countLines(dicFile.toPath());
 		try(
 				final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset);
-				final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+				final BufferedWriter writer = Files.newBufferedWriter(supportFile.toPath(), charset);
 				){
 			String line = ParserHelper.extractLine(br);
 			currentLine ++;
@@ -161,9 +163,12 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				sleepOnPause();
 			}
 		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void sortSupportFile() throws IOException{
+	private void sortSupportFile(final File supportFile){
 		//sort file by length first and by alphabet after:
 		final ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(dicParser.getCharset())
@@ -171,10 +176,15 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			.useZip(true)
 			.removeDuplicates(true)
 			.build();
-		dicParser.getSorter().sort(outputFile, options, outputFile);
+		try{
+			dicParser.getSorter().sort(supportFile, options, supportFile);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
-	private Map<String, List<String>> extractMinimalPairs() throws IOException{
+	private Map<String, List<String>> extractMinimalPairs(){
 		final Charset charset = dicParser.getCharset();
 		int totalPairs = 0;
 		final Map<String, List<String>> minimalPairs = new HashMap<>();
@@ -223,13 +233,17 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				setProgress(readSoFarSource, totalSizeSource);
 			}
+
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 		}
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 		return minimalPairs;
 	}
 
-	private void createMinimalPairsFile(Map<String, List<String>> minimalPairs) throws IOException, InterruptedException{
-		try(final BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
+	private void createMinimalPairsFile(final File minimalPairsFile, final Map<String, List<String>> minimalPairs){
+		try(final BufferedWriter destinationWriter = Files.newBufferedWriter(minimalPairsFile.toPath(), dicParser.getCharset())){
 			int index = 0;
 			final int size = minimalPairs.size();
 			for(final Map.Entry<String, List<String>> entry : minimalPairs.entrySet()){
@@ -244,9 +258,12 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				sleepOnPause();
 			}
 		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void sortMinimalPairs() throws IOException{
+	private void sortMinimalPairs(){
 		//sort file alphabetically:
 		final ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(dicParser.getCharset())
@@ -254,7 +271,12 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			.useZip(true)
 			.removeDuplicates(true)
 			.build();
-		dicParser.getSorter().sort(outputFile, options, outputFile);
+		try{
+			dicParser.getSorter().sort(outputFile, options, outputFile);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
 }
