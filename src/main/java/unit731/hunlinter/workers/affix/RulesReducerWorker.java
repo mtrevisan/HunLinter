@@ -96,6 +96,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 			executeReadProcess(lineProcessor, lines);
 
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+
 			return null;
 		};
 		setProcessor(step1.andThen(step2));

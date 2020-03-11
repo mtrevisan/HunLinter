@@ -59,6 +59,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			executeReadProcess(dataProcessor, entries);
 
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+
 			return null;
 		};
 		setProcessor(step1.andThen(step2));

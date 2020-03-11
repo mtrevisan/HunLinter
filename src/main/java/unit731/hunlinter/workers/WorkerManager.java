@@ -291,4 +291,17 @@ public class WorkerManager{
 		};
 	}
 
+	public static Function<File, Void> openFolderStep(final Logger logger){
+		return file -> {
+			try{
+				FileHelper.browse(file);
+			}
+			catch(final IOException | InterruptedException e){
+				logger.warn("Exception while opening folder {}", file.getParent(), e);
+			}
+
+			return null;
+		};
+	}
+
 }

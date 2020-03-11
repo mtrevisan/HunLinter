@@ -84,6 +84,42 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 
+	protected void executeReadProcessNoIndex(final Consumer<T> dataProcessor, final List<T> entries){
+		try{
+			final int totalEntries = entries.size();
+			processingIndex.set(0);
+
+			final Consumer<T> innerProcessor = createInnerProcessorNoIndex(dataProcessor, totalEntries);
+			final Stream<T> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
+			stream.forEach(innerProcessor);
+		}
+		catch(final Exception e){
+			cancel(e);
+		}
+	}
+
+	private Consumer<T> createInnerProcessorNoIndex(final Consumer<T> dataProcessor, final int totalData){
+		return data -> {
+			try{
+				dataProcessor.accept(data);
+
+				setProgress(processingIndex.incrementAndGet(), totalData);
+
+				sleepOnPause();
+			}
+			catch(final Exception e){
+				if(!JavaHelper.isInterruptedException(e)){
+					final String errorMessage = ExceptionHelper.getMessage(e);
+					LOGGER.trace("{}: {}", errorMessage, data);
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}: {}", e.getMessage(), data);
+				}
+
+				if(workerData.isRelaunchException())
+					throw new RuntimeException(e);
+			}
+		};
+	}
+
 	protected void executeReadProcess(final BiConsumer<Integer, T> dataProcessor, final List<Pair<Integer, T>> entries){
 		try{
 			final int totalEntries = entries.size();
@@ -92,8 +128,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
-
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 		}
 		catch(final Exception e){
 			cancel(e);
