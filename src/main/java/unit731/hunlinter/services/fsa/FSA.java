@@ -123,7 +123,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 */
 	public Iterable<ByteBuffer> getSequences(final int node){
 		if(node == 0)
-			return Collections.<ByteBuffer>emptyList();
+			return Collections.emptyList();
 
 		return () -> new ByteSequenceIterator(FSA.this, node);
 	}
@@ -244,7 +244,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * them as a byte array.
 	 * @throws IOException Rethrown if an I/O exception occurs.
 	 */
-	protected static final byte[] readRemaining(final InputStream in) throws IOException{
+	protected static byte[] readRemaining(final InputStream in) throws IOException{
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final byte[] buffer = new byte[1024 * 8];
 		int len;

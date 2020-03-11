@@ -221,8 +221,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		//if validating, try to scan the input
 		final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
+		//noinspection StatementWithEmptyBody
 		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){
-			// Do nothing, just scan and make sure no exceptions are thrown.
+			//do nothing, just scan and make sure no exceptions are thrown.
 		}
 	}
 

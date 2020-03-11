@@ -210,6 +210,7 @@ public class WordData implements Cloneable{
 	 * this object. The content of all internal buffers is copied.
 	 */
 	@Override
+	@SuppressWarnings("MethodDoesntCallSuperMethod")
 	public WordData clone(){
 		final WordData clone = new WordData(this.decoder);
 		clone.wordCharSequence = cloneCharSequence(wordCharSequence);

@@ -21,6 +21,7 @@ public class MatchResult{
 	 * you have to check for both {@link #NO_MATCH} and
 	 * {@link #AUTOMATON_HAS_PREFIX}.
 	 */
+	@SuppressWarnings("JavaDoc")
 	public static final int NO_MATCH = -1;
 
 	/**

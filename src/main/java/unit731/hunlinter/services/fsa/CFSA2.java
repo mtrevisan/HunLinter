@@ -111,6 +111,9 @@ public class CFSA2 extends FSA{
 	/** Maximum size of the labels index */
 	public static final int LABEL_INDEX_SIZE = (1 << LABEL_INDEX_BITS) - 1;
 
+	/** Epsilon node's offset */
+	private static final int EPSILON = 0;
+
 	/**
 	 * An array of bytes with the internal representation of the automaton.
 	 * Please see the documentation of this class for more information on how
@@ -127,8 +130,6 @@ public class CFSA2 extends FSA{
 	/** If <code>true</code> states are prepended with numbers */
 	private final boolean hasNumbers;
 
-	/** Epsilon node's offset */
-	private final int epsilon = 0;
 
 	/** Reads an automaton from a byte stream */
 	CFSA2(InputStream stream) throws IOException{
@@ -167,8 +168,8 @@ public class CFSA2 extends FSA{
 	 */
 	@Override
 	public int getRootNode(){
-		// Skip dummy node marking terminating state.
-		return getDestinationNodeOffset(getFirstArc(epsilon));
+		//skip dummy node marking terminating state
+		return getDestinationNodeOffset(getFirstArc(EPSILON));
 	}
 
 	/**
@@ -364,9 +365,8 @@ public class CFSA2 extends FSA{
 	 * Skip a v-int.
 	 */
 	private int skipVInt(int offset){
-		while(arcs[offset++] < 0){
-			// Do nothing.
-		}
+		//do nothing
+		while(arcs[offset ++] < 0){}
 		return offset;
 	}
 

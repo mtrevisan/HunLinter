@@ -58,7 +58,7 @@ public class WordlistWorker extends WorkerDictionary{
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES)
 				productions.stream()
-					.map(toString::apply)
+					.map(toString)
 					.forEach(words::add);
 			else{
 				try{

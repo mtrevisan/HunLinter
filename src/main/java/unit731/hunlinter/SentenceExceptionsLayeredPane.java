@@ -6,25 +6,20 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
 

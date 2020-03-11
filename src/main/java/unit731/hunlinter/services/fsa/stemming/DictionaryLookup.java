@@ -110,16 +110,15 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
 		this.dictionary = dictionary;
-		this.dictionaryMetadata = dictionary.metadata;
-		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
-		this.rootNode = dictionary.fsa.getRootNode();
-		this.fsa = dictionary.fsa;
-		this.matcher = new FSATraversal(fsa);
-		this.finalStatesIterator = new ByteSequenceIterator(fsa, fsa.getRootNode());
+		dictionaryMetadata = dictionary.metadata;
+		sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
+		rootNode = dictionary.fsa.getRootNode();
+		fsa = dictionary.fsa;
+		matcher = new FSATraversal(fsa);
+		finalStatesIterator = new ByteSequenceIterator(fsa, fsa.getRootNode());
 
-		if(dictionaryMetadata == null){
+		if(dictionaryMetadata == null)
 			throw new IllegalArgumentException("Dictionary metadata must not be null.");
-		}
 
 		decoder = dictionary.metadata.getDecoder();
 		encoder = dictionary.metadata.getEncoder();

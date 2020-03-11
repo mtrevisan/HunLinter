@@ -291,7 +291,7 @@ public class FSA5 extends FSA{
 	/**
 	 * Returns an n-byte integer encoded in byte-packed representation.
 	 */
-	static final int decodeFromBytes(final byte[] arcs, final int start, final int n){
+	static int decodeFromBytes(final byte[] arcs, final int start, final int n){
 		int r = 0;
 		for(int i = n; --i >= 0; ){
 			r = r << 8 | (arcs[start + i] & 0xFF);

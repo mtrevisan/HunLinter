@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;

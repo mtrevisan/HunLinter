@@ -103,7 +103,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	}
 
 	/** Advances to the next available final state. */
-	private final ByteBuffer advance(){
+	private ByteBuffer advance(){
 		if(position == 0)
 			return null;
 
