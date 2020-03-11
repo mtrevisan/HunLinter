@@ -89,6 +89,7 @@ public class FSABuilder{
 
 	/**
 	 * Build a minimal, deterministic automaton from an iterable list of byte sequences.
+	 * NOTE: The input must be lexicographically greater than any previously added sequence!
 	 *
 	 * @param input	Input sequences to build automaton from.
 	 * @return	The automaton encoding of all input sequences.
