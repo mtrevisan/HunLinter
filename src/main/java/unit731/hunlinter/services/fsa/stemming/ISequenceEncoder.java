@@ -42,6 +42,7 @@ public interface ISequenceEncoder{
 	 * An ugly workaround for GH-85, should be fixed by prior knowledge of whether the dictionary contains tags;
 	 * then we can scan for separator right-to-left.
 	 *
+	 * @return	The number of bytes
 	 * @see "https://github.com/morfologik/morfologik-stemming/issues/85"
 	 */
 	@Deprecated

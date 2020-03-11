@@ -112,11 +112,11 @@ public class BufferUtils{
 		return sharedPrefixLength(a, 0, b, 0);
 	}
 
-	/**
+	/*
 	 * Convert byte buffer's content into characters. The input buffer's bytes are not
 	 * consumed (mark is set and reset).
 	 */
-	public static CharBuffer bytesToChars(CharsetDecoder decoder, ByteBuffer bytes, CharBuffer chars){
+	public static CharBuffer bytesToChars(final CharsetDecoder decoder, final ByteBuffer bytes, CharBuffer chars){
 		assert decoder.malformedInputAction() == CodingErrorAction.REPORT;
 
 		chars = clearAndEnsureCapacity(chars, (int) (bytes.remaining() * decoder.maxCharsPerByte()));
@@ -143,10 +143,10 @@ public class BufferUtils{
 		return chars;
 	}
 
-	/**
+	/*
 	 * Convert chars into bytes.
 	 */
-	public static ByteBuffer charsToBytes(CharsetEncoder encoder, CharBuffer chars, ByteBuffer bytes){
+	public static ByteBuffer charsToBytes(final CharsetEncoder encoder, final CharBuffer chars, ByteBuffer bytes){
 		assert encoder.malformedInputAction() == CodingErrorAction.REPORT;
 
 		bytes = clearAndEnsureCapacity(bytes, (int) (chars.remaining() * encoder.maxBytesPerChar()));

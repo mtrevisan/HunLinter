@@ -102,6 +102,8 @@ public class FSABuilder{
 	/**
 	 * Add a single string to the FSA.
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
+	 *
+	 * @param sequence	The string to be added.
 	 */
 	public final void add(final String sequence){
 		add(sequence.getBytes(StandardCharsets.UTF_8));
@@ -151,7 +153,11 @@ public class FSABuilder{
 		activePathLen = len;
 	}
 
-	/** Finalizes the construction of the automaton and returns it */
+	/**
+	 * Finalizes the construction of the automaton and returns it
+	 *
+	 * @return	The {@link FSA} just constructed
+	 */
 	public final FSA complete(){
 		add(new byte[0]);
 
