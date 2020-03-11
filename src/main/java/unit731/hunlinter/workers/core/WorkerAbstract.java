@@ -18,7 +18,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
