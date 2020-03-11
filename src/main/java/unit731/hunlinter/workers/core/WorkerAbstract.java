@@ -83,6 +83,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		doInBackground();
 	}
 
+
 	protected void executeReadProcess(final BiConsumer<Integer, T> dataProcessor, final List<Pair<Integer, T>> entries){
 		try{
 			final int totalEntries = entries.size();

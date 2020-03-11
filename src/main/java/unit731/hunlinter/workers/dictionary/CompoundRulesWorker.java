@@ -36,7 +36,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
-			for(Production production : productions)
+			for(final Production production : productions)
 				productionReader.accept(production, row);
 		};
 
