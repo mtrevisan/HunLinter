@@ -89,8 +89,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //			}
 //		};
 //
-//		getWorkerData()
+		getWorkerData()
 //			.withDataCompletedCallback(completed);
+			.withRelaunchException(true);
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");

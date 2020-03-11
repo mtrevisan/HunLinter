@@ -94,7 +94,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			stream.forEach(innerProcessor);
 		}
 		catch(final Exception e){
-			cancel(e);
+			throw new RuntimeException(e);
 		}
 	}
 
