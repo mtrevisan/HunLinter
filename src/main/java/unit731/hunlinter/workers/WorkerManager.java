@@ -1,10 +1,12 @@
 package unit731.hunlinter.workers;
 
+import org.slf4j.Logger;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.workers.dictionary.CompoundRulesWorker;
@@ -22,6 +24,7 @@ import unit731.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -132,7 +136,7 @@ public class WorkerManager{
 		if(worker == null || worker.isDone()){
 			final Integer selectedRow = preStart.get();
 			if(selectedRow != null){
-				worker = new SorterWorker(parserManager, selectedRow);
+				worker = new SorterWorker(packager, parserManager, selectedRow);
 				WORKERS.put(workerName, worker);
 				ON_ENDS.put(workerName, onEnd);
 
@@ -272,6 +276,19 @@ public class WorkerManager{
 
 			onStart.accept(worker);
 		}
+	}
+
+	public static Function<File, Void> openFileStep(final Logger logger){
+		return file -> {
+			try{
+				FileHelper.openFileWithChosenEditor(file);
+			}
+			catch(final IOException | InterruptedException e){
+				logger.warn("Exception while opening file {}", file.getName(), e);
+			}
+
+			return null;
+		};
 	}
 
 }

@@ -7,11 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -389,15 +386,6 @@ public class ParserManager implements FileChangeListener{
 		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
-	}
-
-	public void mergeSectionsToDictionary(final List<File> files) throws IOException{
-		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
-		for(File file : files){
-			Files.write(packager.getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
-
-			option = StandardOpenOption.APPEND;
-		}
 	}
 
 	public boolean hasHyphenationRule(final String addedRule, final HyphenationParser.Level level){

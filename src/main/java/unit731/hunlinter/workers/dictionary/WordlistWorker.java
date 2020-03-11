@@ -24,10 +24,10 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.FileHelper;
 
 
 public class WordlistWorker extends WorkerDictionary{
@@ -77,14 +77,9 @@ public class WordlistWorker extends WorkerDictionary{
 				writeProcess(words);
 			}
 
-			try{
-				finalizeProcessing("File written: " + outputFile.getAbsolutePath());
+			finalizeProcessing("File written: " + outputFile.getAbsolutePath());
 
-				FileHelper.openFileWithChosenEditor(outputFile);
-			}
-			catch(final IOException | InterruptedException e){
-				LOGGER.warn("Exception while opening the resulting file", e);
-			}
+			WorkerManager.openFileStep(LOGGER).apply(outputFile);
 		};
 
 		setWriteDataProcessor(lineProcessor, outputFile);

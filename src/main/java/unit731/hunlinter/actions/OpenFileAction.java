@@ -52,7 +52,7 @@ public class OpenFileAction extends AbstractAction{
 			FileHelper.openFileWithChosenEditor(file);
 		}
 		catch(final IOException | InterruptedException e){
-			LOGGER.warn("Exception while opening sentence exceptions file", e);
+			LOGGER.warn("Exception while opening file", e);
 		}
 	}
 

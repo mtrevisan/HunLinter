@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.dictionary;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,6 +30,7 @@ import unit731.hunlinter.parsers.dictionary.Duplicate;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -113,16 +113,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			finalizeProcessing("Duplicates extracted successfully");
 			return outputFile;
 		};
-		final Function<File, Void> step4 = file -> {
-			try{
-				FileHelper.openFileWithChosenEditor(file);
-			}
-			catch(final IOException | InterruptedException e){
-				LOGGER.warn("Exception while opening the resulting file", e);
-			}
-
-			return null;
-		};
+		final Function<File, Void> step4 = WorkerManager.openFileStep(LOGGER);
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
