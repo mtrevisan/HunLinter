@@ -7,12 +7,12 @@ import unit731.hunlinter.services.fsa.FSAFlags;
 import unit731.hunlinter.services.fsa.FSATestUtils;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.serializers.FSASerializer;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +31,7 @@ public class SerializerTestBase{
 		List<String> input = Collections.singletonList("a");
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -45,7 +45,7 @@ public class SerializerTestBase{
 		List<String> input = Arrays.asList("acf", "adg", "aeh", "bdg", "beh");
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -59,7 +59,7 @@ public class SerializerTestBase{
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -73,7 +73,7 @@ public class SerializerTestBase{
 		List<String> input = Arrays.asList("aba", "b", "ba");
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -95,7 +95,7 @@ public class SerializerTestBase{
 	private void checkCorrect(List<String> input) throws IOException{
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -170,7 +170,7 @@ public class SerializerTestBase{
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
 		List<byte[]> in = input.stream()
 			.sorted()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();

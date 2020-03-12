@@ -1,5 +1,6 @@
 package unit731.hunlinter.services.text;
 
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -163,6 +164,10 @@ public class StringHelper{
 		);
 	}
 
+
+	public static byte[] getRawBytes(final String text){
+		return text.getBytes(StandardCharsets.UTF_8);
+	}
 
 	/**
 	 * Converts an array of bytes into a string representing the hexadecimal values of each byte in order

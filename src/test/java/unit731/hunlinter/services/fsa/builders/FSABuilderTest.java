@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSATestUtils;
+import unit731.hunlinter.services.text.StringHelper;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +30,7 @@ class FSABuilderTest{
 	void testHashResizeBug(){
 		List<String> input = Arrays.asList("01", "02", "11", "21");
 		List<byte[]> in = input.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
@@ -44,7 +44,7 @@ class FSABuilderTest{
 	void testSmallInput(){
 		List<String> input = Arrays.asList("abc", "bbc", "d");
 		List<byte[]> in = input.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,35 +22,35 @@ class FSATraversalTest{
 	void testAutomatonHasPrefixBug(){
 		List<String> words = Arrays.asList("a", "ab", "abc", "ad", "bcd", "bce");
 		List<byte[]> input = words.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 		FSABuilder builder = new FSABuilder();
 		FSA fsa = builder.build(input);
 
 		FSATraversal fsaTraversal = new FSATraversal(fsa);
-		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("a".getBytes(StandardCharsets.UTF_8)).kind);
-		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("ab".getBytes(StandardCharsets.UTF_8)).kind);
-		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("abc".getBytes(StandardCharsets.UTF_8)).kind);
-		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match("ad".getBytes(StandardCharsets.UTF_8)).kind);
+		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match(StringHelper.getRawBytes("a")).kind);
+		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match(StringHelper.getRawBytes("ab")).kind);
+		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match(StringHelper.getRawBytes("abc")).kind);
+		Assertions.assertEquals(MatchResult.EXACT_MATCH, fsaTraversal.match(StringHelper.getRawBytes("ad")).kind);
 
-		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, fsaTraversal.match("b".getBytes(StandardCharsets.UTF_8)).kind);
-		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, fsaTraversal.match("bc".getBytes(StandardCharsets.UTF_8)).kind);
+		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, fsaTraversal.match(StringHelper.getRawBytes("b")).kind);
+		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, fsaTraversal.match(StringHelper.getRawBytes("bc")).kind);
 
 		MatchResult m;
 
-		m = fsaTraversal.match("abcd".getBytes(StandardCharsets.UTF_8));
+		m = fsaTraversal.match(StringHelper.getRawBytes("abcd"));
 		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals(3, m.index);
 
-		m = fsaTraversal.match("ade".getBytes(StandardCharsets.UTF_8));
+		m = fsaTraversal.match(StringHelper.getRawBytes("ade"));
 		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals(2, m.index);
 
-		m = fsaTraversal.match("ax".getBytes(StandardCharsets.UTF_8));
+		m = fsaTraversal.match(StringHelper.getRawBytes("ax"));
 		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals(1, m.index);
 
-		Assertions.assertEquals(MatchResult.NO_MATCH, fsaTraversal.match("d".getBytes(StandardCharsets.UTF_8)).kind);
+		Assertions.assertEquals(MatchResult.NO_MATCH, fsaTraversal.match(StringHelper.getRawBytes("d")).kind);
 	}
 
 	@Test
@@ -97,18 +98,18 @@ class FSATraversalTest{
 		final FSA fsa = FSA.read(FSATraversalTest.class.getResourceAsStream("/services/fsa/stemming/abc.fsa"));
 		final FSATraversal traversalHelper = new FSATraversal(fsa);
 
-		MatchResult m = traversalHelper.match("ax".getBytes());
+		MatchResult m = traversalHelper.match(StringHelper.getRawBytes("ax"));
 		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals(1, m.index);
 		Assertions.assertEquals(new HashSet<>(Arrays.asList("ba", "c")), suffixes(fsa, m.node));
 
-		Assertions.assertEquals(MatchResult.EXACT_MATCH, traversalHelper.match("aba".getBytes()).kind);
+		Assertions.assertEquals(MatchResult.EXACT_MATCH, traversalHelper.match(StringHelper.getRawBytes("aba")).kind);
 
-		m = traversalHelper.match("abalonger".getBytes());
+		m = traversalHelper.match(StringHelper.getRawBytes("abalonger"));
 		Assertions.assertEquals(MatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals("longer", "abalonger".substring(m.index));
 
-		m = traversalHelper.match("ab".getBytes());
+		m = traversalHelper.match(StringHelper.getRawBytes("ab"));
 		Assertions.assertEquals(MatchResult.SEQUENCE_IS_A_PREFIX, m.kind);
 		Assertions.assertEquals(new HashSet<>(Arrays.asList("a")), suffixes(fsa, m.node));
 	}

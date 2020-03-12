@@ -6,13 +6,13 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.FSATestUtils;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,7 +62,7 @@ class CFSA2SerializerTest{
 		input.sort(Comparator.naturalOrder());
 
 		List<byte[]> in = input.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(word -> StringHelper.getRawBytes(word))
 			.collect(Collectors.toList());
 		FSABuilder builder = new FSABuilder();
 		FSA fsa = builder.build(in);
@@ -131,7 +131,7 @@ class CFSA2SerializerTest{
 		input.sort(Comparator.naturalOrder());
 
 		List<byte[]> in = input.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 		FSABuilder builder = new FSABuilder();
 		FSA fsa1 = builder.build(in);

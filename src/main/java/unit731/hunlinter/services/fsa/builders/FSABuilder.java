@@ -2,7 +2,6 @@ package unit731.hunlinter.services.fsa.builders;
 
 import unit731.hunlinter.services.fsa.FSA;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -89,7 +88,7 @@ public class FSABuilder{
 
 	/**
 	 * Build a minimal, deterministic automaton from an iterable list of byte sequences.
-	 * NOTE: The input must be lexicographically greater than any previously added sequence!
+	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence!
 	 *
 	 * @param input	Input sequences to build automaton from.
 	 * @return	The automaton encoding of all input sequences.
@@ -98,16 +97,6 @@ public class FSABuilder{
 		for(final byte[] chs : input)
 			add(chs);
 		return complete();
-	}
-
-	/**
-	 * Add a single string to the FSA.
-	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
-	 *
-	 * @param sequence	The string to be added.
-	 */
-	public final void add(final String sequence){
-		add(sequence.getBytes(StandardCharsets.UTF_8));
 	}
 
 	/**
@@ -279,7 +268,8 @@ public class FSABuilder{
 
 	/** Return <code>true</code> if two regions in {@link #serialized} are identical */
 	private boolean equivalent(int start1, int start2, int len){
-		if(Math.max(start1, start2) + len > size)
+//		if(Math.max(start1, start2) + len > size)
+		if(start1 + len > size || start2 + len > size)
 			return false;
 
 		while(len -- > 0)

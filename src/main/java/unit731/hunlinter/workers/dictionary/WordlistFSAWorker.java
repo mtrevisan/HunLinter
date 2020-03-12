@@ -11,6 +11,7 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -19,7 +20,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {
-			final byte[] chs = word.getBytes(StandardCharsets.UTF_8);
+			final byte[] chs = StringHelper.getRawBytes(word);
 			builder.add(chs);
 		};
 //		final Runnable completed = () -> {
@@ -131,7 +131,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return outputFile;
 		};
 		final Function<File, Void> step5 = file -> {
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ", file written: " + file.getAbsolutePath());
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 

@@ -74,7 +74,7 @@ public class WordData implements Cloneable{
 	/**
 	 * Package scope constructor.
 	 */
-	WordData(CharsetDecoder decoder){
+	WordData(final CharsetDecoder decoder){
 		this.decoder = decoder;
 
 		stemBuffer = ByteBuffer.allocate(0);
@@ -86,15 +86,16 @@ public class WordData implements Cloneable{
 	/**
 	 * A constructor for tests only.
 	 */
-	WordData(String stem, String tag, String encoding){
-		this(Charset.forName(encoding).newDecoder());
+	WordData(final String stem, final String tag, final String charset){
+		this(Charset.forName(charset).newDecoder());
 
 		try{
 			if(stem != null)
-				stemBuffer.put(stem.getBytes(encoding));
+				stemBuffer.put(stem.getBytes(charset));
 			if(tag != null)
-				tagBuffer.put(tag.getBytes(encoding));
-		}catch(UnsupportedEncodingException e){
+				tagBuffer.put(tag.getBytes(charset));
+		}
+		catch(final UnsupportedEncodingException e){
 			throw new RuntimeException(e);
 		}
 	}
@@ -188,7 +189,7 @@ public class WordData implements Cloneable{
 	 *
 	 */
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		throw new UnsupportedOperationException(COLLECTIONS_ERROR_MESSAGE);
 	}
 
@@ -223,13 +224,13 @@ public class WordData implements Cloneable{
 	/**
 	 * Clone char sequences only if not immutable.
 	 */
-	private CharSequence cloneCharSequence(CharSequence chs){
+	private CharSequence cloneCharSequence(final CharSequence chs){
 		if(chs instanceof String)
 			return chs;
 		return chs.toString();
 	}
 
-	void update(ByteBuffer wordBuffer, CharSequence word){
+	void update(final ByteBuffer wordBuffer, final CharSequence word){
 		this.stemCharSequence.clear();
 		this.tagCharSequence.clear();
 		this.stemBuffer.clear();

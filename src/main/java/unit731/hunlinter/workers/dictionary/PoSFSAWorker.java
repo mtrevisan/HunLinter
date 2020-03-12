@@ -1,5 +1,7 @@
 package unit731.hunlinter.workers.dictionary;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
@@ -16,6 +19,7 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -33,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -74,36 +79,36 @@ public class PoSFSAWorker extends WorkerDictionary{
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {
-			final byte[] chs = word.getBytes(StandardCharsets.UTF_8);
+			final byte[] chs = StringHelper.getRawBytes(word);
 			builder.add(chs);
 		};
-//		final Runnable completed = () -> {
-//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
-//
-//			try{
-//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-//				final File outputInfoFile = new File(filenameNoExtension + ".info");
-//				if(!outputInfoFile.exists()){
-//					final List<String> content = Arrays.asList(
-//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
-//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-//						"fsa.dict.encoder=prefix");
-//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-//				}
-//
-//				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
-//
-//				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
-//
-//				FileHelper.browse(outputFile);
-//			}
-//			catch(final Exception e){
-//				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
-//			}
-//		};
+		final Runnable completed = () -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+
+			try{
+				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+				final File outputInfoFile = new File(filenameNoExtension + ".info");
+				if(!outputInfoFile.exists()){
+					final List<String> content = Arrays.asList(
+						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+						"fsa.dict.encoder=prefix");
+					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+				}
+
+				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
+
+				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
+
+				FileHelper.browse(outputFile);
+			}
+			catch(final Exception e){
+				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
+			}
+		};
 
 		getWorkerData()
-//			.withDataCompletedCallback(completed)
+			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
@@ -144,13 +149,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 		};
 		final Function<File, Void> step5 = file -> {
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ", file written: " + file.getAbsolutePath());
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+//		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
 	private void buildFSA(final List<String> words, final String input, final String output) throws Exception{
@@ -182,7 +187,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			Collections.sort(words);
 
 			Iterator<String> i = words.iterator();
-			byte[] row = i.next().getBytes(StandardCharsets.UTF_8);
+			byte[] row = StringHelper.getRawBytes(i.next());
 			final int separatorCount = countOf(separator, row);
 
 			if(separatorCount < 1 || separatorCount > 2){
@@ -192,7 +197,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 
 			while(i.hasNext()){
-				row = i.next().getBytes(StandardCharsets.UTF_8);
+				row = StringHelper.getRawBytes(i.next());
 				final int count = countOf(separator, row);
 				if(count != separatorCount)
 					throw new IllegalArgumentException("The number of separators (" + count + ") is inconsistent with previous lines: " + new String(row, charsetDecoder.charset()));
@@ -205,7 +210,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
 		for(int i = 0, max = words.size(); i < max; i++){
-			final byte[] row = words.get(i).getBytes(StandardCharsets.UTF_8);
+			final byte[] row = StringHelper.getRawBytes(words.get(i));
 			final int sep1 = indexOf(separator, row, 0);
 			int sep2 = indexOf(separator, row, sep1 + 1);
 			if(sep2 < 0)
@@ -245,7 +250,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		//lexical order
 		Collections.sort(words);
 		List<byte[]> in = words.stream()
-			.map(word -> word.getBytes(StandardCharsets.UTF_8))
+			.map(StringHelper::getRawBytes)
 			.collect(Collectors.toList());
 		final FSABuilder builder = new FSABuilder();
 		final FSA fsa = builder.build(in);
