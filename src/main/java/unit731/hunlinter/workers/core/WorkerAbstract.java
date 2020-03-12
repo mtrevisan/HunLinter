@@ -21,6 +21,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
+import unit731.hunlinter.services.text.StringHelper;
 
 
 public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
@@ -106,6 +107,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			try{
 				dataProcessor.accept(data);
 
+System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(JavaHelper.getUsedMemory()));
+
 				setProgress(processingIndex.incrementAndGet(), totalData);
 
 				sleepOnPause();
@@ -144,6 +147,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		return data -> {
 			try{
 				dataProcessor.accept(data.getKey(), data.getValue());
+
+System.out.println("cip: " + StringHelper.byteCountToHumanReadable(JavaHelper.getUsedMemory()));
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 

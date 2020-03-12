@@ -16,6 +16,11 @@ import java.util.stream.Stream;
 
 public class JavaHelper{
 
+	public static long getUsedMemory(){
+		final Runtime runtime =Runtime.getRuntime();
+		return runtime.totalMemory() - runtime.freeMemory();
+	}
+
 	public static boolean isInterruptedException(final Exception exception){
 		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
 		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
