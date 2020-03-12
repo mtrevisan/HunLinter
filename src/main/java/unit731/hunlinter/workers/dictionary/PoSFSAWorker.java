@@ -121,38 +121,38 @@ public class PoSFSAWorker extends WorkerDictionary{
 			executeReadProcess(lineProcessor, lines);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 
-			final Set<String> words2 = new HashSet<>();
-			for(Pair<Integer, String> l : lines){
-				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(l.getValue());
-				final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
-
-				productions.stream()
-					.map(Production::toStringPoSFSA)
-					.flatMap(List::stream)
-					.forEach(words2::add);
-			}
-
-
-			try{
-				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-				final File outputInfoFile = new File(filenameNoExtension + ".info");
-				if(!outputInfoFile.exists()){
-					final List<String> content = Arrays.asList(
-						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
-						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-						"fsa.dict.encoder=prefix");
-					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-				}
-
-				buildFSA(new ArrayList<>(words2), outputFile.toString(), filenameNoExtension + ".dict");
-
-				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
-
-				FileHelper.browse(outputFile);
-			}
-			catch(final Exception e){
-				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
-			}
+//			final Set<String> words2 = new HashSet<>();
+//			for(Pair<Integer, String> l : lines){
+//				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(l.getValue());
+//				final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+//
+//				productions.stream()
+//					.map(Production::toStringPoSFSA)
+//					.flatMap(List::stream)
+//					.forEach(words2::add);
+//			}
+//
+//
+//			try{
+//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+//				final File outputInfoFile = new File(filenameNoExtension + ".info");
+//				if(!outputInfoFile.exists()){
+//					final List<String> content = Arrays.asList(
+//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+//						"fsa.dict.encoder=prefix");
+//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+//				}
+//
+//				buildFSA(new ArrayList<>(words2), outputFile.toString(), filenameNoExtension + ".dict");
+//
+//				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
+//
+//				FileHelper.browse(outputFile);
+//			}
+//			catch(final Exception e){
+//				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
+//			}
 
 			return words;
 		};

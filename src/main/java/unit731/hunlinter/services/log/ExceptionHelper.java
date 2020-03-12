@@ -3,7 +3,6 @@ package unit731.hunlinter.services.log;
 import org.apache.commons.lang3.StringUtils;
 
 
-
 public class ExceptionHelper{
 
 	private ExceptionHelper(){}
@@ -43,14 +42,17 @@ public class ExceptionHelper{
 
 	private static StackTraceElement extractOwnCodeStackTrace(final Throwable t){
 		final StackTraceElement[] stackTrace = t.getStackTrace();
-		StackTraceElement stackTrace0 = (stackTrace.length > 0? stackTrace[0]: null);
-		String classPackage = ExceptionHelper.class.getName();
-		classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
-		for(final StackTraceElement trace : stackTrace)
-			if(trace.getClassName().startsWith(classPackage)){
-				stackTrace0 = trace;
-				break;
-			}
+		StackTraceElement stackTrace0 = null;
+		if(stackTrace.length > 0){
+			stackTrace0 = stackTrace[0];
+			String classPackage = ExceptionHelper.class.getName();
+			classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
+			for(final StackTraceElement trace : stackTrace)
+				if(trace.getClassName().startsWith(classPackage)){
+					stackTrace0 = trace;
+					break;
+				}
+		}
 		return stackTrace0;
 	}
 
