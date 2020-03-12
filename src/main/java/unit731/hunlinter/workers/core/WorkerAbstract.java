@@ -93,6 +93,9 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			final Stream<T> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 		}
+		catch(final RuntimeException e){
+			throw e;
+		}
 		catch(final Exception e){
 			throw new RuntimeException(e);
 		}
@@ -129,8 +132,11 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 		}
+		catch(final RuntimeException e){
+			throw e;
+		}
 		catch(final Exception e){
-			cancel(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -180,6 +186,9 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 			}
 
 			finalizeProcessing("Successfully processed dictionary file");
+		}
+		catch(final RuntimeException e){
+			throw e;
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

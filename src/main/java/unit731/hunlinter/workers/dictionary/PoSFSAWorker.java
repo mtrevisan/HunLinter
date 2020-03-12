@@ -39,11 +39,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -66,7 +64,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 
-		final Set<String> words = new HashSet<>();
+		final List<String> words = new ArrayList<>();
 		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
@@ -115,7 +113,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Set<String>> step2 = lines -> {
+		final Function<List<Pair<Integer, String>>, List<String>> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
 
 			executeReadProcess(lineProcessor, lines);
@@ -156,7 +154,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return words;
 		};
-		final Function<Set<String>, FSA> step3 = uniqueWordsSet -> {
+		final Function<List<String>, FSA> step3 = extractedWords -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
 
 			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
@@ -183,15 +181,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 				throw new RuntimeException(e);
 			}
 
-			List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
 			final byte separator = metadata.getSeparator();
 			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
-			uniqueWords = encode(uniqueWords, separator, sequenceEncoder);
+			extractedWords = encode(extractedWords, separator, sequenceEncoder);
 
 			//lexical order
-			Collections.sort(uniqueWords);
+			Collections.sort(extractedWords);
 
-			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
+			executeReadProcessNoIndex(fsaProcessor, extractedWords);
 
 			return builder.complete();
 		};
