@@ -19,7 +19,6 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -79,8 +78,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<String> fsaProcessor = word -> {
 			final byte[] chs = StringHelper.getRawBytes(word);
 			builder.add(chs);
-
-System.out.println("fp: " + StringHelper.byteCountToHumanReadable(JavaHelper.getUsedMemory()));
 		};
 //		final Runnable completed = () -> {
 //			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
@@ -120,8 +117,11 @@ System.out.println("fp: " + StringHelper.byteCountToHumanReadable(JavaHelper.get
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
 
 			executeReadProcess(lineProcessor, lines);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 
+//			System.gc();
+
+//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+//
 //			final Set<String> words2 = new HashSet<>();
 //			for(Pair<Integer, String> l : lines){
 //				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(l.getValue());

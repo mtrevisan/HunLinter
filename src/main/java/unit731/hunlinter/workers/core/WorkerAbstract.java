@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -103,11 +104,18 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 	private Consumer<T> createInnerProcessorNoIndex(final Consumer<T> dataProcessor, final int totalData){
+final AtomicLong memoryUsage = new AtomicLong(0l);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 
-System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(JavaHelper.getUsedMemory()));
+final long currentMemoryUsage = JavaHelper.getUsedMemory();
+if(currentMemoryUsage > memoryUsage.get()){
+	memoryUsage.set(currentMemoryUsage);
+	System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
+
+	System.gc();
+}//3.9 GiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 
@@ -144,11 +152,18 @@ System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(JavaHelper.
 	}
 
 	private Consumer<Pair<Integer, T>> createInnerProcessor(final BiConsumer<Integer, T> dataProcessor, final int totalData){
+final AtomicLong memoryUsage = new AtomicLong(0l);
 		return data -> {
 			try{
 				dataProcessor.accept(data.getKey(), data.getValue());
 
-System.out.println("cip: " + StringHelper.byteCountToHumanReadable(JavaHelper.getUsedMemory()));
+final long currentMemoryUsage = JavaHelper.getUsedMemory();
+if(currentMemoryUsage > memoryUsage.get()){
+	memoryUsage.set(currentMemoryUsage);
+//	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
+
+	System.gc();
+}//3.6 GiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 
