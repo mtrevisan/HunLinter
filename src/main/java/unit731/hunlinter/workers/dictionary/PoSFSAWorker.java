@@ -79,33 +79,33 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final byte[] chs = StringHelper.getRawBytes(word);
 			builder.add(chs);
 		};
-		final Runnable completed = () -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
-
-			try{
-				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-				final File outputInfoFile = new File(filenameNoExtension + ".info");
-				if(!outputInfoFile.exists()){
-					final List<String> content = Arrays.asList(
-						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
-						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-						"fsa.dict.encoder=prefix");
-					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-				}
-
-				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
-
-				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
-
-				FileHelper.browse(outputFile);
-			}
-			catch(final Exception e){
-				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
-			}
-		};
+//		final Runnable completed = () -> {
+//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+//
+//			try{
+//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+//				final File outputInfoFile = new File(filenameNoExtension + ".info");
+//				if(!outputInfoFile.exists()){
+//					final List<String> content = Arrays.asList(
+//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+//						"fsa.dict.encoder=prefix");
+//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+//				}
+//
+//				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
+//
+//				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
+//
+//				FileHelper.browse(outputFile);
+//			}
+//			catch(final Exception e){
+//				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
+//			}
+//		};
 
 		getWorkerData()
-			.withDataCompletedCallback(completed)
+//			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
 		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
@@ -344,7 +344,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			if(row[fromIndex] == separator)
 				return fromIndex;
 
-			fromIndex++;
+			fromIndex ++;
 		}
 		return -1;
 	}
