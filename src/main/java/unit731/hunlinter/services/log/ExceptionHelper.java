@@ -34,19 +34,19 @@ public class ExceptionHelper{
 		return sb.toString();
 	}
 
-	private static String extractExceptionPosition(Throwable t){
-		StackTraceElement stackTrace = extractOwnCodeStackTrace(t);
+	private static String extractExceptionPosition(final Throwable t){
+		final StackTraceElement stackTrace = extractOwnCodeStackTrace(t);
 		String filename = stackTrace.getFileName();
 		filename = filename.substring(0, filename.lastIndexOf('.'));
 		return filename + "." + stackTrace.getMethodName() + ":" + stackTrace.getLineNumber();
 	}
 
-	private static StackTraceElement extractOwnCodeStackTrace(Throwable t){
-		StackTraceElement[] stackTrace = t.getStackTrace();
-		StackTraceElement stackTrace0 = t.getStackTrace()[0];
+	private static StackTraceElement extractOwnCodeStackTrace(final Throwable t){
+		final StackTraceElement[] stackTrace = t.getStackTrace();
+		StackTraceElement stackTrace0 = (stackTrace.length > 0? stackTrace[0]: null);
 		String classPackage = ExceptionHelper.class.getName();
 		classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
-		for(StackTraceElement trace : stackTrace)
+		for(final StackTraceElement trace : stackTrace)
 			if(trace.getClassName().startsWith(classPackage)){
 				stackTrace0 = trace;
 				break;
@@ -54,7 +54,7 @@ public class ExceptionHelper{
 		return stackTrace0;
 	}
 
-	private static String extractExceptionName(Throwable t){
+	private static String extractExceptionName(final Throwable t){
 		return t.getClass().getSimpleName();
 	}
 

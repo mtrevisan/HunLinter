@@ -58,8 +58,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true));
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
@@ -120,14 +119,76 @@ public class PoSFSAWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
 
 			executeReadProcess(lineProcessor, lines);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+
+			final Set<String> words2 = new HashSet<>();
+			for(Pair<Integer, String> l : lines){
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(l.getValue());
+				final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+
+				productions.stream()
+					.map(Production::toStringPoSFSA)
+					.flatMap(List::stream)
+					.forEach(words2::add);
+			}
+
+
+			try{
+				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+				final File outputInfoFile = new File(filenameNoExtension + ".info");
+				if(!outputInfoFile.exists()){
+					final List<String> content = Arrays.asList(
+						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+						"fsa.dict.encoding=" + charset.name().toLowerCase(),
+						"fsa.dict.encoder=prefix");
+					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+				}
+
+				buildFSA(new ArrayList<>(words2), outputFile.toString(), filenameNoExtension + ".dict");
+
+				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
+
+				FileHelper.browse(outputFile);
+			}
+			catch(final Exception e){
+				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
+			}
 
 			return words;
 		};
 		final Function<Set<String>, FSA> step3 = uniqueWordsSet -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
 
+			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+			final File outputInfoFile = new File(filenameNoExtension + ".info");
+			if(!outputInfoFile.exists()){
+				final List<String> content = Arrays.asList(
+					"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+					"fsa.dict.encoding=" + charset.name().toLowerCase(),
+					"fsa.dict.encoder=prefix");
+				try{
+					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+				}
+				catch(final Exception e){
+					throw new RuntimeException(e);
+				}
+			}
+
+			final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
+			final DictionaryMetadata metadata;
+			try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
+				metadata = DictionaryMetadata.read(is);
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
+
+			List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
+			final byte separator = metadata.getSeparator();
+			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
+			uniqueWords = encode(uniqueWords, separator, sequenceEncoder);
+
 			//lexical order
-			final List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
 			Collections.sort(uniqueWords);
 
 			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
@@ -155,10 +216,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return null;
 		};
-//		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
-	private void buildFSA(final List<String> words, final String input, final String output) throws Exception{
+	private void buildFSA(List<String> words, final String input, final String output) throws Exception{
 		final Path inputPath = Path.of(input);
 		final Path outputPath = Path.of(output);
 
@@ -204,6 +265,27 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 		}
 
+		words = encode(words, separator, sequenceEncoder);
+		List<byte[]> in = words.stream()
+			.map(StringHelper::getRawBytes)
+			.collect(Collectors.toList());
+		final FSABuilder builder = new FSABuilder();
+		final FSA fsa = builder.build(in);
+
+		final CFSA2Serializer serializer = new CFSA2Serializer();
+		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
+			serializer.serialize(fsa, os);
+		}
+
+		//if validating, try to scan the input
+		final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
+		//noinspection StatementWithEmptyBody
+		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){
+			//do nothing, just scan and make sure no exceptions are thrown.
+		}
+	}
+
+	private List<String> encode(List<String> words, byte separator, ISequenceEncoder sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
 		ByteBuffer target = ByteBuffer.allocate(0);
@@ -249,23 +331,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		//lexical order
 		Collections.sort(words);
-		List<byte[]> in = words.stream()
-			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
-		final FSABuilder builder = new FSABuilder();
-		final FSA fsa = builder.build(in);
-
-		final CFSA2Serializer serializer = new CFSA2Serializer();
-		try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputPath))){
-			serializer.serialize(fsa, os);
-		}
-
-		//if validating, try to scan the input
-		final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
-		//noinspection StatementWithEmptyBody
-		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){
-			//do nothing, just scan and make sure no exceptions are thrown.
-		}
+		return words;
 	}
 
 	private static int countOf(final byte separator, final byte[] row){
