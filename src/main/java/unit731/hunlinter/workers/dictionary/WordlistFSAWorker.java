@@ -123,17 +123,15 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
 				serializer.serialize(fsa, os);
-
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
-
-				return null;
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);
 			}
+
+			return outputFile;
 		};
 		final Function<File, Void> step5 = file -> {
-			finalizeProcessing("File written: " + file.getAbsolutePath());
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ", file written: " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 

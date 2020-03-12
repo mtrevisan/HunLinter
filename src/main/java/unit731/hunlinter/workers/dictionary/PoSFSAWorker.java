@@ -137,16 +137,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
 				serializer.serialize(fsa, os);
 
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
-
-				return null;
+				return outputFile;
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);
 			}
 		};
 		final Function<File, Void> step5 = file -> {
-			finalizeProcessing("File written: " + file.getAbsolutePath());
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ", file written: " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 
