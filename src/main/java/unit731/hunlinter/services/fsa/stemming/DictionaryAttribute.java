@@ -251,24 +251,14 @@ public enum DictionaryAttribute{
 		}
 	},
 
-	/**
-	 * Dictionary license attribute.
-	 */
+	/** Dictionary license attribute */
 	LICENSE("fsa.dict.license"),
-
-	/**
-	 * Dictionary author.
-	 */
+	/** Dictionary author */
 	AUTHOR("fsa.dict.author"),
-
-	/**
-	 * Dictionary creation date.
-	 */
+	/** Dictionary creation date */
 	CREATION_DATE("fsa.dict.created");
 
-	/**
-	 * Property name for this attribute.
-	 */
+	/** Property name for this attribute */
 	public final String propertyName;
 
 	/**
@@ -299,15 +289,12 @@ public enum DictionaryAttribute{
 
 	static{
 		attrsByPropertyName = new HashMap<>();
-		for(final DictionaryAttribute attr : DictionaryAttribute.values()){
+		for(final DictionaryAttribute attr : DictionaryAttribute.values())
 			if(attrsByPropertyName.put(attr.propertyName, attr) != null)
 				throw new RuntimeException("Duplicate property key for: " + attr);
-		}
 	}
 
-	/**
-	 * Private enum instance constructor.
-	 */
+	/** Private enum instance constructor */
 	DictionaryAttribute(final String propertyName){
 		this.propertyName = propertyName;
 	}
