@@ -180,27 +180,28 @@ public class Production extends DictionaryEntry{
 	}
 
 	public List<String> toStringPoSFSA(){
-		//extract Stem
-		final List<String> stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
-
 		//extract Part-of-Speech
 		final List<String> pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(pos.size() != 1)
 			throw new LinterException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
-		final PartOfSpeechTag posTag = PartOfSpeechTag.createFromCode(pos.get(0));
 
 		//extract Inflection
-		final Stream<String> suffixStream = JavaHelper.nullableToStream(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX));
-		final Stream<String> prefixStream = JavaHelper.nullableToStream(getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX));
-		final List<String> inflection = Stream.concat(suffixStream, prefixStream)
-			.map(InflectionTag::createFromCode)
-			.map(InflectionTag::getTags)
-			.map(tags -> StringUtils.join(tags, POS_FSA_TAG_SEPARATOR))
-			.collect(Collectors.toList());
-		inflection.add(0, posTag.getTag());
+		final List<String> suffixInflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX);
+		final List<String> prefixInflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX);
+		final List<String> inflections = new ArrayList<>(suffixInflection);
+		inflections.addAll(prefixInflection);
+		for(int i = 0; i < inflections.size(); i ++){
+			final String code = inflections.get(i);
+			final String[] tags = InflectionTag.createFromCode(code).getTags();
+			inflections.set(i, StringUtils.join(tags, POS_FSA_TAG_SEPARATOR));
+		}
+		inflections.add(0, PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
 
+		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + StringUtils.join(inflections, POS_FSA_TAG_SEPARATOR);
+		//extract stem
+		final List<String> stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
 		return stem.stream()
-			.map(st -> st + POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + StringUtils.join(inflection, POS_FSA_TAG_SEPARATOR))
+			.map(st -> st + suffix)
 			.collect(Collectors.toList());
 	}
 

@@ -1,7 +1,5 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
-
 
 public enum PartOfSpeechTag{
 
@@ -93,10 +91,10 @@ TAG_ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	}
 
 	public static PartOfSpeechTag createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(tag -> tag.code.equals(code))
-			.findFirst()
-			.orElse(null);
+		for(final PartOfSpeechTag tag : values())
+			if(tag.code.equals(code))
+				return tag;
+		return null;
 	}
 
 	public String getCode(){

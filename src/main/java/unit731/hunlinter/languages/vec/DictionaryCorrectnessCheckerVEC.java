@@ -117,7 +117,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private boolean hasPluralFlag(final Production production){
-		return (pluralFlags != null && production.hasContinuationFlag(pluralFlags));
+		return (pluralFlags != null && production.hasContinuationFlags(pluralFlags));
 	}
 
 	@Override

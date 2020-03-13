@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.vos;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,7 +79,8 @@ public class DictionaryEntry{
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
+		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs:
+			ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
 		final DictionaryEntry dicEntry = new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 
@@ -165,9 +167,17 @@ public class DictionaryEntry{
 		return (continuationFlags != null? continuationFlags.length: 0);
 	}
 
-	public boolean hasContinuationFlag(final String ... continuationFlags){
-		return (this.continuationFlags != null && continuationFlags != null
-			&& JavaHelper.nullableToStream(this.continuationFlags).anyMatch(flag -> ArrayUtils.contains(continuationFlags, flag)));
+	public boolean hasContinuationFlag(final String flag){
+		return (continuationFlags != null && flag != null && ArrayUtils.contains(continuationFlags, flag));
+	}
+
+	public boolean hasContinuationFlags(final String[] flags){
+		if(continuationFlags != null && flags != null){
+			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
+			return Arrays.stream(flags)
+				.anyMatch(flag -> !list.add(flag));
+		}
+		return false;
 	}
 
 	public List<AffixEntry> getAppliedRules(){
