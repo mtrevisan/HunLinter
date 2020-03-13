@@ -7,23 +7,23 @@ import java.util.List;
 
 public class Affixes{
 
-	private final String[] prefixes;
-	private final String[] suffixes;
-	private final String[] terminalAffixes;
+	private final List<String> prefixes;
+	private final List<String> suffixes;
+	private final List<String> terminalAffixes;
 
 
 	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminalAffixes){
-		this.prefixes = prefixes.toArray(String[]::new);
-		this.suffixes = suffixes.toArray(String[]::new);
-		this.terminalAffixes = terminalAffixes.toArray(String[]::new);
+		this.prefixes = prefixes;
+		this.suffixes = suffixes;
+		this.terminalAffixes = terminalAffixes;
 	}
 
-	public String[] getTerminalAffixes(){
+	public List<String> getTerminalAffixes(){
 		return terminalAffixes;
 	}
 
-	public List<String[]> extractAllAffixes(final boolean reverseAffixes){
-		final List<String[]> applyAffixes = new ArrayList<>(3);
+	public List<List<String>> extractAllAffixes(final boolean reverseAffixes){
+		final List<List<String>> applyAffixes = new ArrayList<>();
 		applyAffixes.add(prefixes);
 		applyAffixes.add(suffixes);
 		if(reverseAffixes)

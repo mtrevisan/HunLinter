@@ -146,12 +146,12 @@ public class AffixEntry{
 		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
+	public String[] combineContinuationFlags(final List<String> otherContinuationFlags){
 		final Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)
 			flags.addAll(Arrays.asList(continuationFlags));
-		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
-			flags.addAll(Arrays.asList(otherContinuationFlags));
+		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
+			flags.addAll(otherContinuationFlags);
 		final int size = flags.size();
 		return (size > 0? flags.toArray(String[]::new): null);
 	}

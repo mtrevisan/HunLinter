@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +51,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
-			final String[] remainingContinuationFlags, final boolean combinable){
+			final List<String> remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final List<AffixEntry> appliedRules = new ArrayList<>(3);
@@ -72,8 +71,8 @@ public class Production extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable,
-			final List<AffixEntry> appliedRules, final List<DictionaryEntry> compoundEntries){
+	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields,
+			final boolean combinable, final List<AffixEntry> appliedRules, final List<DictionaryEntry> compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;

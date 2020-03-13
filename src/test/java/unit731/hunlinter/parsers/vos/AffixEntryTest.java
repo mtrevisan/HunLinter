@@ -6,6 +6,8 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
+import java.util.Arrays;
+
 
 class AffixEntryTest{
 
@@ -74,7 +76,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
-		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
+		String[] combinedFlags = entry.combineContinuationFlags(Arrays.asList("B", "A"));
 
 		Assertions.assertArrayEquals(new String[]{"A", "B"}, combinedFlags);
 	}
