@@ -19,11 +19,11 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData);
 	}
 
-	List<Production> applyAffixRules(final DictionaryEntry dicEntry){
+	Production[] applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 
-	List<Production> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	Production[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 
 		enforceOnlyInCompound(productions);
@@ -35,7 +35,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		if(LOGGER.isTraceEnabled())
 			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
-		return productions;
+		return productions.toArray(Production[]::new);
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule */

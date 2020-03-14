@@ -20,7 +20,7 @@ public class ProductionTableModel extends AbstractTableModel implements HunLinte
 
 
 	@Override
-	public void setProductions(List<Production> productions){
+	public void setProductions(final List<Production> productions){
 		this.productions = productions;
 
 		fireTableDataChanged();

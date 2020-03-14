@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -307,16 +308,16 @@ final int iconSize = 17;
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
 					parserManager.getAffixData());
-				final List<Production> productions = parserManager.getWordGenerator().applyAffixRules(dicEntry);
+				final Production[] productions = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
 				final ProductionTableModel dm = (ProductionTableModel)table.getModel();
-				dm.setProductions(productions);
+				dm.setProductions(Arrays.asList(productions));
 
 				//show first row
 				final Rectangle cellRect = table.getCellRect(0, 0, true);
 				table.scrollRectToVisible(cellRect);
 
-				totalProductionsValueLabel.setText(Integer.toString(productions.size()));
+				totalProductionsValueLabel.setText(Integer.toString(productions.length));
 
 				//check for correctness
 				int line = 0;

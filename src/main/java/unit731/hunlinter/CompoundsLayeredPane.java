@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -247,7 +248,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
             //FIXME transfer into ParserManager
-            final List<Production> words;
+            final Production[] words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
             if(inputText.equals(affixData.getCompoundFlag())){
@@ -256,11 +257,11 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
                   maxCompounds);
             }
             else
-            words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
-               limit);
+					words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
+						limit);
 
             final CompoundTableModel dm = (CompoundTableModel)table.getModel();
-            dm.setProductions(words);
+            dm.setProductions(Arrays.asList(words));
          }
          catch(final Exception e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);

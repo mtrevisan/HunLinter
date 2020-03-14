@@ -2,9 +2,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.vos.Production;
@@ -36,17 +33,17 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -65,13 +62,13 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -90,9 +87,9 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("aa", null, "pa:a st:a pa:a st:a"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
@@ -130,8 +127,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createProduction("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
 			createProduction("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
 			createProduction("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -172,9 +169,9 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"9/#@",
 			"9th/}{"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("13th", "_", "pa:1 st:1 pa:3th st:3th"),
 			createProduction("15th", null, "pa:1 st:1 pa:5th st:5th"),
 			createProduction("11th", "_", "pa:1 st:1 pa:1th st:1th"),
@@ -212,8 +209,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createProduction("710th", null, "pa:7 st:7 pa:1 st:1 pa:0th st:0th"),
 			createProduction("712th", "_", "pa:7 st:7 pa:1 st:1 pa:2th st:2th"),
 			createProduction("714th", null, "pa:7 st:7 pa:1 st:1 pa:4th st:4th")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -232,17 +229,17 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -262,17 +259,17 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/bb",
 			"c/bbcc"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -292,17 +289,17 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/2",
 			"c/2,3"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 
@@ -341,9 +338,9 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		Assertions.assertTrue(words.isEmpty());
+		Assertions.assertTrue(words.length == 0);
 	}
 
 
@@ -362,12 +359,12 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		List<Production> expected = Collections.singletonList(
+		Production[] expected = new Production[]{
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 }

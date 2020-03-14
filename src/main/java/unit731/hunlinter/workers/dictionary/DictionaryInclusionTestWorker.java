@@ -1,5 +1,6 @@
 package unit731.hunlinter.workers.dictionary;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -43,9 +44,11 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			productions.forEach(production -> dictionary.add(production.getWord()));
+			Arrays.stream(productions)
+				.map(DictionaryEntry::getWord)
+				.forEach(dictionary::add);
 		};
 		final Runnable completed = () -> {
 			dictionary.close();

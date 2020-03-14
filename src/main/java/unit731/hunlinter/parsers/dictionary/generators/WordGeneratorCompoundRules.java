@@ -36,7 +36,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	Production[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)

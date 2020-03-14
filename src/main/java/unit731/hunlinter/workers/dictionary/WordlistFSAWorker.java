@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +54,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Set<String> words = new HashSet<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			productions.stream()
+			Arrays.stream(productions)
 				.map(Production::getWord)
 				.forEach(words::add);
 		};

@@ -20,6 +20,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,11 +82,11 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectProductionsByFlag(final List<Production> productions, final String flag, final AffixType type){
+	public List<LineEntry> collectProductionsByFlag(Production[] productions, final String flag, final AffixType type){
 		//remove base production
-		productions.remove(0);
+		productions = ArrayUtils.remove(productions, WordGenerator.BASE_PRODUCTION_INDEX);
 		//collect all productions that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>(productions.size());
+		final List<LineEntry> filteredRules = new ArrayList<>(productions.length);
 		for(final Production production : productions){
 			final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
@@ -699,8 +701,8 @@ public class RulesReducer{
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-			final List<Production> originalProductions = wordGenerator.applyAffixRules(dicEntry);
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
+			final Production[] originalProductions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
 			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);

@@ -141,9 +141,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 				if(!line.isEmpty()){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-						productions.stream()
+						Arrays.stream(productions)
 							.map(Production::toStringWithPartOfSpeechFields)
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
@@ -201,9 +201,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 					if(!line.isEmpty()){
 						try{
 							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
-							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
-							result.ensureCapacity(result.size() + productions.size());
+							final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+							final String word = productions[WordGenerator.BASE_PRODUCTION_INDEX].getWord();
+							result.ensureCapacity(result.size() + productions.length);
 							for(final Production production : productions){
 								final String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))

@@ -2,8 +2,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -30,9 +28,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"xy/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("fooxy", null, "pa:foo st:foo pa:xy st:xy"),
@@ -43,8 +41,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("baryz", null, "pa:bar st:bar pa:yz st:yz"),
 			createProduction("xyfoo", null, "pa:xy st:xy pa:foo st:foo"),
 			createProduction("xybar", null, "pa:xy st:xy pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -61,15 +59,15 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", null, "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -87,9 +85,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"eel/A",
 			"bare/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("fooeel", null, "pa:foo st:foo pa:eel st:eel"),
 			createProduction("foobare", null, "pa:foo st:foo pa:bare st:bare"),
@@ -101,8 +99,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("eelopera", null, "pa:eel st:eel pa:opera st:opera"),
 			createProduction("eeleel", null, "pa:eel st:eel pa:eel st:eel"),
 			createProduction("eelbare", null, "pa:eel st:eel pa:bare st:bare")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -120,14 +118,14 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"glass/A",
 			"sko/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("glassglass", null, "pa:glass st:glass pa:glass st:glass"),
 			createProduction("glassko", null, "pa:glass st:glass pa:sko st:sko"),
 			createProduction("skoglass", null, "pa:sko st:sko pa:glass st:glass")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -145,17 +143,17 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("fooyz", null, "pa:foo st:foo pa:yz st:yz"),
 			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
 			createProduction("baryz", null, "pa:bar st:bar pa:yz st:yz"),
 			createProduction("yzfoo", null, "pa:yz st:yz pa:foo st:foo"),
 			createProduction("yzbar", null, "pa:yz st:yz pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -173,16 +171,16 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", null, "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words[2]);
+		Assertions.assertEquals(createProduction("prefoosuf", null, "st:foo"), words[3]);
 		//lastfold productions
 
 
@@ -192,7 +190,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 20, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
@@ -209,8 +207,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -230,19 +228,19 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(6, words.size());
+		Assertions.assertEquals(6, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words[2]);
 		//lastfold productions
-		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
-		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
-		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words[3]);
+		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words[4]);
+		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words[5]);
 
 
 		String[] inputCompounds = new String[]{
@@ -251,7 +249,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 20, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
@@ -268,8 +266,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -290,19 +288,19 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(6, words.size());
+		Assertions.assertEquals(6, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words[2]);
 		//lastfold productions
-		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
-		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
-		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words[3]);
+		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words[4]);
+		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words[5]);
 
 
 		String[] inputCompounds = new String[]{
@@ -311,7 +309,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 30, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosufsff", "P", "pa:foo st:foo pa:foo st:foo"),
@@ -336,8 +334,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsufsff", null, "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -355,16 +353,16 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", "", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words[2]);
+		Assertions.assertEquals(createProduction("prefoosuf", "", "st:foo"), words[3]);
 		//lastfold productions
 
 
@@ -374,7 +372,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 70, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
@@ -391,8 +389,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -411,16 +409,16 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "PY", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PY", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("prefoo", "SY", "st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", "Y", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "SY", "st:foo"), words[2]);
+		Assertions.assertEquals(createProduction("prefoosuf", "Y", "st:foo"), words[3]);
 		//lastfold productions
 
 
@@ -430,7 +428,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 70, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "PY", "pa:foo st:foo pa:foosuf st:foo"),
 			createProduction("fooprefoo", "PSY", "pa:foo st:foo pa:prefoo st:foo"),
@@ -495,8 +493,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("prebarsufbarsuf", "Y", "pa:prebarsuf st:bar pa:barsuf st:bar"),
 			createProduction("prebarsufprebar", "SY", "pa:prebarsuf st:bar pa:prebar st:bar"),
 			createProduction("prebarsufprebarsuf", "Y", "pa:prebarsuf st:bar pa:prebarsuf st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -515,16 +513,16 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.length);
 		//base production
-		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words[0]);
 		//onefold productions
-		Assertions.assertEquals(createProduction("foosuf", "PZ", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PZ", "st:foo"), words[1]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("prefoo", "SZ", "st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", "Z", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "SZ", "st:foo"), words[2]);
+		Assertions.assertEquals(createProduction("prefoosuf", "Z", "st:foo"), words[3]);
 		//lastfold productions
 
 
@@ -534,13 +532,13 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -561,9 +559,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"-/A"
 		};
 
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", null, "pa:foo st:foo pa:Bar st:Bar"),
 			createProduction("foobAZ", null, "pa:foo st:foo pa:BAZ st:BAZ"),
@@ -644,8 +642,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("--Bar", null, "pa:- st:- pa:- st:- pa:Bar st:Bar"),
 			createProduction("--BAZ", null, "pa:- st:- pa:- st:- pa:BAZ st:BAZ"),
 			createProduction("---", null, "pa:- st:- pa:- st:- pa:- st:-")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -671,9 +669,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"kocsi/A",
 			"szerviz"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("szerszer", null, "pa:szer st:szer pa:szer st:szer"),
 			createProduction("szerkocsi", null, "pa:szer st:szer pa:kocsi st:kocsi"),
 			createProduction("szerszerviz", null, "pa:szer st:szer pa:szerviz st:szerviz"),
@@ -707,8 +705,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("vízvízvíz", null, "pa:víz st:víz pa:víz st:víz pa:víz st:víz"),
 			createProduction("vízvízkocsi", null, "pa:víz st:víz pa:víz st:víz pa:kocsi st:kocsi"),
 			createProduction("vízvízszerviz", null, "pa:víz st:víz pa:víz st:víz pa:szerviz st:szerviz")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 
@@ -731,9 +729,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bars/X",
 			"foos/X"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
 			createProduction("foofoos", null, "pa:foo st:foo po:1 pa:foo st:foo po:1"),
 			createProduction("foofoo", null, "pa:foo st:foo po:1 pa:foo st:foo po:3"),
@@ -749,8 +747,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("barfoo", null, "pa:bar st:bar po:4 pa:foo st:foo po:3"),
 			createProduction("barbar", "S", "pa:bar st:bar po:4 pa:bar st:bar po:4"),
 			createProduction("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 
@@ -768,9 +766,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/C",
 			"baz/CA"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("Foobaz", null, "pa:foo st:foo pa:baz st:baz"),
@@ -807,8 +805,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createProduction("bazbazfoo", null, "pa:baz st:baz pa:baz st:baz pa:foo st:foo"),
 			createProduction("bazbazbar", null, "pa:baz st:baz pa:baz st:baz pa:bar st:bar"),
 			createProduction("Bazbazbaz", null, "pa:baz st:baz pa:baz st:baz pa:baz st:baz")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
@@ -824,12 +822,12 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(1, words.size());
+		Assertions.assertEquals(1, words.length);
 		//base production
 		//suffix productions
-		Assertions.assertEquals(createProduction("foo", "A", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "A", "st:foo"), words[0]);
 		//prefix productions
 		//twofold productions
 
@@ -837,10 +835,10 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		dicEntry = wordGenerator.createFromDictionaryLine(line);
 		words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(1, words.size());
+		Assertions.assertEquals(1, words.length);
 		//base production
 		//suffix productions
-		Assertions.assertEquals(createProduction("pseudos", null, "st:pseudo"), words.get(0));
+		Assertions.assertEquals(createProduction("pseudos", null, "st:pseudo"), words[0]);
 		//prefix productions
 		//twofold productions
 
@@ -851,15 +849,15 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, 10, 2);
 
-		List<Production> expected = Arrays.asList(
+		Production[] expected = new Production[]{
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foopseudo", "BO", "pa:foo st:foo pa:pseudo st:pseudo"),
 			createProduction("foopseudos", null, "pa:foo st:foo pa:pseudo st:pseudo"),
 			createProduction("pseudofoo", "O", "pa:pseudo st:pseudo pa:foo st:foo"),
 			createProduction("pseudopseudo", "BO", "pa:pseudo st:pseudo pa:pseudo st:pseudo"),
 			createProduction("pseudopseudos", null, "pa:pseudo st:pseudo pa:pseudo st:pseudo")
-		);
-		Assertions.assertEquals(expected, words);
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	//FIXME manage CHECKCOMPOUNDPATTERN
@@ -884,9 +882,9 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 //			"foo/A",
 //			"pseudo/AB"
 //		};
-//		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, 2);
+//		Production[] words = wordGenerator.applyCompoundFlag(inputCompounds, 10, 2);
 //
-//		List<Production> expected = Arrays.asList(
+//		Production[] expected = new Production[]{
 //			TestHelper.createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
 //			TestHelper.createProduction("foopseudo", "B", "pa:foo st:foo pa:pseudo st:pseudo"),
 //			TestHelper.createProduction("foopseudos", "PO", "pa:foo st:foo pa:pseudos st:pseudo"),
@@ -895,8 +893,8 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 //			TestHelper.createProduction("pseudopseudos", "PO", "pa:pseudo st:pseudo pa:pseudos st:pseudo"),
 //			TestHelper.createProduction("pseudospseudo", "BPO", "pa:pseudos st:pseudo pa:pseudo st:pseudo"),
 //			TestHelper.createProduction("pseudospseudos", "PO", "pa:pseudos st:pseudo pa:pseudos st:pseudo")
-//		);
-//		Assertions.assertEquals(expected, words);
+//		};
+//		Assertions.assertArrayEquals(expected, words);
 //	}
 
 }

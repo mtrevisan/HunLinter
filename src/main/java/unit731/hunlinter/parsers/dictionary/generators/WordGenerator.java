@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.util.List;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -33,23 +32,23 @@ public class WordGenerator{
 		return DictionaryEntry.createFromDictionaryLineNoStemTag(line, wordGeneratorAffixRules.affixData);
 	}
 
-	public List<Production> applyAffixRules(final DictionaryEntry dicEntry){
+	public Production[] applyAffixRules(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry);
 	}
 
-	public List<Production> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	public Production[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 
-	public List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	public Production[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
-	public List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	public Production[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 
-	public List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
+	public Production[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		return wordGeneratorCompoundBeginMiddleEnd.applyCompoundBeginMiddleEnd(inputCompounds, limit);
 	}
 

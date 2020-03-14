@@ -91,7 +91,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected List<Production> applyCompound(final List<List<List<Production>>> entries, final int limit){
+	protected Production[] applyCompound(final List<List<List<Production>>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -145,11 +145,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		}
 	}
 
-	private List<Production> limitResponse(final Set<Production> productions, final int limit){
-		List<Production> response = new ArrayList<>(productions);
-		if(response.size() > limit)
-			response = response.subList(0, limit);
-		return response;
+	private Production[] limitResponse(final Set<Production> productions, final int limit){
+		return (productions.size() > limit?
+			new ArrayList<>(productions).subList(0, limit).toArray(Production[]::new):
+			productions.toArray(Production[]::new));
 	}
 
 	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries,

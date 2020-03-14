@@ -66,10 +66,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final ArrayList<String> words = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			words.ensureCapacity(words.size() + productions.size());
-			productions.stream()
+			words.ensureCapacity(words.size() + productions.length);
+			Arrays.stream(productions)
 				.map(Production::toStringPoSFSA)
 				.flatMap(List::stream)
 				.forEach(words::add);

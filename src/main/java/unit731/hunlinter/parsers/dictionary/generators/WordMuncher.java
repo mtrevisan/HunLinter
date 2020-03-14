@@ -1,5 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -80,15 +81,15 @@ public class WordMuncher{
 					if(originatingWord != null){
 						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-						final List<Production> productions = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+						Production[] productions = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
 						//remove base production
-						productions.remove(WordGenerator.BASE_PRODUCTION_INDEX);
+						productions = ArrayUtils.remove(productions, WordGenerator.BASE_PRODUCTION_INDEX);
 
 						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
-						if(productions.size() != 1)
+						if(productions.length != 1)
 							continue;
 
-						final List<String> baseProductionPartOfSpeech = productions.get(0).getMorphologicalFieldPartOfSpeech();
+						final List<String> baseProductionPartOfSpeech = productions[0].getMorphologicalFieldPartOfSpeech();
 						if(baseProductionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty()
 								|| baseProductionPartOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
 							originators.add(originatorEntry);

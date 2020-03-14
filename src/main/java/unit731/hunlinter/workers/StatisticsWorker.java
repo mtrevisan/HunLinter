@@ -56,7 +56,7 @@ public class StatisticsWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Production production : productions){
 				//collect statistics

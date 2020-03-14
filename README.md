@@ -304,6 +304,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - substituted charting library
 - added undo/redo capabilities on input fields
 - reduced application footprint
+- reduced memory footprint
 - various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>

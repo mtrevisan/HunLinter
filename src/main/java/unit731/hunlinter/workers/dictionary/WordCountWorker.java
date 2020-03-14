@@ -44,9 +44,9 @@ public class WordCountWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			totalProductions.addAndGet(productions.size());
+			totalProductions.addAndGet(productions.length);
 			for(Production production : productions)
 				dictionary.add(production.getWord());
 		};

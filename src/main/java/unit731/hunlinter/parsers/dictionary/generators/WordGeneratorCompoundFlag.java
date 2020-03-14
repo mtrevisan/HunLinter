@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
-	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	Production[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
@@ -54,7 +53,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		//check if it's possible to compound some words
 		if(inputs.isEmpty())
-			return Collections.emptyList();
+			return new Production[]{};
 
 		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);

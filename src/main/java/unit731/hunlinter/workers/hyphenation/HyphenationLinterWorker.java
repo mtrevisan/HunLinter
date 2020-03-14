@@ -56,9 +56,9 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			productions.forEach(production -> {
+			for(final Production production : productions){
 				final String word = production.getWord();
 				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
@@ -73,7 +73,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 						throw new LinterException(sb.toString());
 					}
 				}
-			});
+			}
 		};
 
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {

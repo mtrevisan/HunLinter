@@ -133,7 +133,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				if(!line.isEmpty()){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 						for(final Production production : productions)
 							if(checker.shouldBeProcessedForMinimalPair(production)){

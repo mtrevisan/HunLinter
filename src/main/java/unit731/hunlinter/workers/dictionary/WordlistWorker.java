@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -54,11 +55,11 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
 		final BiConsumer<BufferedWriter, IndexDataPair<String>> lineProcessor = (writer, indexData) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES)
-				productions.stream()
-					.map(toString)
+				Arrays.stream(productions)
+					.map(toString::apply)
 					.forEach(words::add);
 			else{
 				try{

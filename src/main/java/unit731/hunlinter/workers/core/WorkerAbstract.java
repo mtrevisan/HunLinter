@@ -163,7 +163,7 @@ if(currentMemoryUsage > memoryUsage.get()){
 
 	System.gc();
 }//3.6 GiB
-//dic linter: 487 MiB
+//dic linter: 487 MiB, 313 MiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 

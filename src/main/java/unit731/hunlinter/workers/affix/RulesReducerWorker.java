@@ -58,7 +58,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final List<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
+			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(!filteredRules.isEmpty()){
