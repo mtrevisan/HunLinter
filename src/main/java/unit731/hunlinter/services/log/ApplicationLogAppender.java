@@ -25,7 +25,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 		Objects.requireNonNull(textArea);
 
 		JavaHelper.nullableToStream(markers)
-			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>()).add(textArea));
+			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(textArea));
 	}
 
 	public void setEncoder(final Encoder<ILoggingEvent> encoder){

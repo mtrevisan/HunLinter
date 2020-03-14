@@ -86,7 +86,7 @@ class WordGeneratorBase{
 
 	private List<Production> collectProductions(final Production baseProduction, final List<Production> onefoldProductions,
 			final List<Production> twofoldProductions, final List<Production> lastfoldProductions){
-		final List<Production> productions = new ArrayList<>();
+		final List<Production> productions = new ArrayList<>(1);
 		productions.add(baseProduction);
 		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);

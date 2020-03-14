@@ -205,7 +205,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 							if(checker.isConsonant(left) && checker.isConsonant(right)){
 								final String key = left + SLASH + right;
 								final String value = sourceLine + SLASH + line2;
-								minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
+								minimalPairs.computeIfAbsent(key, k -> new ArrayList<>(1))
 									.add(value);
 
 								totalPairs ++;

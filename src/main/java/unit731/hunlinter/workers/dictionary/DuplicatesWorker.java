@@ -179,7 +179,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	}
 
 	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
-		final List<Duplicate> result = new ArrayList<>();
+		final ArrayList<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting duplicates (step 2/3)");
@@ -203,6 +203,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 							final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 							final String word = productions.get(WordGenerator.BASE_PRODUCTION_INDEX).getWord();
+							result.ensureCapacity(result.size() + productions.size());
 							for(final Production production : productions){
 								final String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
@@ -281,7 +282,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
 			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
 				duplicate -> {
-					final List<Duplicate> list = new ArrayList<>();
+					final List<Duplicate> list = new ArrayList<>(1);
 					list.add(duplicate);
 					return list;
 				},

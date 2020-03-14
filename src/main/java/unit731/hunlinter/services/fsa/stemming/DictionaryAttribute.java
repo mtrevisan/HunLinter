@@ -212,7 +212,7 @@ public enum DictionaryAttribute{
 					throw new IllegalArgumentException("Attribute " + propertyName + " is not in the proper format: " + value);
 
 				if(!replacementPairs.containsKey(twoStrings[0])){
-					final List<String> strList = new ArrayList<>();
+					final List<String> strList = new ArrayList<>(1);
 					strList.add(twoStrings[1]);
 					replacementPairs.put(twoStrings[0], strList);
 				}
@@ -241,11 +241,8 @@ public enum DictionaryAttribute{
 
 				final char fromChar = twoChars[0].charAt(0);
 				final char toChar = twoChars[1].charAt(0);
-				if(!equivalentCharacters.containsKey(fromChar)){
-					final List<Character> chList = new ArrayList<>();
-					equivalentCharacters.put(fromChar, chList);
-				}
-				equivalentCharacters.get(fromChar).add(toChar);
+				equivalentCharacters.putIfAbsent(fromChar, new ArrayList<>(1))
+					.add(toChar);
 			}
 			return equivalentCharacters;
 		}

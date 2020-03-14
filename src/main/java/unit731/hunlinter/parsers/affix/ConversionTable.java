@@ -70,7 +70,7 @@ public class ConversionTable{
 				checkValidity(parts, context);
 
 				final String key = reduceKey(parts[1]);
-				table.computeIfAbsent(key, k -> new ArrayList<>())
+				table.computeIfAbsent(key, k -> new ArrayList<>(1))
 					.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
 		}

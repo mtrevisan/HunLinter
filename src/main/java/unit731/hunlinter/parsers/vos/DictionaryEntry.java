@@ -272,10 +272,13 @@ public class DictionaryEntry{
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
-		final List<String> terminalAffixes = new ArrayList<>();
-		final List<String> prefixes = new ArrayList<>();
-		final List<String> suffixes = new ArrayList<>();
-		if(continuationFlags != null)
+		final ArrayList<String> terminalAffixes = new ArrayList<>();
+		final ArrayList<String> prefixes = new ArrayList<>();
+		final ArrayList<String> suffixes = new ArrayList<>();
+		if(continuationFlags != null){
+			terminalAffixes.ensureCapacity(continuationFlags.length);
+			prefixes.ensureCapacity(continuationFlags.length);
+			suffixes.ensureCapacity(continuationFlags.length);
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
@@ -293,7 +296,7 @@ public class DictionaryEntry{
 				}
 
 				if(rule instanceof RuleEntry){
-					if(((RuleEntry)rule).isSuffix())
+					if(((RuleEntry) rule).isSuffix())
 						suffixes.add(affix);
 					else
 						prefixes.add(affix);
@@ -301,6 +304,10 @@ public class DictionaryEntry{
 				else
 					terminalAffixes.add(affix);
 			}
+			terminalAffixes.trimToSize();
+			prefixes.trimToSize();
+			suffixes.trimToSize();
+		}
 
 		return new Affixes(prefixes, suffixes, terminalAffixes);
 	}

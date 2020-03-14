@@ -163,8 +163,8 @@ public class AffixData{
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
 		final FlagParsingStrategy strategy = getFlagParsingStrategy();
-		final String[] flags = strategy.extractCompoundRule(compoundRule);
-		return ArrayUtils.contains(flags, flag);
+		final List<String> flags = strategy.extractCompoundRule(compoundRule);
+		return flags.contains(flag);
 	}
 
 	public Charset getCharset(){

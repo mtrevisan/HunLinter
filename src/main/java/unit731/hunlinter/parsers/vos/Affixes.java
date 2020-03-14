@@ -23,7 +23,7 @@ public class Affixes{
 	}
 
 	public List<List<String>> extractAllAffixes(final boolean reverseAffixes){
-		final List<List<String>> applyAffixes = new ArrayList<>();
+		final List<List<String>> applyAffixes = new ArrayList<>(3);
 		applyAffixes.add(prefixes);
 		applyAffixes.add(suffixes);
 		if(reverseAffixes)

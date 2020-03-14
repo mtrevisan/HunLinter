@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -221,10 +222,10 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.LANGUAGE)){
 			//try to infer language from filename
 			final String filename = FilenameUtils.removeExtension(affFile.getName());
-			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
-			if(languages.length == 0)
+			List<String> languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
+			if(languages.isEmpty())
 				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
-			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
+			final String language = (!languages.isEmpty()? languages.get(0): NO_LANGUAGE);
 			data.addData(AffixOption.LANGUAGE, language);
 		}
 	}

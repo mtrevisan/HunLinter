@@ -84,7 +84,7 @@ public class RulesReducer{
 		//remove base production
 		productions.remove(0);
 		//collect all productions that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>();
+		final List<LineEntry> filteredRules = new ArrayList<>(productions.size());
 		for(final Production production : productions){
 			final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
@@ -116,7 +116,7 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> compactProductions(final List<LineEntry> rules){
-		final List<LineEntry> compactedRules = new ArrayList<>();
+		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
 		if(rules.size() > 1){
 			//retrieve rule with longest condition (all the other conditions must be this long)
 			final LineEntry compactedRule = rules.stream()
@@ -125,6 +125,7 @@ public class RulesReducer{
 			expandAddition(rules, compactedRule);
 
 			compactedRules.add(compactedRule);
+			compactedRules.trimToSize();
 		}
 		else
 			compactedRules.addAll(rules);
@@ -446,7 +447,7 @@ public class RulesReducer{
 		//bucket by condition ending
 		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
-		final List<LineEntry> finalRules = new ArrayList<>();
+		final ArrayList<LineEntry> finalRules = new ArrayList<>(forest.size());
 		//for each bush in the forest
 		for(final List<LineEntry> bush : forest){
 			//if there is only one rule, then it goes in the final set
@@ -456,7 +457,7 @@ public class RulesReducer{
 			else
 				finalRules.addAll(disjoinSameEndingConditionsBush(bush, overallLastGroups));
 		}
-
+		finalRules.trimToSize();
 		return finalRules;
 	}
 
@@ -564,7 +565,7 @@ public class RulesReducer{
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
 		rules.sort(shortestConditionComparator);
 
-		List<List<LineEntry>> forest = new ArrayList<>();
+		ArrayList<List<LineEntry>> forest = new ArrayList<>(rules.size());
 		while(!rules.isEmpty()){
 			//extract base condition
 			final String parentCondition = rules.get(0).condition;

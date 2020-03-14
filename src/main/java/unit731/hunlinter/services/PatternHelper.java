@@ -48,18 +48,19 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static String[] extract(final String text, final Pattern pattern){
+	public static List<String> extract(final String text, final Pattern pattern){
 		return extract(text, pattern, -1);
 	}
 
-	public static String[] extract(final String text, final Pattern pattern, final int limit){
+	public static List<String> extract(final String text, final Pattern pattern, final int limit){
 		final Matcher matcher = pattern.matcher(text);
-		final List<String> result = new ArrayList<>();
+		final ArrayList<String> result = new ArrayList<>(Math.max(limit, 0));
 		while(matcher.find() && (limit < 0 || result.size() < limit)){
 			final String component = getNextGroup(matcher);
 			result.add(component != null? component: matcher.group());
 		}
-		return result.toArray(String[]::new);
+		result.trimToSize();
+		return result;
 	}
 
 	private static String getNextGroup(final Matcher matcher){

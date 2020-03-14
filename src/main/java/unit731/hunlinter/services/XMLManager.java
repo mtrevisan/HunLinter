@@ -85,9 +85,10 @@ public class XMLManager{
 	}
 
 	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extractionCondition){
-		final List<Node> children = new ArrayList<>();
+		final ArrayList<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
+			children.ensureCapacity(nodes.getLength());
 			IntStream.range(0, nodes.getLength())
 				.mapToObj(nodes::item)
 				.filter(extractionCondition::apply)

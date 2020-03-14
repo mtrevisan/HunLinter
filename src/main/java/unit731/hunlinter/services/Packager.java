@@ -392,13 +392,14 @@ public class Packager{
 			throw new IllegalArgumentException("Invalid root element, expected '" + MANIFEST_ROOT_ELEMENT + "', was "
 				+ rootElement.getNodeName());
 
-		final List<String> configurationPaths = new ArrayList<>();
 		final List<Node> children = extractChildren(rootElement);
+		final ArrayList<String> configurationPaths = new ArrayList<>(children.size());
 		for(final Node child : children){
 			final Node mediaType = XMLManager.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
 			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
 				configurationPaths.add(XMLManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
+		configurationPaths.trimToSize();
 		return configurationPaths;
 	}
 

@@ -237,12 +237,11 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
-		final List<String> result = new ArrayList<>();
-
 		int startIndex = 0;
 		int after = 0;
 		String addAfter = null;
 		final int size = word.length();
+		final ArrayList<String> result = new ArrayList<>(size);
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
@@ -291,6 +290,7 @@ public class Hyphenator implements HyphenatorInterface{
 		if(StringUtils.isNotBlank(addAfter))
 			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
 		result.add(subword);
+		result.trimToSize();
 
 		return result;
 	}

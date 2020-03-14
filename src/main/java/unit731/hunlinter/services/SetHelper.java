@@ -241,7 +241,7 @@ public class SetHelper{
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			if(key != null)
-				bucket.computeIfAbsent(key, k -> new ArrayList<>())
+				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
 					.add(entry);
 		}
 		return bucket;

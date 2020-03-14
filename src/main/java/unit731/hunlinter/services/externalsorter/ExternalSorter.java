@@ -200,7 +200,7 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 */
 	private int mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile) throws IOException{
-		final List<BinaryFileBuffer> bfbs = new ArrayList<>();
+		final List<BinaryFileBuffer> bfbs = new ArrayList<>(files.size());
 		for(final File f : files){
 			final InputStream in = new FileInputStream(f);
 			final InputStreamReader isr;

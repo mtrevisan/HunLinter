@@ -183,7 +183,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean forbidTriples = affixData.isForbidTriplesInCompound();
 		final boolean simplifyTriples = affixData.isSimplifyTriplesInCompound();
 
-		final List<DictionaryEntry> compoundEntries = new ArrayList<>();
+		final ArrayList<DictionaryEntry> compoundEntries = new ArrayList<>(indexes.length);
 
 		sb.setLength(0);
 		StringHelper.Casing lastWordCasing = null;
@@ -223,6 +223,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 			sb.append(nextCompound);
 		}
+		compoundEntries.trimToSize();
 		return compoundEntries;
 	}
 

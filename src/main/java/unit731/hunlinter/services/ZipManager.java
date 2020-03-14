@@ -78,10 +78,9 @@ public class ZipManager{
 	}
 
 	private List<String> extractFilesList(final Path dir){
-		final List<String> filesListInDir = new ArrayList<>();
-
 		final File[] files = Optional.ofNullable(dir.toFile().listFiles())
 			.orElse(new File[0]);
+		final List<String> filesListInDir = new ArrayList<>(files.length);
 		for(final File file : files){
 			if(file.isFile())
 				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));

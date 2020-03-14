@@ -64,11 +64,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 
-		final List<String> words = new ArrayList<>();
+		final ArrayList<String> words = new ArrayList<>();
 		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
+			words.ensureCapacity(words.size() + productions.size());
 			productions.stream()
 				.map(Production::toStringPoSFSA)
 				.flatMap(List::stream)

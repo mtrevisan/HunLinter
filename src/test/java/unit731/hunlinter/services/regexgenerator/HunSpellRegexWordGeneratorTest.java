@@ -11,7 +11,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allOne(){
-		String[] regex = new String[]{"abc", "de", "a"};
+		List<String> regex = Arrays.asList("abc", "de", "a");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
@@ -24,7 +24,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void oneForEach(){
-		String[] regex = new String[]{"abc", "de", "?", "a", "*"};
+		List<String> regex = Arrays.asList("abc", "de", "?", "a", "*");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
@@ -42,7 +42,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allZeroOrOne(){
-		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
+		List<String> regex = Arrays.asList("abc", "?", "de", "?", "a", "?");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
@@ -61,7 +61,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allZeroOrOneWithZeroMinimum(){
-		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
+		List<String> regex = Arrays.asList("abc", "?", "de", "?", "a", "?");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(0, 7);
@@ -80,7 +80,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allZeroOrOneWithTwoMinimum(){
-		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
+		List<String> regex = Arrays.asList("abc", "?", "de", "?", "a", "?");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(2, 7);
@@ -96,7 +96,7 @@ class HunSpellRegexWordGeneratorTest{
 
 	@Test
 	void allZeroOrMore(){
-		String[] regex = new String[]{"abc", "*", "de", "*", "a", "*"};
+		List<String> regex = Arrays.asList("abc", "*", "de", "*", "a", "*");
 
 		HunSpellRegexWordGenerator generator = new HunSpellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
