@@ -130,8 +130,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		incompatibilityCheck(production);
 
-		if(production.hasNonTerminalContinuationFlags(affixData::isTerminalAffix) && !production.hasPartOfSpeech(POS_VERB)
-				&& !production.hasPartOfSpeech(POS_ADVERB))
+		if(production.hasNonTerminalContinuationFlags(affixData::isTerminalAffix)
+				&& !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB))
 			northernPluralCheck(production);
 
 		finalSonorizationCheck(production);
@@ -197,7 +197,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private boolean hasToCheckForNorthernPlural(final Production production){
 		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN)
-			&& !production.hasPartOfSpeech(POS_PROPER_NOUN) && hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
+			&& !production.hasPartOfSpeech(POS_PROPER_NOUN)&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
+			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
 	}
 
 	private String getRuleToCheckNorthernPlural(final String word){
