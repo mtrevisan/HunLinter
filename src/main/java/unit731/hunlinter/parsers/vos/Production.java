@@ -124,11 +124,9 @@ public class Production extends DictionaryEntry{
 	}
 
 	public void prependAppliedRules(final AffixEntry[] appliedRules){
-		if(appliedRules != null){
-			if(this.appliedRules == null)
-				this.appliedRules = new AffixEntry[1];
-			ArrayUtils.insert(0, this.appliedRules, appliedRules);
-		}
+		if(appliedRules != null)
+			this.appliedRules = ArrayUtils.insert(0, (this.appliedRules != null? this.appliedRules: new AffixEntry[1]),
+				appliedRules);
 	}
 
 	public boolean hasProductionRules(){

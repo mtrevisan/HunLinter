@@ -139,8 +139,8 @@ class WordGeneratorBase{
 			final List<String> aff = affixes.get(complexPrefixes? 1: 0);
 			if(!aff.isEmpty()){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff.toArray(String[]::new));
-				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(), prod.getRulesSequence(),
-					overabundantAffixes}));
+				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(),
+					prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
 	}
