@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -24,8 +23,8 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		super(workerData);
 	}
 
-	protected List<Pair<Integer, String>> readLines(){
-		final List<Pair<Integer, String>> lines = new ArrayList<>();
+	protected List<IndexDataPair<String>> readLines(){
+		final List<IndexDataPair<String>> lines = new ArrayList<>();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Path dicPath = dicParser.getDicFile().toPath();
 		final Charset charset = dicParser.getCharset();
@@ -43,7 +42,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 				line = ParserHelper.cleanLine(line);
 				if(!line.isEmpty())
-					lines.add(Pair.of(br.getLineNumber(), line));
+					lines.add(IndexDataPair.of(br.getLineNumber(), line));
 
 				setProgress(currentLine, totalLines);
 

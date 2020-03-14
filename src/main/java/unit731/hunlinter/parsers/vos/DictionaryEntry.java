@@ -93,8 +93,8 @@ public class DictionaryEntry{
 		Objects.requireNonNull(dicEntry);
 
 		word = dicEntry.word;
-		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
-		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
+		continuationFlags = dicEntry.continuationFlags;
+		morphologicalFields = dicEntry.morphologicalFields;
 		combinable = dicEntry.combinable;
 	}
 

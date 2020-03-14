@@ -89,8 +89,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){
-		final List<DictionaryEntry> entries = (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
-		return (entries != null? new ArrayList<>(entries): null);
+		return (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
 	}
 
 	@Override

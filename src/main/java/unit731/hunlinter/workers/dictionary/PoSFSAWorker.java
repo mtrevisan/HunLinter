@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.dictionary;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -21,6 +20,7 @@ import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -65,8 +64,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 		final ArrayList<String> words = new ArrayList<>();
-		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			words.ensureCapacity(words.size() + productions.size());
@@ -109,12 +108,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
-		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, List<String>> step2 = lines -> {
+		final Function<List<IndexDataPair<String>>, List<String>> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
 
 			executeReadProcess(lineProcessor, lines);

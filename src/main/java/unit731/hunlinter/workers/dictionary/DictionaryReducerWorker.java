@@ -1,18 +1,18 @@
 package unit731.hunlinter.workers.dictionary;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -30,8 +30,8 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 
 		Objects.requireNonNull(affixData);
 
-		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
 
 //TODO
 //			for(final Production production : productions){
@@ -44,12 +44,12 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 //			}
 		};
 
-		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
+		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			executeReadProcess(lineProcessor, lines);

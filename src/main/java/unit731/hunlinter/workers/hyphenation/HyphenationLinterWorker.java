@@ -2,18 +2,18 @@ package unit731.hunlinter.workers.hyphenation;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import unit731.hunlinter.languages.RulesLoader;
@@ -54,8 +54,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final RulesLoader rulesLoader = new RulesLoader(language, null);
 
-		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			productions.forEach(production -> {
@@ -66,7 +66,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 					final List<String> syllabes = hyphenation.getSyllabes();
 					if(orthography.hasSyllabationErrors(syllabes)){
 						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
-							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), row});
+							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
 						final StringBuffer sb = new StringBuffer(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
@@ -76,12 +76,12 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 			});
 		};
 
-		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
+		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			executeReadProcess(lineProcessor, lines);

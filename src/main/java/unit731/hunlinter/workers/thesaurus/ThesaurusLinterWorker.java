@@ -1,6 +1,5 @@
 package unit731.hunlinter.workers.thesaurus;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -8,13 +7,14 @@ import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerThesaurus;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -32,10 +32,10 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			.withParallelProcessing(true)
 		);
 
-		final BiConsumer<Integer, ThesaurusEntry> dataProcessor = (row, entry) -> {
-			final String originalDefinition = entry.getDefinition();
+		final Consumer<IndexDataPair<ThesaurusEntry>> dataProcessor = indexData -> {
+			final String originalDefinition = indexData.getData().getDefinition();
 			//check if each part of `entry`, with appropriate PoS, exists
-			final List<SynonymsEntry> syns = entry.getSynonyms();
+			final List<SynonymsEntry> syns = indexData.getData().getSynonyms();
 			for(final SynonymsEntry syn : syns){
 				final List<String> definitions = syn.getSynonyms();
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
@@ -49,12 +49,12 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			}
 		};
 
-		final Function<Void, List<Pair<Integer, ThesaurusEntry>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step1 = ignored -> {
 			prepareProcessing("Reading thesaurus file (step 1/2)");
 
 			return readEntries();
 		};
-		final Function<List<Pair<Integer, ThesaurusEntry>>, Void> step2 = entries -> {
+		final Function<List<IndexDataPair<ThesaurusEntry>>, Void> step2 = entries -> {
 			prepareProcessing("Start processing " + workerData.getWorkerName());
 
 			executeReadProcess(dataProcessor, entries);

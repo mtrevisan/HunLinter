@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -134,13 +133,13 @@ if(currentMemoryUsage > memoryUsage.get()){
 		};
 	}
 
-	protected void executeReadProcess(final BiConsumer<Integer, T> dataProcessor, final List<Pair<Integer, T>> entries){
+	protected void executeReadProcess(final Consumer<IndexDataPair<T>> dataProcessor, final List<IndexDataPair<T>> entries){
 		try{
 			final int totalEntries = entries.size();
 			processingIndex.set(0);
 
-			final Consumer<Pair<Integer, T>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
-			final Stream<Pair<Integer, T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
+			final Consumer<IndexDataPair<T>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+			final Stream<IndexDataPair<T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
 			stream.forEach(innerProcessor);
 		}
 		catch(final RuntimeException e){
@@ -151,19 +150,20 @@ if(currentMemoryUsage > memoryUsage.get()){
 		}
 	}
 
-	private Consumer<Pair<Integer, T>> createInnerProcessor(final BiConsumer<Integer, T> dataProcessor, final int totalData){
+	private Consumer<IndexDataPair<T>> createInnerProcessor(final Consumer<IndexDataPair<T>> dataProcessor, final int totalData){
 final AtomicLong memoryUsage = new AtomicLong(0l);
 		return data -> {
 			try{
-				dataProcessor.accept(data.getKey(), data.getValue());
+				dataProcessor.accept(data);
 
 final long currentMemoryUsage = JavaHelper.getUsedMemory();
 if(currentMemoryUsage > memoryUsage.get()){
 	memoryUsage.set(currentMemoryUsage);
-//	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
+	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
 
 	System.gc();
 }//3.6 GiB
+//dic linter: 487 MiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 
@@ -172,8 +172,8 @@ if(currentMemoryUsage > memoryUsage.get()){
 			catch(final Exception e){
 				if(!JavaHelper.isInterruptedException(e)){
 					final String errorMessage = ExceptionHelper.getMessage(e);
-					LOGGER.trace("{}, line {}: {}", errorMessage, data.getKey(), data.getValue());
-					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getKey(), data.getValue());
+					LOGGER.trace("{}, line {}: {}", errorMessage, data.getIndex(), data.getData());
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getIndex(), data.getData());
 				}
 
 				if(workerData.isRelaunchException())
@@ -182,12 +182,12 @@ if(currentMemoryUsage > memoryUsage.get()){
 		};
 	}
 
-	protected void executeWriteProcess(final BiConsumer<BufferedWriter, Pair<Integer, String>> dataProcessor,
-			final List<Pair<Integer, String>> lines, final File outputFile, final Charset charset){
+	protected void executeWriteProcess(final BiConsumer<BufferedWriter, IndexDataPair<String>> dataProcessor,
+			final List<IndexDataPair<String>> lines, final File outputFile, final Charset charset){
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			for(final Pair<Integer, String> line : lines){
+			for(final IndexDataPair<String> line : lines){
 				try{
 					writtenSoFar ++;
 
@@ -199,7 +199,8 @@ if(currentMemoryUsage > memoryUsage.get()){
 				}
 				catch(final Exception e){
 					if(!JavaHelper.isInterruptedException(e))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), line.getKey(), line.getValue());
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), line.getIndex(),
+							line.getData());
 
 					throw e;
 				}

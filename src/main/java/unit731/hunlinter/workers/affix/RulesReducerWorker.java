@@ -4,10 +4,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -20,6 +19,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -56,13 +56,13 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> originalRules = new ArrayList<>();
-		final BiConsumer<Integer, String> lineProcessor = (row, line) -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(!filteredRules.isEmpty()){
-				originalLines.add(line);
+				originalLines.add(indexData.getData());
 				originalRules.addAll(filteredRules);
 			}
 		};
@@ -86,12 +86,12 @@ public class RulesReducerWorker extends WorkerDictionary{
 		getWorkerData()
 			.withDataCompletedCallback(completed);
 
-		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = lines -> {
+		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			executeReadProcess(lineProcessor, lines);

@@ -44,7 +44,8 @@ class WordGeneratorBase{
 	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule){
+	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
+			final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();

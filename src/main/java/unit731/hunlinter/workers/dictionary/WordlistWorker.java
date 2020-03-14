@@ -15,7 +15,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -25,6 +24,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -52,8 +52,8 @@ public class WordlistWorker extends WorkerDictionary{
 
 		final Set<String> words = new HashSet<>();
 		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
-		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line.getValue());
+		final BiConsumer<BufferedWriter, IndexDataPair<String>> lineProcessor = (writer, indexData) -> {
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Production> productions = wordGenerator.applyAffixRules(dicEntry);
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES)
@@ -87,15 +87,15 @@ public class WordlistWorker extends WorkerDictionary{
 		getWorkerData()
 			.withDataCompletedCallback(completed);
 
-		final Function<Void, List<Pair<Integer, String>>> step1 = ignored -> {
+		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
 			return readLines();
 		};
-		final Function<List<Pair<Integer, String>>, Void> step2 = param -> {
+		final Function<List<IndexDataPair<String>>, Void> step2 = indexData -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			executeWriteProcess(lineProcessor, param, outputFile, charset);
+			executeWriteProcess(lineProcessor, indexData, outputFile, charset);
 
 			return null;
 		};

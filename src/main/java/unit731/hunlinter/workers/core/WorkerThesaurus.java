@@ -1,9 +1,9 @@
 package unit731.hunlinter.workers.core;
 
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -15,12 +15,13 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 		super(workerData);
 	}
 
-	protected List<Pair<Integer, ThesaurusEntry>> readEntries(){
+	protected List<IndexDataPair<ThesaurusEntry>> readEntries(){
 		final ThesaurusParser theParser = workerData.getParser();
 		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-		return IntStream.range(0, dictionary.size())
-			.mapToObj(index -> Pair.of(index, dictionary.get(index)))
-			.collect(Collectors.toList());
+		final List<IndexDataPair<ThesaurusEntry>> list = new ArrayList<>(dictionary.size());
+		for(int index = 0; index < dictionary.size(); index ++)
+			list.add(IndexDataPair.of(index, dictionary.get(index)));
+		return list;
 	}
 
 }
