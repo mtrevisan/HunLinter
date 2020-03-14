@@ -57,7 +57,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
+		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}

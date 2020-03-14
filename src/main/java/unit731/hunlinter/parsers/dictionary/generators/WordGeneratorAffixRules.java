@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.util.List;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -24,26 +24,28 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	}
 
 	Production[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
-		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
+		Production[] productions = applyAffixRules(dicEntry, false, overriddenRule);
 
-		enforceOnlyInCompound(productions);
+		productions = enforceOnlyInCompound(productions);
 
 		//convert using output table
 		for(final Production production : productions)
 			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
+			Arrays.stream(productions)
+				.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
-		return productions.toArray(Production[]::new);
+		return productions;
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule */
-	private void enforceOnlyInCompound(final List<Production> productions){
+	private Production[] enforceOnlyInCompound(Production[] productions){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null)
-			productions.removeIf(production -> production.hasContinuationFlag(onlyInCompoundFlag)
+			productions = JavaHelper.removeIf(productions, production -> production.hasContinuationFlag(onlyInCompoundFlag)
 				|| JavaHelper.nullableToStream(production.getAppliedRules()).anyMatch(appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)));
+		return productions;
 	}
 
 }

@@ -1,12 +1,11 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -44,11 +44,11 @@ class WordGeneratorBase{
 	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
+	protected Production[] applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
 			final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-			return Collections.emptyList();
+			return new Production[0];
 
 		//extract base production
 		final Production baseProduction = getBaseProduction(dicEntry);
@@ -58,50 +58,49 @@ class WordGeneratorBase{
 		}
 
 		//extract suffixed productions
-		final List<Production> suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(),
+		final Production[] suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(),
 			overriddenRule);
-		suffixedProductions.sort(PRODUCTION_COMPARATOR);
+		Arrays.sort(suffixedProductions, PRODUCTION_COMPARATOR);
 		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), suffixedProductions);
 
-		List<Production> prefixedProductions = Collections.emptyList();
+		Production[] prefixedProductions = new Production[0];
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
-			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
-			prefixedProductions.sort(PRODUCTION_COMPARATOR);
+			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(),
+				overriddenRule);
+			Arrays.sort(prefixedProductions, PRODUCTION_COMPARATOR);
 			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), prefixedProductions);
 		}
 
 		//extract lastfold productions
-		List<Production> twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
+		Production[] twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
 		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
-		twofoldProductions.sort(PRODUCTION_COMPARATOR);
+		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
 		printProductions("Twofold productions:", twofoldProductions);
 
 		checkTwofoldCorrectness(twofoldProductions);
 
-		final List<Production> productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions,
+		final Production[] productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions,
 			twofoldProductions);
-		filterProductions(productions);
-		return productions;
+		return filterProductions(productions);
 	}
 
-	private List<Production> collectProductions(final Production baseProduction, final List<Production> onefoldProductions,
-			final List<Production> twofoldProductions, final List<Production> lastfoldProductions){
-		final List<Production> productions = new ArrayList<>(1);
-		productions.add(baseProduction);
-		productions.addAll(onefoldProductions);
-		productions.addAll(twofoldProductions);
+	private Production[] collectProductions(final Production baseProduction, final Production[] onefoldProductions,
+			final Production[] twofoldProductions, final Production[] lastfoldProductions){
+		Production[] productions = new Production[]{baseProduction};
+		productions = ArrayUtils.addAll(productions, onefoldProductions);
+		productions = ArrayUtils.addAll(productions, twofoldProductions);
 		if(lastfoldProductions != null)
-			productions.addAll(lastfoldProductions);
+			productions = ArrayUtils.addAll(productions, lastfoldProductions);
 		return productions;
 	}
 
 
-	private void printProductions(final String title, final List<Production> productions){
-		if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
+	private void printProductions(final String title, final Production[] productions){
+		if(LOGGER.isDebugEnabled() && productions.length > 0){
 			LOGGER.debug(title);
-			productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
-				production.getRulesSequence()));
+			for(final Production production : productions)
+				LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()), production.getRulesSequence());
 		}
 	}
 
@@ -110,29 +109,30 @@ class WordGeneratorBase{
 		return Production.clone(dicEntry);
 	}
 
-	protected List<Production> getOnefoldProductions(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
+	protected Production[] getOnefoldProductions(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
-	private List<Production> getTwofoldProductions(final List<Production> onefoldProductions, final boolean isCompound,
+	private Production[] getTwofoldProductions(final Production[] onefoldProductions, final boolean isCompound,
 			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final List<Production> twofoldProductions = new ArrayList<>();
+		Production[] twofoldProductions = new Production[0];
 		for(final Production production : onefoldProductions)
 			if(production.isCombinable()){
-				final List<Production> prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
+				final Production[] prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
 
 				final List<AffixEntry> appliedRules = production.getAppliedRules();
 				//add parent derivations
-				prods.forEach(prod -> prod.prependAppliedRules(appliedRules));
+				Arrays.stream(prods)
+					.forEach(prod -> prod.prependAppliedRules(appliedRules));
 
-				twofoldProductions.addAll(prods);
+				twofoldProductions = ArrayUtils.addAll(twofoldProductions, prods);
 			}
 		return twofoldProductions;
 	}
 
-	private void checkTwofoldCorrectness(final List<Production> twofoldProductions){
+	private void checkTwofoldCorrectness(final Production[] twofoldProductions){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Production prod : twofoldProductions){
 			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
@@ -145,24 +145,26 @@ class WordGeneratorBase{
 		}
 	}
 
-	private void filterProductions(final List<Production> productions){
-		enforceCircumfix(productions);
+	private Production[] filterProductions(Production[] productions){
+		productions = enforceCircumfix(productions);
 
-		enforceNeedAffixFlag(productions);
+		return enforceNeedAffixFlag(productions);
 	}
 
 	/** Remove rules that invalidate the circumfix rule */
-	private void enforceCircumfix(final List<Production> productions){
+	private Production[] enforceCircumfix(Production[] productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			productions.removeIf(production -> production.hasContinuationFlag(circumfixFlag));
+			productions = JavaHelper.removeIf(productions, production -> production.hasContinuationFlag(circumfixFlag));
+		return productions;
 	}
 
 	/** Remove rules that invalidate the affix rule */
-	private void enforceNeedAffixFlag(final List<Production> productions){
+	private Production[] enforceNeedAffixFlag(Production[] productions){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)
-			productions.removeIf(production -> hasNeedAffixFlag(production, needAffixFlag));
+			productions = JavaHelper.removeIf(productions, production -> hasNeedAffixFlag(production, needAffixFlag));
+		return productions;
 	}
 
 	private boolean hasNeedAffixFlag(final Production production, final String needAffixFlag){
@@ -190,7 +192,7 @@ class WordGeneratorBase{
 		return (hasNeedAffixFlag || production.hasContinuationFlag(needAffixFlag));
 	}
 
-	private List<Production> applyAffixRules(final DictionaryEntry dicEntry, final List<List<String>> allAffixes,
+	private Production[] applyAffixRules(final DictionaryEntry dicEntry, final List<List<String>> allAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
@@ -200,16 +202,16 @@ class WordGeneratorBase{
 		if(circumfixFlag != null && allAffixes.get(2).contains(circumfixFlag))
 			postponedAffixes.add(circumfixFlag);
 
-		final List<Production> productions = new ArrayList<>();
+		Production[] productions = new Production[0];
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
-			appliedAffixes.stream()
-				.map(affix -> applyAffixRule(dicEntry, affix, postponedAffixes, isCompound, overriddenRule))
-				.forEach(productions::addAll);
-
+			for(final String affix : appliedAffixes){
+				final Production[] prods = applyAffixRule(dicEntry, affix, postponedAffixes, isCompound, overriddenRule);
+				productions = ArrayUtils.addAll(productions, prods);
+			}
 		return productions;
 	}
 
-	private List<Production> applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,
+	private Production[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
 
@@ -219,7 +221,7 @@ class WordGeneratorBase{
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))
-				return Collections.emptyList();
+				return new Production[0];
 
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
@@ -236,7 +238,7 @@ class WordGeneratorBase{
 		if(applicableAffixes.isEmpty())
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' and word '" + word + "'");
 
-		final List<Production> productions = new ArrayList<>();
+		Production[] productions = new Production[0];
 		for(final AffixEntry entry : applicableAffixes)
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and production has the same contraint then remove it from postponedAffixes
@@ -255,7 +257,7 @@ class WordGeneratorBase{
 				if(removeCircumfixFlag)
 					production.removeContinuationFlag(circumfixFlag);
 				if(!production.hasContinuationFlag(forbiddenWordFlag))
-					productions.add(production);
+					productions = ArrayUtils.add(productions, production);
 			}
 		return productions;
 	}

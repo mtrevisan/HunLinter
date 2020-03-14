@@ -56,7 +56,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
+		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -71,7 +71,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
-			final List<Production> productions = applyAffixRules(dicEntry, false, null);
+			final Production[] productions = applyAffixRules(dicEntry, false, null);
 			for(final Production production : productions){
 				final Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);

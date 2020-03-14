@@ -53,12 +53,12 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		//check if it's possible to compound some words
 		if(inputs.isEmpty())
-			return new Production[]{};
+			return new Production[0];
 
 		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
-		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
+		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -78,19 +78,19 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result;
 	}
 
-	private List<List<List<Production>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
-		final Map<Integer, List<Production>> dicEntries = new HashMap<>();
+	private List<List<Production[]>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+		final Map<Integer, Production[]> dicEntries = new HashMap<>();
 		return permutations.stream()
 			.map(permutation -> generateCompound(permutation, dicEntries, inputs))
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
 
-	private List<List<Production>> generateCompound(final int[] permutation, final Map<Integer, List<Production>> dicEntries,
+	private List<Production[]> generateCompound(final int[] permutation, final Map<Integer, Production[]> dicEntries,
 			final List<DictionaryEntry> inputs){
-		final List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
+		final List<Production[]> expandedPermutationEntries = Arrays.stream(permutation)
 			.mapToObj(index -> dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null)))
-			.filter(Predicate.not(List::isEmpty))
+			.filter(list -> list.length > 0)
 			.collect(Collectors.toList());
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);
 	}

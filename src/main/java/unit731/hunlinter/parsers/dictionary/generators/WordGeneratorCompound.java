@@ -4,17 +4,16 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +22,8 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.ArraySet;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -59,25 +60,31 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		this.wordGenerator = wordGenerator;
 	}
 
-	protected List<List<List<Production>>> generateCompounds(final List<List<String>> permutations, final Map<String, Set<DictionaryEntry>> inputs){
-		final List<List<List<Production>>> entries = new ArrayList<>();
-		final Map<String, List<Production>> dicEntries = new HashMap<>();
+	protected List<List<Production[]>> generateCompounds(final List<List<String>> permutations,
+			final Map<String, Set<DictionaryEntry>> inputs){
+		final List<List<Production[]>> entries = new ArrayList<>();
+		final Map<String, Production[]> dicEntries = new HashMap<>();
 		outer:
 		for(final List<String> permutation : permutations){
 			//expand permutation
-			final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+			final List<Production[]> expandedPermutationEntries = new ArrayList<>();
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
-					final List<Production> dicEntriesPerFlag = inputs.get(flag).stream()
-						.map(entry -> applyAffixRules(entry, true, null))
-						.map(productions -> productions.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
-						.flatMap(Collection::stream)
-						.collect(Collectors.toList());
+					Production[] dicEntriesPerFlag = new Production[0];
+					for(DictionaryEntry entry : inputs.get(flag)){
+						final Production[] productions = applyAffixRules(entry, true, null);
+						Production[] collect = new Production[0];
+						for(final Production prod : productions)
+							if(prod.hasContinuationFlag(flag))
+								collect = ArrayUtils.add(collect, prod);
+						for(final Production production : collect)
+							dicEntriesPerFlag = ArrayUtils.add(dicEntriesPerFlag, production);
+					}
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
 
-				final List<Production> dicEntriesPerFlag = dicEntries.get(flag);
-				if(!dicEntriesPerFlag.isEmpty())
+				final Production[] dicEntriesPerFlag = dicEntries.get(flag);
+				if(dicEntriesPerFlag.length > 0)
 					expandedPermutationEntries.add(dicEntriesPerFlag);
 				else{
 					//it is not possible to compound some words, return empty list
@@ -91,7 +98,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected Production[] applyCompound(final List<List<List<Production>>> entries, final int limit){
+	protected Production[] applyCompound(final List<List<Production[]>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -100,9 +107,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundAsReplacement.clear();
 
 		final StringBuffer sb = new StringBuffer();
-		final Set<Production> productions = new LinkedHashSet<>();
+		final ArraySet<Production> productions = new ArraySet<>();
 		//generate compounds:
-		for(final List<List<Production>> entry : entries){
+		for(final List<Production[]> entry : entries){
 			//compose compound:
 			boolean completed = false;
 			final int[] indexes = new int[entry.size()];
@@ -116,8 +123,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 							&& !continuationFlags.get(1).contains(forbiddenWordFlag)
 							&& !continuationFlags.get(2).contains(forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
-						final List<Production> newProductions = generateProductions(compoundWord, compoundEntries, continuationFlags);
-						productions.addAll(newProductions.subList(0, Math.min(limit - productions.size(), newProductions.size())));
+						final Production[] newProductions = generateProductions(compoundWord, compoundEntries, continuationFlags);
+						final Production[] subProductions = ArrayUtils.subarray(newProductions,
+							0, Math.min(limit - productions.size(), newProductions.length));
+						productions.addAll(subProductions);
 					}
 				}
 
@@ -151,20 +160,20 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			productions.toArray(Production[]::new));
 	}
 
-	private List<Production> generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries,
+	private Production[] generateProductions(final String compoundWord, final List<DictionaryEntry> compoundEntries,
 			final List<List<String>> continuationFlags){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
-		final List<Production> productions;
+		final Production[] productions;
 		final String flags = (!continuationFlags.isEmpty()?
 			StringUtils.join(continuationFlags.stream().flatMap(Collection::stream).toArray(String[]::new)):
 			null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-			productions = Collections.singletonList(p);
+			productions = new Production[]{p};
 		else{
 			//add boundary affixes
 			productions = applyAffixRules(p, false, null);
@@ -176,7 +185,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return productions;
 	}
 
-	private List<DictionaryEntry> composeCompound(final int[] indexes, final List<List<Production>> entry, final StringBuffer sb){
+	private List<DictionaryEntry> composeCompound(final int[] indexes, final List<Production[]> entry, final StringBuffer sb){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
 		final boolean forbidTriples = affixData.isForbidTriplesInCompound();
@@ -187,7 +196,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		sb.setLength(0);
 		StringHelper.Casing lastWordCasing = null;
 		for(int i = 0; i < indexes.length; i ++){
-			final Production next = entry.get(i).get(indexes[i]);
+			final Production next = entry.get(i)[indexes[i]];
 
 			//skip forbidden words
 			if(next.hasContinuationFlag(forbiddenWordFlag)){
@@ -265,8 +274,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return Arrays.asList(prefixes.get(0), suffixes.get(1), new ArrayList<>(terminals));
 	}
 
-	private void removeTwofolds(final List<Production> prods){
-		prods.removeIf(Production::isTwofolded);
+	private void removeTwofolds(final Production[] prods){
+		JavaHelper.removeIf(prods, Production::isTwofolded);
 	}
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?
@@ -286,12 +295,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return exists;
 	}
 
-	private boolean getNextTuple(final int[] indexes, final List<List<Production>> entry){
+	private boolean getNextTuple(final int[] indexes, final List<Production[]> entry){
 		//obtain next tuple
 		int i = indexes.length - 1;
 		while(i >= 0){
 			indexes[i] ++;
-			if(indexes[i] < entry.get(i).size())
+			if(indexes[i] < entry.get(i).length)
 				break;
 
 			indexes[i --] = 0;

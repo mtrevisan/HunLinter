@@ -252,20 +252,24 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		Production[] expected = new Production[]{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foofoosufsff", "P", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("prefoofoosuf", "T", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoosufsff", null, "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
 			createProduction("foobarsuf", "PT", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("foobarsufsff", "P", "pa:foo st:foo pa:bar st:bar"),
 			createProduction("prefoobar", "S", "pa:foo st:foo pa:bar st:bar"),
 			createProduction("prefoobarsuf", "T", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobarsufsff", null, "pa:foo st:foo pa:bar st:bar"),
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barfoosuf", "PT", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barfoosufsff", "P", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("prebarfoo", "S", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("prebarfoosuf", "T", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoosufsff", null, "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar")
+			createProduction("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
