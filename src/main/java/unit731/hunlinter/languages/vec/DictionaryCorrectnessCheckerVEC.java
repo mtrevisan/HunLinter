@@ -264,9 +264,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private String getLastAppliedRule(final Production production){
 		String appliedRuleFlag = null;
-		final List<AffixEntry> appliedRules = production.getAppliedRules();
+		final AffixEntry[] appliedRules = production.getAppliedRules();
 		if(appliedRules != null)
-			appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
+			appliedRuleFlag = appliedRules[appliedRules.length - 1]
 				.getFlag();
 		return appliedRuleFlag;
 	}

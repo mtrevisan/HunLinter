@@ -2,14 +2,14 @@ package unit731.hunlinter.parsers.vos;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
@@ -33,13 +33,13 @@ public class Production extends DictionaryEntry{
 	private static final String POS_FSA_TAG_SEPARATOR = "+";
 
 
-	private List<AffixEntry> appliedRules;
+	private AffixEntry[] appliedRules;
 
-	private final List<DictionaryEntry> compoundEntries;
+	private final DictionaryEntry[] compoundEntries;
 
 
 	public static Production createFromCompound(final String word, final String continuationFlags,
-			final List<DictionaryEntry> compoundEntries, final FlagParsingStrategy strategy){
+			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
@@ -47,16 +47,15 @@ public class Production extends DictionaryEntry{
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final boolean combinable){
 		return new Production(word, appliedEntry.continuationFlags, appliedEntry.morphologicalFields, combinable,
-			Collections.singletonList(appliedEntry), null);
+			new AffixEntry[]{appliedEntry}, null);
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
 			final List<String> remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
-		final List<AffixEntry> appliedRules = new ArrayList<>(3);
-		appliedRules.add(appliedEntry);
-		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
+		final AffixEntry[] appliedRules = new AffixEntry[]{appliedEntry};
+		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
 		return new Production(word, continuationFlags, morphologicalFields, combinable,
 			appliedRules, compoundEntries);
 	}
@@ -72,7 +71,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-			final boolean combinable, final List<AffixEntry> appliedRules, final List<DictionaryEntry> compoundEntries){
+			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
@@ -81,24 +80,24 @@ public class Production extends DictionaryEntry{
 
 	/* NOTE: used for testing purposes */
 	public Production(final String word, final String continuationFlags, final String morphologicalFields,
-			final List<DictionaryEntry> compoundEntries, final FlagParsingStrategy strategy){
+			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
 			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		this.compoundEntries = compoundEntries;
 	}
 
-	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){
+	private static DictionaryEntry[] extractCompoundEntries(final DictionaryEntry dicEntry){
 		return (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
 	}
 
 	@Override
-	public List<AffixEntry> getAppliedRules(){
+	public AffixEntry[] getAppliedRules(){
 		return appliedRules;
 	}
 
 	public AffixEntry getAppliedRule(final int index){
-		return (appliedRules != null && index < appliedRules.size()? appliedRules.get(index): null);
+		return (appliedRules != null && index < appliedRules.length? appliedRules[index]: null);
 	}
 
 	@Override
@@ -111,12 +110,12 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(){
-		return (appliedRules != null? appliedRules.get(appliedRules.size() - 1): null);
+		return (appliedRules != null? appliedRules[appliedRules.length - 1]: null);
 	}
 
 	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
-		if(compoundEntries != null && !compoundEntries.isEmpty()
-				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
+		if(compoundEntries != null && compoundEntries.length > 0
+				&& compoundEntries[compoundEntries.length - 1].hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
 	}
 
@@ -124,15 +123,16 @@ public class Production extends DictionaryEntry{
 		return (morphologicalFields != null && morphologicalFields.length > 0);
 	}
 
-	public void prependAppliedRules(final List<AffixEntry> appliedRules){
+	public void prependAppliedRules(final AffixEntry[] appliedRules){
 		if(appliedRules != null){
-			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>(3));
-			this.appliedRules.addAll(0, appliedRules);
+			if(this.appliedRules == null)
+				this.appliedRules = new AffixEntry[1];
+			ArrayUtils.insert(0, this.appliedRules, appliedRules);
 		}
 	}
 
 	public boolean hasProductionRules(){
-		return (appliedRules != null && !appliedRules.isEmpty());
+		return (appliedRules != null && appliedRules.length > 0);
 	}
 
 //	public boolean hasProductionRule(final String continuationFlag){
@@ -165,7 +165,7 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public boolean isCompound(){
-		return (compoundEntries != null && !compoundEntries.isEmpty());
+		return (compoundEntries != null && compoundEntries.length > 0);
 	}
 
 	public String toStringWithPartOfSpeechFields(){
@@ -218,7 +218,7 @@ public class Production extends DictionaryEntry{
 		sj.add(super.toString(strategy));
 		if(hasProductionRules()){
 			sj.add(FROM);
-			sj.add(appliedRules.stream()
+			sj.add(Arrays.stream(appliedRules)
 				.map(AffixEntry::getFlag)
 				.collect(Collectors.joining(LEADS_TO)));
 		}

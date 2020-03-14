@@ -42,13 +42,17 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //System.out.println("dicEntry: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(dicEntry));
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 //System.out.println("base production: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(productions.get(0)));
-//System.out.println("productions: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions));
+System.out.println("productions: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions));
 /*dicEntry: 576
 dicEntry: 408
 dicEntry: 592
 dicEntry: 352
 base production: 360 > 224
-productions: 272*/
+productions: 272
+fsa2: 344
+fsa3: 376
+fsa4: 296
+fsa5: 344*/
 
 			for(final Production production : productions){
 				try{

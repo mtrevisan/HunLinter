@@ -122,7 +122,7 @@ class WordGeneratorBase{
 			if(production.isCombinable()){
 				final Production[] prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
 
-				final List<AffixEntry> appliedRules = production.getAppliedRules();
+				final AffixEntry[] appliedRules = production.getAppliedRules();
 				//add parent derivations
 				Arrays.stream(prods)
 					.forEach(prod -> prod.prependAppliedRules(appliedRules));
@@ -169,15 +169,15 @@ class WordGeneratorBase{
 
 	private boolean hasNeedAffixFlag(final Production production, final String needAffixFlag){
 		boolean hasNeedAffixFlag = false;
-		final List<AffixEntry> appliedRules = production.getAppliedRules();
+		final AffixEntry[] appliedRules = production.getAppliedRules();
 		if(appliedRules != null){
 			//check that last suffix and last prefix don't have the needaffix flag
 			boolean lastSuffix = false;
 			boolean lastPrefix = false;
 			boolean lastSuffixNeedAffix = false;
 			boolean lastPrefixNeedAffix = false;
-			for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
-				final AffixEntry appliedRule = appliedRules.get(i);
+			for(int i = appliedRules.length - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
+				final AffixEntry appliedRule = appliedRules[i];
 				if(appliedRule.isSuffix() && !lastSuffix){
 					lastSuffix = true;
 					lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
@@ -213,7 +213,7 @@ class WordGeneratorBase{
 
 	private Production[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
+		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
 		RuleEntry rule = affixData.getData(affix);
 		//override with the given rule
@@ -223,7 +223,7 @@ class WordGeneratorBase{
 			if(affixData.isManagedByCompoundRule(affix))
 				return new Production[0];
 
-			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
+			final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
 				(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
@@ -245,7 +245,7 @@ class WordGeneratorBase{
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = appliedRules.stream()
+					final boolean appliedRuleContainsCircumfix = Arrays.stream(appliedRules)
 						.anyMatch(r -> (entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag));
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
 				}

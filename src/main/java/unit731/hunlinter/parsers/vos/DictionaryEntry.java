@@ -180,8 +180,8 @@ public class DictionaryEntry{
 		return false;
 	}
 
-	public List<AffixEntry> getAppliedRules(){
-		return Collections.emptyList();
+	public AffixEntry[] getAppliedRules(){
+		return new AffixEntry[0];
 	}
 
 	/**
@@ -290,9 +290,10 @@ public class DictionaryEntry{
 					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
-					final List<AffixEntry> appliedRules = getAppliedRules();
-					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+					final AffixEntry[] appliedRules = getAppliedRules();
+					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
+					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
+						(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
 				if(rule instanceof RuleEntry){

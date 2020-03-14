@@ -193,8 +193,8 @@ public class AffixEntry{
 		return mf.toArray(String[]::new);
 	}
 
-	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
-		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.size(): 0);
+	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
+		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
 		JavaHelper.nullableToStream(compoundEntries)
 			.forEach(compoundEntry -> {
 				final String compound = compoundEntry.getWord();
