@@ -77,6 +77,11 @@ class WordGeneratorBase{
 		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
 		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
 		printProductions("Twofold productions:", twofoldProductions);
+if(twofoldProductions.length > 0){
+	long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(twofoldProductions[0]);
+	System.out.println("productions: " + size);
+	//fsa6: 1016?
+}
 
 		checkTwofoldCorrectness(twofoldProductions);
 

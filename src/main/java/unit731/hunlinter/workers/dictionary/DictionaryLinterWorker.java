@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.carrotsearch.sizeof.RamUsageEstimator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -42,7 +43,10 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //System.out.println("dicEntry: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(dicEntry));
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 //System.out.println("base production: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(productions.get(0)));
-System.out.println("productions: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions));
+//long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions);
+//System.out.println("productions: " + size);
+//if(size > 10_000)
+//	System.out.println();
 /*dicEntry: 576
 dicEntry: 408
 dicEntry: 592
@@ -52,7 +56,8 @@ productions: 272
 fsa2: 344
 fsa3: 376
 fsa4: 296
-fsa5: 344*/
+fsa5: 344
+fsa6: 296*/
 
 			for(final Production production : productions){
 				try{
