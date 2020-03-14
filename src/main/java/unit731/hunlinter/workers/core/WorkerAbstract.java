@@ -163,8 +163,11 @@ if(currentMemoryUsage > memoryUsage.get()){
 	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
 
 	System.gc();
-}//3.6 GiB
-//dic linter: 487 MiB, 313 MiB
+}
+//PoS FSA:
+//?: 3.6 GiB
+//dic linter:
+//fsa6: 278/274 MiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 

@@ -80,8 +80,8 @@ class WordGeneratorBase{
 //if(twofoldProductions.length > 0){
 //	long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(twofoldProductions[0]);
 //	System.out.println("productions: " + size);
-	//fsa4: 1048
-	//fsa6: 1016
+	//fsa4: 1048 B
+	//fsa6: 1016 B
 //}
 
 		checkTwofoldCorrectness(twofoldProductions);
