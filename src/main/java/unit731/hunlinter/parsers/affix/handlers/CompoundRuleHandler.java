@@ -73,8 +73,8 @@ public class CompoundRuleHandler implements Handler{
 	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
 			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
-		final List<String> compounds = strategy.extractCompoundRule(rule);
-		if(compounds.isEmpty())
+		final String[] compounds = strategy.extractCompoundRule(rule);
+		if(compounds.length == 0)
 			throw new LinterException(BAD_FORMAT.format(new Object[]{line}));
 	}
 

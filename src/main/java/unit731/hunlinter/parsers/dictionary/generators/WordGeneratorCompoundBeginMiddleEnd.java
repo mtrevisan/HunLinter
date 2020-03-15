@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-		final List<String> compoundRule = Arrays.asList(compoundBeginFlag, "?", compoundMiddleFlag, "?", compoundEndFlag, "?");
+		final String[] compoundRule = new String[]{compoundBeginFlag, "?", compoundMiddleFlag, "?", compoundEndFlag, "?"};
 		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);

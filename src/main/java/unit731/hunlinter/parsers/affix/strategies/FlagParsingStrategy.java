@@ -6,7 +6,6 @@ import unit731.hunlinter.services.SetHelper;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -49,6 +48,6 @@ public abstract class FlagParsingStrategy{
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags
 	 */
-	public abstract List<String> extractCompoundRule(final String compoundRule);
+	public abstract String[] extractCompoundRule(final String compoundRule);
 
 }

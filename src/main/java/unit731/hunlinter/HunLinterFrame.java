@@ -566,7 +566,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
-			final List<String> extractions = PatternHelper.extract(content, EXTRACTOR, 10);
+			final String[] extractions = PatternHelper.extract(content, EXTRACTOR, 10);
 			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 				.mapToObj(Character::toString).collect(Collectors.toSet()));
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));

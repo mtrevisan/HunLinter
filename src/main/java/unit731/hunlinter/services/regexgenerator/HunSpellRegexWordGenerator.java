@@ -45,18 +45,18 @@ public class HunSpellRegexWordGenerator{
 	 *
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
 	 */
-	public HunSpellRegexWordGenerator(final List<String> regexpParts){
+	public HunSpellRegexWordGenerator(final String[] regexpParts){
 		int offset = 0;
-		final int size = regexpParts.size();
+		final int size = regexpParts.length;
 		for(int i = 0; i + offset < size; i ++){
 			final int operatorIndex = i + offset + 1;
-			final char next = (operatorIndex < size && regexpParts.get(operatorIndex).length() == 1?
-				regexpParts.get(operatorIndex).charAt(0): 0);
+			final char next = (operatorIndex < size && regexpParts[operatorIndex].length() == 1?
+				regexpParts[operatorIndex].charAt(0): 0);
 			switch(next){
 				//zero or more
 				case '*':
 					graph.addEdge(i, i + 1);
-					graph.addEdge(i, i, regexpParts.get(operatorIndex - 1));
+					graph.addEdge(i, i, regexpParts[operatorIndex - 1]);
 
 					//skip operator
 					offset ++;
@@ -64,7 +64,7 @@ public class HunSpellRegexWordGenerator{
 
 				//zero or one
 				case '?':
-					graph.addEdge(i, i + 1, regexpParts.get(operatorIndex - 1));
+					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
 					graph.addEdge(i, i + 1);
 
 					//skip operator
@@ -73,11 +73,11 @@ public class HunSpellRegexWordGenerator{
 
 				default:
 					//one
-					graph.addEdge(i, i + 1, regexpParts.get(operatorIndex - 1));
+					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
 			}
 		}
 
-		finalStateIndex = regexpParts.size() - offset;
+		finalStateIndex = size - offset;
 	}
 
 	/**

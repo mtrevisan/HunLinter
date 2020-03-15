@@ -49,7 +49,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//extract map flag -> dictionary entries
 		final Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
-		final List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		final String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
@@ -78,7 +78,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	}
 
 	private void checkCompoundRuleInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs,
-			final List<String> compoundRuleComponents){
+			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
 				throw new LinterException(MISSING_WORD.format(new Object[]{component,

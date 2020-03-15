@@ -4,9 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,14 +79,14 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public List<String> extractCompoundRule(final String compoundRule){
+	public String[] extractCompoundRule(final String compoundRule){
 		checkCompoundValidity(compoundRule);
 
 		//NOTE: same as compoundRule.split(StringUtils.EMPTY) but faster
 		final int size = compoundRule.length();
 		return IntStream.range(0, size)
 			.mapToObj(i -> String.valueOf(compoundRule.charAt(i)))
-			.collect(Collectors.toCollection(() -> new ArrayList<>(size)));
+			.toArray(String[]::new);
 	}
 
 	private void checkCompoundValidity(final String compoundRule){

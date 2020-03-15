@@ -45,20 +45,13 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //System.out.println("base production: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(productions.get(0)));
 long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions);
 //System.out.println("productions: " + size);
-//if(size > 10_000)
-//	System.out.println();
 /*
-dicEntry: 576
-dicEntry: 408
-dicEntry: 592
-dicEntry: 352
-base production: 360 > 224
-productions: 272
-fsa2: 344
-fsa3: 376
-fsa4: 296
-fsa5: 344
-fsa6: 296
+fsa2: 344 B
+fsa3: 376 B
+fsa4: 296 B
+fsa5: 344 B
+fsa6: 296 B
+fsa8: ? B
 */
 
 			for(final Production production : productions){

@@ -253,10 +253,10 @@ public class HyphenationParser{
 
 	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
 	private String convertUnicode(final String line){
-		final List<String> components = PatternHelper.extract(line, PATTERN_ESCAPED_UNICODE);
-		for(int i = 0; i < components.size(); i ++)
-			if(components.get(i).startsWith(ESCAPE_SEQUENCE))
-				components.set(i, String.valueOf((char)Integer.parseInt(components.get(i).substring(2), 16)));
+		final String[] components = PatternHelper.extract(line, PATTERN_ESCAPED_UNICODE);
+		for(int i = 0; i < components.length; i ++)
+			if(components[i].startsWith(ESCAPE_SEQUENCE))
+				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
 		return StringUtils.join(components);
 	}
 

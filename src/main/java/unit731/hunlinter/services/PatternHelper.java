@@ -1,13 +1,12 @@
 package unit731.hunlinter.services;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -48,18 +47,31 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static List<String> extract(final String text, final Pattern pattern){
+	public static String[] extract(final String text, final Pattern pattern){
 		return extract(text, pattern, -1);
 	}
 
-	public static List<String> extract(final String text, final Pattern pattern, final int limit){
+	public static String[] extract(final String text, final Pattern pattern, final int limit){
 		final Matcher matcher = pattern.matcher(text);
-		final ArrayList<String> result = new ArrayList<>(Math.max(limit, 0));
-		while(matcher.find() && (limit < 0 || result.size() < limit)){
+		return (limit >= 0? extractWithLimit(matcher, limit): extractUnlimited(matcher));
+	}
+
+	private static String[] extractWithLimit(final Matcher matcher, final int limit){
+		int index = 0;
+		final String[] result = new String[limit];
+		while(matcher.find() && index < limit){
 			final String component = getNextGroup(matcher);
-			result.add(component != null? component: matcher.group());
+			result[index ++] = (component != null? component: matcher.group());
 		}
-		result.trimToSize();
+		return result;
+	}
+
+	private static String[] extractUnlimited(final Matcher matcher){
+		String[] result = new String[0];
+		while(matcher.find()){
+			final String component = getNextGroup(matcher);
+			result = ArrayUtils.add(result, (component != null? component: matcher.group()));
+		}
 		return result;
 	}
 

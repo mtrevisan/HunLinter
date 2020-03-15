@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -70,15 +69,15 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public List<String> extractCompoundRule(final String compoundRule){
-		final List<String> parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+	public String[] extractCompoundRule(final String compoundRule){
+		final String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
 	}
 
-	private void checkCompoundValidity(final List<String> parts, final String compoundRule){
+	private void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
 			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');

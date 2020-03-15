@@ -107,7 +107,7 @@ public class ProjectLoaderAction extends AbstractAction{
 	private Font temporarilyChooseAFont() throws IOException{
 		final Path affixPath = packager.getAffixFile().toPath();
 		final String content = new String(Files.readAllBytes(affixPath));
-		final List<String> extractions = PatternHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
+		final String[] extractions = PatternHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 			.mapToObj(Character::toString).collect(Collectors.toSet()));
 		return GUIUtils.chooseBestFont(sample);
