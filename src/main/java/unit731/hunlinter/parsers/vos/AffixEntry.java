@@ -144,10 +144,10 @@ public class AffixEntry{
 
 	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
 		final ArraySet<String> flags = new ArraySet<>();
-		if(continuationFlags != null)
-			flags.addAll(Arrays.asList(continuationFlags));
 		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(otherContinuationFlags);
+		if(continuationFlags != null)
+			flags.addAll(Arrays.asList(continuationFlags));
 		final int size = flags.size();
 		return (size > 0? flags.toArray(String[]::new): null);
 	}

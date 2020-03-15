@@ -61,7 +61,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "AÜ", "st:foo"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "ÖÜü", "st:foo"), words[1]);
+		Assertions.assertEquals(createProduction("foos", "ÜÖü", "st:foo"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("foosbar", "Ü", "st:foo"), words[2]);
 		Assertions.assertEquals(createProduction("foosbaz", "Ü", "st:foo"), words[3]);
@@ -130,7 +130,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "A3", "st:foo"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "123", "st:foo"), words[1]);
+		Assertions.assertEquals(createProduction("foos", "312", "st:foo"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("foosbar", "3", "st:foo"), words[2]);
 		Assertions.assertEquals(createProduction("foosbaz", "3", "st:foo"), words[3]);
@@ -165,7 +165,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "zx09", "st:foo"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "g?1G09", "st:foo"), words[1]);
+		Assertions.assertEquals(createProduction("foos", "09g?1G", "st:foo"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("foosbaz", "09", "st:foo"), words[2]);
 		Assertions.assertEquals(createProduction("foosbar", "09", "st:foo"), words[3]);
@@ -227,7 +227,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("aa", "S1", "st:aa"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words[1]);
+		Assertions.assertEquals(createProduction("aas1", "S2P1", "st:aa"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words[2]);
 		//twofold productions
@@ -352,9 +352,9 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(createProduction("a", "ABCDE", "st:a"), words[0]);
 		//suffix productions
 		Assertions.assertEquals(createProduction("aa", "E", "st:a"), words[1]);
-		Assertions.assertEquals(createProduction("ab", "AE", "st:a"), words[2]);
+		Assertions.assertEquals(createProduction("ab", "EA", "st:a"), words[2]);
 		Assertions.assertEquals(createProduction("ac", "E", "st:a"), words[3]);
-		Assertions.assertEquals(createProduction("ad", "AE", "st:a"), words[4]);
+		Assertions.assertEquals(createProduction("ad", "EA", "st:a"), words[4]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("aba", "E", "st:a"), words[5]);
 		Assertions.assertEquals(createProduction("ada", "E", "st:a"), words[6]);
@@ -431,7 +431,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'p1aas1/P2,S2	st:aa	from	S1 > P1 from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for 'p1aas1/S2,P2	st:aa	from	S1 > P1 from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
 	}
 
 	@Test
@@ -493,9 +493,9 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(createProduction("a", "ABCDE", "st:a"), words[0]);
 		//suffix productions
 		Assertions.assertEquals(createProduction("aa", "E", "st:a"), words[1]);
-		Assertions.assertEquals(createProduction("ba", "AE", "st:a"), words[2]);
+		Assertions.assertEquals(createProduction("ba", "EA", "st:a"), words[2]);
 		Assertions.assertEquals(createProduction("ca", "E", "st:a"), words[3]);
-		Assertions.assertEquals(createProduction("da", "AE", "st:a"), words[4]);
+		Assertions.assertEquals(createProduction("da", "EA", "st:a"), words[4]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("aba", "E", "st:a"), words[5]);
 		Assertions.assertEquals(createProduction("ada", "E", "st:a"), words[6]);
@@ -643,7 +643,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "AC", "st:foo"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("foo-suf", "BC", "st:foo"), words[1]);
+		Assertions.assertEquals(createProduction("foo-suf", "CB", "st:foo"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("foo-suf-bar", "C", "st:foo"), words[2]);
 		Assertions.assertEquals(createProduction("foo-pseudosuf-bar", "C", "st:foo"), words[3]);

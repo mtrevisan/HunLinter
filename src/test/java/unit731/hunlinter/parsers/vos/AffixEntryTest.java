@@ -13,9 +13,8 @@ class AffixEntryTest{
 	void notValidSuffix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 b i a";
-		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			AffixEntry entry = new AffixEntry(line, strategy, null, null);
-		});
+		Throwable exception = Assertions.assertThrows(LinterException.class,
+			() -> new AffixEntry(line, strategy, null, null));
 		Assertions.assertEquals("Condition part doesn't ends with removal part: '" + line + "'", exception.getMessage());
 	}
 
@@ -23,9 +22,8 @@ class AffixEntryTest{
 	void notValidSuffix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 a ai a";
-		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			AffixEntry entry = new AffixEntry(line, strategy, null, null);
-		});
+		Throwable exception = Assertions.assertThrows(LinterException.class,
+			() -> new AffixEntry(line, strategy, null, null));
 		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
 	}
 
@@ -33,9 +31,8 @@ class AffixEntryTest{
 	void notValidPrefix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 b i a";
-		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			AffixEntry entry = new AffixEntry(line, strategy, null, null);
-		});
+		Throwable exception = Assertions.assertThrows(LinterException.class,
+			() -> new AffixEntry(line, strategy, null, null));
 		Assertions.assertEquals("Condition part doesn't starts with removal part: '" + line + "'", exception.getMessage());
 	}
 
@@ -43,9 +40,8 @@ class AffixEntryTest{
 	void notValidPrefix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 a ia a";
-		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			AffixEntry entry = new AffixEntry(line, strategy, null, null);
-		});
+		Throwable exception = Assertions.assertThrows(LinterException.class,
+			() -> new AffixEntry(line, strategy, null, null));
 		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
 	}
 
@@ -76,7 +72,7 @@ class AffixEntryTest{
 
 		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
 
-		Assertions.assertArrayEquals(new String[]{"A", "B"}, combinedFlags);
+		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags);
 	}
 
 	@Test
