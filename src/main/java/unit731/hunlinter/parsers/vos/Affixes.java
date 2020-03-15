@@ -23,11 +23,10 @@ public class Affixes{
 	}
 
 	public String[][] extractAllAffixes(final boolean reverseAffixes){
-		final String[][] applyAffixes = new String[3][];
-		applyAffixes[0] = (reverseAffixes? suffixes: prefixes);
-		applyAffixes[1] = (reverseAffixes? prefixes: suffixes);
-		applyAffixes[2] = terminals;
-		return applyAffixes;
+		return new String[][]{
+			(reverseAffixes? suffixes: prefixes),
+			(reverseAffixes? prefixes: suffixes),
+			terminals};
 	}
 
 }

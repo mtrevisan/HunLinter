@@ -95,9 +95,6 @@ public class AffixEntry{
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 		appendingLength = appending.length();
 
-		if(continuationFlags != null)
-			Arrays.sort(continuationFlags);
-
 		checkValidity(cond, removal, line);
 
 

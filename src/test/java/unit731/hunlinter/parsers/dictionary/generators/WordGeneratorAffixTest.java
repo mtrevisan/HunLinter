@@ -165,13 +165,13 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("foo", "zx09", "st:foo"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "1Gg?09", "st:foo"), words[1]);
+		Assertions.assertEquals(createProduction("foos", "g?1G09", "st:foo"), words[1]);
 		//prefix productions
 		Assertions.assertEquals(createProduction("foosbaz", "09", "st:foo"), words[2]);
 		Assertions.assertEquals(createProduction("foosbar", "09", "st:foo"), words[3]);
 		//twofold productions
 		Assertions.assertEquals(createProduction("unfoo", "zx", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("unfoos", "1Gg?", "st:foo"), words[5]);
+		Assertions.assertEquals(createProduction("unfoos", "g?1G", "st:foo"), words[5]);
 		Assertions.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words[6]);
 		Assertions.assertEquals(createProduction("unfoosbar", null, "st:foo"), words[7]);
 	}
