@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.ArraySet;
@@ -117,11 +118,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					final List<List<String>> continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					final String[][] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
 					if(forbiddenWordFlag == null
-							|| !continuationFlags.get(0).contains(forbiddenWordFlag)
-							&& !continuationFlags.get(1).contains(forbiddenWordFlag)
-							&& !continuationFlags.get(2).contains(forbiddenWordFlag)){
+							|| !ArrayUtils.contains(continuationFlags[Affixes.INDEX_PREFIXES], forbiddenWordFlag)
+							&& !ArrayUtils.contains(continuationFlags[Affixes.INDEX_SUFFIXES], forbiddenWordFlag)
+							&& !ArrayUtils.contains(continuationFlags[Affixes.INDEX_TERMINALS], forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
 						final Production[] newProductions = generateProductions(compoundWord, compoundEntries, continuationFlags);
 						final Production[] subProductions = ArrayUtils.subarray(newProductions,
@@ -161,15 +162,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private Production[] generateProductions(final String compoundWord, final DictionaryEntry[] compoundEntries,
-			final List<List<String>> continuationFlags){
+			final String[][] continuationFlags){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		final Production[] productions;
-		final String flags = (!continuationFlags.isEmpty()?
-			StringUtils.join(continuationFlags.stream().flatMap(Collection::stream).toArray(String[]::new)):
+		final String flags = (continuationFlags.length > 0?
+			StringUtils.join(Arrays.stream(continuationFlags).flatMap(Arrays::stream).toArray(String[]::new)):
 			null);
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
@@ -263,14 +264,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	private List<List<String>> extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries, final String compoundFlag){
-		final List<List<String>> prefixes = compoundEntries[0].extractAllAffixes(affixData, false);
-		final List<List<String>> suffixes = compoundEntries[compoundEntries.length - 1].extractAllAffixes(affixData, false);
-		final Set<String> terminals = new HashSet<>(prefixes.get(2));
-		terminals.addAll(suffixes.get(2));
+	private String[][] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries, final String compoundFlag){
+		final String[][] prefixes = compoundEntries[0].extractAllAffixes(affixData, false);
+		final String[][] suffixes = compoundEntries[compoundEntries.length - 1].extractAllAffixes(affixData, false);
+		final ArraySet<String> terminals = new ArraySet<>();
+		terminals.addAll(prefixes[Affixes.INDEX_TERMINALS]);
+		terminals.addAll(suffixes[Affixes.INDEX_TERMINALS]);
 		terminals.remove(compoundFlag);
 
-		return Arrays.asList(prefixes.get(0), suffixes.get(1), new ArrayList<>(terminals));
+		return new String[][]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals.toArray(String[]::new)};
 	}
 
 	private void removeTwofolds(final Production[] prods){

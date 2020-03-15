@@ -1,34 +1,32 @@
 package unit731.hunlinter.parsers.vos;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 
 public class Affixes{
 
-	private final List<String> prefixes;
-	private final List<String> suffixes;
-	private final List<String> terminalAffixes;
+	public static final int INDEX_PREFIXES = 0;
+	public static final int INDEX_SUFFIXES = 1;
+	public static final int INDEX_TERMINALS = 2;
+
+	private final String[] prefixes;
+	private final String[] suffixes;
+	private final String[] terminals;
 
 
-	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminalAffixes){
+	public Affixes(final String[] prefixes, final String[] suffixes, final String[] terminals){
 		this.prefixes = prefixes;
 		this.suffixes = suffixes;
-		this.terminalAffixes = terminalAffixes;
+		this.terminals = terminals;
 	}
 
-	public List<String> getTerminalAffixes(){
-		return terminalAffixes;
+	public String[] getTerminals(){
+		return terminals;
 	}
 
-	public List<List<String>> extractAllAffixes(final boolean reverseAffixes){
-		final List<List<String>> applyAffixes = new ArrayList<>(3);
-		applyAffixes.add(prefixes);
-		applyAffixes.add(suffixes);
-		if(reverseAffixes)
-			Collections.reverse(applyAffixes);
-		applyAffixes.add(terminalAffixes);
+	public String[][] extractAllAffixes(final boolean reverseAffixes){
+		final String[][] applyAffixes = new String[3][];
+		applyAffixes[0] = (reverseAffixes? suffixes: prefixes);
+		applyAffixes[1] = (reverseAffixes? prefixes: suffixes);
+		applyAffixes[2] = terminals;
 		return applyAffixes;
 	}
 

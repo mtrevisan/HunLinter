@@ -4,10 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -19,6 +17,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.ArraySet;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -146,11 +145,11 @@ public class AffixEntry{
 		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(final List<String> otherContinuationFlags){
-		final Set<String> flags = new HashSet<>();
+	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
+		final ArraySet<String> flags = new ArraySet<>();
 		if(continuationFlags != null)
 			flags.addAll(Arrays.asList(continuationFlags));
-		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
+		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(otherContinuationFlags);
 		final int size = flags.size();
 		return (size > 0? flags.toArray(String[]::new): null);

@@ -260,7 +260,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public List<List<String>> extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public String[][] extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -272,16 +272,16 @@ public class DictionaryEntry{
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
-		final ArrayList<String> terminalAffixes = new ArrayList<>();
+		final ArrayList<String> terminals = new ArrayList<>();
 		final ArrayList<String> prefixes = new ArrayList<>();
 		final ArrayList<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null){
-			terminalAffixes.ensureCapacity(continuationFlags.length);
+			terminals.ensureCapacity(continuationFlags.length);
 			prefixes.ensureCapacity(continuationFlags.length);
 			suffixes.ensureCapacity(continuationFlags.length);
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
-					terminalAffixes.add(affix);
+					terminals.add(affix);
 					continue;
 				}
 
@@ -303,14 +303,11 @@ public class DictionaryEntry{
 						prefixes.add(affix);
 				}
 				else
-					terminalAffixes.add(affix);
+					terminals.add(affix);
 			}
-			terminalAffixes.trimToSize();
-			prefixes.trimToSize();
-			suffixes.trimToSize();
 		}
 
-		return new Affixes(prefixes, suffixes, terminalAffixes);
+		return new Affixes(prefixes.toArray(String[]::new), suffixes.toArray(String[]::new), terminals.toArray(String[]::new));
 	}
 
 	public boolean isCompound(){

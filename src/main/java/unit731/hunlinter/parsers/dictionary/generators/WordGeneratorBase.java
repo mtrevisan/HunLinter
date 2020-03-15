@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -118,7 +119,7 @@ if(twofoldProductions.length > 0){
 
 	protected Production[] getOnefoldProductions(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		final String[][] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
@@ -142,10 +143,10 @@ if(twofoldProductions.length > 0){
 	private void checkTwofoldCorrectness(final Production[] twofoldProductions){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Production prod : twofoldProductions){
-			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
-			final List<String> aff = affixes.get(complexPrefixes? 1: 0);
-			if(!aff.isEmpty()){
-				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff.toArray(String[]::new));
+			final String[][] affixes = prod.extractAllAffixes(affixData, false);
+			final String[] aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
+			if(aff.length > 0){
+				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
 				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(),
 					prod.getRulesSequence(), overabundantAffixes}));
 			}
@@ -199,15 +200,15 @@ if(twofoldProductions.length > 0){
 		return (hasNeedAffixFlag || production.hasContinuationFlag(needAffixFlag));
 	}
 
-	private Production[] applyAffixRules(final DictionaryEntry dicEntry, final List<List<String>> allAffixes,
+	private Production[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final List<String> appliedAffixes = allAffixes.get(0);
-		final List<String> postponedAffixes = allAffixes.get(1);
-		if(circumfixFlag != null && allAffixes.get(2).contains(circumfixFlag))
-			postponedAffixes.add(circumfixFlag);
+		final String[] appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
+		String[] postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
+		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS], circumfixFlag))
+			postponedAffixes = ArrayUtils.add(postponedAffixes, circumfixFlag);
 
 		Production[] productions = new Production[0];
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
@@ -218,7 +219,7 @@ if(twofoldProductions.length > 0){
 		return productions;
 	}
 
-	private Production[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,
+	private Production[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
@@ -269,8 +270,8 @@ if(twofoldProductions.length > 0){
 		return productions;
 	}
 
-	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final List<String> appliedAffixes, final String forbiddenWordFlag){
-		return (!appliedAffixes.isEmpty() && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
+	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final String[] appliedAffixes, final String forbiddenWordFlag){
+		return (appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
 	private boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,

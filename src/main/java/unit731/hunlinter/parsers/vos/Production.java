@@ -51,7 +51,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
-			final List<String> remainingContinuationFlags, final boolean combinable){
+			final String[] remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = new AffixEntry[]{appliedEntry};
