@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,8 @@ public class WordlistWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 
+		final List<IndexDataPair<String>> collectedLines = new ArrayList<>();
+		final Consumer<IndexDataPair<String>> lineReadProcessor = collectedLines::add;
 		final Set<String> words = new HashSet<>();
 		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
 		final BiConsumer<BufferedWriter, IndexDataPair<String>> lineProcessor = (writer, indexData) -> {
@@ -91,12 +94,14 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
-			return readLines();
+			processLines(lineReadProcessor);
+
+			return collectedLines;
 		};
-		final Function<List<IndexDataPair<String>>, Void> step2 = indexData -> {
+		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			executeWriteProcess(lineProcessor, indexData, outputFile, charset);
+			executeWriteProcess(lineProcessor, lines, outputFile, charset);
 
 			return null;
 		};

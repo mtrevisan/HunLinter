@@ -7,12 +7,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import javax.swing.SwingWorker;
 
 import org.slf4j.Logger;
@@ -21,7 +17,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
-import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
@@ -30,8 +26,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 
 
 	protected final WD workerData;
-
-	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
@@ -85,120 +79,36 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 
-	protected void executeReadProcessNoIndex(final Consumer<T> dataProcessor, final List<T> entries){
-		try{
-			final int totalEntries = entries.size();
-			processingIndex.set(0);
-
-			final Consumer<T> innerProcessor = createInnerProcessorNoIndex(dataProcessor, totalEntries);
-			final Stream<T> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
-			stream.forEach(innerProcessor);
+	protected void manageException(final LinterException e){
+		if(JavaHelper.isInterruptedException(e))
+			cancel(e);
+		else if(e.getData() != null){
+			final String errorMessage = ExceptionHelper.getMessage(e);
+			final IndexDataPair<?> data = e.getData();
+			final int index = data.getIndex();
+			if(index >= 0){
+				LOGGER.trace("{}, line {}: {}", errorMessage, index, data.getData());
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), index, data.getData());
+			}
+			else{
+				LOGGER.trace("{}: {}", errorMessage, data.getData());
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}: {}", e.getMessage(), data.getData());
+			}
 		}
-		catch(final RuntimeException e){
-			throw e;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
+		else
+			e.printStackTrace();
 	}
 
-	private Consumer<T> createInnerProcessorNoIndex(final Consumer<T> dataProcessor, final int totalData){
-final AtomicLong memoryUsage = new AtomicLong(0l);
-		return data -> {
-			try{
-				dataProcessor.accept(data);
-
-final long currentMemoryUsage = JavaHelper.getUsedMemory();
-if(currentMemoryUsage > memoryUsage.get()){
-	memoryUsage.set(currentMemoryUsage);
-	System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-
-	System.gc();
-}//3.9 GiB
-//dic linter: 487 MiB, 313 MiB
-
-				setProgress(processingIndex.incrementAndGet(), totalData);
-
-				sleepOnPause();
-			}
-			catch(final Exception e){
-				if(!JavaHelper.isInterruptedException(e)){
-					final String errorMessage = ExceptionHelper.getMessage(e);
-					LOGGER.trace("{}: {}", errorMessage, data);
-					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}: {}", e.getMessage(), data);
-				}
-
-				if(workerData.isRelaunchException())
-					throw new RuntimeException(e);
-			}
-		};
-	}
-
-	protected void executeReadProcess(final Consumer<IndexDataPair<T>> dataProcessor, final List<IndexDataPair<T>> entries){
-		try{
-			final int totalEntries = entries.size();
-			processingIndex.set(0);
-
-			final Consumer<IndexDataPair<T>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
-			final Stream<IndexDataPair<T>> stream = (workerData.isParallelProcessing()? entries.parallelStream(): entries.stream());
-			stream.forEach(innerProcessor);
-		}
-		catch(final RuntimeException e){
-			throw e;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-
-	private Consumer<IndexDataPair<T>> createInnerProcessor(final Consumer<IndexDataPair<T>> dataProcessor, final int totalData){
-final AtomicLong memoryUsage = new AtomicLong(0l);
-		return data -> {
-			try{
-				dataProcessor.accept(data);
-
-final long currentMemoryUsage = JavaHelper.getUsedMemory();
-if(currentMemoryUsage > memoryUsage.get()){
-	memoryUsage.set(currentMemoryUsage);
-	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-
-	System.gc();
-}
-//PoS FSA:
-//?: 3.6 GiB
-//dic linter:
-//fsa6: 278/274 MiB
-//fsa8: 322/272/286 MiB
-
-				setProgress(processingIndex.incrementAndGet(), totalData);
-
-				sleepOnPause();
-			}
-			catch(final Exception e){
-				if(!JavaHelper.isInterruptedException(e)){
-					final String errorMessage = ExceptionHelper.getMessage(e);
-					LOGGER.trace("{}, line {}: {}", errorMessage, data.getIndex(), data.getData());
-					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), data.getIndex(), data.getData());
-				}
-
-				if(workerData.isRelaunchException())
-					throw new RuntimeException(e);
-			}
-		};
-	}
-
-	protected void executeWriteProcess(final BiConsumer<BufferedWriter, IndexDataPair<String>> dataProcessor,
-			final List<IndexDataPair<String>> lines, final File outputFile, final Charset charset){
+	protected void executeWriteProcess(final BiConsumer<BufferedWriter, IndexDataPair<T>> dataProcessor,
+			final List<IndexDataPair<T>> lines, final File outputFile, final Charset charset){
 		int writtenSoFar = 0;
 		final int totalLines = lines.size();
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			for(final IndexDataPair<String> line : lines){
+			for(final IndexDataPair<T> line : lines){
 				try{
-					writtenSoFar ++;
-
 					dataProcessor.accept(writer, line);
 
-					setProgress(writtenSoFar, totalLines);
+					setProgress(++ writtenSoFar, totalLines);
 
 					sleepOnPause();
 				}

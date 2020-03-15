@@ -32,10 +32,10 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			.withParallelProcessing(true)
 		);
 
-		final Consumer<IndexDataPair<ThesaurusEntry>> dataProcessor = indexData -> {
-			final String originalDefinition = indexData.getData().getDefinition();
+		final Consumer<ThesaurusEntry> dataProcessor = data -> {
+			final String originalDefinition = data.getDefinition();
 			//check if each part of `entry`, with appropriate PoS, exists
-			final List<SynonymsEntry> syns = indexData.getData().getSynonyms();
+			final List<SynonymsEntry> syns = data.getSynonyms();
 			for(final SynonymsEntry syn : syns){
 				final List<String> definitions = syn.getSynonyms();
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
@@ -50,20 +50,15 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		};
 
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step1 = ignored -> {
-			prepareProcessing("Reading thesaurus file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			return readEntries();
-		};
-		final Function<List<IndexDataPair<ThesaurusEntry>>, Void> step2 = entries -> {
-			prepareProcessing("Start processing " + workerData.getWorkerName());
-
-			executeReadProcess(dataProcessor, entries);
+			processLines(dataProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1);
 	}
 
 }

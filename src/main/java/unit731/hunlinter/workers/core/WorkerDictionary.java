@@ -6,9 +6,16 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
@@ -23,36 +30,92 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		super(workerData);
 	}
 
-	protected List<IndexDataPair<String>> readLines(){
-		final List<IndexDataPair<String>> lines = new ArrayList<>();
+	protected void processLines(final Consumer<IndexDataPair<String>> dataProcessor){
+		Objects.requireNonNull(dataProcessor);
+
+		//load dictionary
+		final List<IndexDataPair<String>> entries = loadDictionary();
+
+		//process dictionary
+		final Stream<IndexDataPair<String>> stream = (workerData.isParallelProcessing()?
+			entries.parallelStream(): entries.stream());
+		processDictionary(stream, entries.size(), dataProcessor);
+	}
+
+	private List<IndexDataPair<String>> loadDictionary(){
+		final List<IndexDataPair<String>> entries = new ArrayList<>();
 		final DictionaryParser dicParser = workerData.getParser();
 		final Path dicPath = dicParser.getDicFile().toPath();
 		final Charset charset = dicParser.getCharset();
-		int currentLine = 0;
-		final int totalLines = FileHelper.countLines(dicPath);
 		try(final LineNumberReader br = FileHelper.createReader(dicPath, charset)){
 			String line = ParserHelper.extractLine(br);
-			currentLine ++;
-
 			if(!NumberUtils.isCreatable(line))
 				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			while((line = br.readLine()) != null){
-				currentLine ++;
-
 				line = ParserHelper.cleanLine(line);
-				if(!line.isEmpty())
-					lines.add(IndexDataPair.of(br.getLineNumber(), line));
+				if(line.isEmpty())
+					continue;
 
-				setProgress(currentLine, totalLines);
+				entries.add(IndexDataPair.of(br.getLineNumber(), line));
 
 				sleepOnPause();
 			}
 		}
 		catch(final Exception e){
-			cancel(e);
+			manageException(new LinterException(e, null));
+
+			throw new RuntimeException(e);
 		}
-		return lines;
+
+		return entries;
+	}
+
+	private void processDictionary(final Stream<IndexDataPair<String>> entries, final int totalEntries,
+			final Consumer<IndexDataPair<String>> dataProcessor){
+		try{
+			final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+			entries.forEach(innerProcessor);
+		}
+		catch(final LinterException e){
+			manageException(e);
+
+			throw e;
+		}
+	}
+
+	private Consumer<IndexDataPair<String>> createInnerProcessor(final Consumer<IndexDataPair<String>> dataProcessor,
+			final int totalEntries){
+final AtomicLong memoryUsage = new AtomicLong(0l);
+		final AtomicInteger processingIndex = new AtomicInteger(0);
+		return data -> {
+			try{
+				dataProcessor.accept(data);
+
+final long currentMemoryUsage = JavaHelper.getUsedMemory();
+if(currentMemoryUsage > memoryUsage.get()){
+	memoryUsage.set(currentMemoryUsage);
+	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
+
+	System.gc();
+}
+//PoS FSA:
+//?: 3.6 GiB
+//dic linter:
+//fsa6: 278/274 MiB
+//fsa8: 322/272/286 MiB
+
+				setProgress(processingIndex.incrementAndGet(), totalEntries);
+
+				sleepOnPause();
+			}
+			catch(final LinterException e){
+				throw e;
+			}
+			catch(final Exception e){
+				throw new LinterException(e, data);
+			}
+		};
 	}
 
 }

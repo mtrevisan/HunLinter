@@ -68,20 +68,15 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			.withDataCancelledCallback(cancelled);
 
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			return readLines();
-		};
-		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
-
-			executeReadProcess(lineProcessor, lines);
+			processLines(lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1);
 	}
 
 	public boolean isInDictionary(final String word){

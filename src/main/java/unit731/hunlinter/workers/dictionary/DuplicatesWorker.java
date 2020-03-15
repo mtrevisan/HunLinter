@@ -248,7 +248,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProgress(1, totalSize + 1);
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
@@ -264,7 +263,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						.collect(Collectors.joining(", ")));
 					writer.newLine();
 
-					setProgress(++ writtenSoFar, totalSize + 1);
+					setProgress(++ writtenSoFar, totalSize);
 
 					sleepOnPause();
 				}

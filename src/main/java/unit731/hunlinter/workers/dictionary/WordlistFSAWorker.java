@@ -95,31 +95,26 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/4)");
+		final Function<Void, Set<String>> step1 = ignored -> {
+			prepareProcessing("Extract words (step 1/3)");
 
-			return readLines();
-		};
-		final Function<List<IndexDataPair<String>>, Set<String>> step2 = lines -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
-
-			executeReadProcess(lineProcessor, lines);
+			processLines(lineProcessor);
 
 			return words;
 		};
-		final Function<Set<String>, FSA> step3 = uniqueWordsSet -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+		final Function<Set<String>, FSA> step2 = uniqueWordsSet -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 2/3)");
 
 			//lexical order
 			final List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
 			Collections.sort(uniqueWords);
 
-			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
+//			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step4 = fsa -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
+		final Function<FSA, File> step3 = fsa -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 3/3)");
 
 			//FIXME
 final AtomicLong memoryUsage = new AtomicLong(0l);
@@ -141,14 +136,14 @@ if(currentMemoryUsage > memoryUsage.get()){
 
 			return outputFile;
 		};
-		final Function<File, Void> step5 = file -> {
+		final Function<File, Void> step4 = file -> {
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
 }

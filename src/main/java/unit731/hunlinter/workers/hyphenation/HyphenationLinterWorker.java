@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -77,20 +76,15 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		};
 
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			return readLines();
-		};
-		final Function<List<IndexDataPair<String>>, Void> step2 = lines -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Execute " + workerData.getWorkerName() + " (step 2/2)");
-
-			executeReadProcess(lineProcessor, lines);
+			processLines(lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1);
 	}
 
 }

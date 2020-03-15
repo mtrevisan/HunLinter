@@ -18,6 +18,7 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -108,15 +109,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/4)");
+		final Function<Void, List<String>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/3)");
 
-			return readLines();
-		};
-		final Function<List<IndexDataPair<String>>, List<String>> step2 = lines -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extract words (step 2/4)");
-
-			executeReadProcess(lineProcessor, lines);
+long before = JavaHelper.getUsedMemory();
+			processLines(lineProcessor);
+long delta = JavaHelper.getUsedMemory() - before;
+System.out.println("delta: " + delta);
+//3 968 335 848
 
 //			System.gc();
 
@@ -157,8 +157,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return words;
 		};
-		final Function<List<String>, FSA> step3 = extractedWords -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+		final Function<List<String>, FSA> step2 = extractedWords -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 2/3)");
 
 			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 			final File outputInfoFile = new File(filenameNoExtension + ".info");
@@ -191,12 +191,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 			//lexical order
 			Collections.sort(extractedWords);
 
-			executeReadProcessNoIndex(fsaProcessor, extractedWords);
+//			executeReadProcessNoIndex(fsaProcessor, extractedWords);
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step4 = fsa -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
+		final Function<FSA, File> step3 = fsa -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 3/3)");
 
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
@@ -209,14 +209,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 				throw new RuntimeException(e);
 			}
 		};
-		final Function<File, Void> step5 = file -> {
+		final Function<File, Void> step4 = file -> {
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
 	private void buildFSA(List<String> words, final String input, final String output) throws Exception{
