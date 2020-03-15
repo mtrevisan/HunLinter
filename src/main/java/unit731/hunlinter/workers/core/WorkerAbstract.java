@@ -168,6 +168,7 @@ if(currentMemoryUsage > memoryUsage.get()){
 //?: 3.6 GiB
 //dic linter:
 //fsa6: 278/274 MiB
+//fsa8: 322/272/286 MiB
 
 				setProgress(processingIndex.incrementAndGet(), totalData);
 

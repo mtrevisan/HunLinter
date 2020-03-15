@@ -43,7 +43,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //System.out.println("dicEntry: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(dicEntry));
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 //System.out.println("base production: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(productions.get(0)));
-long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions);
+//long size = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions);
 //System.out.println("productions: " + size);
 /*
 fsa2: 344 B
