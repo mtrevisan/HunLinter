@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -276,7 +275,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private void removeTwofolds(final Production[] prods){
-		JavaHelper.removeIf(prods, Production::isTwofolded);
+		final String circumfixFlag = affixData.getCircumfixFlag();
+		if(circumfixFlag != null)
+			JavaHelper.removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
 	}
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?

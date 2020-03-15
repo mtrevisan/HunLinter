@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -141,14 +142,20 @@ public class Production extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
-	public boolean isTwofolded(){
-		final Long affixesMaxCount = JavaHelper.nullableToStream(appliedRules)
-			.map(AffixEntry::isSuffix)
-			.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-			.values().stream()
-			.max(Comparator.naturalOrder())
-			.orElse(0L);
-		return (affixesMaxCount > 1);
+	public boolean isTwofolded(final String circumfixFlag){
+		if(appliedRules != null){
+			//find last applied rule with circumfix flag
+			int startIndex = appliedRules.length - 1;
+			while(startIndex >= 0)
+				if(appliedRules[startIndex --].hasContinuationFlag(circumfixFlag))
+					break;
+
+			final long[] suffixesAffixesCount = new long[2];
+			IntStream.range(startIndex + 1, appliedRules.length)
+				.forEach(idx -> suffixesAffixesCount[appliedRules[idx].isSuffix()? 1: 0] ++);
+			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);
+		}
+		return false;
 	}
 
 	public String getRulesSequence(){

@@ -163,7 +163,8 @@ if(twofoldProductions.length > 0){
 	private Production[] enforceCircumfix(Production[] productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			productions = JavaHelper.removeIf(productions, production -> production.hasContinuationFlag(circumfixFlag));
+			productions = JavaHelper.removeIf(productions,
+				production -> production.hasContinuationFlag(circumfixFlag) && !production.isTwofolded(circumfixFlag));
 		return productions;
 	}
 
@@ -213,7 +214,16 @@ if(twofoldProductions.length > 0){
 		Production[] productions = new Production[0];
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(final String affix : appliedAffixes){
-				final Production[] prods = applyAffixRule(dicEntry, affix, postponedAffixes, isCompound, overriddenRule);
+				//extract current rule
+				RuleEntry rule = affixData.getData(affix);
+				//override with the given rule
+				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
+					rule = overriddenRule;
+
+				String[] currentPostponedAffixes = ArrayUtils.clone(postponedAffixes);
+				if(dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().isSuffix() ^ rule.isSuffix())
+					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
+				final Production[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
 				productions = ArrayUtils.addAll(productions, prods);
 			}
 		return productions;

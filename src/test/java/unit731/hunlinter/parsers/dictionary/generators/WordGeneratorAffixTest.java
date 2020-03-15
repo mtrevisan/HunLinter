@@ -733,10 +733,10 @@ class WordGeneratorAffixTest extends TestBase{
 			"PFX c 0 t/X [^a]",
 			"PFX c 0 lt/X [^a]",
 			"PFX c 0 wlt/X [^a]",
-			"PFX d Y 1",
-			"PFX d 0 y/X .",
 			"SFX b Y 1",
 			"SFX b 0 i/cX .",
+			"PFX d Y 1",
+			"PFX d 0 y/X .",
 			"SFX e Y 2",
 			"SFX e 0 un/cdX .",
 			"SFX e 0 n/cdX .");
@@ -746,7 +746,7 @@ class WordGeneratorAffixTest extends TestBase{
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Production[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(16, words.length);
+		Assertions.assertEquals(17, words.length);
 		//base production
 		Assertions.assertEquals(createProduction("bark", "abe", "st:bark"), words[0]);
 		//suffix productions
@@ -755,17 +755,18 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(createProduction("nbark", "be", "st:bark"), words[2]);
 		Assertions.assertEquals(createProduction("tbark", "be", "st:bark"), words[3]);
 		Assertions.assertEquals(createProduction("ybark", "be", "st:bark"), words[4]);
-		Assertions.assertEquals(createProduction("tbarki", null, "st:bark"), words[5]);
-		Assertions.assertEquals(createProduction("ltbarki", null, "st:bark"), words[6]);
-		Assertions.assertEquals(createProduction("wltbarki", null, "st:bark"), words[7]);
-		Assertions.assertEquals(createProduction("tbarkun", null, "st:bark"), words[8]);
-		Assertions.assertEquals(createProduction("ltbarkun", null, "st:bark"), words[9]);
-		Assertions.assertEquals(createProduction("wltbarkun", null, "st:bark"), words[10]);
-		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words[11]);
-		Assertions.assertEquals(createProduction("ltbarkn", null, "st:bark"), words[12]);
-		Assertions.assertEquals(createProduction("wltbarkn", null, "st:bark"), words[13]);
-		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words[14]);
-		Assertions.assertEquals(createProduction("ybarkn", null, "st:bark"), words[15]);
+		Assertions.assertEquals(createProduction("abarki", null, "st:bark"), words[5]);
+		Assertions.assertEquals(createProduction("nbarki", null, "st:bark"), words[6]);
+		Assertions.assertEquals(createProduction("tbarki", null, "st:bark"), words[7]);
+		Assertions.assertEquals(createProduction("ybarki", null, "st:bark"), words[8]);
+		Assertions.assertEquals(createProduction("abarkun", null, "st:bark"), words[9]);
+		Assertions.assertEquals(createProduction("nbarkun", null, "st:bark"), words[10]);
+		Assertions.assertEquals(createProduction("tbarkun", null, "st:bark"), words[11]);
+		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words[12]);
+		Assertions.assertEquals(createProduction("abarkn", null, "st:bark"), words[13]);
+		Assertions.assertEquals(createProduction("nbarkn", null, "st:bark"), words[14]);
+		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words[15]);
+		Assertions.assertEquals(createProduction("ybarkn", null, "st:bark"), words[16]);
 	}
 
 
