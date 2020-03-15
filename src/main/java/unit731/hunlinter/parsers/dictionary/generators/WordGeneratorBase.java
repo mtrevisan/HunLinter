@@ -82,7 +82,7 @@ if(twofoldProductions.length > 0){
 	System.out.println("productions: " + size);
 	//fsa4: 1048 B
 	//fsa6: 1016 B
-	//fsa8: ? B
+	//fsa8: 1016 B
 }
 
 		checkTwofoldCorrectness(twofoldProductions);
