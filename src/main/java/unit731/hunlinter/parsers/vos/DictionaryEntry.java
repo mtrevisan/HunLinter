@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.vos;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -245,8 +244,10 @@ public class DictionaryEntry{
 	}
 
 	public List<String> getMorphologicalFieldPartOfSpeech(){
-		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		return (!filteredFields.isEmpty()? filteredFields: Collections.emptyList());
+		final String tag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
+		return JavaHelper.nullableToStream(morphologicalFields)
+			.filter(df -> df.startsWith(tag))
+			.collect(Collectors.toList());
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

@@ -57,7 +57,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static String NORTHERN_PLURAL_STRESSED_RULE;
 	private static String NORTHERN_PLURAL_EXCEPTION;
 
-	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique ({0})");
+	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("Word {0} have unnecessary stress");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE = new MessageFormat("Word with ƚ cannot contain rule {0} or {1}, {2}");
@@ -166,8 +166,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 				variants.add(LanguageVariant.VENETIAN);
 			}
-			else if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END) || subword.contains(GraphemeVEC.GRAPHEME_D_STROKE)
-					|| subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
+			else if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
+					|| subword.contains(GraphemeVEC.GRAPHEME_D_STROKE) || subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
 				variants.add(LanguageVariant.NORTHERN);
 		}
 		if(variants.contains(LanguageVariant.VENETIAN) && variants.contains(LanguageVariant.NORTHERN))
@@ -182,7 +182,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		final List<String> pos = production.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
-			throw new LinterException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+			throw new LinterException(SINGLE_POS_NOT_PRESENT);
 	}
 
 	private void northernPluralCheck(final Production production){

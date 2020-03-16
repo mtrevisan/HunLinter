@@ -23,7 +23,7 @@ import unit731.hunlinter.services.system.JavaHelper;
 
 public class Production extends DictionaryEntry{
 
-	private static final MessageFormat SINGLE_POS_NOT_PRESENT = new MessageFormat("Part-of-Speech not unique, found ''{0}''");
+	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
@@ -174,10 +174,10 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String toStringWithPartOfSpeechFields(){
-		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		if(!fields.isEmpty()){
-			fields.sort(Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + StringUtils.join(fields, StringUtils.SPACE);
+		final List<String> pos = getMorphologicalFieldPartOfSpeech();
+		if(!pos.isEmpty()){
+			pos.sort(Comparator.naturalOrder());
+			return word + POS_FIELD_PREFIX + StringUtils.join(pos, StringUtils.SPACE);
 		}
 		return word;
 	}
@@ -186,7 +186,7 @@ public class Production extends DictionaryEntry{
 		//extract Part-of-Speech
 		final List<String> pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
 		if(pos.size() != 1)
-			throw new LinterException(SINGLE_POS_NOT_PRESENT.format(new Object[]{String.join(", ", pos)}));
+			throw new LinterException(SINGLE_POS_NOT_PRESENT);
 
 		//extract Inflection
 		final List<String> suffixInflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX);

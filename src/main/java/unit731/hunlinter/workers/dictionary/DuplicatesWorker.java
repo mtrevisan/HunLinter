@@ -251,7 +251,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
-					final String origin = prod.getWord() + prod.getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH).stream()
+					final String origin = prod.getWord() + prod.getMorphologicalFieldPartOfSpeech().stream()
 						.collect(Collectors.joining(", ", " (", "): "));
 					writer.write(origin);
 					writer.write(entries.stream()
