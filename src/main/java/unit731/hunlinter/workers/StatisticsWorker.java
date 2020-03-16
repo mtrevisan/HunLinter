@@ -1,10 +1,7 @@
 package unit731.hunlinter.workers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -29,8 +26,6 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 
 public class StatisticsWorker extends WorkerDictionary{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsWorker.class);
 
 	public static final String WORKER_NAME = "Collecting statistics";
 

@@ -1,7 +1,9 @@
 package unit731.hunlinter.languages.vec;
 
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -27,8 +29,9 @@ class GraphemeVEC{
 	public static final String GRAPHEME_T_STROKE = "ŧ";
 	public static final String GRAPHEME_X = "x";
 
-	private static final Pattern DIPHTONG = PatternHelper.pattern("[iu][íú]|[àèéòó][iu]|[aàeèé][aeo]|[íòóú][aeoi]");
-	private static final Pattern HYATUS = PatternHelper.pattern("[aeïoü][aàeèéiíoòóuú]");
+	private static final Pattern DIPHTONG1 = PatternHelper.pattern("[àèéíòóú][aeoiu]");
+	private static final Pattern DIPHTONG2 = PatternHelper.pattern("[aeo][aeo]");
+	private static final Pattern HYATUS = PatternHelper.pattern("[aeïoü][aàeèéiíoòóuú]|[iu][íú]");
 
 	private static final Pattern ETEROPHONIC_SEQUENCE = PatternHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
@@ -37,12 +40,16 @@ class GraphemeVEC{
 
 	private GraphemeVEC(){}
 
-	public static boolean isDiphtong(final String group){
-		return PatternHelper.find(group, DIPHTONG);
+	public static boolean isDiphtong(final String word){
+		if(PatternHelper.find(word, DIPHTONG1))
+			return true;
+
+		final Matcher m = DIPHTONG2.matcher(word);
+		return (m.find() && m.start() != WordVEC.getIndexOfStress(word));
 	}
 
-	public static boolean isHyatus(final String group){
-		return PatternHelper.find(group, HYATUS);
+	public static boolean isHyatus(final String word){
+		return PatternHelper.find(word, HYATUS);
 	}
 
 	public static boolean isEterophonicSequence(final String group){

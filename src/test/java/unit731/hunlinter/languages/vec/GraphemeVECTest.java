@@ -10,16 +10,14 @@ public class GraphemeVECTest{
 	void dyphtongStrong(){
 		//àa, aa
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("buxaràa"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("praa"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("fiaa"));
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("fiàa"));
 		//àe, ae
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("fràe"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("poràe"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("guàena"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("saeta"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("frae"));
 		//ào, ao
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("masañào"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("rao"));
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("rào"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("tàol"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("fàola"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("kaorèr"));
@@ -28,18 +26,17 @@ public class GraphemeVECTest{
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("kavixéa"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("béar"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("féara"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("krea"));
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("kréa"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("kreador"));
 		//ée, ee
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("sée"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("léexe"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("àmee"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("peerada"));
 		//éo, eo
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("menadéo"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("jéor"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("néola"));
-		Assertions.assertTrue(GraphemeVEC.isDiphtong("speo"));
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("spéo"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("idòneo"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("teoría"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("reoxamente"));
@@ -59,22 +56,21 @@ public class GraphemeVECTest{
 	}
 
 	@Test
-	void dyphtongWeakAccentOnFirst(){
+	void dyphtongWeak(){
 		//ía
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("poría"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("kualsíasi"));
-		Assertions.assertFalse(GraphemeVEC.isDiphtong("viajo"));
-		Assertions.assertFalse(GraphemeVEC.isDiphtong("babia"));
-		Assertions.assertFalse(GraphemeVEC.isDiphtong("biada"));
 		//íe
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("píe"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("poríelo"));
 		//íi
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("defeníi"));
-		//ío, ïo
+		//ío
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("jïografía"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("dexvío"));
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("víolo"));
+		//íu
+		Assertions.assertTrue(GraphemeVEC.isDiphtong("pipíu"));
 
 		//úa
 		Assertions.assertTrue(GraphemeVEC.isDiphtong("gúa"));
@@ -91,11 +87,11 @@ public class GraphemeVECTest{
 	}
 
 	@Test
-	void hyatusWeakAccentOnSecond(){
+	void hyatus(){
 		//aa, aà
 		//ae, aè, aé
-		Assertions.assertTrue(GraphemeVEC.isHyatus("frae"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("maestro"));
+		Assertions.assertTrue(GraphemeVEC.isHyatus("saeta"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("inkaécoe"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("maèstro"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("fraèl"));
@@ -120,6 +116,7 @@ public class GraphemeVECTest{
 		Assertions.assertTrue(GraphemeVEC.isHyatus("kaveel"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("kreenŧa"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("meexina"));
+		Assertions.assertTrue(GraphemeVEC.isHyatus("peerada"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("greèla"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("veèl"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("treèximo"));
@@ -151,6 +148,8 @@ public class GraphemeVECTest{
 		//ïu, ïú
 		Assertions.assertTrue(GraphemeVEC.isHyatus("kïuo"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("rïúsoe"));
+		//iú
+		Assertions.assertTrue(GraphemeVEC.isHyatus("piúbiko"));
 
 
 		//oa, oà
@@ -184,13 +183,14 @@ public class GraphemeVECTest{
 		Assertions.assertTrue(GraphemeVEC.isHyatus("ŧüetar"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("ŧüétoe"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("minüèl"));
-		//üi, üí
+		//üi, üí, uí
 		Assertions.assertTrue(GraphemeVEC.isHyatus("rüina"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("argüir"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("spüi"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("püin"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("cüí"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("küía"));
+		Assertions.assertTrue(GraphemeVEC.isHyatus("guíndol"));
 		//üo, üò
 		Assertions.assertTrue(GraphemeVEC.isHyatus("flüòr"));
 		Assertions.assertTrue(GraphemeVEC.isHyatus("esètüo"));

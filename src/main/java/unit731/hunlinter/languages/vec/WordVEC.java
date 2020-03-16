@@ -192,8 +192,8 @@ public class WordVEC{
 			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
-			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel
-			//of a group of two (first one on a monosyllabe)
+			//last vowel if the word ends with consonant, penultimate otherwise
+			//default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
 				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
 			if(stressIndex >= 0 && PatternHelper.find(phones.substring(0, stressIndex + 1), DEFAULT_STRESS_GROUP))
@@ -223,7 +223,7 @@ public class WordVEC{
 		return word;
 	}
 
-	private static int getIndexOfStress(final String word){
+	static int getIndexOfStress(final String word){
 		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
 	}
 
