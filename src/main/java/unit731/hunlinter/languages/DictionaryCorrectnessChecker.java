@@ -41,7 +41,8 @@ public class DictionaryCorrectnessChecker{
 	public void checkProduction(final Production production){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
+			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{
+				AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
 			morphologicalFieldCheck(production);
@@ -58,12 +59,12 @@ public class DictionaryCorrectnessChecker{
 				throw new LinterException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 
-			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField.substring(0, 3));
+			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
 				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
-			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
 				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
 					morphologicalField}));
 		});

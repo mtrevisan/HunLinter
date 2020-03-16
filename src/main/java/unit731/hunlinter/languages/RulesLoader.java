@@ -51,10 +51,10 @@ public class RulesLoader{
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
 		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
 
-		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
-		dataFields.put(MorphologicalTag.TAG_DERIVATIONAL_SUFFIX, readPropertyAsSet("derivationalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
+		fillDataFields(MorphologicalTag.TAG_PART_OF_SPEECH, "partOfSpeeches");
+		fillDataFields(MorphologicalTag.TAG_DERIVATIONAL_SUFFIX, "derivationalSuffixes");
+		fillDataFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
+		fillDataFields(MorphologicalTag.TAG_TERMINAL_SUFFIX, "terminalSuffixes");
 		dataFields.put(MorphologicalTag.TAG_STEM, null);
 		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
 
@@ -93,6 +93,14 @@ public class RulesLoader{
 				}
 			}
 		}
+	}
+
+	private void fillDataFields(final MorphologicalTag tag, final String property){
+		Set<String> list = readPropertyAsSet(property, ',');
+		list = list.stream()
+			.map(p -> tag.getCode() + p)
+			.collect(Collectors.toSet());
+		dataFields.put(tag, list);
 	}
 
 	public final String readProperty(final String key){

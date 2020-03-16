@@ -17,7 +17,6 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -123,7 +122,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	@Override
 	public void checkProduction(final Production production){
-//long before = JavaHelper.getUsedMemory();
 		super.checkProduction(production);
 
 		stressCheck(production);

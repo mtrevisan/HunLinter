@@ -11,7 +11,6 @@ import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -53,15 +52,11 @@ public class JavaHelper{
 	}
 
 	public static <T> Stream<T> nullableToStream(final T... array){
-		return Optional.ofNullable(array).stream()
-			.flatMap(Arrays::stream)
-			.filter(Objects::nonNull);
+		return (array != null? Arrays.stream(array): Stream.empty());
 	}
 
 	public static <T> Stream<T> nullableToStream(final Collection<T> collection){
-		return Optional.ofNullable(collection).stream()
-			.flatMap(Collection::stream)
-			.filter(Objects::nonNull);
+		return (collection != null? collection.stream(): Stream.empty());
 	}
 
 	public static void executeOnEventDispatchThread(final Runnable runnable){

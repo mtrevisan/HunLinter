@@ -36,7 +36,7 @@ public enum MorphologicalTag{
 
 	public static MorphologicalTag createFromCode(final String code){
 		return Arrays.stream(values())
-			.filter(tag -> tag.code.equals(code))
+			.filter(tag -> code.startsWith(tag.code))
 			.findFirst()
 			.orElse(null);
 	}

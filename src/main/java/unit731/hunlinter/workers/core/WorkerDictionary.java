@@ -33,6 +33,8 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 	protected void processLines(final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor);
 
+		setProgress(0);
+
 		//load dictionary
 		final List<IndexDataPair<String>> entries = loadDictionary();
 
@@ -86,24 +88,25 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	private Consumer<IndexDataPair<String>> createInnerProcessor(final Consumer<IndexDataPair<String>> dataProcessor,
 			final int totalEntries){
-final AtomicLong memoryUsage = new AtomicLong(0l);
+//final AtomicLong memoryUsage = new AtomicLong(0l);
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
-
-final long currentMemoryUsage = JavaHelper.getUsedMemory();
-if(currentMemoryUsage > memoryUsage.get()){
-	memoryUsage.set(currentMemoryUsage);
-	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-
-	System.gc();
-}
+//5 147 272
+//final long currentMemoryUsage = JavaHelper.getUsedMemory();
+//if(currentMemoryUsage > memoryUsage.get()){
+//	memoryUsage.set(currentMemoryUsage);
+//	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
+//
+//	System.gc();
+//}
 //PoS FSA:
 //?: 3.6 GiB
 //dic linter:
 //fsa6: 278/274 MiB
 //fsa8: 322/272/286 MiB
+//mem1: ?-49 MiB
 
 				setProgress(processingIndex.incrementAndGet(), totalEntries);
 
