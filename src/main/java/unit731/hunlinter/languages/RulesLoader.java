@@ -1,17 +1,18 @@
 package unit731.hunlinter.languages;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -96,11 +97,11 @@ public class RulesLoader{
 	}
 
 	private void fillDataFields(final MorphologicalTag tag, final String property){
-		Set<String> list = readPropertyAsSet(property, ',');
-		list = list.stream()
-			.map(p -> tag.getCode() + p)
-			.collect(Collectors.toSet());
-		dataFields.put(tag, list);
+		final Iterator<String> itr = readPropertyAsIterator(property, ',');
+		final Set<String> set = new HashSet<>();
+		while(itr.hasNext())
+			set.add(tag.getCode() + itr.next());
+		dataFields.put(tag, set);
 	}
 
 	public final String readProperty(final String key){
@@ -113,14 +114,16 @@ public class RulesLoader{
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		return rulesProperties.keySet().stream()
-			.map(String.class::cast)
-			.filter(k -> k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length())))
-			.map(this::readProperty)
-			.filter(StringUtils::isNotEmpty)
-			.flatMap(line -> Arrays.stream(StringUtils.split(line, separator)))
-			.collect(Collectors.toList())
-			.iterator();
+		final List<String> list = new ArrayList<>();
+		for(final Object o : rulesProperties.keySet()){
+			final String k = (String)o;
+			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
+				final String line = readProperty(k);
+				for(final String s : StringUtils.split(line, separator))
+					list.add(s);
+			}
+		}
+		return list.iterator();
 	}
 
 
@@ -161,17 +164,17 @@ public class RulesLoader{
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Production production){
-		letterAndRulesNotCombinable.entrySet().stream()
-			.filter(entry -> StringUtils.containsAny(production.getWord(), entry.getKey()))
-			.flatMap(entry -> entry.getValue().stream())
-			.forEach(entry -> entry.match(production));
+		for(final Map.Entry<String, Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
+			if(StringUtils.containsAny(production.getWord(), entry.getKey()))
+				for(final LetterMatcherEntry letterMatcherEntry : entry.getValue())
+					letterMatcherEntry.match(production);
 	}
 
 	public void flagToFlagIncompatibilityCheck(final Production production){
-		ruleAndRulesNotCombinable.entrySet().stream()
-			.filter(check -> production.hasContinuationFlag(check.getKey()))
-			.flatMap(check -> check.getValue().stream())
-			.forEach(entry -> entry.match(production));
+		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
+			if(production.hasContinuationFlag(check.getKey()))
+				for(final RuleMatcherEntry entry : check.getValue())
+					entry.match(production);
 	}
 
 }

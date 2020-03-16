@@ -225,15 +225,17 @@ public class AffixEntry{
 	}
 
 	public boolean canApplyTo(final String word){
-		if(condition.length() == 1 && condition.charAt(0) == '.')
+		final int conditionLength = condition.length();
+		if(conditionLength == 1 && condition.charAt(0) == '.')
 			return true;
 
+		final int wordLength = word.length();
 		if(affixType == AffixType.PREFIX){
-			if(word.length() >= condition.length() && word.startsWith(condition))
+			if(wordLength >= conditionLength && word.startsWith(condition))
 				return true;
 
 			int i, j;
-			for(i = 0, j = 0; i < word.length() && j < condition.length(); i ++, j ++){
+			for(i = 0, j = 0; i < wordLength && j < conditionLength; i ++, j ++){
 				if(condition.charAt(j) == '['){
 					final boolean neg = (condition.charAt(j + 1) == '^');
 					boolean in = false;
@@ -241,22 +243,22 @@ public class AffixEntry{
 						j ++;
 						if(word.charAt(i) == condition.charAt(j))
 							in = true;
-					}while(j < condition.length() - 1 && condition.charAt(j) != ']');
-					if(neg == in || j == condition.length() - 1 && condition.charAt(j) != ']')
+					}while(j < conditionLength - 1 && condition.charAt(j) != ']');
+					if(neg == in || j == conditionLength - 1 && condition.charAt(j) != ']')
 						return false;
 				}
 				else if(condition.charAt(j) != word.charAt(i))
 					return false;
 			}
-			if(j >= condition.length())
+			if(j >= conditionLength)
 				return true;
 		}
 		else{
-			if(word.length() >= condition.length() && word.endsWith(condition))
+			if(wordLength >= conditionLength && word.endsWith(condition))
 				return true;
 
 			int i, j;
-			for(i = word.length() - 1, j = condition.length() - 1; i >= 0 && j >= 0; i --, j --){
+			for(i = wordLength - 1, j = conditionLength - 1; i >= 0 && j >= 0; i --, j --){
 				if(condition.charAt(j) == ']'){
 					boolean in = false;
 					do{
