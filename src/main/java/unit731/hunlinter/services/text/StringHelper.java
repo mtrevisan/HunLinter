@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
@@ -219,9 +218,9 @@ public class StringHelper{
 
 	public static String removeAll(final String text, final char charToRemove){
 		final StringBuffer sb = new StringBuffer(text);
-		IntStream.range(0, sb.length())
-			.filter(i -> sb.charAt(i) == charToRemove)
-			.forEach(sb::deleteCharAt);
+		for(int i = 0; i < text.length(); i ++)
+			if(sb.charAt(i) == charToRemove)
+				sb.deleteCharAt(i);
 		return sb.toString();
 	}
 
