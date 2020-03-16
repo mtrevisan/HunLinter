@@ -13,6 +13,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.SetHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,7 +69,7 @@ public class WordMuncher{
 
 	private List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
 		final String word = dicEntry.getWord();
-		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
+		final String[] partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
 		final List<DictionaryEntry> originators = new ArrayList<>();
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
@@ -89,9 +90,9 @@ public class WordMuncher{
 						if(productions.length != 1)
 							continue;
 
-						final List<String> baseProductionPartOfSpeech = productions[0].getMorphologicalFieldPartOfSpeech();
-						if(baseProductionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty()
-								|| baseProductionPartOfSpeech != null && baseProductionPartOfSpeech.equals(partOfSpeech))
+						final String[] baseProductionPartOfSpeech = productions[0].getMorphologicalFieldPartOfSpeech();
+						if(baseProductionPartOfSpeech.length == 0 && partOfSpeech.length == 0
+								|| baseProductionPartOfSpeech != null && Arrays.equals(baseProductionPartOfSpeech, partOfSpeech))
 							originators.add(originatorEntry);
 					}
 				}

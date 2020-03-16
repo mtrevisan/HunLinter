@@ -90,15 +90,12 @@ class WordGeneratorBase{
 		final int size = 1 + onefoldProductions.length + twofoldProductions.length
 			+ (lastfoldProductions != null? lastfoldProductions.length: 0);
 		final Production[] productions = new Production[size];
-		int offset = 0;
-		productions[offset ++] = baseProduction;
-		for(int i = 0; i < onefoldProductions.length; i ++)
-			productions[offset ++] = onefoldProductions[i];
-		for(int i = 0; i < twofoldProductions.length; i ++)
-			productions[offset ++] = twofoldProductions[i];
+		productions[0] = baseProduction;
+		System.arraycopy(onefoldProductions, 0, productions, 1, onefoldProductions.length);
+		System.arraycopy(twofoldProductions, 0, productions, 1 + onefoldProductions.length, twofoldProductions.length);
 		if(lastfoldProductions != null)
-			for(int i = 0; i < lastfoldProductions.length; i ++)
-				productions[offset ++] = lastfoldProductions[i];
+			System.arraycopy(lastfoldProductions, 0, productions, 1 + onefoldProductions.length + twofoldProductions.length,
+				lastfoldProductions.length);
 		return productions;
 	}
 

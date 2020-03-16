@@ -154,7 +154,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		if(position == arcs.length)
 			arcs = Arrays.copyOf(arcs, arcs.length + EXPECTED_MAX_STATES);
 
-		arcs[position++] = fsa.getFirstArc(node);
+		arcs[position ++] = fsa.getFirstArc(node);
 	}
 
 }

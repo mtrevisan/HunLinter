@@ -70,10 +70,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			words.ensureCapacity(words.size() + productions.length);
-			Arrays.stream(productions)
-				.map(Production::toStringPoSFSA)
-				.flatMap(List::stream)
-				.forEach(words::add);
+			for(final Production production : productions){
+				final String[] toStringPoSFSA = production.toStringPoSFSA();
+				words.addAll(Arrays.asList(toStringPoSFSA));
+			}
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {

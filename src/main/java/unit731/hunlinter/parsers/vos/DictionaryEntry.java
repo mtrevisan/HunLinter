@@ -227,20 +227,29 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
-	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+	public String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		if(morphologicalFields == null)
+			return new String[0];
+
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		return JavaHelper.nullableToStream(morphologicalFields)
-			.filter(df -> df.startsWith(tag))
-			.map(df -> df.substring(purgeTag))
-			.collect(Collectors.toList());
+		final List<String> list = new ArrayList<>(morphologicalFields.length);
+		for(final String mf : morphologicalFields)
+			if(mf.startsWith(tag))
+				list.add(mf.substring(purgeTag));
+		return list.toArray(String[]::new);
 	}
 
-	public List<String> getMorphologicalFieldPartOfSpeech(){
+	public String[] getMorphologicalFieldPartOfSpeech(){
+		if(morphologicalFields == null)
+			return new String[0];
+
 		final String tag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
-		return JavaHelper.nullableToStream(morphologicalFields)
-			.filter(df -> df.startsWith(tag))
-			.collect(Collectors.toList());
+		final List<String> list = new ArrayList<>(morphologicalFields.length);
+		for(final String mf : morphologicalFields)
+			if(mf.startsWith(tag))
+				list.add(mf);
+		return list.toArray(String[]::new);
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

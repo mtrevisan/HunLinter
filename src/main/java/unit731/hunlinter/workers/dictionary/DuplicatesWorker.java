@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -27,7 +28,6 @@ import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.Duplicate;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.WorkerManager;
@@ -251,8 +251,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Production prod = entries.get(0).getProduction();
-					final String origin = prod.getWord() + prod.getMorphologicalFieldPartOfSpeech().stream()
-						.collect(Collectors.joining(", ", " (", "): "));
+					final String origin = prod.getWord() + "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech())
+						+ "): ";
 					writer.write(origin);
 					writer.write(entries.stream()
 						.map(duplicate ->

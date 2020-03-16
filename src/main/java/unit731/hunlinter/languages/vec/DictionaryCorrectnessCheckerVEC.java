@@ -176,8 +176,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new LinterException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
 
-		final List<String> pos = production.getMorphologicalFieldPartOfSpeech();
-		if(pos.size() > 1)
+		final String[] pos = production.getMorphologicalFieldPartOfSpeech();
+		if(pos.length > 1)
 			throw new LinterException(SINGLE_POS_NOT_PRESENT);
 	}
 
