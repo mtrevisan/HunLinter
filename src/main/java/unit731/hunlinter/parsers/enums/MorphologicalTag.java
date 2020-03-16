@@ -1,7 +1,5 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
-
 
 public enum MorphologicalTag{
 
@@ -35,10 +33,10 @@ public enum MorphologicalTag{
 	}
 
 	public static MorphologicalTag createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(tag -> code.startsWith(tag.code))
-			.findFirst()
-			.orElse(null);
+		for(final MorphologicalTag tag : values())
+			if(code.startsWith(tag.code))
+				return tag;
+		return null;
 	}
 
 	public String getCode(){

@@ -1,7 +1,5 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
-
 
 public enum AffixOption{
 
@@ -157,10 +155,10 @@ public enum AffixOption{
 	}
 
 	public static AffixOption createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(option -> option.code.equals(code))
-			.findFirst()
-			.orElse(null);
+		for(final AffixOption option : values())
+			if(option.code.equals(code))
+				return option;
+		return null;
 	}
 
 	public String getCode(){

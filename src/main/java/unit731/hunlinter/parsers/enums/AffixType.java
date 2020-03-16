@@ -1,7 +1,5 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
-
 
 public enum AffixType{
 
@@ -16,10 +14,10 @@ public enum AffixType{
 	}
 
 	public static AffixType createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(t -> t.option.getCode().equals(code))
-			.findFirst()
-			.orElse(null);
+		for(final AffixType tag : values())
+			if(tag.option.getCode().equals(code))
+				return tag;
+		return null;
 	}
 
 	public boolean is(final String code){
