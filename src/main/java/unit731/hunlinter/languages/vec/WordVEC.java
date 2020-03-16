@@ -187,33 +187,33 @@ public class WordVEC{
 	}
 
 	public static String markDefaultStress(String word){
-		int idx = getIndexOfStress(word);
-		if(idx < 0){
+		int stressIndex = getIndexOfStress(word);
+		if(stressIndex < 0){
 			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel
 			//of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
-				idx = getLastUnstressedVowelIndex(phones, lastChar);
-			if(idx >= 0 && PatternHelper.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
-				idx --;
-			else if(idx < 0)
-				idx = lastChar;
+				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
+			if(stressIndex >= 0 && PatternHelper.find(phones.substring(0, stressIndex + 1), DEFAULT_STRESS_GROUP))
+				stressIndex --;
+			else if(stressIndex < 0)
+				stressIndex = lastChar;
 
-			if(idx >= 0)
-				word = setAcuteStressAtIndex(word, idx);
+			if(stressIndex >= 0)
+				word = setAcuteStressAtIndex(word, stressIndex);
 		}
 		return word;
 	}
 
 	public static String unmarkDefaultStress(String word){
-		final int idx = getIndexOfStress(word);
-		//check if the word have a stress and this is not on the last letter (and not followed by a minus sign)
-		final int wordSize = word.length();
-		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != HyphenationParser.MINUS_SIGN.charAt(0)){
-			final String subword = word.substring(idx, idx + 2);
-			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword)
+		final int stressIndex = getIndexOfStress(word);
+		//check if the word have a stress, not on the last letter, not followed by an en dash
+		final int wordLength = word.length();
+		if(stressIndex >= 0 && stressIndex + 1 < wordLength
+				&& word.charAt(stressIndex + 1) != HyphenationParser.EN_DASH.charAt(0)){
+			if(!GraphemeVEC.isDiphtong(word) && !GraphemeVEC.isHyatus(word)
 					&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
 				final String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))

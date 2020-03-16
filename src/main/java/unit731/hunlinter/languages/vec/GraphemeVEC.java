@@ -27,9 +27,8 @@ class GraphemeVEC{
 	public static final String GRAPHEME_T_STROKE = "ŧ";
 	public static final String GRAPHEME_X = "x";
 
-	private static final Pattern DIPHTONG = PatternHelper.pattern("[iu][íú]|[àèéòó][iu]");
-	private static final Pattern HYATUS = PatternHelper.pattern("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
-//	private static final Pattern HYATUS = PatternService.pattern("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
+	private static final Pattern DIPHTONG = PatternHelper.pattern("[iu][íú]|[àèéòó][iu]|[aàeèé][aeo]|[íòóú][aeoi]");
+	private static final Pattern HYATUS = PatternHelper.pattern("[aeïoü][aàeèéiíoòóuú]");
 
 	private static final Pattern ETEROPHONIC_SEQUENCE = PatternHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
