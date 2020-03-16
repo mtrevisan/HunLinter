@@ -217,10 +217,11 @@ public class StringHelper{
 	}
 
 	public static String removeAll(final String text, final char charToRemove){
+		final String strToRemove = Character.toString(charToRemove);
 		final StringBuffer sb = new StringBuffer(text);
-		for(int i = 0; i < text.length(); i ++)
-			if(sb.charAt(i) == charToRemove)
-				sb.deleteCharAt(i);
+		int index = 0;
+		while((index = sb.indexOf(strToRemove, index)) >= 0)
+			sb.deleteCharAt(index --);
 		return sb.toString();
 	}
 
