@@ -99,10 +99,10 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withReplacementPairs(Map<String, List<String>> replacementPairs){
-		StringBuilder builder = new StringBuilder();
-		for(Map.Entry<String, List<String>> e : replacementPairs.entrySet()){
-			String k = e.getKey();
-			for(String v : e.getValue()){
+		final StringBuffer builder = new StringBuffer();
+		for(final Map.Entry<String, List<String>> e : replacementPairs.entrySet()){
+			final String k = e.getKey();
+			for(final String v : e.getValue()){
 				if(builder.length() > 0)
 					builder.append(", ");
 				builder.append(k).append(StringUtils.SPACE).append(v);
@@ -113,10 +113,10 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withEquivalentChars(Map<Character, List<Character>> equivalentChars){
-		StringBuilder builder = new StringBuilder();
-		for(Map.Entry<Character, List<Character>> e : equivalentChars.entrySet()){
-			Character k = e.getKey();
-			for(Character v : e.getValue()){
+		final StringBuffer builder = new StringBuffer();
+		for(final Map.Entry<Character, List<Character>> e : equivalentChars.entrySet()){
+			final Character k = e.getKey();
+			for(final Character v : e.getValue()){
 				if(builder.length() > 0)
 					builder.append(", ");
 				builder.append(k).append(StringUtils.SPACE).append(v);
@@ -127,9 +127,9 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withInputConversionPairs(Map<String, String> conversionPairs){
-		StringBuilder builder = new StringBuilder();
-		for(Map.Entry<String, String> e : conversionPairs.entrySet()){
-			String k = e.getKey();
+		final StringBuffer builder = new StringBuffer();
+		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
+			final String k = e.getKey();
 			if(builder.length() > 0)
 				builder.append(", ");
 			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
@@ -139,9 +139,9 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withOutputConversionPairs(Map<String, String> conversionPairs){
-		StringBuilder builder = new StringBuilder();
-		for(Map.Entry<String, String> e : conversionPairs.entrySet()){
-			String k = e.getKey();
+		final StringBuffer builder = new StringBuffer();
+		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
+			final String k = e.getKey();
 			if(builder.length() > 0)
 				builder.append(", ");
 			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));

@@ -262,7 +262,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 	 */
 	public static String applyReplacements(CharSequence word, Map<String, String> replacements){
 		// quite horrible from performance point of view; this should really be a transducer.
-		StringBuilder sb = new StringBuilder(word);
+		final StringBuffer sb = new StringBuffer(word);
 		for(final Map.Entry<String, String> e : replacements.entrySet()){
 			String key = e.getKey();
 			int index = sb.indexOf(e.getKey());

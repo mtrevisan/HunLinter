@@ -236,8 +236,10 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void orthographyCheck(final String word){
 		final String correctedDerivedWord = orthography.correctOrthography(word);
-		if(!correctedDerivedWord.equals(word))
+		if(!correctedDerivedWord.equals(word)){
+			orthography.correctOrthography(word);
 			throw new LinterException(MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
+		}
 	}
 
 	@Override

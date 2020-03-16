@@ -66,9 +66,7 @@ class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(final String word){
-		String phonemizedWord = correctFhOccurrences(word);
-
-		phonemizedWord = correctUIJGraphemes(phonemizedWord);
+		String phonemizedWord = correctUIJGraphemes(word);
 
 		//phonize etherophonic sequences
 		if(phonemizedWord.contains(GRAPHEME_U))
@@ -77,12 +75,6 @@ class GraphemeVEC{
 			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1" + GRAPHEME_J + "$2");
 
 		return phonemizedWord;
-	}
-
-	private static String correctFhOccurrences(String word){
-		if(word.contains(GRAPHEME_FH))
-			word = StringUtils.replace(word, GRAPHEME_FH, GRAPHEME_F);
-		return word;
 	}
 
 	private static String correctUIJGraphemes(String word){

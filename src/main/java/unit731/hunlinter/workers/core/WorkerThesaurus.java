@@ -36,8 +36,8 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 		try{
 			final ThesaurusParser theParser = workerData.getParser();
 			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-			for(int index = 0; index < dictionary.size(); index ++){
-				data = dictionary.get(index);
+			for(final ThesaurusEntry thesaurusEntry : dictionary){
+				data = thesaurusEntry;
 				dataProcessor.accept(data);
 			}
 		}
@@ -50,8 +50,7 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 		final List<ThesaurusEntry> entries = new ArrayList<>();
 		final ThesaurusParser theParser = workerData.getParser();
 		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-		for(int index = 0; index < dictionary.size(); index ++)
-			entries.add(dictionary.get(index));
+		entries.addAll(dictionary);
 
 		return entries;
 	}

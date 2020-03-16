@@ -2,8 +2,6 @@ package unit731.hunlinter.services.fsa;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
-import unit731.hunlinter.services.fsa.FSA;
-import unit731.hunlinter.services.fsa.StateVisitor;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
 import java.io.IOException;
@@ -98,16 +96,16 @@ public class FSATestUtils{
 		final Map<String, Integer> stateLanguages = new HashMap<String, Integer>();
 
 		fsa.visitInPostOrder(new StateVisitor(){
-			private StringBuilder b = new StringBuilder();
+			private StringBuffer sb = new StringBuffer();
 
 			public boolean accept(int state){
 				List<byte[]> rightLanguage = allSequences(fsa, state);
 				Collections.sort(rightLanguage, FSABuilder.LEXICAL_ORDERING);
 
-				b.setLength(0);
+				sb.setLength(0);
 				for(byte[] seq : rightLanguage)
-					b.append(Arrays.toString(seq)).append(',');
-				String full = b.toString();
+					sb.append(Arrays.toString(seq)).append(',');
+				String full = sb.toString();
 				Assertions.assertFalse(stateLanguages.containsKey(full), "State exists: " + state + " " + full + " " + stateLanguages.get(full));
 				stateLanguages.put(full, state);
 

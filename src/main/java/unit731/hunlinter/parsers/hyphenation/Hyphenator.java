@@ -121,11 +121,11 @@ public class Hyphenator implements HyphenatorInterface{
 		final HyphenationBreak hyphBreak;
 		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
-			final String[] hyphenations = StringUtils.split(customHyphenation, HyphenationParser.HYPHEN_EQUALS);
+			final String[] hyphenations = StringUtils.split(customHyphenation, HyphenationParser.EQUALS_SIGN);
 			final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){
-				final String customRule = hyphenations[i - 1] + HyphenationParser.HYPHEN_EQUALS + hyphenations[i];
+				final String customRule = hyphenations[i - 1] + HyphenationParser.EQUALS_SIGN + hyphenations[i];
 				indexesAndRules.put(charCount, Pair.of(1, customRule));
 
 				charCount += getNormalizedLength(hyphenations[i]);

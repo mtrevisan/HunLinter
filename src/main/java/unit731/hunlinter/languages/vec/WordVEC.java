@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
@@ -54,11 +53,7 @@ public class WordVEC{
 		}
 	}
 
-//	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
-	private static final Pattern FIRST_STRESSED_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú].*$");
-	private static final Pattern LAST_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
-
-	private static final Pattern DEFAULT_STRESS_GROUP = PatternHelper.pattern("(fr|[ln]|st)au$");
+	private static final Pattern DEFAULT_STRESS_GROUP = PatternHelper.pattern("^((de)?fr|(ma|ko|x)?[lƚ]|n|apl|(in|re)st)au");
 
 	private static final String NO_STRESS_AVER = "^(r[aeiï]|ar)?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[aeiï]|ar)?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -98,7 +93,7 @@ public class WordVEC{
 	}
 
 	public static boolean isApostrophe(final char chr){
-		return (chr == 'ʼ' || chr == '\'');
+		return (chr == HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE || chr == HyphenationParser.APOSTROPHE.charAt(0));
 	}
 
 	public static boolean isVowel(final char chr){
@@ -119,34 +114,21 @@ public class WordVEC{
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
 	public static boolean endsWithVowel(final String word){
-		int i = word.length();
-		while((-- i) >= 0){
-			final char chr = word.charAt(i);
-			if(!isApostrophe(chr))
-				return isVowel(chr);
-		}
-		return false;
-	}
-
-	public static int getFirstVowelIndex(final String word, final int index){
-		final Matcher m = FIRST_STRESSED_VOWEL.matcher(word.substring(index));
-		return (m.find()? m.start() + index: -1);
-	}
-
-	public static int getLastVowelIndex(final String word){
-		final Matcher m = LAST_VOWEL.matcher(word);
-		return (m.find()? m.start(): -1);
+		final int idx = word.length() - 1;
+		char chr = word.charAt(idx);
+		if(isApostrophe(chr))
+			chr = word.charAt(idx - 1);
+		return isVowel(chr);
 	}
 
 	//[aeiou][^aeiou]*$
-	private static int getLastUnstressedVowelIndex(final String word, final int idx){
-		int i = (idx >= 0? idx: word.length());
-		while((-- i) >= 0){
-			final char chr = word.charAt(i);
+	private static int getLastUnstressedVowelIndex(final String word, int lastLetterIndex){
+		while(lastLetterIndex > 0){
+			final char chr = word.charAt(-- lastLetterIndex);
 			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
-				return i;
+				break;
 		}
-		return -1;
+		return lastLetterIndex;
 	}
 
 
@@ -167,7 +149,9 @@ public class WordVEC{
 
 
 	private static String setAcuteStressAtIndex(final String word, final int idx){
-		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
+		final StringBuffer sb = new StringBuffer(word);
+		sb.setCharAt(idx, addStressAcute(word.charAt(idx)));
+		return sb.toString();
 	}
 
 	//NOTE: is seems faster the current method (above)
@@ -190,13 +174,13 @@ public class WordVEC{
 		int stressIndex = getIndexOfStress(word);
 		if(stressIndex < 0){
 			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
-			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
+			final int lastChar = getLastUnstressedVowelIndex(phones, phones.length());
 
 			//last vowel if the word ends with consonant, penultimate otherwise
 			//default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
 				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
-			if(stressIndex >= 0 && PatternHelper.find(phones.substring(0, stressIndex + 1), DEFAULT_STRESS_GROUP))
+			if(stressIndex >= 0 && PatternHelper.find(phones, DEFAULT_STRESS_GROUP))
 				stressIndex --;
 			else if(stressIndex < 0)
 				stressIndex = lastChar;

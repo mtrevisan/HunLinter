@@ -7,8 +7,8 @@ public class IndexDataPair<T>{
 	private final T data;
 
 
-	public static <T> IndexDataPair of(final int index, final T data){
-		return new IndexDataPair(index, data);
+	public static <T> IndexDataPair<T> of(final int index, final T data){
+		return new IndexDataPair<>(index, data);
 	}
 
 	private IndexDataPair(final int index, final T data){

@@ -271,7 +271,7 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public String toString(){
-		final StringBuilder sb = (new StringBuilder())
+		final StringBuffer sb = (new StringBuffer())
 			.append(major).append(DOT).append(minor).append(DOT).append(patch);
 		if(preRelease.length > 0)
 			sb.append(PRE_RELEASE_PREFIX).append(String.join(DOT, preRelease));

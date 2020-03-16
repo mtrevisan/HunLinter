@@ -24,6 +24,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 			if(offset == values.length)
 				throw new NoSuchElementException();
 
+			//noinspection unchecked
 			return (E)values[offset ++];
 		}
 
@@ -47,8 +48,9 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 	}
 
 	@Override
-	public ArraySet clone(){
-		final ArraySet ret = new ArraySet();
+	@SuppressWarnings("MethodDoesntCallSuperMethod")
+	public ArraySet<E> clone(){
+		final ArraySet<E> ret = new ArraySet<>();
 		ret.values = (values == EMPTY_ARRAY? EMPTY_ARRAY: values.clone());
 		return ret;
 	}
@@ -76,8 +78,8 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 	@Override
 	public boolean add(final E value){
 		int n = values.length;
-		for(int i = 0; i < n; i ++)
-			if(values[i].equals(value))
+		for(final Object o : values)
+			if(o.equals(value))
 				return false;
 
 		final Object[] newValues = new Object[n + 1];

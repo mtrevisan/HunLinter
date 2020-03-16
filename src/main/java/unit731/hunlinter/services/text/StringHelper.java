@@ -10,16 +10,16 @@ import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.PatternHelper;
 
 
 public class StringHelper{
 
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
-
-	private static final char UNICODE_MODIFIER_LETTER_APOSTROPHE = '\u02BC';
 
 	public enum Casing{
 		/** All lower case or neutral case, e.g. "hello java" */
@@ -61,7 +61,8 @@ public class StringHelper{
 		final long lower = text.chars()
 			//Unicode modifier letter apostrophe is considered as an uppercase letter, but shoule be regarded as caseless,
 			//so it has to be excluded
-			.filter(chr -> Character.isLetter(chr) && chr != UNICODE_MODIFIER_LETTER_APOSTROPHE && Character.isLowerCase(chr))
+			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE
+				&& Character.isLowerCase(chr))
 			.count();
 		if(lower == 0l)
 			return Casing.ALL_CAPS;
@@ -176,7 +177,7 @@ public class StringHelper{
 	 * @return	The hexadecimal characters
 	 */
 	public static String byteArrayToHexString(final byte[] byteArray){
-		final StringBuilder sb = new StringBuilder(byteArray.length << 1);
+		final StringBuffer sb = new StringBuffer(byteArray.length << 1);
 		for(final byte b : byteArray){
 			sb.append(Character.forDigit((b >> 4) & 0x0F, 16));
 			sb.append(Character.forDigit((b & 0x0F), 16));
@@ -214,6 +215,14 @@ public class StringHelper{
 			}
 		}
 		return count;
+	}
+
+	public static String removeAll(final String text, final char charToRemove){
+		final StringBuffer sb = new StringBuffer(text);
+		IntStream.range(0, sb.length())
+			.filter(i -> sb.charAt(i) == charToRemove)
+			.forEach(sb::deleteCharAt);
+		return sb.toString();
 	}
 
 }

@@ -4,16 +4,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.PatternHelper;
 
 
 public class Orthography{
 
-	private static final Pattern PATTERN_APOSTROPHE = PatternHelper.pattern("['‘ʼ]");
+	private static final String WRONG_APOSTROPHES = "'‘ʼ";
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
@@ -32,7 +31,15 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(final String word){
-		return PatternHelper.replaceAll(word, PATTERN_APOSTROPHE, HyphenationParser.APOSTROPHE);
+		String correctedWord = word;
+		if(StringUtils.containsAny(word, WRONG_APOSTROPHES)){
+			final StringBuffer sb = new StringBuffer(word);
+			IntStream.range(0, word.length())
+				.filter(i -> WRONG_APOSTROPHES.contains(Character.toString(word.charAt(i))))
+				.forEach(i -> sb.setCharAt(i, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE));
+			correctedWord = sb.toString();
+		}
+		return correctedWord;
 	}
 
 	public boolean[] getSyllabationErrors(final List<String> syllabes){
@@ -56,7 +63,8 @@ public class Orthography{
 	}
 
 	public StringJoiner formatHyphenation(final List<String> syllabes){
-		return formatHyphenation(syllabes, new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity());
+		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
+		return formatHyphenation(syllabes, sj, Function.identity());
 	}
 
 	/**

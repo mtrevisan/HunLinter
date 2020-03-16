@@ -10,16 +10,15 @@ import java.util.regex.Pattern;
 
 public class WordTokenizerVEC extends WordTokenizer{
 
-	private static final String UNICODE_APOSTROPHE = "'";
-	private static final String UNICODE_APOSTROPHES = UNICODE_APOSTROPHE + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE;
+	private static final String APOSTROPHES = HyphenationParser.APOSTROPHE + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE;
 
 	private static final Pattern TOKENIZING_CHARACTERS;
 	static{
 		final String quotedTokenizingChars = Pattern.quote(DEFAULT_TOKENIZING_CHARACTERS);
 		TOKENIZING_CHARACTERS = Pattern.compile("(?i)"
-			+ "(a[lƚnv]|di|e[lƚn]|[gks][oó]|[iu]n|[lƚ][aài]|v[aàeèéiíoòóuú])[" + UNICODE_APOSTROPHES + "](?=[" + quotedTokenizingChars + "]|$)"
+			+ "(a[lƚnv]|di|e[lƚn]|[gks][oó]|[iu]n|[lƚ][aài]|v[aàeèéiíoòóuú])[" + APOSTROPHES + "](?=[" + quotedTokenizingChars + "]|$)"
 			+ "|"
-			+ "[" + UNICODE_APOSTROPHES + "](a[nrsŧ]|b[iuú]|e[cdglƚmnrstv-]|i[eégklƚmnoóstv]|[kpsv]a|[lntuéíòóú]|o[klƚmnrsx]|s[eé]|à[nrs]|èc|[ñv][aàeèéiíoòóuú]|[lƚ]o)"
+			+ "[" + APOSTROPHES + "](a[nrsŧ]|b[iuú]|e[cdglƚmnrstv-]|i[eégklƚmnoóstv]|[kpsv]a|[lntuéíòóú]|o[klƚmnrsx]|s[eé]|à[nrs]|èc|[ñv][aàeèéiíoòóuú]|[lƚ]o)"
 		);
 	}
 

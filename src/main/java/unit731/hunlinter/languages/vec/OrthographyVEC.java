@@ -62,8 +62,10 @@ public class OrthographyVEC extends Orthography{
 
 	@Override
 	public String correctOrthography(final String word){
+		String correctedWord = correctApostrophes(word);
+
 		//correct stress
-		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+		correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
 
 		//correct h occurrences after d, j, l, n, t
 		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
@@ -99,8 +101,6 @@ public class OrthographyVEC extends Orthography{
 		//eliminate consonant geminates
 		correctedWord = GEMINATES_REDUCER.apply(correctedWord);
 
-		correctedWord = correctApostrophes(correctedWord);
-
 		return correctedWord;
 	}
 
@@ -127,7 +127,7 @@ public class OrthographyVEC extends Orthography{
 		for(int i = 0; i < size; i ++){
 			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
-				&& !syllabe.contains(HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE)
+				&& !StringUtils.contains(syllabe, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE)
 				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
 		return errors;

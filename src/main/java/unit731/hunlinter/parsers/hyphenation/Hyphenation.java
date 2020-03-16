@@ -14,7 +14,8 @@ public class Hyphenation{
 	private final String breakCharacter;
 
 
-	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules, final String breakCharacter){
+	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules,
+			final String breakCharacter){
 		Objects.requireNonNull(syllabes);
 		Objects.requireNonNull(compounds);
 		Objects.requireNonNull(rules);

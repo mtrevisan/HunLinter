@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.PatternHelper;
@@ -60,12 +61,12 @@ public class HyphenationParser{
 //	private static final String HYPHEN = "\u2010";
 //	private static final String HYPHEN_MINUS = "\u002D";
 	public static final String MINUS_SIGN = "-";
-	public static final String HYPHEN_EQUALS = "=";
+	public static final char EQUALS_SIGN = '=';
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
-//	private static final String EM_DASH = "\u2014";
-	public static final String APOSTROPHE = "ʼ";
-	public static final String RIGHT_MODIFIER_LETTER_APOSTROPHE = "\u02BC";
+//	private static final char EM_DASH = '\u2014';
+	public static final String APOSTROPHE = "'";
+	public static final char RIGHT_MODIFIER_LETTER_APOSTROPHE = '\u02BC';
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
@@ -100,7 +101,6 @@ public class HyphenationParser{
 
 	public static final Pattern PATTERN_WORD_BOUNDARIES = PatternHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
-	private static final Pattern PATTERN_EQUALS = PatternHelper.pattern(HYPHEN_EQUALS);
 	private static final Pattern PATTERN_KEY = PatternHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = PatternHelper.pattern("[^13579]|/.+$");
 
@@ -261,7 +261,7 @@ public class HyphenationParser{
 	}
 
 	private void parseCustomRule(final String line, final Level level){
-		final String key = PatternHelper.clear(line, PATTERN_EQUALS);
+		final String key = StringHelper.removeAll(line, EQUALS_SIGN);
 		if(customHyphenations.get(level).containsKey(key))
 			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
@@ -283,11 +283,12 @@ public class HyphenationParser{
 		//dash and apostrophe are added by default (retro-compatibility)
 		final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 		if(charset == StandardCharsets.UTF_8)
-			retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_MODIFIER_LETTER_APOSTROPHE, EN_DASH));
+			retroCompatibilityNoHyphen.addAll(Arrays.asList(Character.toString(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH));
 
 		patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
 
-		options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
+		options.getNoHyphen()
+			.addAll(retroCompatibilityNoHyphen);
 
 		for(final String noHyphen : retroCompatibilityNoHyphen){
 			final String line = ONE + noHyphen + ONE;
@@ -302,7 +303,7 @@ public class HyphenationParser{
 	}
 
 	public static boolean isCustomRule(final String line){
-		return (!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS));
+		return (!isAugmentedRule(line) && StringUtils.contains(line, EQUALS_SIGN));
 	}
 
 	private boolean isRuleDuplicated(final String key, final String line, final Level level){
@@ -357,7 +358,7 @@ public class HyphenationParser{
 
 		final String oldRule;
 		if(isCustomRule(rule)){
-			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			final String key = StringHelper.removeAll(rule, EQUALS_SIGN);
 			oldRule = customHyphenations.get(level)
 				.putIfAbsent(key, rule);
 		}
@@ -384,7 +385,7 @@ public class HyphenationParser{
 	public boolean removeRule(final String rule, final Level level){
 		final String oldRule;
 		if(isCustomRule(rule)){
-			final String key = PatternHelper.clear(rule, PATTERN_EQUALS);
+			final String key = StringHelper.removeAll(rule, EQUALS_SIGN);
 			oldRule = customHyphenations.get(level).get(key);
 			if(oldRule != null)
 				customHyphenations.get(level).remove(key);
@@ -428,7 +429,7 @@ public class HyphenationParser{
 	private static void validateBasicRules(final String rule){
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
 			throw new LinterException(INVALID_RULE.format(new Object[]{rule}));
-		if(!rule.contains(HYPHEN_EQUALS)){
+		if(!StringUtils.contains(rule, EQUALS_SIGN)){
 			if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
 				throw new LinterException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
 			if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
