@@ -157,8 +157,10 @@ public class AffixData{
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		return getCompoundRules().stream()
-			.anyMatch(rule -> isManagedByCompoundRule(rule, flag));
+		for(final String rule : getCompoundRules())
+			if(isManagedByCompoundRule(rule, flag))
+				return true;
+		return false;
 	}
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
@@ -200,24 +202,24 @@ public class AffixData{
 		return getData(AffixOption.FLAG);
 	}
 
-	public boolean isAffixProductive(final String word, final String affix){
+	public boolean isAffixProductive(final String affix, final String word){
 		final String convertedWord = applyInputConversionTable(word);
 
 		boolean productive;
 		final Object data = getData(affix);
 		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
-			productive = ((RuleEntry)data).getEntries().stream()
-				.anyMatch(entry -> entry.canApplyTo(convertedWord));
+			productive = ((RuleEntry)data).isProductiveFor(convertedWord);
 		else
 			productive = isManagedByCompoundRule(affix);
 		return productive;
 	}
 
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
-		//extract the list of applicable affixes…
-		return entries.stream()
-			.filter(entry -> entry.canApplyTo(word))
-			.collect(Collectors.toList());
+		final List<AffixEntry> list = new ArrayList<>();
+		for(final AffixEntry entry : entries)
+			if(entry.canApplyTo(word))
+				list.add(entry);
+		return list;
 	}
 
 	public List<String> applyReplacementTable(final String word){

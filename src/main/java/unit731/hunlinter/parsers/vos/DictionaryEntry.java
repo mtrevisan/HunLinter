@@ -81,11 +81,8 @@ public class DictionaryEntry{
 		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs:
 			ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
-		final DictionaryEntry dicEntry = new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
-
-		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
-
-		return dicEntry;
+		final String convertedWord = affixData.applyInputConversionTable(word);
+		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
 	protected DictionaryEntry(final DictionaryEntry dicEntry){
@@ -133,10 +130,6 @@ public class DictionaryEntry{
 
 	public boolean isCombinable(){
 		return combinable;
-	}
-
-	public void applyInputConversionTable(final Function<String, String> inputConversionTable){
-		word = inputConversionTable.apply(word);
 	}
 
 	public boolean removeContinuationFlag(final String continuationFlagToRemove){

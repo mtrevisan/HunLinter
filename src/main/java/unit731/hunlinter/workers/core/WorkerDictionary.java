@@ -8,14 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
@@ -88,25 +85,18 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 
 	private Consumer<IndexDataPair<String>> createInnerProcessor(final Consumer<IndexDataPair<String>> dataProcessor,
 			final int totalEntries){
-final AtomicLong memoryUsage = new AtomicLong(0l);
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 //5 147 272
-final long currentMemoryUsage = JavaHelper.getUsedMemory();
-if(currentMemoryUsage > memoryUsage.get()){
-	memoryUsage.set(currentMemoryUsage);
-	System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-
-	System.gc();
-}
+//System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
 //PoS FSA:
 //?: 3.6 GiB
 //dic linter:
 //fsa6: 278/274 MiB
 //fsa8: 322/272/286 MiB
-//mem1: 455/511 MiB
+//mem1: 455/511/?-47 MiBnew
 
 				setProgress(processingIndex.incrementAndGet(), totalEntries);
 

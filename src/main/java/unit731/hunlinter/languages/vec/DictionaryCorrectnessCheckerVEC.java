@@ -137,10 +137,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		finalSonorizationCheck(production);
 
 		orthographyCheck(production);
-//long delta = JavaHelper.getUsedMemory() - before;
-//if(delta > 0 && production.getAppliedRules() != null && production.getAppliedRules().length > 1)
-//	System.out.println("delta: " + delta);
-//10 416 B
 	}
 
 	private void stressCheck(final Production production){
@@ -201,7 +197,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private boolean hasToCheckForNorthernPlural(final Production production){
 		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN)
-			&& !production.hasPartOfSpeech(POS_PROPER_NOUN)&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
+			&& !production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
 	}
 
@@ -216,7 +212,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final String word = production.getWord();
 		final boolean hasPluralFlag = hasPluralFlag(production);
 		return (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE)
-			&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
+			&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(rule, word));
 	}
 
 	private void orthographyCheck(final Production production){

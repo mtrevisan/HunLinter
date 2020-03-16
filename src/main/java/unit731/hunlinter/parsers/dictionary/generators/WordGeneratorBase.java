@@ -76,10 +76,9 @@ class WordGeneratorBase{
 		//extract lastfold productions
 		Production[] twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
 		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
+		checkTwofoldCorrectness(twofoldProductions);
 		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
 		printProductions("Twofold productions:", twofoldProductions);
-
-		checkTwofoldCorrectness(twofoldProductions);
 
 		final Production[] productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions,
 			twofoldProductions);
@@ -88,11 +87,18 @@ class WordGeneratorBase{
 
 	private Production[] collectProductions(final Production baseProduction, final Production[] onefoldProductions,
 			final Production[] twofoldProductions, final Production[] lastfoldProductions){
-		Production[] productions = new Production[]{baseProduction};
-		productions = ArrayUtils.addAll(productions, onefoldProductions);
-		productions = ArrayUtils.addAll(productions, twofoldProductions);
+		final int size = 1 + onefoldProductions.length + twofoldProductions.length
+			+ (lastfoldProductions != null? lastfoldProductions.length: 0);
+		final Production[] productions = new Production[size];
+		int offset = 0;
+		productions[offset ++] = baseProduction;
+		for(int i = 0; i < onefoldProductions.length; i ++)
+			productions[offset ++] = onefoldProductions[i];
+		for(int i = 0; i < twofoldProductions.length; i ++)
+			productions[offset ++] = twofoldProductions[i];
 		if(lastfoldProductions != null)
-			productions = ArrayUtils.addAll(productions, lastfoldProductions);
+			for(int i = 0; i < lastfoldProductions.length; i ++)
+				productions[offset ++] = lastfoldProductions[i];
 		return productions;
 	}
 

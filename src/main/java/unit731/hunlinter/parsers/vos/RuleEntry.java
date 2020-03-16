@@ -60,4 +60,11 @@ public class RuleEntry{
 		return entries;
 	}
 
+	public boolean isProductiveFor(final String word){
+		for(final AffixEntry entry : entries)
+			if(entry.canApplyTo(word))
+				return true;
+		return false;
+	}
+
 }
