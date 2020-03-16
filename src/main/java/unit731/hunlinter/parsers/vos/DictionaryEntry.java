@@ -168,7 +168,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasContinuationFlag(final String flag){
-		return (continuationFlags != null && flag != null && ArrayUtils.contains(continuationFlags, flag));
+		return (continuationFlags != null && ArrayUtils.contains(continuationFlags, flag));
 	}
 
 	public boolean hasContinuationFlags(final String[] flags){

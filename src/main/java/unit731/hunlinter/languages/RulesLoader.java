@@ -73,7 +73,7 @@ public class RulesLoader{
 			while(rules.hasNext()){
 				final String masterFlag = rules.next();
 				final String[] wrongFlags = strategy.parseFlags(rules.next());
-				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
+				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
@@ -87,7 +87,7 @@ public class RulesLoader{
 					flags = strategy.parseFlags(elem);
 					final String correctRule = flags[flags.length - 1];
 					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
+					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
 				}
@@ -162,8 +162,8 @@ public class RulesLoader{
 
 	public void letterToFlagIncompatibilityCheck(final Production production){
 		letterAndRulesNotCombinable.entrySet().stream()
-			.filter(check -> StringUtils.containsAny(production.getWord(), check.getKey()))
-			.flatMap(check -> check.getValue().stream())
+			.filter(entry -> StringUtils.containsAny(production.getWord(), entry.getKey()))
+			.flatMap(entry -> entry.getValue().stream())
 			.forEach(entry -> entry.match(production));
 	}
 
