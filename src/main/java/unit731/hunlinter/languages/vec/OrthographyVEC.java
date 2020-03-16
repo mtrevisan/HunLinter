@@ -62,10 +62,8 @@ public class OrthographyVEC extends Orthography{
 
 	@Override
 	public String correctOrthography(final String word){
-		String correctedWord = correctApostrophes(word);
-
 		//correct stress
-		correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
 
 		//correct h occurrences after d, j, l, n, t
 		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
