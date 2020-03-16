@@ -51,7 +51,7 @@ public class AffixEntry{
 	private final String flag;
 	final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
-	private final Pattern condition;
+	private final String condition;
 	/** string to strip */
 	private final String removing;
 	private final int removingLength;
@@ -80,37 +80,33 @@ public class AffixEntry{
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
-		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
+		condition = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
 		affixType = AffixType.createFromCode(ruleType);
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
-		final String matcherCondition = (affixType == AffixType.PREFIX? "^": StringUtils.EMPTY)
-			+ cond
-			+ (affixType == AffixType.SUFFIX? "$": StringUtils.EMPTY);
-		condition = PatternHelper.pattern(matcherCondition);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		removingLength = removing.length();
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 		appendingLength = appending.length();
 
-		checkValidity(cond, removal, line);
+		checkValidity(condition, removal, line);
 
 
 		entry = line;
 	}
 
-	private void checkValidity(final String cond, final String removal, final String line){
+	private void checkValidity(final String condition, final String removal, final String line){
 		if(removingLength > 0){
 			if(isSuffix()){
-				if(!cond.endsWith(removal))
+				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
 					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 			else{
-				if(!cond.startsWith(removal))
+				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
 					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
@@ -229,7 +225,58 @@ public class AffixEntry{
 	}
 
 	public boolean canApplyTo(final String word){
-		return PatternHelper.find(word, condition);
+		if(condition.length() == 1 && condition.charAt(0) == '.')
+			return true;
+
+		if(affixType == AffixType.PREFIX){
+			if(word.length() >= condition.length() && word.startsWith(condition))
+				return true;
+
+			int i, j;
+			for(i = 0, j = 0; i < word.length() && j < condition.length(); i ++, j ++){
+				if(condition.charAt(j) == '['){
+					final boolean neg = (condition.charAt(j + 1) == '^');
+					boolean in = false;
+					do{
+						j ++;
+						if(word.charAt(i) == condition.charAt(j))
+							in = true;
+					}while(j < condition.length() - 1 && condition.charAt(j) != ']');
+					if(neg == in || j == condition.length() - 1 && condition.charAt(j) != ']')
+						return false;
+				}
+				else if(condition.charAt(j) != word.charAt(i))
+					return false;
+			}
+			if(j >= condition.length())
+				return true;
+		}
+		else{
+			if(word.length() >= condition.length() && word.endsWith(condition))
+				return true;
+
+			int i, j;
+			for(i = word.length() - 1, j = condition.length() - 1; i >= 0 && j >= 0; i --, j --){
+				if(condition.charAt(j) == ']'){
+					boolean in = false;
+					do{
+						j --;
+						if(word.charAt(i) == condition.charAt(j))
+							in = true;
+					}while(j > 0 && condition.charAt(j) != '[');
+					if(j == 0 && condition.charAt(j) != '[')
+						return false;
+					final boolean neg = (condition.charAt(j + 1) == '^');
+					if(neg == in)
+						return false;
+				}
+				else if(condition.charAt(j) != word.charAt(i))
+					return false;
+			}
+			if(j < 0)
+				return true;
+		}
+		return false;
 	}
 
 	public boolean canInverseApplyTo(final String word){
