@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -33,8 +32,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			Arrays.stream(productions)
-				.forEach(production -> LOGGER.trace("Produced word: {}", production));
+			for(final Production production : productions)
+				LOGGER.trace("Produced word: {}", production);
 
 		return productions;
 	}

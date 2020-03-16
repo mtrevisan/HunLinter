@@ -166,8 +166,9 @@ public class DictionaryEntry{
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
-			return Arrays.stream(flags)
-				.anyMatch(flag -> !list.add(flag));
+			for(final String flag : flags)
+				if(!list.add(flag))
+					return true;
 		}
 		return false;
 	}

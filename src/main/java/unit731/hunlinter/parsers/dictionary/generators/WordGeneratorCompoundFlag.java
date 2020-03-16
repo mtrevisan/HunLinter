@@ -2,12 +2,10 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -79,18 +77,23 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 	private List<List<Production[]>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
 		final Map<Integer, Production[]> dicEntries = new HashMap<>();
-		return permutations.stream()
-			.map(permutation -> generateCompound(permutation, dicEntries, inputs))
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+		final List<List<Production[]>> list = new ArrayList<>();
+		for(final int[] permutation : permutations){
+			final List<Production[]> productions = generateCompound(permutation, dicEntries, inputs);
+			if(productions != null)
+				list.add(productions);
+		}
+		return list;
 	}
 
 	private List<Production[]> generateCompound(final int[] permutation, final Map<Integer, Production[]> dicEntries,
 			final List<DictionaryEntry> inputs){
-		final List<Production[]> expandedPermutationEntries = Arrays.stream(permutation)
-			.mapToObj(index -> dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null)))
-			.filter(list -> list.length > 0)
-			.collect(Collectors.toList());
+		final List<Production[]> expandedPermutationEntries = new ArrayList<>();
+		for(final int index : permutation){
+			final Production[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
+			if(list.length > 0)
+				expandedPermutationEntries.add(list);
+		}
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);
 	}
 

@@ -221,9 +221,10 @@ public class Production extends DictionaryEntry{
 		sj.add(super.toString(strategy));
 		if(hasProductionRules()){
 			sj.add(FROM);
-			sj.add(Arrays.stream(appliedRules)
-				.map(AffixEntry::getFlag)
-				.collect(Collectors.joining(LEADS_TO)));
+			final StringJoiner subsj = new StringJoiner(LEADS_TO);
+			for(final AffixEntry appliedRule : appliedRules)
+				subsj.add(appliedRule.getFlag());
+			sj.add(subsj.toString());
 		}
 		return sj.toString();
 	}

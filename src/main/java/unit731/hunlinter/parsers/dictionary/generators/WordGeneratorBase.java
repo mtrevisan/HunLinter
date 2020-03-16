@@ -128,8 +128,8 @@ class WordGeneratorBase{
 
 				final AffixEntry[] appliedRules = production.getAppliedRules();
 				//add parent derivations
-				Arrays.stream(prods)
-					.forEach(prod -> prod.prependAppliedRules(appliedRules));
+				for(final Production prod : prods)
+					prod.prependAppliedRules(appliedRules);
 
 				twofoldProductions = ArrayUtils.addAll(twofoldProductions, prods);
 			}
@@ -259,8 +259,12 @@ class WordGeneratorBase{
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = Arrays.stream(appliedRules)
-						.anyMatch(r -> (entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag));
+					boolean appliedRuleContainsCircumfix = false;
+					for(final AffixEntry r : appliedRules)
+						if((entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag)){
+							appliedRuleContainsCircumfix = true;
+							break;
+						}
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
 				}
 
