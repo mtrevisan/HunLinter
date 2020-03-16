@@ -27,7 +27,7 @@ public class WordVEC{
 
 	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
-	private static final String VOWELS_UNSTRESSED = "aAeEeEiIïÏoOoOuUüÜ";
+	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 
 	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
@@ -211,14 +211,15 @@ public class WordVEC{
 		final int stressIndex = getIndexOfStress(word);
 		//check if the word have a stress, not on the last letter, not followed by an en dash
 		final int wordLength = word.length();
-		if(stressIndex >= 0 && stressIndex + 1 < wordLength
-				&& word.charAt(stressIndex + 1) != HyphenationParser.EN_DASH.charAt(0)){
-			if(!GraphemeVEC.isDiphtong(word) && !GraphemeVEC.isHyatus(word)
-					&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
-				final String tmp = suppressStress(word);
-				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
-					word = tmp;
-			}
+		if(stressIndex >= 0
+				&& stressIndex + 1 < wordLength
+				&& word.charAt(stressIndex + 1) != HyphenationParser.EN_DASH.charAt(0)
+				&& !GraphemeVEC.isDiphtong(word)
+				&& !GraphemeVEC.isHyatus(word)
+				&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
+			final String tmp = suppressStress(word);
+			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
+				word = tmp;
 		}
 		return word;
 	}
