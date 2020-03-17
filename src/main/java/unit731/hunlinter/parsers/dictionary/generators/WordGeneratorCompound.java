@@ -277,7 +277,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = LoopHelper.anyMatch(compoundAsReplacement, word::contains);
+		boolean exists = (LoopHelper.match(compoundAsReplacement, word::contains) != null);
 		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)

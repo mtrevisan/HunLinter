@@ -121,9 +121,7 @@ public class RulesReducer{
 		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
 		if(rules.size() > 1){
 			//retrieve rule with longest condition (all the other conditions must be this long)
-			final LineEntry compactedRule = rules.stream()
-				.max(Comparator.comparingInt(rule -> rule.condition.length()))
-				.get();
+			final LineEntry compactedRule = LoopHelper.max(rules, Comparator.comparingInt(rule -> rule.condition.length()));
 			expandAddition(rules, compactedRule);
 
 			compactedRules.add(compactedRule);
@@ -242,9 +240,8 @@ public class RulesReducer{
 
 			final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
-			final Set<String> addition = list.stream()
-				.map(add -> add.substring(keyLength))
-				.collect(Collectors.toSet());
+			final Set<String> addition = new HashSet<>();
+			LoopHelper.forEach(list, add -> addition.add(add.substring(keyLength)));
 			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
 			if(rules.contains(newEntry)){
 				temporaryRules.add(newEntry);
@@ -274,9 +271,9 @@ public class RulesReducer{
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
 		if(!plainRules.isEmpty()){
 			try{
-				final Set<String> overallFrom = plainRules.stream()
-					.flatMap(entry -> entry.from.stream())
-					.collect(Collectors.toSet());
+				final Set<String> overallFrom = new HashSet<>();
+				for(final LineEntry entry : plainRules)
+					LoopHelper.forEach(entry.from, overallFrom::add);
 				//noinspection InfiniteLoopStatement
 				for(int index = 0; ; index ++){
 					final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
@@ -319,12 +316,14 @@ public class RulesReducer{
 	private void disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
 			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
 		//extract children
-		final List<LineEntry> children = rules.stream()
-			.filter(rule -> rule.condition.endsWith(condition))
-			.collect(Collectors.toList());
+		final List<LineEntry> children = new ArrayList<>();
+		LoopHelper.applyIf(rules,
+			rule -> rule.condition.endsWith(condition),
+			children::add);
 
-		final Map<LineEntry, Set<Character>> groups = children.stream()
-			.collect(Collectors.toMap(Function.identity(), child -> child.extractGroup(condition.length())));
+		final Map<LineEntry, Set<Character>> groups = new HashMap<>();
+		if(LoopHelper.match(children, child -> groups.put(child, child.extractGroup(condition.length())) != null) != null)
+			throw new IllegalStateException("Duplicate key");
 
 		rules.removeAll(sameCondition);
 

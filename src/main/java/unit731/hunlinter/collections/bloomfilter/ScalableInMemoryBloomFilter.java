@@ -62,14 +62,15 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized boolean contains(final T value){
-		return (value != null && filters.stream().anyMatch(filter -> filter.contains(value)));
+		return (value != null && LoopHelper.match(filters, filter -> filter.contains(value)) != null);
 	}
 
 	@Override
 	public synchronized int getAddedElements(){
-		return filters.stream()
-			.map(BloomFilterInterface::getAddedElements)
-			.reduce(0, Integer::sum);
+		int elements = 0;
+		for(final BloomFilterInterface<T> filter : filters)
+			elements += filter.getAddedElements();
+		return elements;
 	}
 
 	@Override

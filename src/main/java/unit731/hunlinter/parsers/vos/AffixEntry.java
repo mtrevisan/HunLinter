@@ -198,9 +198,11 @@ public class AffixEntry{
 			final String compound = compoundEntry.getWord();
 			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
 		});
-		return mf.stream()
-			.flatMap(Arrays::stream)
-			.toArray(String[]::new);
+
+		final List<String> list = new ArrayList<>();
+		for(final String[] strings : mf)
+			LoopHelper.forEach(strings, list::add);
+		return list.toArray(new String[0]);
 	}
 
 	public final boolean isSuffix(){

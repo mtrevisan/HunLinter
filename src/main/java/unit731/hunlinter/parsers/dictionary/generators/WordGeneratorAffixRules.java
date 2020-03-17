@@ -45,8 +45,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			productions = LoopHelper.removeIf(productions, production -> {
 				final boolean hasOnlyInCompoundFlag = production.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = production.getAppliedRules();
-				final boolean hasOnlyInCompoundFlagInAppliedRules = LoopHelper.anyMatch(appliedRules,
-					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag));
+				final boolean hasOnlyInCompoundFlagInAppliedRules = (LoopHelper.match(appliedRules,
+					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
 				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
 			});
 		return productions;

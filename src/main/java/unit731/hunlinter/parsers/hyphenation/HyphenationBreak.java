@@ -1,13 +1,14 @@
 package unit731.hunlinter.parsers.hyphenation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class HyphenationBreak{
@@ -48,9 +49,9 @@ public class HyphenationBreak{
 	}
 
 	public List<String> getRules(){
-		return indexesAndRules.values().stream()
-			.map(Pair::getValue)
-			.collect(Collectors.toList());
+		final List<String> list = new ArrayList<>();
+		LoopHelper.forEach(indexesAndRules.values(), pair -> list.add(pair.getValue()));
+		return list;
 	}
 
 	public void enforceNoHyphens(final List<String> syllabes, final Set<String> noHyphen){

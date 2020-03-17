@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.dictionary;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,11 +12,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
@@ -53,9 +54,10 @@ public class LineEntry implements Serializable{
 	}
 
 	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
-		final List<String> words = parentRulesFrom.stream()
-			.flatMap(rule -> rule.extractFromEndingWith(condition).stream())
-			.collect(Collectors.toList());
+		final List<String> words = new ArrayList<>();
+		for(final LineEntry rule : parentRulesFrom)
+			for(final String s : rule.extractFromEndingWith(condition))
+				words.add(s);
 		return createFromWithWords(entry, condition, words);
 	}
 
@@ -85,11 +87,13 @@ public class LineEntry implements Serializable{
 			from.addAll(words);
 	}
 
-	public List<String> extractFromEndingWith(String suffix){
+	public List<String> extractFromEndingWith(final String suffix){
 		final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
-		return from.stream()
-			.filter(word -> PatternHelper.find(word, conditionPattern))
-			.collect(Collectors.toList());
+		final List<String> list = new ArrayList<>();
+		LoopHelper.applyIf(from,
+			word -> PatternHelper.find(word, conditionPattern),
+			list::add);
+		return list;
 	}
 
 	public boolean isProductive(){
@@ -102,14 +106,14 @@ public class LineEntry implements Serializable{
 
 	public LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
-		final Set<String> reversedAddition = addition.stream()
-			.map(add -> {
-				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
-				additions[0] = StringUtils.reverse(additions[0]);
-				return StringUtils.join(additions, StringUtils.EMPTY);
-			})
-			.collect(Collectors.toSet());
-		final String reversedCondition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
+		final Set<String> reversedAddition = new HashSet<>(addition.size());
+		LoopHelper.forEach(addition, add -> {
+			final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
+			additions[0] = StringUtils.reverse(additions[0]);
+			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
+		});
+		final String reversedCondition = LineEntry.SEQUENCER_REGEXP
+			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 

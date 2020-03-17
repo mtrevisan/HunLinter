@@ -10,9 +10,9 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.services.system.LoopHelper;
@@ -236,9 +235,11 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
-		return getListeners(dir).stream()
-			.filter(list -> matchesAny(file, getPatterns(list)))
-			.collect(Collectors.toSet());
+		final Set<FileChangeListener> set = new HashSet<>();
+		LoopHelper.applyIf(getListeners(dir),
+			list -> matchesAny(file, getPatterns(list)),
+			set::add);
+		return set;
 	}
 
 	private Set<FileChangeListener> getListeners(final Path dir){
@@ -246,8 +247,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	public boolean matchesAny(final Path input, final Set<PathMatcher> patterns){
-		return patterns.stream()
-			.anyMatch(pattern -> matches(input, pattern));
+		return (LoopHelper.match(patterns, pattern -> matches(input, pattern)) != null);
 	}
 
 	public boolean matches(final Path input, final PathMatcher pattern){

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -17,7 +18,7 @@ public class LoopHelper{
 
 	public static <T> void forEach(final T[] array, final Consumer<T> fun){
 		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i++)
+		for(int i = 0; i < size; i ++)
 			fun.accept(array[i]);
 	}
 
@@ -28,20 +29,34 @@ public class LoopHelper{
 	}
 
 
-	public static <T> boolean anyMatch(final T[] array, final Predicate<T> condition){
+	public static <T> T match(final T[] array, final Predicate<T> condition){
 		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i++)
-			if(condition.test(array[i]))
-				return true;
-		return false;
+		for(int i = 0; i < size; i ++){
+			final T elem = array[i];
+			if(condition.test(elem))
+				return elem;
+		}
+		return null;
 	}
 
-	public static <T> boolean anyMatch(final Collection<T> collection, final Predicate<T> condition){
+	public static <T> T match(final Collection<T> collection, final Predicate<T> condition){
 		if(collection != null)
 			for(final T elem : collection)
 				if(condition.test(elem))
-					return true;
-		return false;
+					return elem;
+		return null;
+	}
+
+
+	public static <T> boolean allMatch(final Collection<T> collection, final Predicate<T> condition){
+		boolean result = true;
+		if(collection != null)
+			for(final T elem : collection)
+				if(!condition.test(elem)){
+					result = false;
+					break;
+				}
+		return result;
 	}
 
 
@@ -65,12 +80,21 @@ public class LoopHelper{
 	public static <T> T[] collectIf(final T[] array, final Predicate<T> condition, final Supplier<T[]> creator){
 		T[] collect = creator.get();
 		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i++){
+		for(int i = 0; i < size; i ++){
 			final T elem = array[i];
 			if(condition.test(elem))
 				collect = ArrayUtils.add(collect, elem);
 		}
 		return collect;
+	}
+
+
+	public static <T> T max(final Collection<T> collection, final Comparator<T> comparator){
+		T best = null;
+		for(final T elem : collection)
+			if(best == null || comparator.compare(elem, best) > 0)
+				best = elem;
+		return best;
 	}
 
 

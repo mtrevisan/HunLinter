@@ -158,7 +158,7 @@ public class AffixData{
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		return LoopHelper.anyMatch(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag));
+		return (LoopHelper.match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
 	}
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){

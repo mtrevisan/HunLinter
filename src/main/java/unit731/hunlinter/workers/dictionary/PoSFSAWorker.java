@@ -19,6 +19,7 @@ import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -45,7 +46,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class PoSFSAWorker extends WorkerDictionary{
@@ -266,9 +266,8 @@ System.out.println("delta: " + delta);
 		}
 
 		words = encode(words, separator, sequenceEncoder);
-		List<byte[]> in = words.stream()
-			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+		final List<byte[]> in = new ArrayList<>();
+		LoopHelper.forEach(words, word -> in.add(StringHelper.getRawBytes(word)));
 		final FSABuilder builder = new FSABuilder();
 		final FSA fsa = builder.build(in);
 

@@ -109,7 +109,7 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return LoopHelper.anyMatch(mfs, mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode()));
+		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode())) != null);
 	}
 
 //	public static String extractWord(final String line){
@@ -149,7 +149,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return LoopHelper.anyMatch(continuationFlags, Predicate.not(isTerminalAffix::apply));
+		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix::apply)) != null);
 	}
 
 	public int getContinuationFlagCount(){
@@ -163,7 +163,7 @@ public class DictionaryEntry{
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
-			return LoopHelper.anyMatch(flags, Predicate.not(list::add));
+			return (LoopHelper.match(flags, Predicate.not(list::add)) != null);
 		}
 		return false;
 	}
@@ -214,8 +214,8 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(){
-		return LoopHelper.anyMatch(morphologicalFields,
-			field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
+		return (LoopHelper.match(morphologicalFields,
+			field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())) != null);
 	}
 
 	public boolean hasPartOfSpeech(final String partOfSpeech){
