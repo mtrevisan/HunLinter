@@ -138,16 +138,14 @@ public class GUIUtils{
 	}
 
 	public static void addFontableProperty(final JComponent... components){
-		LoopHelper.nullableToStream(components)
-			.forEach(component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
+		LoopHelper.forEach(components, component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
 	}
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
 		if(!font.equals(currentFont)){
 			currentFont = font;
 
-			LoopHelper.nullableToStream(parentFrames)
-				.forEach(parentFrame -> updateComponent(parentFrame, font));
+			LoopHelper.forEach(parentFrames, parentFrame -> updateComponent(parentFrame, font));
 		}
 	}
 

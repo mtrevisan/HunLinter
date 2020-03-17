@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -100,10 +99,11 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixType type){
-		return LoopHelper.nullableToStream(appliedRules)
-			.filter(rule -> rule.getType() == type)
-			.reduce((first, second) -> second)
-			.orElse(null);
+		AffixEntry result = null;
+		if(appliedRules != null)
+			for(final AffixEntry rule : appliedRules)
+				result = rule;
+		return result;
 	}
 
 	@Override
@@ -156,9 +156,9 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getRulesSequence(){
-		return LoopHelper.nullableToStream(appliedRules)
-			.map(AffixEntry::getFlag)
-			.collect(Collectors.joining(LEADS_TO));
+		final StringJoiner sj = new StringJoiner(LEADS_TO);
+		LoopHelper.forEach(appliedRules, rule -> sj.add(rule.getFlag()));
+		return sj.toString();
 	}
 
 	public String getMorphologicalFields(){

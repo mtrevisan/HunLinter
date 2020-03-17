@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import org.apache.commons.lang3.StringUtils;
@@ -106,8 +106,10 @@ final int iconSize = 17;
             final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
             .map(AffixEntry::toString)
             .orElse(null);
-            return LoopHelper.nullableToStream(production, morphologicalFields, rule1, rule2, rule3)
-            .collect(Collectors.joining(TAB));
+            final StringJoiner sj = new StringJoiner(TAB);
+            LoopHelper.applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, rule -> rule != null,
+               sj::add);
+            return sj.toString();
          }
       };
       totalProductionsLabel = new javax.swing.JLabel();

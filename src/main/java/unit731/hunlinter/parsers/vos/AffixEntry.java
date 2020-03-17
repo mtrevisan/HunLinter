@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -195,11 +194,10 @@ public class AffixEntry{
 
 	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
 		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
-		LoopHelper.nullableToStream(compoundEntries)
-			.forEach(compoundEntry -> {
-				final String compound = compoundEntry.getWord();
-				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
-			});
+		LoopHelper.forEach(compoundEntries, compoundEntry -> {
+			final String compound = compoundEntry.getWord();
+			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
+		});
 		return mf.stream()
 			.flatMap(Arrays::stream)
 			.toArray(String[]::new);
@@ -218,10 +216,9 @@ public class AffixEntry{
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		return LoopHelper.nullableToStream(morphologicalFields)
-			.filter(df -> df.startsWith(tag))
-			.map(df -> df.substring(purgeTag))
-			.collect(Collectors.toList());
+		final List<String> collector = new ArrayList<>();
+		LoopHelper.applyIf(morphologicalFields, df -> df.startsWith(tag), df -> collector.add(df.substring(purgeTag)));
+		return collector;
 	}
 
 	public boolean canApplyTo(final String word){

@@ -25,8 +25,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
 		Objects.requireNonNull(textArea);
 
-		LoopHelper.nullableToStream(markers)
-			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(textArea));
+		LoopHelper.forEach(markers,
+			marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(textArea));
 	}
 
 	public void setEncoder(final Encoder<ILoggingEvent> encoder){
@@ -39,11 +39,11 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 			final Marker marker = eventObject.getMarker();
-			JavaHelper.executeOnEventDispatchThread(() -> LoopHelper.nullableToStream(TEXT_AREAS.get(marker))
-					.forEach(textArea -> {
-						textArea.append(message);
-						textArea.setCaretPosition(textArea.getDocument().getLength());
-					})
+			JavaHelper.executeOnEventDispatchThread(() ->
+				LoopHelper.forEach(TEXT_AREAS.get(marker), textArea -> {
+					textArea.append(message);
+					textArea.setCaretPosition(textArea.getDocument().getLength());
+				})
 			);
 		}
 	}

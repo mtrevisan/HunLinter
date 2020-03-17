@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -63,7 +64,7 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			originators.forEach(production -> LOGGER.trace("Inferred word: {}", production));
+			LoopHelper.forEach(originators, production -> LOGGER.trace("Inferred word: {}", production));
 		return originators;
 	}
 

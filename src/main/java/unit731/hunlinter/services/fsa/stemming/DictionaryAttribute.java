@@ -241,7 +241,7 @@ public enum DictionaryAttribute{
 
 				final char fromChar = twoChars[0].charAt(0);
 				final char toChar = twoChars[1].charAt(0);
-				equivalentCharacters.putIfAbsent(fromChar, new ArrayList<>(1))
+				equivalentCharacters.computeIfAbsent(fromChar, k -> new ArrayList<>(1))
 					.add(toChar);
 			}
 			return equivalentCharacters;

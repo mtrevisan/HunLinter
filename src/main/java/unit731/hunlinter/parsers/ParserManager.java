@@ -1,5 +1,6 @@
 package unit731.hunlinter.parsers;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.interfaces.HunLintable;
 import java.io.File;
@@ -8,7 +9,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -144,10 +147,11 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final String[] uris = LoopHelper.nullableToStream(affFile, hypFile, aidFile, sexFile, wexFile)
-			.map(File::getAbsolutePath)
-			.toArray(String[]::new);
-		flm.register(this, uris);
+		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, hypFile, aidFile, sexFile, wexFile},
+			null);
+		final List<String> uris = new ArrayList(files.length);
+		LoopHelper.forEach(files, file -> uris.add(file.getAbsolutePath()));
+		flm.register(this, uris.toArray(String[]::new));
 	}
 
 	public void startFileListener(){

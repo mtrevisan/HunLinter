@@ -21,6 +21,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 /**
@@ -227,11 +228,11 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 *
 	 */
-	private int mergeSortedFiles(final BufferedWriter writer, final ExternalSorterOptions options, final List<BinaryFileBuffer> buffers) throws IOException{
-		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
-		buffers.stream()
-			.filter(Predicate.not(BinaryFileBuffer::empty))
-			.forEachOrdered(queue::add);
+	private int mergeSortedFiles(final BufferedWriter writer, final ExternalSorterOptions options,
+			final List<BinaryFileBuffer> buffers) throws IOException{
+		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11,
+			(i, j) -> options.getComparator().compare(i.peek(), j.peek()));
+		LoopHelper.applyIf(buffers, Predicate.not(BinaryFileBuffer::empty), queue::add);
 		int rowCounter = 0;
 		try(writer){
 			if(options.isRemoveDuplicates())

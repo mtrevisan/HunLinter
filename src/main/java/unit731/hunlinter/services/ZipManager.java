@@ -3,7 +3,6 @@ package unit731.hunlinter.services;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.system.LoopHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -33,8 +32,7 @@ public class ZipManager{
 		Files.deleteIfExists(zipFile.toPath());
 
 		final List<String> folders = extractFilesList(dir);
-		excludeFolderBut = LoopHelper.nullableToStream(excludeFolderBut)
-			.toArray(Path[]::new);
+		excludeFolderBut = ArrayUtils.removeAllOccurences(excludeFolderBut, null);
 		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
 
 		//zip files one by one

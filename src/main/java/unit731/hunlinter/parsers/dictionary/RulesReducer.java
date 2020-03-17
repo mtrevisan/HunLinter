@@ -25,6 +25,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegExpSequencer;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -145,7 +146,7 @@ public class RulesReducer{
 				final int delta = longestConditionLength - rule.condition.length();
 				final String deltaAddition = from.substring(startIndex, startIndex + delta);
 				//add addition
-				rule.addition.forEach(addition -> compactedRule.addition.add(deltaAddition + addition));
+				LoopHelper.forEach(rule.addition, addition -> compactedRule.addition.add(deltaAddition + addition));
 			}
 		}
 	}
@@ -168,8 +169,7 @@ public class RulesReducer{
 
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
-		plainRules.forEach(entry -> redistributeAddition(entry, map));
-
+		LoopHelper.forEach(plainRules, entry -> redistributeAddition(entry, map));
 		return SetHelper.collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
@@ -218,7 +218,7 @@ public class RulesReducer{
 				keys.sort(Comparator.comparingInt(String::length).reversed());
 				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
-				temporaryRules.forEach(temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule));
+				LoopHelper.forEach(temporaryRules, temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule));
 				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
@@ -551,7 +551,7 @@ public class RulesReducer{
 
 			if(parent.from.containsAll(child.from)){
 				final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
-				childGroup.forEach(chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
+				LoopHelper.forEach(childGroup, chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
 
 				itr.remove();
 			}
@@ -637,7 +637,7 @@ public class RulesReducer{
 					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
-				similarities.forEach(entries::remove);
+				LoopHelper.forEach(similarities, entries::remove);
 			}
 	}
 
@@ -675,7 +675,7 @@ public class RulesReducer{
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			entries.forEach(entry -> entry.expandConditionToMaxLength(comparator));
+			LoopHelper.forEach(entries, entry -> entry.expandConditionToMaxLength(comparator));
 
 		return entries.stream()
 			.sorted(lineEntryComparator)

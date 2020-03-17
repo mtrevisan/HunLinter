@@ -136,7 +136,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		applyOutputConversions(productions, forceCompoundUppercaseFlag);
 
 		if(LOGGER.isTraceEnabled())
-			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
+			LoopHelper.forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
 
 		return limitResponse(productions, limit);
 	}

@@ -3,6 +3,7 @@ package unit731.hunlinter.parsers.thesaurus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,16 +41,21 @@ public class ThesaurusDictionary{
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
-	public boolean add(final String[] partOfSpeeches, String[] synonyms){
+	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		boolean result = false;
 		final String wholePartOfSpeeches = Arrays.stream(partOfSpeeches)
 			.collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END));
-		synonyms = LoopHelper.nullableToStream(synonyms)
-			.map(synonym -> synonym.toLowerCase(Locale.ROOT))
-			.distinct()
-			.toArray(String[]::new);
-		for(String currentDefinition : synonyms){
-			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
+		final List<String> uniqueSynonyms = new ArrayList<>();
+		final Set<String> uniqueValues = new HashSet<>();
+		LoopHelper.forEach(synonyms, synonym -> {
+			final String s = synonym.toLowerCase(Locale.ROOT);
+			if(uniqueValues.add(s))
+				uniqueSynonyms.add(s);
+		});
+
+		for(String currentDefinition : uniqueSynonyms){
+			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, uniqueSynonyms,
+				currentDefinition);
 
 			currentDefinition = removeSynonymUse(currentDefinition);
 			final ThesaurusEntry foundDefinition = dictionary.get(currentDefinition);
@@ -68,12 +74,13 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private SynonymsEntry extractPartOfSpeechAndSynonyms(final String partOfSpeeches, final String[] synonyms, final String definition){
+	private SynonymsEntry extractPartOfSpeechAndSynonyms(final String partOfSpeeches, final List<String> synonyms,
+			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		LoopHelper.nullableToStream(synonyms)
-			.filter(synonym -> !synonym.equals(definition))
-			.forEachOrdered(sj::add);
+		LoopHelper.applyIf(synonyms,
+			synonym -> !synonym.equals(definition),
+			sj::add);
 		return new SynonymsEntry(sj.toString());
 	}
 

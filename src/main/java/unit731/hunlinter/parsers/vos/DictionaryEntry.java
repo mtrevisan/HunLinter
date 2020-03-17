@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -110,8 +109,7 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return LoopHelper.nullableToStream(mfs)
-			.anyMatch(mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode()));
+		return LoopHelper.anyMatch(mfs, mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode()));
 	}
 
 //	public static String extractWord(final String line){
@@ -151,8 +149,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return LoopHelper.nullableToStream(continuationFlags)
-			.anyMatch(Predicate.not(isTerminalAffix::apply));
+		return LoopHelper.anyMatch(continuationFlags, Predicate.not(isTerminalAffix::apply));
 	}
 
 	public int getContinuationFlagCount(){
@@ -166,9 +163,7 @@ public class DictionaryEntry{
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
-			for(final String flag : flags)
-				if(!list.add(flag))
-					return true;
+			return LoopHelper.anyMatch(flags, Predicate.not(list::add));
 		}
 		return false;
 	}
@@ -197,9 +192,11 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		return LoopHelper.nullableToStream(continuationFlags)
-			.filter(affixData::isManagedByCompoundRule)
-			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toList())));
+		final Map<String, List<DictionaryEntry>> result = new HashMap<>();
+		LoopHelper.applyIf(continuationFlags,
+			affixData::isManagedByCompoundRule,
+			flag -> result.computeIfAbsent(flag, k -> new ArrayList<>(1)).add(this));
+		return result;
 	}
 
 	public Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
@@ -208,16 +205,17 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new ArrayList<>());
 		distribution.put(compoundMiddleFlag, new ArrayList<>());
 		distribution.put(compoundEndFlag, new ArrayList<>());
-		LoopHelper.nullableToStream(continuationFlags)
-			.map(distribution::get)
-			.filter(Objects::nonNull)
-			.forEach(value -> value.add(this));
+		LoopHelper.forEach(continuationFlags, flag -> {
+			final List<DictionaryEntry> entries = distribution.get(flag);
+			if(entries != null)
+				entries.add(this);
+		});
 		return distribution;
 	}
 
 	public boolean hasPartOfSpeech(){
-		return LoopHelper.nullableToStream(morphologicalFields)
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
+		return LoopHelper.anyMatch(morphologicalFields,
+			field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
 	}
 
 	public boolean hasPartOfSpeech(final String partOfSpeech){
@@ -254,8 +252,7 @@ public class DictionaryEntry{
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		LoopHelper.nullableToStream(morphologicalFields)
-			.forEach(fun);
+		LoopHelper.forEach(morphologicalFields, fun);
 	}
 
 	/**

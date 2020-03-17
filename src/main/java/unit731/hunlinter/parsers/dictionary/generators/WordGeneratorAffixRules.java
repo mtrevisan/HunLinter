@@ -7,10 +7,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.LoopHelper;
-
-import java.util.Arrays;
 
 
 class WordGeneratorAffixRules extends WordGeneratorBase{
@@ -36,8 +33,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			production -> production.applyOutputConversionTable(affixData::applyOutputConversionTable));
 
 		if(LOGGER.isTraceEnabled())
-			Arrays.stream(productions)
-				.forEach(production -> LOGGER.trace("Produced word: {}", production));
+			LoopHelper.forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}

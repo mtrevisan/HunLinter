@@ -1,8 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,7 +13,6 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
@@ -23,8 +20,6 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
-
-	private static final Comparator<Production> PRODUCTION_COMPARATOR = Comparator.comparing(prod -> prod.getLastAppliedRule().getFlag());
 
 	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
@@ -62,7 +57,7 @@ class WordGeneratorBase{
 		//extract suffixed productions
 		final Production[] suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(),
 			overriddenRule);
-		Arrays.sort(suffixedProductions, PRODUCTION_COMPARATOR);
+//		Arrays.sort(suffixedProductions, PRODUCTION_COMPARATOR);
 		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), suffixedProductions);
 
 		Production[] prefixedProductions = new Production[0];
@@ -70,7 +65,7 @@ class WordGeneratorBase{
 			//extract prefixed productions
 			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(),
 				overriddenRule);
-			Arrays.sort(prefixedProductions, PRODUCTION_COMPARATOR);
+//			Arrays.sort(prefixedProductions, PRODUCTION_COMPARATOR);
 			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), prefixedProductions);
 		}
 
@@ -78,7 +73,7 @@ class WordGeneratorBase{
 		Production[] twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
 		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
 		checkTwofoldCorrectness(twofoldProductions);
-		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
+//		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
 		printProductions("Twofold productions:", twofoldProductions);
 
 		final Production[] productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions,
@@ -104,9 +99,9 @@ class WordGeneratorBase{
 	private void printProductions(final String title, final Production[] productions){
 		if(LOGGER.isDebugEnabled() && productions.length > 0){
 			LOGGER.debug(title);
-			Arrays.stream(productions)
-				.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
-					production.getRulesSequence()));
+			LoopHelper.forEach(productions,
+				production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
+				production.getRulesSequence()));
 		}
 	}
 

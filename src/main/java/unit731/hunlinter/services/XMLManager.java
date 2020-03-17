@@ -73,8 +73,7 @@ public class XMLManager{
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		LoopHelper.nullableToStream(properties)
-			.forEach(property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
+		LoopHelper.forEach(properties, property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
 		final DOMSource domSource = new DOMSource(doc);
 		final StreamResult streamResult = new StreamResult(xmlFile);
 		transformer.transform(domSource, streamResult);
