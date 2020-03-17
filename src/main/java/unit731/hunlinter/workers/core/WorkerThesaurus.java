@@ -6,7 +6,6 @@ import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,12 +46,8 @@ public class WorkerThesaurus extends WorkerAbstract<ThesaurusEntry, WorkerDataPa
 	}
 
 	private List<ThesaurusEntry> loadThesaurus(){
-		final List<ThesaurusEntry> entries = new ArrayList<>();
 		final ThesaurusParser theParser = workerData.getParser();
-		final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-		entries.addAll(dictionary);
-
-		return entries;
+		return theParser.getSynonymsDictionary();
 	}
 
 	private void processThesaurus(final Stream<ThesaurusEntry> entries, final int totalEntries,

@@ -108,7 +108,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 
 	@Override
 	public boolean contains(Object value){
-		for(int i = 0, n = values.length; i < n; i++){
+		for(int i = 0, n = values.length; i < n; i ++){
 			if(values[i].equals(value))
 				return true;
 		}

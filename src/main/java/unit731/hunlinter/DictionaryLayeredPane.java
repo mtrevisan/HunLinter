@@ -107,8 +107,7 @@ final int iconSize = 17;
             .map(AffixEntry::toString)
             .orElse(null);
             final StringJoiner sj = new StringJoiner(TAB);
-            LoopHelper.applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, rule -> rule != null,
-               sj::add);
+            LoopHelper.applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
             return sj.toString();
          }
       };

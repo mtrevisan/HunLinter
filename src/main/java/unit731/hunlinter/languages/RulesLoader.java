@@ -119,8 +119,7 @@ public class RulesLoader{
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
 				final String line = readProperty(k);
-				for(final String s : StringUtils.split(line, separator))
-					list.add(s);
+				list.addAll(Arrays.asList(StringUtils.split(line, separator)));
 			}
 		}
 		return list.iterator();

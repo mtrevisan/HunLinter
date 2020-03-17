@@ -149,7 +149,7 @@ public class ParserManager implements FileChangeListener{
 		final File wexFile = packager.getWordExceptionsFile();
 		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, hypFile, aidFile, sexFile, wexFile},
 			null);
-		final List<String> uris = new ArrayList(files.length);
+		final List<String> uris = new ArrayList<>(files.length);
 		LoopHelper.forEach(files, file -> uris.add(file.getAbsolutePath()));
 		flm.register(this, uris.toArray(String[]::new));
 	}

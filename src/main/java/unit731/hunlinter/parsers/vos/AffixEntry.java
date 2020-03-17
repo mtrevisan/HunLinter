@@ -240,6 +240,7 @@ public class AffixEntry{
 					boolean in = false;
 					do{
 						j ++;
+						//noinspection IfStatementMissingBreakInLoop
 						if(word.charAt(i) == condition.charAt(j))
 							in = true;
 					}while(j < conditionLength - 1 && condition.charAt(j) != ']');
@@ -249,8 +250,7 @@ public class AffixEntry{
 				else if(condition.charAt(j) != word.charAt(i))
 					return false;
 			}
-			if(j >= conditionLength)
-				return true;
+			return (j >= conditionLength);
 		}
 		else{
 			if(wordLength >= conditionLength && word.endsWith(condition))
@@ -262,6 +262,7 @@ public class AffixEntry{
 					boolean in = false;
 					do{
 						j --;
+						//noinspection IfStatementMissingBreakInLoop
 						if(word.charAt(i) == condition.charAt(j))
 							in = true;
 					}while(j > 0 && condition.charAt(j) != '[');
@@ -274,10 +275,8 @@ public class AffixEntry{
 				else if(condition.charAt(j) != word.charAt(i))
 					return false;
 			}
-			if(j < 0)
-				return true;
+			return (j < 0);
 		}
-		return false;
 	}
 
 	public boolean canInverseApplyTo(final String word){
