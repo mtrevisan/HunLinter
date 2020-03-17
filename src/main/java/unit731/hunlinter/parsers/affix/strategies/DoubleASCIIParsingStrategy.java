@@ -3,6 +3,7 @@ package unit731.hunlinter.parsers.affix.strategies;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -62,8 +63,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		for(final String flag : flags)
-			validate(flag);
+		LoopHelper.forEach(flags, this::validate);
 
 		return StringUtils.join(flags, StringUtils.EMPTY);
 	}

@@ -160,7 +160,7 @@ public class LineEntry implements Serializable{
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)
-			.add(Character.toString(combinableChar))
+			.add(String.valueOf(combinableChar))
 			.add(Integer.toString(size))
 			.toString();
 	}

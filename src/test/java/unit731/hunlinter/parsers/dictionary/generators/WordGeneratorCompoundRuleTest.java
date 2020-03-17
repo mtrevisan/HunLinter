@@ -172,43 +172,43 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Production[] expected = new Production[]{
-			createProduction("13th", "_", "pa:1 st:1 pa:3th st:3th"),
-			createProduction("15th", null, "pa:1 st:1 pa:5th st:5th"),
-			createProduction("11th", "_", "pa:1 st:1 pa:1th st:1th"),
-			createProduction("18th", null, "pa:1 st:1 pa:8th st:8th"),
 			createProduction("10th", null, "pa:1 st:1 pa:0th st:0th"),
+			createProduction("11th", "_", "pa:1 st:1 pa:1th st:1th"),
 			createProduction("12th", "_", "pa:1 st:1 pa:2th st:2th"),
+			createProduction("13th", "_", "pa:1 st:1 pa:3th st:3th"),
 			createProduction("14th", null, "pa:1 st:1 pa:4th st:4th"),
-			createProduction("19th", null, "pa:1 st:1 pa:9th st:9th"),
+			createProduction("15th", null, "pa:1 st:1 pa:5th st:5th"),
 			createProduction("16th", null, "pa:1 st:1 pa:6th st:6th"),
 			createProduction("17th", null, "pa:1 st:1 pa:7th st:7th"),
-			createProduction("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
-			createProduction("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
-			createProduction("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
-			createProduction("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
+			createProduction("18th", null, "pa:1 st:1 pa:8th st:8th"),
+			createProduction("19th", null, "pa:1 st:1 pa:9th st:9th"),
 			createProduction("010th", null, "pa:0 st:0 pa:1 st:1 pa:0th st:0th"),
+			createProduction("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
 			createProduction("012th", "_", "pa:0 st:0 pa:1 st:1 pa:2th st:2th"),
+			createProduction("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
 			createProduction("014th", null, "pa:0 st:0 pa:1 st:1 pa:4th st:4th"),
-			createProduction("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
+			createProduction("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
 			createProduction("016th", null, "pa:0 st:0 pa:1 st:1 pa:6th st:6th"),
 			createProduction("017th", null, "pa:0 st:0 pa:1 st:1 pa:7th st:7th"),
-			createProduction("613th", "_", "pa:6 st:6 pa:1 st:1 pa:3th st:3th"),
-			createProduction("615th", null, "pa:6 st:6 pa:1 st:1 pa:5th st:5th"),
-			createProduction("611th", "_", "pa:6 st:6 pa:1 st:1 pa:1th st:1th"),
-			createProduction("618th", null, "pa:6 st:6 pa:1 st:1 pa:8th st:8th"),
-			createProduction("610th", null, "pa:6 st:6 pa:1 st:1 pa:0th st:0th"),
-			createProduction("612th", "_", "pa:6 st:6 pa:1 st:1 pa:2th st:2th"),
-			createProduction("614th", null, "pa:6 st:6 pa:1 st:1 pa:4th st:4th"),
-			createProduction("619th", null, "pa:6 st:6 pa:1 st:1 pa:9th st:9th"),
-			createProduction("616th", null, "pa:6 st:6 pa:1 st:1 pa:6th st:6th"),
-			createProduction("617th", null, "pa:6 st:6 pa:1 st:1 pa:7th st:7th"),
-			createProduction("713th", "_", "pa:7 st:7 pa:1 st:1 pa:3th st:3th"),
-			createProduction("715th", null, "pa:7 st:7 pa:1 st:1 pa:5th st:5th"),
-			createProduction("711th", "_", "pa:7 st:7 pa:1 st:1 pa:1th st:1th"),
-			createProduction("718th", null, "pa:7 st:7 pa:1 st:1 pa:8th st:8th"),
-			createProduction("710th", null, "pa:7 st:7 pa:1 st:1 pa:0th st:0th"),
-			createProduction("712th", "_", "pa:7 st:7 pa:1 st:1 pa:2th st:2th"),
-			createProduction("714th", null, "pa:7 st:7 pa:1 st:1 pa:4th st:4th")
+			createProduction("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
+			createProduction("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
+			createProduction("110th", null, "pa:1 st:1 pa:1 st:1 pa:0th st:0th"),
+			createProduction("111th", "_", "pa:1 st:1 pa:1 st:1 pa:1th st:1th"),
+			createProduction("112th", "_", "pa:1 st:1 pa:1 st:1 pa:2th st:2th"),
+			createProduction("113th", "_", "pa:1 st:1 pa:1 st:1 pa:3th st:3th"),
+			createProduction("114th", null, "pa:1 st:1 pa:1 st:1 pa:4th st:4th"),
+			createProduction("115th", null, "pa:1 st:1 pa:1 st:1 pa:5th st:5th"),
+			createProduction("116th", null, "pa:1 st:1 pa:1 st:1 pa:6th st:6th"),
+			createProduction("117th", null, "pa:1 st:1 pa:1 st:1 pa:7th st:7th"),
+			createProduction("118th", null, "pa:1 st:1 pa:1 st:1 pa:8th st:8th"),
+			createProduction("119th", null, "pa:1 st:1 pa:1 st:1 pa:9th st:9th"),
+			createProduction("210th", null, "pa:2 st:2 pa:1 st:1 pa:0th st:0th"),
+			createProduction("211th", "_", "pa:2 st:2 pa:1 st:1 pa:1th st:1th"),
+			createProduction("212th", "_", "pa:2 st:2 pa:1 st:1 pa:2th st:2th"),
+			createProduction("213th", "_", "pa:2 st:2 pa:1 st:1 pa:3th st:3th"),
+			createProduction("214th", null, "pa:2 st:2 pa:1 st:1 pa:4th st:4th"),
+			createProduction("215th", null, "pa:2 st:2 pa:1 st:1 pa:5th st:5th"),
+			createProduction("216th", null, "pa:2 st:2 pa:1 st:1 pa:6th st:6th")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -262,12 +262,12 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Production[] expected = new Production[]{
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
+			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}

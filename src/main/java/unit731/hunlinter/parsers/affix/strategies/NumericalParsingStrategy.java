@@ -1,10 +1,10 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PatternHelper;
 
@@ -46,8 +46,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 		checkForDuplicates(singleFlags);
 
-		Arrays.stream(singleFlags)
-			.forEach(this::validate);
+		LoopHelper.forEach(singleFlags, this::validate);
 
 		return singleFlags;
 	}
@@ -73,8 +72,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		Arrays.stream(flags)
-			.forEach(this::validate);
+		LoopHelper.forEach(flags, this::validate);
 
 		return StringUtils.join(flags, COMMA);
 	}

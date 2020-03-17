@@ -46,6 +46,23 @@ public class LoopHelper{
 	}
 
 
+	public static <T> void applyIf(final T[] array, final Function<T, Boolean> condition, final Consumer<T> fun){
+		final int size = (array != null? array.length: 0);
+		for(int i = 0; i < size; i ++){
+			final T elem = array[i];
+			if(condition.apply(elem))
+				fun.accept(elem);
+		}
+	}
+
+	public static <T> void applyIf(final Collection<T> collection, final Function<T, Boolean> condition, final Consumer<T> fun){
+		if(collection != null)
+			for(final T elem : collection)
+				if(condition.apply(elem))
+					fun.accept(elem);
+	}
+
+
 	public static <T> T[] collectIf(final T[] array, final Function<T, Boolean> condition, final Supplier<T[]> creator){
 		T[] collect = creator.get();
 		final int size = (array != null? array.length: 0);
@@ -54,16 +71,6 @@ public class LoopHelper{
 			if(condition.apply(elem))
 				collect = ArrayUtils.add(collect, elem);
 		}
-		return collect;
-	}
-
-	public static <T> Collection<T> collectIf(final Collection<T> collection, final Function<T, Boolean> condition,
-			final Supplier<Collection<T>> creator){
-		final Collection<T> collect = creator.get();
-		forEach(collection, elem -> {
-			if(condition.apply(elem))
-				collect.add(elem);
-		});
 		return collect;
 	}
 

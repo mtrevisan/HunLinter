@@ -22,7 +22,6 @@ import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.ArraySet;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
@@ -61,7 +60,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	protected List<List<Production[]>> generateCompounds(final List<List<String>> permutations,
-			final Map<String, Set<DictionaryEntry>> inputs){
+			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<Production[]>> entries = new ArrayList<>();
 		final Map<String, Production[]> dicEntries = new HashMap<>();
 		outer:
@@ -71,7 +70,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					Production[] dicEntriesPerFlag = new Production[0];
-					for(DictionaryEntry entry : inputs.get(flag)){
+					for(final DictionaryEntry entry : inputs.get(flag)){
 						final Production[] productions = applyAffixRules(entry, true, null);
 						final Production[] collect = LoopHelper.collectIf(productions,
 							production -> production.hasContinuationFlag(flag), () -> new Production[0]);
@@ -306,21 +305,22 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others */
-	protected Map<String, Set<DictionaryEntry>> mergeDistributions(Map<String, Set<DictionaryEntry>> compoundRules,
-			final Map<String, Set<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		compoundRules = Stream.of(compoundRules, distribution)
+	protected Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
+			final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
+		return Stream.of(compoundRules, distribution)
 			.flatMap(m -> m.entrySet().stream())
 			.map(m -> {
-				final Set<DictionaryEntry> entries = m.getValue();
-				final Set<DictionaryEntry> value = new HashSet<>(LoopHelper.collectIf(entries,
-					entry -> (entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag)),
-					() -> new HashSet<>(entries.size())));
+				final List<DictionaryEntry> entries = m.getValue();
+				final List<DictionaryEntry> value = new ArrayList<>(entries.size());
+				LoopHelper.forEach(entries, entry -> {
+					if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+						value.add(entry);
+				});
 				final String key = m.getKey();
 				return new AbstractMap.SimpleEntry<>(key, value);
 			})
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 				(entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
-		return compoundRules;
 	}
 
 	protected void loadDictionaryForInclusionTest(){

@@ -196,18 +196,18 @@ public class DictionaryEntry{
 		return null;
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
+	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		return LoopHelper.nullableToStream(continuationFlags)
 			.filter(affixData::isManagedByCompoundRule)
-			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
+			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toList())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
+	public Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
-		final Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
-		distribution.put(compoundBeginFlag, new HashSet<>());
-		distribution.put(compoundMiddleFlag, new HashSet<>());
-		distribution.put(compoundEndFlag, new HashSet<>());
+		final Map<String, List<DictionaryEntry>> distribution = new HashMap<>(3);
+		distribution.put(compoundBeginFlag, new ArrayList<>());
+		distribution.put(compoundMiddleFlag, new ArrayList<>());
+		distribution.put(compoundEndFlag, new ArrayList<>());
 		LoopHelper.nullableToStream(continuationFlags)
 			.map(distribution::get)
 			.filter(Objects::nonNull)

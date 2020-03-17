@@ -45,7 +45,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		loadDictionaryForInclusionTest();
 
 		//extract map flag -> dictionary entries
-		final Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag,
+		final Map<String, List<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag,
 			compoundEndFlag);
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
@@ -60,19 +60,19 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		return applyCompound(entries, limit);
 	}
 
-	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
+	private Map<String, List<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
-		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
+		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
 			final Production[] productions = applyAffixRules(dicEntry, false, null);
 			for(final Production production : productions){
-				final Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
+				final Map<String, List<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
 				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 			}
@@ -80,8 +80,8 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		return compoundRules;
 	}
 
-	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs){
-		for(final Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
+	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, List<DictionaryEntry>> inputs){
+		for(final Map.Entry<String, List<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
 				throw new LinterException(MISSING_WORD.format(new Object[]{entry.getKey()}));
 	}

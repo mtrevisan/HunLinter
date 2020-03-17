@@ -89,14 +89,6 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		return data -> {
 			try{
 				dataProcessor.accept(data);
-//5 147 272
-//System.out.println("cip: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-//PoS FSA:
-//?: 3.6 GiB
-//dic linter:
-//fsa6: 278/274 MiB
-//fsa8: 322/272/286 MiB
-//mem1: 455/511/?-47 MiBnew
 
 				setProgress(processingIndex.incrementAndGet(), totalEntries);
 

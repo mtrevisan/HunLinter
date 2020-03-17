@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -56,9 +55,11 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	private String[] extractFlags(final String flags){
-		return IntStream.range(0, flags.length())
-			.mapToObj(i -> Character.toString(flags.charAt(i)))
-			.toArray(String[]::new);
+		final int size = flags.length();
+		final String[] list = new String[size];
+		for(int i = 0; i < size; i ++)
+			list[i] = String.valueOf(flags.charAt(i));
+		return list;
 	}
 
 	@Override
@@ -83,10 +84,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		checkCompoundValidity(compoundRule);
 
 		//NOTE: same as compoundRule.split(StringUtils.EMPTY) but faster
-		final int size = compoundRule.length();
-		return IntStream.range(0, size)
-			.mapToObj(i -> String.valueOf(compoundRule.charAt(i)))
-			.toArray(String[]::new);
+		return extractFlags(compoundRule);
 	}
 
 	private void checkCompoundValidity(final String compoundRule){

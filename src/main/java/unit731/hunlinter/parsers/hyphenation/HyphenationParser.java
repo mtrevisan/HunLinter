@@ -283,7 +283,7 @@ public class HyphenationParser{
 		//dash and apostrophe are added by default (retro-compatibility)
 		final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 		if(charset == StandardCharsets.UTF_8)
-			retroCompatibilityNoHyphen.addAll(Arrays.asList(Character.toString(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH));
+			retroCompatibilityNoHyphen.addAll(Arrays.asList(String.valueOf(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH));
 
 		patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
 
