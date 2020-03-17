@@ -7,6 +7,7 @@ import unit731.hunlinter.gui.IntegerFilter;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptions;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.swing.*;
 import javax.swing.text.DocumentFilter;
@@ -15,6 +16,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -45,10 +48,11 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 		minRightNonCompoundTextField.setText(Integer.toString(options.getNonCompoundOptions().getRightMin()));
 		minLeftCompoundTextField.setText(Integer.toString(options.getCompoundOptions().getLeftMin()));
 		minRightCompoundTextField.setText(Integer.toString(options.getCompoundOptions().getRightMin()));
+
+		final List<String> list = new ArrayList<>(options.getNoHyphen());
+		list.sort(Comparator.naturalOrder());
 		final DefaultListModel<String> model = new DefaultListModel<>();
-		options.getNoHyphen().stream()
-			.sorted()
-			.forEach(model::addElement);
+		LoopHelper.forEach(list, model::addElement);
 		noHyphenationList.setModel(model);
 	}
 
@@ -221,9 +225,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 	}
 
 	private void deleteRows(final int[] selectedRowIDs){
-		final int count = selectedRowIDs.length;
 		final DefaultListModel<String> model = (DefaultListModel<String>)(noHyphenationList.getModel());
-		for(int i = 0; i < count; i ++)
+		for(int i = 0; i < selectedRowIDs.length; i ++)
 			model.remove(selectedRowIDs[i] - i);
 	}
 
