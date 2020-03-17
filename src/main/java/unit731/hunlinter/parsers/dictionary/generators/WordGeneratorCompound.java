@@ -2,7 +2,6 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -168,9 +167,14 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		final Production[] productions;
-		final String flags = (continuationFlags.length > 0?
-			StringUtils.join(Arrays.stream(continuationFlags).flatMap(Arrays::stream).toArray(String[]::new)):
-			null);
+		String flags = null;
+		if(continuationFlags.length > 0){
+			final List<String> list = new ArrayList<>();
+			for(final String[] continuationFlag : continuationFlags)
+				for(final String s : continuationFlag)
+					list.add(s);
+			flags = StringUtils.join(list.toArray(String[]::new));
+		}
 		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			productions = new Production[]{p};
@@ -282,8 +286,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = compoundAsReplacement.stream()
-			.anyMatch(word::contains);
+		boolean exists = false;
+		for(final String s : compoundAsReplacement)
+			if(word.contains(s)){
+				exists = true;
+				break;
+			}
 		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)
@@ -316,10 +324,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundRules = Stream.of(compoundRules, distribution)
 			.flatMap(m -> m.entrySet().stream())
 			.map(m -> {
+				final Set<DictionaryEntry> value = new HashSet<>();
+				for(final DictionaryEntry entry : m.getValue())
+					if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+						value.add(entry);
 				final String key = m.getKey();
-				final Set<DictionaryEntry> value = m.getValue().stream()
-					.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-					.collect(Collectors.toSet());
 				return new AbstractMap.SimpleEntry<>(key, value);
 			})
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
