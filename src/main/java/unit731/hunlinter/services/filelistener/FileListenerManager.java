@@ -27,6 +27,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 /**
@@ -134,9 +135,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){
 		final Set<PathMatcher> filePatterns = newConcurrentSet();
-		Arrays.stream(patterns)
-			.map(this::matcherForExpression)
-			.forEach(filePatterns::add);
+		LoopHelper.forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
@@ -231,7 +230,7 @@ public class FileListenerManager implements FileListener, Runnable{
 				final Path dir = getDirPath(key);
 				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
-				listeners.forEach(listener -> listenerMethod.accept(listener, file));
+				LoopHelper.forEach(listeners, listener -> listenerMethod.accept(listener, file));
 			}
 		}
 	}

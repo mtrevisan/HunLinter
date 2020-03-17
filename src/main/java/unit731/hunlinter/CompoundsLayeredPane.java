@@ -36,6 +36,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 
 
@@ -288,7 +289,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          },
          compounds -> {
             final StringJoiner sj = new StringJoiner(StringUtils.LF);
-            compounds.forEach(compound -> sj.add(compound.toString(strategy)));
+				LoopHelper.forEach(compounds, compound -> sj.add(compound.toString(strategy)));
             inputTextArea.setText(sj.toString());
             inputTextArea.setCaretPosition(0);
          },
@@ -321,7 +322,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//affix file:
 		if(!compoundRules.isEmpty()){
 			inputComboBox.removeAllItems();
-			compoundRules.forEach(inputComboBox::addItem);
+			LoopHelper.forEach(compoundRules, inputComboBox::addItem);
 			final String compoundFlag = affixData.getCompoundFlag();
 			if(compoundFlag != null)
 				inputComboBox.addItem(compoundFlag);
@@ -334,10 +335,9 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		//aid file:
 		final List<String> lines = parserManager.getAidParser().getLines();
-		final boolean aidLinesPresent = !lines.isEmpty();
 		ruleFlagsAidComboBox.removeAllItems();
-		if(aidLinesPresent)
-			lines.forEach(ruleFlagsAidComboBox::addItem);
+		LoopHelper.forEach(lines, ruleFlagsAidComboBox::addItem);
+		final boolean aidLinesPresent = !lines.isEmpty();
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 		openAidButton.setEnabled(aidLinesPresent);

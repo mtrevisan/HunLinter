@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +24,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -61,9 +61,7 @@ public class WordlistWorker extends WorkerDictionary{
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES)
-				Arrays.stream(productions)
-					.map(toString)
-					.forEach(words::add);
+				LoopHelper.forEach(productions, production -> words.add(production.toString()));
 			else{
 				try{
 					for(final Production production : productions){

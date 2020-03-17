@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -148,8 +147,8 @@ public class Production extends DictionaryEntry{
 					break;
 
 			final long[] suffixesAffixesCount = new long[2];
-			IntStream.range(startIndex + 1, appliedRules.length)
-				.forEach(idx -> suffixesAffixesCount[appliedRules[idx].isSuffix()? 1: 0] ++);
+			for(int idx = startIndex + 1; idx < appliedRules.length; idx ++)
+				suffixesAffixesCount[appliedRules[idx].isSuffix()? 1: 0] ++;
 			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);
 		}
 		return false;

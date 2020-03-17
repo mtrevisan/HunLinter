@@ -3,11 +3,10 @@ package unit731.hunlinter.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.prefs.Preferences;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 /**
@@ -28,7 +27,7 @@ public class RecentItems{
 	private final List<RecentItemsObserver> observers = new ArrayList<>();
 
 
-	public RecentItems(int maxItems, Preferences preferenceNode){
+	public RecentItems(final int maxItems, final Preferences preferenceNode){
 		Objects.requireNonNull(preferenceNode);
 
 		this.maxItems = maxItems;
@@ -42,7 +41,7 @@ public class RecentItems{
 		return items;
 	}
 
-	public void push(String item){
+	public void push(final String item){
 		items.remove(item);
 		items.add(0, item);
 
@@ -52,7 +51,7 @@ public class RecentItems{
 		update();
 	}
 
-	public void remove(String item){
+	public void remove(final String item){
 		items.remove(item);
 
 		update();
@@ -64,11 +63,11 @@ public class RecentItems{
 		update();
 	}
 
-	public String get(int index){
+	public String get(final int index){
 		return items.get(index);
 	}
 
-	public int indexOf(String item){
+	public int indexOf(final String item){
 		return items.indexOf(item);
 	}
 
@@ -76,29 +75,30 @@ public class RecentItems{
 		return items.size();
 	}
 
-	public void addObserver(RecentItemsObserver observer){
+	public void addObserver(final RecentItemsObserver observer){
 		observers.add(observer);
 	}
 
-	public void removeObserver(RecentItemsObserver observer){
+	public void removeObserver(final RecentItemsObserver observer){
 		observers.remove(observer);
 	}
 
 	private void update(){
-		observers.forEach(observer -> observer.onRecentItemChange(this));
+		LoopHelper.forEach(observers, observer -> observer.onRecentItemChange(this));
 
 		storeToPreferences();
 	}
 
 	private void loadFromPreferences(){
-		IntStream.range(0, maxItems)
-			.mapToObj(i -> preferenceNode.get(RECENT_ITEM_PREFIX + i, StringUtils.EMPTY))
-			.takeWhile(Predicate.not(String::isEmpty))
-			.forEach(items::add);
+		for(int i = 0; i < maxItems; i ++){
+			final String s = preferenceNode.get(RECENT_ITEM_PREFIX + i, StringUtils.EMPTY);
+			if(!s.isEmpty())
+				items.add(s);
+		}
 	}
 
 	private void storeToPreferences(){
-		int size = items.size();
+		final int size = items.size();
 		for(int i = 0; i < maxItems; i ++){
 			if(i < size)
 				preferenceNode.put(RECENT_ITEM_PREFIX + i, items.get(i));

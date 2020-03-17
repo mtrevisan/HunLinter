@@ -214,7 +214,7 @@ public class ExternalSorter{
 		}
 		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), options.getCharset()));
 		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
-		files.forEach(File::delete);
+		LoopHelper.forEach(files, File::delete);
 		return rowCounter;
 	}
 

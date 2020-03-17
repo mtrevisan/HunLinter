@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 
 public class XMLManager{
@@ -88,10 +87,11 @@ public class XMLManager{
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			children.ensureCapacity(nodes.getLength());
-			IntStream.range(0, nodes.getLength())
-				.mapToObj(nodes::item)
-				.filter(extractionCondition::apply)
-				.forEach(children::add);
+			for(int i = 0; i < nodes.getLength(); i++){
+				final Node item = nodes.item(i);
+				if(extractionCondition.apply(item))
+					children.add(item);
+			}
 		}
 		return children;
 	}

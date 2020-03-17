@@ -13,7 +13,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -161,8 +160,7 @@ public class GUIUtils{
 				comp.setFont(font);
 
 			if(comp instanceof Container)
-				Arrays.stream(((Container)comp).getComponents())
-					.forEach(stack::push);
+				LoopHelper.forEach(((Container)comp).getComponents(), stack::push);
 		}
 	}
 

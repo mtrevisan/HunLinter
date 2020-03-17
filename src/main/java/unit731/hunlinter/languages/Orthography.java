@@ -34,9 +34,13 @@ public class Orthography{
 		String correctedWord = word;
 		if(StringUtils.containsAny(word, WRONG_APOSTROPHES)){
 			final StringBuffer sb = new StringBuffer(word);
-			IntStream.range(0, word.length())
-				.filter(i -> WRONG_APOSTROPHES.contains(Character.toString(word.charAt(i))))
-				.forEach(i -> sb.setCharAt(i, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE));
+			int index = 0;
+			for(final char chr : word.toCharArray()){
+				if(WRONG_APOSTROPHES.contains(String.valueOf(chr)))
+					sb.setCharAt(index, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
+
+				index ++;
+			}
 			correctedWord = sb.toString();
 		}
 		return correctedWord;

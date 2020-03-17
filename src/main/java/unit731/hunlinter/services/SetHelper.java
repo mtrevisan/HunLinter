@@ -1,5 +1,7 @@
 package unit731.hunlinter.services;
 
+import unit731.hunlinter.services.system.LoopHelper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,7 +109,7 @@ public class SetHelper{
 	 */
 	public static <T> Set<T> union(final Collection<Set<T>> sets){
 		final Set<T> union = new HashSet<>();
-		sets.forEach(union::addAll);
+		LoopHelper.forEach(sets, union::addAll);
 		return union;
 	}
 

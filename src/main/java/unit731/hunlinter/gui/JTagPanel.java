@@ -2,6 +2,7 @@ package unit731.hunlinter.gui;
 
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -42,7 +43,7 @@ public class JTagPanel extends JPanel{
 			if(tags == null)
 				removeAll();
 			else
-				tags.forEach(this::createAndAddTag);
+				LoopHelper.forEach(tags, this::createAndAddTag);
 
 			forceRepaint();
 		}

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -143,10 +142,11 @@ public class DuplicatesWorker extends WorkerDictionary{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-						Arrays.stream(productions)
-							.map(Production::toStringWithPartOfSpeechFields)
-							.filter(Predicate.not(bloomFilter::add))
-							.forEach(duplicatesBloomFilter::add);
+						for(final Production production : productions){
+							final String str = production.toStringWithPartOfSpeechFields();
+							if(!bloomFilter.add(str))
+								duplicatesBloomFilter.add(str);
+						}
 					}
 					catch(final LinterException e){
 						LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);

@@ -12,6 +12,7 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class ThesaurusMergeDialog extends JDialog{
@@ -36,9 +37,7 @@ public class ThesaurusMergeDialog extends JDialog{
 
 		GUIUtils.addUndoManager(mergerTextArea);
 
-		synonymsEntries.stream()
-			.map(SynonymsEntry::toString)
-			.forEach(lineComboBox::addItem);
+		LoopHelper.forEach(synonymsEntries, entry -> lineComboBox.addItem(entry.toString()));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

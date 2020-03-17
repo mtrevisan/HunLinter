@@ -18,6 +18,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
@@ -83,7 +84,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Finalize sort (step 4/4)");
 
 			//remove temporary files
-			chunks.forEach(File::delete);
+			LoopHelper.forEach(chunks, File::delete);
 
 			dicParser.clear();
 

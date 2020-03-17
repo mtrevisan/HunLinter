@@ -8,6 +8,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 /**
@@ -84,10 +85,8 @@ public class SmithWatermanAlignment{
 
 		Set<Trace> traces = new HashSet<>();
 		Stack<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
-		maxScoreIndices.forEach(score -> {
-			//extract edit operations
-			traces.add(traceback(score.getLeft(), score.getRight()));
-		});
+		//extract edit operations
+		LoopHelper.forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
 		return traces;
 	}
 

@@ -17,7 +17,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -261,9 +260,9 @@ public class RulesReducer{
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
-			expandedRules.stream()
-				.filter(expandedRule -> expandedRule.isContainedInto(rule))
-				.forEach(expandedRule -> {
+			LoopHelper.applyIf(expandedRules,
+				expandedRule -> expandedRule.isContainedInto(rule),
+				expandedRule -> {
 					rule.addition.removeAll(expandedRule.addition);
 					expandedRule.from.addAll(rule.from);
 				});
@@ -398,9 +397,7 @@ public class RulesReducer{
 					finalRules.add(newEntry);
 				}
 			}
-			groupsIntersection.stream()
-				.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
-				.forEach(rules::add);
+			LoopHelper.forEach(groupsIntersection, chr -> rules.add(LineEntry.createFrom(parent, chr + parent.condition)));
 		}
 	}
 
@@ -517,10 +514,11 @@ public class RulesReducer{
 				finalRules.addAll(bubbles);
 			}
 			else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1))
-				childrenGroup.stream()
-					.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
-					.filter(Predicate.not(queue::contains))
-					.forEach(queue::add);
+				LoopHelper.forEach(childrenGroup, chr -> {
+					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
+					if(!queue.contains(entry))
+						queue.add(entry);
+				});
 			else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
 				//expand intersection
 				for(final Character chr : groupsIntersection){

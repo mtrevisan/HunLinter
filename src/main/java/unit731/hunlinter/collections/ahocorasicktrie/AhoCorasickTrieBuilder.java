@@ -1,5 +1,7 @@
 package unit731.hunlinter.collections.ahocorasicktrie;
 
+import unit731.hunlinter.services.system.LoopHelper;
+
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
@@ -81,9 +83,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			fakeNode.addChildrenId(parent.getLargestChildrenId());
 			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 		}
-		parent.getSuccess().entrySet().stream()
-			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()))
-			.forEach(siblings::add);
+		LoopHelper.forEach(parent.getSuccess().entrySet(),
+			entry -> siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue())));
 		return siblings.size();
 	}
 

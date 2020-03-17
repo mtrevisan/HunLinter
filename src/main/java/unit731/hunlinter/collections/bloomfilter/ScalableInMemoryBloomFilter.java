@@ -1,5 +1,7 @@
 package unit731.hunlinter.collections.bloomfilter;
 
+import unit731.hunlinter.services.system.LoopHelper;
+
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Stack;
@@ -106,12 +108,12 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized void clear(){
-		filters.forEach(BloomFilterInterface::clear);
+		LoopHelper.forEach(filters, BloomFilterInterface::clear);
 	}
 
 	@Override
 	public synchronized void close(){
-		filters.forEach(BloomFilterInterface::close);
+		LoopHelper.forEach(filters, BloomFilterInterface::close);
 	}
 
 }

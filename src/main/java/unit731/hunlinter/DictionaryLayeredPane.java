@@ -244,11 +244,10 @@ final int iconSize = 17;
 
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
-			final boolean aidLinesPresent = !lines.isEmpty();
 			ruleFlagsAidComboBox.removeAllItems();
-			if(aidLinesPresent)
-				lines.forEach(ruleFlagsAidComboBox::addItem);
+			LoopHelper.forEach(lines, ruleFlagsAidComboBox::addItem);
 			//enable combo-box only if an AID file exists
+			final boolean aidLinesPresent = !lines.isEmpty();
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
