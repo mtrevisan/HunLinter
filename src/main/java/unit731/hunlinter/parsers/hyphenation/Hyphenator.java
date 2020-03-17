@@ -224,7 +224,7 @@ public class Hyphenator implements HyphenatorInterface{
 			response.remove(response.size() - 1);
 	}
 
-	private void manageNoHyphenAtMiddle(List<String> response, String nohyp){
+	private void manageNoHyphenAtMiddle(final List<String> response, final String nohyp){
 		response.removeIf(nohyp::equals);
 	}
 
