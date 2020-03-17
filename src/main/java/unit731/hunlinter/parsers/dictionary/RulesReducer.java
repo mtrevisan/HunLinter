@@ -677,9 +677,9 @@ public class RulesReducer{
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
-		return entries.stream()
-			.map(entry -> entry.toHunspellRule(type, flag))
-			.collect(Collectors.toList());
+		final List<String> list = new ArrayList<>();
+		LoopHelper.forEach(entries, entry -> list.add(entry.toHunspellRule(type, flag)));
+		return list;
 	}
 
 	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
@@ -687,10 +687,11 @@ public class RulesReducer{
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
-		final List<AffixEntry> entries = reducedRules.stream()
-			.skip(1)
-			.map(line -> new AffixEntry(line, strategy, null, null))
-			.collect(Collectors.toList());
+		//extract rules (skip the header)
+		final List<AffixEntry> entries = new ArrayList<>();
+		LoopHelper.forEach(reducedRules.subList(1, reducedRules.size()),
+			reducedRule -> entries.add(new AffixEntry(reducedRule, strategy, null, null)));
+
 		final AffixType type = ruleToBeReduced.getType();
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
