@@ -262,15 +262,17 @@ public class SetHelper{
 	}
 
 	public static <V> List<V> getDuplicates(final List<V> list){
-		return getDuplicatesMap(list).values().stream()
-			.filter(duplicates -> duplicates.size() > 1)
-			.flatMap(Collection::stream)
-			.collect(Collectors.toList());
+		final List<V> result = new ArrayList<>();
+		for(final List<V> duplicates : getDuplicatesMap(list).values())
+			if(duplicates.size() > 1)
+				LoopHelper.forEach(duplicates, result::add);
+		return result;
 	}
 
 	private static <V> Map<V, List<V>> getDuplicatesMap(final List<V> personList){
-		return personList.stream()
-			.collect(Collectors.groupingBy(Function.identity()));
+		final Map<V, List<V>> map = new HashMap<>();
+		LoopHelper.forEach(personList, v -> map.computeIfAbsent(v, k -> new ArrayList<>()).add(v));
+		return map;
 	}
 
 }

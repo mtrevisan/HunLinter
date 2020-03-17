@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -42,9 +41,9 @@ public class ThesaurusDictionary{
 	}
 
 	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
-		boolean result = false;
-		final String wholePartOfSpeeches = Arrays.stream(partOfSpeeches)
-			.collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END));
+		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
+		LoopHelper.forEach(partOfSpeeches, sj::add);
+		final String wholePartOfSpeeches = sj.toString();
 		final List<String> uniqueSynonyms = new ArrayList<>();
 		final Set<String> uniqueValues = new HashSet<>();
 		LoopHelper.forEach(synonyms, synonym -> {
@@ -53,6 +52,7 @@ public class ThesaurusDictionary{
 				uniqueSynonyms.add(s);
 		});
 
+		boolean result = false;
 		for(String currentDefinition : uniqueSynonyms){
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, uniqueSynonyms,
 				currentDefinition);
@@ -94,8 +94,7 @@ public class ThesaurusDictionary{
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
-		return dictionary.values().stream()
-			.anyMatch(entry -> entry.contains(pos, syns));
+		return (LoopHelper.match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
 	}
 
 	//FIXME? remove only one entry?
@@ -150,9 +149,11 @@ public class ThesaurusDictionary{
 	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);
-		return dictionary.values().stream()
-			.filter(entry -> entry.intersects(pos, syns))
-			.collect(Collectors.toList());
+		final List<ThesaurusEntry> list = new ArrayList<>();
+		LoopHelper.applyIf(dictionary.values(),
+			entry -> entry.intersects(pos, syns),
+			list::add);
+		return list;
 	}
 
 	public static String removeSynonymUse(final String synonym){

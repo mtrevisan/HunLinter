@@ -6,16 +6,18 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
@@ -79,10 +81,12 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public Set<String> getSynonymsSet(){
-		return synonyms.stream()
-			.map(SynonymsEntry::getSynonyms)
-			.flatMap(List::stream)
-			.collect(Collectors.toSet());
+		final Set<String> set = new HashSet<>();
+		for(final SynonymsEntry synonym : synonyms){
+			final List<String> synonymsEntrySynonyms = synonym.getSynonyms();
+			LoopHelper.forEach(synonymsEntrySynonyms, set::add);
+		}
+		return set;
 	}
 
 	public int getSynonymsEntries(){
@@ -93,11 +97,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return synonyms.stream()
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
-		for(final SynonymsEntry entry : synonyms)
-			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
-				if(entry.containsSynonym(synonym))
-					return true;
-		return false;
+		return (LoopHelper.match(synonyms, entry -> entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym)) != null);
 //		for(SynonymsEntry entry : synonyms)
 //			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
 //				return entry.containsSynonym(synonym);
@@ -138,10 +138,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	@Override
 	public String toString(){
-		return synonyms.stream()
-			.map(SynonymsEntry::toString)
-			.map(s -> definition + ": " + String.join(", ", s))
-			.collect(Collectors.joining("\\r\\n"));
+		final StringJoiner sj = new StringJoiner("\r\n");
+		LoopHelper.forEach(synonyms, synonym -> sj.add(definition + ": " + String.join(", ", synonym.toString())));
+		return sj.toString();
 	}
 
 	public String toLine(final int definitionIndex){

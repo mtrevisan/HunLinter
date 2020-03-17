@@ -15,6 +15,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -649,13 +650,14 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
+		final Function<LineEntry, Stream<LineEntry>> createEntry = rule -> rule.addition.stream()
+			.map(addition -> {
+				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
+				final String removal = rule.removal.substring(lcp);
+				return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
+			});
 		Stream<LineEntry> stream = entries.stream()
-			.flatMap(rule -> rule.addition.stream()
-				.map(addition -> {
-					final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
-					final String removal = rule.removal.substring(lcp);
-					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
-				}));
+			.flatMap(createEntry);
 		if(type == AffixType.PREFIX)
 			stream = stream.map(LineEntry::createReverse);
 		final List<LineEntry> restoredRules = stream

@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 
@@ -141,9 +142,9 @@ public class FileHelper{
 			catch(final IOException ignored){}
 		}
 
-		final String charsets = HUNSPELL_CHARSETS.stream()
-			.map(Charset::name)
-			.collect(Collectors.joining(", "));
+		final StringJoiner sj = new StringJoiner(", ");
+		LoopHelper.forEach(HUNSPELL_CHARSETS, charset -> sj.add(charset.name()));
+		final String charsets = sj.toString();
 		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
 	}
 

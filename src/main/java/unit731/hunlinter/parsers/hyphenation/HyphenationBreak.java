@@ -57,10 +57,9 @@ public class HyphenationBreak{
 	public void enforceNoHyphens(final List<String> syllabes, final Set<String> noHyphen){
 		int syllabesCount = syllabes.size();
 		if(syllabesCount > 1){
-			final int wordLength = syllabes.stream()
-				.map(String::length)
-				.mapToInt(x -> x)
-				.sum();
+			int wordLength = 0;
+			for(final String syllabe : syllabes)
+				wordLength += syllabe.length();
 			for(final String nohyp : noHyphen){
 				final String reducedKey = reduceKey(nohyp);
 				final NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);

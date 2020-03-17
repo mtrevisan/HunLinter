@@ -1,13 +1,15 @@
 package unit731.hunlinter.services;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class PatternHelper{
@@ -116,11 +118,13 @@ public class PatternHelper{
 	}
 
 	public static <V> String mergeSet(final Set<V> set, final Comparator<String> comparator){
-		return set.stream()
-			.map(String::valueOf)
-			.sorted(comparator)
-			//TODO try to remove all `.collect(Collectors.joining(`…
-			.collect(Collectors.joining());
+		final List<String> list = new ArrayList<>();
+		LoopHelper.forEach(set, v -> list.add(String.valueOf(v)));
+		list.sort(comparator);
+
+		final StringBuilder sb = new StringBuilder();
+		LoopHelper.forEach(list, sb::append);
+		return sb.toString();
 	}
 
 }
