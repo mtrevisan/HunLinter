@@ -11,12 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -334,13 +332,13 @@ public class RulesReducer{
 			final Set<Character> parentGroup = groups.get(parent);
 
 			//extract negated group
-			final List<LineEntry> childrenNotParent = children.stream()
-				.filter(child -> child != parent)
-				.collect(Collectors.toList());
-			final Set<Character> childrenGroup = childrenNotParent.stream()
-				.map(groups::get)
-				.flatMap(Set::stream)
-				.collect(Collectors.toSet());
+			final List<LineEntry> childrenNotParent = new ArrayList<>();
+			LoopHelper.applyIf(children,
+				child -> child != parent,
+				childrenNotParent::add);
+			final Set<Character> childrenGroup = new HashSet<>();
+			for(final LineEntry lineEntry : childrenNotParent)
+				LoopHelper.forEach(groups.get(lineEntry), childrenGroup::add);
 
 			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			parentGroup.removeAll(groupsIntersection);
@@ -372,17 +370,17 @@ public class RulesReducer{
 				final Set<Character> overallLastGroup = new HashSet<>(overallLastGroups.get(parent.condition.length()));
 				overallLastGroup.removeAll(notPresentConditions);
 				final String yesCondition = PatternHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
-				final Optional<LineEntry> notRule = finalRules.stream()
-					.filter(rule -> rule.condition.equals(notCondition) || rule.condition.equals(yesCondition))
-					.findFirst();
-				if(notRule.isPresent())
-					notRule.get().condition = parent.condition;
+				final LineEntry notRule = LoopHelper.match(finalRules,
+					rule -> rule.condition.equals(notCondition) || rule.condition.equals(yesCondition));
+				if(notRule != null)
+					notRule.condition = parent.condition;
 				else{
 					//find already present rule
-					final List<LineEntry> alreadyPresentRules = finalRules.stream()
-						.filter(r -> r.removal.equals(parent.removal) && r.addition.equals(parent.addition)
-							&& r.condition.endsWith(parent.condition))
-						.collect(Collectors.toList());
+					final List<LineEntry> alreadyPresentRules = new ArrayList<>();
+					LoopHelper.applyIf(finalRules,
+						r -> r.removal.equals(parent.removal) && r.addition.equals(parent.addition)
+							&& r.condition.endsWith(parent.condition),
+						alreadyPresentRules::add);
 					for(final LineEntry alreadyPresentRule : alreadyPresentRules){
 						finalRules.remove(alreadyPresentRule);
 
@@ -479,9 +477,9 @@ public class RulesReducer{
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 			//extract negated group
-			final Set<Character> childrenGroup = bubbles.stream()
-				.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
-				.collect(Collectors.toSet());
+			final Set<Character> childrenGroup = new HashSet<>();
+			LoopHelper.forEach(bubbles,
+				child -> childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1)));
 
 			//if intersection(parent-group, children-group) is empty
 			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
@@ -503,16 +501,14 @@ public class RulesReducer{
 				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, StringUtils.join(newEntry.addition, PIPE),
 					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
-			final int maxConditionLength = queue.stream()
-				.mapToInt(e -> e.condition.length())
-				.max()
-				.orElse(0);
+			final LineEntry maxConditionEntry = LoopHelper.max(queue, Comparator.comparingInt(e -> e.condition.length()));
+			final int maxConditionLength = (maxConditionEntry != null? maxConditionEntry.condition.length(): 0);
 			if(parentConditionLength + 1 >= maxConditionLength){
 				queue.removeAll(bubbles);
 
 				finalRules.addAll(bubbles);
 			}
-			else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1))
+			else if(LoopHelper.allMatch(queue, rule -> rule.condition.length() > parentConditionLength + 1))
 				LoopHelper.forEach(childrenGroup, chr -> {
 					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
 					if(!queue.contains(entry))
@@ -593,9 +589,10 @@ public class RulesReducer{
 
 	private List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
-		final List<LineEntry> bubbles = bush.stream()
-			.filter(child -> child.condition.length() > parentConditionLength && child.condition.endsWith(parent.condition))
-			.collect(Collectors.toList());
+		final List<LineEntry> bubbles = new ArrayList<>();
+		LoopHelper.applyIf(bush,
+			child -> child.condition.length() > parentConditionLength && child.condition.endsWith(parent.condition),
+			bubbles::add);
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
 		bubbles.removeIf(bubble -> parent.from.containsAll(bubble.from)
@@ -627,9 +624,8 @@ public class RulesReducer{
 				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				final Set<Character> group = similarities.stream()
-					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
-					.collect(Collectors.toSet());
+				final Set<Character> group = new HashSet<>();
+				LoopHelper.forEach(similarities, entry -> group.add(RegExpSequencer.splitSequence(entry.condition)[1].charAt(0)));
 				final String condition = StringUtils.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
 					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
@@ -674,9 +670,10 @@ public class RulesReducer{
 		if(keepLongestCommonAffix)
 			LoopHelper.forEach(entries, entry -> entry.expandConditionToMaxLength(comparator));
 
-		return entries.stream()
-			.sorted(lineEntryComparator)
-			.collect(Collectors.toList());
+		final List<LineEntry> list = new ArrayList<>();
+		LoopHelper.forEach(entries, list::add);
+		list.sort(lineEntryComparator);
+		return list;
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
