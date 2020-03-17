@@ -33,7 +33,7 @@ import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.filelistener.FileChangeListener;
 import unit731.hunlinter.services.filelistener.FileListenerManager;
-import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.xml.transform.TransformerException;
 
@@ -144,7 +144,7 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final String[] uris = JavaHelper.nullableToStream(affFile, hypFile, aidFile, sexFile, wexFile)
+		final String[] uris = LoopHelper.nullableToStream(affFile, hypFile, aidFile, sexFile, wexFile)
 			.map(File::getAbsolutePath)
 			.toArray(String[]::new);
 		flm.register(this, uris);

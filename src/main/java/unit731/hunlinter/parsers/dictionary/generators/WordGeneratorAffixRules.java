@@ -3,10 +3,14 @@ package unit731.hunlinter.parsers.dictionary.generators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
+
+import java.util.Arrays;
 
 
 class WordGeneratorAffixRules extends WordGeneratorBase{
@@ -28,12 +32,12 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		productions = enforceOnlyInCompound(productions);
 
 		//convert using output table
-		for(final Production production : productions)
-			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
+		LoopHelper.forEach(productions,
+			production -> production.applyOutputConversionTable(affixData::applyOutputConversionTable));
 
 		if(LOGGER.isTraceEnabled())
-			for(final Production production : productions)
-				LOGGER.trace("Produced word: {}", production);
+			Arrays.stream(productions)
+				.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}
@@ -42,8 +46,13 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private Production[] enforceOnlyInCompound(Production[] productions){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null)
-			productions = JavaHelper.removeIf(productions, production -> production.hasContinuationFlag(onlyInCompoundFlag)
-				|| JavaHelper.nullableToStream(production.getAppliedRules()).anyMatch(appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)));
+			productions = LoopHelper.removeIf(productions, production -> {
+				final boolean hasOnlyInCompoundFlag = production.hasContinuationFlag(onlyInCompoundFlag);
+				final AffixEntry[] appliedRules = production.getAppliedRules();
+				final boolean hasOnlyInCompoundFlagInAppliedRules = LoopHelper.anyMatch(appliedRules,
+					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag));
+				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
+			});
 		return productions;
 	}
 

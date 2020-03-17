@@ -23,6 +23,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.ArraySet;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -72,12 +73,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					Production[] dicEntriesPerFlag = new Production[0];
 					for(DictionaryEntry entry : inputs.get(flag)){
 						final Production[] productions = applyAffixRules(entry, true, null);
-						Production[] collect = new Production[0];
-						for(final Production prod : productions)
-							if(prod.hasContinuationFlag(flag))
-								collect = ArrayUtils.add(collect, prod);
-						for(final Production production : collect)
-							dicEntriesPerFlag = ArrayUtils.add(dicEntriesPerFlag, production);
+						final Production[] collect = LoopHelper.collectIf(productions,
+							production -> production.hasContinuationFlag(flag), () -> new Production[0]);
+						dicEntriesPerFlag = ArrayUtils.addAll(dicEntriesPerFlag, collect);
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
@@ -167,15 +165,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		final Production[] productions;
-		String flags = null;
-		if(continuationFlags.length > 0){
-			final List<String> list = new ArrayList<>();
-			for(final String[] continuationFlag : continuationFlags)
-				for(final String s : continuationFlag)
-					list.add(s);
-			flags = StringUtils.join(list.toArray(String[]::new));
-		}
-		final Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
+		final StringBuffer flags = new StringBuffer();
+		LoopHelper.forEach(continuationFlags, continuationFlag -> LoopHelper.forEach(continuationFlag, flags::append));
+		final Production p = Production.createFromCompound(compoundWord, flags.toString(), compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			productions = new Production[]{p};
 		else{
@@ -281,17 +273,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private void removeTwofolds(final Production[] prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			JavaHelper.removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
+			LoopHelper.removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
 	}
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = false;
-		for(final String s : compoundAsReplacement)
-			if(word.contains(s)){
-				exists = true;
-				break;
-			}
+		boolean exists = LoopHelper.anyMatch(compoundAsReplacement, word::contains);
 		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)
@@ -324,10 +311,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundRules = Stream.of(compoundRules, distribution)
 			.flatMap(m -> m.entrySet().stream())
 			.map(m -> {
-				final Set<DictionaryEntry> value = new HashSet<>();
-				for(final DictionaryEntry entry : m.getValue())
-					if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-						value.add(entry);
+				final Set<DictionaryEntry> entries = m.getValue();
+				final Set<DictionaryEntry> value = new HashSet<>(LoopHelper.collectIf(entries,
+					entry -> (entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag)),
+					() -> new HashSet<>(entries.size())));
 				final String key = m.getKey();
 				return new AbstractMap.SimpleEntry<>(key, value);
 			})

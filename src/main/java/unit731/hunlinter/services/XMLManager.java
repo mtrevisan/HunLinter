@@ -9,7 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,7 +73,7 @@ public class XMLManager{
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		JavaHelper.nullableToStream(properties)
+		LoopHelper.nullableToStream(properties)
 			.forEach(property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
 		final DOMSource domSource = new DOMSource(doc);
 		final StreamResult streamResult = new StreamResult(xmlFile);

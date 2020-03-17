@@ -34,8 +34,8 @@ import javax.swing.undo.UndoManager;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.FontChooserDialog;
 import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -138,7 +138,7 @@ public class GUIUtils{
 	}
 
 	public static void addFontableProperty(final JComponent... components){
-		JavaHelper.nullableToStream(components)
+		LoopHelper.nullableToStream(components)
 			.forEach(component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
 	}
 
@@ -146,7 +146,7 @@ public class GUIUtils{
 		if(!font.equals(currentFont)){
 			currentFont = font;
 
-			JavaHelper.nullableToStream(parentFrames)
+			LoopHelper.nullableToStream(parentFrames)
 				.forEach(parentFrame -> updateComponent(parentFrame, font));
 		}
 	}

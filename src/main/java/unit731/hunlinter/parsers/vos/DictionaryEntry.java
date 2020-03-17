@@ -26,8 +26,8 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -110,7 +110,7 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return JavaHelper.nullableToStream(mfs)
+		return LoopHelper.nullableToStream(mfs)
 			.anyMatch(mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode()));
 	}
 
@@ -151,7 +151,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return JavaHelper.nullableToStream(continuationFlags)
+		return LoopHelper.nullableToStream(continuationFlags)
 			.anyMatch(Predicate.not(isTerminalAffix::apply));
 	}
 
@@ -197,7 +197,7 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		return JavaHelper.nullableToStream(continuationFlags)
+		return LoopHelper.nullableToStream(continuationFlags)
 			.filter(affixData::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
@@ -208,7 +208,7 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
 		distribution.put(compoundEndFlag, new HashSet<>());
-		JavaHelper.nullableToStream(continuationFlags)
+		LoopHelper.nullableToStream(continuationFlags)
 			.map(distribution::get)
 			.filter(Objects::nonNull)
 			.forEach(value -> value.add(this));
@@ -216,7 +216,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(){
-		return JavaHelper.nullableToStream(morphologicalFields)
+		return LoopHelper.nullableToStream(morphologicalFields)
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()));
 	}
 
@@ -254,7 +254,7 @@ public class DictionaryEntry{
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		JavaHelper.nullableToStream(morphologicalFields)
+		LoopHelper.nullableToStream(morphologicalFields)
 			.forEach(fun);
 	}
 

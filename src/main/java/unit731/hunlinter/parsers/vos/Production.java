@@ -14,8 +14,8 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class Production extends DictionaryEntry{
@@ -100,7 +100,7 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixType type){
-		return JavaHelper.nullableToStream(appliedRules)
+		return LoopHelper.nullableToStream(appliedRules)
 			.filter(rule -> rule.getType() == type)
 			.reduce((first, second) -> second)
 			.orElse(null);
@@ -156,7 +156,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getRulesSequence(){
-		return JavaHelper.nullableToStream(appliedRules)
+		return LoopHelper.nullableToStream(appliedRules)
 			.map(AffixEntry::getFlag)
 			.collect(Collectors.joining(LEADS_TO));
 	}

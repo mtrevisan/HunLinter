@@ -16,6 +16,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -103,8 +104,9 @@ class WordGeneratorBase{
 	private void printProductions(final String title, final Production[] productions){
 		if(LOGGER.isDebugEnabled() && productions.length > 0){
 			LOGGER.debug(title);
-			for(final Production production : productions)
-				LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()), production.getRulesSequence());
+			Arrays.stream(productions)
+				.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
+					production.getRulesSequence()));
 		}
 	}
 
@@ -159,7 +161,7 @@ class WordGeneratorBase{
 	private Production[] enforceCircumfix(Production[] productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			productions = JavaHelper.removeIf(productions,
+			productions = LoopHelper.removeIf(productions,
 				production -> production.hasContinuationFlag(circumfixFlag) && !production.isTwofolded(circumfixFlag));
 		return productions;
 	}
@@ -168,7 +170,7 @@ class WordGeneratorBase{
 	private Production[] enforceNeedAffixFlag(Production[] productions){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)
-			productions = JavaHelper.removeIf(productions, production -> hasNeedAffixFlag(production, needAffixFlag));
+			productions = LoopHelper.removeIf(productions, production -> hasNeedAffixFlag(production, needAffixFlag));
 		return productions;
 	}
 
@@ -259,12 +261,8 @@ class WordGeneratorBase{
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					boolean appliedRuleContainsCircumfix = false;
-					for(final AffixEntry r : appliedRules)
-						if((entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag)){
-							appliedRuleContainsCircumfix = true;
-							break;
-						}
+					final boolean appliedRuleContainsCircumfix = LoopHelper.anyMatch(appliedRules,
+						appliedRule -> (entry.isSuffix() ^ appliedRule.isSuffix()) && appliedRule.hasContinuationFlag(circumfixFlag));
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
 				}
 

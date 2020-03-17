@@ -18,8 +18,8 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.services.ArraySet;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
 
 
@@ -195,7 +195,7 @@ public class AffixEntry{
 
 	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
 		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
-		JavaHelper.nullableToStream(compoundEntries)
+		LoopHelper.nullableToStream(compoundEntries)
 			.forEach(compoundEntry -> {
 				final String compound = compoundEntry.getWord();
 				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
@@ -218,7 +218,7 @@ public class AffixEntry{
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		return JavaHelper.nullableToStream(morphologicalFields)
+		return LoopHelper.nullableToStream(morphologicalFields)
 			.filter(df -> df.startsWith(tag))
 			.map(df -> df.substring(purgeTag))
 			.collect(Collectors.toList());

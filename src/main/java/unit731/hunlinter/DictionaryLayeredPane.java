@@ -35,7 +35,7 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class DictionaryLayeredPane extends JLayeredPane{
@@ -106,7 +106,7 @@ final int iconSize = 17;
             final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
             .map(AffixEntry::toString)
             .orElse(null);
-            return JavaHelper.nullableToStream(production, morphologicalFields, rule1, rule2, rule3)
+            return LoopHelper.nullableToStream(production, morphologicalFields, rule1, rule2, rule3)
             .collect(Collectors.joining(TAB));
          }
       };

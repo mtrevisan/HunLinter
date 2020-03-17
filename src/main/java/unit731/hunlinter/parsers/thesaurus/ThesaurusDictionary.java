@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class ThesaurusDictionary{
@@ -44,7 +44,7 @@ public class ThesaurusDictionary{
 		boolean result = false;
 		final String wholePartOfSpeeches = Arrays.stream(partOfSpeeches)
 			.collect(Collectors.joining(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END));
-		synonyms = JavaHelper.nullableToStream(synonyms)
+		synonyms = LoopHelper.nullableToStream(synonyms)
 			.map(synonym -> synonym.toLowerCase(Locale.ROOT))
 			.distinct()
 			.toArray(String[]::new);
@@ -71,7 +71,7 @@ public class ThesaurusDictionary{
 	private SynonymsEntry extractPartOfSpeechAndSynonyms(final String partOfSpeeches, final String[] synonyms, final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		JavaHelper.nullableToStream(synonyms)
+		LoopHelper.nullableToStream(synonyms)
 			.filter(synonym -> !synonym.equals(definition))
 			.forEachOrdered(sj::add);
 		return new SynonymsEntry(sj.toString());
