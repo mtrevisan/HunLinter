@@ -297,14 +297,15 @@ It is possible to right click on a row to bring up the popup menu and select whe
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-1.10.1"></a>
-### version 1.10.1 - 20200xxx
+### version 1.11.0 - 20200xxx
 - made update process stoppable
 - added linter for thesaurus
 - fixed a bug on hyphenation: when the same rule is added (with different breakpoints), the old one is lost
 - substituted charting library
 - added undo/redo capabilities on input fields
 - reduced application footprint
-- reduced memory footprint
+- reduced memory footprint by ?%
+- augmented speed-up by ?%
 - various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>
