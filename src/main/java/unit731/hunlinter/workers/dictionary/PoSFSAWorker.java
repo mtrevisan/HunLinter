@@ -18,7 +18,6 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -69,7 +68,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			words.ensureCapacity(words.size() + productions.length);
 			LoopHelper.forEach(productions, production -> words.addAll(production.toStringPoSFSA()));
 		};
 		final FSABuilder builder = new FSABuilder();
@@ -109,13 +107,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<Void, List<String>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
-long before = JavaHelper.getUsedMemory();
 			processLines(lineProcessor);
-long delta = JavaHelper.getUsedMemory() - before;
-System.out.println("delta: " + delta);
-//3 968 335 848
-
-//			System.gc();
 
 //			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 //
@@ -155,6 +147,7 @@ System.out.println("delta: " + delta);
 			return words;
 		};
 		final Function<List<String>, FSA> step2 = extractedWords -> {
+System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(extractedWords));
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 2/3)");
 
 			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());

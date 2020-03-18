@@ -34,7 +34,6 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
-//System.out.println("productions: " + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(productions));
 
 			for(final Production production : productions){
 				try{

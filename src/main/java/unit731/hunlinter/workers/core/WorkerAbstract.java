@@ -45,6 +45,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 	public final void setProcessor(final Function<?, ?> processor){
+		Objects.requireNonNull(processor);
+
 		this.processor = processor;
 	}
 
