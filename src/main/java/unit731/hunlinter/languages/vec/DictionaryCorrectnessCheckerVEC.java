@@ -13,6 +13,7 @@ import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
@@ -25,22 +26,22 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	public static final String LANGUAGE = "vec-IT";
 
-	private static final String POS_PROPER_NOUN = "proper_noun";
-	private static final String POS_NOUN = "noun";
-	private static final String POS_ADJECTIVE = "adjective";
-	private static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
-	private static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
-	private static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
-	private static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
-	private static final String POS_QUANTIFIER = "quantifier";
-	private static final String POS_VERB = "verb";
-	private static final String POS_ARTICLE = "article";
-	private static final String POS_PRONOUN = "pronoun";
-	private static final String POS_PREPOSITION = "preposition";
-	private static final String POS_ADVERB = "adverb";
-	private static final String POS_CONJUNCTION = "conjunction";
-	private static final String POS_NUMERAL_LATIN = "numeral_latin";
-	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
+	private static final String POS_PROPER_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("proper_noun");
+	private static final String POS_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("noun");
+	private static final String POS_ADJECTIVE = MorphologicalTag.PART_OF_SPEECH.attachValue("adjective");
+	private static final String POS_ADJECTIVE_POSSESSIVE = MorphologicalTag.PART_OF_SPEECH.attachValue("adjective_possessive");
+	private static final String POS_ADJECTIVE_DEMONSTRATIVE = MorphologicalTag.PART_OF_SPEECH.attachValue("adjective_demonstrative");
+	private static final String POS_ADJECTIVE_IDENTIFICATIVE = MorphologicalTag.PART_OF_SPEECH.attachValue("adjective_identificative");
+	private static final String POS_ADJECTIVE_INTERROGATIVE = MorphologicalTag.PART_OF_SPEECH.attachValue("adjective_interrogative");
+	private static final String POS_QUANTIFIER = MorphologicalTag.PART_OF_SPEECH.attachValue("quantifier");
+	private static final String POS_VERB = MorphologicalTag.PART_OF_SPEECH.attachValue("verb");
+	private static final String POS_ARTICLE = MorphologicalTag.PART_OF_SPEECH.attachValue("article");
+	private static final String POS_PRONOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("pronoun");
+	private static final String POS_PREPOSITION = MorphologicalTag.PART_OF_SPEECH.attachValue("preposition");
+	private static final String POS_ADVERB = MorphologicalTag.PART_OF_SPEECH.attachValue("adverb");
+	private static final String POS_CONJUNCTION = MorphologicalTag.PART_OF_SPEECH.attachValue("conjunction");
+	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
+	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 

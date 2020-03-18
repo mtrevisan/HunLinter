@@ -1,6 +1,9 @@
 package unit731.hunlinter.parsers.enums;
 
 
+import unit731.hunlinter.services.system.LoopHelper;
+
+
 public enum AffixOption{
 
 	//General options
@@ -155,10 +158,7 @@ public enum AffixOption{
 	}
 
 	public static AffixOption createFromCode(final String code){
-		for(final AffixOption option : values())
-			if(option.code.equals(code))
-				return option;
-		return null;
+		return LoopHelper.match(values(), option -> option.code.equals(code));
 	}
 
 	public String getCode(){

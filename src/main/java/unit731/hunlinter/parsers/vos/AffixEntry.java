@@ -3,7 +3,6 @@ package unit731.hunlinter.parsers.vos;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -161,35 +160,25 @@ public class AffixEntry{
 	 * @return	The list of new morphological fields
 	 */
 	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
-		final List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)):
-			new ArrayList<>());
-		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
+		final String[] mf = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
+		final String[] amf = (morphologicalFields != null? morphologicalFields: new String[0]);
 
 		//NOTE: part–of–speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
+		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
 			MorphologicalTag.INFLECTIONAL_PREFIX);
-		boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
+		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
 			MorphologicalTag.TERMINAL_PREFIX);
 		//remove inflectional and terminal suffixes
-		mf.removeIf(field -> containsInflectionalAffix
-			&& (field.startsWith(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode())
-			|| field.startsWith(MorphologicalTag.INFLECTIONAL_PREFIX.getCode()))
-			|| !containsTerminalAffixes && field.startsWith(MorphologicalTag.TERMINAL_SUFFIX.getCode()));
+		LoopHelper.removeIf(mf, field ->
+			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
+			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
 
 		//add morphological fields from the applied affix
-		mf.addAll((isSuffix()? mf.size(): 0), amf);
-
-		return mf.toArray(String[]::new);
+		return (isSuffix()? ArrayUtils.addAll(mf, amf): ArrayUtils.addAll(amf, mf));
 	}
 
-	private boolean containsAffixes(final List<String> amf, final MorphologicalTag tagSuffix, final MorphologicalTag tagPrefix){
-		boolean containsInflectionalAffix = false;
-		for(final String s : amf)
-			if(s.startsWith(tagSuffix.getCode()) || s.startsWith(tagPrefix.getCode())){
-				containsInflectionalAffix = true;
-				break;
-			}
-		return containsInflectionalAffix;
+	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
+		return (LoopHelper.match(tags, tag -> LoopHelper.match(amf, tag::isSupertypeOf) != null) != null);
 	}
 
 	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){

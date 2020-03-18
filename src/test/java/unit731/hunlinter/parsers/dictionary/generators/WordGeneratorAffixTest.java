@@ -806,15 +806,15 @@ class WordGeneratorAffixTest extends TestBase{
 		//base production
 		Assertions.assertEquals(createProduction("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words[0]);
 		//suffix productions
-		Assertions.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ds:der_able"), words[1]);
-		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk is:sg_3"), words[2]);
+		Assertions.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words[1]);
+		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[2]);
 		//prefix productions
-		Assertions.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ds:der_able is:plur"),
+		Assertions.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words[3]);
 		//twofold productions
-		Assertions.assertEquals(createProduction("undrinkable", "S", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ds:der_able"),
+		Assertions.assertEquals(createProduction("undrinkable", "S", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
 			words[4]);
-		Assertions.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ds:der_able is:plur"),
+		Assertions.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words[5]);
 	}
 

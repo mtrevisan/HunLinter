@@ -215,11 +215,15 @@ public class DictionaryEntry{
 
 	public boolean hasPartOfSpeech(){
 		return (LoopHelper.match(morphologicalFields,
-			field -> field.startsWith(MorphologicalTag.PART_OF_SPEECH.getCode())) != null);
+			field -> MorphologicalTag.PART_OF_SPEECH.isSupertypeOf(field)) != null);
 	}
 
+	/**
+	 * @param partOfSpeech	Part–of–Speech WITH the MorphologicalTag.PART_OF_SPEECH prefix
+	 * @return	Whether this entry has the given Part–of–Speech
+	 */
 	public boolean hasPartOfSpeech(final String partOfSpeech){
-		return hasMorphologicalField(MorphologicalTag.PART_OF_SPEECH.attachValue(partOfSpeech));
+		return hasMorphologicalField(partOfSpeech);
 	}
 
 	private boolean hasMorphologicalField(final String morphologicalField){
@@ -260,16 +264,17 @@ public class DictionaryEntry{
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
-		final ArrayList<String> terminals = new ArrayList<>();
-		final ArrayList<String> prefixes = new ArrayList<>();
-		final ArrayList<String> suffixes = new ArrayList<>();
+		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
+		String[] terminals = new String[maxSize];
+		String[] prefixes = new String[maxSize];
+		String[] suffixes = new String[maxSize];
 		if(continuationFlags != null){
-			terminals.ensureCapacity(continuationFlags.length);
-			prefixes.ensureCapacity(continuationFlags.length);
-			suffixes.ensureCapacity(continuationFlags.length);
+			int indexTerminal = 0;
+			int indexPrefix = 0;
+			int indexSuffix = 0;
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
-					terminals.add(affix);
+					terminals[indexTerminal ++] = affix;
 					continue;
 				}
 
@@ -286,16 +291,21 @@ public class DictionaryEntry{
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry) rule).isSuffix())
-						suffixes.add(affix);
+						suffixes[indexSuffix ++] = affix;
 					else
-						prefixes.add(affix);
+						prefixes[indexPrefix ++] = affix;
 				}
 				else
-					terminals.add(affix);
+					terminals[indexTerminal ++] = affix;
 			}
+
+			//trim arrays
+			terminals = Arrays.copyOf(terminals, indexTerminal);
+			prefixes = Arrays.copyOf(prefixes, indexPrefix);
+			suffixes = Arrays.copyOf(suffixes, indexSuffix);
 		}
 
-		return new Affixes(prefixes.toArray(String[]::new), suffixes.toArray(String[]::new), terminals.toArray(String[]::new));
+		return new Affixes(prefixes, suffixes, terminals);
 	}
 
 	public boolean isCompound(){

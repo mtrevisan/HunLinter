@@ -6,8 +6,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -18,8 +16,6 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 
 
 public class CompoundRulesWorker extends WorkerDictionary{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(CompoundRulesWorker.class);
 
 	public static final String WORKER_NAME = "Compound rules extraction";
 

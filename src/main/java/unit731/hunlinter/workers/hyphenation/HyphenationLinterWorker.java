@@ -2,10 +2,9 @@ package unit731.hunlinter.workers.hyphenation;
 
 import java.text.MessageFormat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -27,15 +26,13 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 
 public class HyphenationLinterWorker extends WorkerDictionary{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLinterWorker.class);
-
 	public static final String WORKER_NAME = "Hyphenation linter";
 
 	private static final String SLASH = "/";
 	private static final String ASTERISK = "*";
 
-	private static final String POS_NUMERAL_LATIN = "numeral_latin";
-	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
+	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
+	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
