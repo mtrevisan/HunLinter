@@ -166,15 +166,15 @@ public class AffixEntry{
 		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
 		//NOTE: part–of–speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.TAG_INFLECTIONAL_SUFFIX,
-			MorphologicalTag.TAG_INFLECTIONAL_PREFIX);
-		boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TAG_TERMINAL_SUFFIX,
-			MorphologicalTag.TAG_TERMINAL_PREFIX);
+		boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
+			MorphologicalTag.INFLECTIONAL_PREFIX);
+		boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
+			MorphologicalTag.TERMINAL_PREFIX);
 		//remove inflectional and terminal suffixes
 		mf.removeIf(field -> containsInflectionalAffix
-			&& (field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode())
-			|| field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_PREFIX.getCode()))
-			|| !containsTerminalAffixes && field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
+			&& (field.startsWith(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode())
+			|| field.startsWith(MorphologicalTag.INFLECTIONAL_PREFIX.getCode()))
+			|| !containsTerminalAffixes && field.startsWith(MorphologicalTag.TERMINAL_SUFFIX.getCode()));
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
@@ -196,7 +196,7 @@ public class AffixEntry{
 		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
 		LoopHelper.forEach(compoundEntries, compoundEntry -> {
 			final String compound = compoundEntry.getWord();
-			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
+			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.PART.attachValue(compound)}, compoundEntry.morphologicalFields));
 		});
 
 		final List<String> list = new ArrayList<>();
@@ -210,7 +210,7 @@ public class AffixEntry{
 	}
 
 	public void validate(){
-		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
 		if(!filteredFields.isEmpty())
 			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
 	}

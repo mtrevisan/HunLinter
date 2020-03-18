@@ -1,7 +1,11 @@
 package unit731.hunlinter.parsers.vos;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -178,31 +182,45 @@ public class Production extends DictionaryEntry{
 		return word;
 	}
 
-	public String[] toStringPoSFSA(){
+	public List<String> toStringPoSFSA(){
+		//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
+		final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags();
+
 		//extract Part-of-Speech
-		final String[] pos = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		if(pos.length != 1)
+		final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
+		if(pos.size() != 1)
 			throw new LinterException(SINGLE_POS_NOT_PRESENT);
 
 		//extract Inflection
-		final String[] suffixInflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX);
-		final String[] prefixInflection = getMorphologicalFields(MorphologicalTag.TAG_INFLECTIONAL_PREFIX);
-		final String[] inflections = new String[1 + suffixInflection.length + prefixInflection.length];
-		inflections[0] = PartOfSpeechTag.createFromCode(pos[0]).getTag();
-		System.arraycopy(suffixInflection, 0, inflections, 1, suffixInflection.length);
-		System.arraycopy(prefixInflection, 0, inflections, 1 + suffixInflection.length, prefixInflection.length);
-		for(int i = 1; i < inflections.length; i ++){
-			final String code = inflections[i];
-			final String[] tags = InflectionTag.createFromCode(code).getTags();
-			inflections[i] = StringUtils.join(tags, POS_FSA_TAG_SEPARATOR);
-		}
+		final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
+		final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 
-		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + StringUtils.join(inflections, POS_FSA_TAG_SEPARATOR);
+		final StringJoiner inflections = new StringJoiner(POS_FSA_TAG_SEPARATOR);
+		inflections.add(PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
+		LoopHelper.forEach(suffixInflection,
+			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), inflections::add));
+		LoopHelper.forEach(prefixInflection,
+			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), inflections::add));
+
+		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + inflections;
 		//extract stem
-		final String[] stem = getMorphologicalFields(MorphologicalTag.TAG_STEM);
-		for(int i = 0; i < stem.length; i ++)
-			stem[i] += suffix;
+		final List<String> stem = bucket.get(MorphologicalTag.STEM);
+		for(int i = 0; i < stem.size(); i ++)
+			stem.set(i, stem.get(i) + suffix);
 		return stem;
+	}
+
+	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(){
+		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
+		final List<MorphologicalTag> mtags = Arrays.asList(MorphologicalTag.PART_OF_SPEECH, MorphologicalTag.INFLECTIONAL_SUFFIX,
+			MorphologicalTag.INFLECTIONAL_PREFIX, MorphologicalTag.STEM);
+		LoopHelper.forEach(morphologicalFields, mf -> {
+			final MorphologicalTag matchedTag = LoopHelper.match(mtags, tag -> tag.isSupertypeOf(mf));
+			if(matchedTag != null)
+				bucket.computeIfAbsent(matchedTag, k -> new ArrayList<>(1))
+					.add(mf.substring(matchedTag.getCode().length()));
+		});
+		return bucket;
 	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){

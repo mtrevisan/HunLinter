@@ -52,12 +52,12 @@ public class RulesLoader{
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
 		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
 
-		fillDataFields(MorphologicalTag.TAG_PART_OF_SPEECH, "partOfSpeeches");
-		fillDataFields(MorphologicalTag.TAG_DERIVATIONAL_SUFFIX, "derivationalSuffixes");
-		fillDataFields(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
-		fillDataFields(MorphologicalTag.TAG_TERMINAL_SUFFIX, "terminalSuffixes");
-		dataFields.put(MorphologicalTag.TAG_STEM, null);
-		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
+		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
+		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
+		fillDataFields(MorphologicalTag.INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
+		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
+		dataFields.put(MorphologicalTag.STEM, null);
+		dataFields.put(MorphologicalTag.ALLOMORPH, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
 		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');

@@ -78,7 +78,7 @@ public class DictionaryEntry{
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
 		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs:
-			ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
+			ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
 		final String convertedWord = affixData.applyInputConversionTable(word);
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
@@ -109,7 +109,7 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.TAG_STEM.getCode())) != null);
+		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
 	}
 
 //	public static String extractWord(final String line){
@@ -215,39 +215,26 @@ public class DictionaryEntry{
 
 	public boolean hasPartOfSpeech(){
 		return (LoopHelper.match(morphologicalFields,
-			field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode())) != null);
+			field -> field.startsWith(MorphologicalTag.PART_OF_SPEECH.getCode())) != null);
 	}
 
 	public boolean hasPartOfSpeech(final String partOfSpeech){
-		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH.attachValue(partOfSpeech));
+		return hasMorphologicalField(MorphologicalTag.PART_OF_SPEECH.attachValue(partOfSpeech));
 	}
 
 	private boolean hasMorphologicalField(final String morphologicalField){
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
-	public String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		if(morphologicalFields == null)
-			return new String[0];
-
-		final String tag = morphologicalTag.getCode();
-		final int purgeTag = tag.length();
-		final List<String> list = new ArrayList<>(morphologicalFields.length);
-		for(final String mf : morphologicalFields)
-			if(mf.startsWith(tag))
-				list.add(mf.substring(purgeTag));
-		return list.toArray(String[]::new);
-	}
-
 	public String[] getMorphologicalFieldPartOfSpeech(){
 		if(morphologicalFields == null)
 			return new String[0];
 
-		final String tag = MorphologicalTag.TAG_PART_OF_SPEECH.getCode();
+		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
 		final List<String> list = new ArrayList<>(morphologicalFields.length);
-		for(final String mf : morphologicalFields)
-			if(mf.startsWith(tag))
-				list.add(mf);
+		LoopHelper.applyIf(morphologicalFields,
+			mf -> mf.startsWith(tag),
+			list::add);
 		return list.toArray(String[]::new);
 	}
 

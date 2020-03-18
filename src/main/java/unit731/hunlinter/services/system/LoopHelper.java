@@ -5,7 +5,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -99,9 +98,6 @@ public class LoopHelper{
 
 
 	public static <T> T[] removeIf(final T[] array, final Predicate<T> filter){
-		Objects.requireNonNull(array);
-		Objects.requireNonNull(filter);
-
 		int index = indexOf(array, filter, 0);
 		if(index == -1)
 			return ArrayUtils.clone(array);

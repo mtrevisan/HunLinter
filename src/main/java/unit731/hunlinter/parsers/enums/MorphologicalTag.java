@@ -4,25 +4,25 @@ package unit731.hunlinter.parsers.enums;
 public enum MorphologicalTag{
 
 	//default morphological fields:
-	TAG_STEM("st:"),
-	TAG_ALLOMORPH("al:"),
-	TAG_PART_OF_SPEECH("po:"),
+	STEM("st:"),
+	ALLOMORPH("al:"),
+	PART_OF_SPEECH("po:"),
 
-	TAG_DERIVATIONAL_PREFIX("dp:"),
-	TAG_INFLECTIONAL_PREFIX("ip:"),
-	TAG_TERMINAL_PREFIX("tp:"),
+	DERIVATIONAL_PREFIX("dp:"),
+	INFLECTIONAL_PREFIX("ip:"),
+	TERMINAL_PREFIX("tp:"),
 
-	TAG_DERIVATIONAL_SUFFIX("ds:"),
-	TAG_INFLECTIONAL_SUFFIX("is:"),
-	TAG_TERMINAL_SUFFIX("ts:"),
+	DERIVATIONAL_SUFFIX("ds:"),
+	INFLECTIONAL_SUFFIX("is:"),
+	TERMINAL_SUFFIX("ts:"),
 
-	TAG_SURFACE_PREFIX("sp:"),
+	SURFACE_PREFIX("sp:"),
 
-	TAG_FREQUENCY("fr:"),
-	TAG_PHONETIC("ph:"),
-	TAG_HYPHENATION("hy:"),
-	TAG_PART("pa:"),
-	TAG_FLAG("fl:");
+	FREQUENCY("fr:"),
+	PHONETIC("ph:"),
+	HYPHENATION("hy:"),
+	PART("pa:"),
+	FLAG("fl:");
 
 
 	private final String code;
@@ -41,6 +41,10 @@ public enum MorphologicalTag{
 
 	public String getCode(){
 		return code;
+	}
+
+	public boolean isSupertypeOf(final String value){
+		return value.startsWith(code);
 	}
 
 	public String attachValue(final String value){

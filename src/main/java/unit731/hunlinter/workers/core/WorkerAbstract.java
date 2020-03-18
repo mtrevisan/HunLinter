@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import javax.swing.SwingWorker;
@@ -28,6 +30,8 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	protected final WD workerData;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
+	private static final ReentrantLock PAUSE_LOCK = new ReentrantLock();
+	private static final Condition UNPAUSE = PAUSE_LOCK.newCondition();
 
 	private final TimeWatch watch = TimeWatch.start();
 
@@ -157,18 +161,35 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 	}
 
 	public final void resume(){
-		if(!isDone() && paused.compareAndSet(true, false))
+		if(!isDone() && paused.compareAndSet(true, false)){
+			PAUSE_LOCK.lock();
+			try{
+				UNPAUSE.signal();
+			}
+			finally{
+				PAUSE_LOCK.unlock();
+			}
+
 			firePropertyChange("paused", true, false);
+		}
 	}
 
 	/**
-	 * NOTE: this souble be called inside `SwingWorker.doInBackground()` to allow process abortion
-	 *
-	 * @throws	InterruptedException	In case of interrupted thread
+	 * NOTE: this should be called inside `SwingWorker.doInBackground()` to allow process abortion
 	 */
-	protected void sleepOnPause() throws InterruptedException{
-		while(paused.get())
-			Thread.sleep(500l);
+	protected void sleepOnPause(){
+		if(paused.get()){
+			PAUSE_LOCK.lock();
+			try{
+				try{
+					UNPAUSE.await();
+				}
+				catch(final InterruptedException ignored){}
+			}
+			finally{
+				PAUSE_LOCK.unlock();
+			}
+		}
 	}
 
 	/**
