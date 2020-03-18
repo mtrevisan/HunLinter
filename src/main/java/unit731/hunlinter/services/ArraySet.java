@@ -1,6 +1,7 @@
 package unit731.hunlinter.services;
 
 import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import java.io.Serializable;
 import java.util.AbstractSet;
@@ -107,12 +108,8 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 	}
 
 	@Override
-	public boolean contains(Object value){
-		for(int i = 0, n = values.length; i < n; i ++){
-			if(values[i].equals(value))
-				return true;
-		}
-		return false;
+	public boolean contains(final Object value){
+		return (LoopHelper.match(values, v -> v.equals(value)) != null);
 	}
 
 }

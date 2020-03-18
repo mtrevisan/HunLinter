@@ -15,9 +15,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -650,20 +647,16 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
-		//FIXME remove stream
-		final Function<LineEntry, Stream<LineEntry>> createEntry = rule -> rule.addition.stream()
-			.map(addition -> {
+		final List<LineEntry> restoredRules = new ArrayList<>();
+		LoopHelper.forEach(entries, rule ->
+			LoopHelper.forEach(rule.addition, addition -> {
 				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
 				final String removal = rule.removal.substring(lcp);
-				return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
-			});
-		Stream<LineEntry> stream = entries.stream()
-			.flatMap(createEntry);
-		if(type == AffixType.PREFIX)
-			stream = stream.map(LineEntry::createReverse);
-		final List<LineEntry> restoredRules = stream
-			.collect(Collectors.toList());
-
+				final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
+					rule.condition, rule.from);
+				restoredRules.add(type == AffixType.SUFFIX? entry: entry.createReverse());
+			})
+		);
 		final List<LineEntry> sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);
 
 		return composeAffixRules(flag, type, sortedEntries);

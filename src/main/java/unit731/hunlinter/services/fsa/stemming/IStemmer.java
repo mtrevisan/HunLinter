@@ -3,7 +3,7 @@ package unit731.hunlinter.services.fsa.stemming;
 import java.util.List;
 
 
-/** A generic &quot;stemmer&quot; interface in Morfologik. */
+/** A generic &quot;stemmer&quot; interface */
 public interface IStemmer{
 
 	/**

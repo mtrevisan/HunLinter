@@ -214,8 +214,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(){
-		return (LoopHelper.match(morphologicalFields,
-			field -> MorphologicalTag.PART_OF_SPEECH.isSupertypeOf(field)) != null);
+		return (LoopHelper.match(morphologicalFields, MorphologicalTag.PART_OF_SPEECH::isSupertypeOf) != null);
 	}
 
 	/**

@@ -10,7 +10,6 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
-import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -29,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -115,18 +113,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 3/3)");
 
 			//FIXME
-final AtomicLong memoryUsage = new AtomicLong(0l);
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
 				serializer.serialize(fsa, os);
-
-final long currentMemoryUsage = JavaHelper.getUsedMemory();
-if(currentMemoryUsage > memoryUsage.get()){
-	memoryUsage.set(currentMemoryUsage);
-	System.out.println("cipni: " + StringHelper.byteCountToHumanReadable(currentMemoryUsage));
-
-	System.gc();
-}//? GiB
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);

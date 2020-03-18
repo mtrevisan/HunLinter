@@ -70,7 +70,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/**
 	 * Serialize the automaton with the number of right-language sequences in each node. This is required to implement
-	 * perfect hashing. The numbering also ppreserves the order of input sequences.
+	 * perfect hashing. The numbering also preserves the order of input sequences.
 	 *
 	 * @return Returns the same object for easier call chaining.
 	 */
@@ -419,7 +419,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Write a v-int to a byte array */
 	static int writeVInt(final byte[] array, int offset, int value){
-		assert value >= 0: "Can't v-code negative ints.";
+		assert value >= 0: "Can't v-code negative integers.";
 
 		while(value > 0x7F){
 			array[offset ++] = (byte)(0x80 | (value & 0x7F));

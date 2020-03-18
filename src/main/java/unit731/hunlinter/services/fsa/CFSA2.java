@@ -316,7 +316,7 @@ public class CFSA2 extends FSA{
 
 	/** Return the byte-length of a v-coded int */
 	static int vIntLength(int value){
-		assert value >= 0: "Can't v-code negative ints.";
+		assert value >= 0: "Can't v-code negative integers.";
 
 		int bytes;
 		for(bytes = 1; value >= 0x80; bytes ++)
