@@ -24,8 +24,9 @@ public class ExternalSorterOptions{
 	private final int zipBufferSize;
 
 
-	private ExternalSorterOptions(Charset charset, Comparator<String> comparator, boolean removeDuplicates, int skipHeaderLines,
-			boolean sortInParallel, int maxTemporaryFiles, boolean useZip, int zipBufferSize){
+	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
+			final int skipHeaderLines, final boolean sortInParallel, final int maxTemporaryFiles, final boolean useZip,
+			final int zipBufferSize){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
@@ -56,43 +57,43 @@ public class ExternalSorterOptions{
 
 		ExternalSorterOptionsBuilder(){}
 
-		public ExternalSorterOptionsBuilder charset(Charset charset){
+		public ExternalSorterOptionsBuilder charset(final Charset charset){
 			this.charset = charset;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder comparator(Comparator<String> comparator){
+		public ExternalSorterOptionsBuilder comparator(final Comparator<String> comparator){
 			this.comparator = comparator;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder removeDuplicates(boolean removeDuplicates){
+		public ExternalSorterOptionsBuilder removeDuplicates(final boolean removeDuplicates){
 			this.removeDuplicates = removeDuplicates;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder skipHeaderLines(int skipHeaderLines){
+		public ExternalSorterOptionsBuilder skipHeaderLines(final int skipHeaderLines){
 			this.skipHeaderLines = skipHeaderLines;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder sortInParallel(boolean sortInParallel){
+		public ExternalSorterOptionsBuilder sortInParallel(final boolean sortInParallel){
 			this.sortInParallel = sortInParallel;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder maxTemporaryFiles(int maxTemporaryFiles){
+		public ExternalSorterOptionsBuilder maxTemporaryFiles(final int maxTemporaryFiles){
 			this.maxTemporaryFiles = maxTemporaryFiles;
 			maxTemporaryFiles$set = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder useZip(boolean useZip){
+		public ExternalSorterOptionsBuilder useZip(final boolean useZip){
 			this.useZip = useZip;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder zipBufferSize(int zipBufferSize){
+		public ExternalSorterOptionsBuilder zipBufferSize(final int zipBufferSize){
 			this.zipBufferSize = zipBufferSize;
 			zipBufferSize$set = true;
 			return this;

@@ -33,7 +33,10 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		setProgress(0);
 
 		//load dictionary
-		final List<IndexDataPair<String>> entries = loadDictionary();
+		final DictionaryParser dicParser = workerData.getParser();
+		final Path dicPath = dicParser.getDicFile().toPath();
+		final Charset charset = dicParser.getCharset();
+		final List<IndexDataPair<String>> entries = loadFile(dicPath, charset);
 
 		//process dictionary
 		final Stream<IndexDataPair<String>> stream = (workerData.isParallelProcessing()?
@@ -41,12 +44,32 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		processDictionary(stream, entries.size(), dataProcessor);
 	}
 
-	private List<IndexDataPair<String>> loadDictionary(){
+//	protected void writeLines(final BiConsumer<Writer, String> dataProcessor, final int totalEntries, final File outputFile,
+//			final Charset charset){
+//		Objects.requireNonNull(dataProcessor);
+//		Objects.requireNonNull(outputFile);
+//		Objects.requireNonNull(charset);
+//
+//		setProgress(0);
+//
+//		try{
+//			final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+//			try{
+//				final BiConsumer<Writer, String> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+//				innerProcessor.accept(writer, line);
+//			}
+//			finally{
+//				writer.close();
+//			}
+//		}
+//		catch(final Exception e){
+//			cancel(e);
+//		}
+//	}
+
+	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset){
 		final List<IndexDataPair<String>> entries = new ArrayList<>();
-		final DictionaryParser dicParser = workerData.getParser();
-		final Path dicPath = dicParser.getDicFile().toPath();
-		final Charset charset = dicParser.getCharset();
-		try(final LineNumberReader br = FileHelper.createReader(dicPath, charset)){
+		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = ParserHelper.extractLine(br);
 			if(!NumberUtils.isCreatable(line))
 				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));

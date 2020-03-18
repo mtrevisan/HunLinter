@@ -61,7 +61,8 @@ public class ExternalSorter{
 	 * @return a list of temporary flat files
 	 * @throws IOException generic IO exception
 	 */
-	private List<File> splitAndSortFiles(final BufferedReader fbr, final ExternalSorterOptions options, final long blockSize) throws IOException{
+	private List<File> splitAndSortFiles(final BufferedReader fbr, final ExternalSorterOptions options, final long blockSize)
+			throws IOException{
 		final List<File> files = new ArrayList<>();
 		try(fbr){
 			final List<String> headers = new ArrayList<>();
@@ -156,7 +157,8 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final List<String> headers, final List<String> sortedLines, final ExternalSorterOptions options, final OutputStream out) throws IOException{
+	private void saveChunk(final List<String> headers, final List<String> sortedLines, final ExternalSorterOptions options,
+			final OutputStream out) throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			//copy header
 			for(final String r : headers){
@@ -200,7 +202,8 @@ public class ExternalSorter{
 	 * @return The number of lines sorted
 	 * @throws IOException generic IO exception
 	 */
-	private int mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile) throws IOException{
+	private int mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
+			throws IOException{
 		final List<BinaryFileBuffer> bfbs = new ArrayList<>(files.size());
 		for(final File f : files){
 			final InputStream in = new FileInputStream(f);
@@ -212,7 +215,8 @@ public class ExternalSorter{
 			final BinaryFileBuffer bfb = new BinaryFileBuffer(new BufferedReader(isr));
 			bfbs.add(bfb);
 		}
-		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), options.getCharset()));
+		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),
+			options.getCharset()));
 		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
 		LoopHelper.forEach(files, File::delete);
 		return rowCounter;
@@ -247,7 +251,8 @@ public class ExternalSorter{
 		return rowCounter;
 	}
 
-	private int mergeSortRemoveDuplicates(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer, int rowCounter) throws IOException{
+	private int mergeSortRemoveDuplicates(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer,
+			int rowCounter) throws IOException{
 		String lastLine = null;
 		if(!queue.isEmpty()){
 			final BinaryFileBuffer buffer = queue.poll();
@@ -280,7 +285,8 @@ public class ExternalSorter{
 		return rowCounter;
 	}
 
-	private int mergeSort(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer, int rowCounter) throws IOException{
+	private int mergeSort(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer, int rowCounter)
+			throws IOException{
 		while(!queue.isEmpty()){
 			final BinaryFileBuffer buffer = queue.poll();
 			final String line = buffer.pop();

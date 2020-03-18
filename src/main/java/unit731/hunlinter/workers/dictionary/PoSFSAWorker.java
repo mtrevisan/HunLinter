@@ -10,6 +10,8 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.externalsorter.ExternalSorter;
+import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
@@ -27,7 +29,9 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -40,6 +44,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -60,15 +65,35 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
+
 		final Charset charset = dicParser.getCharset();
-
-
-		final ArrayList<String> words = new ArrayList<>();
+		File supportFile;
+		BufferedWriter writer;
+		try{
+			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".txt");
+			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
+		}
+		catch(final IOException e){
+			//TODO to manage
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			LoopHelper.forEach(productions, production -> words.addAll(production.toStringPoSFSA()));
+			LoopHelper.forEach(productions, production -> {
+				final List<String> words = production.toStringPoSFSA();
+				for(final String word : words){
+					try{
+						writer.write(word);
+						writer.newLine();
+					}
+					catch(final Exception e){
+						throw new RuntimeException(e);
+					}
+				}
+			});
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {
@@ -104,10 +129,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
-		final Function<Void, List<String>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/3)");
+		final Function<Void, File> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			processLines(lineProcessor);
+			try{
+				writer.close();
+			}
+			catch(final IOException e){
+				throw new RuntimeException(e);
+			}
 
 //			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 //
@@ -144,11 +175,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 //				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
 //			}
 
-			return words;
+			return supportFile;
 		};
-		final Function<List<String>, FSA> step2 = extractedWords -> {
-System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(extractedWords));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 2/3)");
+		final Function<File, File> step2 = file -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create support file (step 2/4)");
+
+			setProgress(0);
 
 			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 			final File outputInfoFile = new File(filenameNoExtension + ".info");
@@ -165,6 +197,31 @@ System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(extracted
 				}
 			}
 
+			setProgress(50);
+
+			//sort file & remove duplicates
+			final ExternalSorter sorter = new ExternalSorter();
+			final ExternalSorterOptions options = ExternalSorterOptions.builder()
+				.charset(charset)
+				//lexical order
+				.comparator(Comparator.naturalOrder())
+				.useZip(true)
+				.removeDuplicates(true)
+				.build();
+			try{
+				sorter.sort(supportFile, options, supportFile);
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
+
+			setProgress(100);
+
+			return supportFile;
+		};
+		final Function<File, FSA> step3 = file -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+
 			final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
 			final DictionaryMetadata metadata;
 			try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
@@ -174,19 +231,18 @@ System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(extracted
 				throw new RuntimeException(e);
 			}
 
+			//TODO read file line by line
+
 			final byte separator = metadata.getSeparator();
 			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 			extractedWords = encode(extractedWords, separator, sequenceEncoder);
-
-			//lexical order
-			Collections.sort(extractedWords);
 
 //			executeReadProcessNoIndex(fsaProcessor, extractedWords);
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step3 = fsa -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 3/3)");
+		final Function<FSA, File> step4 = fsa -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
 
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
@@ -199,7 +255,7 @@ System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(extracted
 				throw new RuntimeException(e);
 			}
 		};
-		final Function<File, Void> step4 = file -> {
+		final Function<File, Void> step5 = file -> {
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
 
 			WorkerManager.openFolderStep(LOGGER).apply(file);

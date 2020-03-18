@@ -14,7 +14,7 @@ class BinaryFileBuffer{
 	private String cache;
 
 
-	BinaryFileBuffer(BufferedReader r) throws IOException{
+	BinaryFileBuffer(final BufferedReader r) throws IOException{
 		Objects.requireNonNull(r);
 
 		br = r;
@@ -35,7 +35,7 @@ class BinaryFileBuffer{
 	}
 
 	public String pop() throws IOException{
-		String answer = peek();
+		final String answer = peek();
 		reload();
 		return answer;
 	}

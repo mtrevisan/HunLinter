@@ -11,7 +11,7 @@ class StringSizeEstimator{
 		//check the system property "sun.arch.data.model" not very safe, as it might not work for all JVM implementations
 		//nevertheless the worst thing that might happen is that the JVM is 32bit but we assume its 64bit, so we will be
 		//counting a few extra bytes per string object: no harm done here since this is just an approximation
-		String arch = System.getProperty("sun.arch.data.model");
+		final String arch = System.getProperty("sun.arch.data.model");
 		if(arch != null && arch.contains("32"))
 			//if exists and is 32 bit then we assume a 32bit JVM
 			is64bitJVM = false;
@@ -19,10 +19,10 @@ class StringSizeEstimator{
 		//the sizes below are a bit rough as we don't take into account advanced JVM options such as compressed oops
 		//however if our calculation is not accurate it'll be a bit over so there is no danger of an out of memory error
 		//because of this
-		int objectHeader = (is64bitJVM? 16: 8);
-		int arrayHeader = (is64bitJVM? 24: 12);
-		int integerFields = 12;
-		int objectReference = (is64bitJVM? 8: 4);
+		final int objectHeader = (is64bitJVM? 16: 8);
+		final int arrayHeader = (is64bitJVM? 24: 12);
+		final int integerFields = 12;
+		final int objectReference = (is64bitJVM? 8: 4);
 		OBJ_OVERHEAD = objectHeader + integerFields + objectReference + arrayHeader;
 	}
 
@@ -41,7 +41,7 @@ class StringSizeEstimator{
 	 * @param text The string to estimate memory footprint
 	 * @return The <strong>estimated</strong> size [B]
 	 */
-	public static long estimatedSizeOf(String text){
+	public static long estimatedSizeOf(final String text){
 		return text.length() * 2 + OBJ_OVERHEAD;
 	}
 
