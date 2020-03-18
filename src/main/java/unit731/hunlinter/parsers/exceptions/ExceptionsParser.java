@@ -8,6 +8,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
@@ -16,9 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 
 /**
@@ -80,11 +81,12 @@ public class ExceptionsParser{
 
 	private void validate(){
 		//check for duplications
-		final List<List<String>> duplications = dictionary.stream()
-			.collect(Collectors.groupingBy(Function.identity()))
-			.values().stream()
-			.filter(list -> list.size() > 1)
-			.collect(Collectors.toList());
+		final Map<String, List<String>> map = new HashMap<>();
+		LoopHelper.forEach(dictionary, s -> map.computeIfAbsent(s, k -> new ArrayList<>(1)).add(s));
+		final List<List<String>> duplications = new ArrayList<>();
+		LoopHelper.applyIf(map.values(),
+			s -> s.size() > 1,
+			duplications::add);
 		for(final List<String> duplication : duplications)
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
 	}

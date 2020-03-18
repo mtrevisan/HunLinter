@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
@@ -18,7 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -73,11 +76,13 @@ public class AutoCorrectParser{
 
 	private void validate(){
 		//check for duplications
-		final List<List<CorrectionEntry>> duplications = dictionary.stream()
-			.collect(Collectors.groupingBy(CorrectionEntry::getIncorrectForm))
-			.values().stream()
-			.filter(list -> list.size() > 1)
-			.collect(Collectors.toList());
+		final Map<String, List<CorrectionEntry>> map = new HashMap<>();
+		LoopHelper.forEach(dictionary,
+			correctionEntry -> map.computeIfAbsent(correctionEntry.getIncorrectForm(), k -> new ArrayList<>(1)).add(correctionEntry));
+		final List<List<CorrectionEntry>> duplications = new ArrayList<>();
+		LoopHelper.applyIf(map.values(),
+			list -> list.size() > 1,
+			duplications::add);
 		for(final List<CorrectionEntry> duplication : duplications)
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in auto–correct file: incorrect form '{}', correct forms '{}'",
 				duplication.get(0).getIncorrectForm(),
@@ -124,16 +129,18 @@ public class AutoCorrectParser{
 
 	/* Find if there is a duplicate with the same incorrect and correct forms */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
-		return dictionary.stream()
-			.filter(correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
-			.collect(Collectors.toList());
+		final List<CorrectionEntry> duplicates = new ArrayList<>();
+		LoopHelper.applyIf(dictionary,
+			correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct),
+			duplicates::add);
+		return duplicates;
 	}
 
 	/* Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean contains(final String incorrect, final String correct){
-		return dictionary.stream()
-			.anyMatch(elem -> !incorrect.isEmpty() && !correct.isEmpty()
-				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct));
+		return (LoopHelper.match(dictionary,
+			elem -> !incorrect.isEmpty() && !correct.isEmpty()
+				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){

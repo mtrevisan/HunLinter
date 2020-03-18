@@ -195,14 +195,14 @@ public class Production extends DictionaryEntry{
 		final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
 		final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 
-		final StringJoiner inflections = new StringJoiner(POS_FSA_TAG_SEPARATOR);
-		inflections.add(PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
+		final StringJoiner sj = new StringJoiner(POS_FSA_TAG_SEPARATOR);
+		sj.add(PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
 		LoopHelper.forEach(suffixInflection,
-			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), inflections::add));
+			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
 		LoopHelper.forEach(prefixInflection,
-			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), inflections::add));
+			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
 
-		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + inflections;
+		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj;
 		//extract stem
 		final List<String> stem = bucket.get(MorphologicalTag.STEM);
 		for(int i = 0; i < stem.size(); i ++)

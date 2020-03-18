@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.File;
@@ -163,9 +164,8 @@ public class Packager{
 			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
 				+ ", cannot load project");
 
-		manifestFiles = extractFileEntries(mainManifestPath.toFile()).stream()
-			.map(configurationFile -> Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile())
-			.collect(Collectors.toList());
+		LoopHelper.forEach(extractFileEntries(mainManifestPath.toFile()),
+			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile()));
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
@@ -238,7 +238,7 @@ public class Packager{
 			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
 				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
 		else
-			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 	}
 
 	private void processPathsConfigurationFile() throws IOException, SAXException{
@@ -246,14 +246,13 @@ public class Packager{
 		final File file = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			this.configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-			final Set<String> uniqueFolders = this.configurationFiles.values().stream()
-				.map(File::toString)
-				.collect(Collectors.toSet());
-			if(this.configurationFiles.size() != uniqueFolders.size())
+			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			final Set<String> uniqueFolders = new HashSet<>();
+			LoopHelper.forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
+			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-					+ StringUtils.join(this.configurationFiles));
-			if(uniqueFolders.stream().anyMatch(String::isEmpty))
+					+ StringUtils.join(configurationFiles));
+			if(LoopHelper.match(uniqueFolders, String::isEmpty) != null)
 				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
 	}
@@ -440,10 +439,11 @@ public class Packager{
 
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
 			final Map<String, File> folders) throws IOException{
-		final List<Node> children = extractChildren(entry).stream()
-			//restrict to given language
-			.filter(child -> ArrayUtils.contains(extractLocale(child), language))
-			.collect(Collectors.toList());
+		//restrict to given language
+		final List<Node> children = new ArrayList<>();
+		LoopHelper.applyIf(extractChildren(entry),
+			node -> ArrayUtils.contains(extractLocale(node), language),
+			children::add);
 		for(final Node child : children){
 			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			final String childFolders = extractLocation(child);

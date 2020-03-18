@@ -3,6 +3,7 @@ package unit731.hunlinter.services;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -56,23 +56,23 @@ public class ZipManager{
 	}
 
 	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
-		return folders.stream()
-			.filter(folder -> {
-				folder = Path.of(folder)
-					.toString();
-				if(ArrayUtils.contains(excludeFolderBut, Path.of(folder)))
-					return true;
+		final List<String> filteredFolders = new ArrayList<>();
+		for(String folder : folders){
+			folder = Path.of(folder)
+				.toString();
 
+			boolean process = true;
+			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
 				final String[] includeFolders = Arrays.stream(excludeFolderBut)
 					.map(Path::getParent)
 					.map(Path::toString)
 					.toArray(String[]::new);
-				for(final String includeFolder : includeFolders)
-					if(folder.startsWith(includeFolder))
-						return false;
-				return true;
-			})
-			.collect(Collectors.toList());
+				process = (LoopHelper.match(includeFolders, folder::startsWith) == null);
+			}
+			if(process)
+				filteredFolders.add(folder);
+		}
+		return filteredFolders;
 	}
 
 	private List<String> extractFilesList(final Path dir){

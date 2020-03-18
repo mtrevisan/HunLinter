@@ -650,6 +650,7 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
+		//FIXME remove stream
 		final Function<LineEntry, Stream<LineEntry>> createEntry = rule -> rule.addition.stream()
 			.map(addition -> {
 				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();

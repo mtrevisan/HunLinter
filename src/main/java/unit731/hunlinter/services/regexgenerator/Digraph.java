@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.services.system.LoopHelper;
 
 
 /**
@@ -113,13 +114,13 @@ public final class Digraph<T>{
 		s.append(NEWLINE);
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			final String transitions = adjacency.get(v).stream()
-				.map(w -> w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")")
-				.collect(Collectors.joining(", "));
+			final StringJoiner transitions = new StringJoiner(", ");
+			LoopHelper.forEach(adjacency.get(v),
+				w -> transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")"));
 			s.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
-				.append(transitions)
+				.append(transitions.toString())
 				.append(NEWLINE);
 		}
 		return s.toString();

@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -8,8 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -307,20 +304,22 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** Merge the distribution with the others */
 	protected Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
 			final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		return Stream.of(compoundRules, distribution)
-			.flatMap(m -> m.entrySet().stream())
-			.map(m -> {
-				final List<DictionaryEntry> entries = m.getValue();
-				final List<DictionaryEntry> value = new ArrayList<>(entries.size());
-				LoopHelper.forEach(entries, entry -> {
-					if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-						value.add(entry);
-				});
-				final String key = m.getKey();
-				return new AbstractMap.SimpleEntry<>(key, value);
-			})
-			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-				(entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
+		final List<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
+		list.addAll(distribution.entrySet());
+
+		final Map<String, List<DictionaryEntry>> map = new HashMap<>();
+		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
+			final List<DictionaryEntry> entries = m.getValue();
+			final List<DictionaryEntry> value = new ArrayList<>(entries.size());
+			LoopHelper.forEach(entries, entry -> {
+				if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+					value.add(entry);
+			});
+			final String key = m.getKey();
+			map.computeIfAbsent(key, k -> new ArrayList<>(1))
+				.addAll(value);
+		}
+		return map;
 	}
 
 	protected void loadDictionaryForInclusionTest(){

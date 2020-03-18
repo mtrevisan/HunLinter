@@ -74,11 +74,14 @@ public class GUIUtils{
 				return Pair.of(w, currentFont);
 			};
 			final List<String> fontNames = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
-			bestFont = fontNames.stream()
-				.map(widthFontPair)
-				.max(Comparator.comparingDouble(Pair::getKey))
-				.map(Pair::getValue)
-				.orElse(currentFont);
+
+			Pair<Double, Font> bestPair = null;
+			for(final String fontName : fontNames){
+				final Pair<Double, Font> doubleFontPair = widthFontPair.apply(fontName);
+				if(bestPair == null || doubleFontPair.getKey() > bestPair.getKey())
+					bestPair = doubleFontPair;
+			}
+			bestFont = (bestPair != null? bestPair.getValue(): currentFont);
 		}
 		return getDefaultHeightFont(bestFont);
 	}

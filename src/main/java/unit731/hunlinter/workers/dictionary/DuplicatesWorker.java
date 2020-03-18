@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.Duplicate;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -254,13 +256,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 					final String origin = prod.getWord() + "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech())
 						+ "): ";
 					writer.write(origin);
-					writer.write(entries.stream()
-						.map(duplicate ->
-							StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"),
-								StringUtils.EMPTY)
-						)
-						.collect(Collectors.joining(", ")));
+					final StringJoiner sj = new StringJoiner(", ");
+					LoopHelper.forEach(entries,
+						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
+					writer.write(sj.toString());
 					writer.newLine();
 
 					setProgress(++ writtenSoFar, totalSize);
