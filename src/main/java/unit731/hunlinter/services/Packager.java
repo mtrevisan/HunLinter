@@ -144,7 +144,7 @@ public class Packager{
 
 	private Path projectPath;
 	private Path mainManifestPath;
-	private List<File> manifestFiles;
+	private final List<File> manifestFiles = new ArrayList<>();
 	private List<String> languages;
 
 	private String language;
