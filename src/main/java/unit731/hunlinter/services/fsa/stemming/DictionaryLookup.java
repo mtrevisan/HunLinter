@@ -144,7 +144,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 
 		// Encode word characters into bytes in the same encoding as the FSA's.
 		charBuffer = BufferUtils.clearAndEnsureCapacity(charBuffer, word.length());
-		for(int i = 0; i < word.length(); i++){
+		for(int i = 0; i < word.length(); i ++){
 			char chr = word.charAt(i);
 			if(chr == separatorChar){
 				// No valid input can contain the separator.
@@ -188,7 +188,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 
 					if(formsCount >= forms.length){
 						forms = Arrays.copyOf(forms, forms.length + EXPAND_SIZE);
-						for(int k = 0; k < forms.length; k++){
+						for(int k = 0; k < forms.length; k ++){
 							if(forms[k] == null)
 								forms[k] = new WordData(decoder);
 						}
@@ -198,7 +198,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 					 * Now, expand the prefix/ suffix 'compression' and store
 					 * the base form.
 					 */
-					final WordData wordData = forms[formsCount++];
+					final WordData wordData = forms[formsCount ++];
 					if(dictionaryMetadata.getOutputConversionPairs().isEmpty()){
 						wordData.update(byteBuffer, word);
 					}
@@ -212,7 +212,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 					 */
 					assert prefixBytes <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
 					int sepPos;
-					for(sepPos = prefixBytes; sepPos < bbSize; sepPos++){
+					for(sepPos = prefixBytes; sepPos < bbSize; sepPos ++){
 						if(ba[sepPos] == separator){
 							break;
 						}
@@ -224,7 +224,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 					wordData.stemBuffer = sequenceEncoder.decode(wordData.stemBuffer, byteBuffer, ByteBuffer.wrap(ba, 0, sepPos));
 
 					// Skip separator character.
-					sepPos++;
+					sepPos ++;
 
 					/*
 					 * Decode the tag data.

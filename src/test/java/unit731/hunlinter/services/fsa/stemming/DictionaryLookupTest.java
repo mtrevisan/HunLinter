@@ -109,7 +109,7 @@ class DictionaryLookupTest{
 		final DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
 		int i = 0;
 		for(WordData wd : s2){
-			WordData clone = words.get(i++);
+			WordData clone = words.get(i ++);
 			assertEqualSequences(clone.getStem(), wd.getStem());
 			assertEqualSequences(clone.getTag(), wd.getTag());
 			assertEqualSequences(clone.getWord(), wd.getWord());

@@ -87,7 +87,7 @@ public class XMLManager{
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			children.ensureCapacity(nodes.getLength());
-			for(int i = 0; i < nodes.getLength(); i++){
+			for(int i = 0; i < nodes.getLength(); i ++){
 				final Node item = nodes.item(i);
 				if(extractionCondition.apply(item))
 					children.add(item);

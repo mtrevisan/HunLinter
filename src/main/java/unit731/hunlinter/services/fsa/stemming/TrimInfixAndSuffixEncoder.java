@@ -58,7 +58,7 @@ public class TrimInfixAndSuffixEncoder implements ISequenceEncoder{
 		int maxSubsequenceLength = BufferUtils.sharedPrefixLength(source, target);
 		int maxInfixLength = 0;
 		for(int i : new int[]{0, maxSubsequenceLength}){
-			for(int j = 1; j <= source.remaining() - i; j++){
+			for(int j = 1; j <= source.remaining() - i; j ++){
 				// Compute temporary src with the infix removed.
 				// Concatenate in scratch space for simplicity.
 				final int len2 = source.remaining() - (i + j);

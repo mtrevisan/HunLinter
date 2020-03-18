@@ -287,7 +287,7 @@ System.out.println("delta: " + delta);
 		ByteBuffer target = ByteBuffer.allocate(0);
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
-		for(int i = 0, max = words.size(); i < max; i++){
+		for(int i = 0, max = words.size(); i < max; i ++){
 			final byte[] row = StringHelper.getRawBytes(words.get(i));
 			final int sep1 = indexOf(separator, row, 0);
 			int sep2 = indexOf(separator, row, sep1 + 1);

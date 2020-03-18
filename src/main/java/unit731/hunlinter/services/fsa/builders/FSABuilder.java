@@ -133,7 +133,7 @@ public class FSABuilder{
 			final int p = nextArcOffset[i - 1];
 
 			serialized[p + ConstantArcSizeFSA.FLAGS_OFFSET] = (byte)(i == len? ConstantArcSizeFSA.BIT_ARC_FINAL: 0);
-			serialized[p + ConstantArcSizeFSA.LABEL_OFFSET] = sequence[j++];
+			serialized[p + ConstantArcSizeFSA.LABEL_OFFSET] = sequence[j ++];
 			setArcTarget(p, i == len? ConstantArcSizeFSA.TERMINAL_STATE: activePath[i]);
 
 			nextArcOffset[i - 1] = p + ConstantArcSizeFSA.ARC_SIZE;

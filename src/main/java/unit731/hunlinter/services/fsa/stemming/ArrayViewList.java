@@ -50,12 +50,12 @@ public class ArrayViewList<E> extends AbstractList<E> implements RandomAccess, S
 
 	public int indexOf(Object o){
 		if(o == null){
-			for(int i = start; i < start + length; i++)
+			for(int i = start; i < start + length; i ++)
 				if(a[i] == null)
 					return i - start;
 		}
 		else{
-			for(int i = start; i < start + length; i++)
+			for(int i = start; i < start + length; i ++)
 				if(o.equals(a[i]))
 					return i - start;
 		}

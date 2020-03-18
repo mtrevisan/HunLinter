@@ -53,7 +53,7 @@ public class FSATraversal{
 						return hash;
 					}
 
-					hash++;
+					hash ++;
 				}
 
 				if(fsa.isArcTerminal(arc)){
@@ -68,12 +68,12 @@ public class FSATraversal{
 
 				// Make a transition along the arc, go the target node's first arc.
 				arc = fsa.getFirstArc(fsa.getEndNode(arc));
-				label = sequence[++seqIndex];
+				label = sequence[++ seqIndex];
 				continue;
 			}
 			else{
 				if(fsa.isArcFinal(arc)){
-					hash++;
+					hash ++;
 				}
 				if(!fsa.isArcTerminal(arc)){
 					hash += fsa.getRightLanguageCount(fsa.getEndNode(arc));
@@ -126,7 +126,7 @@ public class FSATraversal{
 
 		final FSA fsa = this.fsa;
 		final int end = start + length;
-		for(int i = start; i < end; i++){
+		for(int i = start; i < end; i ++){
 			final int arc = fsa.getArc(node, sequence[i]);
 			if(arc != 0){
 				if(i + 1 == end && fsa.isArcFinal(arc)){

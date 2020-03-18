@@ -60,7 +60,7 @@ class FSATraversalTest{
 		for(ByteBuffer bb : fsa.getSequences()){
 			Assertions.assertEquals(0, bb.arrayOffset());
 			Assertions.assertEquals(0, bb.position());
-			count++;
+			count ++;
 		}
 		Assertions.assertEquals(346773, count);
 	}
@@ -76,7 +76,7 @@ class FSATraversalTest{
 				int arc = fsa.getFirstArc(node);
 				do{
 					if(fsa.isArcFinal(arc)){
-						counter[0]++;
+						counter[0] ++;
 					}
 
 					if(!fsa.isArcTerminal(arc)){

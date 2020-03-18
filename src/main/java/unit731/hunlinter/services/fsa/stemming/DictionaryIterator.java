@@ -47,7 +47,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 		int bbSize = entryBuffer.remaining();
 
 		int sepPos;
-		for(sepPos = 0; sepPos < bbSize; sepPos++){
+		for(sepPos = 0; sepPos < bbSize; sepPos ++){
 			if(ba[sepPos] == separator){
 				break;
 			}
@@ -65,7 +65,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 		entry.update(inflectedBuffer, inflectedCharBuffer);
 
 		temp = BufferUtils.clearAndEnsureCapacity(temp, bbSize - sepPos);
-		sepPos++;
+		sepPos ++;
 		temp.put(ba, sepPos, bbSize - sepPos);
 		temp.flip();
 
@@ -77,7 +77,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 		 */
 		assert sequenceEncoder.prefixBytes() <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
 		sepPos = sequenceEncoder.prefixBytes();
-		for(; sepPos < bbSize; sepPos++){
+		for(; sepPos < bbSize; sepPos ++){
 			if(ba[sepPos] == separator)
 				break;
 		}
@@ -94,10 +94,9 @@ public class DictionaryIterator implements Iterator<WordData>{
 			entry.stemBuffer.flip();
 		}
 
-		// Skip separator character, if present.
-		if(sepPos + 1 <= bbSize){
-			sepPos++;
-		}
+		//skip separator character, if present
+		if(sepPos + 1 <= bbSize)
+			sepPos ++;
 
 		/*
 		 * Decode the tag data.

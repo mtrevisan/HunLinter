@@ -363,7 +363,7 @@ public class CFSA extends FSA{
 	private int skipArc(int offset){
 		if(isNextSet(offset)){
 			if(isLabelCompressed(offset)){
-				offset++;
+				offset ++;
 			}
 			else{
 				offset += 1 + 1;

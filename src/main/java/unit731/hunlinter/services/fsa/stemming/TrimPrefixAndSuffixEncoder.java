@@ -42,7 +42,7 @@ public class TrimPrefixAndSuffixEncoder implements ISequenceEncoder{
 		// Search for the maximum matching subsequence that can be encoded.
 		int maxSubsequenceLength = 0;
 		int maxSubsequenceIndex = 0;
-		for(int i = 0; i < source.remaining(); i++){
+		for(int i = 0; i < source.remaining(); i ++){
 			// prefix at i => shared subsequence (infix)
 			int sharedPrefix = BufferUtils.sharedPrefixLength(source, i, target, 0);
 			// Only update maxSubsequenceLength if we will be able to encode it.

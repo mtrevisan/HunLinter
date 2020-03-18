@@ -99,8 +99,8 @@ public class BufferUtils{
 		final int max = Math.min(a.remaining() - aStart, b.remaining() - bStart);
 		aStart += a.position();
 		bStart += b.position();
-		while(i < max && a.get(aStart++) == b.get(bStart++)){
-			i++;
+		while(i < max && a.get(aStart ++) == b.get(bStart ++)){
+			i ++;
 		}
 		return i;
 	}

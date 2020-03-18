@@ -113,7 +113,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 			if(arc == 0){
 				//remove the current node from the queue.
-				position--;
+				position --;
 				continue;
 			}
 
