@@ -47,7 +47,7 @@ public class HyphenationOptionsParser{
 		noHyphen.clear();
 	}
 
-	public boolean parseLine(String line){
+	public boolean parseLine(final String line){
 		boolean managed = true;
 		if(line.startsWith(MIN_LEFT_HYPHENATION))
 			nonCompoundOptions.setLeftMin(Integer.parseInt(extractValue(line)));
@@ -65,11 +65,11 @@ public class HyphenationOptionsParser{
 	}
 
 	private String extractValue(String line){
-		String[] components = StringUtils.split(line);
-		return StringUtils.strip(components[1]);
+		final String[] components = StringUtils.split(line);
+		return components[1].trim();
 	}
 
-	public void write(BufferedWriter writer) throws IOException{
+	public void write(final BufferedWriter writer) throws IOException{
 		if(nonCompoundOptions.getLeftMin() != nonCompoundOptions.getMinDefault())
 			writeValue(writer, MIN_LEFT_HYPHENATION, nonCompoundOptions.getLeftMin());
 		if(nonCompoundOptions.getRightMin() != nonCompoundOptions.getMinDefault())
@@ -82,11 +82,11 @@ public class HyphenationOptionsParser{
 			writeValue(writer, NO_HYPHEN, StringUtils.join(noHyphen, NO_HYPHEN_SEPARATOR));
 	}
 
-	private void writeValue(BufferedWriter writer, String key, int value) throws IOException{
+	private void writeValue(final BufferedWriter writer, final String key, final int value) throws IOException{
 		writeValue(writer, key, Integer.toString(value));
 	}
 
-	private void writeValue(BufferedWriter writer, String key, String value) throws IOException{
+	private void writeValue(final BufferedWriter writer, final String key, final String value) throws IOException{
 		writer.write(key);
 		writer.write(StringUtils.SPACE);
 		writer.write(value);
