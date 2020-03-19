@@ -63,21 +63,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(outputFile);
 
 
-
-		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
-		final DictionaryMetadata metadata;
-		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
-			metadata = DictionaryMetadata.read(is);
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
-
+		final Charset charset = dicParser.getCharset();
+		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
 		final byte separator = metadata.getSeparator();
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final Charset charset = dicParser.getCharset();
 		File supportFile;
 		BufferedWriter writer;
 		try{
@@ -87,6 +78,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		catch(final IOException e){
 			throw new RuntimeException(e);
 		}
+
+
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
@@ -220,6 +213,31 @@ public class PoSFSAWorker extends WorkerDictionary{
 			return null;
 		};
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+	}
+
+	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
+		final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+		final File outputInfoFile = new File(filenameNoExtension + ".info");
+		if(!outputInfoFile.exists()){
+			final List<String> content = Arrays.asList(
+				"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+				"fsa.dict.encoding=" + charset.name().toLowerCase(),
+				"fsa.dict.encoder=prefix");
+			try{
+				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
+		}
+
+		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
+		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
+			return DictionaryMetadata.read(is);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
 	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
