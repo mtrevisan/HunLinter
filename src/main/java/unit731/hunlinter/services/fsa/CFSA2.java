@@ -141,7 +141,7 @@ public class CFSA2 extends FSA{
 			if(f.isSet(flagBits))
 				flags.add(f);
 
-		if(flagBits != FSAFlags.asShort(flags))
+		if(flagBits != FSAFlags.getMask(flags))
 			throw new IOException("Unrecognized flags: 0x" + Integer.toHexString(flagBits));
 
 		this.hasNumbers = flags.contains(FSAFlags.NUMBERS);

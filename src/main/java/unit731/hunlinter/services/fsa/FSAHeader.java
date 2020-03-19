@@ -8,8 +8,12 @@ import java.io.OutputStream;
 /** Standard FSA file header, as described in <code>fsa</code> package documentation. */
 public class FSAHeader{
 
+	private static final int FSA_MAGIC1 = '\\';
+	private static final int FSA_MAGIC2 = 'f';
+	private static final int FSA_MAGIC3 = 's';
+	private static final int FSA_MAGIC4 = 'a';
 	/** FSA magic (4 bytes) */
-	final static int FSA_MAGIC = ('\\' << 24) | ('f' << 16) | ('s' << 8) | ('a');
+	static final int FSA_MAGIC = (FSA_MAGIC1 << 24) | (FSA_MAGIC2 << 16) | (FSA_MAGIC3 << 8) | FSA_MAGIC4;
 
 	/** Maximum length of the header block */
 	static final int MAX_HEADER_LENGTH = 4 + 8;
@@ -31,14 +35,14 @@ public class FSAHeader{
 	 * @throws IOException If the stream ends prematurely or if it contains invalid data.
 	 */
 	public static FSAHeader read(final InputStream in) throws IOException{
-		if(in.read() != ((FSA_MAGIC >>> 24)) || in.read() != ((FSA_MAGIC >>> 16) & 0xFF) || in.read() != ((FSA_MAGIC >>> 8) & 0xFF) || in.read() != ((FSA_MAGIC) & 0xFF))
+		if(in.read() != FSA_MAGIC1 || in.read() != FSA_MAGIC2 || in.read() != FSA_MAGIC3 || in.read() != FSA_MAGIC4)
 			throw new IOException("Invalid file header, probably not an FSA.");
 
 		final int version = in.read();
 		if(version == -1)
 			throw new IOException("Truncated file, no version number.");
 
-		return new FSAHeader((byte) version);
+		return new FSAHeader((byte)version);
 	}
 
 	/**
