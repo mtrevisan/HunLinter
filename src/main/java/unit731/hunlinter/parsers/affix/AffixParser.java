@@ -27,7 +27,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 /**
@@ -55,8 +55,8 @@ public class AffixParser{
 	private static final String START = "^";
 	private static final String END = "$";
 
-	private static final Pattern PATTERN_ISO639_1 = PatternHelper.pattern("([a-z]{2})");
-	private static final Pattern PATTERN_ISO639_2 = PatternHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
+	private static final Pattern PATTERN_ISO639_1 = RegexHelper.pattern("([a-z]{2})");
+	private static final Pattern PATTERN_ISO639_2 = RegexHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
 	private static final Handler COPY_OVER = new CopyOverHandler();
 	private static final Handler COPY_OVER_AS_NUMBER = new CopyOverAsNumberHandler();
@@ -221,9 +221,9 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.LANGUAGE)){
 			//try to infer language from filename
 			final String filename = FilenameUtils.removeExtension(affFile.getName());
-			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
+			String[] languages = RegexHelper.extract(filename, PATTERN_ISO639_2);
 			if(languages.length == 0)
-				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
+				languages = RegexHelper.extract(filename, PATTERN_ISO639_1);
 			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 			data.addData(AffixOption.LANGUAGE, language);
 		}

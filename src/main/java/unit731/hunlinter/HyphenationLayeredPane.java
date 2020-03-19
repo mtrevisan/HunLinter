@@ -27,7 +27,7 @@ import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.system.Debouncer;
 
 
@@ -35,7 +35,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLayeredPane.class);
 
-	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
+	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = RegexHelper.pattern("[.\\d=-]");
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
@@ -417,7 +417,7 @@ final int iconSize = 17;
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
 			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule,
+				ruleMatchesText = addedRuleText.contains(RegexHelper.clear(addedRule,
 					PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){

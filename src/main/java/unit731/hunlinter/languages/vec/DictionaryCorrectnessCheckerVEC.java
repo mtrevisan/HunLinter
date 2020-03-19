@@ -19,7 +19,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{
@@ -49,8 +49,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static Pattern PATTERN_NON_VANISHING_EL_NOT_AT_END;
 	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
 	private static Pattern PATTERN_PHONEME_CIJJHNHIV;
-	private static final Pattern PATTERN_V_IU_V = PatternHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
-	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = PatternHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü][aeiou]|[^aeiou][ïü][^aeiou]", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_V_IU_V = RegexHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = RegexHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü]", Pattern.CASE_INSENSITIVE);
 	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static String PLURAL_NOUN_MASCULINE_RULE;
 	private static String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL;
@@ -99,15 +99,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
 		finalSonorizationFlag = rulesLoader.readProperty("finalSonorizationFlag");
 
-		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
+		PATTERN_NON_VANISHING_EL = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_NON_VANISHING_EL_NOT_AT_END = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingElNotAtEnd"),
+		PATTERN_NON_VANISHING_EL_NOT_AT_END = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingElNotAtEnd"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
+		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = RegexHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"),
+		PATTERN_PHONEME_CIJJHNHIV = RegexHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(rulesLoader.readProperty("patternNorthernPlural"),
+		PATTERN_NORTHERN_PLURAL = RegexHelper.pattern(rulesLoader.readProperty("patternNorthernPlural"),
 			Pattern.CASE_INSENSITIVE);
 
 		PLURAL_NOUN_MASCULINE_RULE = rulesLoader.readProperty("masculinePluralNoun");
@@ -153,17 +153,17 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final Set<LanguageVariant> variants = new HashSet<>();
 		for(final String subword : subwords){
 			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-				if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL))
+				if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL))
 					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 				if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
 						NORTHERN_PLURAL_STRESSED_RULE, subword}));
-				if(PatternHelper.find(subword, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
+				if(RegexHelper.find(subword, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
 					throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 
 				variants.add(LanguageVariant.VENETIAN);
 			}
-			else if(PatternHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
+			else if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
 					|| subword.contains(GraphemeVEC.GRAPHEME_D_STROKE) || subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
 				variants.add(LanguageVariant.NORTHERN);
 		}
@@ -205,7 +205,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String getRuleToCheckNorthernPlural(final String word){
 		final List<String> subwords = hyphenator.splitIntoCompounds(word);
 		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1))
-			|| PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
+			|| RegexHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 			NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 	}
 
@@ -276,13 +276,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void ciuiCheck(final String subword, final Production production){
 		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
-			if(PatternHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
+			if(RegexHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
 				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
 		}
 
-		if(PatternHelper.find(subword, PATTERN_V_IU_V))
+		if(RegexHelper.find(subword, PATTERN_V_IU_V))
 			throw new LinterException(WORD_CANNOT_HAVE_V_IU_V.format(new Object[]{production.getWord()}));
-		if(PatternHelper.find(subword, PATTERN_NOT_V_IU_DIERESIS_V))
+		if(RegexHelper.find(subword, PATTERN_NOT_V_IU_DIERESIS_V))
 			throw new LinterException(WORD_CANNOT_HAVE_NOT_V_IU_DIERESIS_V.format(new Object[]{production.getWord()}));
 	}
 

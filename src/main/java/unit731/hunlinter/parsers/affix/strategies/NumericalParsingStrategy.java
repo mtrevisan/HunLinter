@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 /**
@@ -24,7 +24,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((\\d+)\\)|([?*])");
+	private static final Pattern COMPOUND_RULE_SPLITTER = RegexHelper.pattern("\\((\\d+)\\)|([?*])");
 
 	private static class SingletonHelper{
 		private static final NumericalParsingStrategy INSTANCE = new NumericalParsingStrategy();
@@ -79,7 +79,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	@Override
 	public String[] extractCompoundRule(final String compoundRule){
-		final String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+		final String[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 

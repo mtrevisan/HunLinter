@@ -13,12 +13,12 @@ import java.util.stream.Collector;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class StringHelper{
 
-	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
+	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
 		/** All lower case or neutral case, e.g. "hello java" */
@@ -141,7 +141,7 @@ public class StringHelper{
 	}
 
 	public static String removeCombiningDiacriticalMarks(final String word){
-		return PatternHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
+		return RegexHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
 			StringUtils.EMPTY);
 	}
 

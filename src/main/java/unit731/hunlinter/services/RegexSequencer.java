@@ -8,14 +8,14 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.system.Memoizer;
 
 
-public class RegExpSequencer{
+public class RegexSequencer{
 
-	private static final Pattern PATTERN = PatternHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternHelper.split(seq, PATTERN)));
+	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: RegexHelper.split(seq, PATTERN)));
 
 
 	public static String[] splitSequence(final String sequence){

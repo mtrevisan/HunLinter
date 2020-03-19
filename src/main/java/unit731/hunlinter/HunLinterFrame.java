@@ -18,6 +18,7 @@ import unit731.hunlinter.actions.ExitAction;
 import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.IssueReporterAction;
 import unit731.hunlinter.actions.OnlineHelpAction;
+import unit731.hunlinter.actions.ProjectLoaderAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
@@ -44,7 +45,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -71,7 +71,7 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.RecentItems;
 
 
@@ -92,8 +92,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private static final long serialVersionUID = 6772959670167531135L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
-
-	private static final Pattern EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
@@ -568,7 +566,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	private void temporarilyChooseAFont(final Path basePath){
 		try{
 			final String content = new String(Files.readAllBytes(basePath));
-			final String[] extractions = PatternHelper.extract(content, EXTRACTOR, 10);
+			final String[] extractions = RegexHelper.extract(content, ProjectLoaderAction.LANGUAGE_SAMPLE_EXTRACTOR, 10);
 			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 				.mapToObj(Character::toString).collect(Collectors.toSet()));
 			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));

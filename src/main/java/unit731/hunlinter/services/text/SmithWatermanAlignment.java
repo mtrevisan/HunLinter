@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 
 
@@ -26,7 +26,7 @@ import unit731.hunlinter.services.system.LoopHelper;
  */
 public class SmithWatermanAlignment{
 
-	private static final Pattern UNICODE_SPLITTER = PatternHelper.pattern("(\\[([^\\]]+)\\]|[^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u035B\\u035D-\\u0360\\u0362-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*(?:[\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*[\\u035C\\u0361][^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*)?)");
+	private static final Pattern UNICODE_SPLITTER = RegexHelper.pattern("(\\[([^\\]]+)\\]|[^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u035B\\u035D-\\u0360\\u0362-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*(?:[\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*[\\u035C\\u0361][^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*)?)");
 
 	private static final double COST_GAP = -1.;
 	private static final double COST_MATCH = 2.;
@@ -57,8 +57,8 @@ public class SmithWatermanAlignment{
 
 
 	public SmithWatermanAlignment(String a, String b){
-		x = PatternHelper.split(a, UNICODE_SPLITTER);
-		y = PatternHelper.split(b, UNICODE_SPLITTER);
+		x = RegexHelper.split(a, UNICODE_SPLITTER);
+		y = RegexHelper.split(b, UNICODE_SPLITTER);
 
 		n = x.length;
 		m = y.length;

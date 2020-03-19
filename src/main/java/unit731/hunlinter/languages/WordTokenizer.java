@@ -1,7 +1,7 @@
 package unit731.hunlinter.languages;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class WordTokenizer implements WordTokenizerInterface{
 			.add(EMAIL)
 			.add(URL)
 		;
-		PATTERN_UNBREAKABLE = PatternHelper.pattern("(" + sj.toString() + ")");
+		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj.toString() + ")");
 	}
 
 	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +

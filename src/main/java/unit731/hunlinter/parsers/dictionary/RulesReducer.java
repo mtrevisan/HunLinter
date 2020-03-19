@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegExpSequencer;
+import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -32,7 +32,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
@@ -68,8 +68,8 @@ public class RulesReducer{
 		strategy = affixData.getFlagParsingStrategy();
 		this.wordGenerator = wordGenerator;
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
-		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegExpSequencer.splitSequence(entry.condition).length)
-			.thenComparingInt(entry -> StringUtils.countMatches(entry.condition, PatternHelper.GROUP_END))
+		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegexSequencer.splitSequence(entry.condition).length)
+			.thenComparingInt(entry -> StringUtils.countMatches(entry.condition, RegexHelper.GROUP_END))
 			.thenComparingInt(entry -> entry.removal.length())
 			.thenComparing(entry -> StringUtils.reverse(entry.condition), comparator)
 			.thenComparing(entry -> entry.removal, comparator)
@@ -164,7 +164,7 @@ public class RulesReducer{
 		final Map<String, LineEntry> map = new HashMap<>();
 		LoopHelper.forEach(plainRules, entry -> redistributeAddition(entry, map));
 		return SetHelper.collect(map.values(),
-			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),
+			entry -> entry.removal + TAB + entry.condition + TAB + RegexHelper.mergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
 	}
 
@@ -181,7 +181,7 @@ public class RulesReducer{
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return SetHelper.collect(rules,
-			entry -> entry.removal + TAB + PatternHelper.mergeSet(entry.addition, comparator) + TAB + entry.condition,
+			entry -> entry.removal + TAB + RegexHelper.mergeSet(entry.addition, comparator) + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
@@ -364,10 +364,10 @@ public class RulesReducer{
 			}
 
 			if(!notPresentConditions.isEmpty()){
-				final String notCondition = PatternHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
+				final String notCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
 				final Set<Character> overallLastGroup = new HashSet<>(overallLastGroups.get(parent.condition.length()));
 				overallLastGroup.removeAll(notPresentConditions);
-				final String yesCondition = PatternHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
+				final String yesCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 				final LineEntry notRule = LoopHelper.match(finalRules,
 					rule -> rule.condition.equals(notCondition) || rule.condition.equals(yesCondition));
 				if(notRule != null)
@@ -386,8 +386,8 @@ public class RulesReducer{
 					}
 
 					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()?
-						PatternHelper.makeGroup(notPresentConditions, comparator) + parent.condition:
-						PatternHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
+						RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition:
+						RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
 					final LineEntry newEntry = LineEntry.createFrom(parent, newCondition);
 					finalRules.add(newEntry);
 				}
@@ -405,11 +405,11 @@ public class RulesReducer{
 		final Set<Character> overallLastGroup = overallLastGroups.get(parentConditionLength);
 		final Set<Character> baseGroup = (chooseRatifyingOverNegated? parentGroup: childrenGroup);
 		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated?
-			PatternHelper::makeGroup:
-			PatternHelper::makeNotGroup);
+			RegexHelper::makeGroup:
+			RegexHelper::makeNotGroup);
 		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated?
-			PatternHelper::makeNotGroup:
-			PatternHelper::makeGroup);
+			RegexHelper::makeNotGroup:
+			RegexHelper::makeGroup);
 
 		final String preCondition;
 		if(overallLastGroup != null){
@@ -486,8 +486,8 @@ public class RulesReducer{
 			//calculate new condition
 			final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
 				childrenGroup);
-			final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
-				PatternHelper.makeNotGroup(childrenGroup, comparator));
+			final String preCondition = (chooseRatifyingOverNegated? RegexHelper.makeGroup(parentGroup, comparator):
+				RegexHelper.makeNotGroup(childrenGroup, comparator));
 			LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
 
 			//keep only rules that matches some existent words
@@ -611,20 +611,20 @@ public class RulesReducer{
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(final List<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
-			entry -> (entry.condition.contains(PatternHelper.GROUP_END)?
-			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB
-				+ RegExpSequencer.splitSequence(entry.condition).length:
+			entry -> (entry.condition.contains(RegexHelper.GROUP_END)?
+			entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
+				+ RegexSequencer.splitSequence(entry.condition).length:
 			null));
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
-				final String[] aCondition = RegExpSequencer.splitSequence(anEntry.condition);
+				final String[] aCondition = RegexSequencer.splitSequence(anEntry.condition);
 				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
 				final Set<Character> group = new HashSet<>();
-				LoopHelper.forEach(similarities, entry -> group.add(RegExpSequencer.splitSequence(entry.condition)[1].charAt(0)));
-				final String condition = StringUtils.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
+				LoopHelper.forEach(similarities, entry -> group.add(RegexSequencer.splitSequence(entry.condition)[1].charAt(0)));
+				final String condition = StringUtils.join(commonPreCondition) + RegexHelper.makeGroup(group, comparator)
 					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 

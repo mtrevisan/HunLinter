@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 /**
@@ -18,9 +18,9 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_TWO = new MessageFormat("Flag must be of length two: ''{0}''");
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by double-characters flags, or the optional operators '*' or '?: was ''{0}''");
 
-	private static final Pattern PATTERN = PatternHelper.pattern("(?<=\\G.{2})");
+	private static final Pattern PATTERN = RegexHelper.pattern("(?<=\\G.{2})");
 
-	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((..)\\)|([?*])");
+	private static final Pattern COMPOUND_RULE_SPLITTER = RegexHelper.pattern("\\((..)\\)|([?*])");
 
 	private static class SingletonHelper{
 		private static final DoubleASCIIParsingStrategy INSTANCE = new DoubleASCIIParsingStrategy();
@@ -49,7 +49,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	}
 
 	private String[] extractFlags(final String flags){
-		return PatternHelper.split(flags, PATTERN);
+		return RegexHelper.split(flags, PATTERN);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 
 	@Override
 	public String[] extractCompoundRule(final String compoundRule){
-		final String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+		final String[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 

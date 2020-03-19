@@ -270,7 +270,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			encoded = sequenceEncoder.encode(encoded, target, source);
 
-			assembled = BufferUtils.clearAndEnsureCapacity(assembled, target.remaining() + 1 + encoded.remaining() + 1 + tag.remaining());
+			assembled = BufferUtils.clearAndEnsureCapacity(assembled,
+				target.remaining() + 1 + encoded.remaining() + 1 + tag.remaining());
 
 			assembled.put(target);
 			assembled.put(separator);

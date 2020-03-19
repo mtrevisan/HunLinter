@@ -18,9 +18,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegExpSequencer;
+import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
@@ -32,9 +32,9 @@ public class LineEntry implements Serializable{
 
 	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word ''{2}'' that is too short");
 
-	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
+	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
-	public static final RegExpSequencer SEQUENCER_REGEXP = new RegExpSequencer();
+	public static final RegexSequencer SEQUENCER_REGEXP = new RegexSequencer();
 
 	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
@@ -87,10 +87,10 @@ public class LineEntry implements Serializable{
 	}
 
 	public List<String> extractFromEndingWith(final String suffix){
-		final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
+		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
 		final List<String> list = new ArrayList<>();
 		LoopHelper.applyIf(from,
-			word -> PatternHelper.find(word, conditionPattern),
+			word -> RegexHelper.find(word, conditionPattern),
 			list::add);
 		return list;
 	}
@@ -107,12 +107,12 @@ public class LineEntry implements Serializable{
 		final String reversedRemoval = StringUtils.reverse(removal);
 		final Set<String> reversedAddition = new HashSet<>(addition.size());
 		LoopHelper.forEach(addition, add -> {
-			final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
+			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
 		});
 		final String reversedCondition = LineEntry.SEQUENCER_REGEXP
-			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
+			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
@@ -153,9 +153,9 @@ public class LineEntry implements Serializable{
 		final String lcs = StringHelper.longestCommonSuffix(from);
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
-			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(condition));
+			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-				condition = PatternHelper.makeGroup(group, comparator) + lcs;
+				condition = RegexHelper.makeGroup(group, comparator) + lcs;
 		}
 	}
 

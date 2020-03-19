@@ -27,7 +27,7 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class DictionaryEntry{
@@ -38,7 +38,7 @@ public class DictionaryEntry{
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
+	private static final Pattern PATTERN_ENTRY = RegexHelper.pattern("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
 
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.system.LoopHelper;
 
 
-public class PatternHelper{
+public class RegexHelper{
 
 	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
 
@@ -21,7 +21,7 @@ public class PatternHelper{
 	public static final String GROUP_END = "]";
 
 
-	private PatternHelper(){}
+	private RegexHelper(){}
 
 	public static Pattern pattern(final String pattern){
 		return Pattern.compile(pattern);

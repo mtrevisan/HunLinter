@@ -5,7 +5,7 @@ import org.xml.sax.SAXException;
 import unit731.hunlinter.LanguageChooserDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class ProjectLoaderAction extends AbstractAction{
 
-	private static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = PatternHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
+	public static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = RegexHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 
 	private final Path projectPath;
@@ -107,7 +107,7 @@ public class ProjectLoaderAction extends AbstractAction{
 	private Font temporarilyChooseAFont() throws IOException{
 		final Path affixPath = packager.getAffixFile().toPath();
 		final String content = new String(Files.readAllBytes(affixPath));
-		final String[] extractions = PatternHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
+		final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 			.mapToObj(Character::toString).collect(Collectors.toSet()));
 		return GUIUtils.chooseBestFont(sample);

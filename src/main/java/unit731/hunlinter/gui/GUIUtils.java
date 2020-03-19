@@ -35,14 +35,14 @@ import unit731.hunlinter.FontChooserDialog;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class GUIUtils{
 
 	private static final String CLIENT_PROPERTY_KEY_FONTABLE = "fontable";
 
-	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
+	private static final Pattern PATTERN_HTML_CODE = RegexHelper.pattern("</?[^>]+>");
 
 	private static final String GRAPHEME_I = "i";
 	private static final String GRAPHEME_M = "m";
@@ -252,7 +252,7 @@ public class GUIUtils{
 
 
 	public static String removeHTMLCode(final String text){
-		return PatternHelper.clear(text, PATTERN_HTML_CODE);
+		return RegexHelper.clear(text, PATTERN_HTML_CODE);
 	}
 
 	/**

@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunlinter.collections.ahocorasicktrie.dtos.SearchResult;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class Hyphenator implements HyphenatorInterface{
@@ -114,7 +114,7 @@ public class Hyphenator implements HyphenatorInterface{
 	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns,
 			final HyphenationParser.Level level, final HyphenationOptions options){
 		//clear already present word boundaries' characters
-		word = PatternHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
+		word = RegexHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
 		final int wordSize = word.length();
 
 		final String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
@@ -197,7 +197,7 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 		else if(hypParser.getPatternNoHyphen() != null)
 			//apply retro-compatibility word separators
-			response = Arrays.asList(PatternHelper.split(word, hypParser.getPatternNoHyphen()));
+			response = Arrays.asList(RegexHelper.split(word, hypParser.getPatternNoHyphen()));
 		else
 			response = Collections.emptyList();
 		return response;
@@ -256,7 +256,7 @@ public class Hyphenator implements HyphenatorInterface{
 				//manage augmented patterns:
 				final String augmentedPatternData = hyphBreak.getRule(endIndex);
 				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
-					final int index = HyphenationParser.getIndexOfBreakpoint(PatternHelper.clear(augmentedPatternData,
+					final int index = HyphenationParser.getIndexOfBreakpoint(RegexHelper.clear(augmentedPatternData,
 						HyphenationParser.PATTERN_WORD_INITIAL));
 
 					final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(augmentedPatternData);
@@ -268,7 +268,7 @@ public class Hyphenator implements HyphenatorInterface{
 						if(start == null){
 							final String rule = m.group(HyphenationParser.PARAM_RULE);
 							start = Integer.toString(1);
-							cut = Integer.toString(PatternHelper.clear(rule, HyphenationParser.PATTERN_POINTS_AND_NUMBERS).length());
+							cut = Integer.toString(RegexHelper.clear(rule, HyphenationParser.PATTERN_POINTS_AND_NUMBERS).length());
 						}
 
 						//remove last characters from subword
@@ -296,7 +296,7 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private String removeNonStandardPart(final String rule){
-		return PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
+		return RegexHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
 	private int getNormalizedLength(final String word){

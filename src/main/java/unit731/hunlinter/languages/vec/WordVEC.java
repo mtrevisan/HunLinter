@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class WordVEC{
@@ -53,14 +53,14 @@ public class WordVEC{
 		}
 	}
 
-	private static final Pattern DEFAULT_STRESS_GROUP = PatternHelper.pattern("^((de)?fr|(ma|ko|x)?[lƚ]|n|apl|(in|re)st)au");
+	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au");
 
-	private static final String NO_STRESS_AVER = "^(r[aeiï]|ar)?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ESER = "^(r[aeiï]|ar)?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^((dex)?d|((dex)?asue|des|kon(tra–?)?|[lƚ]iku[ei]|mal–?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|sora|stra–?|st[ou]pe|tore|tume)?f|(kon(tra)?|mal–?|move|o|re|so(ra|to))?st)([ae]rà|[àé])-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_SAVER = "^(pre|r[ae]|ar|stra–?)?(sà|sav?arà)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(r[ae]|ar)?v[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_AVER = "^(?:r[aeiï]|ar)?g?(?:ar)?[àé]-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_ESER = "^(?:r[aeiï]|ar)?(?:(?:s[ae]r)?[àé]|[sx]é)-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex)?d|(?:(?:dex)?asue|des|kon(?:tra–?)?|[lƚ]iku[ei]|mal–?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|sora|stra–?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal–?|move|o|re|so(?:ra|to))?st)(?:[ae]rà|[àé])-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_SAVER = "^(?:pre|r[ae]|ar|stra–?)?(?:sà|sav?arà)-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_ANDAR = "^(?:r[ae]|ar)?v[àé]-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_TRAER = "^(?:|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		final StringJoiner sj = (new StringJoiner(PIPE))
@@ -70,7 +70,7 @@ public class WordVEC{
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER);
-		PREVENT_UNMARK_STRESS = PatternHelper.pattern(sj.toString());
+		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 
 	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
@@ -180,7 +180,7 @@ public class WordVEC{
 			//default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
 				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
-			if(stressIndex >= 0 && PatternHelper.find(phones, DEFAULT_STRESS_GROUP))
+			if(stressIndex >= 0 && RegexHelper.find(phones, DEFAULT_STRESS_GROUP))
 				stressIndex --;
 			else if(stressIndex < 0)
 				stressIndex = lastChar;
@@ -200,7 +200,7 @@ public class WordVEC{
 				&& word.charAt(stressIndex + 1) != HyphenationParser.EN_DASH.charAt(0)
 				&& !GraphemeVEC.isDiphtong(word)
 				&& !GraphemeVEC.isHyatus(word)
-				&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
+				&& !RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
 			final String tmp = suppressStress(word);
 			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 				word = tmp;

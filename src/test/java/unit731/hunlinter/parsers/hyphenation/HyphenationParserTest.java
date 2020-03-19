@@ -13,12 +13,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 class HyphenationParserTest{
 
-	private static final Pattern PATTERN_CLEANER = PatternHelper.pattern("\\d|/.+$");
+	private static final Pattern PATTERN_CLEANER = RegexHelper.pattern("\\d|/.+$");
 
 
 	@Test
@@ -690,7 +690,7 @@ class HyphenationParserTest{
 	}
 
 	private String getKeyFromData(String rule){
-		return PatternHelper.replaceAll(rule, PATTERN_CLEANER, StringUtils.EMPTY);
+		return RegexHelper.replaceAll(rule, PATTERN_CLEANER, StringUtils.EMPTY);
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){

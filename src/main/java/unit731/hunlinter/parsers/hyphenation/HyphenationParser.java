@@ -30,7 +30,7 @@ import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 /**
@@ -83,12 +83,12 @@ public class HyphenationParser{
 	private static final String COMMA = ",";
 
 	private static final String ESCAPE_SEQUENCE = "^^";
-	private static final Pattern PATTERN_ESCAPED_UNICODE = PatternHelper.pattern("(\\^{2}[a-fA-F0-9]{2})|.");
-	private static final Pattern PATTERN_VALID_RULE = PatternHelper.pattern("^\\.?[^.]+\\.?$");
-	private static final Pattern PATTERN_VALID_RULE_BREAK_POINTS = PatternHelper.pattern("[\\d]");
-	private static final Pattern PATTERN_INVALID_RULE_START = PatternHelper.pattern("^\\.[\\d]");
-	private static final Pattern PATTERN_INVALID_RULE_END = PatternHelper.pattern("[\\d]\\.$");
-	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = PatternHelper.pattern("[13579]");
+	private static final Pattern PATTERN_ESCAPED_UNICODE = RegexHelper.pattern("(\\^{2}[a-fA-F0-9]{2})|.");
+	private static final Pattern PATTERN_VALID_RULE = RegexHelper.pattern("^\\.?[^.]+\\.?$");
+	private static final Pattern PATTERN_VALID_RULE_BREAK_POINTS = RegexHelper.pattern("[\\d]");
+	private static final Pattern PATTERN_INVALID_RULE_START = RegexHelper.pattern("^\\.[\\d]");
+	private static final Pattern PATTERN_INVALID_RULE_END = RegexHelper.pattern("[\\d]\\.$");
+	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = RegexHelper.pattern("[13579]");
 
 	public static final int PARAM_RULE = 1;
 	public static final int PARAM_ADD_BEFORE = 2;
@@ -96,17 +96,17 @@ public class HyphenationParser{
 	public static final int PARAM_ADD_AFTER = 4;
 	public static final int PARAM_START = 5;
 	public static final int PARAM_CUT = 6;
-	public static final Pattern PATTERN_AUGMENTED_RULE = PatternHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	public static final Pattern PATTERN_POINTS_AND_NUMBERS = PatternHelper.pattern("[.\\d]");
-	public static final Pattern PATTERN_WORD_INITIAL = PatternHelper.pattern("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	public static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
+	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
-	public static final Pattern PATTERN_WORD_BOUNDARIES = PatternHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
-	private static final Pattern PATTERN_KEY = PatternHelper.pattern("[\\d=]|/.+$");
-	private static final Pattern PATTERN_HYPHENATION_POINT = PatternHelper.pattern("[^13579]|/.+$");
+	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
+	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
 
-	public static final Pattern PATTERN_REDUCE = PatternHelper.pattern("/.+$");
-	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^$|\\s*[%#].*$");
+	public static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
+	private static final Pattern PATTERN_COMMENT = RegexHelper.pattern("^$|\\s*[%#].*$");
 
 	public enum Level{NON_COMPOUND, COMPOUND}
 
@@ -251,7 +251,7 @@ public class HyphenationParser{
 
 	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
 	private String convertUnicode(final String line){
-		final String[] components = PatternHelper.extract(line, PATTERN_ESCAPED_UNICODE);
+		final String[] components = RegexHelper.extract(line, PATTERN_ESCAPED_UNICODE);
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
@@ -279,11 +279,11 @@ public class HyphenationParser{
 
 	private void addDefaults(final Level level, final Charset charset){
 		//dash and apostrophe are added by default (retro-compatibility)
-		final List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
-		if(charset == StandardCharsets.UTF_8)
-			retroCompatibilityNoHyphen.addAll(Arrays.asList(String.valueOf(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH));
+		final List<String> retroCompatibilityNoHyphen = (charset == StandardCharsets.UTF_8?
+			Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH):
+			Arrays.asList(APOSTROPHE, MINUS_SIGN));
 
-		patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
+		patternNoHyphen = RegexHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
 
 		options.getNoHyphen()
 			.addAll(retroCompatibilityNoHyphen);
@@ -309,8 +309,8 @@ public class HyphenationParser{
 		final String foundNodeValue = rules.get(level)
 			.get(key);
 		if(foundNodeValue != null){
-			final String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
-			final String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
+			final String clearedLine = RegexHelper.clear(line, PATTERN_REDUCE);
+			final String clearedFoundNodeValue = RegexHelper.clear(foundNodeValue, PATTERN_REDUCE);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
 		return duplicatedRule;
@@ -324,7 +324,7 @@ public class HyphenationParser{
 	 */
 	private static String removeComment(String line){
 		//remove comments
-		line = PatternHelper.clear(line, PATTERN_COMMENT);
+		line = RegexHelper.clear(line, PATTERN_COMMENT);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}
@@ -420,18 +420,18 @@ public class HyphenationParser{
 	}
 
 	private static void validateBasicRules(final String rule){
-		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
+		if(!RegexHelper.find(rule, PATTERN_VALID_RULE))
 			throw new LinterException(INVALID_RULE.format(new Object[]{rule}));
 		if(!StringUtils.contains(rule, EQUALS_SIGN)){
-			if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
+			if(!RegexHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
 				throw new LinterException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
-			if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
+			if(RegexHelper.find(rule, PATTERN_INVALID_RULE_START) || RegexHelper.find(rule, PATTERN_INVALID_RULE_END))
 				throw new LinterException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
 		}
 	}
 
 	private static void validateAugmentedRule(final String cleanedRule, final String rule){
-		final int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
+		final int count = RegexHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
 			throw new LinterException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
 
@@ -530,7 +530,7 @@ public class HyphenationParser{
 	}
 
 	public static String getKeyFromData(final String rule){
-		return PatternHelper.clear(rule, PATTERN_KEY);
+		return RegexHelper.clear(rule, PATTERN_KEY);
 	}
 
 }

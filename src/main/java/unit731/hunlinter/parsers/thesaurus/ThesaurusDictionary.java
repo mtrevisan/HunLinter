@@ -14,13 +14,13 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class ThesaurusDictionary{
 
-	public static final Pattern PATTERN_SYNONYM_USE = PatternHelper.pattern("\\s*\\([^)]+\\)");
+	public static final Pattern PATTERN_SYNONYM_USE = RegexHelper.pattern("\\s*\\([^)]+\\)");
 
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String PART_OF_SPEECH_START = "(";
@@ -157,7 +157,7 @@ public class ThesaurusDictionary{
 	}
 
 	public static String removeSynonymUse(final String synonym){
-		return PatternHelper.replaceAll(synonym, PATTERN_SYNONYM_USE, StringUtils.EMPTY);
+		return RegexHelper.replaceAll(synonym, PATTERN_SYNONYM_USE, StringUtils.EMPTY);
 	}
 
 }

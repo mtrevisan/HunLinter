@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
 
@@ -43,11 +43,11 @@ public class ThesaurusParser{
 	private static final String PART_OF_SPEECH_START = "(";
 	private static final String PART_OF_SPEECH_END = ")";
 
-	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
+	private static final Pattern PATTERN_PARENTHESIS = RegexHelper.pattern("\\([^)]+\\)");
 
-	private static final Pattern PATTERN_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
-	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
-	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("(,|\\|)+");
+	private static final Pattern PATTERN_CLEAR_SEARCH = RegexHelper.pattern("\\s+\\([^)]+\\)");
+	private static final Pattern PATTERN_FILTER_EMPTY = RegexHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
+	private static final Pattern PATTERN_FILTER_OR = RegexHelper.pattern("(,|\\|)+");
 
 	private final ThesaurusDictionary dictionary;
 
@@ -171,9 +171,9 @@ public class ThesaurusParser{
 
 		text = clearFilter(text);
 
-		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
-		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
-		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
+		text = RegexHelper.clear(text, PATTERN_FILTER_EMPTY);
+		text = RegexHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
+		text = RegexHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
 		//compose filter regexp
 		return Pair.of(pos, StringUtils.split(text, PIPE));
@@ -226,7 +226,7 @@ public class ThesaurusParser{
 		//escape special characters
 		text = Matcher.quoteReplacement(text);
 		//remove all \s+([^)]+)
-		return PatternHelper.clear(text, PATTERN_CLEAR_SEARCH);
+		return RegexHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}
 
 	public void clear(){

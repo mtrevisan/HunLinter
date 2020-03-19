@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 public class ParserHelper{
 
-	public static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^\\s*[#\\/].*$");
+	public static final Pattern PATTERN_COMMENT = RegexHelper.pattern("^\\s*[#\\/].*$");
 
 
 	public static boolean isComment(final String line){
-		return PatternHelper.find(line, PATTERN_COMMENT);
+		return RegexHelper.find(line, PATTERN_COMMENT);
 	}
 
 	public static String extractLine(final BufferedReader br) throws IOException{
@@ -33,7 +33,7 @@ public class ParserHelper{
 	 */
 	public static String cleanLine(String line){
 		//remove comments
-		line = PatternHelper.clear(line, PATTERN_COMMENT);
+		line = RegexHelper.clear(line, PATTERN_COMMENT);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;

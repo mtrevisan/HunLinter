@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 class GraphemeVEC{
@@ -29,19 +29,19 @@ class GraphemeVEC{
 	public static final String GRAPHEME_T_STROKE = "ŧ";
 	public static final String GRAPHEME_X = "x";
 
-	private static final Pattern DIPHTONG1 = PatternHelper.pattern("[àèéíòóú][aeoiu]");
-	private static final Pattern DIPHTONG2 = PatternHelper.pattern("[aeo][aeo]");
-	private static final Pattern HYATUS = PatternHelper.pattern("[aeïoü][aàeèéiíoòóuú]|[iu][íú]");
+	private static final Pattern DIPHTONG1 = RegexHelper.pattern("[àèéíòóú][aeoiu]");
+	private static final Pattern DIPHTONG2 = RegexHelper.pattern("[aeo][aeo]");
+	private static final Pattern HYATUS = RegexHelper.pattern("[aeïoü][aàeèéiíoòóuú]|[iu][íú]");
 
-	private static final Pattern ETEROPHONIC_SEQUENCE = PatternHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
-	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
-	private static final Pattern ETEROPHONIC_SEQUENCE_J = PatternHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
+	private static final Pattern ETEROPHONIC_SEQUENCE = RegexHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
+	private static final Pattern ETEROPHONIC_SEQUENCE_W = RegexHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
+	private static final Pattern ETEROPHONIC_SEQUENCE_J = RegexHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 
 
 	private GraphemeVEC(){}
 
 	public static boolean isDiphtong(final String word){
-		if(PatternHelper.find(word, DIPHTONG1))
+		if(RegexHelper.find(word, DIPHTONG1))
 			return true;
 
 		final Matcher m = DIPHTONG2.matcher(word);
@@ -49,11 +49,11 @@ class GraphemeVEC{
 	}
 
 	public static boolean isHyatus(final String word){
-		return PatternHelper.find(word, HYATUS);
+		return RegexHelper.find(word, HYATUS);
 	}
 
 	public static boolean isEterophonicSequence(final String group){
-		return PatternHelper.find(group, ETEROPHONIC_SEQUENCE);
+		return RegexHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
 
@@ -70,9 +70,9 @@ class GraphemeVEC{
 
 		//phonize etherophonic sequences
 		if(phonemizedWord.contains(GRAPHEME_U))
-			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_W, "$1" + GRAPHEME_W + "$2");
+			phonemizedWord = RegexHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_W, "$1" + GRAPHEME_W + "$2");
 		if(phonemizedWord.contains(GRAPHEME_I))
-			phonemizedWord = PatternHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1" + GRAPHEME_J + "$2");
+			phonemizedWord = RegexHelper.replaceAll(phonemizedWord, ETEROPHONIC_SEQUENCE_J, "$1" + GRAPHEME_J + "$2");
 
 		return phonemizedWord;
 	}
@@ -88,7 +88,7 @@ class GraphemeVEC{
 	private static String correctGrapheme(String word, final String grapheme, final List<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
 		if(word.contains(grapheme))
 			for(final Pattern p : eterophonicSequenceFalsePositives)
-				word = PatternHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
+				word = RegexHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
 		return word;
 	}
 

@@ -18,7 +18,7 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.services.ArraySet;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class AffixEntry{
@@ -34,7 +34,7 @@ public class AffixEntry{
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
-	private static final Pattern PATTERN_LINE = PatternHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
+	private static final Pattern PATTERN_LINE = RegexHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
 	private static final String TAB = "\t";
 	private static final String SLASH = "/";
