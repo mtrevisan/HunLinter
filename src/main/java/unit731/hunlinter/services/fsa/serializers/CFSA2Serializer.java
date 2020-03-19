@@ -125,8 +125,7 @@ public class CFSA2Serializer implements FSASerializer{
 		//compute labels count
 		final int[] countByValue = new int[256];
 		fsa.visitAllStates(state -> {
-			int arc = fsa.getFirstArc(state);
-			while((arc = fsa.getNextArc(arc)) != 0)
+			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
 				countByValue[fsa.getArcLabel(arc) & 0xFF] ++;
 			return true;
 		});
@@ -147,7 +146,9 @@ public class CFSA2Serializer implements FSASerializer{
 		for(final FSAUtils.IntIntHolder p : labelAndCount){
 			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte)p.a;
-			i --;
+
+			if((-- i) < 0)
+				break;
 		}
 	}
 
