@@ -25,9 +25,12 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class DictionaryEntry{
@@ -109,7 +112,7 @@ public class DictionaryEntry{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
+		return (match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
 	}
 
 //	public static String extractWord(final String line){
@@ -149,7 +152,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix::apply)) != null);
+		return (match(continuationFlags, Predicate.not(isTerminalAffix::apply)) != null);
 	}
 
 	public int getContinuationFlagCount(){
@@ -163,7 +166,7 @@ public class DictionaryEntry{
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
-			return (LoopHelper.match(flags, Predicate.not(list::add)) != null);
+			return (match(flags, Predicate.not(list::add)) != null);
 		}
 		return false;
 	}
@@ -193,7 +196,7 @@ public class DictionaryEntry{
 
 	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, List<DictionaryEntry>> result = new HashMap<>();
-		LoopHelper.applyIf(continuationFlags,
+		applyIf(continuationFlags,
 			affixData::isManagedByCompoundRule,
 			flag -> result.computeIfAbsent(flag, k -> new ArrayList<>(1)).add(this));
 		return result;
@@ -205,7 +208,7 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new ArrayList<>());
 		distribution.put(compoundMiddleFlag, new ArrayList<>());
 		distribution.put(compoundEndFlag, new ArrayList<>());
-		LoopHelper.forEach(continuationFlags, flag -> {
+		forEach(continuationFlags, flag -> {
 			final List<DictionaryEntry> entries = distribution.get(flag);
 			if(entries != null)
 				entries.add(this);
@@ -214,7 +217,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(){
-		return (LoopHelper.match(morphologicalFields, MorphologicalTag.PART_OF_SPEECH::isSupertypeOf) != null);
+		return (match(morphologicalFields, MorphologicalTag.PART_OF_SPEECH::isSupertypeOf) != null);
 	}
 
 	/**
@@ -235,14 +238,14 @@ public class DictionaryEntry{
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
 		final List<String> list = new ArrayList<>(morphologicalFields.length);
-		LoopHelper.applyIf(morphologicalFields,
+		applyIf(morphologicalFields,
 			mf -> mf.startsWith(tag),
 			list::add);
 		return list.toArray(String[]::new);
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		LoopHelper.forEach(morphologicalFields, fun);
+		forEach(morphologicalFields, fun);
 	}
 
 	/**

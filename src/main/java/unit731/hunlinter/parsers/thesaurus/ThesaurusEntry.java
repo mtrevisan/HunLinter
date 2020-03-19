@@ -17,7 +17,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
@@ -84,7 +86,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		final Set<String> set = new HashSet<>();
 		for(final SynonymsEntry synonym : synonyms){
 			final List<String> synonymsEntrySynonyms = synonym.getSynonyms();
-			LoopHelper.forEach(synonymsEntrySynonyms, set::add);
+			forEach(synonymsEntrySynonyms, set::add);
 		}
 		return set;
 	}
@@ -97,7 +99,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return synonyms.stream()
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
-		return (LoopHelper.match(synonyms, entry -> entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym)) != null);
+		return (match(synonyms, entry -> entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym)) != null);
 //		for(SynonymsEntry entry : synonyms)
 //			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
 //				return entry.containsSynonym(synonym);
@@ -106,13 +108,13 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && LoopHelper.match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
+		return (ss.remove(definition) && match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
 	}
 
 	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && LoopHelper.match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
-			|| LoopHelper.match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
+		return (ss.remove(definition) && match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
+			|| match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
@@ -139,7 +141,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	@Override
 	public String toString(){
 		final StringJoiner sj = new StringJoiner("\r\n");
-		LoopHelper.forEach(synonyms, synonym -> sj.add(definition + ": " + String.join(", ", synonym.toString())));
+		forEach(synonyms, synonym -> sj.add(definition + ": " + String.join(", ", synonym.toString())));
 		return sj.toString();
 	}
 

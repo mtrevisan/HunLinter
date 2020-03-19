@@ -30,13 +30,14 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.Duplicate;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DuplicatesWorker extends WorkerDictionary{
@@ -257,7 +258,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						+ "): ";
 					writer.write(origin);
 					final StringJoiner sj = new StringJoiner(", ");
-					LoopHelper.forEach(entries,
+					forEach(entries,
 						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
 					writer.write(sj.toString());
 					writer.newLine();

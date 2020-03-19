@@ -21,11 +21,12 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class RulesReducerWorker extends WorkerDictionary{
@@ -77,7 +78,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines);
 
-				LoopHelper.forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
+				forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
 			}
 			catch(final Exception e){
 				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());

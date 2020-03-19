@@ -1,7 +1,5 @@
 package unit731.hunlinter.services;
 
-import unit731.hunlinter.services.system.LoopHelper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +15,8 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class SetHelper{
@@ -109,7 +109,7 @@ public class SetHelper{
 	 */
 	public static <T> Set<T> union(final Collection<Set<T>> sets){
 		final Set<T> union = new HashSet<>();
-		LoopHelper.forEach(sets, union::addAll);
+		forEach(sets, union::addAll);
 		return union;
 	}
 
@@ -265,13 +265,13 @@ public class SetHelper{
 		final List<V> result = new ArrayList<>();
 		for(final List<V> duplicates : getDuplicatesMap(list).values())
 			if(duplicates.size() > 1)
-				LoopHelper.forEach(duplicates, result::add);
+				forEach(duplicates, result::add);
 		return result;
 	}
 
 	private static <V> Map<V, List<V>> getDuplicatesMap(final List<V> personList){
 		final Map<V, List<V>> map = new HashMap<>();
-		LoopHelper.forEach(personList, v -> map.computeIfAbsent(v, k -> new ArrayList<>()).add(v));
+		forEach(personList, v -> map.computeIfAbsent(v, k -> new ArrayList<>()).add(v));
 		return map;
 	}
 

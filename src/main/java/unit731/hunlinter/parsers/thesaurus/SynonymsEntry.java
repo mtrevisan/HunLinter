@@ -16,8 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class SynonymsEntry implements Comparable<SynonymsEntry>{
@@ -90,7 +91,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public boolean containsSynonym(final String synonym){
-		return (LoopHelper.match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
+		return (match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
 	}
 
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){

@@ -27,11 +27,12 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -113,7 +114,7 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		LoopHelper.forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>()));
+		forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>()));
 	}
 
 	private final Comparator<String> comparator;
@@ -146,7 +147,7 @@ public class HyphenationParser{
 		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		LoopHelper.forEach(Level.values(), level -> this.patterns.put(level, patterns.get(level)));
+		forEach(Level.values(), level -> this.patterns.put(level, patterns.get(level)));
 		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new HashMap<>(0));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
@@ -232,7 +233,7 @@ public class HyphenationParser{
 		}
 
 		//build tries
-		LoopHelper.forEach(Level.values(), lev -> buildTrie(lev, rules.get(lev)));
+		forEach(Level.values(), lev -> buildTrie(lev, rules.get(lev)));
 
 		secondLevelPresent = (level == Level.COMPOUND);
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
@@ -318,10 +319,10 @@ public class HyphenationParser{
 	public void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
-		LoopHelper.forEach(Level.values(), lev -> rules.get(lev).clear());
+		forEach(Level.values(), lev -> rules.get(lev).clear());
 		patterns.clear();
-		LoopHelper.forEach(Level.values(), lev -> REDUCED_PATTERNS.get(lev).clear());
-		LoopHelper.forEach(customHyphenations.values(), Map::clear);
+		forEach(Level.values(), lev -> REDUCED_PATTERNS.get(lev).clear());
+		forEach(customHyphenations.values(), Map::clear);
 		options.clear();
 	}
 

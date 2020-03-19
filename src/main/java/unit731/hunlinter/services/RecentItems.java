@@ -6,7 +6,8 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -84,7 +85,7 @@ public class RecentItems{
 	}
 
 	private void update(){
-		LoopHelper.forEach(observers, observer -> observer.onRecentItemChange(this));
+		forEach(observers, observer -> observer.onRecentItemChange(this));
 
 		storeToPreferences();
 	}

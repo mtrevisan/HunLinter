@@ -16,9 +16,13 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.services.ArraySet;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
+import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
 public class AffixEntry{
@@ -169,7 +173,7 @@ public class AffixEntry{
 		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
 			MorphologicalTag.TERMINAL_PREFIX);
 		//remove inflectional and terminal suffixes
-		LoopHelper.removeIf(mf, field ->
+		removeIf(mf, field ->
 			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
 			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
 
@@ -178,19 +182,19 @@ public class AffixEntry{
 	}
 
 	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
-		return (LoopHelper.match(tags, tag -> LoopHelper.match(amf, tag::isSupertypeOf) != null) != null);
+		return (match(tags, tag -> match(amf, tag::isSupertypeOf) != null) != null);
 	}
 
 	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
 		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
-		LoopHelper.forEach(compoundEntries, compoundEntry -> {
+		forEach(compoundEntries, compoundEntry -> {
 			final String compound = compoundEntry.getWord();
 			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.PART.attachValue(compound)}, compoundEntry.morphologicalFields));
 		});
 
 		final List<String> list = new ArrayList<>();
 		for(final String[] strings : mf)
-			LoopHelper.forEach(strings, list::add);
+			forEach(strings, list::add);
 		return list.toArray(new String[0]);
 	}
 
@@ -208,7 +212,7 @@ public class AffixEntry{
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
 		final List<String> collector = new ArrayList<>();
-		LoopHelper.applyIf(morphologicalFields, df -> df.startsWith(tag), df -> collector.add(df.substring(purgeTag)));
+		applyIf(morphologicalFields, df -> df.startsWith(tag), df -> collector.add(df.substring(purgeTag)));
 		return collector;
 	}
 

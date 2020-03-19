@@ -16,8 +16,10 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class Production extends DictionaryEntry{
@@ -160,7 +162,7 @@ public class Production extends DictionaryEntry{
 
 	public String getRulesSequence(){
 		final StringJoiner sj = new StringJoiner(LEADS_TO);
-		LoopHelper.forEach(appliedRules, rule -> sj.add(rule.getFlag()));
+		forEach(appliedRules, rule -> sj.add(rule.getFlag()));
 		return sj.toString();
 	}
 
@@ -197,10 +199,10 @@ public class Production extends DictionaryEntry{
 
 		final StringJoiner sj = new StringJoiner(POS_FSA_TAG_SEPARATOR);
 		sj.add(PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
-		LoopHelper.forEach(suffixInflection,
-			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
-		LoopHelper.forEach(prefixInflection,
-			code -> LoopHelper.forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
+		forEach(suffixInflection,
+			code -> forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
+		forEach(prefixInflection,
+			code -> forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
 
 		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj;
 		//extract stem
@@ -214,8 +216,8 @@ public class Production extends DictionaryEntry{
 		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
 		final List<MorphologicalTag> mtags = Arrays.asList(MorphologicalTag.PART_OF_SPEECH, MorphologicalTag.INFLECTIONAL_SUFFIX,
 			MorphologicalTag.INFLECTIONAL_PREFIX, MorphologicalTag.STEM);
-		LoopHelper.forEach(morphologicalFields, mf -> {
-			final MorphologicalTag matchedTag = LoopHelper.match(mtags, tag -> tag.isSupertypeOf(mf));
+		forEach(morphologicalFields, mf -> {
+			final MorphologicalTag matchedTag = match(mtags, tag -> tag.isSupertypeOf(mf));
 			if(matchedTag != null)
 				bucket.computeIfAbsent(matchedTag, k -> new ArrayList<>(1))
 					.add(mf.substring(matchedTag.getCode().length()));

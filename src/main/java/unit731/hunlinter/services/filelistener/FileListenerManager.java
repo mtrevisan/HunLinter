@@ -26,7 +26,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 /**
@@ -134,7 +137,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){
 		final Set<PathMatcher> filePatterns = newConcurrentSet();
-		LoopHelper.forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
+		forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
@@ -229,14 +232,14 @@ public class FileListenerManager implements FileListener, Runnable{
 				final Path dir = getDirPath(key);
 				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
-				LoopHelper.forEach(listeners, listener -> listenerMethod.accept(listener, file));
+				forEach(listeners, listener -> listenerMethod.accept(listener, file));
 			}
 		}
 	}
 
 	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
 		final Set<FileChangeListener> set = new HashSet<>();
-		LoopHelper.applyIf(getListeners(dir),
+		applyIf(getListeners(dir),
 			list -> matchesAny(file, getPatterns(list)),
 			set::add);
 		return set;
@@ -247,7 +250,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	public boolean matchesAny(final Path input, final Set<PathMatcher> patterns){
-		return (LoopHelper.match(patterns, pattern -> matches(input, pattern)) != null);
+		return (match(patterns, pattern -> matches(input, pattern)) != null);
 	}
 
 	public boolean matches(final Path input, final PathMatcher pattern){

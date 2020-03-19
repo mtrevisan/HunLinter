@@ -15,7 +15,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class ThesaurusDictionary{
@@ -42,11 +45,11 @@ public class ThesaurusDictionary{
 
 	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
-		LoopHelper.forEach(partOfSpeeches, sj::add);
+		forEach(partOfSpeeches, sj::add);
 		final String wholePartOfSpeeches = sj.toString();
 		final List<String> uniqueSynonyms = new ArrayList<>();
 		final Set<String> uniqueValues = new HashSet<>();
-		LoopHelper.forEach(synonyms, synonym -> {
+		forEach(synonyms, synonym -> {
 			final String s = synonym.toLowerCase(Locale.ROOT);
 			if(uniqueValues.add(s))
 				uniqueSynonyms.add(s);
@@ -78,7 +81,7 @@ public class ThesaurusDictionary{
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		LoopHelper.applyIf(synonyms,
+		applyIf(synonyms,
 			synonym -> !synonym.equals(definition),
 			sj::add);
 		return new SynonymsEntry(sj.toString());
@@ -94,7 +97,7 @@ public class ThesaurusDictionary{
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
-		return (LoopHelper.match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
+		return (match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
 	}
 
 	//FIXME? remove only one entry?
@@ -150,7 +153,7 @@ public class ThesaurusDictionary{
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);
 		final List<ThesaurusEntry> list = new ArrayList<>();
-		LoopHelper.applyIf(dictionary.values(),
+		applyIf(dictionary.values(),
 			entry -> entry.intersects(pos, syns),
 			list::add);
 		return list;

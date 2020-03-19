@@ -22,9 +22,12 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class AffixData{
@@ -113,7 +116,7 @@ public class AffixData{
 
 	private List<String> getStringData(final AffixOption... keys){
 		final List<String> strings = new ArrayList<>(keys.length);
-		LoopHelper.forEach(keys, key -> strings.add(getData(key)));
+		forEach(keys, key -> strings.add(getData(key)));
 		return strings;
 	}
 
@@ -158,7 +161,7 @@ public class AffixData{
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		return (LoopHelper.match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
+		return (match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
 	}
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
@@ -214,7 +217,7 @@ public class AffixData{
 
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
 		final List<AffixEntry> list = new ArrayList<>();
-		LoopHelper.applyIf(entries,
+		applyIf(entries,
 			entry -> entry.canApplyTo(word),
 			list::add);
 		return list;
@@ -330,7 +333,7 @@ public class AffixData{
 
 	public List<RuleEntry> getRuleEntries(){
 		final List<RuleEntry> list = new ArrayList<>();
-		LoopHelper.applyIf(data.values(),
+		applyIf(data.values(),
 			entry -> RuleEntry.class.isAssignableFrom(entry.getClass()),
 			entry -> list.add((RuleEntry)entry));
 		return list;

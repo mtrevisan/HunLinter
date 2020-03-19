@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.enums;
 
-import unit731.hunlinter.services.system.LoopHelper;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public enum MorphologicalTag{
@@ -35,7 +35,7 @@ public enum MorphologicalTag{
 	}
 
 	public static MorphologicalTag createFromCode(final String code){
-		return LoopHelper.match(values(), tag -> tag.isSupertypeOf(code));
+		return match(values(), tag -> tag.isSupertypeOf(code));
 	}
 
 	public String getCode(){

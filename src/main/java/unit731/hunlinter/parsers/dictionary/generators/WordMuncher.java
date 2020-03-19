@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -18,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 //https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
@@ -64,7 +65,7 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			LoopHelper.forEach(originators, production -> LOGGER.trace("Inferred word: {}", production));
+			forEach(originators, production -> LOGGER.trace("Inferred word: {}", production));
 		return originators;
 	}
 

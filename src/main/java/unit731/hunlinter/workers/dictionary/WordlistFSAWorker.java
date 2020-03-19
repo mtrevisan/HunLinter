@@ -10,7 +10,6 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -31,6 +30,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class WordlistFSAWorker extends WorkerDictionary{
@@ -55,7 +56,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			LoopHelper.forEach(productions, prod -> words.add(prod.toString()));
+			forEach(productions, prod -> words.add(prod.toString()));
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {

@@ -10,7 +10,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -83,7 +84,7 @@ public class RadixTrieNode{
 	 * @param childrenIds	Id of the children to add
 	 */
 	public void addChildrenIds(final Collection<Integer> childrenIds){
-		LoopHelper.forEach(childrenIds, this::addChildrenId);
+		forEach(childrenIds, this::addChildrenId);
 	}
 
 	/**

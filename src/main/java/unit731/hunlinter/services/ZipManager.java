@@ -3,7 +3,6 @@ package unit731.hunlinter.services;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.system.LoopHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -19,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class ZipManager{
@@ -67,7 +68,7 @@ public class ZipManager{
 					.map(Path::getParent)
 					.map(Path::toString)
 					.toArray(String[]::new);
-				process = (LoopHelper.match(includeFolders, folder::startsWith) == null);
+				process = (match(includeFolders, folder::startsWith) == null);
 			}
 			if(process)
 				filteredFolders.add(folder);

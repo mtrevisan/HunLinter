@@ -21,7 +21,9 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -218,7 +220,7 @@ public class ExternalSorter{
 		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),
 			options.getCharset()));
 		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
-		LoopHelper.forEach(files, File::delete);
+		forEach(files, File::delete);
 		return rowCounter;
 	}
 
@@ -236,7 +238,7 @@ public class ExternalSorter{
 			final List<BinaryFileBuffer> buffers) throws IOException{
 		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11,
 			(i, j) -> options.getComparator().compare(i.peek(), j.peek()));
-		LoopHelper.applyIf(buffers, Predicate.not(BinaryFileBuffer::empty), queue::add);
+		applyIf(buffers, Predicate.not(BinaryFileBuffer::empty), queue::add);
 		int rowCounter = 0;
 		try(writer){
 			if(options.isRemoveDuplicates())

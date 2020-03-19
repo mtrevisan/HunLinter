@@ -20,7 +20,6 @@ import unit731.hunlinter.services.fsa.stemming.Dictionary;
 import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -47,6 +46,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class PoSFSAWorker extends WorkerDictionary{
@@ -84,13 +85,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			LoopHelper.forEach(productions, production -> {
+			forEach(productions, production -> {
 				final List<String> lines = production.toStringPoSFSA();
 
 				//encode lines
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
 
-				LoopHelper.forEach(encodedLines, line -> writeLine(writer, line));
+				forEach(encodedLines, line -> writeLine(writer, line));
 			});
 		};
 		final FSABuilder builder = new FSABuilder();

@@ -8,7 +8,8 @@ import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -115,7 +116,7 @@ public final class Digraph<T>{
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			final StringJoiner transitions = new StringJoiner(", ");
-			LoopHelper.forEach(adjacency.get(v),
+			forEach(adjacency.get(v),
 				w -> transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")"));
 			s.append(v)
 				.append(':')

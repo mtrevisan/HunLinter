@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.autocorrect;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 
@@ -25,6 +23,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 /** Manages pairs of mistyped words and their correct spelling */
@@ -77,10 +79,10 @@ public class AutoCorrectParser{
 	private void validate(){
 		//check for duplications
 		final Map<String, List<CorrectionEntry>> map = new HashMap<>();
-		LoopHelper.forEach(dictionary,
+		forEach(dictionary,
 			correctionEntry -> map.computeIfAbsent(correctionEntry.getIncorrectForm(), k -> new ArrayList<>(1)).add(correctionEntry));
 		final List<List<CorrectionEntry>> duplications = new ArrayList<>();
-		LoopHelper.applyIf(map.values(),
+		applyIf(map.values(),
 			list -> list.size() > 1,
 			duplications::add);
 		for(final List<CorrectionEntry> duplication : duplications)
@@ -130,7 +132,7 @@ public class AutoCorrectParser{
 	/* Find if there is a duplicate with the same incorrect and correct forms */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
 		final List<CorrectionEntry> duplicates = new ArrayList<>();
-		LoopHelper.applyIf(dictionary,
+		applyIf(dictionary,
 			correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct),
 			duplicates::add);
 		return duplicates;
@@ -138,7 +140,7 @@ public class AutoCorrectParser{
 
 	/* Find if there is a duplicate with the same incorrect and correct forms */
 	public boolean contains(final String incorrect, final String correct){
-		return (LoopHelper.match(dictionary,
+		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
 	}

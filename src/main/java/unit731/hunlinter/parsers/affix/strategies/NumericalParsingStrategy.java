@@ -4,9 +4,10 @@ import java.text.MessageFormat;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -46,7 +47,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 		checkForDuplicates(singleFlags);
 
-		LoopHelper.forEach(singleFlags, this::validate);
+		forEach(singleFlags, this::validate);
 
 		return singleFlags;
 	}
@@ -72,7 +73,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		LoopHelper.forEach(flags, this::validate);
+		forEach(flags, this::validate);
 
 		return StringUtils.join(flags, COMMA);
 	}

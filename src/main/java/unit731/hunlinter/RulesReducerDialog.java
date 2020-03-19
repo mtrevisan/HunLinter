@@ -25,10 +25,11 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.affix.RulesReducerWorker;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.system.JavaHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -202,7 +203,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		JavaHelper.executeOnEventDispatchThread(() -> {
 			ruleComboBox.removeAllItems();
-			LoopHelper.forEach(affixEntries, ruleComboBox::addItem);
+			forEach(affixEntries, ruleComboBox::addItem);
 		});
 	}
 

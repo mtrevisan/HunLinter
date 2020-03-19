@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
@@ -24,6 +23,9 @@ import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class LineEntry implements Serializable{
@@ -89,7 +91,7 @@ public class LineEntry implements Serializable{
 	public List<String> extractFromEndingWith(final String suffix){
 		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
 		final List<String> list = new ArrayList<>();
-		LoopHelper.applyIf(from,
+		applyIf(from,
 			word -> RegexHelper.find(word, conditionPattern),
 			list::add);
 		return list;
@@ -106,7 +108,7 @@ public class LineEntry implements Serializable{
 	public LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
 		final Set<String> reversedAddition = new HashSet<>(addition.size());
-		LoopHelper.forEach(addition, add -> {
+		forEach(addition, add -> {
 			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));

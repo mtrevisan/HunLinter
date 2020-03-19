@@ -11,7 +11,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.File;
@@ -32,6 +31,10 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class Packager{
@@ -164,7 +167,7 @@ public class Packager{
 			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
 				+ ", cannot load project");
 
-		LoopHelper.forEach(extractFileEntries(mainManifestPath.toFile()),
+		forEach(extractFileEntries(mainManifestPath.toFile()),
 			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile()));
 
 		languages = extractLanguages(manifestFiles);
@@ -248,11 +251,11 @@ public class Packager{
 		if(node != null){
 			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 			final Set<String> uniqueFolders = new HashSet<>();
-			LoopHelper.forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
+			forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
 					+ StringUtils.join(configurationFiles));
-			if(LoopHelper.match(uniqueFolders, String::isEmpty) != null)
+			if(match(uniqueFolders, String::isEmpty) != null)
 				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
 	}
@@ -441,7 +444,7 @@ public class Packager{
 			final Map<String, File> folders) throws IOException{
 		//restrict to given language
 		final List<Node> children = new ArrayList<>();
-		LoopHelper.applyIf(extractChildren(entry),
+		applyIf(extractChildren(entry),
 			node -> ArrayUtils.contains(extractLocale(node), language),
 			children::add);
 		for(final Node child : children){

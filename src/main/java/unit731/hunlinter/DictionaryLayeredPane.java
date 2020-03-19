@@ -35,7 +35,9 @@ import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DictionaryLayeredPane extends JLayeredPane{
@@ -107,7 +109,7 @@ final int iconSize = 17;
             .map(AffixEntry::toString)
             .orElse(null);
             final StringJoiner sj = new StringJoiner(TAB);
-            LoopHelper.applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
+            applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
             return sj.toString();
          }
       };
@@ -244,7 +246,7 @@ final int iconSize = 17;
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			ruleFlagsAidComboBox.removeAllItems();
-			LoopHelper.forEach(lines, ruleFlagsAidComboBox::addItem);
+			forEach(lines, ruleFlagsAidComboBox::addItem);
 			//enable combo-box only if an AID file exists
 			final boolean aidLinesPresent = !lines.isEmpty();
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);

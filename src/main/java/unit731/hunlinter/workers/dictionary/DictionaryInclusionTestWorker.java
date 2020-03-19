@@ -18,10 +18,11 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DictionaryInclusionTestWorker extends WorkerDictionary{
@@ -48,7 +49,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
-			LoopHelper.forEach(productions, prod -> dictionary.add(prod.getWord()));
+			forEach(productions, prod -> dictionary.add(prod.getWord()));
 		};
 		final Runnable completed = () -> {
 			dictionary.close();

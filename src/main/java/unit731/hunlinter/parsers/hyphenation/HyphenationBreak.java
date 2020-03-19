@@ -8,7 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class HyphenationBreak{
@@ -50,7 +51,7 @@ public class HyphenationBreak{
 
 	public List<String> getRules(){
 		final List<String> list = new ArrayList<>();
-		LoopHelper.forEach(indexesAndRules.values(), pair -> list.add(pair.getValue()));
+		forEach(indexesAndRules.values(), pair -> list.add(pair.getValue()));
 		return list;
 	}
 

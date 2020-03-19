@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.enums;
 
-
-import unit731.hunlinter.services.system.LoopHelper;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public enum InflectionTag{
@@ -58,7 +57,7 @@ public enum InflectionTag{
 	}
 
 	public static InflectionTag createFromCode(final String code){
-		return LoopHelper.match(values(), tag -> tag.code.equals(code));
+		return match(values(), tag -> tag.code.equals(code));
 	}
 
 	public String getCode(){

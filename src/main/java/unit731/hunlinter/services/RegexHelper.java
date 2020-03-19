@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class RegexHelper{
@@ -119,11 +120,11 @@ public class RegexHelper{
 
 	public static <V> String mergeSet(final Set<V> set, final Comparator<String> comparator){
 		final List<String> list = new ArrayList<>();
-		LoopHelper.forEach(set, v -> list.add(String.valueOf(v)));
+		forEach(set, v -> list.add(String.valueOf(v)));
 		list.sort(comparator);
 
 		final StringBuilder sb = new StringBuilder();
-		LoopHelper.forEach(list, sb::append);
+		forEach(list, sb::append);
 		return sb.toString();
 	}
 

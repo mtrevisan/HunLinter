@@ -7,7 +7,6 @@ import unit731.hunlinter.gui.IntegerFilter;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptions;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
-import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.swing.*;
 import javax.swing.text.DocumentFilter;
@@ -23,6 +22,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class HyphenationOptionsDialog extends javax.swing.JDialog implements ActionListener{
@@ -52,7 +53,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 		final List<String> list = new ArrayList<>(options.getNoHyphen());
 		list.sort(Comparator.naturalOrder());
 		final DefaultListModel<String> model = new DefaultListModel<>();
-		LoopHelper.forEach(list, model::addElement);
+		forEach(list, model::addElement);
 		noHyphenationList.setModel(model);
 	}
 

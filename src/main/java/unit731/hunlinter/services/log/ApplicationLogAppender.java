@@ -12,7 +12,8 @@ import java.util.Objects;
 import javax.swing.JTextArea;
 import org.slf4j.Marker;
 import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
@@ -25,7 +26,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
 		Objects.requireNonNull(textArea);
 
-		LoopHelper.forEach(markers,
+		forEach(markers,
 			marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(textArea));
 	}
 
@@ -40,7 +41,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() ->
-				LoopHelper.forEach(TEXT_AREAS.get(marker), textArea -> {
+				forEach(TEXT_AREAS.get(marker), textArea -> {
 					textArea.append(message);
 					textArea.setCaretPosition(textArea.getDocument().getLength());
 				})

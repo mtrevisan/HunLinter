@@ -25,12 +25,13 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class WordlistWorker extends WorkerDictionary{
@@ -62,7 +63,7 @@ public class WordlistWorker extends WorkerDictionary{
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES)
-				LoopHelper.forEach(productions, production -> words.add(production.toString()));
+				forEach(productions, production -> words.add(production.toString()));
 			else{
 				try{
 					for(final Production production : productions){

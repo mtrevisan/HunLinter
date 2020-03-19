@@ -7,7 +7,10 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.system.LoopHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
+import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
 class WordGeneratorAffixRules extends WordGeneratorBase{
@@ -29,11 +32,11 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		productions = enforceOnlyInCompound(productions);
 
 		//convert using output table
-		LoopHelper.forEach(productions,
+		forEach(productions,
 			production -> production.applyOutputConversionTable(affixData::applyOutputConversionTable));
 
 		if(LOGGER.isTraceEnabled())
-			LoopHelper.forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
+			forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}
@@ -42,10 +45,10 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private Production[] enforceOnlyInCompound(Production[] productions){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null)
-			productions = LoopHelper.removeIf(productions, production -> {
+			productions = removeIf(productions, production -> {
 				final boolean hasOnlyInCompoundFlag = production.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = production.getAppliedRules();
-				final boolean hasOnlyInCompoundFlagInAppliedRules = (LoopHelper.match(appliedRules,
+				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules,
 					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
 				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
 			});

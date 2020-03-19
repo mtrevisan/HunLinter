@@ -1,11 +1,12 @@
 package unit731.hunlinter.collections.bloomfilter;
 
-import unit731.hunlinter.services.system.LoopHelper;
-
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.IntStream;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 /**
@@ -62,7 +63,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized boolean contains(final T value){
-		return (value != null && LoopHelper.match(filters, filter -> filter.contains(value)) != null);
+		return (value != null && match(filters, filter -> filter.contains(value)) != null);
 	}
 
 	@Override
@@ -109,12 +110,12 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized void clear(){
-		LoopHelper.forEach(filters, BloomFilterInterface::clear);
+		forEach(filters, BloomFilterInterface::clear);
 	}
 
 	@Override
 	public synchronized void close(){
-		LoopHelper.forEach(filters, BloomFilterInterface::close);
+		forEach(filters, BloomFilterInterface::close);
 	}
 
 }

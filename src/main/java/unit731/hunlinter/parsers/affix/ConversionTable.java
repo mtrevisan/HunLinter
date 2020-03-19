@@ -11,9 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ConversionTable{
@@ -123,7 +124,7 @@ public class ConversionTable{
 		final List<Pair<String, String>> list = table.get(key);
 		if(list != null){
 			final ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(key);
-			LoopHelper.forEach(list, entry -> fun.convert(word, entry, conversions));
+			forEach(list, entry -> fun.convert(word, entry, conversions));
 		}
 		return conversions;
 	}

@@ -19,10 +19,14 @@ import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.ArraySet;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.collectIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
+import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{
@@ -69,7 +73,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					Production[] dicEntriesPerFlag = new Production[0];
 					for(final DictionaryEntry entry : inputs.get(flag)){
 						final Production[] productions = applyAffixRules(entry, true, null);
-						final Production[] collect = LoopHelper.collectIf(productions,
+						final Production[] collect = collectIf(productions,
 							production -> production.hasContinuationFlag(flag), () -> new Production[0]);
 						dicEntriesPerFlag = ArrayUtils.addAll(dicEntriesPerFlag, collect);
 					}
@@ -133,7 +137,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		applyOutputConversions(productions, forceCompoundUppercaseFlag);
 
 		if(LOGGER.isTraceEnabled())
-			LoopHelper.forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
+			forEach(productions, production -> LOGGER.trace("Produced word: {}", production));
 
 		return limitResponse(productions, limit);
 	}
@@ -162,7 +166,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 		final Production[] productions;
 		final StringBuffer flags = new StringBuffer();
-		LoopHelper.forEach(continuationFlags, continuationFlag -> LoopHelper.forEach(continuationFlag, flags::append));
+		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::append));
 		final Production p = Production.createFromCompound(compoundWord, flags.toString(), compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			productions = new Production[]{p};
@@ -269,12 +273,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private void removeTwofolds(final Production[] prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			LoopHelper.removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
+			removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
 	}
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = (LoopHelper.match(compoundAsReplacement, word::contains) != null);
+		boolean exists = (match(compoundAsReplacement, word::contains) != null);
 		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)
@@ -311,7 +315,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
 			final List<DictionaryEntry> entries = m.getValue();
 			final List<DictionaryEntry> value = new ArrayList<>(entries.size());
-			LoopHelper.forEach(entries, entry -> {
+			forEach(entries, entry -> {
 				if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
 					value.add(entry);
 			});
