@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -94,7 +95,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Function<Void, Set<String>> step1 = ignored -> {
 			prepareProcessing("Extract words (step 1/3)");
 
-			processLines(lineProcessor);
+			final Path dicPath = dicParser.getDicFile().toPath();
+			processLines(dicPath, charset, lineProcessor);
 
 			return words;
 		};

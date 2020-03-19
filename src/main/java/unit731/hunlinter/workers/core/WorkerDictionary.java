@@ -1,6 +1,9 @@
 package unit731.hunlinter.workers.core;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.LineNumberReader;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -27,16 +30,13 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 		super(workerData);
 	}
 
-	protected void processLines(final Consumer<IndexDataPair<String>> dataProcessor){
+	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor);
 
 		setProgress(0);
 
 		//load dictionary
-		final DictionaryParser dicParser = workerData.getParser();
-		final Path dicPath = dicParser.getDicFile().toPath();
-		final Charset charset = dicParser.getCharset();
-		final List<IndexDataPair<String>> entries = loadFile(dicPath, charset);
+		final List<IndexDataPair<String>> entries = loadFile(path, charset);
 
 		//process dictionary
 		final Stream<IndexDataPair<String>> stream = (workerData.isParallelProcessing()?
@@ -67,7 +67,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 //		}
 //	}
 
-	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset){
+	protected List<IndexDataPair<String>> loadFile(final Path path, final Charset charset){
 		final List<IndexDataPair<String>> entries = new ArrayList<>();
 		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = ParserHelper.extractLine(br);
@@ -124,6 +124,23 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 				throw new LinterException(e, data);
 			}
 		};
+	}
+
+	protected void writeLine(final BufferedWriter writer, final String line){
+		try{
+			writer.write(line);
+			writer.newLine();
+		}
+		catch(final IOException e){
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected void closeWriter(final Writer writer){
+		try{
+			writer.close();
+		}
+		catch(final IOException ignored){}
 	}
 
 }

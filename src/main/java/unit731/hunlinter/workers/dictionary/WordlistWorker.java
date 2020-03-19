@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -92,7 +93,8 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/2)");
 
-			processLines(lineReadProcessor);
+			final Path dicPath = dicParser.getDicFile().toPath();
+			processLines(dicPath, charset, lineReadProcessor);
 
 			return collectedLines;
 		};

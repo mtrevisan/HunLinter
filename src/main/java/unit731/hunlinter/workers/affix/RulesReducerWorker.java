@@ -1,5 +1,7 @@
 package unit731.hunlinter.workers.affix;
 
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +92,9 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			processLines(lineProcessor);
+			final Path dicPath = dicParser.getDicFile().toPath();
+			final Charset charset = dicParser.getCharset();
+			processLines(dicPath, charset, lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 

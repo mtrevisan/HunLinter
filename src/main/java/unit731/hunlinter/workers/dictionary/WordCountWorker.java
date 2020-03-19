@@ -4,6 +4,9 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -71,7 +74,9 @@ public class WordCountWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			processLines(lineProcessor);
+			final Path dicPath = dicParser.getDicFile().toPath();
+			final Charset charset = dicParser.getCharset();
+			processLines(dicPath, charset, lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 

@@ -74,8 +74,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
 		}
 		catch(final IOException e){
-			//TODO to manage
-			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
@@ -83,17 +81,20 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
 
 			LoopHelper.forEach(productions, production -> {
-				final List<String> words = production.toStringPoSFSA();
-				for(final String word : words){
-					try{
-						writer.write(word);
-						writer.newLine();
-					}
-					catch(final Exception e){
-						throw new RuntimeException(e);
-					}
-				}
+				final List<String> lines = production.toStringPoSFSA();
+				LoopHelper.forEach(lines, line -> writeLine(writer, line));
 			});
+		};
+		final Consumer<IndexDataPair<String>> supportProcessor = indexData -> {
+			System.out.println(indexData.getData());
+			//TODO
+//			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+//			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+//
+//			LoopHelper.forEach(productions, production -> {
+//				final List<String> lines = production.toStringPoSFSA();
+//				LoopHelper.forEach(lines, line -> writeLine(writer, line));
+//			});
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {
@@ -127,18 +128,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		getWorkerData()
 //			.withDataCompletedCallback(completed)
+			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException(true);
 
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
-			processLines(lineProcessor);
-			try{
-				writer.close();
-			}
-			catch(final IOException e){
-				throw new RuntimeException(e);
-			}
+			final Path dicPath = dicParser.getDicFile().toPath();
+			writeLine(writer, "0");
+			processLines(dicPath, charset, lineProcessor);
+			closeWriter(writer);
 
 //			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
 //
@@ -231,11 +230,11 @@ public class PoSFSAWorker extends WorkerDictionary{
 				throw new RuntimeException(e);
 			}
 
-			//TODO read file line by line
+			processLines(file.toPath(), charset, supportProcessor);
 
-			final byte separator = metadata.getSeparator();
-			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
-			extractedWords = encode(extractedWords, separator, sequenceEncoder);
+//			final byte separator = metadata.getSeparator();
+//			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
+//			extractedWords = encode(extractedWords, separator, sequenceEncoder);
 
 //			executeReadProcessNoIndex(fsaProcessor, extractedWords);
 

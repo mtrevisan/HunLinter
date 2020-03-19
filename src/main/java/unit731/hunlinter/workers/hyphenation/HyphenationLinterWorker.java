@@ -1,5 +1,7 @@
 package unit731.hunlinter.workers.hyphenation;
 
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 
 import unit731.hunlinter.languages.BaseBuilder;
@@ -75,7 +77,9 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			processLines(lineProcessor);
+			final Path dicPath = dicParser.getDicFile().toPath();
+			final Charset charset = dicParser.getCharset();
+			processLines(dicPath, charset, lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
