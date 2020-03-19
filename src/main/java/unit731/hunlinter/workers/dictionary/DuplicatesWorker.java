@@ -138,8 +138,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.getBytes(charset).length + 2;
-				line = ParserHelper.cleanLine(line);
-				if(!line.isEmpty()){
+
+				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
@@ -199,8 +199,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.getBytes(charset).length + 2;
-					line = ParserHelper.cleanLine(line);
-					if(!line.isEmpty()){
+
+					if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 						try{
 							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 							final Production[] productions = wordGenerator.applyAffixRules(dicEntry);

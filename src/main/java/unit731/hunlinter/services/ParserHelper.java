@@ -5,16 +5,18 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 
 public class ParserHelper{
 
-	public static final Pattern PATTERN_COMMENT = RegexHelper.pattern("^\\s*[#\\/].*$");
+	public static final char COMMENT_MARK_SHARP = '#';
+	public static final char COMMENT_MARK_SLASH = '/';
+	public static final char COMMENT_MARK_PERCENT = '%';
 
 
-	public static boolean isComment(final String line){
-		return RegexHelper.find(line, PATTERN_COMMENT);
+	public static boolean isComment(String line, final char... comment){
+		line = line.trim();
+		return (line.isEmpty() || StringUtils.indexOfAny(line, comment) == 0);
 	}
 
 	public static String extractLine(final BufferedReader br) throws IOException{
@@ -22,21 +24,7 @@ public class ParserHelper{
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading file");
 
-		return cleanLine(line);
-	}
-
-	/**
-	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
-	 *
-	 * @param line	The line to be cleaned
-	 * @return	The cleaned line (without comments or spaces at the beginning or at the end)
-	 */
-	public static String cleanLine(String line){
-		//remove comments
-		line = RegexHelper.clear(line, PATTERN_COMMENT);
-		//trim the entire string
-		line = StringUtils.strip(line);
-		return line;
+		return (isComment(line)? StringUtils.EMPTY: line);
 	}
 
 }

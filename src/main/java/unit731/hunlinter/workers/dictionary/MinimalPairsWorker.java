@@ -129,8 +129,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			while((line = br.readLine()) != null){
 				currentLine ++;
 
-				line = ParserHelper.cleanLine(line);
-				if(!line.isEmpty()){
+				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);

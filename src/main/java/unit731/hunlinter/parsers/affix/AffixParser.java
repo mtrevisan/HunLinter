@@ -159,8 +159,7 @@ public class AffixParser{
 		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
 			String line;
 			while((line = br.readLine()) != null){
-				line = ParserHelper.cleanLine(line);
-				if(line.isEmpty())
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))

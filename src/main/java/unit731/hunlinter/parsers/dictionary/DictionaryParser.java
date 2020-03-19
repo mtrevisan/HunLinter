@@ -105,7 +105,7 @@ public class DictionaryParser{
 			int startSection = -1;
 			boolean needSorting = false;
 			while((line = br.readLine()) != null){
-				if(!ParserHelper.isComment(line) && !StringUtils.isBlank(line)){
+				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					if(startSection < 0)
 						startSection = lineIndex;
 

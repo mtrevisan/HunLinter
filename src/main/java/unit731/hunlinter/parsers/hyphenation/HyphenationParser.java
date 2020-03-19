@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -96,7 +97,7 @@ public class HyphenationParser{
 	public static final int PARAM_ADD_AFTER = 4;
 	public static final int PARAM_START = 5;
 	public static final int PARAM_CUT = 6;
-	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	public static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
 	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
@@ -106,7 +107,6 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
 
 	public static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
-	private static final Pattern PATTERN_COMMENT = RegexHelper.pattern("^$|\\s*[%#].*$");
 
 	public enum Level{NON_COMPOUND, COMPOUND}
 
@@ -195,8 +195,7 @@ public class HyphenationParser{
 			charset = FileHelper.readCharset(line);
 
 			while((line = br.readLine()) != null){
-				line = removeComment(line);
-				if(line.isEmpty())
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SLASH, ParserHelper.COMMENT_MARK_PERCENT))
 					continue;
 
 				final boolean parsedLine = options.parseLine(line);
@@ -316,19 +315,6 @@ public class HyphenationParser{
 		return duplicatedRule;
 	}
 
-	/**
-	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
-	 *
-	 * @param line	The line from an affix file
-	 * @return The cleaned-up line
-	 */
-	private static String removeComment(String line){
-		//remove comments
-		line = RegexHelper.clear(line, PATTERN_COMMENT);
-		//trim the entire string
-		return StringUtils.strip(line);
-	}
-
 	public void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
@@ -409,7 +395,7 @@ public class HyphenationParser{
 		validateBasicRules(rule);
 
 		String cleanedRule = rule;
-		final int augmentedIndex = rule.indexOf('/');
+		final int augmentedIndex = rule.indexOf(AUGMENTED_RULE);
 		if(augmentedIndex >= 0){
 			cleanedRule = rule.substring(0, augmentedIndex);
 			validateAugmentedRule(cleanedRule, rule);

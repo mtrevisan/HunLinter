@@ -75,8 +75,7 @@ public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<Di
 				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 
 			while((line = br.readLine()) != null){
-				line = ParserHelper.cleanLine(line);
-				if(line.isEmpty())
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
 				entries.add(IndexDataPair.of(br.getLineNumber(), line));
