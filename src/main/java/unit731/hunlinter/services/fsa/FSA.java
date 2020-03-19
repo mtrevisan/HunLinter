@@ -12,10 +12,11 @@ import java.util.Set;
 
 
 /**
- * This is a top abstract class for handling finite state automata. These
- * automata are arc-based, a design described in Jan Daciuk's <i>Incremental
- * Construction of Finite-State Automata and Transducers, and Their Use in the
- * Natural Language Processing</i> (PhD thesis, Technical University of Gdansk).
+ * This is a top abstract class for handling Finite State Automata.
+ * These automata are arc-based, a design described in Jan Daciuk's <i>Incremental Construction of Finite-State Automata
+ * and Transducers, and their use in the Natural Language Processing</i> (PhD thesis, Technical University of Gdansk).
+ *
+ * @see <a href="http://www.jandaciuk.pl/thesis/thesis.html">Incremental Construction of Finite-State Automata and Transducers, and their use in the Natural Language Processing</>
  */
 public abstract class FSA implements Iterable<ByteBuffer>{
 
@@ -122,10 +123,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @return An iterable over all sequences encoded starting at the given node.
 	 */
 	public Iterable<ByteBuffer> getSequences(final int node){
-		if(node == 0)
-			return Collections.emptyList();
-
-		return () -> new ByteSequenceIterator(FSA.this, node);
+		return (node > 0? () -> new ByteSequenceIterator(FSA.this, node): Collections.emptyList());
 	}
 
 	/**
@@ -207,7 +205,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(!isArcTerminal(arc) && !visitInPostOrder(v, getEndNode(arc), visited))
-					return false;
+				return false;
 		return v.accept(node);
 	}
 
@@ -253,9 +251,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		return baos.toByteArray();
 	}
 
-	/**
-	 * Private recursion.
-	 */
+	/** Private recursion */
 	private void visitInPreOrder(final StateVisitor v, final int node, final BitSet visited){
 		if(visited.get(node))
 			return;
@@ -288,7 +284,8 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 				return new CFSA2(stream);
 
 			default:
-				throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x", header.version & 0xFF));
+				throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x",
+					header.version & 0xFF));
 		}
 	}
 
@@ -306,8 +303,8 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	public static <T extends FSA> T read(final InputStream stream, final Class<? extends T> clazz) throws IOException{
 		final FSA fsa = read(stream);
 		if(!clazz.isInstance(fsa))
-			throw new IOException(String.format(Locale.ROOT, "Expected FSA type %s, but read an incompatible type %s.", clazz.getName(),
-				fsa.getClass().getName()));
+			throw new IOException(String.format(Locale.ROOT, "Expected FSA type %s, but read an incompatible type %s.",
+				clazz.getName(), fsa.getClass().getName()));
 
 		return clazz.cast(fsa);
 	}

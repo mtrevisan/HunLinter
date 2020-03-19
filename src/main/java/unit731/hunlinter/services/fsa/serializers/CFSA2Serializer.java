@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
@@ -123,9 +124,9 @@ public class CFSA2Serializer implements FSASerializer{
 	private void computeLabelsIndex(final FSA fsa){
 		//compute labels count
 		final int[] countByValue = new int[256];
-
 		fsa.visitAllStates(state -> {
-			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
+			int arc = fsa.getFirstArc(state);
+			while((arc = fsa.getNextArc(arc)) != 0)
 				countByValue[fsa.getArcLabel(arc) & 0xFF] ++;
 			return true;
 		});
@@ -135,7 +136,6 @@ public class CFSA2Serializer implements FSASerializer{
 			final int countDiff = o2.b - o1.b;
 			return (countDiff == 0? o1.a - o2.a: countDiff);
 		};
-
 		final TreeSet<FSAUtils.IntIntHolder> labelAndCount = new TreeSet<>(comparator);
 		for(int label = 0; label < countByValue.length; label ++)
 			if(countByValue[label] > 0)
@@ -143,11 +143,11 @@ public class CFSA2Serializer implements FSASerializer{
 
 		labelsIndex = new byte[1 + Math.min(labelAndCount.size(), CFSA2.LABEL_INDEX_SIZE)];
 		invertedLabelsIndex = new int[256];
-		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); i --){
-			final FSAUtils.IntIntHolder p = labelAndCount.first();
-			labelAndCount.remove(p);
+		int i = labelsIndex.length - 1;
+		for(final FSAUtils.IntIntHolder p : labelAndCount){
 			invertedLabelsIndex[p.a] = i;
-			labelsIndex[i] = (byte) p.a;
+			labelsIndex[i] = (byte)p.a;
+			i --;
 		}
 	}
 
@@ -210,7 +210,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final IntArrayList states, final IntArrayList linearized,
-			final IntIntHashMap offsets) throws IOException{
+														  final IntIntHashMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final IntStack nodes = new IntStack();
 		linearized.clear();
@@ -243,7 +243,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Add a state to linearized list */
 	private void linearizeState(final FSA fsa, final IntStack nodes, final IntArrayList linearized, final BitSet visited,
-			final int node){
+										 final int node){
 		linearized.add(node);
 		visited.set(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
