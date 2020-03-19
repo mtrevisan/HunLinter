@@ -66,6 +66,20 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(outputFile);
 
 
+
+		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
+		final DictionaryMetadata metadata;
+		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
+			metadata = DictionaryMetadata.read(is);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
+
+		final byte separator = metadata.getSeparator();
+		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
+
+
 		final Charset charset = dicParser.getCharset();
 		File supportFile;
 		BufferedWriter writer;
@@ -82,23 +96,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			LoopHelper.forEach(productions, production -> {
 				final List<String> lines = production.toStringPoSFSA();
-				LoopHelper.forEach(lines, line -> writeLine(writer, line));
+
+				//encode lines
+				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
+
+				LoopHelper.forEach(encodedLines, line -> writeLine(writer, line));
 			});
 		};
-		final Consumer<IndexDataPair<String>> supportProcessor = indexData -> {
-			System.out.println(indexData.getData());
-			//TODO
-//			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-//			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
-//
-//			LoopHelper.forEach(productions, production -> {
-//				final List<String> lines = production.toStringPoSFSA();
-//				LoopHelper.forEach(lines, line -> writeLine(writer, line));
-//			});
-		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<String> fsaProcessor = word -> {
-			final byte[] chs = StringHelper.getRawBytes(word);
+		final Consumer<IndexDataPair<String>> fsaProcessor = indexData -> {
+			final byte[] chs = StringHelper.getRawBytes(indexData.getData());
 			builder.add(chs);
 		};
 //		final Runnable completed = () -> {
@@ -221,22 +228,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<File, FSA> step3 = file -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
 
-			final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
-			final DictionaryMetadata metadata;
-			try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
-				metadata = DictionaryMetadata.read(is);
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
-
-			processLines(file.toPath(), charset, supportProcessor);
-
-//			final byte separator = metadata.getSeparator();
-//			final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
-//			extractedWords = encode(extractedWords, separator, sequenceEncoder);
-
-//			executeReadProcessNoIndex(fsaProcessor, extractedWords);
+			processLines(file.toPath(), charset, fsaProcessor);
 
 			return builder.complete();
 		};
@@ -329,7 +321,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		}
 	}
 
-	private List<String> encode(List<String> words, byte separator, ISequenceEncoder sequenceEncoder){
+	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
 		ByteBuffer target = ByteBuffer.allocate(0);
