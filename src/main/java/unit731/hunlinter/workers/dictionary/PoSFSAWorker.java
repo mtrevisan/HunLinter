@@ -178,8 +178,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 				throw new RuntimeException(e);
 			}
 
-			setProgress(100);
-
 			return supportFile;
 		};
 		final Function<File, FSA> step3 = file -> {

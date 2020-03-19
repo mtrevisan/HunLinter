@@ -272,7 +272,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 			catch(final Exception e){
 				throw new RuntimeException(e);
 			}
-			setProgress(100);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());
 		}

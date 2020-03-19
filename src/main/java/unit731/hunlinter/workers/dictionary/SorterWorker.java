@@ -89,7 +89,7 @@ public class SorterWorker extends WorkerDictionary{
 
 			dicParser.clear();
 
-			setProgress(100);
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
