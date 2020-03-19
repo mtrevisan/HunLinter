@@ -1,7 +1,7 @@
 HunLinter
 ==========
 
-![Java-12+](https://img.shields.io/badge/java-12%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java-13+](https://img.shields.io/badge/java-13%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 <a href="https://codeclimate.com/github/mtrevisan/HunLinter/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
 
@@ -304,7 +304,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - fixed a bug on hyphenation: when the same rule is added (with different breakpoints), the old one is lost
 - substituted charting library
 - added undo/redo capabilities on input fields
-- reduced application footprint
+- completely revised thread management
 - reduced memory footprint by ?%
 - augmented speed-up by ?%
 - various minor bugfixes and code revisions
