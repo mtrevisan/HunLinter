@@ -256,6 +256,55 @@ public class PoSFSAWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
+	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
+		ByteBuffer encoded = ByteBuffer.allocate(0);
+		ByteBuffer source = ByteBuffer.allocate(0);
+		ByteBuffer target = ByteBuffer.allocate(0);
+		ByteBuffer tag = ByteBuffer.allocate(0);
+		ByteBuffer assembled = ByteBuffer.allocate(0);
+		for(int i = 0, max = words.size(); i < max; i ++){
+			final byte[] row = StringHelper.getRawBytes(words.get(i));
+			final int sep1 = indexOf(separator, row, 0);
+			int sep2 = indexOf(separator, row, sep1 + 1);
+			if(sep2 < 0)
+				sep2 = row.length;
+
+			source = BufferUtils.clearAndEnsureCapacity(source, sep1);
+			source.put(row, 0, sep1);
+			source.flip();
+
+			final int len = sep2 - (sep1 + 1);
+			target = BufferUtils.clearAndEnsureCapacity(target, len);
+			target.put(row, sep1 + 1, len);
+			target.flip();
+
+			final int len2 = row.length - (sep2 + 1);
+			tag = BufferUtils.clearAndEnsureCapacity(tag, len2);
+			if(len2 > 0)
+				tag.put(row, sep2 + 1, len2);
+			tag.flip();
+
+			encoded = sequenceEncoder.encode(encoded, target, source);
+
+			assembled = BufferUtils.clearAndEnsureCapacity(assembled, target.remaining() + 1 + encoded.remaining() + 1 + tag.remaining());
+
+			assembled.put(target);
+			assembled.put(separator);
+			assembled.put(encoded);
+			if(tag.hasRemaining()){
+				assembled.put(separator);
+				assembled.put(tag);
+			}
+			assembled.flip();
+
+			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
+		}
+
+		//lexical order
+		Collections.sort(words);
+		return words;
+	}
+
 	private void buildFSA(List<String> words, final String input, final String output) throws Exception{
 		final Path inputPath = Path.of(input);
 		final Path outputPath = Path.of(output);
@@ -319,55 +368,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){
 			//do nothing, just scan and make sure no exceptions are thrown.
 		}
-	}
-
-	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
-		ByteBuffer encoded = ByteBuffer.allocate(0);
-		ByteBuffer source = ByteBuffer.allocate(0);
-		ByteBuffer target = ByteBuffer.allocate(0);
-		ByteBuffer tag = ByteBuffer.allocate(0);
-		ByteBuffer assembled = ByteBuffer.allocate(0);
-		for(int i = 0, max = words.size(); i < max; i ++){
-			final byte[] row = StringHelper.getRawBytes(words.get(i));
-			final int sep1 = indexOf(separator, row, 0);
-			int sep2 = indexOf(separator, row, sep1 + 1);
-			if(sep2 < 0)
-				sep2 = row.length;
-
-			source = BufferUtils.clearAndEnsureCapacity(source, sep1);
-			source.put(row, 0, sep1);
-			source.flip();
-
-			final int len = sep2 - (sep1 + 1);
-			target = BufferUtils.clearAndEnsureCapacity(target, len);
-			target.put(row, sep1 + 1, len);
-			target.flip();
-
-			final int len2 = row.length - (sep2 + 1);
-			tag = BufferUtils.clearAndEnsureCapacity(tag, len2);
-			if(len2 > 0)
-				tag.put(row, sep2 + 1, len2);
-			tag.flip();
-
-			encoded = sequenceEncoder.encode(encoded, target, source);
-
-			assembled = BufferUtils.clearAndEnsureCapacity(assembled, target.remaining() + 1 + encoded.remaining() + 1 + tag.remaining());
-
-			assembled.put(target);
-			assembled.put(separator);
-			assembled.put(encoded);
-			if(tag.hasRemaining()){
-				assembled.put(separator);
-				assembled.put(tag);
-			}
-			assembled.flip();
-
-			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
-		}
-
-		//lexical order
-		Collections.sort(words);
-		return words;
 	}
 
 	private static int countOf(final byte separator, final byte[] row){
