@@ -204,12 +204,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
 				serializer.serialize(fsa, os);
 
-				//validation: try to scan the input
-				final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
-				//noinspection StatementWithEmptyBody
-				for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){
-					//do nothing, just scan and make sure no exceptions are thrown.
-				}
+				validateFSA(fsa, metadata);
 
 				return outputFile;
 			}
@@ -224,7 +219,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
 	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
@@ -284,6 +279,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 			fromIndex ++;
 		}
 		return -1;
+	}
+
+	private void validateFSA(final FSA fsa, final DictionaryMetadata metadata){
+		//validation: try to scan the input
+		final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
+		//do nothing, just scan and make sure no exceptions are thrown
+		//noinspection StatementWithEmptyBody
+		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){}
 	}
 
 }
