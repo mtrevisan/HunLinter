@@ -243,8 +243,7 @@ public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 		else{
 			/*
 			 * this case is somewhat confusing: we should have hit the separator
-			 * first... I don't really know how to deal with it at the time
-			 * being.
+			 * first... I don't really know how to deal with it at the time being.
 			 */
 		}
 		return formsList;
