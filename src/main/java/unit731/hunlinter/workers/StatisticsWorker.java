@@ -29,7 +29,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 public class StatisticsWorker extends WorkerDictionary{
 
-	public static final String WORKER_NAME = "Collecting statistics";
+	public static final String WORKER_NAME = "Statistics";
 
 	private final DictionaryStatistics dicStatistics;
 	private final HyphenatorInterface hyphenator;
@@ -68,22 +68,12 @@ public class StatisticsWorker extends WorkerDictionary{
 					}
 			}
 		};
-		final Runnable completed = () -> {
-			dicStatistics.close();
-
-			//show statistics window
-			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-			GUIUtils.addCancelByEscapeKey(dialog);
-			dialog.setLocationRelativeTo(parent);
-			dialog.setVisible(true);
-		};
 		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
 
 		getWorkerData()
-			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
 
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
+		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
 			final Path dicPath = dicParser.getDicFile().toPath();
@@ -94,7 +84,18 @@ public class StatisticsWorker extends WorkerDictionary{
 
 			return null;
 		};
-		setProcessor(step1);
+		final Function<Void, Void> step2 = ignored -> {
+			dicStatistics.close();
+
+			//show statistics window
+			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			GUIUtils.addCancelByEscapeKey(dialog);
+			dialog.setLocationRelativeTo(parent);
+			dialog.setVisible(true);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 	public boolean isPerformingHyphenationStatistics(){

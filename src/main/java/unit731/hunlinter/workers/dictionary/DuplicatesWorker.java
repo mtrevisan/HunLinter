@@ -113,6 +113,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			writeDuplicates(outputFile, duplicates);
 
 			finalizeProcessing("Duplicates extracted successfully");
+
 			return outputFile;
 		};
 		final Function<File, Void> step4 = WorkerManager.openFileStep(LOGGER);

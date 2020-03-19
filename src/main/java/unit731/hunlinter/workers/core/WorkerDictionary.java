@@ -21,7 +21,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 
-public class WorkerDictionary extends WorkerAbstract<String, WorkerDataParser<DictionaryParser>>{
+public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 

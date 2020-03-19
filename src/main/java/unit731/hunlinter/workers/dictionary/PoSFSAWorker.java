@@ -125,7 +125,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
-//			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException(true);
 
@@ -160,6 +159,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 			}
 
 			setProgress(50);
+
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
 			//sort file & remove duplicates
 			final ExternalSorter sorter = new ExternalSorter();
@@ -200,19 +201,15 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 				validateFSA(fsa, metadata);
 
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+
 				return outputFile;
 			}
 			catch(final Exception e){
-				throw new RuntimeException(e);
+				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step5 = file -> {
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
-
-			WorkerManager.openFolderStep(LOGGER).apply(file);
-
-			return null;
-		};
+		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 

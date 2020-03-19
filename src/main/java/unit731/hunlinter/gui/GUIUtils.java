@@ -293,7 +293,7 @@ public class GUIUtils{
 	}
 
 
-	public static void askUserToAbort(final WorkerAbstract<?, ?> worker, final Component parentComponent, final Runnable onAbort,
+	public static void askUserToAbort(final WorkerAbstract<?> worker, final Component parentComponent, final Runnable onAbort,
 			final Runnable resumeTask){
 		Objects.requireNonNull(parentComponent);
 

@@ -90,7 +90,6 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //		};
 //
 		getWorkerData()
-//			.withDataCompletedCallback(completed)
 			.withRelaunchException(true);
 
 		final Function<Void, Set<String>> step1 = ignored -> {
@@ -119,20 +118,16 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
 				serializer.serialize(fsa, os);
+
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+
+				return outputFile;
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);
 			}
-
-			return outputFile;
 		};
-		final Function<File, Void> step4 = file -> {
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + file.getAbsolutePath());
-
-			WorkerManager.openFolderStep(LOGGER).apply(file);
-
-			return null;
-		};
+		final Function<File, Void> step4 = WorkerManager.openFolderStep(LOGGER);
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 

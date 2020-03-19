@@ -7,7 +7,6 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -53,25 +52,12 @@ public class WordCountWorker extends WorkerDictionary{
 			for(Production production : productions)
 				dictionary.add(production.getWord());
 		};
-		final Runnable completed = () -> {
-			dictionary.close();
-
-			final int totalUniqueProductions = dictionary.getAddedElements();
-			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
-				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
-				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
-				falsePositiveCount);
-		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
 		getWorkerData()
-			.withDataCompletedCallback(completed)
 			.withDataCancelledCallback(cancelled);
 
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
+		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
 			final Path dicPath = dicParser.getDicFile().toPath();
@@ -82,7 +68,21 @@ public class WordCountWorker extends WorkerDictionary{
 
 			return null;
 		};
-		setProcessor(step1);
+		final Function<Void, Void> step2 = ignored -> {
+			dictionary.close();
+
+			final int totalUniqueProductions = dictionary.getAddedElements();
+			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
+			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
+				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
+				falsePositiveCount);
+
+			return null;
+		};
+		setProcessor(step1.andThen(step2));
 	}
 
 }

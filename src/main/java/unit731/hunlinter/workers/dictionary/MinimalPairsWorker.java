@@ -100,7 +100,6 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			createMinimalPairsFile(outputFile, minimalPairs);
 			sortMinimalPairs(outputFile);
 
-			setProgress(100);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
 			finalizeProcessing("Minimal pairs extracted successfully");

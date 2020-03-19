@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.dictionary;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -51,7 +50,21 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 			forEach(productions, prod -> dictionary.add(prod.getWord()));
 		};
-		final Runnable completed = () -> {
+		final Consumer<Exception> cancelled = exception -> dictionary.close();
+
+		getWorkerData()
+			.withDataCancelledCallback(cancelled);
+
+		final Function<Void, Void> step1 = ignored -> {
+			prepareProcessing("Execute " + workerData.getWorkerName());
+
+			final Path dicPath = dicParser.getDicFile().toPath();
+			final Charset charset = dicParser.getCharset();
+			processLines(dicPath, charset, lineProcessor);
+
+			return null;
+		};
+		final Function<Void, Void> step2 = ignored -> {
 			dictionary.close();
 
 			final int totalUniqueProductions = dictionary.getAddedElements();
@@ -61,25 +74,12 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
-		};
-		final Consumer<Exception> cancelled = exception -> dictionary.close();
-
-		getWorkerData()
-			.withDataCompletedCallback(completed)
-			.withDataCancelledCallback(cancelled);
-
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
-
-			final Path dicPath = dicParser.getDicFile().toPath();
-			final Charset charset = dicParser.getCharset();
-			processLines(dicPath, charset, lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1);
+		setProcessor(step1.andThen(step2));
 	}
 
 	public boolean isInDictionary(final String word){

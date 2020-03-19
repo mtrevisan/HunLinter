@@ -39,8 +39,8 @@ public class ProjectLoaderAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public ProjectLoaderAction(final Path projectPath, final Packager packager, final WorkerManager workerManager, final Runnable completed,
-			final Consumer<Exception> cancelled, final PropertyChangeListener propertyChangeListener){
+	public ProjectLoaderAction(final Path projectPath, final Packager packager, final WorkerManager workerManager,
+			final Runnable completed, final Consumer<Exception> cancelled, final PropertyChangeListener propertyChangeListener){
 		super("project.load");
 
 		Objects.requireNonNull(packager);

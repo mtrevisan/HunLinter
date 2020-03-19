@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class WorkerProject extends WorkerAbstract<Void, WorkerDataProject>{
+public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 

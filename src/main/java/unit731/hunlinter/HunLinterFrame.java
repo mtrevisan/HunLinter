@@ -797,7 +797,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 			case "state":
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?, ?>)evt.getSource()).getWorkerData().getWorkerName();
+					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerData().getWorkerName();
 					workerManager.callOnEnd(workerName);
 				}
 				break;

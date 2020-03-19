@@ -70,7 +70,20 @@ public class RulesReducerWorker extends WorkerDictionary{
 				originalRules.addAll(filteredRules);
 			}
 		};
-		final Runnable completed = () -> {
+
+
+		final Function<Void, Void> step1 = ignored -> {
+			prepareProcessing("Execute " + workerData.getWorkerName());
+
+			final Path dicPath = dicParser.getDicFile().toPath();
+			final Charset charset = dicParser.getCharset();
+			processLines(dicPath, charset, lineProcessor);
+
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+
+			return null;
+		};
+		final Function<Void, Void> step2 = ignored -> {
 			try{
 				final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules);
 
@@ -85,23 +98,10 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 				e.printStackTrace();
 			}
-		};
-
-		getWorkerData()
-			.withDataCompletedCallback(completed);
-
-		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
-
-			final Path dicPath = dicParser.getDicFile().toPath();
-			final Charset charset = dicParser.getCharset();
-			processLines(dicPath, charset, lineProcessor);
-
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1);
+		setProcessor(step1.andThen(step2));
 	}
 
 }

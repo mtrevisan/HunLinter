@@ -1,15 +1,9 @@
 package unit731.hunlinter.workers.core;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import javax.swing.SwingWorker;
 
@@ -22,7 +16,7 @@ import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
-public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends SwingWorker<Void, Void>{
+public abstract class WorkerAbstract<WD extends WorkerData<?>> extends SwingWorker<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
@@ -50,7 +44,7 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		this.processor = processor;
 	}
 
-	public final WorkerData<WD> getWorkerData(){
+	public final WorkerData<?> getWorkerData(){
 		return workerData;
 	}
 
@@ -103,38 +97,6 @@ public abstract class WorkerAbstract<T, WD extends WorkerData<WD>> extends Swing
 		}
 		else
 			e.printStackTrace();
-	}
-
-	protected void executeWriteProcess(final BiConsumer<BufferedWriter, IndexDataPair<T>> dataProcessor,
-			final List<IndexDataPair<T>> lines, final File outputFile, final Charset charset){
-		int writtenSoFar = 0;
-		final int totalLines = lines.size();
-		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			for(final IndexDataPair<T> line : lines){
-				try{
-					dataProcessor.accept(writer, line);
-
-					setProgress(++ writtenSoFar, totalLines);
-
-					sleepOnPause();
-				}
-				catch(final Exception e){
-					if(!JavaHelper.isInterruptedException(e))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), line.getIndex(),
-							line.getData());
-
-					throw e;
-				}
-			}
-
-			finalizeProcessing("Successfully processed dictionary file");
-		}
-		catch(final RuntimeException e){
-			throw e;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
 	}
 
 
