@@ -17,6 +17,7 @@ import java.util.Set;
  * and Transducers, and their use in the Natural Language Processing</i> (PhD thesis, Technical University of Gdansk).
  *
  * @see <a href="http://www.jandaciuk.pl/thesis/thesis.html">Incremental Construction of Finite-State Automata and Transducers, and their use in the Natural Language Processing</>
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public abstract class FSA implements Iterable<ByteBuffer>{
 

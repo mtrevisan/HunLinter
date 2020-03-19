@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 
-/** Standard FSA file header, as described in <code>fsa</code> package documentation. */
+/**
+ * Standard FSA file header, as described in <code>fsa</code> package documentation.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class FSAHeader{
 
 	private static final int FSA_MAGIC1 = '\\';

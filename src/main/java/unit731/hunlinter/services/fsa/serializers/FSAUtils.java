@@ -4,7 +4,11 @@ import com.carrotsearch.hppc.IntIntHashMap;
 import unit731.hunlinter.services.fsa.FSA;
 
 
-/** Other FSA-related utilities not directly associated with the class hierarchy */
+/**
+ * Other FSA-related utilities not directly associated with the class hierarchy
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class FSAUtils{
 
 	private FSAUtils(){}
