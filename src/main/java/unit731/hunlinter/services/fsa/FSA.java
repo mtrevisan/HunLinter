@@ -194,9 +194,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		return v;
 	}
 
-	/**
-	 * Private recursion.
-	 */
+	//FIXME recursion to iteration!
 	private boolean visitInPostOrder(final StateVisitor v, final int node, final BitSet visited){
 		if(visited.get(node))
 			return true;
@@ -251,7 +249,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		return baos.toByteArray();
 	}
 
-	/** Private recursion */
+	//FIXME recursion to iteration!
 	private void visitInPreOrder(final StateVisitor v, final int node, final BitSet visited){
 		if(visited.get(node))
 			return;
