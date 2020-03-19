@@ -7,13 +7,13 @@ import java.util.Set;
 public enum FSAFlags{
 
 	/** Daciuk: flexible FSA encoding. */
-	FLEXIBLE(1 << 0),
+	FLEXIBLE(0x0001),
 	/** Daciuk: stop bit in use. */
-	STOPBIT(1 << 1),
+	STOPBIT(0x0002),
 	/** Daciuk: next bit in use. */
-	NEXTBIT(1 << 2),
+	NEXTBIT(0x0004),
 	/** Daciuk: tails compression. */
-	TAILS(1 << 3),
+	TAILS(0x0008),
 
 	/*
 	 * These flags are outside of byte range (never occur in Daciuk's FSA).
@@ -24,13 +24,13 @@ public enum FSAFlags{
 	 *
 	 * @see FSA#getRightLanguageCount(int)
 	 */
-	NUMBERS(1 << 8),
+	NUMBERS(0x0100),
 
 	/**
 	 * The FSA supports legacy built-in separator and filler characters (Daciuk's
 	 * FSA package compatibility).
 	 */
-	SEPARATORS(1 << 9);
+	SEPARATORS(0x0200);
 
 	/**
 	 * Bit mask for the corresponding flag.

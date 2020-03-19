@@ -33,10 +33,10 @@ public class ConstantArcSizeFSA extends FSA{
 	/** A dummy address of the terminal state */
 	final static int TERMINAL_STATE = 0;
 
-	/** An arc flag indicating the target node of an arc corresponds to a final state */
-	public final static int BIT_ARC_FINAL = 1 << 1;
 	/** An arc flag indicating the arc is last within its state */
-	public final static int BIT_ARC_LAST = 1 << 0;
+	public final static int BIT_ARC_LAST = 0x01;
+	/** An arc flag indicating the target node of an arc corresponds to a final state */
+	public final static int BIT_ARC_FINAL = 0x02;
 
 	/**
 	 * An epsilon state. The first and only arc of this state points either to the

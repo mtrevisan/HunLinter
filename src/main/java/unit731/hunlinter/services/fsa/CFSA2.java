@@ -90,16 +90,16 @@ public class CFSA2 extends FSA{
 	public static final byte VERSION = (byte)0xC6;
 
 	/** The target node of this arc follows the last arc of the current state (no goto field) */
-	public static final int BIT_TARGET_NEXT = 1 << 7;
+	public static final int BIT_TARGET_NEXT = 0x80;
 
 	/** The arc is the last one from the current node's arcs list */
-	public static final int BIT_LAST_ARC = 1 << 6;
+	public static final int BIT_LAST_ARC = 0x40;
 
 	/**
 	 * The arc corresponds to the last character of a sequence
 	 * available when building the automaton (acceptor transition).
 	 */
-	public static final int BIT_FINAL_ARC = 1 << 5;
+	public static final int BIT_FINAL_ARC = 0x20;
 
 	/** The count of bits assigned to storing an indexed label */
 	static final int LABEL_INDEX_BITS = 5;

@@ -84,19 +84,19 @@ public class FSA5 extends FSA{
 	 * Bit indicating that an arc corresponds to the last character of a sequence
 	 * available when building the automaton.
 	 */
-	public static final int BIT_FINAL_ARC = 1 << 0;
+	public static final int BIT_FINAL_ARC = 0x01;
 
 	/**
 	 * Bit indicating that an arc is the last one of the node's list and the
 	 * following one belongs to another node.
 	 */
-	public static final int BIT_LAST_ARC = 1 << 1;
+	public static final int BIT_LAST_ARC = 0x02;
 
 	/**
 	 * Bit indicating that the target node of this arc follows it in the
 	 * compressed automaton structure (no goto field).
 	 */
-	public static final int BIT_TARGET_NEXT = 1 << 2;
+	public static final int BIT_TARGET_NEXT = 0x04;
 
 	/**
 	 * An offset in the arc structure, where the address and flags field begins.

@@ -113,25 +113,25 @@ public class CFSA extends FSA{
 	/**
 	 * Automaton header version value.
 	 */
-	public static final byte VERSION = (byte) 0xC5;
+	public static final byte VERSION = (byte)0xC5;
 
 	/**
 	 * Bitmask indicating that an arc corresponds to the last character of a
 	 * sequence available when building the automaton.
 	 */
-	public static final int BIT_FINAL_ARC = 1 << 0;
+	public static final int BIT_FINAL_ARC = 0x01;
 
 	/**
 	 * Bitmask indicating that an arc is the last one of the node's list and the
 	 * following one belongs to another node.
 	 */
-	public static final int BIT_LAST_ARC = 1 << 1;
+	public static final int BIT_LAST_ARC = 0x02;
 
 	/**
 	 * Bitmask indicating that the target node of this arc follows it in the
 	 * compressed automaton structure (no goto field).
 	 */
-	public static final int BIT_TARGET_NEXT = 1 << 2;
+	public static final int BIT_TARGET_NEXT = 0x04;
 
 	/**
 	 * An array of bytes with the internal representation of the automaton.
