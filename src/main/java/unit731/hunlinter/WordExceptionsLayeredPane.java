@@ -165,7 +165,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
-         final String exception = StringUtils.strip(textField.getText());
+         final String exception = textField.getText().trim();
          if(!parserManager.getWexParser().contains(exception)){
             parserManager.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
             tagPanel.addTag(exception);
@@ -213,7 +213,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	private void filterWordExceptions(){
-		final String unmodifiedException = StringUtils.strip(textField.getText());
+		final String unmodifiedException = textField.getText().trim();
 		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
 			return;
 

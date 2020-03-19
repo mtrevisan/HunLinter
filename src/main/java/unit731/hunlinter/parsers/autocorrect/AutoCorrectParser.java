@@ -149,7 +149,7 @@ public class AutoCorrectParser{
 
 	private static String clearFilter(final String text){
 		//escape special characters
-		return Matcher.quoteReplacement(StringUtils.strip(text));
+		return Matcher.quoteReplacement(text.trim());
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String incorrect, String correct){

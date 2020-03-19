@@ -43,7 +43,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		if(components.length < 2)
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		final String partOfSpeech = StringUtils.strip(components[0]);
+		final String partOfSpeech = components[0].trim();
 		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')
 			throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 

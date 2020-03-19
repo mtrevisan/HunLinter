@@ -348,8 +348,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	private void filterAutoCorrect(){
-		final String unmodifiedIncorrectText = StringUtils.strip(incorrectTextField.getText());
-		final String unmodifiedCorrectText = StringUtils.strip(correctTextField.getText());
+		final String unmodifiedIncorrectText = incorrectTextField.getText().trim();
+		final String unmodifiedCorrectText = correctTextField.getText().trim();
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
 			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;

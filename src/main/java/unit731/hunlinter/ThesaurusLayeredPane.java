@@ -298,7 +298,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	}
 
 	private void filterThesaurus(){
-		final String unmodifiedSearchText = StringUtils.strip(synonymsTextField.getText());
+		final String unmodifiedSearchText = synonymsTextField.getText().trim();
 
 		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 

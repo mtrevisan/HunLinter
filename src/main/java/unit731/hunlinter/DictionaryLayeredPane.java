@@ -296,7 +296,7 @@ final int iconSize = 17;
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 
 	private void calculateProductions(){
-		final String inputText = StringUtils.strip(inputTextField.getText());
+		final String inputText = inputTextField.getText().trim();
 
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;

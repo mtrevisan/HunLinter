@@ -115,7 +115,7 @@ public class ThesaurusParser{
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		final String partOfSpeech = StringUtils.strip(posAndSyns[0]);
+		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
 		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
@@ -180,7 +180,7 @@ public class ThesaurusParser{
 	}
 
 	private static String[] extractPartOfSpeechFromFilter(String text){
-		text = StringUtils.strip(text);
+		text = text.trim();
 
 		int start = 0;
 		String[] pos = null;
@@ -210,7 +210,7 @@ public class ThesaurusParser{
 	}
 
 	private static String clearFilter(String text){
-		text = StringUtils.strip(text);
+		text = text.trim();
 
 		//remove part–of–speech and format the search string
 		int idx = text.indexOf(':');

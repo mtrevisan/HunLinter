@@ -242,7 +242,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
-      final String inputText = StringUtils.strip((String)inputComboBox.getEditor().getItem());
+      final String inputText = ((String)inputComboBox.getEditor().getItem()).trim();
       final int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
       final String inputCompounds = inputTextArea.getText();
 
@@ -375,7 +375,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	private void calculateCompoundProductions(){
-		final String inputText = StringUtils.strip((String)inputComboBox.getEditor().getItem());
+		final String inputText = ((String)inputComboBox.getEditor().getItem()).trim();
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 

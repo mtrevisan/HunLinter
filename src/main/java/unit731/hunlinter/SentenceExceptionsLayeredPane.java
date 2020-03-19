@@ -162,7 +162,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
-         final String exception = StringUtils.strip(textField.getText());
+         final String exception = textField.getText().trim();
          if(!parserManager.getSexParser().contains(exception)){
             parserManager.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
             tagPanel.addTag(exception);
@@ -211,7 +211,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	private void filterSentenceExceptions(){
-		final String unmodifiedException = StringUtils.strip(textField.getText());
+		final String unmodifiedException = textField.getText().trim();
 		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
 			return;
 
