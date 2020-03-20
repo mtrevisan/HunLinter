@@ -1,14 +1,24 @@
 package unit731.hunlinter.services.fsa;
 
+import com.carrotsearch.hppc.IntArrayDeque;
+import com.carrotsearch.hppc.IntArrayList;
+import com.carrotsearch.hppc.IntDeque;
+import com.carrotsearch.hppc.IntStack;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -63,7 +73,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns <code>true</code> if this <code>arc</code> does not have a terminating node
+	 * @return Returns whether this <code>arc</code> does NOT have a terminating node
 	 * 	(@link {@link #getEndNode(int)} will throw an exception). Implies {@link #isArcFinal(int)}.
 	 */
 	public abstract boolean isArcTerminal(final int arc);
@@ -191,8 +201,56 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @return Returns the argument (for access to anonymous class fields).
 	 */
 	public <T extends StateVisitor> T visitInPostOrder(final T v, final int node){
-		visitInPostOrder(v, node, new BitSet());
+		visitInPostOrder2(v, node, new BitSet());
 		return v;
+	}
+
+	private void visitInPostOrder2(final StateVisitor v, final int node, final BitSet visited){
+		final IntStack stack = new IntStack();
+		//push root node to first stack
+		stack.push(node);
+
+		//post-order traversal stack
+		final IntArrayList out = new IntArrayList();
+
+		//loop while first stack is not empty
+		while(!stack.isEmpty()){
+			final int current = stack.pop();
+//			if(visited.get(current))
+//				continue;
+
+//			visited.set(current);
+
+			//pop a node from first stack and push it to second stack
+			out.add(current);
+
+			//push children of the popped node from left to right to first stack
+			for(int arc = getFirstArc(current); arc != 0; arc = getNextArc(arc))
+				if(!isArcTerminal(arc))
+					stack.add(getEndNode(arc));
+		}
+
+		List<Integer> o0 = Arrays.stream(out.toArray()).mapToObj(x -> Integer.valueOf(x)).collect(Collectors.toList());
+		Collections.reverse(o0);
+		o0 = new ArrayList<>(new LinkedHashSet(o0));
+		String o1 = Arrays.toString(o0.stream().mapToInt(x -> x).toArray());
+		String o2 = Arrays.toString(new int[]{
+			92166, 92172, 92178, 92184, 92190, 92196, 92202, 92208, 92214, 92220, 92226, 92232, 92238, 92244, 92250, 92256, 92262,
+			92268, 92274, 92280, 92286, 92292, 92298, 92304, 92310, 92316, 92322, 92328, 92334, 92340, 92346, 92352, 92358, 92364,
+			92370, 92376, 92382, 92388, 92394, 92400, 92406, 92412, 92418, 92424, 92430, 92436, 92442, 92448, 92454, 92460, 92466,
+			92472, 92478, 92484, 92490, 92496, 92502, 92508, 92514, 92520, 92526, 92532, 92538, 92544, 92550, 92556, 92562, 92568,
+			92574, 92580, 92586, 92592, 92598, 92604, 92610, 92616, 92622, 92628, 92634, 92640, 92646, 92652, 92658, 92664, 92670,
+			92676, 92682 ,92688, 92694, 92700, 92706, 92712, 92718, 92724, 92730, 92736, 92742, 92748, 92754, 92760, 92766, 92772,
+			92778, 92784, 92790, 92796, 92802, 92808, 92814, 92820, 92826, 92832, 92838, 92844, 92850, 92856, 92862, 92868, 92874,
+			92880, 92886, 92892, 92898, 92904, 92910, 92916, 92922, 92928, 92934, 92940, 92946, 92952, 92958, 92964, 92970, 92976,
+			92982, 92988, 92994, 93000, 93006, 93012, 93018, 93024, 93030
+		});
+		if(!o1.equals(o2))
+			throw new IllegalArgumentException("different!");
+		//process nodes from second stack
+		final int[] oo = out.toArray();
+		for(int i = 0; i < oo.length; i ++)
+			v.accept(oo[i]);
 	}
 
 	//FIXME recursion to iteration!
@@ -205,6 +263,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(!isArcTerminal(arc) && !visitInPostOrder(v, getEndNode(arc), visited))
 				return false;
+System.out.println(node);
 		return v.accept(node);
 	}
 
