@@ -200,9 +200,8 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 		//process nodes from second stack
 		final BitSet visited = new BitSet();
-		final Iterator<IntCursor> itr = out.iterator();
-		while(itr.hasNext()){
-			final int n = itr.next().value;
+		for(final IntCursor intCursor : out){
+			final int n = intCursor.value;
 			if(!visited.get(n) && !v.accept(n))
 				break;
 

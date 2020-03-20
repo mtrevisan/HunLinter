@@ -69,19 +69,13 @@ import java.util.Set;
  */
 public class FSA5 extends FSA{
 
-	/**
-	 * Default filler byte.
-	 */
+	/** Default filler byte */
 	public final static byte DEFAULT_FILLER = '_';
 
-	/**
-	 * Default annotation byte.
-	 */
+	/** Default annotation byte */
 	public final static byte DEFAULT_ANNOTATION = '+';
 
-	/**
-	 * Automaton version as in the file header.
-	 */
+	/** Automaton version as in the file header */
 	public static final byte VERSION = 5;
 
 	/**
@@ -121,24 +115,16 @@ public class FSA5 extends FSA{
 	 */
 	public final int nodeDataLength;
 
-	/**
-	 * Flags for this automaton version.
-	 */
+	/** Flags for this automaton version */
 	private Set<FSAFlags> flags;
 
-	/**
-	 * Number of bytes each address takes in full, expanded form (goto length).
-	 */
+	/** Number of bytes each address takes in full, expanded form (goto length) */
 	public final int gtl;
 
-	/**
-	 * Filler character.
-	 */
+	/** Filler character */
 	public final byte filler;
 
-	/**
-	 * Annotation character.
-	 */
+	/** Annotation character */
 	public final byte annotation;
 
 

@@ -19,9 +19,6 @@ public class FSAHeader{
 	/** FSA magic (4 bytes) */
 	static final int FSA_MAGIC = (FSA_MAGIC1 << 24) | (FSA_MAGIC2 << 16) | (FSA_MAGIC3 << 8) | FSA_MAGIC4;
 
-	/** Maximum length of the header block */
-	static final int MAX_HEADER_LENGTH = 4 + 8;
-
 
 	/** FSA version number */
 	final byte version;
