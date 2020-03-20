@@ -159,19 +159,17 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearization of states */
 	private IntArrayList linearize(final FSA fsa) throws IOException{
-		//states with most inlinks (these should be placed as close to the start of the automaton as possible
+		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
 		final IntIntHashMap inLinkCount = computeInlinkCount(fsa);
 
 		//ordered states for serialization
 		final IntArrayList linearized = new IntArrayList(0,
-			new BoundedProportionalArraySizingStrategy(1000, 10000, 1.5f));
+			new BoundedProportionalArraySizingStrategy(1_000, 10_000, 1.5f));
 
 		//determine which states should be linearized first (at fixed positions) so as to minimize the place occupied by
 		//goto fields
-		final int maxStates = Integer.MAX_VALUE;
-		final int minInLinkCount = 2;
-		final int[] states = computeFirstStates(inLinkCount, maxStates, minInLinkCount);
+		final int[] states = computeFirstStates(inLinkCount, Integer.MAX_VALUE, 2);
 
 		//compute initial addresses, without node rearrangements
 		final int serializedSize = linearizeAndCalculateOffsets(fsa, new IntArrayList(), linearized, offsets);
@@ -186,6 +184,7 @@ public class CFSA2Serializer implements FSASerializer{
 		int cutAt = 0;
 		for(int cut = Math.min(25, states.length); cut <= Math.min(150, states.length); cut += 25){
 			sublist.elementsCount = cut;
+
 			final int newSize = linearizeAndCalculateOffsets(fsa, sublist, linearized, offsets);
 			LOGGER.trace("Moved {} states, output size: {}", sublist.size(), newSize);
 			if(newSize >= serializedSize)
@@ -198,6 +197,7 @@ public class CFSA2Serializer implements FSASerializer{
 		sublist.elementsCount = cutAt;
 		final int size = linearizeAndCalculateOffsets(fsa, sublist, linearized, offsets);
 		LOGGER.trace("{} states moved, final size: {}", sublist.size(), size);
+
 		return linearized;
 	}
 
@@ -208,7 +208,7 @@ public class CFSA2Serializer implements FSASerializer{
 		final IntStack nodes = new IntStack();
 		linearized.clear();
 
-		//linearize states with most inlinks first
+		//linearize states with most in-links first
 		for(int i = 0; i < states.size(); i ++)
 			linearizeState(fsa, nodes, linearized, visited, states.get(i));
 
