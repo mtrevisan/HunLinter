@@ -238,9 +238,6 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 			case FSA5.VERSION:
 				return new FSA5(stream);
 
-			case CFSA.VERSION:
-				return new CFSA(stream);
-
 			case CFSA2.VERSION:
 				return new CFSA2(stream);
 
