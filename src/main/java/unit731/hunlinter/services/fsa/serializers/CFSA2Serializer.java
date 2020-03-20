@@ -113,8 +113,8 @@ public class CFSA2Serializer implements FSASerializer{
 
 		//emit the automaton
 		final int size = emitNodes(fsa, os, linearized);
-		if(LOGGER.isErrorEnabled() && size != 0)
-			LOGGER.error("Size changed in the final pass: {}", size);
+		if(size != 0)
+			throw new IllegalArgumentException("Size changed in the final pass: " + size);
 
 		return os;
 	}
@@ -322,8 +322,9 @@ public class CFSA2Serializer implements FSASerializer{
 				offsetsChanged |= (offsets.get(state) != offset);
 				offsets.put(state, offset);
 			}
-			else if(LOGGER.isErrorEnabled() && offsets.get(state) != offset)
-				LOGGER.error("Error on offsets: state {}, offset of state {}, offset {}", state, offsets.get(state), offset);
+			else if(offsets.get(state) != offset)
+				throw new IllegalArgumentException("Error on offsets: state " + state
+					+ ", offset of state " + offsets.get(state) + ", offset " + offset);
 
 			offset += emitNodeData(os, serializeWithNumbers? numbers.get(state): 0);
 			offset += emitNodeArcs(fsa, os, state, nextState);
@@ -405,8 +406,8 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Write a v-int to a byte array */
 	private int writeVInt(final byte[] array, int value){
-		if(LOGGER.isErrorEnabled() && value < 0)
-			LOGGER.error("Can't v-code negative integers: {}", value);
+		if(value < 0)
+			throw new IllegalArgumentException("V-code can't be negative: " + value);
 
 		int offset = 0;
 		while(value > 0x7F){
