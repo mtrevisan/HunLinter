@@ -17,6 +17,7 @@ import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -116,8 +117,10 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
-			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
+			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os);
+
+				Files.write(outputFile.toPath(), os.toByteArray());
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
 

@@ -217,12 +217,13 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @throws IOException Rethrown if an I/O exception occurs.
 	 */
 	protected static byte[] readRemaining(final InputStream in) throws IOException{
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final byte[] buffer = new byte[1024 * 8];
-		int len;
-		while((len = in.read(buffer)) >= 0)
-			baos.write(buffer, 0, len);
-		return baos.toByteArray();
+		try(final ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+			final byte[] buffer = new byte[1024 * 8];
+			int len;
+			while((len = in.read(buffer)) >= 0)
+				baos.write(buffer, 0, len);
+			return baos.toByteArray();
+		}
 	}
 
 	/**

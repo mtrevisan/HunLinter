@@ -212,6 +212,7 @@ public class Production extends DictionaryEntry{
 		return stem;
 	}
 
+	//FIXME refactor for speed-up
 	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(){
 		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
 		final List<MorphologicalTag> mtags = Arrays.asList(MorphologicalTag.PART_OF_SPEECH, MorphologicalTag.INFLECTIONAL_SUFFIX,

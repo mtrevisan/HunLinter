@@ -22,6 +22,10 @@ public class ByteSink{
 	 * @return	The byte array
 	 */
 	public byte[] getByteArray(){
+		try{
+			stream.close();
+		}
+		catch(final IOException ignored){}
 		return stream.toByteArray();
 	}
 

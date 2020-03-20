@@ -27,12 +27,11 @@ import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -187,17 +186,21 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			file.delete();
 
-			return builder.complete();
+			final FSA fsa = builder.complete();
+
+			validateFSA(fsa, metadata);
+
+			return fsa;
 		};
 		final Function<FSA, File> step4 = fsa -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
 
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
-			try(final OutputStream os = new BufferedOutputStream(Files.newOutputStream(outputFile.toPath()))){
+			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os);
 
-				validateFSA(fsa, metadata);
+				Files.write(outputFile.toPath(), os.toByteArray());
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
 

@@ -87,6 +87,7 @@ public class FileHelper{
 			}
 		}){
 			gzip.write(bytes);
+			os.close();
 		}
 		return os.toByteArray();
 	}
