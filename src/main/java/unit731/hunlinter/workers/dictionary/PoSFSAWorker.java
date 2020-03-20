@@ -184,7 +184,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			processLines(file.toPath(), charset, fsaProcessor);
 
-			file.delete();
+			if(!file.delete())
+				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
 
 			final FSA fsa = builder.complete();
 
@@ -195,7 +196,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<FSA, File> step4 = fsa -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
 
-			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os);
