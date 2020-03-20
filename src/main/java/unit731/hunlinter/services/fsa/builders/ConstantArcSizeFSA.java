@@ -51,7 +51,8 @@ public class ConstantArcSizeFSA extends FSA{
 	 * @param data FSA data. There must be no trailing bytes after the last state.
 	 */
 	ConstantArcSizeFSA(final byte[] data, final int epsilon){
-		assert epsilon == 0: "Epsilon is not zero?";
+		if(epsilon != 0)
+			throw new IllegalArgumentException("Epsilon is not zero: " + epsilon);
 
 		this.epsilon = epsilon;
 		this.data = data;

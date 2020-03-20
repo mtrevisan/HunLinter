@@ -106,10 +106,11 @@ public class FSABuilder{
 	 * @param sequence The array holding input sequence of bytes.
 	 */
 	public final void add(final byte[] sequence){
-		assert serialized != null : "Automaton already built.";
-		assert previous == null || sequence.length == 0 || compare(previous, previousLength, sequence, sequence.length) <= 0 :
-			"Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength)) + " >= "
-			+ Arrays.toString(Arrays.copyOfRange(sequence, 0, sequence.length));
+		if(serialized == null)
+			throw new IllegalArgumentException("Automaton already built");
+		if(previous != null && sequence.length > 0 && compare(previous, previousLength, sequence, sequence.length) > 0)
+			throw new IllegalArgumentException("Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength))
+				+ " >= " + Arrays.toString(Arrays.copyOfRange(sequence, 0, sequence.length)));
 
 		final int len = sequence.length;
 		setPrevious(sequence, len);
@@ -293,7 +294,8 @@ public class FSABuilder{
 
 	/** Hash code of a fragment of {@link #serialized} array */
 	private int hash(int start, final int byteCount){
-		assert byteCount % ConstantArcSizeFSA.ARC_SIZE == 0 : "Not an arc multiply?";
+		if(byteCount % ConstantArcSizeFSA.ARC_SIZE != 0)
+			throw new IllegalArgumentException("Not an arc multiply: " + byteCount + " mod " + ConstantArcSizeFSA.ARC_SIZE);
 
 		int h = 0;
 		for(int arcs = byteCount / ConstantArcSizeFSA.ARC_SIZE; -- arcs >= 0; start += ConstantArcSizeFSA.ARC_SIZE){
