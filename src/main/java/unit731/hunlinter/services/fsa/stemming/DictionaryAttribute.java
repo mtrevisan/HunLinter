@@ -11,7 +11,11 @@ import java.util.Locale;
 import java.util.Map;
 
 
-/** Attributes applying to {@link Dictionary} and {@link DictionaryMetadata}. */
+/**
+ * Attributes applying to {@link Dictionary} and {@link DictionaryMetadata}.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public enum DictionaryAttribute{
 
 	/**

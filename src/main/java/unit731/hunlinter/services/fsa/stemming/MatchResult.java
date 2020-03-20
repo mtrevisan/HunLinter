@@ -5,6 +5,7 @@ package unit731.hunlinter.services.fsa.stemming;
  * A matching result returned from {@link FSATraversal}.
  *
  * @see FSATraversal
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class MatchResult{
 

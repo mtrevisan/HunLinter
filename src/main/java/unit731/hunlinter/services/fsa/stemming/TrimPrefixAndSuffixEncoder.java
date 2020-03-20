@@ -30,6 +30,8 @@ import java.nio.ByteBuffer;
  * dst: xyz
  * encoded: ADxyz
  * </pre>
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class TrimPrefixAndSuffixEncoder implements ISequenceEncoder{
 

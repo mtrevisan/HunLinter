@@ -1,7 +1,11 @@
 package unit731.hunlinter.services.fsa.stemming;
 
 
-/** Known {@link ISequenceEncoder}s. */
+/**
+ * Known {@link ISequenceEncoder}s.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public enum EncoderType{
 
 	SUFFIX{

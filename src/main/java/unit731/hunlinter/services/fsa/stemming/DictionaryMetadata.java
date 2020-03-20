@@ -25,7 +25,11 @@ import java.util.Map;
 import java.util.Properties;
 
 
-/** Description of attributes, their types and default values */
+/**
+ * Description of attributes, their types and default values
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class DictionaryMetadata{
 
 	/** Default attribute values */

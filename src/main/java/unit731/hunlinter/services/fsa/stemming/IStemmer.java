@@ -3,7 +3,11 @@ package unit731.hunlinter.services.fsa.stemming;
 import java.util.List;
 
 
-/** A generic &quot;stemmer&quot; interface */
+/**
+ * A generic &quot;stemmer&quot; interface
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public interface IStemmer{
 
 	/**

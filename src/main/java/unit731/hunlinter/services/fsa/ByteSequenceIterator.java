@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 /**
  * An iterator that traverses the right language of a given node (all sequences
  * reachable from a given node).
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 

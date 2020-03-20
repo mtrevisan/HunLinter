@@ -28,6 +28,8 @@ import java.nio.ByteBuffer;
  * dst: bar
  * encoded: Dbar
  * </pre>
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class TrimSuffixEncoder implements ISequenceEncoder{
 

@@ -4,7 +4,11 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
 
 
-/** This class implements some common matching and scanning operations on a generic FSA */
+/**
+ * This class implements some common matching and scanning operations on a generic FSA
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class FSATraversal{
 
 	/**

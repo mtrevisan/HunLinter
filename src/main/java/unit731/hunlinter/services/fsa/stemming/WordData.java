@@ -26,6 +26,8 @@ import java.nio.charset.CharsetDecoder;
  * of this class in associative containers or lists. In fact,
  * both {@link #equals(Object)} and {@link #hashCode()} are overridden and throw
  * exceptions to prevent accidental damage.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class WordData implements Cloneable{
 

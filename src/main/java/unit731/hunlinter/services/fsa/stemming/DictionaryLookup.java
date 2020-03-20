@@ -17,6 +17,8 @@ import java.util.Map;
  * This class implements a dictionary lookup of an inflected word over a
  * dictionary previously compiled using the
  * <code>dict_compile</code> tool.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class DictionaryLookup implements IStemmer, Iterable<WordData>{
 

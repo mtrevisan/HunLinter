@@ -20,6 +20,8 @@ import java.nio.file.Path;
  * <li>an actual compressed FSA file,
  * <li>{@link DictionaryMetadata}, describing the way terms are encoded.
  * </ul>
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class Dictionary{
 

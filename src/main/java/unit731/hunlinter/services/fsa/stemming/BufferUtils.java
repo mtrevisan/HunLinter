@@ -11,14 +11,12 @@ import java.nio.charset.CodingErrorAction;
 import java.util.Arrays;
 
 
+/**
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class BufferUtils{
 
-	/**
-	 * No instances.
-	 */
-	private BufferUtils(){
-		// empty
-	}
+	private BufferUtils(){}
 
 	/**
 	 * Ensure the buffer's capacity is large enough to hold a given number
@@ -30,13 +28,11 @@ public class BufferUtils{
 	 *                 allocated.
 	 * @return Returns the same buffer or a new buffer with the given capacity.
 	 */
-	public static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, int elements){
-		if(buffer == null || buffer.capacity() < elements){
+	public static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
 			buffer = ByteBuffer.allocate(elements);
-		}
-		else{
+		else
 			buffer.clear();
-		}
 		return buffer;
 	}
 
@@ -50,13 +46,11 @@ public class BufferUtils{
 	 *                 allocated.
 	 * @return Returns the same buffer or a new buffer with the given capacity.
 	 */
-	public static CharBuffer clearAndEnsureCapacity(CharBuffer buffer, int elements){
-		if(buffer == null || buffer.capacity() < elements){
+	public static CharBuffer clearAndEnsureCapacity(CharBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
 			buffer = CharBuffer.allocate(elements);
-		}
-		else{
+		else
 			buffer.clear();
-		}
 		return buffer;
 	}
 
@@ -65,16 +59,16 @@ public class BufferUtils{
 	 * @param charset The charset to use when converting bytes to characters.
 	 * @return A string representation of buffer's content.
 	 */
-	public static String toString(ByteBuffer buffer, Charset charset){
+	public static String toString(ByteBuffer buffer, final Charset charset){
 		buffer = buffer.slice();
-		byte[] buf = new byte[buffer.remaining()];
+		final byte[] buf = new byte[buffer.remaining()];
 		buffer.get(buf);
 		return new String(buf, charset);
 	}
 
 	public static String toString(CharBuffer buffer){
 		buffer = buffer.slice();
-		char[] buf = new char[buffer.remaining()];
+		final char[] buf = new char[buffer.remaining()];
 		buffer.get(buf);
 		return new String(buf);
 	}
@@ -83,8 +77,8 @@ public class BufferUtils{
 	 * @param buffer The buffer to read from.
 	 * @return Returns the remaining bytes from the buffer copied to an array.
 	 */
-	public static byte[] toArray(ByteBuffer buffer){
-		byte[] dst = new byte[buffer.remaining()];
+	public static byte[] toArray(final ByteBuffer buffer){
+		final byte[] dst = new byte[buffer.remaining()];
 		buffer.mark();
 		buffer.get(dst);
 		buffer.reset();
@@ -94,21 +88,20 @@ public class BufferUtils{
 	/**
 	 * Compute the length of the shared prefix between two byte sequences.
 	 */
-	static int sharedPrefixLength(ByteBuffer a, int aStart, ByteBuffer b, int bStart){
+	static int sharedPrefixLength(final ByteBuffer a, int aStart, final ByteBuffer b, int bStart){
 		int i = 0;
 		final int max = Math.min(a.remaining() - aStart, b.remaining() - bStart);
 		aStart += a.position();
 		bStart += b.position();
-		while(i < max && a.get(aStart ++) == b.get(bStart ++)){
+		while(i < max && a.get(aStart ++) == b.get(bStart ++))
 			i ++;
-		}
 		return i;
 	}
 
 	/**
 	 * Compute the length of the shared prefix between two byte sequences.
 	 */
-	static int sharedPrefixLength(ByteBuffer a, ByteBuffer b){
+	static int sharedPrefixLength(final ByteBuffer a, final ByteBuffer b){
 		return sharedPrefixLength(a, 0, b, 0);
 	}
 
@@ -128,12 +121,14 @@ public class BufferUtils{
 			bytes.reset();
 			try{
 				cr.throwException();
-			}catch(CharacterCodingException e){
+			}
+			catch(final CharacterCodingException e){
 				throw new RuntimeException("Input cannot be mapped to bytes using encoding " + decoder.charset().name() + ": " + Arrays.toString(toArray(bytes)), e);
 			}
 		}
 
-		assert cr.isUnderflow();  // This should be guaranteed by ensuring max. capacity.
+		//this should be guaranteed by ensuring max. capacity
+		assert cr.isUnderflow();
 		cr = decoder.flush(chars);
 		assert cr.isUnderflow();
 
@@ -159,7 +154,8 @@ public class BufferUtils{
 			chars.reset();
 			try{
 				cr.throwException();
-			}catch(CharacterCodingException e){
+			}
+			catch(final CharacterCodingException e){
 				throw new IllegalArgumentException("Input cannot be mapped to characters using encoding " + encoder.charset().name() + ": " + Arrays.toString(toArray(bytes)), e);
 			}
 		}

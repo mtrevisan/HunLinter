@@ -8,7 +8,11 @@ import java.util.ListIterator;
 import java.util.RandomAccess;
 
 
-/** A view over a range of an array. */
+/**
+ * A view over a range of an array.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ */
 public class ArrayViewList<E> extends AbstractList<E> implements RandomAccess, Serializable{
 
 	/**

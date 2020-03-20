@@ -83,6 +83,8 @@ import java.util.Set;
  *       |A|A|A|A|A|A|A|A| +------ v-coded goto address
  *       +-+-+-+-+-+-+-+-+/
  * </pre>
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class CFSA2 extends FSA{
 
