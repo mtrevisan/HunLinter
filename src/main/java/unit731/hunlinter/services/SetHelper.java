@@ -70,17 +70,6 @@ public class SetHelper{
 	}
 
 	/**
-	 * Returns the cardinality of the specified set (|A|).
-	 *
-	 * @param <T>	The type of the values contained into the set
-	 * @param set	Set
-	 * @return	The cardinality of {@code set}
-	 */
-	public static <T> int cardinality(final Set<T> set){
-		return set.size();
-	}
-
-	/**
 	 * Returns a set with the union of two sets (A ∪ B).
 	 * <p>
 	 * The returned set contains all elements that are contained either in {@code set1} and {@code set2}.
@@ -261,18 +250,13 @@ public class SetHelper{
 		return new ArrayList<>(compaction.values());
 	}
 
-	public static <V> List<V> getDuplicates(final List<V> list){
-		final List<V> result = new ArrayList<>();
-		for(final List<V> duplicates : getDuplicatesMap(list).values())
-			if(duplicates.size() > 1)
-				forEach(duplicates, result::add);
-		return result;
-	}
-
-	private static <V> Map<V, List<V>> getDuplicatesMap(final List<V> personList){
-		final Map<V, List<V>> map = new HashMap<>();
-		forEach(personList, v -> map.computeIfAbsent(v, k -> new ArrayList<>()).add(v));
-		return map;
+	public static <V> Set<V> getDuplicates(final V... list){
+		final Set<V> uniques = new HashSet<>();
+		final Set<V> duplicates = new HashSet<>();
+		for(final V elem : list)
+			if(!uniques.add(elem))
+				duplicates.add(elem);
+		return duplicates;
 	}
 
 }

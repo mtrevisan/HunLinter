@@ -119,7 +119,7 @@ public class RegexHelper{
 	}
 
 	public static <V> String mergeSet(final Set<V> set, final Comparator<String> comparator){
-		final List<String> list = new ArrayList<>();
+		final List<String> list = new ArrayList<>(set.size());
 		forEach(set, v -> list.add(String.valueOf(v)));
 		list.sort(comparator);
 

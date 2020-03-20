@@ -317,7 +317,7 @@ public class RulesReducer{
 	private void disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
 			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
 		//extract children
-		final List<LineEntry> children = new ArrayList<>();
+		final List<LineEntry> children = new ArrayList<>(rules.size());
 		applyIf(rules,
 			rule -> rule.condition.endsWith(condition),
 			children::add);
@@ -335,7 +335,7 @@ public class RulesReducer{
 			final Set<Character> parentGroup = groups.get(parent);
 
 			//extract negated group
-			final List<LineEntry> childrenNotParent = new ArrayList<>();
+			final List<LineEntry> childrenNotParent = new ArrayList<>(children.size());
 			applyIf(children,
 				child -> child != parent,
 				childrenNotParent::add);
@@ -379,7 +379,7 @@ public class RulesReducer{
 					notRule.condition = parent.condition;
 				else{
 					//find already present rule
-					final List<LineEntry> alreadyPresentRules = new ArrayList<>();
+					final List<LineEntry> alreadyPresentRules = new ArrayList<>(finalRules.size());
 					applyIf(finalRules,
 						r -> r.removal.equals(parent.removal) && r.addition.equals(parent.addition)
 							&& r.condition.endsWith(parent.condition),

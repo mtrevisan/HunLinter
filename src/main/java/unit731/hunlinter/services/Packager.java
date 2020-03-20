@@ -32,7 +32,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 
-import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
 
@@ -443,10 +442,8 @@ public class Packager{
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
 			final Map<String, File> folders) throws IOException{
 		//restrict to given language
-		final List<Node> children = new ArrayList<>();
-		applyIf(extractChildren(entry),
-			node -> ArrayUtils.contains(extractLocale(node), language),
-			children::add);
+		final List<Node> children = extractChildren(entry);
+		children.removeIf(node -> !ArrayUtils.contains(extractLocale(node), language));
 		for(final Node child : children){
 			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			final String childFolders = extractLocation(child);

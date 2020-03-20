@@ -216,10 +216,11 @@ public class AffixData{
 	}
 
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
-		final List<AffixEntry> list = new ArrayList<>();
+		final ArrayList<AffixEntry> list = new ArrayList<>(entries.size());
 		applyIf(entries,
 			entry -> entry.canApplyTo(word),
 			list::add);
+		list.trimToSize();
 		return list;
 	}
 
@@ -332,10 +333,11 @@ public class AffixData{
 	}
 
 	public List<RuleEntry> getRuleEntries(){
-		final List<RuleEntry> list = new ArrayList<>();
+		final ArrayList<RuleEntry> list = new ArrayList<>(data.size());
 		applyIf(data.values(),
 			entry -> RuleEntry.class.isAssignableFrom(entry.getClass()),
 			entry -> list.add((RuleEntry)entry));
+		list.trimToSize();
 		return list;
 	}
 

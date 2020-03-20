@@ -81,7 +81,7 @@ public class AutoCorrectParser{
 		final Map<String, List<CorrectionEntry>> map = new HashMap<>();
 		forEach(dictionary,
 			correctionEntry -> map.computeIfAbsent(correctionEntry.getIncorrectForm(), k -> new ArrayList<>(1)).add(correctionEntry));
-		final List<List<CorrectionEntry>> duplications = new ArrayList<>();
+		final List<List<CorrectionEntry>> duplications = new ArrayList<>(map.size());
 		applyIf(map.values(),
 			list -> list.size() > 1,
 			duplications::add);
@@ -131,10 +131,11 @@ public class AutoCorrectParser{
 
 	/* Find if there is a duplicate with the same incorrect and correct forms */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
-		final List<CorrectionEntry> duplicates = new ArrayList<>();
+		final ArrayList<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
 		applyIf(dictionary,
 			correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct),
 			duplicates::add);
+		duplicates.trimToSize();
 		return duplicates;
 	}
 

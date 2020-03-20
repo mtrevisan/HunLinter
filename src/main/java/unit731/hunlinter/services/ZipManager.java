@@ -57,7 +57,7 @@ public class ZipManager{
 	}
 
 	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
-		final List<String> filteredFolders = new ArrayList<>();
+		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
 		for(String folder : folders){
 			folder = Path.of(folder)
 				.toString();
@@ -73,6 +73,7 @@ public class ZipManager{
 			if(process)
 				filteredFolders.add(folder);
 		}
+		filteredFolders.trimToSize();
 		return filteredFolders;
 	}
 

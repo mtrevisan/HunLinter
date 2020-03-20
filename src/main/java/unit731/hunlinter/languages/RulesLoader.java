@@ -114,7 +114,7 @@ public class RulesLoader{
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		final List<String> list = new ArrayList<>();
+		final List<String> list = new ArrayList<>(rulesProperties.size());
 		for(final Object o : rulesProperties.keySet()){
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){

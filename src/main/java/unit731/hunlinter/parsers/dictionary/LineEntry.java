@@ -90,10 +90,11 @@ public class LineEntry implements Serializable{
 
 	public List<String> extractFromEndingWith(final String suffix){
 		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
-		final List<String> list = new ArrayList<>();
+		final ArrayList<String> list = new ArrayList<>(from.size());
 		applyIf(from,
 			word -> RegexHelper.find(word, conditionPattern),
 			list::add);
+		list.trimToSize();
 		return list;
 	}
 

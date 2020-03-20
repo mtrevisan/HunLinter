@@ -211,8 +211,10 @@ public class AffixEntry{
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final String tag = morphologicalTag.getCode();
 		final int purgeTag = tag.length();
-		final List<String> collector = new ArrayList<>();
-		applyIf(morphologicalFields, df -> df.startsWith(tag), df -> collector.add(df.substring(purgeTag)));
+		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.length: 0);
+		applyIf(morphologicalFields,
+			df -> df.startsWith(tag),
+			df -> collector.add(df.substring(purgeTag)));
 		return collector;
 	}
 
