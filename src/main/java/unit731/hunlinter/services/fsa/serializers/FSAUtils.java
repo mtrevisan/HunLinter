@@ -22,7 +22,7 @@ public class FSAUtils{
 	 */
 	public static IntIntHashMap rightLanguageForAllStates(final FSA fsa){
 		final IntIntHashMap numbers = new IntIntHashMap();
-		fsa.visitInPostOrder(state -> {
+		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
 			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
 				thisNodeNumber += (fsa.isArcFinal(arc)? 1: 0)
@@ -32,6 +32,16 @@ public class FSAUtils{
 			return true;
 		});
 		return numbers;
+	}
+
+	/**
+	 * Returns an n-byte integer encoded in byte-packed representation.
+	 */
+	public static int decodeFromBytes(final byte[] arcs, final int start, final int n){
+		int r = 0;
+		for(int i = n; -- i >= 0; )
+			r = r << 8 | (arcs[start + i] & 0xFF);
+		return r;
 	}
 
 }

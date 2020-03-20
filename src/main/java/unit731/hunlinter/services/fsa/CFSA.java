@@ -1,5 +1,7 @@
 package unit731.hunlinter.services.fsa;
 
+import unit731.hunlinter.services.fsa.serializers.FSAUtils;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -277,7 +279,7 @@ public class CFSA extends FSA{
 	@Override
 	public int getRightLanguageCount(int node){
 		assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
-		return FSA5.decodeFromBytes(arcs, node, nodeDataLength);
+		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
 	}
 
 	/**

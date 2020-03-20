@@ -1,5 +1,7 @@
 package unit731.hunlinter.services.fsa;
 
+import unit731.hunlinter.services.fsa.serializers.FSAUtils;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -252,7 +254,7 @@ public class FSA5 extends FSA{
 	@Override
 	public int getRightLanguageCount(int node){
 		assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
-		return decodeFromBytes(arcs, node, nodeDataLength);
+		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
 	}
 
 	/**
@@ -289,17 +291,6 @@ public class FSA5 extends FSA{
 	}
 
 	/**
-	 * Returns an n-byte integer encoded in byte-packed representation.
-	 */
-	static int decodeFromBytes(final byte[] arcs, final int start, final int n){
-		int r = 0;
-		for(int i = n; --i >= 0; ){
-			r = r << 8 | (arcs[start + i] & 0xFF);
-		}
-		return r;
-	}
-
-	/**
 	 * Returns the address of the node pointed to by this arc.
 	 */
 	final int getDestinationNodeOffset(int arc){
@@ -312,7 +303,7 @@ public class FSA5 extends FSA{
 			 * The destination node address has to be extracted from the arc's
 			 * goto field.
 			 */
-			return decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
+			return FSAUtils.decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
 		}
 	}
 

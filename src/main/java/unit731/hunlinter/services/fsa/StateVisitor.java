@@ -4,8 +4,7 @@ package unit731.hunlinter.services.fsa;
 /**
  * State visitor.
  *
- * @see FSA#visitInPostOrder(StateVisitor)
- * @see FSA#visitInPreOrder(StateVisitor)
+ * @see FSA#visitPostOrder(StateVisitor)
  */
 public interface StateVisitor{
 

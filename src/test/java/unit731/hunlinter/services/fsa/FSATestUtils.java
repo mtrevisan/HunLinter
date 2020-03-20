@@ -95,7 +95,7 @@ public class FSATestUtils{
 	public static void checkMinimal(final FSA fsa){
 		final Map<String, Integer> stateLanguages = new HashMap<String, Integer>();
 
-		fsa.visitInPostOrder(new StateVisitor(){
+		fsa.visitPostOrder(new StateVisitor(){
 			private StringBuffer sb = new StringBuffer();
 
 			public boolean accept(int state){

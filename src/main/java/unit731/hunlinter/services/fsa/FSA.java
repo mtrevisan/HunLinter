@@ -1,7 +1,6 @@
 package unit731.hunlinter.services.fsa;
 
 import com.carrotsearch.hppc.IntArrayDeque;
-import com.carrotsearch.hppc.IntArrayList;
 import com.carrotsearch.hppc.IntDeque;
 import com.carrotsearch.hppc.IntStack;
 import com.carrotsearch.hppc.cursors.IntCursor;
@@ -10,16 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -167,49 +161,26 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * Visit all states. The order of visiting is undefined. This method may be
-	 * faster than traversing the automaton in post or preorder since it can scan
+	 * faster than traversing the automaton in post- or pre-order since it can scan
 	 * states linearly. Returning false from {@link StateVisitor#accept(int)}
 	 * immediately terminates the traversal.
 	 *
 	 * @param v   Visitor to receive traversal calls.
-	 * @param <T> A subclass of {@link StateVisitor}.
-	 * @return Returns the argument (for access to anonymous class fields).
 	 */
-	public <T extends StateVisitor> T visitAllStates(final T v){
-		return visitInPostOrder(v);
+	public void visitAllStates(final StateVisitor v){
+		visitPostOrder(v);
 	}
 
 	/**
-	 * Same as {@link #visitInPostOrder(StateVisitor, int)}, starting from root
-	 * automaton node.
+	 * Visits all states reachable from the root node in post-order.
+	 * Returning false from {@link StateVisitor#accept(int)} skips traversal of all sub-states of a given state.
 	 *
 	 * @param v   Visitor to receive traversal calls.
-	 * @param <T> A subclass of {@link StateVisitor}.
-	 * @return Returns the argument (for access to anonymous class fields).
 	 */
-	public <T extends StateVisitor> T visitInPostOrder(final T v){
-		return visitInPostOrder(v, getRootNode());
-	}
-
-	/**
-	 * Visits all states reachable from <code>node</code> in postorder. Returning
-	 * false from {@link StateVisitor#accept(int)} immediately terminates the
-	 * traversal.
-	 *
-	 * @param v    Visitor to receive traversal calls.
-	 * @param <T>  A subclass of {@link StateVisitor}.
-	 * @param node Identifier of the node.
-	 * @return Returns the argument (for access to anonymous class fields).
-	 */
-	public <T extends StateVisitor> T visitInPostOrder(final T v, final int node){
-		visitInPostOrder2(v, node, new BitSet());
-		return v;
-	}
-
-	private void visitInPostOrder2(final StateVisitor v, final int node, final BitSet ignored){
+	public void visitPostOrder(final StateVisitor v){
 		final IntStack stack = new IntStack();
 		//push root node to first stack
-		stack.push(node);
+		stack.push(getRootNode());
 
 		//post-order traversal stack
 		final IntDeque out = new IntArrayDeque();
@@ -227,76 +198,16 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 					stack.add(getEndNode(arc));
 		}
 
-		List<Integer> o0 = new ArrayList<>();
-
 		//process nodes from second stack
 		final BitSet visited = new BitSet();
-		final int[] oo = out.toArray();
-		for(int i = 0; i < oo.length; i ++){
-			final int n = oo[i];
-			if(!visited.get(n)){
-				v.accept(n);
-				o0.add(n);
-			}
+		final Iterator<IntCursor> itr = out.iterator();
+		while(itr.hasNext()){
+			final int n = itr.next().value;
+			if(!visited.get(n) && !v.accept(n))
+				break;
 
 			visited.set(n);
 		}
-
-		String o1 = Arrays.toString(o0.toArray());
-		String o2 = Arrays.toString(new int[]{
-			92166, 92172, 92178, 92184, 92190, 92196, 92202, 92208, 92214, 92220, 92226, 92232, 92238, 92244, 92250, 92256, 92262,
-			92268, 92274, 92280, 92286, 92292, 92298, 92304, 92310, 92316, 92322, 92328, 92334, 92340, 92346, 92352, 92358, 92364,
-			92370, 92376, 92382, 92388, 92394, 92400, 92406, 92412, 92418, 92424, 92430, 92436, 92442, 92448, 92454, 92460, 92466,
-			92472, 92478, 92484, 92490, 92496, 92502, 92508, 92514, 92520, 92526, 92532, 92538, 92544, 92550, 92556, 92562, 92568,
-			92574, 92580, 92586, 92592, 92598, 92604, 92610, 92616, 92622, 92628, 92634, 92640, 92646, 92652, 92658, 92664, 92670,
-			92676, 92682 ,92688, 92694, 92700, 92706, 92712, 92718, 92724, 92730, 92736, 92742, 92748, 92754, 92760, 92766, 92772,
-			92778, 92784, 92790, 92796, 92802, 92808, 92814, 92820, 92826, 92832, 92838, 92844, 92850, 92856, 92862, 92868, 92874,
-			92880, 92886, 92892, 92898, 92904, 92910, 92916, 92922, 92928, 92934, 92940, 92946, 92952, 92958, 92964, 92970, 92976,
-			92982, 92988, 92994, 93000, 93006, 93012, 93018, 93024, 93030
-		});
-		if(!o1.equals(o2))
-			throw new IllegalArgumentException("different!");
-	}
-
-	//FIXME recursion to iteration!
-	private boolean visitInPostOrder(final StateVisitor v, final int node, final BitSet visited){
-		if(visited.get(node))
-			return true;
-
-		visited.set(node);
-
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			if(!isArcTerminal(arc) && !visitInPostOrder(v, getEndNode(arc), visited))
-				return false;
-System.out.println(node);
-		return v.accept(node);
-	}
-
-	/**
-	 * Same as {@link #visitInPreOrder(StateVisitor, int)}, starting from root
-	 * automaton node.
-	 *
-	 * @param v   Visitor to receive traversal calls.
-	 * @param <T> A subclass of {@link StateVisitor}.
-	 * @return Returns the argument (for access to anonymous class fields).
-	 */
-	public <T extends StateVisitor> T visitInPreOrder(final T v){
-		return visitInPreOrder(v, getRootNode());
-	}
-
-	/**
-	 * Visits all states in preorder. Returning false from
-	 * {@link StateVisitor#accept(int)} skips traversal of all sub-states of a
-	 * given state.
-	 *
-	 * @param v    Visitor to receive traversal calls.
-	 * @param <T>  A subclass of {@link StateVisitor}.
-	 * @param node Identifier of the node.
-	 * @return Returns the argument (for access to anonymous class fields).
-	 */
-	public <T extends StateVisitor> T visitInPreOrder(final T v, final int node){
-		visitInPreOrder(v, node, new BitSet());
-		return v;
 	}
 
 	/**
@@ -312,19 +223,6 @@ System.out.println(node);
 		while((len = in.read(buffer)) >= 0)
 			baos.write(buffer, 0, len);
 		return baos.toByteArray();
-	}
-
-	//FIXME recursion to iteration!
-	private void visitInPreOrder(final StateVisitor v, final int node, final BitSet visited){
-		if(visited.get(node))
-			return;
-
-		visited.set(node);
-
-		if(v.accept(node))
-			for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-				if(!isArcTerminal(arc))
-					visitInPreOrder(v, getEndNode(arc), visited);
 	}
 
 	/**
