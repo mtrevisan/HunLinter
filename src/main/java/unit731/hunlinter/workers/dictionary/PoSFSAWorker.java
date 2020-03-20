@@ -16,8 +16,6 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
-import unit731.hunlinter.services.fsa.stemming.Dictionary;
-import unit731.hunlinter.services.fsa.stemming.DictionaryLookup;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
 import unit731.hunlinter.services.text.StringHelper;
@@ -187,11 +185,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			if(!file.delete())
 				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
 
-			final FSA fsa = builder.complete();
-
-			validateFSA(fsa, metadata);
-
-			return fsa;
+			return builder.complete();
 		};
 		final Function<FSA, File> step4 = fsa -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
@@ -297,14 +291,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			fromIndex ++;
 		}
 		return -1;
-	}
-
-	private void validateFSA(final FSA fsa, final DictionaryMetadata metadata){
-		//validation: try to scan the input
-		final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
-		//do nothing, just scan and make sure no exceptions are thrown
-		//noinspection StatementWithEmptyBody
-		for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){}
 	}
 
 }

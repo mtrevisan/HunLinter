@@ -164,14 +164,14 @@ public class DictionaryMetadata{
 		for(final Map.Entry<DictionaryAttribute, String> e : attributeMap.entrySet()){
 			requiredAttributes.remove(e.getKey());
 
-			// Run validation and conversion on all of them.
+			//run validation and conversion on all of them
 			final Object value = e.getKey().fromString(e.getValue());
 			switch(e.getKey()){
 				case ENCODING:
 					this.encoding = e.getValue();
-					if(!Charset.isSupported(encoding)){
+					if(!Charset.isSupported(encoding))
 						throw new IllegalArgumentException("Encoding not supported on this JVM: " + encoding);
-					}
+
 					this.charset = (Charset) value;
 					break;
 
@@ -188,25 +188,29 @@ public class DictionaryMetadata{
 					break;
 
 				case INPUT_CONVERSION:{
-					@SuppressWarnings("unchecked") Map<String, String> gvalue = (Map<String, String>) value;
+					@SuppressWarnings("unchecked")
+					Map<String, String> gvalue = (Map<String, String>) value;
 					this.inputConversion = gvalue;
 				}
 				break;
 
 				case OUTPUT_CONVERSION:{
-					@SuppressWarnings("unchecked") Map<String, String> gvalue = (Map<String, String>) value;
+					@SuppressWarnings("unchecked")
+					Map<String, String> gvalue = (Map<String, String>) value;
 					this.outputConversion = gvalue;
 				}
 				break;
 
 				case REPLACEMENT_PAIRS:{
-					@SuppressWarnings("unchecked") Map<String, List<String>> gvalue = (Map<String, List<String>>) value;
+					@SuppressWarnings("unchecked")
+					Map<String, List<String>> gvalue = (Map<String, List<String>>) value;
 					this.replacementPairs = gvalue;
 				}
 				break;
 
 				case EQUIVALENT_CHARS:{
-					@SuppressWarnings("unchecked") Map<Character, List<Character>> gvalue = (Map<Character, List<Character>>) value;
+					@SuppressWarnings("unchecked")
+					Map<Character, List<Character>> gvalue = (Map<Character, List<Character>>) value;
 					this.equivalentChars = gvalue;
 				}
 				break;
