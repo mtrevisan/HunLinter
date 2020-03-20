@@ -4,6 +4,7 @@ import com.carrotsearch.hppc.IntArrayDeque;
 import com.carrotsearch.hppc.IntArrayList;
 import com.carrotsearch.hppc.IntDeque;
 import com.carrotsearch.hppc.IntStack;
+import com.carrotsearch.hppc.cursors.IntCursor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -205,24 +206,20 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		return v;
 	}
 
-	private void visitInPostOrder2(final StateVisitor v, final int node, final BitSet visited){
+	private void visitInPostOrder2(final StateVisitor v, final int node, final BitSet ignored){
 		final IntStack stack = new IntStack();
 		//push root node to first stack
 		stack.push(node);
 
 		//post-order traversal stack
-		final IntArrayList out = new IntArrayList();
+		final IntDeque out = new IntArrayDeque();
 
 		//loop while first stack is not empty
 		while(!stack.isEmpty()){
 			final int current = stack.pop();
-//			if(visited.get(current))
-//				continue;
-
-//			visited.set(current);
 
 			//pop a node from first stack and push it to second stack
-			out.add(current);
+			out.addFirst(current);
 
 			//push children of the popped node from left to right to first stack
 			for(int arc = getFirstArc(current); arc != 0; arc = getNextArc(arc))
@@ -230,10 +227,22 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 					stack.add(getEndNode(arc));
 		}
 
-		List<Integer> o0 = Arrays.stream(out.toArray()).mapToObj(x -> Integer.valueOf(x)).collect(Collectors.toList());
-		Collections.reverse(o0);
-		o0 = new ArrayList<>(new LinkedHashSet(o0));
-		String o1 = Arrays.toString(o0.stream().mapToInt(x -> x).toArray());
+		List<Integer> o0 = new ArrayList<>();
+
+		//process nodes from second stack
+		final BitSet visited = new BitSet();
+		final int[] oo = out.toArray();
+		for(int i = 0; i < oo.length; i ++){
+			final int n = oo[i];
+			if(!visited.get(n)){
+				v.accept(n);
+				o0.add(n);
+			}
+
+			visited.set(n);
+		}
+
+		String o1 = Arrays.toString(o0.toArray());
 		String o2 = Arrays.toString(new int[]{
 			92166, 92172, 92178, 92184, 92190, 92196, 92202, 92208, 92214, 92220, 92226, 92232, 92238, 92244, 92250, 92256, 92262,
 			92268, 92274, 92280, 92286, 92292, 92298, 92304, 92310, 92316, 92322, 92328, 92334, 92340, 92346, 92352, 92358, 92364,
@@ -247,10 +256,6 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		});
 		if(!o1.equals(o2))
 			throw new IllegalArgumentException("different!");
-		//process nodes from second stack
-		final int[] oo = out.toArray();
-		for(int i = 0; i < oo.length; i ++)
-			v.accept(oo[i]);
 	}
 
 	//FIXME recursion to iteration!
