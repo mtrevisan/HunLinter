@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,7 +33,6 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.text.HammingDistance;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 
 
 public class MinimalPairsWorker extends WorkerDictionary{
@@ -153,19 +151,20 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	}
 
 	private void sortSupportFile(final File supportFile){
+//FIXME
 		//sort file by length first and by alphabet after:
-		final ExternalSorterOptions options = ExternalSorterOptions.builder()
-			.charset(dicParser.getCharset())
-			.comparator(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator))
-			.useZip(true)
-			.removeDuplicates(true)
-			.build();
-		try{
-			dicParser.getSorter().sort(supportFile, options, supportFile);
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
+//		final ExternalSorterOptions options = ExternalSorterOptions.builder()
+//			.charset(dicParser.getCharset())
+//			.comparator(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator))
+//			.useZip(true)
+//			.removeDuplicates(true)
+//			.build();
+//		try{
+//			dicParser.getSorter().sort(supportFile, options, supportFile);
+//		}
+//		catch(final Exception e){
+//			throw new RuntimeException(e);
+//		}
 	}
 
 	private Map<String, List<String>> extractMinimalPairs(final File outputFile){
@@ -248,19 +247,20 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	}
 
 	private void sortMinimalPairs(final File file){
+//FIXME
 		//sort file alphabetically:
-		final ExternalSorterOptions options = ExternalSorterOptions.builder()
-			.charset(dicParser.getCharset())
-			.comparator(comparator)
-			.useZip(true)
-			.removeDuplicates(true)
-			.build();
-		try{
-			dicParser.getSorter().sort(file, options, file);
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
+//		final ExternalSorterOptions options = ExternalSorterOptions.builder()
+//			.charset(dicParser.getCharset())
+//			.comparator(comparator)
+//			.useZip(true)
+//			.removeDuplicates(true)
+//			.build();
+//		try{
+//			dicParser.getSorter().sort(file, options, file);
+//		}
+//		catch(final Exception e){
+//			throw new RuntimeException(e);
+//		}
 	}
 
 }

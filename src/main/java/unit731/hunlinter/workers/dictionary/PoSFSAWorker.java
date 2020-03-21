@@ -10,8 +10,6 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.externalsorter.ExternalSorter;
-import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
@@ -158,21 +156,22 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
+//FIXME
 			//sort file & remove duplicates
-			final ExternalSorter sorter = new ExternalSorter();
-			final ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(charset)
-				//lexical order
-				.comparator(Comparator.naturalOrder())
-				.useZip(true)
-				.removeDuplicates(true)
-				.build();
-			try{
-				sorter.sort(supportFile, options, supportFile);
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
+//			final ExternalSorter sorter = new ExternalSorter();
+//			final ExternalSorterOptions options = ExternalSorterOptions.builder()
+//				.charset(charset)
+//				//lexical order
+//				.comparator(Comparator.naturalOrder())
+//				.useZip(true)
+//				.removeDuplicates(true)
+//				.build();
+//			try{
+//				sorter.sort(supportFile, options, supportFile);
+//			}
+//			catch(final Exception e){
+//				throw new RuntimeException(e);
+//			}
 
 			return supportFile;
 		};

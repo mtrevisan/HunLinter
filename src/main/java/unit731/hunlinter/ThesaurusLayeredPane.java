@@ -72,7 +72,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			//FIXME
 //			final int iconSize = hypRulesValueLabel.getHeight();
 //			final int iconSize = dicTotalProductionsValueLabel.getHeight();
-			final int iconSize = 17;
+final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();

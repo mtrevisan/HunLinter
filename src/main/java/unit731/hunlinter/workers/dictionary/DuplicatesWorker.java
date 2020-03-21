@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.dictionary;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -186,14 +185,15 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
-			try(final LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
-				String line = br.readLine();
+			try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
+				String line = ParserHelper.assertLinesCount(scanner);
 
 				long readSoFar = line.getBytes(charset).length + 2;
 
 				int lineIndex = 1;
 				final long totalSize = dicFile.length();
-				while((line = br.readLine()) != null){
+				while(scanner.hasNextLine()){
+					line = scanner.nextLine();
 					lineIndex ++;
 					readSoFar += line.getBytes(charset).length + 2;
 

@@ -17,8 +17,6 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.externalsorter.ExternalSorter;
-import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -78,21 +76,22 @@ public class WordlistWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES){
-				//sort file & remove duplicates
-				final ExternalSorter sorter = new ExternalSorter();
-				final ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(charset)
-					//lexical order
-					.comparator(Comparator.naturalOrder())
-					.useZip(true)
-					.removeDuplicates(true)
-					.build();
-				try{
-					sorter.sort(outputFile, options, outputFile);
-				}
-				catch(final Exception e){
-					throw new RuntimeException(e);
-				}
+//FIXME
+//				//sort file & remove duplicates
+//				final ExternalSorter sorter = new ExternalSorter();
+//				final ExternalSorterOptions options = ExternalSorterOptions.builder()
+//					.charset(charset)
+//					//lexical order
+//					.comparator(Comparator.naturalOrder())
+//					.useZip(true)
+//					.removeDuplicates(true)
+//					.build();
+//				try{
+//					sorter.sort(outputFile, options, outputFile);
+//				}
+//				catch(final Exception e){
+//					throw new RuntimeException(e);
+//				}
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());

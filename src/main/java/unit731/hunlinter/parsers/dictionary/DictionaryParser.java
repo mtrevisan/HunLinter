@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.externalsorter.ExternalSorter;
 
 
 public class DictionaryParser{
@@ -48,7 +47,6 @@ public class DictionaryParser{
 	private final Charset charset;
 
 	private final Comparator<String> comparator;
-	private final ExternalSorter sorter = new ExternalSorter();
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
@@ -72,10 +70,6 @@ public class DictionaryParser{
 
 	public Comparator<String> getComparator(){
 		return comparator;
-	}
-
-	public ExternalSorter getSorter(){
-		return sorter;
 	}
 
 	//sorter worker
