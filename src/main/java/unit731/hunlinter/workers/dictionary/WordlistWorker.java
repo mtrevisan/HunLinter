@@ -4,13 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,13 +17,12 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.TimSort;
+import unit731.hunlinter.services.externalsorter.ExternalSorter;
+import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -51,7 +46,6 @@ public class WordlistWorker extends WorkerDictionary{
 
 
 		final Charset charset = dicParser.getCharset();
-		final Comparator<String> comparator = dicParser.getComparator();
 
 
 		BufferedWriter writer;
@@ -87,28 +81,19 @@ public class WordlistWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
 			//sort file & remove duplicates
-			String[] sortedLines;
-			try(final Scanner scanner = FileHelper.createScanner(file.toPath(), charset)){
-				final List<String> lines = new ArrayList<>();
-				while(scanner.hasNextLine())
-					lines.add(scanner.nextLine());
-				sortedLines = lines.toArray(String[]::new);
-				TimSort.sort(sortedLines, comparator);
-
-				TimSort.removeDuplicates(sortedLines);
+			final ExternalSorter sorter = new ExternalSorter();
+			final ExternalSorterOptions options = ExternalSorterOptions.builder()
+				.charset(charset)
+				//lexical order
+				.comparator(Comparator.naturalOrder())
+				.useZip(true)
+				.removeDuplicates(true)
+				.build();
+			try{
+				sorter.sort(outputFile, options, outputFile);
 			}
-			catch(final Exception t){
-				throw new LinterException(t.getMessage());
-			}
-
-			try(final BufferedWriter writer2 = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
-				for(final String line : sortedLines){
-					writer2.write(line);
-					writer2.newLine();
-				}
-			}
-			catch(final Exception t){
-				throw new LinterException(t.getMessage());
+			catch(final Exception e){
+				throw new RuntimeException(e);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
