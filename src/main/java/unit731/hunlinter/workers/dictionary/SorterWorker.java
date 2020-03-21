@@ -15,7 +15,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.TimSort;
+import unit731.hunlinter.services.sorters.TimSort;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 

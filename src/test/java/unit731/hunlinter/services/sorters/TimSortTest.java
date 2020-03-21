@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.sorters;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -145,6 +145,16 @@ public class TimSortTest{
 	void worstCase(){
 		int len = 10_000;
 		Integer[] data = TimSortTestUtils.worstCase(len);
+
+		TimSort.sort(data, NATURAL_ORDER);
+
+		assertSort(data);
+	}
+
+	@Test
+	void correctWorstCase(){
+		int len = 10_000;
+		Integer[] data = TimSortTestUtils.correctWorstCase(len);
 
 		TimSort.sort(data, NATURAL_ORDER);
 

@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.externalsorter;
+package unit731.hunlinter.services.sorters.externalsorter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,17 +10,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.FileHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -47,35 +48,35 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
-		final BufferedReader br = Files.newBufferedReader(file.toPath(), options.getCharset());
+		final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
 		final long dataLength = file.length();
 		final long blockSize = estimateBestSizeOfBlocks(dataLength, options.getMaxTemporaryFiles(), estimateAvailableMemory());
-		return splitAndSortFiles(br, options, blockSize);
+		return splitAndSortFiles(scanner, options, blockSize);
 	}
 
 	/**
 	 * This will simply load the file by blocks of lines, then sort them in-memory, and write the result to temporary files that have to be
 	 * merged later.
 	 *
-	 * @param fbr	Data source
+	 * @param scanner	Data source
 	 * @param options	Sorting options
 	 * @param blockSize	Block size [B]
 	 * @return a list of temporary flat files
 	 * @throws IOException generic IO exception
 	 */
-	private List<File> splitAndSortFiles(final BufferedReader fbr, final ExternalSorterOptions options, final long blockSize)
+	private List<File> splitAndSortFiles(final Scanner scanner, final ExternalSorterOptions options, final long blockSize)
 			throws IOException{
 		final List<File> files = new ArrayList<>();
-		try(fbr){
+		try(scanner){
 			final List<String> headers = new ArrayList<>();
 			List<String> temporaryList = new ArrayList<>();
-			String line = StringUtils.EMPTY;
 			int headerLinesCounter = 0;
-			while(line != null){
+			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
 				//as long as there is enough memory
-				while(currentBlockSize < blockSize && (line = fbr.readLine()) != null){
+				while(currentBlockSize < blockSize && scanner.hasNextLine()){
+					final String line = scanner.nextLine();
 					if(headerLinesCounter < options.getSkipHeaderLines()){
 						headers.add(line);
 
@@ -106,12 +107,13 @@ public class ExternalSorter{
 	}
 
 	private List<String> sortList(List<String> list, final ExternalSorterOptions options){
+		final Comparator<String> comparator = options.getComparator();
 		if(options.isSortInParallel())
 			list = list.stream().parallel()
-				.sorted(options.getComparator())
-				.collect(Collectors.toCollection(ArrayList::new));
+				.sorted(comparator)
+				.collect(Collectors.toList());
 		else
-			list.sort(options.getComparator());
+			list.sort(comparator);
 		return list;
 	}
 

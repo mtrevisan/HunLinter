@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.sorters;
 
 import java.util.ArrayList;
 import java.util.Arrays;

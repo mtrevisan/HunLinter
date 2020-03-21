@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.externalsorter;
+package unit731.hunlinter.services.sorters.externalsorter;
 
 import java.nio.charset.Charset;
 import java.util.Comparator;

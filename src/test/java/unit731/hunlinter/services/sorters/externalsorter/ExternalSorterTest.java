@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.externalsorter;
+package unit731.hunlinter.services.sorters.externalsorter;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
