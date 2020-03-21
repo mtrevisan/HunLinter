@@ -40,7 +40,6 @@ public class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT_COUNT = new MessageFormat("The file doesn''t starts with a line counter ({0})");
 	private static final MessageFormat WRONG_FILE_FORMAT_CHARSET = new MessageFormat("The file is not in an allowable charset ({0})");
 
 
@@ -108,15 +107,6 @@ public class FileHelper{
 		}
 		catch(final IOException ignored){}
 		return size;
-	}
-
-	public static int readCount(final String count){
-		try{
-			return Integer.parseInt(count);
-		}
-		catch(final Exception e){
-			throw new LinterException(WRONG_FILE_FORMAT_COUNT.format(new Object[]{count}));
-		}
 	}
 
 	public static Charset readCharset(final String charsetName){

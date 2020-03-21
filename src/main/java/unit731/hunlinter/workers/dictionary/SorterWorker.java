@@ -2,23 +2,20 @@ package unit731.hunlinter.workers.dictionary;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.TimSort;
-import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -42,23 +39,19 @@ public class SorterWorker extends WorkerDictionary{
 
 		dicFile = packager.getDictionaryFile();
 		dicParser = parserManager.getDicParser();
-		final Charset charset = dicParser.getCharset();
 
-		//FIXME start by counting how many line terminators there are (CR+LF)
-		final AtomicInteger start = new AtomicInteger(0);
 		comparator = BaseBuilder.getComparator(parserManager.getAffixData().getLanguage());
+		final Map.Entry<Integer, Pair<Integer, Integer>> boundary = dicParser.getBoundary(lineIndex);
 
 		final Function<Void, String[]> step1 = ignored -> {
 			prepareProcessing("Splitting dictionary file (step 1/3)");
 
 			String[] chunk = null;
-			final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
-			start.set(boundary.getKey() * 2);
 			if(boundary != null){
 				parserManager.stopFileListener();
 
 				//split dictionary isolating the sorted section
-				chunk = extractSection(boundary, start);
+				chunk = extractSection(boundary);
 
 				setProgress(33);
 			}
@@ -78,7 +71,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Merge sections (step 3/3)");
 
 			//re-merge section
-			mergeSectionsToDictionary(dicFile, charset, chunk, start.get());
+			mergeSectionsToDictionary(dicFile, chunk, boundary.getValue().getKey());
 
 			dicParser.clear();
 
@@ -89,19 +82,15 @@ public class SorterWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
-	private String[] extractSection(final Map.Entry<Integer, Integer> boundary, final AtomicInteger start){
-		try(final Scanner scanner = FileHelper.createScanner(dicParser.getDicFile().toPath(), dicParser.getCharset())){
+	private String[] extractSection(final Map.Entry<Integer, Pair<Integer, Integer>> boundary){
+		try(final RandomAccessFile accessor = new RandomAccessFile(dicParser.getDicFile(), "r")){
 			//skip to begin of chunk
-			int lineIndex = 0;
-			while(lineIndex ++ < boundary.getKey())
-				start.addAndGet(StringHelper.getRawBytes(scanner.nextLine()).length);
+			accessor.seek(boundary.getValue().getKey());
 
 			//read lines
-			lineIndex --;
-			int index = 0;
-			final String[] chunk = new String[boundary.getValue() - boundary.getKey() + 1];
-			while(lineIndex ++ <= boundary.getValue())
-				chunk[index ++] = scanner.nextLine();
+			final String[] chunk = new String[boundary.getValue().getValue() - boundary.getKey() + 1];
+			for(int index = 0; index < chunk.length; index ++)
+				chunk[index] = accessor.readLine();
 			return chunk;
 		}
 		catch(final Exception e){
@@ -109,12 +98,12 @@ public class SorterWorker extends WorkerDictionary{
 		}
 	}
 
-	private void mergeSectionsToDictionary(final File dicFile, final Charset charset, final String[] chunk, final int startIndex){
+	private void mergeSectionsToDictionary(final File dicFile, final String[] chunk, final int startIndex){
 		try{
 			final RandomAccessFile accessor = new RandomAccessFile(dicFile, "rwd");
 			accessor.seek(startIndex);
 			for(final String line : chunk){
-				accessor.write(line.getBytes(charset));
+				accessor.write(line.getBytes(StandardCharsets.ISO_8859_1));
 				accessor.writeBytes(StringUtils.CR);
 				accessor.writeBytes(StringUtils.LF);
 			}
