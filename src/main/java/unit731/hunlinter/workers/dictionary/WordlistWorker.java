@@ -76,22 +76,21 @@ public class WordlistWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
 			if(type == WorkerType.PLAIN_WORDS_NO_DUPLICATES){
-//FIXME
-//				//sort file & remove duplicates
-//				final ExternalSorter sorter = new ExternalSorter();
-//				final ExternalSorterOptions options = ExternalSorterOptions.builder()
-//					.charset(charset)
-//					//lexical order
-//					.comparator(Comparator.naturalOrder())
-//					.useZip(true)
-//					.removeDuplicates(true)
-//					.build();
-//				try{
-//					sorter.sort(outputFile, options, outputFile);
-//				}
-//				catch(final Exception e){
-//					throw new RuntimeException(e);
-//				}
+				//sort file & remove duplicates
+				final ExternalSorter sorter = new ExternalSorter();
+				final ExternalSorterOptions options = ExternalSorterOptions.builder()
+					.charset(charset)
+					//lexical order
+					.comparator(Comparator.naturalOrder())
+					.useZip(true)
+					.removeDuplicates(true)
+					.build();
+				try{
+					sorter.sort(outputFile, options, outputFile);
+				}
+				catch(final Exception e){
+					throw new RuntimeException(e);
+				}
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
