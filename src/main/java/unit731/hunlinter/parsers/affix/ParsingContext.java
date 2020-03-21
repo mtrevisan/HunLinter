@@ -1,8 +1,9 @@
 package unit731.hunlinter.parsers.affix;
 
-import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Scanner;
+
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -10,20 +11,20 @@ public class ParsingContext{
 
 	private final String line;
 	private final String[] definitionParts;
-	private final BufferedReader reader;
+	private final Scanner scanner;
 
 
-	public ParsingContext(final String line, final BufferedReader br){
+	public ParsingContext(final String line, final Scanner scanner){
 		Objects.requireNonNull(line);
-		Objects.requireNonNull(br);
+		Objects.requireNonNull(scanner);
 
 		this.line = line;
 		definitionParts = StringUtils.split(line);
-		reader = br;
+		this.scanner = scanner;
 	}
 
-	public BufferedReader getReader(){
-		return reader;
+	public Scanner getScanner(){
+		return scanner;
 	}
 
 	public String getRuleType(){

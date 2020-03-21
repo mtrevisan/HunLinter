@@ -5,19 +5,18 @@ import java.io.File;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -43,8 +42,6 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 public class DuplicatesWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
-
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 
 	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
@@ -127,17 +124,15 @@ public class DuplicatesWorker extends WorkerDictionary{
 			DuplicatesDictionaryBaseData.getInstance());
 
 		final File dicFile = dicParser.getDicFile();
-		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
-			String line = ParserHelper.extractLine(br);
+		try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
+			String line = ParserHelper.assertLinesCount(scanner);
 
 			long readSoFar = line.getBytes(charset).length + 2;
 
-			if(!NumberUtils.isCreatable(line))
-				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
-
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
-			while((line = br.readLine()) != null){
+			while(scanner.hasNextLine()){
+				line = scanner.nextLine();
 				lineIndex ++;
 				readSoFar += line.getBytes(charset).length + 2;
 

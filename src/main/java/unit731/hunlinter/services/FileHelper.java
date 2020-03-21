@@ -7,8 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -17,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -175,10 +174,10 @@ public class FileHelper{
 		return file;
 	}
 
-	public static LineNumberReader createReader(final Path path, final Charset charset) throws IOException{
+	public static Scanner createScanner(final Path path, final Charset charset) throws IOException{
 		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
-		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
+		return new Scanner(bomis, charset);
 	}
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform

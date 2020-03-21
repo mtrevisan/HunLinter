@@ -1,10 +1,11 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -15,7 +16,6 @@ import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class WordBreakTableHandler implements Handler{
@@ -33,7 +33,7 @@ public class WordBreakTableHandler implements Handler{
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
-			final BufferedReader br = context.getReader();
+			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -42,9 +42,12 @@ public class WordBreakTableHandler implements Handler{
 
 			final Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = ParserHelper.extractLine(br);
+				if(!scanner.hasNextLine())
+					throw new EOFException("Unexpected EOF while reading file");
 
+				final String line = scanner.nextLine();
 				final String[] lineParts = StringUtils.split(line);
+
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.WORD_BREAK_CHARACTERS)
 					throw new LinterException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));

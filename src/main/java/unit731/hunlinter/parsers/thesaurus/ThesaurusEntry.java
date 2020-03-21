@@ -3,13 +3,13 @@ package unit731.hunlinter.parsers.thesaurus;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -47,9 +47,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		this.synonyms = synonyms;
 	}
 
-	public ThesaurusEntry(final String line, final LineNumberReader br) throws IOException{
+	public ThesaurusEntry(final String line, final Scanner scanner) throws IOException{
 		Objects.requireNonNull(line);
-		Objects.requireNonNull(br);
+		Objects.requireNonNull(scanner);
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_SEPARATOR);
@@ -58,10 +58,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		final int numEntries = Integer.parseInt(components[1]);
 		synonyms = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
-			final String definitionAndSynonyms = br.readLine();
-			if(definitionAndSynonyms == null)
-				throw new EOFException("Unexpected EOF while reading Thesaurus file");
+			if(!scanner.hasNextLine())
+				throw new EOFException("Unexpected EOF while reading file");
 
+			final String definitionAndSynonyms = scanner.nextLine();
 			synonyms.add(new SynonymsEntry(definitionAndSynonyms));
 		}
 	}

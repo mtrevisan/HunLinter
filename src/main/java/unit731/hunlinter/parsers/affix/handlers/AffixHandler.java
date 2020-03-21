@@ -1,10 +1,11 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -15,7 +16,6 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class AffixHandler implements Handler{
@@ -52,7 +52,7 @@ public class AffixHandler implements Handler{
 		if(numEntries <= 0)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
 
-		final BufferedReader br = context.getReader();
+		final Scanner scanner = context.getScanner();
 		final AffixType ruleType = AffixType.createFromCode(context.getRuleType());
 		final String ruleFlag = context.getFirstParameter();
 
@@ -63,8 +63,10 @@ public class AffixHandler implements Handler{
 		String line;
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
-			line = ParserHelper.extractLine(br);
+			if(!scanner.hasNextLine())
+				throw new EOFException("Unexpected EOF while reading file");
 
+			line = scanner.nextLine();
 			final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
 			checkValidity(entry, ruleType, ruleFlag);

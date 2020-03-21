@@ -2,13 +2,13 @@ package unit731.hunlinter.parsers.affix;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -154,11 +154,13 @@ public class AffixParser{
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
 		data.clear();
 
+		int indexLine = 0;
 		boolean encodingRead = false;
 		final Charset charset = FileHelper.determineCharset(affFile.toPath());
-		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
-			String line;
-			while((line = br.readLine()) != null){
+		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
+				indexLine ++;
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
@@ -166,7 +168,7 @@ public class AffixParser{
 					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
-				final ParsingContext context = new ParsingContext(line, br);
+				final ParsingContext context = new ParsingContext(line, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
@@ -174,7 +176,7 @@ public class AffixParser{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(final RuntimeException e){
-						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));
 					}
 				}
 			}

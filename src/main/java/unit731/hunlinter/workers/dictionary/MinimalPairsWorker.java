@@ -3,7 +3,6 @@ package unit731.hunlinter.workers.dictionary;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -14,10 +13,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +40,6 @@ import unit731.hunlinter.services.externalsorter.ExternalSorterOptions;
 public class MinimalPairsWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MinimalPairsWorker.class);
-
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
 
 	public static final String WORKER_NAME = "Minimal pairs extraction";
 
@@ -116,16 +113,14 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		int currentLine = 0;
 		final int totalLines = FileHelper.countLines(dicFile.toPath());
 		try(
-				final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset);
+				final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset);
 				final BufferedWriter writer = Files.newBufferedWriter(supportFile.toPath(), charset);
 				){
-			String line = ParserHelper.extractLine(br);
+			ParserHelper.assertLinesCount(scanner);
 			currentLine ++;
 
-			if(!NumberUtils.isCreatable(line))
-				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
-
-			while((line = br.readLine()) != null){
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
 				currentLine ++;
 
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){

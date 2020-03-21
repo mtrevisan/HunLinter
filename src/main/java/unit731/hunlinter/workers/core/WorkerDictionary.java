@@ -2,19 +2,18 @@ package unit731.hunlinter.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
@@ -22,9 +21,6 @@ import unit731.hunlinter.services.ParserHelper;
 
 
 public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{
-
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Dictionary file malformed, the first line is not a number, was ''{0}''");
-
 
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
@@ -35,13 +31,15 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 		setProgress(0);
 
-		//load dictionary
-		final List<IndexDataPair<String>> entries = loadFile(path, charset);
+		if(workerData.isParallelProcessing()){
+			//load dictionary
+			final List<IndexDataPair<String>> entries = loadFile(path, charset);
 
-		//process dictionary
-		final Stream<IndexDataPair<String>> stream = (workerData.isParallelProcessing()?
-			entries.parallelStream(): entries.stream());
-		processDictionary(stream, entries.size(), dataProcessor);
+			//process dictionary
+			processLinesParallel(entries, entries.size(), dataProcessor);
+		}
+		else
+			processLinesSequential(path, charset, dataProcessor);
 	}
 
 //	protected void writeLines(final BiConsumer<Writer, String> dataProcessor, final int totalEntries, final File outputFile,
@@ -67,18 +65,18 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 //		}
 //	}
 
-	protected List<IndexDataPair<String>> loadFile(final Path path, final Charset charset){
+	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset){
 		final List<IndexDataPair<String>> entries = new ArrayList<>();
-		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
-			String line = ParserHelper.extractLine(br);
-			if(!NumberUtils.isCreatable(line))
-				throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+			ParserHelper.assertLinesCount(scanner);
 
-			while((line = br.readLine()) != null){
+			int lineIndex = 1;
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
-				entries.add(IndexDataPair.of(br.getLineNumber(), line));
+				entries.add(IndexDataPair.of(lineIndex ++, line));
 
 				sleepOnPause();
 			}
@@ -92,16 +90,50 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		return entries;
 	}
 
-	private void processDictionary(final Stream<IndexDataPair<String>> entries, final int totalEntries,
+	private void processLinesParallel(final List<IndexDataPair<String>> entries, final int totalEntries,
 			final Consumer<IndexDataPair<String>> dataProcessor){
 		try{
 			final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
-			entries.forEach(innerProcessor);
+			entries.parallelStream()
+				.forEach(innerProcessor);
 		}
 		catch(final LinterException e){
 			manageException(e);
 
 			throw e;
+		}
+	}
+
+	private void processLinesSequential(final Path path, final Charset charset,
+			final Consumer<IndexDataPair<String>> dataProcessor){
+		final int totalEntries = FileHelper.countLines(path);
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+
+		LineIterator itr = null;
+		try{
+			itr = FileUtils.lineIterator(path.toFile(), charset.name());
+			ParserHelper.assertLinesCount(itr);
+
+			int lineIndex = 1;
+			while(itr.hasNext()){
+				final String line = itr.nextLine();
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+					continue;
+
+				innerProcessor.accept(IndexDataPair.of(lineIndex ++, line));
+			}
+		}
+		catch(final Exception e){
+			manageException(new LinterException(e, null));
+
+			throw new RuntimeException(e);
+		}
+		finally{
+			try{
+				if(itr != null)
+					itr.close();
+			}
+			catch(final Exception ignored){}
 		}
 	}
 
@@ -124,6 +156,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			}
 		};
 	}
+
 
 	protected void writeLine(final BufferedWriter writer, final String line){
 		try{

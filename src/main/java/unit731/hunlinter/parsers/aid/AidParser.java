@@ -2,11 +2,11 @@ package unit731.hunlinter.parsers.aid;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import unit731.hunlinter.services.FileHelper;
 
@@ -27,11 +27,12 @@ public class AidParser{
 
 		final Path path = aidFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
-		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
-			String line;
-			while((line = br.readLine()) != null)
+		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
 				if(!line.isEmpty())
 					lines.add(line);
+			}
 		}
 	}
 

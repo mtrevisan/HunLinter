@@ -1,18 +1,19 @@
 package unit731.hunlinter.parsers.affix;
 
-import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -56,7 +57,7 @@ public class ConversionTable{
 
 	public void parseConversionTable(final ParsingContext context){
 		try{
-			final BufferedReader br = context.getReader();
+			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -65,8 +66,10 @@ public class ConversionTable{
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = ParserHelper.extractLine(br);
+				if(!scanner.hasNextLine())
+					throw new EOFException("Unexpected EOF while reading file");
 
+				final String line = scanner.nextLine();
 				final String[] parts = StringUtils.split(line);
 
 				checkValidity(parts, context);

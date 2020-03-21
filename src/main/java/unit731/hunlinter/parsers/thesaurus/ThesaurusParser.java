@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,6 +12,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,28 +71,23 @@ public class ThesaurusParser{
 
 		final Path path = theFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
-		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
-			String line = extractLine(br);
+		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+			if(!scanner.hasNextLine())
+				throw new EOFException("Unexpected EOF while reading file");
 
+			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
 
-			while((line = br.readLine()) != null){
+			while(scanner.hasNextLine()){
+				line = scanner.nextLine();
 				if(line.isEmpty())
 					continue;
 
-				final boolean added = dictionary.add(new ThesaurusEntry(line, br));
+				final boolean added = dictionary.add(new ThesaurusEntry(line, scanner));
 				if(!added)
 					throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
 			}
 		}
-	}
-
-	private String extractLine(final LineNumberReader br) throws IOException{
-		final String line = br.readLine();
-		if(line == null)
-			throw new EOFException("Unexpected EOF while reading Thesaurus file");
-
-		return line;
 	}
 
 	public int getSynonymsCount(){

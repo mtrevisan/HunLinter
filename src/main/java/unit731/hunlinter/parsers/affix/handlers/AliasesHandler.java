@@ -1,9 +1,10 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.BufferedReader;
+import java.io.EOFException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class AliasesHandler implements Handler{
@@ -27,7 +27,7 @@ public class AliasesHandler implements Handler{
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
-			final BufferedReader br = context.getReader();
+			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -36,8 +36,10 @@ public class AliasesHandler implements Handler{
 
 			final List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = ParserHelper.extractLine(br);
+				if(!scanner.hasNextLine())
+					throw new EOFException("Unexpected EOF while reading file");
 
+				final String line = scanner.nextLine();
 				final String[] parts = StringUtils.split(line);
 
 				checkValidity(parts, context);
