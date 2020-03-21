@@ -5,6 +5,9 @@ import java.util.Comparator;
 import org.apache.commons.lang3.builder.Builder;
 
 
+/**
+ * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</>, version 0.4.4, 11/3/2020
+ */
 public class ExternalSorterOptions{
 
 	/** Default maximal number of temporary files allowed */
