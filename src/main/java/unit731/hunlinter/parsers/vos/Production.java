@@ -1,9 +1,7 @@
 package unit731.hunlinter.parsers.vos;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -16,10 +14,10 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
+import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
-import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class Production extends DictionaryEntry{
@@ -198,11 +196,11 @@ public class Production extends DictionaryEntry{
 		final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 
 		final StringJoiner sj = new StringJoiner(POS_FSA_TAG_SEPARATOR);
-		sj.add(PartOfSpeechTag.createFromCode(pos.get(0)).getTag());
+		sj.add(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag());
 		forEach(suffixInflection,
-			code -> forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
+			code -> forEach(InflectionTag.createFromCodeAndValue(code).getTags(), sj::add));
 		forEach(prefixInflection,
-			code -> forEach(InflectionTag.createFromCode(code).getTags(), sj::add));
+			code -> forEach(InflectionTag.createFromCodeAndValue(code).getTags(), sj::add));
 
 		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj;
 		//extract stem
@@ -212,18 +210,10 @@ public class Production extends DictionaryEntry{
 		return stem;
 	}
 
-	//FIXME refactor for speed-up
+	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(){
-		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
-		final List<MorphologicalTag> mtags = Arrays.asList(MorphologicalTag.PART_OF_SPEECH, MorphologicalTag.INFLECTIONAL_SUFFIX,
-			MorphologicalTag.INFLECTIONAL_PREFIX, MorphologicalTag.STEM);
-		forEach(morphologicalFields, mf -> {
-			final MorphologicalTag matchedTag = match(mtags, tag -> tag.isSupertypeOf(mf));
-			if(matchedTag != null)
-				bucket.computeIfAbsent(matchedTag, k -> new ArrayList<>(1))
-					.add(mf.substring(matchedTag.getCode().length()));
-		});
-		return bucket;
+		return SetHelper.bucket(morphologicalFields,
+			mf -> MorphologicalTag.createFromCode(mf), MorphologicalTag.class);
 	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){

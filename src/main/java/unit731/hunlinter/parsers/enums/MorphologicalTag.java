@@ -42,8 +42,8 @@ public enum MorphologicalTag{
 		return code;
 	}
 
-	public boolean isSupertypeOf(final String value){
-		return value.startsWith(code);
+	public boolean isSupertypeOf(final String codeAndValue){
+		return codeAndValue.startsWith(code);
 	}
 
 	public String attachValue(final String value){

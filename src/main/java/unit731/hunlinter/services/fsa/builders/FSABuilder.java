@@ -269,8 +269,7 @@ public class FSABuilder{
 
 	/** Return <code>true</code> if two regions in {@link #serialized} are identical */
 	private boolean equivalent(int start1, int start2, int len){
-//		if(Math.max(start1, start2) + len > size)
-		if(start1 + len > size || start2 + len > size)
+		if(Math.max(start1, start2) + len > size)
 			return false;
 
 		while(len -- > 0)

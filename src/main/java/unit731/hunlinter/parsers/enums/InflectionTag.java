@@ -56,8 +56,9 @@ public enum InflectionTag{
 		this.tags = tags;
 	}
 
-	public static InflectionTag createFromCode(final String code){
-		return match(values(), tag -> tag.code.equals(code));
+	public static InflectionTag createFromCodeAndValue(final String codeAndValue){
+		return match(values(), tag -> codeAndValue.endsWith(tag.code)
+			&& codeAndValue.charAt(codeAndValue.length() - tag.code.length() - 1) == ':');
 	}
 
 	public String getCode(){

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -225,6 +226,18 @@ public class SetHelper{
 		union.removeAll(intersection);
 
 		return union;
+	}
+
+	public static <K extends Enum, V> Map<K, List<V>> bucket(final V[] entries, final Function<V, K> keyMapper,
+			final Class<K> enumClass){
+		final Map<K, List<V>> bucket = new EnumMap<>(enumClass);
+		for(final V entry : entries){
+			final K key = keyMapper.apply(entry);
+			if(key != null)
+				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
+					.add(entry);
+		}
+		return bucket;
 	}
 
 	public static <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){

@@ -100,8 +100,9 @@ ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 		this.tag = tag;
 	}
 
-	public static PartOfSpeechTag createFromCode(final String code){
-		return match(values(), tag -> tag.code.equals(code));
+	public static PartOfSpeechTag createFromCodeAndValue(final String codeAndValue){
+		return match(values(), tag -> codeAndValue.endsWith(tag.code)
+			&& codeAndValue.charAt(codeAndValue.length() - tag.code.length() - 1) == ':');
 	}
 
 	public String getCode(){
