@@ -210,6 +210,9 @@ public class ExternalSorter{
 			throws IOException{
 		final List<BinaryFileBuffer> bfbs = new ArrayList<>(files.size());
 		for(final File f : files){
+			if(f.length() == 0)
+				continue;
+
 			final InputStream in = new FileInputStream(f);
 			final InputStreamReader isr;
 			if(options.isUseZip())

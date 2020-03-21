@@ -7,6 +7,12 @@ import org.apache.commons.lang3.builder.Builder;
 
 public class ExternalSorterOptions{
 
+	/** Default maximal number of temporary files allowed */
+	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
+	/** Default ZIP buffer size */
+	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
+
+
 	private final Charset charset;
 	/** String comparator */
 	private final Comparator<String> comparator;

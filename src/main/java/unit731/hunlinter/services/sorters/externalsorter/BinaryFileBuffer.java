@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 class BinaryFileBuffer{
 
-	public final BufferedReader br;
+	protected final BufferedReader br;
 	private String cache;
 
 
