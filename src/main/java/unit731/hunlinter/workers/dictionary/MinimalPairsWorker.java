@@ -6,7 +6,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +28,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.sorters.TimSort;
+import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -76,7 +75,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
-			final String[] words = extractWords();
+			final StringList words = extractWords();
 			writeSupportFile(outputFile, words);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
@@ -105,8 +104,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private String[] extractWords(){
-		final List<String> list = new ArrayList<>();
+	private StringList extractWords(){
+		final StringList list = new StringList();
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
@@ -146,15 +145,14 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			throw new RuntimeException(e);
 		}
 
-		final String[] words = list.toArray(String[]::new);
-		TimSort.sort(words, BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator));
-		return words;
+		list.sort(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator));
+		return list;
 	}
 
-	private void writeSupportFile(final File supportFile, final String[] list){
+	private void writeSupportFile(final File supportFile, final StringList list){
 		try{
 			final Charset charset = dicParser.getCharset();
-			FileUtils.writeLines(supportFile, charset.name(), Arrays.asList(list));
+			FileUtils.writeLines(supportFile, charset.name(), list);
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

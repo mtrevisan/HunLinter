@@ -10,6 +10,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.fsa.FSA;
@@ -18,6 +19,7 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -28,8 +30,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -40,8 +45,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -66,11 +74,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		File supportFile;
-		BufferedWriter writer;
+		final File supportFile;
+		final BufferedWriter writer;
 		try{
-			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".txt");
-			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
+			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
+			final OutputStream out = new GZIPOutputStream(new FileOutputStream(supportFile), 2048){
+				{
+					def.setLevel(Deflater.BEST_SPEED);
+				}
+			};
+			writer = new BufferedWriter(new OutputStreamWriter(out, charset));
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e);
@@ -128,7 +141,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
-			writeLine(writer, "0");
 			processLines(dicPath, charset, lineProcessor);
 			closeWriter(writer);
 
@@ -162,13 +174,30 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final ExternalSorter sorter = new ExternalSorter();
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
+				.sortInParallel()
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-				.useZip(true)
-				.removeDuplicates(true)
+				.useInputAsZip()
+				.useZip()
+				.removeDuplicates()
 				.build();
 			try{
-				sorter.sort(supportFile, options, supportFile);
+//				TimeWatch watch = TimeWatch.start();
+//				sorter.sort(file, options, file);
+//				watch.stop();
+//				System.out.println(watch.toStringMillis());
+
+				try(final Scanner scanner = FileHelper.createScannerForZIP(file, charset)){
+					final StringList lines = new StringList();
+					while(scanner.hasNextLine())
+						lines.add(scanner.nextLine());
+//					watch.reset();
+					TimeWatch watch = TimeWatch.start();
+					lines.sort(Comparator.naturalOrder());
+					lines.removeDuplicates();
+					watch.stop();
+					System.out.println(watch.toStringMillis());
+				}
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);
