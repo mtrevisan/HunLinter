@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 public class StringList extends AbstractList<String> implements List<String>{
@@ -339,10 +340,24 @@ public class StringList extends AbstractList<String> implements List<String>{
 	}
 
 	@Override
-	public void sort(final Comparator<? super String> c){
+	public void sort(final Comparator<? super String> comparator){
 		final int expectedModCount = modCount;
 
-		TimSort.sort(elementData, 0, size, c);
+		TimSort.sort(elementData, comparator);
+
+		if(modCount != expectedModCount)
+			throw new ConcurrentModificationException();
+
+		modCount ++;
+	}
+
+	public void sortParallel(final Comparator<? super String> comparator){
+		final int expectedModCount = modCount;
+
+		this = stream().parallel()
+			.sorted(comparator)
+			.collect(Collectors.toList());
+		TimSort.sort(elementData, comparator);
 
 		if(modCount != expectedModCount)
 			throw new ConcurrentModificationException();

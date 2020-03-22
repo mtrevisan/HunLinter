@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.sorters.StringList;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -73,8 +73,8 @@ public class ExternalSorter{
 			throws IOException{
 		final List<File> files = new ArrayList<>();
 		try(scanner){
-			final List<String> headers = new ArrayList<>();
-			List<String> temporaryList = new ArrayList<>();
+			final StringList headers = new StringList();
+			StringList temporaryList = new StringList();
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
@@ -89,7 +89,13 @@ public class ExternalSorter{
 					}
 				}
 
-				temporaryList = sortList(temporaryList, options);
+				//sort file
+				final Comparator<String> comparator = options.getComparator();
+				if(options.isSortInParallel())
+					temporaryList.sortParallel(comparator);
+				else
+					temporaryList.sort(comparator);
+
 				final File chunkFile = FileHelper.createDeleteOnExitFile("chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseZip())
@@ -105,17 +111,6 @@ public class ExternalSorter{
 			}
 		}
 		return files;
-	}
-
-	private List<String> sortList(List<String> list, final ExternalSorterOptions options){
-		final Comparator<String> comparator = options.getComparator();
-		if(options.isSortInParallel())
-			list = list.stream().parallel()
-				.sorted(comparator)
-				.collect(Collectors.toList());
-		else
-			list.sort(comparator);
-		return list;
 	}
 
 	/**
