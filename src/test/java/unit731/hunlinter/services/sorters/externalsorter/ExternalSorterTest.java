@@ -69,7 +69,7 @@ class ExternalSorterTest{
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(StandardCharsets.UTF_8)
 			.comparator(DEFAULT_COMPARATOR)
-			.removeDuplicates(true)
+			.removeDuplicates()
 			.build();
 
 		sorter.sort(inputFile, options, outputFile);

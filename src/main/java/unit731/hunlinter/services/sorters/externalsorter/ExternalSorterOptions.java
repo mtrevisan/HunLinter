@@ -27,6 +27,8 @@ public class ExternalSorterOptions{
 	private final boolean sortInParallel;
 	/** Maximum number of temporary files allowed */
 	private final int maxTemporaryFiles;
+	/** Whether to use ZIP for input files */
+	private final boolean useInputAsZip;
 	/** Whether to use ZIP for temporary files */
 	private final boolean useZip;
 	/** ZIP buffer size */
@@ -34,14 +36,15 @@ public class ExternalSorterOptions{
 
 
 	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
-			final int skipHeaderLines, final boolean sortInParallel, final int maxTemporaryFiles, final boolean useZip,
-			final int zipBufferSize){
+			final int skipHeaderLines, final boolean sortInParallel, final int maxTemporaryFiles, final boolean useInputAsZip,
+			final boolean useZip, final int zipBufferSize){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
 		this.skipHeaderLines = skipHeaderLines;
 		this.sortInParallel = sortInParallel;
 		this.maxTemporaryFiles = maxTemporaryFiles;
+		this.useInputAsZip = useInputAsZip;
 		this.useZip = useZip;
 		this.zipBufferSize = zipBufferSize;
 	}
@@ -59,6 +62,7 @@ public class ExternalSorterOptions{
 		private boolean sortInParallel;
 		private int maxTemporaryFiles;
 		private boolean maxTemporaryFiles$set;
+		private boolean useInputAsZip;
 		private boolean useZip;
 		private int zipBufferSize;
 		private boolean zipBufferSize$set;
@@ -76,8 +80,8 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder removeDuplicates(final boolean removeDuplicates){
-			this.removeDuplicates = removeDuplicates;
+		public ExternalSorterOptionsBuilder removeDuplicates(){
+			removeDuplicates = true;
 			return this;
 		}
 
@@ -97,8 +101,13 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder useZip(final boolean useZip){
-			this.useZip = useZip;
+		public ExternalSorterOptionsBuilder useInputAsZip(){
+			useInputAsZip = true;
+			return this;
+		}
+
+		public ExternalSorterOptionsBuilder useZip(){
+			useZip = true;
 			return this;
 		}
 
@@ -111,7 +120,8 @@ public class ExternalSorterOptions{
 		@Override
 		public ExternalSorterOptions build(){
 			return new ExternalSorterOptions(charset, comparator, removeDuplicates, skipHeaderLines, sortInParallel,
-				(maxTemporaryFiles$set? maxTemporaryFiles: 1024), useZip, (zipBufferSize$set? zipBufferSize: 2048));
+				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT), useInputAsZip, useZip,
+				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT));
 		}
 
 	}
@@ -138,6 +148,10 @@ public class ExternalSorterOptions{
 
 	public int getMaxTemporaryFiles(){
 		return maxTemporaryFiles;
+	}
+
+	public boolean isUseInputAsZip(){
+		return useInputAsZip;
 	}
 
 	public boolean isUseZip(){

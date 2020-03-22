@@ -49,7 +49,11 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
-		final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
+		final Scanner scanner;
+		if(options.isUseInputAsZip())
+			scanner = FileHelper.createScannerForZIP(file, options.getCharset(), options.getZipBufferSize());
+		else
+			scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
 		final long dataLength = file.length();
 		final long blockSize = estimateBestSizeOfBlocks(dataLength, options.getMaxTemporaryFiles(), estimateAvailableMemory());
 		return splitAndSortFiles(scanner, options, blockSize);
@@ -86,7 +90,7 @@ public class ExternalSorter{
 				}
 
 				temporaryList = sortList(temporaryList, options);
-				final File chunkFile = File.createTempFile("chunk", ".dat");
+				final File chunkFile = FileHelper.createDeleteOnExitFile("chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseZip())
 					out = new GZIPOutputStream(out, options.getZipBufferSize()){

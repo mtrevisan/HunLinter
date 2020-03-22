@@ -84,10 +84,11 @@ public class WordlistWorker extends WorkerDictionary{
 			final ExternalSorter sorter = new ExternalSorter();
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
+				.sortInParallel()
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-				.useZip(true)
-				.removeDuplicates(true)
+				.useZip()
+				.removeDuplicates()
 				.build();
 			try{
 				sorter.sort(outputFile, options, outputFile);

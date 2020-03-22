@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -166,6 +167,14 @@ public class FileHelper{
 
 	public static Scanner createScanner(final Path path, final Charset charset) throws IOException{
 		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
+			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
+		return new Scanner(bomis, charset);
+	}
+
+	public static Scanner createScannerForZIP(final File file, final Charset charset, final int inputBufferSize)
+			throws IOException{
+		final GZIPInputStream zipis = new GZIPInputStream(new FileInputStream(file), inputBufferSize);
+		final BOMInputStream bomis = new BOMInputStream(zipis, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new Scanner(bomis, charset);
 	}
