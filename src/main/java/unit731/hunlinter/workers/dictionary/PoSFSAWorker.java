@@ -10,15 +10,14 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.sorters.StringList;
-import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
-import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
+import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -45,7 +44,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.zip.Deflater;
@@ -88,7 +86,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		catch(final IOException e){
 			throw new RuntimeException(e);
 		}
-
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
@@ -182,28 +179,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.removeDuplicates()
 				.build();
 			try{
-//				TimeWatch watch = TimeWatch.start();
-//				sorter.sort(file, options, file);
-//				watch.stop();
-//				System.out.println(watch.toStringMillis());
-
-				try(final Scanner scanner = FileHelper.createScannerForZIP(file, charset)){
-					final StringList lines = new StringList();
-					while(scanner.hasNextLine())
-						lines.add(scanner.nextLine());
-//					watch.reset();
-					TimeWatch watch = TimeWatch.start();
-					lines.sort(Comparator.naturalOrder());
-					lines.removeDuplicates();
-					watch.stop();
-					System.out.println(watch.toStringMillis());
-				}
+TimeWatch watch = TimeWatch.start();
+				sorter.sort(file, options, file);
+watch.stop();
+System.out.println(watch.toStringMillis());
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e);
 			}
 
-			return supportFile;
+			return file;
 		};
 		final Function<File, FSA> step3 = file -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
