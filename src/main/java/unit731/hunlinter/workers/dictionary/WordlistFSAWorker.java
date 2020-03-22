@@ -16,10 +16,8 @@ import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +41,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 
 	public WordlistFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
+		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);

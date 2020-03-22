@@ -33,7 +33,7 @@ public class SorterWorker extends WorkerDictionary{
 
 
 	public SorterWorker(final Packager packager, final ParserManager parserManager, final int lineIndex){
-		super(new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser())
+		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser())
 			.withParallelProcessing());
 
 		dicFile = packager.getDictionaryFile();
