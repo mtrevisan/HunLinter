@@ -86,7 +86,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(wordGenerator);

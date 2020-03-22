@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -98,7 +97,7 @@ public class ExternalSorter{
 
 				final File chunkFile = FileHelper.createDeleteOnExitFile("chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
-				if(options.isUseZip())
+				if(options.isUseTemporaryAsZip())
 					out = new GZIPOutputStream(out, options.getZipBufferSize()){
 						{
 							def.setLevel(Deflater.BEST_SPEED);
@@ -157,7 +156,7 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final List<String> headers, final List<String> sortedLines, final ExternalSorterOptions options,
+	private void saveChunk(final StringList headers, final StringList sortedLines, final ExternalSorterOptions options,
 			final OutputStream out) throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			//copy header
@@ -211,14 +210,23 @@ public class ExternalSorter{
 
 			final InputStream in = new FileInputStream(f);
 			final InputStreamReader isr;
-			if(options.isUseZip())
+			if(options.isUseTemporaryAsZip())
 				isr = new InputStreamReader(new GZIPInputStream(in, options.getZipBufferSize()), options.getCharset());
 			else
 				isr = new InputStreamReader(in, options.getCharset());
 			final BinaryFileBuffer bfb = new BinaryFileBuffer(new BufferedReader(isr));
 			bfbs.add(bfb);
 		}
-		final BufferedWriter fbw = Files.newBufferedWriter(outputFile.toPath(), options.getCharset());
+
+		OutputStream out = new FileOutputStream(outputFile);
+		if(options.isUseOutputAsZip())
+			out = new GZIPOutputStream(out, options.getZipBufferSize()){
+				{
+					def.setLevel(Deflater.BEST_SPEED);
+				}
+			};
+		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()));
+
 		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
 		forEach(files, File::delete);
 		return rowCounter;

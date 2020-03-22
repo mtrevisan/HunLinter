@@ -32,7 +32,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
 		super(new WorkerDataParser<>(WORKER_NAME, theParser)
-			.withParallelProcessing(true)
+			.withParallelProcessing()
 		);
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {

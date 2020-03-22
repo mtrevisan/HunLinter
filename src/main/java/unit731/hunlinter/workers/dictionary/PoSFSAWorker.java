@@ -131,8 +131,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
+			.withParallelProcessing()
 			.withDataCancelledCallback(e -> closeWriter(writer))
-			.withRelaunchException(true);
+			.withRelaunchException();
 
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
@@ -175,7 +176,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 				//lexical order
 				.comparator(Comparator.naturalOrder())
 				.useInputAsZip()
-				.useZip()
+				.useTemporaryAsZip()
+				.useOutputAsZip()
 				.removeDuplicates()
 				.build();
 			try{

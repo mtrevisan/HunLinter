@@ -21,7 +21,7 @@ public class LoopHelper{
 			fun.accept(array[i]);
 	}
 
-	public static <T> void forEach(final Collection<T> collection, final Consumer<T> fun){
+	public static <T> void forEach(final Iterable<T> collection, final Consumer<T> fun){
 		if(collection != null)
 			for(final T elem : collection)
 				fun.accept(elem);

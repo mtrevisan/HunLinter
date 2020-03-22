@@ -42,8 +42,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true)
-			.withRelaunchException(false));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);

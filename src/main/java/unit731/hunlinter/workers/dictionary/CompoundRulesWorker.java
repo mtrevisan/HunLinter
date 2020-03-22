@@ -25,7 +25,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final BiConsumer<Production, Integer> productionReader, final Runnable completed){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(productionReader);

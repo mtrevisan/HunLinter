@@ -1,23 +1,20 @@
 package unit731.hunlinter.services.sorters;
 
-import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 
-public class StringList extends AbstractList<String> implements List<String>{
+/**
+ * A fast and unsecure version of ArrayList&lt;String&gt;
+ */
+public class StringList implements Iterable<String>{
 
-	/**
-	 * Shared empty array instance used for empty instances.
-	 */
+	/** Shared empty array instance used for empty instances */
 	private static final String[] EMPTY_ELEMENTDATA = {};
 
 	/**
@@ -44,11 +41,7 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 */
 	transient String[] elementData;
 
-	/**
-	 * The size of the ArrayList (the number of elements it contains).
-	 *
-	 * @serial
-	 */
+	/** The size of the ArrayList (the number of elements it contains) */
 	private int size;
 
 
@@ -56,8 +49,7 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 * Constructs an empty list with the specified initial capacity.
 	 *
 	 * @param  initialCapacity  the initial capacity of the list
-	 * @throws IllegalArgumentException if the specified initial capacity
-	 *         is negative
+	 * @throws IllegalArgumentException if the specified initial capacity is negative
 	 */
 	public StringList(final int initialCapacity){
 		if(initialCapacity > 0)
@@ -65,10 +57,10 @@ public class StringList extends AbstractList<String> implements List<String>{
 		else if(initialCapacity == 0)
 			elementData = EMPTY_ELEMENTDATA;
 
-		throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
+		throw new IllegalArgumentException("Illegal capacity: " + initialCapacity);
 	}
 
-	public StringList() {
+	public StringList(){
 		this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
 	}
 
@@ -78,7 +70,6 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 * the storage of an {@code ArrayList} instance.
 	 */
 	public void trimToSize(){
-		modCount ++;
 		if(size < elementData.length)
 			elementData = (size == 0? EMPTY_ELEMENTDATA: Arrays.copyOf(elementData, size));
 	}
@@ -91,14 +82,12 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 * @param minCapacity the desired minimum capacity
 	 */
 	public void ensureCapacity(final int minCapacity){
-		if(minCapacity > elementData.length && (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA || minCapacity > 0)){
-			modCount ++;
+		if(minCapacity > elementData.length)
 			grow(minCapacity);
-		}
 	}
 
-	private String[] grow(){
-		return grow(size + 1);
+	private void grow(){
+		grow(size + 1);
 	}
 
 	/**
@@ -108,7 +97,7 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 * @param minCapacity the desired minimum capacity
 	 * @throws OutOfMemoryError if minCapacity is less than zero
 	 */
-	private String[] grow(final int minCapacity){
+	private void grow(final int minCapacity){
 		final int oldCapacity = elementData.length;
 		if(oldCapacity > 0 || elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA){
 			final int newCapacity = newLength(oldCapacity, minCapacity - oldCapacity,
@@ -117,7 +106,6 @@ public class StringList extends AbstractList<String> implements List<String>{
 		}
 		else
 			elementData = new String[minCapacity];
-		return elementData;
 	}
 
 	/**
@@ -132,13 +120,10 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 * returned.  Otherwise, {@code OutOfMemoryError} is thrown.
 	 *
 	 * @param oldLength   current length of the array (must be non negative)
-	 * @param minGrowth   minimum required growth of the array length (must be
-	 *                    positive)
-	 * @param prefGrowth  preferred growth of the array length (ignored, if less
-	 *                    then {@code minGrowth})
+	 * @param minGrowth   minimum required growth of the array length (must be positive)
+	 * @param prefGrowth  preferred growth of the array length (ignored, if less then {@code minGrowth})
 	 * @return the new length of the array
-	 * @throws OutOfMemoryError if increasing {@code oldLength} by
-	 *                    {@code minGrowth} overflows.
+	 * @throws OutOfMemoryError if increasing {@code oldLength} by {@code minGrowth} overflows.
 	 */
 	private int newLength(final int oldLength, final int minGrowth, final int prefGrowth){
 		final int newLength = Math.max(minGrowth, prefGrowth) + oldLength;
@@ -158,29 +143,15 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 *
 	 * @return the number of elements in this list
 	 */
-	@Override
 	public int size(){
 		return size;
 	}
 
-	/**
-	 * Returns {@code true} if this list contains no elements.
-	 *
-	 * @return {@code true} if this list contains no elements
-	 */
-	@Override
 	public boolean isEmpty(){
 		return (size == 0);
 	}
 
-	public String[] getArray(){
-		return elementData;
-	}
-
-	@Override
 	public String get(final int index){
-		Objects.checkIndex(index, size);
-
 		return elementData[index];
 	}
 
@@ -190,33 +161,31 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 *
 	 * @param index index of the element to replace
 	 * @param element element to be stored at the specified position
-	 * @return the element previously at the specified position
-	 * @throws IndexOutOfBoundsException {@inheritDoc}
+	 * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >= size()})
 	 */
-	@Override
-	public String set(final int index, final String element){
-		Objects.checkIndex(index, size);
-
-		final String oldValue = elementData[index];
+	public void set(final int index, final String element){
 		elementData[index] = element;
-		return oldValue;
 	}
 
 	/**
 	 * Appends the specified element to the end of this list.
 	 *
-	 * @param e element to be appended to this list
-	 * @return {@code true} (as specified by {@link Collection#add})
+	 * @param elem element to be appended to this list
 	 */
-	public boolean add(final String e){
-		modCount ++;
-
+	public void add(final String elem){
 		if(size == elementData.length)
-			elementData = grow();
-		elementData[size] = e;
-		size = size + 1;
+			grow();
 
-		return true;
+		elementData[size ++] = elem;
+	}
+
+	public void addAll(final Collection<? extends String> collection){
+		if(!collection.isEmpty()){
+			grow(size + collection.size());
+
+			for(final String elem : collection)
+				elementData[size ++] = elem;
+		}
 	}
 
 	/**
@@ -226,14 +195,10 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 *
 	 * @param index the index of the element to be removed
 	 * @return the element that was removed from the list
-	 * @throws IndexOutOfBoundsException {@inheritDoc}
+	 * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >= size()})
 	 */
 	public String remove(final int index){
-		Objects.checkIndex(index, size);
-
 		final String oldValue = elementData[index];
-
-		modCount ++;
 
 		final int newSize = size - 1;
 		if(newSize > index)
@@ -245,13 +210,13 @@ public class StringList extends AbstractList<String> implements List<String>{
 	}
 
 	/**
-	 * Removes all of the elements from this list.  The list will
-	 * be empty after this call returns.
+	 * Removes all of the elements from this list.
+	 * The list will be empty after this call returns.
 	 */
 	public void clear(){
-		modCount ++;
-		for(int to = size, i = size = 0; i < to; i ++)
+		for(int i = 0; i < size; i ++)
 			elementData[i] = null;
+		size = 0;
 	}
 
 
@@ -262,119 +227,94 @@ public class StringList extends AbstractList<String> implements List<String>{
 	 *
 	 * @return an iterator over the elements in this list in proper sequence
 	 */
+	@Override
 	public Iterator<String> iterator(){
-		return new StringList.Itr();
+		return new Itr();
 	}
 
-	/**
-	 * An optimized version of AbstractList.Itr
-	 */
+	/** An optimized version of AbstractList.Itr */
 	private class Itr implements Iterator<String>{
-		int cursor;       // index of next element to return
-		int lastRet = -1; // index of last element returned; -1 if no such
-
-		int expectedModCount = modCount;
+		//index of next element to return
+		int cursor;
+		//index of last element returned; -1 if no such
+		int lastReturnedIndex = -1;
 
 		// prevent creating a synthetic constructor
 		Itr(){}
 
+		@Override
 		public boolean hasNext(){
 			return cursor != size;
 		}
 
+		@Override
 		public String next(){
-			checkForComodification();
-
-			int i = cursor;
-			if(i >= size)
+			if(cursor >= size)
 				throw new NoSuchElementException();
 
-			final String[] elementData = StringList.this.elementData;
-			if(i >= elementData.length)
-				throw new ConcurrentModificationException();
-
-			cursor = i + 1;
-			return elementData[lastRet = i];
+			lastReturnedIndex = cursor;
+			cursor ++;
+			return StringList.this.elementData[lastReturnedIndex];
 		}
 
+		@Override
 		public void remove(){
-			if(lastRet < 0)
+			if(lastReturnedIndex < 0)
 				throw new IllegalStateException();
 
-			checkForComodification();
-
 			try{
-				StringList.this.remove(lastRet);
-				cursor = lastRet;
-				lastRet = -1;
+				StringList.this.remove(lastReturnedIndex);
 
-				expectedModCount = modCount;
+				cursor = lastReturnedIndex;
+				lastReturnedIndex = -1;
 			}
 			catch(final IndexOutOfBoundsException ex){
 				throw new ConcurrentModificationException();
 			}
 		}
-
-		final void checkForComodification(){
-			if(modCount != expectedModCount)
-				throw new ConcurrentModificationException();
-		}
 	}
 
 
 	/**
-	 * @throws NullPointerException {@inheritDoc}
+	 * Performs the given action for each element of the {@code Iterable}
+	 * until all elements have been processed or the action throws an
+	 * exception.  Actions are performed in the order of iteration, if that
+	 * order is specified.  Exceptions thrown by the action are relayed to the
+	 * caller.
+	 * <p>
+	 * The behavior of this method is unspecified if the action performs
+	 * side-effects that modify the underlying source of elements, unless an
+	 * overriding class has specified a concurrent modification policy.
+	 *
+	 * @implSpec
+	 * <p>The default implementation behaves as if:
+	 * <pre>{@code
+	 *     for (T t : this)
+	 *         action.accept(t);
+	 * }</pre>
+	 *
+	 * @param action The action to be performed for each element
+	 * @throws NullPointerException if the specified action is null
 	 */
 	@Override
 	public void forEach(final Consumer<? super String> action){
-		Objects.requireNonNull(action);
-
-		final int expectedModCount = modCount;
-
-		final int size = this.size;
-		for(int i = 0; modCount == expectedModCount && i < size; i ++)
+		for(int i = 0; i < size; i ++)
 			action.accept(elementData[i]);
-
-		if(modCount != expectedModCount)
-			throw new ConcurrentModificationException();
 	}
 
-	@Override
 	public void sort(final Comparator<? super String> comparator){
-		final int expectedModCount = modCount;
-
 		TimSort.sort(elementData, comparator);
-
-		if(modCount != expectedModCount)
-			throw new ConcurrentModificationException();
-
-		modCount ++;
 	}
 
 	public void sortParallel(final Comparator<? super String> comparator){
-		final int expectedModCount = modCount;
-
-		this = stream().parallel()
+		elementData = Arrays.stream(elementData).parallel()
 			.sorted(comparator)
-			.collect(Collectors.toList());
-		TimSort.sort(elementData, comparator);
-
-		if(modCount != expectedModCount)
-			throw new ConcurrentModificationException();
-
-		modCount ++;
+			.toArray(String[]::new);
 	}
 
 	/** Assume the list is already sorted! */
 	public void removeDuplicates(){
-		final int expectedModCount = modCount;
-
 		TimSort.removeDuplicates(elementData);
-
-		if(modCount != expectedModCount)
-			throw new ConcurrentModificationException();
-
-		modCount ++;
 	}
 
 }

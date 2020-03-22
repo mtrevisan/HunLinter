@@ -6,7 +6,7 @@ import unit731.hunlinter.services.Packager;
 import java.util.Objects;
 
 
-public class WorkerDataProject extends WorkerData<WorkerDataProject>{
+public class WorkerDataProject extends WorkerData{
 
 	private final Packager packager;
 	private final ParserManager parserManager;

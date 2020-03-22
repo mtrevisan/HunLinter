@@ -3,7 +3,7 @@ package unit731.hunlinter.workers.core;
 import java.util.Objects;
 
 
-public class WorkerDataParser<P> extends WorkerData<WorkerDataParser<P>>{
+public class WorkerDataParser<P> extends WorkerData{
 
 	private final P parser;
 

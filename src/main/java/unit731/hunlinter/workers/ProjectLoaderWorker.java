@@ -14,8 +14,7 @@ public class ProjectLoaderWorker extends WorkerProject{
 
 	public ProjectLoaderWorker(final Packager packager, final ParserManager parserManager, final Runnable completed,
 			final Consumer<Exception> cancelled){
-		super(new WorkerDataProject(WORKER_NAME, packager, parserManager)
-			.withRelaunchException(false));
+		super(new WorkerDataProject(WORKER_NAME, packager, parserManager));
 
 
 		getWorkerData()

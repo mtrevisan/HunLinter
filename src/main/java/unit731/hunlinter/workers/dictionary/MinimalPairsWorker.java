@@ -3,6 +3,8 @@ package unit731.hunlinter.workers.dictionary;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -16,7 +18,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.sorters.StringList;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -55,9 +57,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 	public MinimalPairsWorker(final String language, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator, final File outputFile){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true)
-			.withRelaunchException(false));
+		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
+			.withParallelProcessing());
 
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
@@ -149,10 +150,10 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return list;
 	}
 
-	private void writeSupportFile(final File supportFile, final StringList list){
-		try{
-			final Charset charset = dicParser.getCharset();
-			FileUtils.writeLines(supportFile, charset.name(), list);
+	private void writeSupportFile(final File file, final StringList list){
+		final Charset charset = dicParser.getCharset();
+		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
+			LoopHelper.forEach(list, line -> writeLine(writer, line));
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

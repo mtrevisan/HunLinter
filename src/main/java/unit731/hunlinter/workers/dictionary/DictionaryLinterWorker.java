@@ -26,8 +26,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 	public DictionaryLinterWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true)
-			.withRelaunchException(false));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);

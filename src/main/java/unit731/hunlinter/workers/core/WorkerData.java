@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public class WorkerData<T>{
+public class WorkerData{
 
 	private final String workerName;
 
@@ -25,24 +25,22 @@ public class WorkerData<T>{
 		return workerName;
 	}
 
-	public final T withParallelProcessing(final boolean parallelProcessing){
-		this.parallelProcessing = parallelProcessing;
-		//noinspection unchecked
-		return (T)this;
+	public final WorkerData withParallelProcessing(){
+		parallelProcessing = true;
+		return this;
 	}
 
-	public final T withRelaunchException(final boolean relaunchException){
-		this.relaunchException = relaunchException;
-		//noinspection unchecked
-		return (T)this;
+	public final WorkerData withRelaunchException(){
+		relaunchException = true;
+		return this;
 	}
 
-	public final WorkerData<T> withDataCompletedCallback(final Runnable completed){
+	public final WorkerData withDataCompletedCallback(final Runnable completed){
 		this.completed = completed;
 		return this;
 	}
 
-	public final WorkerData<T> withDataCancelledCallback(final Consumer<Exception> cancelled){
+	public final WorkerData withDataCancelledCallback(final Consumer<Exception> cancelled){
 		this.cancelled = cancelled;
 		return this;
 	}

@@ -16,7 +16,7 @@ import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
-public abstract class WorkerAbstract<WD extends WorkerData<?>> extends SwingWorker<Void, Void>{
+public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
@@ -44,7 +44,7 @@ public abstract class WorkerAbstract<WD extends WorkerData<?>> extends SwingWork
 		this.processor = processor;
 	}
 
-	public final WorkerData<?> getWorkerData(){
+	public final WorkerData getWorkerData(){
 		return workerData;
 	}
 

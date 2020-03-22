@@ -39,7 +39,7 @@ public class WordlistWorker extends WorkerDictionary{
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
 			final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
@@ -87,7 +87,7 @@ public class WordlistWorker extends WorkerDictionary{
 				.sortInParallel()
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-				.useZip()
+				.useTemporaryAsZip()
 				.removeDuplicates()
 				.build();
 			try{

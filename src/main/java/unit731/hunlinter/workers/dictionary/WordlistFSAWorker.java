@@ -44,7 +44,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 	public WordlistFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true));
+			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
@@ -91,7 +91,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //		};
 //
 		getWorkerData()
-			.withRelaunchException(true);
+			.withRelaunchException();
 
 		final Function<Void, Set<String>> step1 = ignored -> {
 			prepareProcessing("Extract words (step 1/3)");

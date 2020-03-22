@@ -25,9 +25,8 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 
 
 	public DictionaryReducerWorker(final DictionaryParser dicParser, final AffixData affixData){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing(true)
-			.withRelaunchException(false));
+		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
+			.withParallelProcessing());
 
 		Objects.requireNonNull(affixData);
 
