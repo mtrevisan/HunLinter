@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -70,22 +71,18 @@ public class ExternalSorter{
 		try(scanner){
 			final List<String> headers = new ArrayList<>();
 			List<String> temporaryList = new ArrayList<>();
-			int headerLinesCounter = 0;
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
 				//as long as there is enough memory
 				while(currentBlockSize < blockSize && scanner.hasNextLine()){
 					final String line = scanner.nextLine();
-					if(headerLinesCounter < options.getSkipHeaderLines()){
+					if(headers.size() < options.getSkipHeaderLines())
 						headers.add(line);
-
-						headerLinesCounter ++;
-						continue;
+					else{
+						temporaryList.add(line);
+						currentBlockSize += StringSizeEstimator.estimatedSizeOf(line);
 					}
-
-					temporaryList.add(line);
-					currentBlockSize += StringSizeEstimator.estimatedSizeOf(line);
 				}
 
 				temporaryList = sortList(temporaryList, options);
@@ -222,8 +219,7 @@ public class ExternalSorter{
 			final BinaryFileBuffer bfb = new BinaryFileBuffer(new BufferedReader(isr));
 			bfbs.add(bfb);
 		}
-		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile),
-			options.getCharset()));
+		final BufferedWriter fbw = Files.newBufferedWriter(outputFile.toPath(), options.getCharset());
 		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
 		forEach(files, File::delete);
 		return rowCounter;

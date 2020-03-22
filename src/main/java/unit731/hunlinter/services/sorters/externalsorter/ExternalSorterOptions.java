@@ -86,8 +86,8 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder sortInParallel(final boolean sortInParallel){
-			this.sortInParallel = sortInParallel;
+		public ExternalSorterOptionsBuilder sortInParallel(){
+			sortInParallel = true;
 			return this;
 		}
 

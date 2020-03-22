@@ -2,9 +2,9 @@ package unit731.hunlinter.services.sorters;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -40,6 +40,9 @@ import java.util.Set;
  * TimSort. Small arrays are sorted in place, using a binary insertion sort.
  *
  * @author Josh Bloch
+ *
+ * @see <a href="https://hackernoon.com/timsort-the-fastest-sorting-algorithm-youve-never-heard-of-36b28417f399">Timsort — the fastest sorting algorithm you’ve never heard of</>
+ * @see <a href="https://github.com/abstools/timsort-benchmark">Java TimSort Benchmarking</>
  */
 public class TimSort<T>{
 
@@ -144,10 +147,7 @@ public class TimSort<T>{
 	}
 
 	public static <T> void sort(final T[] a, int lo, final int hi, final Comparator<? super T> c){
-		if(c == null){
-			Arrays.sort(a, lo, hi);
-			return;
-		}
+		Objects.requireNonNull(c);
 
 		rangeCheck(a.length, lo, hi);
 		int nRemaining = hi - lo;
@@ -162,7 +162,7 @@ public class TimSort<T>{
 			return;
 		}
 
-		/**
+		/*
 		 * March over the array once, left to right, finding natural runs,
 		 * extending short natural runs to minRun elements, and merging runs
 		 * to maintain stack invariant.
@@ -175,7 +175,7 @@ public class TimSort<T>{
 
 			//if run is short, extend to min(minRun, nRemaining)
 			if(runLen < minRun){
-				final int force = (nRemaining <= minRun? nRemaining: minRun);
+				final int force = Math.min(nRemaining, minRun);
 				binarySort(a, lo, lo + force, lo + runLen, c);
 				runLen = force;
 			}
@@ -401,7 +401,7 @@ public class TimSort<T>{
 	private void newMergeCollapse(){
 		while(stackSize > 1){
 			int n = stackSize - 2;
-			if((n >= 1 && runLen[n - 1] <= runLen[n] + runLen[n + 1]) || (n >= 2 && runLen[n - 2] <= runLen[n - 1] + runLen[n])){
+			if(n >= 1 && runLen[n - 1] <= runLen[n] + runLen[n + 1] || n >= 2 && runLen[n - 2] <= runLen[n - 1] + runLen[n]){
 				if(runLen[n - 1] < runLen[n + 1])
 					n --;
 			}
@@ -763,7 +763,7 @@ public class TimSort<T>{
 			minGallop += 2;
 		}
 		//write back to field
-		this.minGallop = (minGallop < 1? 1: minGallop);
+		this.minGallop = Math.max(minGallop, 1);
 
 		if(len1 == 1){
 			assert len2 > 0;
@@ -892,7 +892,7 @@ public class TimSort<T>{
 			minGallop += 2;
 		}
 		//write back to field
-		this.minGallop = (minGallop < 1? 1: minGallop);
+		this.minGallop = Math.max(minGallop, 1);
 
 		if(len2 == 1){
 			assert len1 > 0;
