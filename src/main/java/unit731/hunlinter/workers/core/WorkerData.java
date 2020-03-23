@@ -25,6 +25,11 @@ public class WorkerData{
 		return workerName;
 	}
 
+	public final WorkerData withSequentialProcessing(){
+		parallelProcessing = false;
+		return this;
+	}
+
 	public final WorkerData withParallelProcessing(){
 		parallelProcessing = true;
 		return this;

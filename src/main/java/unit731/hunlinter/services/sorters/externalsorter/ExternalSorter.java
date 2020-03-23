@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import unit731.hunlinter.services.FileHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
@@ -49,12 +52,24 @@ public class ExternalSorter{
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
 		final Scanner scanner;
-		if(options.isUseInputAsZip())
+		final long dataLength;
+		if(options.isUseInputAsZip()){
 			scanner = FileHelper.createScannerForZIP(file, options.getCharset(), options.getZipBufferSize());
-		else
+
+			//extract uncompressed file size
+			final ZipFile zipFile = new ZipFile(file);
+			final ZipEntry zipEntry = zipFile.entries().nextElement();
+			dataLength = zipEntry.getSize();
+		}
+		else{
 			scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
-		final long dataLength = file.length();
-		final long blockSize = estimateBestSizeOfBlocks(dataLength, options.getMaxTemporaryFiles(), estimateAvailableMemory());
+
+			dataLength = file.length();
+		}
+		long blockSize = estimateBestSizeOfBlocks(dataLength, options.getMaxTemporaryFiles(), estimateAvailableMemory());
+		final long maxTemporaryFileSize = options.getMaxTemporaryFileSize();
+		if(maxTemporaryFileSize != ExternalSorterOptions.MAX_TEMPORARY_FILE_SIZE_UNLIMITED && blockSize > maxTemporaryFileSize)
+			blockSize = maxTemporaryFileSize;
 		return splitAndSortFiles(scanner, options, blockSize);
 	}
 

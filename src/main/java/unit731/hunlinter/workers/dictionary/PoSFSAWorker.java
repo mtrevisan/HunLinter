@@ -138,6 +138,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
+			writeLine(writer, "0");
 			processLines(dicPath, charset, lineProcessor);
 			closeWriter(writer);
 
@@ -171,7 +172,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final ExternalSorter sorter = new ExternalSorter();
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
-//				.sortInParallel()	//20+ min...
+				.sortInParallel()
+				.maxTemporaryFileSize(500_000_000l)
 				//lexical order
 				.comparator(Comparator.naturalOrder())
 				.useInputAsZip()
@@ -193,6 +195,9 @@ System.out.println(watch.toStringMillis());
 		};
 		final Function<File, FSA> step3 = file -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+
+			getWorkerData()
+				.withSequentialProcessing();
 
 			processLines(file.toPath(), charset, fsaProcessor);
 

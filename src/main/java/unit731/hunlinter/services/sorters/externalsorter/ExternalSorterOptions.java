@@ -12,7 +12,9 @@ public class ExternalSorterOptions{
 
 	/** Default maximal number of temporary files allowed */
 	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
-	/** Default ZIP buffer size */
+	/** Default maximal size of temporary file allowed [B] */
+	public static final int MAX_TEMPORARY_FILE_SIZE_UNLIMITED = -1;
+	/** Default ZIP buffer size [B] */
 	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
 
 
@@ -25,24 +27,27 @@ public class ExternalSorterOptions{
 	private final boolean sortInParallel;
 	/** Maximum number of temporary files allowed */
 	private final int maxTemporaryFiles;
+	/** Maximum size of temporary file allowed [B] */
+	private final long maxTemporaryFileSize;
 	/** Whether to use ZIP for input files */
 	private final boolean useInputAsZip;
 	/** Whether to use ZIP for temporary files */
 	private final boolean useTemporaryAsZip;
 	/** Whether to use ZIP for output file */
 	private final boolean useOutputAsZip;
-	/** ZIP buffer size */
+	/** ZIP buffer size [B] */
 	private final int zipBufferSize;
 
 
 	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
-			final boolean sortInParallel, final int maxTemporaryFiles, final boolean useInputAsZip,
-			final boolean useTemporaryAsZip, final boolean useOutputAsZip, final int zipBufferSize){
+			final boolean sortInParallel, final int maxTemporaryFiles, final long maxTemporaryFileSize,
+			final boolean useInputAsZip, final boolean useTemporaryAsZip, final boolean useOutputAsZip, final int zipBufferSize){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
 		this.sortInParallel = sortInParallel;
 		this.maxTemporaryFiles = maxTemporaryFiles;
+		this.maxTemporaryFileSize = maxTemporaryFileSize;
 		this.useInputAsZip = useInputAsZip;
 		this.useTemporaryAsZip = useTemporaryAsZip;
 		this.useOutputAsZip = useOutputAsZip;
@@ -61,6 +66,8 @@ public class ExternalSorterOptions{
 		private boolean sortInParallel;
 		private int maxTemporaryFiles;
 		private boolean maxTemporaryFiles$set;
+		private long maxTemporaryFileSize;
+		private boolean maxTemporaryFileSize$set;
 		private boolean useInputAsZip;
 		private boolean useTemporaryAsZip;
 		private boolean useOutputAsZip;
@@ -96,6 +103,12 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
+		public ExternalSorterOptionsBuilder maxTemporaryFileSize(final long maxTemporaryFileSize){
+			this.maxTemporaryFileSize = maxTemporaryFileSize;
+			maxTemporaryFileSize$set = true;
+			return this;
+		}
+
 		public ExternalSorterOptionsBuilder useInputAsZip(){
 			useInputAsZip = true;
 			return this;
@@ -121,6 +134,7 @@ public class ExternalSorterOptions{
 		public ExternalSorterOptions build(){
 			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
 				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
+				(maxTemporaryFileSize$set? maxTemporaryFileSize: MAX_TEMPORARY_FILE_SIZE_UNLIMITED),
 				useInputAsZip, useTemporaryAsZip, useOutputAsZip,
 				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT));
 		}
@@ -145,6 +159,10 @@ public class ExternalSorterOptions{
 
 	public int getMaxTemporaryFiles(){
 		return maxTemporaryFiles;
+	}
+
+	public long getMaxTemporaryFileSize(){
+		return maxTemporaryFileSize;
 	}
 
 	public boolean isUseInputAsZip(){
