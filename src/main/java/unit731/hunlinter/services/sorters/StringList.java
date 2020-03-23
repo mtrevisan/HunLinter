@@ -307,7 +307,6 @@ public class StringList implements Iterable<String>{
 	}
 
 	public void sortParallel(final Comparator<? super String> comparator){
-		//FIXME try a way to pass [0, size[ to parallel stream
 		trimToSize();
 		elementData = Arrays.stream(elementData).parallel()
 			.sorted(comparator)
