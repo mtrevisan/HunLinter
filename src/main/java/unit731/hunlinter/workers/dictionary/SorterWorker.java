@@ -3,6 +3,7 @@ package unit731.hunlinter.workers.dictionary;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,7 +16,6 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.sorters.TimSort;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -60,7 +60,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sort selected section (step 2/3)");
 
 			//sort the chosen section
-			TimSort.sort(chunk, comparator);
+			Arrays.sort(chunk, comparator);
 
 			setProgress(67);
 

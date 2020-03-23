@@ -21,8 +21,6 @@ public class ExternalSorterOptions{
 	private final Comparator<String> comparator;
 	/** Whether the duplicate lines should be discarded */
 	private final boolean removeDuplicates;
-	/** Number of lines to skip before sorting starts (the header line are copied as-is in the output file) */
-	private final int skipHeaderLines;
 	/** Whether to make a parallel sort */
 	private final boolean sortInParallel;
 	/** Maximum number of temporary files allowed */
@@ -38,12 +36,11 @@ public class ExternalSorterOptions{
 
 
 	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
-			final int skipHeaderLines, final boolean sortInParallel, final int maxTemporaryFiles, final boolean useInputAsZip,
+			final boolean sortInParallel, final int maxTemporaryFiles, final boolean useInputAsZip,
 			final boolean useTemporaryAsZip, final boolean useOutputAsZip, final int zipBufferSize){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
-		this.skipHeaderLines = skipHeaderLines;
 		this.sortInParallel = sortInParallel;
 		this.maxTemporaryFiles = maxTemporaryFiles;
 		this.useInputAsZip = useInputAsZip;
@@ -61,7 +58,6 @@ public class ExternalSorterOptions{
 		private Charset charset;
 		private Comparator<String> comparator;
 		private boolean removeDuplicates;
-		private int skipHeaderLines;
 		private boolean sortInParallel;
 		private int maxTemporaryFiles;
 		private boolean maxTemporaryFiles$set;
@@ -86,11 +82,6 @@ public class ExternalSorterOptions{
 
 		public ExternalSorterOptionsBuilder removeDuplicates(){
 			removeDuplicates = true;
-			return this;
-		}
-
-		public ExternalSorterOptionsBuilder skipHeaderLines(final int skipHeaderLines){
-			this.skipHeaderLines = skipHeaderLines;
 			return this;
 		}
 
@@ -128,7 +119,7 @@ public class ExternalSorterOptions{
 
 		@Override
 		public ExternalSorterOptions build(){
-			return new ExternalSorterOptions(charset, comparator, removeDuplicates, skipHeaderLines, sortInParallel,
+			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
 				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
 				useInputAsZip, useTemporaryAsZip, useOutputAsZip,
 				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT));
@@ -146,10 +137,6 @@ public class ExternalSorterOptions{
 
 	public boolean isRemoveDuplicates(){
 		return removeDuplicates;
-	}
-
-	public int getSkipHeaderLines(){
-		return skipHeaderLines;
 	}
 
 	public boolean isSortInParallel(){

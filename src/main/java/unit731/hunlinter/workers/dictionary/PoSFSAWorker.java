@@ -40,7 +40,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -293,8 +292,6 @@ System.out.println(watch.toStringMillis());
 			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
 		}
 
-		//lexical order
-		Collections.sort(words);
 		return words;
 	}
 

@@ -78,18 +78,4 @@ class ExternalSorterTest{
 		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", Files.readString(outputFile.toPath()));
 	}
 
-	@Test
-	void skipHeader() throws Exception{
-		ExternalSorterOptions options = ExternalSorterOptions.builder()
-			.charset(StandardCharsets.UTF_8)
-			.comparator(DEFAULT_COMPARATOR)
-			.skipHeaderLines(2)
-			.build();
-
-		sorter.sort(inputFile, options, outputFile);
-
-		Assertions.assertEquals(27, outputFile.length());
-		Assertions.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", Files.readString(outputFile.toPath()));
-	}
-
 }

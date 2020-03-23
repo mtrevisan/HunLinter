@@ -29,7 +29,6 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -76,7 +75,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
-			final StringList words = extractWords();
+			final List<String> words = extractWords();
 			writeSupportFile(outputFile, words);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
@@ -105,8 +104,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private StringList extractWords(){
-		final StringList list = new StringList();
+	private List<String> extractWords(){
+		final List<String> list = new ArrayList();
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
@@ -150,7 +149,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return list;
 	}
 
-	private void writeSupportFile(final File file, final StringList list){
+	private void writeSupportFile(final File file, final List<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
 			LoopHelper.forEach(list, line -> writeLine(writer, line));

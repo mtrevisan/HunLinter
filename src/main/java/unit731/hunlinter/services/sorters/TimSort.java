@@ -2,6 +2,7 @@ package unit731.hunlinter.services.sorters;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
@@ -79,7 +80,7 @@ public class TimSort<T>{
 
 	/**
 	 * This controls when we get *into* galloping mode. It is initialized
-	 * to MIN_GALLOP. The mergeLo and mergeHi methods nudge it higher for
+	 * to MIN_GALLOP. The `mergeLow` and `mergeHigh` methods nudge it higher for
 	 * random data, and lower for highly structured data.
 	 */
 	private int minGallop = MIN_GALLOP;
@@ -147,8 +148,12 @@ public class TimSort<T>{
 	}
 
 	public static <T> void sort(final T[] array, int low, final int high, final Comparator<? super T> comparator){
+		if(comparator == null){
+			Arrays.sort(array, low, high);
+			return;
+		}
+
 		Objects.requireNonNull(array);
-		Objects.requireNonNull(comparator);
 		assert low < high;
 
 		rangeCheck(array.length, low, high);
@@ -177,7 +182,7 @@ public class TimSort<T>{
 
 			//if run is short, extend to min(minRun, nRemaining)
 			if(runLen < minRun){
-				final int force = Math.min(remaining, minRun);
+				final int force = (remaining <= minRun? remaining: minRun);
 				binarySort(array, low, low + force, low + runLen, comparator);
 				runLen = force;
 			}
@@ -651,7 +656,7 @@ public class TimSort<T>{
 	 * (a[base1 + len1-1]) must be greater than all elements of the second run.
 	 * <p>
 	 * For performance, this method should be called only when len1 <= len2;
-	 * its twin, mergeHi should be called if len1 >= len2. (Either method
+	 * its twin, `mergeHigh` should be called if len1 >= len2. (Either method
 	 * may be called if len1 == len2.)
 	 *
 	 * @param base1	index of first element in first run to be merged
@@ -662,10 +667,8 @@ public class TimSort<T>{
 	private void mergeLow(final int base1, int len1, final int base2, int len2){
 		assert len1 > 0 && len2 > 0 && base1 + len1 == base2;
 
-		//copy first run into temp array
-		final T[] a = this.array;	//for performance
 		final T[] tmp = ensureCapacity(len1);
-		System.arraycopy(a, base1, tmp, 0, len1);
+		System.arraycopy(array, base1, tmp, 0, len1);
 
 		//indexes into tmp array
 		int cursor1 = 0;
@@ -675,22 +678,18 @@ public class TimSort<T>{
 		int destination = base1;
 
 		//move first element of second run and deal with degenerate cases
-		a[destination ++] = a[cursor2 ++];
+		array[destination ++] = array[cursor2 ++];
 		if(-- len2 == 0){
-			System.arraycopy(tmp, cursor1, a, destination, len1);
+			System.arraycopy(tmp, cursor1, array, destination, len1);
 			return;
 		}
 		if(len1 == 1){
-			System.arraycopy(a, cursor2, a, destination, len2);
+			System.arraycopy(array, cursor2, array, destination, len2);
 			//last elt of run 1 to end of merge
-			a[destination + len2] = tmp[cursor1];
+			array[destination + len2] = tmp[cursor1];
 			return;
 		}
 
-		//use local variable for performance
-		final Comparator<? super T> comparator = this.comparator;
-		//use local variable for performance
-		int minGallop = this.minGallop;
 		outer:
 		while(true){
 			//number of times in a row that first run won
@@ -702,15 +701,15 @@ public class TimSort<T>{
 			do{
 				assert len1 > 1 && len2 > 0;
 
-				if(comparator.compare(a[cursor2], tmp[cursor1]) < 0){
-					a[destination ++] = a[cursor2 ++];
+				if(comparator.compare(array[cursor2], tmp[cursor1]) < 0){
+					array[destination ++] = array[cursor2 ++];
 					count2 ++;
 					count1 = 0;
 					if(-- len2 == 0)
 						break outer;
 				}
 				else{
-					a[destination ++] = tmp[cursor1 ++];
+					array[destination ++] = tmp[cursor1 ++];
 					count1 ++;
 					count2 = 0;
 					if(-- len1 == 1)
@@ -726,9 +725,9 @@ public class TimSort<T>{
 			do{
 				assert len1 > 1 && len2 > 0;
 
-				count1 = gallopRight(a[cursor2], tmp, cursor1, len1, 0, comparator);
+				count1 = gallopRight(array[cursor2], tmp, cursor1, len1, 0, comparator);
 				if(count1 != 0){
-					System.arraycopy(tmp, cursor1, a, destination, count1);
+					System.arraycopy(tmp, cursor1, array, destination, count1);
 					destination += count1;
 					cursor1 += count1;
 					len1 -= count1;
@@ -736,20 +735,20 @@ public class TimSort<T>{
 					if(len1 <= 1)
 						break outer;
 				}
-				a[destination ++] = a[cursor2 ++];
+				array[destination ++] = array[cursor2 ++];
 				if(-- len2 == 0)
 					break outer;
 
-				count2 = gallopLeft(tmp[cursor1], a, cursor2, len2, 0, comparator);
+				count2 = gallopLeft(tmp[cursor1], array, cursor2, len2, 0, comparator);
 				if(count2 != 0){
-					System.arraycopy(a, cursor2, a, destination, count2);
+					System.arraycopy(array, cursor2, array, destination, count2);
 					destination += count2;
 					cursor2 += count2;
 					len2 -= count2;
 					if(len2 == 0)
 						break outer;
 				}
-				a[destination ++] = tmp[cursor1 ++];
+				array[destination ++] = tmp[cursor1 ++];
 				if(-- len1 == 1)
 					break outer;
 				minGallop --;
@@ -760,25 +759,25 @@ public class TimSort<T>{
 			minGallop += 2;
 		}
 		//write back to field
-		this.minGallop = Math.max(minGallop, 1);
+		minGallop = (minGallop < 1? 1: minGallop);
 
 		if(len1 == 1){
 			assert len2 > 0;
-			System.arraycopy(a, cursor2, a, destination, len2);
+			System.arraycopy(array, cursor2, array, destination, len2);
 			//last elt of run 1 to end of merge
-			a[destination + len2] = tmp[cursor1];
+			array[destination + len2] = tmp[cursor1];
 		}
 		else if(len1 == 0)
 			throw new IllegalArgumentException("Comparison method violates its general contract!");
 		else{
 			assert len2 == 0;
-			System.arraycopy(tmp, cursor1, a, destination, len1);
+			System.arraycopy(tmp, cursor1, array, destination, len1);
 		}
 	}
 
 	/**
 	 * Like mergeLow, except that this method should be called only if
-	 * len1 >= len2; mergeLo should be called if len1 <= len2. (Either method
+	 * len1 >= len2; mergeLow should be called if len1 <= len2. (Either method
 	 * may be called if len1 == len2.)
 	 *
 	 * @param base1	index of first element in first run to be merged
@@ -789,10 +788,8 @@ public class TimSort<T>{
 	private void mergeHigh(final int base1, int len1, final int base2, int len2){
 		assert len1 > 0 && len2 > 0 && base1 + len1 == base2;
 
-		//copy second run into temp array
-		final T[] a = this.array;	//for performance
 		final T[] tmp = ensureCapacity(len2);
-		System.arraycopy(a, base2, tmp, 0, len2);
+		System.arraycopy(array, base2, tmp, 0, len2);
 
 		//indexes into a
 		int cursor1 = base1 + len1 - 1;
@@ -802,23 +799,19 @@ public class TimSort<T>{
 		int destination = base2 + len2 - 1;
 
 		//move last element of first run and deal with degenerate cases
-		a[destination --] = a[cursor1 --];
+		array[destination --] = array[cursor1 --];
 		if(-- len1 == 0){
-			System.arraycopy(tmp, 0, a, destination - (len2 - 1), len2);
+			System.arraycopy(tmp, 0, array, destination - (len2 - 1), len2);
 			return;
 		}
 		if(len2 == 1){
 			destination -= len1;
 			cursor1 -= len1;
-			System.arraycopy(a, cursor1 + 1, a, destination + 1, len1);
-			a[destination] = tmp[cursor2];
+			System.arraycopy(array, cursor1 + 1, array, destination + 1, len1);
+			array[destination] = tmp[cursor2];
 			return;
 		}
 
-		//use local variable for performance
-		final Comparator<? super T> comparator = this.comparator;
-		//use local variable for performance
-		int minGallop = this.minGallop;
 		outer:
 		while(true){
 			//number of times in a row that first run won
@@ -830,15 +823,15 @@ public class TimSort<T>{
 			do{
 				assert len1 > 0 && len2 > 1;
 
-				if(comparator.compare(tmp[cursor2], a[cursor1]) < 0){
-					a[destination --] = a[cursor1 --];
+				if(comparator.compare(tmp[cursor2], array[cursor1]) < 0){
+					array[destination --] = array[cursor1 --];
 					count1 ++;
 					count2 = 0;
 					if(-- len1 == 0)
 						break outer;
 				}
 				else{
-					a[destination --] = tmp[cursor2 --];
+					array[destination --] = tmp[cursor2 --];
 					count2 ++;
 					count1 = 0;
 					if(-- len2 == 1)
@@ -853,30 +846,30 @@ public class TimSort<T>{
 			 */
 			do{
 				assert len1 > 0 && len2 > 1;
-				count1 = len1 - gallopRight(tmp[cursor2], a, base1, len1, len1 - 1, comparator);
+				count1 = len1 - gallopRight(tmp[cursor2], array, base1, len1, len1 - 1, comparator);
 				if(count1 != 0){
 					destination -= count1;
 					cursor1 -= count1;
 					len1 -= count1;
-					System.arraycopy(a, cursor1 + 1, a, destination + 1, count1);
+					System.arraycopy(array, cursor1 + 1, array, destination + 1, count1);
 					if(len1 == 0)
 						break outer;
 				}
-				a[destination --] = tmp[cursor2 --];
+				array[destination --] = tmp[cursor2 --];
 				if(-- len2 == 1)
 					break outer;
 
-				count2 = len2 - gallopLeft(a[cursor1], tmp, 0, len2, len2 - 1, comparator);
+				count2 = len2 - gallopLeft(array[cursor1], tmp, 0, len2, len2 - 1, comparator);
 				if(count2 != 0){
 					destination -= count2;
 					cursor2 -= count2;
 					len2 -= count2;
-					System.arraycopy(tmp, cursor2 + 1, a, destination + 1, count2);
+					System.arraycopy(tmp, cursor2 + 1, array, destination + 1, count2);
 					//len2 == 1 || len2 == 0
 					if(len2 <= 1)
 						break outer;
 				}
-				a[destination --] = a[cursor1 --];
+				array[destination --] = array[cursor1 --];
 				if(-- len1 == 0)
 					break outer;
 				minGallop --;
@@ -887,22 +880,22 @@ public class TimSort<T>{
 			minGallop += 2;
 		}
 		//write back to field
-		this.minGallop = Math.max(minGallop, 1);
+		minGallop = (minGallop < 1? 1: minGallop);
 
 		if(len2 == 1){
 			assert len1 > 0;
 			destination -= len1;
 			cursor1 -= len1;
-			System.arraycopy(a, cursor1 + 1, a, destination + 1, len1);
+			System.arraycopy(array, cursor1 + 1, array, destination + 1, len1);
 			//move first elt of run2 to front of merge
-			a[destination] = tmp[cursor2];
+			array[destination] = tmp[cursor2];
 		}
 		else if(len2 == 0)
 			throw new IllegalArgumentException("Comparison method violates its general contract!");
 		else{
 			assert len1 == 0;
 			assert len2 > 0;
-			System.arraycopy(tmp, 0, a, destination - (len2 - 1), len2);
+			System.arraycopy(tmp, 0, array, destination - (len2 - 1), len2);
 		}
 	}
 
@@ -923,13 +916,9 @@ public class TimSort<T>{
 			newSize |= newSize >> 4;
 			newSize |= newSize >> 8;
 			newSize |= newSize >> 16;
-			newSize++;
+			newSize ++;
 
-			//not bloody likely!
-			if(newSize < 0)
-				newSize = minCapacity;
-			else
-				newSize = Math.min(newSize, array.length >>> 1);
+			newSize = Math.min(newSize, array.length >>> 1);
 
 			@SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
 			final T[] newArray = (T[])new Object[newSize];

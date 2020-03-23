@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.sorters.StringList;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -72,26 +72,23 @@ public class ExternalSorter{
 			throws IOException{
 		final List<File> files = new ArrayList<>();
 		try(scanner){
-			final StringList headers = new StringList();
-			StringList temporaryList = new StringList();
+			List<String> temporaryList = new ArrayList<>();
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
 				//as long as there is enough memory
 				while(currentBlockSize < blockSize && scanner.hasNextLine()){
 					final String line = scanner.nextLine();
-					if(headers.size() < options.getSkipHeaderLines())
-						headers.add(line);
-					else{
-						temporaryList.add(line);
-						currentBlockSize += StringSizeEstimator.estimatedSizeOf(line);
-					}
+					temporaryList.add(line);
+					currentBlockSize += StringSizeEstimator.estimatedSizeOf(line);
 				}
 
-				//sort file
+				//sort list
 				final Comparator<String> comparator = options.getComparator();
 				if(options.isSortInParallel())
-					temporaryList.sortParallel(comparator);
+					temporaryList = temporaryList.stream()
+						.sorted(comparator)
+						.collect(Collectors.toList());
 				else
 					temporaryList.sort(comparator);
 
@@ -103,7 +100,7 @@ public class ExternalSorter{
 							def.setLevel(Deflater.BEST_SPEED);
 						}
 					};
-				saveChunk(headers, temporaryList, options, out);
+				saveChunk(temporaryList, options, out);
 				files.add(chunkFile);
 
 				temporaryList.clear();
@@ -156,16 +153,9 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final StringList headers, final StringList sortedLines, final ExternalSorterOptions options,
-			final OutputStream out) throws IOException{
+	private void saveChunk(final List<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
+			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
-			//copy header
-			for(final String r : headers){
-				writer.write(r);
-				writer.newLine();
-			}
-
-			//copy sorted lines
 			if(options.isRemoveDuplicates()){
 				String lastLine = null;
 				final Iterator<String> itr = sortedLines.iterator();
