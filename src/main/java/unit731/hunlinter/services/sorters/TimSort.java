@@ -42,8 +42,8 @@ import java.util.Set;
  *
  * @author Josh Bloch
  *
- * @see <a href="https://hackernoon.com/timsort-the-fastest-sorting-algorithm-youve-never-heard-of-36b28417f399">Timsort — the fastest sorting algorithm you’ve never heard of</>
- * @see <a href="https://github.com/abstools/timsort-benchmark">Java TimSort Benchmarking</>
+ * @see <a href="https://hackernoon.com/timsort-the-fastest-sorting-algorithm-youve-never-heard-of-36b28417f399">Timsort — the fastest sorting algorithm you’ve never heard of<a/>
+ * @see <a href="https://github.com/abstools/timsort-benchmark">Java TimSort Benchmarking<a/>
  */
 public class TimSort<T>{
 

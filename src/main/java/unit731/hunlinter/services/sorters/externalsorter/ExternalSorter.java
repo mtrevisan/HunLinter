@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import unit731.hunlinter.services.FileHelper;
 
@@ -32,7 +30,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 /**
  * @see <a href="https://github.com/Dgleish/ExternalSort/blob/master/src/uk/ac/cam/amd96/fjava/tick0/ExternalSort.java">DGleish External Sort</a>
- * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</>, version 0.4.4, 11/3/2020
+ * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java<a/>, version 0.4.4, 11/3/2020
  */
 public class ExternalSorter{
 
@@ -57,19 +55,14 @@ public class ExternalSorter{
 			scanner = FileHelper.createScannerForZIP(file, options.getCharset(), options.getZipBufferSize());
 
 			//extract uncompressed file size
-			final ZipFile zipFile = new ZipFile(file);
-			final ZipEntry zipEntry = zipFile.entries().nextElement();
-			dataLength = zipEntry.getSize();
+			dataLength = FileHelper.getGZIPUncompressedSize(file);
 		}
 		else{
 			scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
 
 			dataLength = file.length();
 		}
-		long blockSize = estimateBestSizeOfBlocks(dataLength, options.getMaxTemporaryFiles(), estimateAvailableMemory());
-		final long maxTemporaryFileSize = options.getMaxTemporaryFileSize();
-		if(maxTemporaryFileSize != ExternalSorterOptions.MAX_TEMPORARY_FILE_SIZE_UNLIMITED && blockSize > maxTemporaryFileSize)
-			blockSize = maxTemporaryFileSize;
+		final long blockSize = estimateBestSizeOfBlocks(dataLength, options, estimateAvailableMemory());
 		return splitAndSortFiles(scanner, options, blockSize);
 	}
 
@@ -144,18 +137,23 @@ public class ExternalSorter{
 	 * be using too much memory.
 	 *
 	 * @param sizeOfFile how much data (in bytes) can we expect
-	 * @param maxTemporaryFiles how many temporary files can we create (e.g., 1024)
+	 * @param options	Sorting options
 	 * @param maxMemory Maximum memory to use (in bytes)
 	 * @return the estimate [B]
 	 */
-	private long estimateBestSizeOfBlocks(final long sizeOfFile, final int maxTemporaryFiles, final long maxMemory){
+	private long estimateBestSizeOfBlocks(final long sizeOfFile, final ExternalSorterOptions options, final long maxMemory){
 		//we don't want to open up much more than maxTemporaryFiles temporary files, better run out of memory first
+		final long maxTemporaryFiles = options.getMaxTemporaryFiles();
 		long blockSize = sizeOfFile / maxTemporaryFiles + (sizeOfFile % maxTemporaryFiles == 0l? 0l: 1l);
 
-		//on the other hand, we don't want to create many temporary files for naught. If {@code blockSize} is smaller
+		//on the other hand, we don't want to create many temporary files for naught: if {@code blockSize} is smaller
 		//than half the free memory, grow it
 		if((blockSize << 1) < maxMemory)
 			blockSize = maxMemory >> 1;
+
+		final long maxTemporaryFileSize = options.getMaxTemporaryFileSize();
+		if(maxTemporaryFileSize != ExternalSorterOptions.MAX_TEMPORARY_FILE_SIZE_UNLIMITED && blockSize > maxTemporaryFileSize)
+			blockSize = maxTemporaryFileSize;
 
 		return blockSize;
 	}

@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -177,6 +178,17 @@ public class FileHelper{
 		final BOMInputStream bomis = new BOMInputStream(zipis, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new Scanner(bomis, charset);
+	}
+
+	public static long getGZIPUncompressedSize(final File file){
+		long size = -1l;
+		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
+			raf.seek(raf.length() - Integer.BYTES);
+			final int n = raf.readInt();
+			size = Integer.toUnsignedLong(Integer.reverseBytes(n));
+		}
+		catch(final Exception ignored){}
+		return size;
 	}
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform

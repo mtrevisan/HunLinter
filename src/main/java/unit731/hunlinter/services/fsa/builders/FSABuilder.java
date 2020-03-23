@@ -7,9 +7,10 @@ import java.util.Comparator;
 
 
 /**
- * Fast, memory-conservative Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
+ * Fast, memory-conservative, Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
  * between construction speed and memory consumption.
  *
+ * @see <a href="https://www.aclweb.org/anthology/J00-1002.pdf">Incremental Construction of Minimal Acyclic Finite-State Automata<a/>
  * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
 public class FSABuilder{
@@ -108,11 +109,11 @@ public class FSABuilder{
 	public final void add(final byte[] sequence){
 		if(serialized == null)
 			throw new IllegalArgumentException("Automaton already built");
-		if(previous != null && sequence.length > 0 && compare(previous, previousLength, sequence, sequence.length) > 0)
-			throw new IllegalArgumentException("Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength))
-				+ " >= " + Arrays.toString(Arrays.copyOfRange(sequence, 0, sequence.length)));
-
 		final int len = sequence.length;
+		if(previous != null && len > 0 && compare(previous, previousLength, sequence, len) > 0)
+			throw new IllegalArgumentException("Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength))
+				+ " >= " + Arrays.toString(Arrays.copyOfRange(sequence, 0, len)));
+
 		setPrevious(sequence, len);
 
 		//determine common prefix length
