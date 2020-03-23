@@ -26,27 +26,21 @@ import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -71,21 +65,22 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final File supportFile;
-		final BufferedWriter writer;
-		try{
-			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
-			final OutputStream out = new GZIPOutputStream(new FileOutputStream(supportFile), 2048){
-				{
-					def.setLevel(Deflater.BEST_SPEED);
-				}
-			};
-			writer = new BufferedWriter(new OutputStreamWriter(out, charset));
-		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
-		}
+//		final File supportFile;
+//		final BufferedWriter writer;
+//		try{
+//			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
+//			final OutputStream out = new GZIPOutputStream(new FileOutputStream(supportFile), 2048){
+//				{
+//					def.setLevel(Deflater.BEST_SPEED);
+//				}
+//			};
+//			writer = new BufferedWriter(new OutputStreamWriter(out, charset));
+//		}
+//		catch(final IOException e){
+//			throw new RuntimeException(e);
+//		}
 
+		final List<String> list = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -96,7 +91,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 				//encode lines
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
 
-				forEach(encodedLines, line -> writeLine(writer, line));
+//				forEach(encodedLines, line -> writeLine(writer, line));
+				list.addAll(encodedLines);
 			});
 		};
 		final FSABuilder builder = new FSABuilder();
@@ -130,19 +126,20 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
-			.withParallelProcessing()
-			.withDataCancelledCallback(e -> closeWriter(writer))
+//			.withParallelProcessing()
+//			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
-			writeLine(writer, "0");
+//			writeLine(writer, "0");
 			processLines(dicPath, charset, lineProcessor);
-			closeWriter(writer);
+//			closeWriter(writer);
 
-			return supportFile;
+//			return supportFile;
+			return null;
 		};
 		final Function<File, File> step2 = file -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create support file (step 2/4)");
@@ -183,7 +180,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.build();
 			try{
 TimeWatch watch = TimeWatch.start();
-				sorter.sort(file, options, file);
+	list.sort(Comparator.naturalOrder());
+//				sorter.sort(file, options, file);
 watch.stop();
 System.out.println(watch.toStringMillis());
 			}
