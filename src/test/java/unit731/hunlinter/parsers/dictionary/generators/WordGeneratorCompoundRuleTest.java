@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
@@ -33,15 +33,15 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 
-		Production[] expected = new Production[]{
-			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+		Inflection[] expected = new Inflection[]{
+			createInflection("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -62,11 +62,11 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		Inflection[] expected = new Inflection[]{
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -87,46 +87,46 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("aa", null, "pa:a st:a pa:a st:a"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("bb", null, "pa:b st:b pa:b st:b"),
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cb", null, "pa:c st:c pa:b st:b"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),
-			createProduction("aab", null, "pa:a st:a pa:a st:a pa:b st:b"),
-			createProduction("aac", null, "pa:a st:a pa:a st:a pa:c st:c"),
-			createProduction("abb", null, "pa:a st:a pa:b st:b pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acb", null, "pa:a st:a pa:c st:c pa:b st:b"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("bbb", null, "pa:b st:b pa:b st:b pa:b st:b"),
-			createProduction("bbc", null, "pa:b st:b pa:b st:b pa:c st:c"),
-			createProduction("bcb", null, "pa:b st:b pa:c st:c pa:b st:b"),
-			createProduction("bcc", null, "pa:b st:b pa:c st:c pa:c st:c"),
-			createProduction("cbb", null, "pa:c st:c pa:b st:b pa:b st:b"),
-			createProduction("cbc", null, "pa:c st:c pa:b st:b pa:c st:c"),
-			createProduction("ccb", null, "pa:c st:c pa:c st:c pa:b st:b"),
-			createProduction("ccc", null, "pa:c st:c pa:c st:c pa:c st:c"),
-			createProduction("aaaa", null, "pa:a st:a pa:a st:a pa:a st:a pa:a st:a"),
-			createProduction("aaab", null, "pa:a st:a pa:a st:a pa:a st:a pa:b st:b"),
-			createProduction("aaac", null, "pa:a st:a pa:a st:a pa:a st:a pa:c st:c"),
-			createProduction("aabb", null, "pa:a st:a pa:a st:a pa:b st:b pa:b st:b"),
-			createProduction("aabc", null, "pa:a st:a pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("aacb", null, "pa:a st:a pa:a st:a pa:c st:c pa:b st:b"),
-			createProduction("aacc", null, "pa:a st:a pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("abbb", null, "pa:a st:a pa:b st:b pa:b st:b pa:b st:b"),
-			createProduction("abbc", null, "pa:a st:a pa:b st:b pa:b st:b pa:c st:c"),
-			createProduction("abcb", null, "pa:a st:a pa:b st:b pa:c st:c pa:b st:b"),
-			createProduction("abcc", null, "pa:a st:a pa:b st:b pa:c st:c pa:c st:c"),
-			createProduction("acbb", null, "pa:a st:a pa:c st:c pa:b st:b pa:b st:b"),
-			createProduction("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
-			createProduction("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
-			createProduction("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
+		Inflection[] expected = new Inflection[]{
+			createInflection("aa", null, "pa:a st:a pa:a st:a"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("bb", null, "pa:b st:b pa:b st:b"),
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cb", null, "pa:c st:c pa:b st:b"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),
+			createInflection("aab", null, "pa:a st:a pa:a st:a pa:b st:b"),
+			createInflection("aac", null, "pa:a st:a pa:a st:a pa:c st:c"),
+			createInflection("abb", null, "pa:a st:a pa:b st:b pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acb", null, "pa:a st:a pa:c st:c pa:b st:b"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
+			createInflection("bbb", null, "pa:b st:b pa:b st:b pa:b st:b"),
+			createInflection("bbc", null, "pa:b st:b pa:b st:b pa:c st:c"),
+			createInflection("bcb", null, "pa:b st:b pa:c st:c pa:b st:b"),
+			createInflection("bcc", null, "pa:b st:b pa:c st:c pa:c st:c"),
+			createInflection("cbb", null, "pa:c st:c pa:b st:b pa:b st:b"),
+			createInflection("cbc", null, "pa:c st:c pa:b st:b pa:c st:c"),
+			createInflection("ccb", null, "pa:c st:c pa:c st:c pa:b st:b"),
+			createInflection("ccc", null, "pa:c st:c pa:c st:c pa:c st:c"),
+			createInflection("aaaa", null, "pa:a st:a pa:a st:a pa:a st:a pa:a st:a"),
+			createInflection("aaab", null, "pa:a st:a pa:a st:a pa:a st:a pa:b st:b"),
+			createInflection("aaac", null, "pa:a st:a pa:a st:a pa:a st:a pa:c st:c"),
+			createInflection("aabb", null, "pa:a st:a pa:a st:a pa:b st:b pa:b st:b"),
+			createInflection("aabc", null, "pa:a st:a pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("aacb", null, "pa:a st:a pa:a st:a pa:c st:c pa:b st:b"),
+			createInflection("aacc", null, "pa:a st:a pa:a st:a pa:c st:c pa:c st:c"),
+			createInflection("abbb", null, "pa:a st:a pa:b st:b pa:b st:b pa:b st:b"),
+			createInflection("abbc", null, "pa:a st:a pa:b st:b pa:b st:b pa:c st:c"),
+			createInflection("abcb", null, "pa:a st:a pa:b st:b pa:c st:c pa:b st:b"),
+			createInflection("abcc", null, "pa:a st:a pa:b st:b pa:c st:c pa:c st:c"),
+			createInflection("acbb", null, "pa:a st:a pa:c st:c pa:b st:b pa:b st:b"),
+			createInflection("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
+			createInflection("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
+			createInflection("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -169,46 +169,46 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"9/#@",
 			"9th/}{"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("10th", null, "pa:1 st:1 pa:0th st:0th"),
-			createProduction("11th", "_", "pa:1 st:1 pa:1th st:1th"),
-			createProduction("12th", "_", "pa:1 st:1 pa:2th st:2th"),
-			createProduction("13th", "_", "pa:1 st:1 pa:3th st:3th"),
-			createProduction("14th", null, "pa:1 st:1 pa:4th st:4th"),
-			createProduction("15th", null, "pa:1 st:1 pa:5th st:5th"),
-			createProduction("16th", null, "pa:1 st:1 pa:6th st:6th"),
-			createProduction("17th", null, "pa:1 st:1 pa:7th st:7th"),
-			createProduction("18th", null, "pa:1 st:1 pa:8th st:8th"),
-			createProduction("19th", null, "pa:1 st:1 pa:9th st:9th"),
-			createProduction("010th", null, "pa:0 st:0 pa:1 st:1 pa:0th st:0th"),
-			createProduction("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
-			createProduction("012th", "_", "pa:0 st:0 pa:1 st:1 pa:2th st:2th"),
-			createProduction("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
-			createProduction("014th", null, "pa:0 st:0 pa:1 st:1 pa:4th st:4th"),
-			createProduction("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
-			createProduction("016th", null, "pa:0 st:0 pa:1 st:1 pa:6th st:6th"),
-			createProduction("017th", null, "pa:0 st:0 pa:1 st:1 pa:7th st:7th"),
-			createProduction("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
-			createProduction("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
-			createProduction("110th", null, "pa:1 st:1 pa:1 st:1 pa:0th st:0th"),
-			createProduction("111th", "_", "pa:1 st:1 pa:1 st:1 pa:1th st:1th"),
-			createProduction("112th", "_", "pa:1 st:1 pa:1 st:1 pa:2th st:2th"),
-			createProduction("113th", "_", "pa:1 st:1 pa:1 st:1 pa:3th st:3th"),
-			createProduction("114th", null, "pa:1 st:1 pa:1 st:1 pa:4th st:4th"),
-			createProduction("115th", null, "pa:1 st:1 pa:1 st:1 pa:5th st:5th"),
-			createProduction("116th", null, "pa:1 st:1 pa:1 st:1 pa:6th st:6th"),
-			createProduction("117th", null, "pa:1 st:1 pa:1 st:1 pa:7th st:7th"),
-			createProduction("118th", null, "pa:1 st:1 pa:1 st:1 pa:8th st:8th"),
-			createProduction("119th", null, "pa:1 st:1 pa:1 st:1 pa:9th st:9th"),
-			createProduction("210th", null, "pa:2 st:2 pa:1 st:1 pa:0th st:0th"),
-			createProduction("211th", "_", "pa:2 st:2 pa:1 st:1 pa:1th st:1th"),
-			createProduction("212th", "_", "pa:2 st:2 pa:1 st:1 pa:2th st:2th"),
-			createProduction("213th", "_", "pa:2 st:2 pa:1 st:1 pa:3th st:3th"),
-			createProduction("214th", null, "pa:2 st:2 pa:1 st:1 pa:4th st:4th"),
-			createProduction("215th", null, "pa:2 st:2 pa:1 st:1 pa:5th st:5th"),
-			createProduction("216th", null, "pa:2 st:2 pa:1 st:1 pa:6th st:6th")
+		Inflection[] expected = new Inflection[]{
+			createInflection("10th", null, "pa:1 st:1 pa:0th st:0th"),
+			createInflection("11th", "_", "pa:1 st:1 pa:1th st:1th"),
+			createInflection("12th", "_", "pa:1 st:1 pa:2th st:2th"),
+			createInflection("13th", "_", "pa:1 st:1 pa:3th st:3th"),
+			createInflection("14th", null, "pa:1 st:1 pa:4th st:4th"),
+			createInflection("15th", null, "pa:1 st:1 pa:5th st:5th"),
+			createInflection("16th", null, "pa:1 st:1 pa:6th st:6th"),
+			createInflection("17th", null, "pa:1 st:1 pa:7th st:7th"),
+			createInflection("18th", null, "pa:1 st:1 pa:8th st:8th"),
+			createInflection("19th", null, "pa:1 st:1 pa:9th st:9th"),
+			createInflection("010th", null, "pa:0 st:0 pa:1 st:1 pa:0th st:0th"),
+			createInflection("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
+			createInflection("012th", "_", "pa:0 st:0 pa:1 st:1 pa:2th st:2th"),
+			createInflection("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
+			createInflection("014th", null, "pa:0 st:0 pa:1 st:1 pa:4th st:4th"),
+			createInflection("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
+			createInflection("016th", null, "pa:0 st:0 pa:1 st:1 pa:6th st:6th"),
+			createInflection("017th", null, "pa:0 st:0 pa:1 st:1 pa:7th st:7th"),
+			createInflection("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
+			createInflection("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
+			createInflection("110th", null, "pa:1 st:1 pa:1 st:1 pa:0th st:0th"),
+			createInflection("111th", "_", "pa:1 st:1 pa:1 st:1 pa:1th st:1th"),
+			createInflection("112th", "_", "pa:1 st:1 pa:1 st:1 pa:2th st:2th"),
+			createInflection("113th", "_", "pa:1 st:1 pa:1 st:1 pa:3th st:3th"),
+			createInflection("114th", null, "pa:1 st:1 pa:1 st:1 pa:4th st:4th"),
+			createInflection("115th", null, "pa:1 st:1 pa:1 st:1 pa:5th st:5th"),
+			createInflection("116th", null, "pa:1 st:1 pa:1 st:1 pa:6th st:6th"),
+			createInflection("117th", null, "pa:1 st:1 pa:1 st:1 pa:7th st:7th"),
+			createInflection("118th", null, "pa:1 st:1 pa:1 st:1 pa:8th st:8th"),
+			createInflection("119th", null, "pa:1 st:1 pa:1 st:1 pa:9th st:9th"),
+			createInflection("210th", null, "pa:2 st:2 pa:1 st:1 pa:0th st:0th"),
+			createInflection("211th", "_", "pa:2 st:2 pa:1 st:1 pa:1th st:1th"),
+			createInflection("212th", "_", "pa:2 st:2 pa:1 st:1 pa:2th st:2th"),
+			createInflection("213th", "_", "pa:2 st:2 pa:1 st:1 pa:3th st:3th"),
+			createInflection("214th", null, "pa:2 st:2 pa:1 st:1 pa:4th st:4th"),
+			createInflection("215th", null, "pa:2 st:2 pa:1 st:1 pa:5th st:5th"),
+			createInflection("216th", null, "pa:2 st:2 pa:1 st:1 pa:6th st:6th")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -229,15 +229,15 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -259,15 +259,15 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/bb",
 			"c/bbcc"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -289,15 +289,15 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/2",
 			"c/2,3"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		Production[] expected = new Production[]{
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}
@@ -338,7 +338,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
 		Assertions.assertTrue(words.length == 0);
 	}
@@ -359,10 +359,10 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		Production[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		Production[] expected = new Production[]{
-			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+		Inflection[] expected = new Inflection[]{
+			createInflection("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		};
 		Assertions.assertArrayEquals(expected, words);
 	}

@@ -20,7 +20,7 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class Production extends DictionaryEntry{
+public class Inflection extends DictionaryEntry{
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 
@@ -38,40 +38,40 @@ public class Production extends DictionaryEntry{
 	private final DictionaryEntry[] compoundEntries;
 
 
-	public static Production createFromCompound(final String word, final String continuationFlags,
+	public static Inflection createFromCompound(final String word, final String continuationFlags,
 			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
-		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
+		return new Inflection(word, cfs, morphologicalFields, true, null, compoundEntries);
 	}
 
-	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final boolean combinable){
-		return new Production(word, appliedEntry.continuationFlags, appliedEntry.morphologicalFields, combinable,
+	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry, final boolean combinable){
+		return new Inflection(word, appliedEntry.continuationFlags, appliedEntry.morphologicalFields, combinable,
 			new AffixEntry[]{appliedEntry}, null);
 	}
 
-	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
-			final String[] remainingContinuationFlags, final boolean combinable){
+	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
+			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = new AffixEntry[]{appliedEntry};
 		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
-		return new Production(word, continuationFlags, morphologicalFields, combinable,
+		return new Inflection(word, continuationFlags, morphologicalFields, combinable,
 			appliedRules, compoundEntries);
 	}
 
-	public static Production clone(final DictionaryEntry dicEntry){
-		return new Production(dicEntry);
+	public static Inflection clone(final DictionaryEntry dicEntry){
+		return new Inflection(dicEntry);
 	}
 
-	private Production(final DictionaryEntry dicEntry){
+	private Inflection(final DictionaryEntry dicEntry){
 		super(dicEntry);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
+	private Inflection(final String word, final String[] continuationFlags, final String[] morphologicalFields,
+							 final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
@@ -79,8 +79,8 @@ public class Production extends DictionaryEntry{
 	}
 
 	/* NOTE: used for testing purposes */
-	public Production(final String word, final String continuationFlags, final String morphologicalFields,
-			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
+	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
+							final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
 			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
@@ -88,7 +88,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	private static DictionaryEntry[] extractCompoundEntries(final DictionaryEntry dicEntry){
-		return (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
+		return (dicEntry instanceof Inflection? ((Inflection)dicEntry).compoundEntries: null);
 	}
 
 	@Override
@@ -130,15 +130,15 @@ public class Production extends DictionaryEntry{
 				appliedRules);
 	}
 
-	public boolean hasProductionRules(){
+	public boolean hasInflectionRules(){
 		return (appliedRules != null && appliedRules.length > 0);
 	}
 
-//	public boolean hasProductionRule(final String continuationFlag){
+//	public boolean hasInflectionRule(final String continuationFlag){
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
 //	}
 
-//	public boolean hasProductionRule(final AffixEntry.Type type){
+//	public boolean hasInflectionRule(final AffixEntry.Type type){
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
@@ -229,7 +229,7 @@ public class Production extends DictionaryEntry{
 	public String toString(final FlagParsingStrategy strategy){
 		final StringJoiner sj = new StringJoiner(TAB);
 		sj.add(super.toString(strategy));
-		if(hasProductionRules()){
+		if(hasInflectionRules()){
 			sj.add(FROM);
 			final StringJoiner subsj = new StringJoiner(LEADS_TO);
 			for(final AffixEntry appliedRule : appliedRules)

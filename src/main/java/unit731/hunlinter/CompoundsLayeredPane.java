@@ -33,7 +33,7 @@ import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.workers.WorkerManager;
@@ -48,7 +48,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Debouncer<CompoundsLayeredPane> debouncer = new Debouncer<>(this::calculateCompoundProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<CompoundsLayeredPane> debouncer = new Debouncer<>(this::calculateCompoundInflections, DEBOUNCER_INTERVAL);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -250,7 +250,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
             //FIXME transfer into ParserManager
-            final Production[] words;
+            final Inflection[] words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
             if(inputText.equals(affixData.getCompoundFlag())){
@@ -263,7 +263,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 						limit);
 
             final CompoundTableModel dm = (CompoundTableModel)table.getModel();
-            dm.setProductions(Arrays.asList(words));
+            dm.setInflections(Arrays.asList(words));
          }
          catch(final Exception e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
@@ -375,7 +375,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		dm.clear();
 	}
 
-	private void calculateCompoundProductions(){
+	private void calculateCompoundInflections(){
 		final String inputText = ((String)inputComboBox.getEditor().getItem()).trim();
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));

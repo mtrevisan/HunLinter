@@ -11,7 +11,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
@@ -29,13 +29,13 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixOption.COMPOUND_RULE
 	 *
-	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
-	 * @param compoundRule	Rule used to generate the productions for
+	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule
+	 * @param compoundRule	Rule used to generate the inflections for
 	 * @param limit	Limit result count
-	 * @return	The list of productions for the given rule
+	 * @return	The list of inflections for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	Production[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)
@@ -56,7 +56,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}

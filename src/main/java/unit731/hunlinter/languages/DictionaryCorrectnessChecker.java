@@ -6,7 +6,7 @@ import java.util.Set;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
@@ -38,46 +38,46 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	//used by the correctness worker after calling {@link #loadRules()}:
-	public void checkProduction(final Production production){
+	public void checkInflection(final Inflection inflection){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
+		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))
 			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{
 				AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
-			morphologicalFieldCheck(production);
+			morphologicalFieldCheck(inflection);
 
-		incompatibilityCheck(production);
+		incompatibilityCheck(inflection);
 	}
 
-	private void morphologicalFieldCheck(final Production production){
-		if(!production.hasMorphologicalFields())
-			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{production.getWord()}));
+	private void morphologicalFieldCheck(final Inflection inflection){
+		if(!inflection.hasMorphologicalFields())
+			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}));
 
-		production.forEachMorphologicalField(morphologicalField -> {
+		inflection.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)
-				throw new LinterException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+				throw new LinterException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(),
 					morphologicalField}));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
-				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(),
 					morphologicalField}));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
-				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
+				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{inflection.getWord(),
 					morphologicalField}));
 		});
 	}
 
-	private void incompatibilityCheck(final Production production){
-		rulesLoader.letterToFlagIncompatibilityCheck(production);
+	private void incompatibilityCheck(final Inflection inflection){
+		rulesLoader.letterToFlagIncompatibilityCheck(inflection);
 
-		rulesLoader.flagToFlagIncompatibilityCheck(production);
+		rulesLoader.flagToFlagIncompatibilityCheck(inflection);
 	}
 
 	//used by the correctness worker:
-	protected void checkCompoundProduction(final String subword, final int subwordIndex, final Production production){}
+	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
 	//used by the minimal pairs worker:
 	public boolean isConsonant(final char chr){
@@ -85,7 +85,7 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	//used by the minimal pairs worker:
-	public boolean shouldBeProcessedForMinimalPair(final Production production){
+	public boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
 		return true;
 	}
 

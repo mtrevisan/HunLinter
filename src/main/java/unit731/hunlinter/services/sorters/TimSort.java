@@ -147,16 +147,18 @@ public class TimSort<T>{
 	}
 
 	public static <T> void sort(final T[] a, int lo, final int hi, final Comparator<? super T> c){
+		Objects.requireNonNull(a);
 		Objects.requireNonNull(c);
+		assert lo < hi;
 
 		rangeCheck(a.length, lo, hi);
-		int nRemaining = hi - lo;
-		if(nRemaining < 2)
+		int remaining = hi - lo;
+		if(remaining < 2)
 			//arrays of size 0 and 1 are always sorted
 			return;
 
 		//if array is small, do a "mini-TimSort" with no merges
-		if(nRemaining < MIN_MERGE){
+		if(remaining < MIN_MERGE){
 			final int initRunLen = countRunAndMakeAscending(a, lo, hi, c);
 			binarySort(a, lo, hi, lo + initRunLen, c);
 			return;
@@ -168,14 +170,14 @@ public class TimSort<T>{
 		 * to maintain stack invariant.
 		 */
 		final TimSort<T> ts = new TimSort<>(a, c);
-		final int minRun = minRunLength(nRemaining);
+		final int minRun = minRunLength(remaining);
 		do{
 			//identify next run
 			int runLen = countRunAndMakeAscending(a, lo, hi, c);
 
 			//if run is short, extend to min(minRun, nRemaining)
 			if(runLen < minRun){
-				final int force = Math.min(nRemaining, minRun);
+				final int force = Math.min(remaining, minRun);
 				binarySort(a, lo, lo + force, lo + runLen, c);
 				runLen = force;
 			}
@@ -186,8 +188,8 @@ public class TimSort<T>{
 
 			//advance to find next run
 			lo += runLen;
-			nRemaining -= runLen;
-		}while(nRemaining != 0);
+			remaining -= runLen;
+		}while(remaining != 0);
 
 		assert lo == hi;
 
@@ -199,8 +201,8 @@ public class TimSort<T>{
 
 	/**
 	 * Sorts the specified portion of the specified array using a binary
-	 * insertion sort.  This is the best method for sorting small numbers
-	 * of elements.  It requires O(n log n) compares, but O(n^2) data
+	 * insertion sort. This is the best method for sorting small numbers
+	 * of elements. It requires O(n * log(n)) compares, but O(n^2) data
 	 * movement (worst case).
 	 * <p>
 	 * If the initial part of the specified range is already sorted,
@@ -251,7 +253,7 @@ public class TimSort<T>{
 			 * first slot after them -- that's why this sort is stable.
 			 * Slide elements over to make room to make room for pivot.
 			 */
-			int n = start - left;	//the number of elements to move
+			final int n = start - left;	//the number of elements to move
 			//switch is just an optimization for arraycopy in default case
 			switch(n){
 				case 2:
@@ -294,19 +296,19 @@ public class TimSort<T>{
 	 * the specified array
 	 */
 	private static <T> int countRunAndMakeAscending(final T[] a, final int lo, final int hi, final Comparator<? super T> c){
-		assert lo < hi;
-
 		int runHi = lo + 1;
 		if(runHi == hi)
 			return 1;
 
 		//find end of run, and reverse range if descending
-		if(c.compare(a[runHi ++], a[lo]) < 0){	//descending
+		//descending
+		if(c.compare(a[runHi ++], a[lo]) < 0){
 			while(runHi < hi && c.compare(a[runHi], a[runHi - 1]) < 0)
 				runHi ++;
 			reverseRange(a, lo, runHi);
 		}
-		else{	//ascending
+		//ascending
+		else{
 			while(runHi < hi && c.compare(a[runHi], a[runHi - 1]) >= 0)
 				runHi ++;
 		}

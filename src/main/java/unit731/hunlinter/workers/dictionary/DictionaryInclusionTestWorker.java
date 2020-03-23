@@ -16,7 +16,7 @@ import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -46,9 +46,9 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(productions, prod -> dictionary.add(prod.getWord()));
+			forEach(inflections, prod -> dictionary.add(prod.getWord()));
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
@@ -67,11 +67,11 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 		final Function<Void, Void> step2 = ignored -> {
 			dictionary.close();
 
-			final int totalUniqueProductions = dictionary.getAddedElements();
+			final int totalUniqueInflections = dictionary.getAddedElements();
 			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
-				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
+			final int falsePositiveCount = (int)Math.ceil(totalUniqueInflections * falsePositiveProbability);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {} ± {} ({})",
+				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 

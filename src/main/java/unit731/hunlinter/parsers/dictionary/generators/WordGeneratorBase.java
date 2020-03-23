@@ -9,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.Affixes;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -38,107 +38,106 @@ class WordGeneratorBase{
 	/**
 	 * Generates a list of stems for the provided word
 	 *
-	 * @param dicEntry	{@link DictionaryEntry dictionary entry} used to generate the productions for
+	 * @param dicEntry	{@link DictionaryEntry dictionary entry} used to generate the inflections for
 	 * @param isCompound	Whether the word is-a or belongs-to a compound word
 	 * @param overriddenRule	Overridden set of rule entries, optional
-	 * @return	The list of productions for the given word
+	 * @return	The list of inflections for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected Production[] applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
-			final RuleEntry overriddenRule){
+	protected Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
+														final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-			return new Production[0];
+			return new Inflection[0];
 
-		//extract base production
-		final Production baseProduction = getBaseProduction(dicEntry);
+		//extract base inflection
+		final Inflection baseInflection = getBaseInflection(dicEntry);
 		if(LOGGER.isDebugEnabled()){
-			LOGGER.debug("Base production:");
-			LOGGER.debug("   {}", baseProduction);
+			LOGGER.debug("Base inflection:");
+			LOGGER.debug("   {}", baseInflection);
 		}
 
-		//extract suffixed productions
-		final Production[] suffixedProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(),
+		//extract suffixed inflections
+		final Inflection[] suffixedInflections = getOnefoldInflections(baseInflection, isCompound, !affixData.isComplexPrefixes(),
 			overriddenRule);
-//		Arrays.sort(suffixedProductions, PRODUCTION_COMPARATOR);
-		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), suffixedProductions);
+//		Arrays.sort(suffixedInflections, INFLECTION_COMPARATOR);
+		printInflections((affixData.isComplexPrefixes()? "Prefix inflections:": "Suffix inflections:"), suffixedInflections);
 
-		Production[] prefixedProductions = new Production[0];
+		Inflection[] prefixedInflections = new Inflection[0];
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
-			//extract prefixed productions
-			prefixedProductions = getTwofoldProductions(suffixedProductions, isCompound, !affixData.isComplexPrefixes(),
+			//extract prefixed inflections
+			prefixedInflections = getTwofoldInflections(suffixedInflections, isCompound, !affixData.isComplexPrefixes(),
 				overriddenRule);
-//			Arrays.sort(prefixedProductions, PRODUCTION_COMPARATOR);
-			printProductions((affixData.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), prefixedProductions);
+//			Arrays.sort(prefixedInflections, INFLECTION_COMPARATOR);
+			printInflections((affixData.isComplexPrefixes()? "Suffix inflections:": "Prefix inflections:"), prefixedInflections);
 		}
 
-		//extract lastfold productions
-		Production[] twofoldProductions = collectProductions(baseProduction, suffixedProductions, prefixedProductions, null);
-		twofoldProductions = getTwofoldProductions(twofoldProductions, isCompound, affixData.isComplexPrefixes(), overriddenRule);
-		checkTwofoldCorrectness(twofoldProductions);
-//		Arrays.sort(twofoldProductions, PRODUCTION_COMPARATOR);
-		printProductions("Twofold productions:", twofoldProductions);
+		//extract lastfold inflections
+		Inflection[] twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, null);
+		twofoldInflections = getTwofoldInflections(twofoldInflections, isCompound, affixData.isComplexPrefixes(), overriddenRule);
+		checkTwofoldCorrectness(twofoldInflections);
+//		Arrays.sort(twofoldInflections, INFLECTION_COMPARATOR);
+		printInflections("Twofold inflections:", twofoldInflections);
 
-		final Production[] productions = collectProductions(baseProduction, suffixedProductions, prefixedProductions,
-			twofoldProductions);
-		return filterProductions(productions);
+		final Inflection[] inflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, twofoldInflections);
+		return filterInflections(inflections);
 	}
 
-	private Production[] collectProductions(final Production baseProduction, final Production[] onefoldProductions,
-			final Production[] twofoldProductions, final Production[] lastfoldProductions){
-		final int size = 1 + onefoldProductions.length + twofoldProductions.length
-			+ (lastfoldProductions != null? lastfoldProductions.length: 0);
-		final Production[] productions = new Production[size];
-		productions[0] = baseProduction;
-		System.arraycopy(onefoldProductions, 0, productions, 1, onefoldProductions.length);
-		System.arraycopy(twofoldProductions, 0, productions, 1 + onefoldProductions.length, twofoldProductions.length);
-		if(lastfoldProductions != null)
-			System.arraycopy(lastfoldProductions, 0, productions, 1 + onefoldProductions.length + twofoldProductions.length,
-				lastfoldProductions.length);
-		return productions;
+	private Inflection[] collectInflections(final Inflection baseInflection, final Inflection[] onefoldInflections,
+														 final Inflection[] twofoldInflections, final Inflection[] lastfoldInflections){
+		final int size = 1 + onefoldInflections.length + twofoldInflections.length
+			+ (lastfoldInflections != null? lastfoldInflections.length: 0);
+		final Inflection[] inflections = new Inflection[size];
+		inflections[0] = baseInflection;
+		System.arraycopy(onefoldInflections, 0, inflections, 1, onefoldInflections.length);
+		System.arraycopy(twofoldInflections, 0, inflections, 1 + onefoldInflections.length, twofoldInflections.length);
+		if(lastfoldInflections != null)
+			System.arraycopy(lastfoldInflections, 0, inflections, 1 + onefoldInflections.length + twofoldInflections.length,
+				lastfoldInflections.length);
+		return inflections;
 	}
 
 
-	private void printProductions(final String title, final Production[] productions){
-		if(LOGGER.isDebugEnabled() && productions.length > 0){
+	private void printInflections(final String title, final Inflection[] inflections){
+		if(LOGGER.isDebugEnabled() && inflections.length > 0){
 			LOGGER.debug(title);
-			forEach(productions,
-				production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
-				production.getRulesSequence()));
+			forEach(inflections,
+				inflection -> LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()),
+				inflection.getRulesSequence()));
 		}
 	}
 
 
-	private Production getBaseProduction(final DictionaryEntry dicEntry){
-		return Production.clone(dicEntry);
+	private Inflection getBaseInflection(final DictionaryEntry dicEntry){
+		return Inflection.clone(dicEntry);
 	}
 
-	protected Production[] getOnefoldProductions(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
-			final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
+																final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String[][] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
-	private Production[] getTwofoldProductions(final Production[] onefoldProductions, final boolean isCompound,
-			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		Production[] twofoldProductions = new Production[0];
-		for(final Production production : onefoldProductions)
-			if(production.isCombinable()){
-				final Production[] prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
+	private Inflection[] getTwofoldInflections(final Inflection[] onefoldInflections, final boolean isCompound,
+															 final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+		Inflection[] twofoldInflections = new Inflection[0];
+		for(final Inflection inflection : onefoldInflections)
+			if(inflection.isCombinable()){
+				final Inflection[] prods = getOnefoldInflections(inflection, isCompound, reverse, overriddenRule);
 
-				final AffixEntry[] appliedRules = production.getAppliedRules();
+				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				//add parent derivations
-				for(final Production prod : prods)
+				for(final Inflection prod : prods)
 					prod.prependAppliedRules(appliedRules);
 
-				twofoldProductions = ArrayUtils.addAll(twofoldProductions, prods);
+				twofoldInflections = ArrayUtils.addAll(twofoldInflections, prods);
 			}
-		return twofoldProductions;
+		return twofoldInflections;
 	}
 
-	private void checkTwofoldCorrectness(final Production[] twofoldProductions){
+	private void checkTwofoldCorrectness(final Inflection[] twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
-		for(final Production prod : twofoldProductions){
+		for(final Inflection prod : twofoldInflections){
 			final String[][] affixes = prod.extractAllAffixes(affixData, false);
 			final String[] aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
 			if(aff.length > 0){
@@ -149,32 +148,32 @@ class WordGeneratorBase{
 		}
 	}
 
-	private Production[] filterProductions(Production[] productions){
-		productions = enforceCircumfix(productions);
+	private Inflection[] filterInflections(Inflection[] inflections){
+		inflections = enforceCircumfix(inflections);
 
-		return enforceNeedAffixFlag(productions);
+		return enforceNeedAffixFlag(inflections);
 	}
 
 	/** Remove rules that invalidate the circumfix rule */
-	private Production[] enforceCircumfix(Production[] productions){
+	private Inflection[] enforceCircumfix(Inflection[] inflections){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			productions = removeIf(productions,
-				production -> production.hasContinuationFlag(circumfixFlag) && !production.isTwofolded(circumfixFlag));
-		return productions;
+			inflections = removeIf(inflections,
+				inflection -> inflection.hasContinuationFlag(circumfixFlag) && !inflection.isTwofolded(circumfixFlag));
+		return inflections;
 	}
 
 	/** Remove rules that invalidate the affix rule */
-	private Production[] enforceNeedAffixFlag(Production[] productions){
+	private Inflection[] enforceNeedAffixFlag(Inflection[] inflections){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)
-			productions = removeIf(productions, production -> hasNeedAffixFlag(production, needAffixFlag));
-		return productions;
+			inflections = removeIf(inflections, inflection -> hasNeedAffixFlag(inflection, needAffixFlag));
+		return inflections;
 	}
 
-	private boolean hasNeedAffixFlag(final Production production, final String needAffixFlag){
+	private boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
 		boolean hasNeedAffixFlag = false;
-		final AffixEntry[] appliedRules = production.getAppliedRules();
+		final AffixEntry[] appliedRules = inflection.getAppliedRules();
 		if(appliedRules != null){
 			//check that last suffix and last prefix don't have the needaffix flag
 			boolean lastSuffix = false;
@@ -194,11 +193,11 @@ class WordGeneratorBase{
 			}
 			hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
 		}
-		return (hasNeedAffixFlag || production.hasContinuationFlag(needAffixFlag));
+		return (hasNeedAffixFlag || inflection.hasContinuationFlag(needAffixFlag));
 	}
 
-	private Production[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes,
-			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes,
+													 final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
@@ -207,7 +206,7 @@ class WordGeneratorBase{
 		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS], circumfixFlag))
 			postponedAffixes = ArrayUtils.add(postponedAffixes, circumfixFlag);
 
-		Production[] productions = new Production[0];
+		Inflection[] inflections = new Inflection[0];
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(final String affix : appliedAffixes){
 				//extract current rule
@@ -219,14 +218,14 @@ class WordGeneratorBase{
 				String[] currentPostponedAffixes = ArrayUtils.clone(postponedAffixes);
 				if(dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().isSuffix() ^ rule.isSuffix())
 					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
-				final Production[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
-				productions = ArrayUtils.addAll(productions, prods);
+				final Inflection[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
+				inflections = ArrayUtils.addAll(inflections, prods);
 			}
-		return productions;
+		return inflections;
 	}
 
-	private Production[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
-			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private Inflection[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
+													final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
 		RuleEntry rule = affixData.getData(affix);
@@ -235,7 +234,7 @@ class WordGeneratorBase{
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))
-				return new Production[0];
+				return new Inflection[0];
 
 			final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
@@ -252,10 +251,10 @@ class WordGeneratorBase{
 		if(applicableAffixes.isEmpty())
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' and word '" + word + "'");
 
-		Production[] productions = new Production[0];
+		Inflection[] inflections = new Inflection[0];
 		for(final AffixEntry entry : applicableAffixes)
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
-				//if entry has circumfix constraint and production has the same contraint then remove it from postponedAffixes
+				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
@@ -266,14 +265,14 @@ class WordGeneratorBase{
 
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
-				final Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes,
+				final Inflection inflection = Inflection.createFromInflection(newWord, entry, dicEntry, postponedAffixes,
 					rule.isCombinable());
 				if(removeCircumfixFlag)
-					production.removeContinuationFlag(circumfixFlag);
-				if(!production.hasContinuationFlag(forbiddenWordFlag))
-					productions = ArrayUtils.add(productions, production);
+					inflection.removeContinuationFlag(circumfixFlag);
+				if(!inflection.hasContinuationFlag(forbiddenWordFlag))
+					inflections = ArrayUtils.add(inflections, inflection);
 			}
-		return productions;
+		return inflections;
 	}
 
 	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final String[] appliedAffixes, final String forbiddenWordFlag){

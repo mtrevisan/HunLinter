@@ -32,9 +32,9 @@
                   </Group>
                   <Component id="scrollPane" alignment="0" pref="909" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="totalProductionsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="totalInflectionsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="totalProductionsValueLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="totalInflectionsValueLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="openAidButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -64,8 +64,8 @@
               <Component id="scrollPane" pref="157" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="totalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="totalProductionsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalInflectionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalInflectionsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openAffButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openDicButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openAidButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -120,7 +120,7 @@
         <Component class="javax.swing.JTable" name="table">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new ProductionTableModel()" type="code"/>
+              <Connection code="new InflectionTableModel()" type="code"/>
             </Property>
             <Property name="showHorizontalLines" type="boolean" value="false"/>
             <Property name="showVerticalLines" type="boolean" value="false"/>
@@ -129,18 +129,18 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String production = (String) model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String morphologicalFields = (String) model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final StringJoiner sj = new StringJoiner(TAB);&#xd;&#xa;&#x9;&#x9;applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);&#xd;&#xa;&#x9;&#x9;return sj.toString();&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String inflection = (String) model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String morphologicalFields = (String) model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final StringJoiner sj = new StringJoiner(TAB);&#xd;&#xa;&#x9;&#x9;applyIf(new String[]{inflection, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);&#xd;&#xa;&#x9;&#x9;return sj.toString();&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>
             <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="table.setRowSelectionAllowed(true);&#xd;&#xa;TableRenderer dicCellRenderer = new TableRenderer();&#xd;&#xa;for(int i = 0; i &lt; table.getColumnCount(); i ++)&#xd;&#xa;&#x9;table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);&#xd;&#xa;KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;table.registerKeyboardAction(event -&gt; GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);"/>
           </AuxValues>
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="totalProductionsLabel">
+    <Component class="javax.swing.JLabel" name="totalInflectionsLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Total productions:"/>
+        <Property name="text" type="java.lang.String" value="Total inflections:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="totalProductionsValueLabel">
+    <Component class="javax.swing.JLabel" name="totalInflectionsValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>

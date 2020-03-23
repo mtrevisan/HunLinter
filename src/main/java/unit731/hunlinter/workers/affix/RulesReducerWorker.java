@@ -19,8 +19,8 @@ import unit731.hunlinter.parsers.dictionary.RulesReducer;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -62,9 +62,9 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final List<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
+			final List<LineEntry> filteredRules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredRules.isEmpty()){
 				originalLines.add(indexData.getData());
 				originalRules.addAll(filteredRules);

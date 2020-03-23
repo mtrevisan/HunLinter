@@ -16,7 +16,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.workers.WorkerManager;
@@ -57,12 +57,12 @@ public class WordlistWorker extends WorkerDictionary{
 		}
 
 
-		final Function<Production, String> toString = (type == WorkerType.COMPLETE? Production::toString: Production::getWord);
+		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(productions, production -> writeLine(writer, toString.apply(production)));
+			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection)));
 		};
 
 		getWorkerData()

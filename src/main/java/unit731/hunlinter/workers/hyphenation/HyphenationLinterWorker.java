@@ -20,7 +20,7 @@ import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -53,11 +53,11 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Production production : productions){
-				final String word = production.getWord();
-				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
+			for(final Inflection inflection : inflections){
+				final String word = inflection.getWord();
+				if(word.length() > 1 && !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
 					final List<String> syllabes = hyphenation.getSyllabes();
@@ -65,8 +65,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
 						final StringBuffer sb = new StringBuffer(message);
-						if(production.hasProductionRules())
-							sb.append(" (via ").append(production.getRulesSequence()).append(")");
+						if(inflection.hasInflectionRules())
+							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						throw new LinterException(sb.toString());
 					}
 				}

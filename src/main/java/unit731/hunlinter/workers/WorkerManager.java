@@ -5,7 +5,7 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.workers.core.WorkerAbstract;
@@ -256,21 +256,21 @@ public class WorkerManager{
 	}
 
 	public void createCompoundRulesWorker(final Consumer<WorkerAbstract<?>> onStart,
-			final Consumer<List<Production>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
+													  final Consumer<List<Inflection>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
 		final String workerName = CompoundRulesWorker.WORKER_NAME;
 		WorkerAbstract<?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();
 			final String compoundFlag = affixData.getCompoundFlag();
-			final List<Production> compounds = new ArrayList<>();
-			final BiConsumer<Production, Integer> productionReader = (production, row) -> {
-				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
-					compounds.add(production);
+			final List<Inflection> compounds = new ArrayList<>();
+			final BiConsumer<Inflection, Integer> inflectionReader = (inflection, row) -> {
+				if(!inflection.distributeByCompoundRule(affixData).isEmpty() || inflection.hasContinuationFlag(compoundFlag))
+					compounds.add(inflection);
 			};
 			final Runnable completed = () -> onComplete.accept(compounds);
 			worker = new CompoundRulesWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
-				productionReader, completed);
+				inflectionReader, completed);
 			WORKERS.put(workerName, worker);
 			ON_ENDS.put(workerName, onEnd);
 

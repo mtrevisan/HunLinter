@@ -23,7 +23,7 @@ import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.ProductionTableModel;
+import unit731.hunlinter.gui.InflectionTableModel;
 import unit731.hunlinter.gui.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -31,7 +31,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
@@ -49,7 +49,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Debouncer<DictionaryLayeredPane> debouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<DictionaryLayeredPane> debouncer = new Debouncer<>(this::calculateInflections, DEBOUNCER_INTERVAL);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -76,7 +76,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		try{
 			//FIXME
 //			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalProductionsValueLabel.getHeight();
+//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
@@ -97,7 +97,7 @@ final int iconSize = 17;
          @Override
          public String getValueAtRow(final int row){
             final TableModel model = getModel();
-            final String production = (String) model.getValueAt(row, 0);
+            final String inflection = (String) model.getValueAt(row, 0);
             final String morphologicalFields = (String) model.getValueAt(row, 1);
             final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
             .map(AffixEntry::toString)
@@ -109,12 +109,12 @@ final int iconSize = 17;
             .map(AffixEntry::toString)
             .orElse(null);
             final StringJoiner sj = new StringJoiner(TAB);
-            applyIf(new String[]{production, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
+            applyIf(new String[]{inflection, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
             return sj.toString();
          }
       };
-      totalProductionsLabel = new javax.swing.JLabel();
-      totalProductionsValueLabel = new javax.swing.JLabel();
+      totalInflectionsLabel = new javax.swing.JLabel();
+      totalInflectionsValueLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
       openAffButton = new javax.swing.JButton();
       openDicButton = new javax.swing.JButton();
@@ -132,7 +132,7 @@ final int iconSize = 17;
 
       ruleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
 
-      table.setModel(new ProductionTableModel());
+      table.setModel(new InflectionTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
       table.setRowSelectionAllowed(true);
@@ -143,9 +143,9 @@ final int iconSize = 17;
       table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
       scrollPane.setViewportView(table);
 
-      totalProductionsLabel.setText("Total productions:");
+      totalInflectionsLabel.setText("Total inflections:");
 
-      totalProductionsValueLabel.setText("…");
+      totalInflectionsValueLabel.setText("…");
 
       openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");
@@ -164,8 +164,8 @@ final int iconSize = 17;
       setLayer(ruleFlagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(ruleFlagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(totalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(totalProductionsValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(totalInflectionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(totalInflectionsValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAidButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -187,9 +187,9 @@ final int iconSize = 17;
                      .addComponent(inputTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(totalProductionsLabel)
+                  .addComponent(totalInflectionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(totalProductionsValueLabel)
+                  .addComponent(totalInflectionsValueLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addComponent(openAidButton)
                   .addGap(18, 18, 18)
@@ -213,8 +213,8 @@ final int iconSize = 17;
             .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(totalProductionsLabel)
-               .addComponent(totalProductionsValueLabel)
+               .addComponent(totalInflectionsLabel)
+               .addComponent(totalInflectionsValueLabel)
                .addComponent(openAffButton)
                .addComponent(openDicButton)
                .addComponent(openAidButton))
@@ -281,7 +281,7 @@ final int iconSize = 17;
 		formerInputText = null;
 
 		//disable menu
-		totalProductionsValueLabel.setText(StringUtils.EMPTY);
+		totalInflectionsValueLabel.setText(StringUtils.EMPTY);
 		inputTextField.setText(null);
 		inputTextField.requestFocusInWindow();
 		openAidButton.setEnabled(false);
@@ -297,7 +297,7 @@ final int iconSize = 17;
 		debouncer.call(this);
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 
-	private void calculateProductions(){
+	private void calculateInflections(){
 		final String inputText = inputTextField.getText().trim();
 
 		if(formerInputText != null && formerInputText.equals(inputText))
@@ -310,32 +310,32 @@ final int iconSize = 17;
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
 					parserManager.getAffixData());
-				final Production[] productions = parserManager.getWordGenerator().applyAffixRules(dicEntry);
+				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final ProductionTableModel dm = (ProductionTableModel)table.getModel();
-				dm.setProductions(Arrays.asList(productions));
+				final InflectionTableModel dm = (InflectionTableModel)table.getModel();
+				dm.setInflections(Arrays.asList(inflections));
 
 				//show first row
 				final Rectangle cellRect = table.getCellRect(0, 0, true);
 				table.scrollRectToVisible(cellRect);
 
-				totalProductionsValueLabel.setText(Integer.toString(productions.length));
+				totalInflectionsValueLabel.setText(Integer.toString(inflections.length));
 
 				//check for correctness
 				int line = 0;
 				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
 				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
-				for(final Production production : productions){
+				for(final Inflection inflection : inflections){
 					try{
-						checker.checkProduction(production);
+						checker.checkInflection(inflection);
 					}
 					catch(final Exception e){
 						dicCellRenderer.setErrorOnRow(line);
 
 						final StringBuffer sb = new StringBuffer(e.getMessage());
-						if(production.hasProductionRules())
-							sb.append(" (via ").append(production.getRulesSequence()).append(")");
+						if(inflection.hasInflectionRules())
+							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						String errorMessage = ExceptionHelper.getMessage(e);
 						LOGGER.trace("{}, line {}", errorMessage, line);
 						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
@@ -349,7 +349,7 @@ final int iconSize = 17;
 			}
 		}
 		else
-			totalProductionsValueLabel.setText(StringUtils.EMPTY);
+			totalInflectionsValueLabel.setText(StringUtils.EMPTY);
 	}
 
 	private void clearOutputTable(final JTable table){
@@ -379,7 +379,7 @@ final int iconSize = 17;
    private javax.swing.JLabel ruleFlagsAidLabel;
    private javax.swing.JScrollPane scrollPane;
    private javax.swing.JTable table;
-   private javax.swing.JLabel totalProductionsLabel;
-   private javax.swing.JLabel totalProductionsValueLabel;
+   private javax.swing.JLabel totalInflectionsLabel;
+   private javax.swing.JLabel totalInflectionsValueLabel;
    // End of variables declaration//GEN-END:variables
 }

@@ -34,12 +34,12 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
 
 //TODO
-//			for(final Production production : productions){
+//			for(final Inflection inflection : inflections){
 //				try{
-//					checker.checkProduction(production);
+//					checker.checkInflection(inflection);
 //				}
 //				catch(final Exception e){
-//					throw wrapException(e, production);
+//					throw wrapException(e, inflection);
 //				}
 //			}
 		};

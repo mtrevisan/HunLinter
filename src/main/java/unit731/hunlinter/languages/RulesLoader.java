@@ -18,7 +18,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.SetHelper;
 
 
@@ -162,18 +162,18 @@ public class RulesLoader{
 		return cannotContainAccent.contains(word);
 	}
 
-	public void letterToFlagIncompatibilityCheck(final Production production){
+	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
 		for(final Map.Entry<String, Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
-			if(StringUtils.containsAny(production.getWord(), entry.getKey()))
+			if(StringUtils.containsAny(inflection.getWord(), entry.getKey()))
 				for(final LetterMatcherEntry letterMatcherEntry : entry.getValue())
-					letterMatcherEntry.match(production);
+					letterMatcherEntry.match(inflection);
 	}
 
-	public void flagToFlagIncompatibilityCheck(final Production production){
+	public void flagToFlagIncompatibilityCheck(final Inflection inflection){
 		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
-			if(production.hasContinuationFlag(check.getKey()))
+			if(inflection.hasContinuationFlag(check.getKey()))
 				for(final RuleMatcherEntry entry : check.getValue())
-					entry.match(production);
+					entry.match(inflection);
 	}
 
 }

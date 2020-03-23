@@ -1,6 +1,7 @@
 package unit731.hunlinter.workers.dictionary;
 
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -21,7 +22,6 @@ import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
 
 
 public class WordCountWorker extends WorkerDictionary{
@@ -30,7 +30,7 @@ public class WordCountWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Word count";
 
-	private final AtomicInteger totalProductions = new AtomicInteger(0);
+	private final AtomicInteger totalInflections = new AtomicInteger(0);
 	private final BloomFilterInterface<String> dictionary;
 
 
@@ -46,11 +46,11 @@ public class WordCountWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			totalProductions.addAndGet(productions.length);
-			for(Production production : productions)
-				dictionary.add(production.getWord());
+			totalInflections.addAndGet(inflections.length);
+			for(Inflection inflection : inflections)
+				dictionary.add(inflection.getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
@@ -71,12 +71,12 @@ public class WordCountWorker extends WorkerDictionary{
 		final Function<Void, Void> step2 = ignored -> {
 			dictionary.close();
 
-			final int totalUniqueProductions = dictionary.getAddedElements();
+			final int totalUniqueInflections = dictionary.getAddedElements();
 			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
-				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
+			final int falsePositiveCount = (int)Math.ceil(totalUniqueInflections * falsePositiveProbability);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {} ± {} ({})",
+				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 

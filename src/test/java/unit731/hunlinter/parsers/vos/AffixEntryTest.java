@@ -120,9 +120,9 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
-		String production = entry.applyRule("man\\/man", true);
+		String inflection = entry.applyRule("man\\/man", true);
 
-		Assertions.assertEquals("man\\/mani", production);
+		Assertions.assertEquals("man\\/mani", inflection);
 	}
 
 	@Test
@@ -140,9 +140,9 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX TB ŧ s ŧ	po:noun", strategy, null, null);
 
-		String production = entry.applyRule("ŧinkue", true);
+		String inflection = entry.applyRule("ŧinkue", true);
 
-		Assertions.assertEquals("sinkue", production);
+		Assertions.assertEquals("sinkue", inflection);
 	}
 
 	@Test
@@ -150,9 +150,9 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i [^oaie]	po:noun", strategy, null, null);
 
-		String production = entry.undoRule("mani");
+		String inflection = entry.undoRule("mani");
 
-		Assertions.assertEquals("man", production);
+		Assertions.assertEquals("man", inflection);
 	}
 
 	@Test
@@ -160,9 +160,9 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX TB ŧ s ŧ	po:noun", strategy, null, null);
 
-		String production = entry.undoRule("sinkue");
+		String inflection = entry.undoRule("sinkue");
 
-		Assertions.assertEquals("ŧinkue", production);
+		Assertions.assertEquals("ŧinkue", inflection);
 	}
 
 	@Test

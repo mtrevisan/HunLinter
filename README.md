@@ -52,7 +52,7 @@ HunLinter
     16. [Copying text](#how-to-copy)
     17. [Rule/dictionary insertion](#how-to-insertion)
 6. [Screenshots](#screenshots)
-    1. [Productions](#screenshots-productions)
+    1. [Inflections](#screenshots-inflections)
     2. [Dictionary linter](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
     4. [Hyphenation](#screenshots-hyphenation)
@@ -234,11 +234,11 @@ This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add 
 
 <a name="screenshots"></a>
 ## Screenshots
-<a name="screenshots-productions"></a>
-### Productions
+<a name="screenshots-inflections"></a>
+### Inflections
 Entries can be a single word followed by a slash and all the flags that have to be applied, followed optionally by one or more morphological fields.
 
-![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Production")
+![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Inflection")
 
 <a name="screenshots-correctness"></a>
 ### Dictionary linter

@@ -6,29 +6,29 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 
 
-public class CompoundTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Production>{
+public class CompoundTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Inflection>{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Production", "Morphological fields"};
+	private static final String[] COLUMN_NAMES = new String[]{"Inflection", "Morphological fields"};
 
 
-	private List<Production> productions;
+	private List<Inflection> inflections;
 
 
 	@Override
-	public void setProductions(final List<Production> productions){
-		this.productions = productions;
+	public void setInflections(final List<Inflection> inflections){
+		this.inflections = inflections;
 
 		fireTableDataChanged();
 	}
 
 	@Override
 	public int getRowCount(){
-		return (productions != null? productions.size(): 0);
+		return (inflections != null? inflections.size(): 0);
 	}
 
 	@Override
@@ -38,16 +38,16 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 
 	@Override
 	public Object getValueAt(final int rowIndex, final int columnIndex){
-		if(productions == null || productions.size() <= rowIndex)
+		if(inflections == null || inflections.size() <= rowIndex)
 			return null;
 
-		final Production production = productions.get(rowIndex);
+		final Inflection inflection = inflections.get(rowIndex);
 		switch(columnIndex){
 			case 0:
-				return production.getWord();
+				return inflection.getWord();
 
 			case 1:
-				return production.getMorphologicalFields();
+				return inflection.getMorphologicalFields();
 
 			default:
 				return null;
@@ -61,7 +61,7 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 
 	@Override
 	public void clear(){
-		setProductions(null);
+		setInflections(null);
 	}
 
 	@SuppressWarnings("unused")

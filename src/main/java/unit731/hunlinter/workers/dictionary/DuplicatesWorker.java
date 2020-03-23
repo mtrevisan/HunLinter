@@ -27,7 +27,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.Duplicate;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -138,10 +138,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+						final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-						for(final Production production : productions){
-							final String str = production.toStringWithPartOfSpeechFields();
+						for(final Inflection inflection : inflections){
+							final String str = inflection.toStringWithPartOfSpeechFields();
 							if(!bloomFilter.add(str))
 								duplicatesBloomFilter.add(str);
 						}
@@ -162,10 +162,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			setProgress(100);
 
-			final int totalProductions = bloomFilter.getAddedElements();
+			final int totalInflections = bloomFilter.getAddedElements();
 			final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+			final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
@@ -200,13 +200,13 @@ public class DuplicatesWorker extends WorkerDictionary{
 					if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 						try{
 							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-							final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
-							final String word = productions[WordGenerator.BASE_PRODUCTION_INDEX].getWord();
-							result.ensureCapacity(result.size() + productions.length);
-							for(final Production production : productions){
-								final String text = production.toStringWithPartOfSpeechFields();
+							final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+							final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
+							result.ensureCapacity(result.size() + inflections.length);
+							for(final Inflection inflection : inflections){
+								final String text = inflection.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
-									result.add(new Duplicate(production, word, lineIndex));
+									result.add(new Duplicate(inflection, word, lineIndex));
 							}
 						}
 						catch(final Exception e){
@@ -232,7 +232,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			duplicatesBloomFilter.clear();
 
-			result.sort((d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
+			result.sort((d1, d2) -> comparator.compare(d1.getInflection().getWord(), d2.getInflection().getWord()));
 		}
 		else
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
@@ -249,13 +249,13 @@ public class DuplicatesWorker extends WorkerDictionary{
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
-					final Production prod = entries.get(0).getProduction();
+					final Inflection prod = entries.get(0).getInflection();
 					final String origin = prod.getWord() + "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech())
 						+ "): ";
 					writer.write(origin);
 					final StringJoiner sj = new StringJoiner(", ");
 					forEach(entries,
-						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
+						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getInflection().hasInflectionRules()? " via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
 					writer.write(sj.toString());
 					writer.newLine();
 
@@ -274,7 +274,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
+			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechFields(),
 				duplicate -> {
 					final List<Duplicate> list = new ArrayList<>(1);
 					list.add(duplicate);
@@ -287,7 +287,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		final List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
-			.thenComparing(list -> list.get(0).getProduction().getWord(), comparator));
+			.thenComparing(list -> list.get(0).getInflection().getWord(), comparator));
 		return result;
 	}
 

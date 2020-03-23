@@ -6,7 +6,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
@@ -53,9 +53,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Set<String> words = new HashSet<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(productions, prod -> words.add(prod.toString()));
+			forEach(inflections, prod -> words.add(prod.toString()));
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<String> fsaProcessor = word -> {
@@ -71,7 +71,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //				final File outputInfoFile = new File(filenameNoExtension + ".info");
 //				if(!outputInfoFile.exists()){
 //					final List<String> content = Arrays.asList(
-//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+//						"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 //						"fsa.dict.encoding=" + charset.name().toLowerCase(),
 //						"fsa.dict.encoder=prefix");
 //					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);

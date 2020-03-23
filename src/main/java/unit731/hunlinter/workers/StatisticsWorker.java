@@ -22,7 +22,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
@@ -53,11 +53,11 @@ public class StatisticsWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Production production : productions){
+			for(final Inflection inflection : inflections){
 				//collect statistics
-				final String word = production.getWord();
+				final String word = inflection.getWord();
 				final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): Collections.emptyList());
 				if(subwords.isEmpty())
 					dicStatistics.addData(word);

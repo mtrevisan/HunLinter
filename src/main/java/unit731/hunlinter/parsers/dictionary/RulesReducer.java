@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -30,7 +31,6 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -83,24 +83,24 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectProductionsByFlag(Production[] productions, final String flag, final AffixType type){
-		//remove base production
-		productions = ArrayUtils.remove(productions, WordGenerator.BASE_PRODUCTION_INDEX);
-		//collect all productions that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>(productions.length);
-		for(final Production production : productions){
-			final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
+	public List<LineEntry> collectInflectionsByFlag(Inflection[] inflections, final String flag, final AffixType type){
+		//remove base inflection
+		inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+		//collect all inflections that generates from the given flag
+		final List<LineEntry> filteredRules = new ArrayList<>(inflections.length);
+		for(final Inflection inflection : inflections){
+			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
-				final String word = lastAppliedRule.undoRule(production.getWord());
-				final LineEntry newEntry = createAffixEntry(production, word, type);
+				final String word = lastAppliedRule.undoRule(inflection.getWord());
+				final LineEntry newEntry = createAffixEntry(inflection, word, type);
 				filteredRules.add(newEntry);
 			}
 		}
-		return compactProductions(filteredRules);
+		return compactInflections(filteredRules);
 	}
 
-	private LineEntry createAffixEntry(final Production production, String word, final AffixType type){
-		String producedWord = production.getWord();
+	private LineEntry createAffixEntry(final Inflection inflection, String word, final AffixType type){
+		String producedWord = inflection.getWord();
 		if(type ==AffixType.PREFIX){
 			producedWord = StringUtils.reverse(producedWord);
 			word = StringUtils.reverse(word);
@@ -111,14 +111,14 @@ public class RulesReducer{
 		final int wordLength = word.length();
 		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): ZERO);
-		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
+		final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 		if(lastAppliedRule != null)
 			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<LineEntry> compactProductions(final List<LineEntry> rules){
+	private List<LineEntry> compactInflections(final List<LineEntry> rules){
 		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
 		if(rules.size() > 1){
 			//retrieve rule with longest condition (all the other conditions must be this long)
@@ -154,7 +154,7 @@ public class RulesReducer{
 
 		compactedRules = compactRules(compactedRules);
 
-		//reshuffle originating list to place the correct productions in the correct rule
+		//reshuffle originating list to place the correct inflections in the correct rule
 		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		final Map<Integer, Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
@@ -697,11 +697,11 @@ public class RulesReducer{
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-			final Production[] originalProductions = wordGenerator.applyAffixRules(dicEntry);
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
+			final Inflection[] originalInflections = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
-			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
-			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
+			final List<LineEntry> filteredOriginalRules = collectInflectionsByFlag(originalInflections, flag, type);
+			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
 				throw new LinterException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
 		}

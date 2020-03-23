@@ -303,10 +303,12 @@ public class StringList implements Iterable<String>{
 	}
 
 	public void sort(final Comparator<? super String> comparator){
-		TimSort.sort(elementData, comparator);
+		TimSort.sort(elementData, 0, size, comparator);
 	}
 
 	public void sortParallel(final Comparator<? super String> comparator){
+		//FIXME try a way to pass [0, size[ to parallel stream
+		trimToSize();
 		elementData = Arrays.stream(elementData).parallel()
 			.sorted(comparator)
 			.toArray(String[]::new);

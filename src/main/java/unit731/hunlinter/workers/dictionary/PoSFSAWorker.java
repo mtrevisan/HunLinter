@@ -8,7 +8,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
@@ -89,10 +89,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(productions, production -> {
-				final List<String> lines = production.toStringPoSFSA();
+			forEach(inflections, inflection -> {
+				final List<String> lines = inflection.toStringPoSFSA();
 
 				//encode lines
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
@@ -113,7 +113,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //				final File outputInfoFile = new File(filenameNoExtension + ".info");
 //				if(!outputInfoFile.exists()){
 //					final List<String> content = Arrays.asList(
-//						"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+//						"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 //						"fsa.dict.encoding=" + charset.name().toLowerCase(),
 //						"fsa.dict.encoder=prefix");
 //					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
@@ -153,7 +153,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final File outputInfoFile = new File(filenameNoExtension + ".info");
 			if(!outputInfoFile.exists()){
 				final List<String> content = Arrays.asList(
-					"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+					"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 					"fsa.dict.encoding=" + charset.name().toLowerCase(),
 					"fsa.dict.encoder=prefix");
 				try{
@@ -172,7 +172,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final ExternalSorter sorter = new ExternalSorter();
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
-				.sortInParallel()
+//				.sortInParallel()	//20+ min...
 				//lexical order
 				.comparator(Comparator.naturalOrder())
 				.useInputAsZip()
@@ -228,7 +228,7 @@ System.out.println(watch.toStringMillis());
 		final File outputInfoFile = new File(filenameNoExtension + ".info");
 		if(!outputInfoFile.exists()){
 			final List<String> content = Arrays.asList(
-				"fsa.dict.separator=" + Production.POS_FSA_SEPARATOR,
+				"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 				"fsa.dict.encoding=" + charset.name().toLowerCase(),
 				"fsa.dict.encoder=prefix");
 			try{

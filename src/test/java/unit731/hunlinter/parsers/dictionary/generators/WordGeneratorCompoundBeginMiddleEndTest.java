@@ -1,16 +1,5 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.PermutationsWithRepetitions;
-
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
@@ -62,15 +51,15 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //
 //		String line = "Arbeit/A-";
 //		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-//		List<Production> words = wordGenerator.applyAffixRules(dicEntry);
+//		List<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 //
 //		Assertions.assertEquals(2, words.size());
-//		//base production
-//		Assertions.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
-//		//suffix productions
-//		//prefix productions
-//		//twofold productions
-//		Assertions.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(1));
+//		//base inflection
+//		Assertions.assertEquals(createInflection("Arbeit", "A-", "st:Arbeit"), words.get(0));
+//		//suffix inflections
+//		//prefix inflections
+//		//twofold inflections
+//		Assertions.assertEquals(createInflection("-Arbeit", "PA", "st:Arbeit"), words.get(1));
 //
 //
 //		line = "Computer/BC-";
@@ -78,15 +67,15 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //		words = wordGenerator.applyAffixRules(dicEntry);
 //
 //		Assertions.assertEquals(5, words.size());
-//		//base production
-//		Assertions.assertEquals(createProduction("Computer", "BC-", "st:Computer"), words.get(0));
-//		//suffix productions
-//		Assertions.assertEquals(createProduction("Computern", "DW-", "st:Computer"), words.get(1));
-//		//prefix productions
-//		//twofold productions
-//		Assertions.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(2));
-//		Assertions.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(3));
-//		Assertions.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(4));
+//		//base inflections
+//		Assertions.assertEquals(createInflection("Computer", "BC-", "st:Computer"), words.get(0));
+//		//suffix inflectionss
+//		Assertions.assertEquals(createInflection("Computern", "DW-", "st:Computer"), words.get(1));
+//		//prefix inflectionss
+//		//twofold inflectionss
+//		Assertions.assertEquals(createInflection("-Computer", "PBC", "st:Computer"), words.get(2));
+//		Assertions.assertEquals(createInflection("-Computern", "P", "st:Computer"), words.get(3));
+//		Assertions.assertEquals(createInflection("computern", "P", "st:Computer"), words.get(4));
 //
 //
 //		line = "-/W";
@@ -94,11 +83,11 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //		words = wordGenerator.applyAffixRules(dicEntry);
 //
 //		Assertions.assertEquals(1, words.size());
-//		//base production
-//		Assertions.assertEquals(createProduction("-", "W", "st:-"), words.get(0));
-//		//suffix productions
-//		//prefix productions
-//		//twofold productions
+//		//base inflection
+//		Assertions.assertEquals(createInflection("-", "W", "st:-"), words.get(0));
+//		//suffix inflections
+//		//prefix inflections
+//		//twofold inflections
 //
 //
 //		line = "Arbeitsnehmer/Z";
@@ -106,10 +95,10 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //		words = wordGenerator.applyAffixRules(dicEntry);
 //
 //		Assertions.assertTrue(words.isEmpty());
-//		//base production
-//		//suffix productions
-//		//prefix productions
-//		//twofold productions
+//		//base inflection
+//		//suffix inflections
+//		//prefix inflections
+//		//twofold inflections
 //
 //
 //		String[] inputCompounds = new String[]{
@@ -191,161 +180,161 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //arbeitscomputerarbeit
 //computerarbeits-Computer
 //computerarbeits-Computern*/
-//		List<Production> expected = Arrays.asList(
-////			createProduction("Arbeitarbeit", "-A", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("Arbeitarbeits", "-PUX", "pa:Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeitarbeits", "-PVX", "pa:Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeit-Arbeit", "-AP", "pa:Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("Arbeit-Arbeits", "-P", "pa:Arbeit st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("Arbeitarbeits", "-P", "pa:Arbeit st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeit", "-APUX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeits-Arbeit", "-APUX", "pa:Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("Arbeits-Arbeits", "-PUX", "pa:Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeit", "D-APVX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "D-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("Arbeits-Arbeit", "D-APVX", "pa:Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("Arbeits-Arbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("Arbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("-ArbeitArbeit", "AP", "pa:-Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("-ArbeitArbeits", "PUX", "pa:-Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("-ArbeitArbeits", "PVX", "pa:-Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("-Arbeit-Arbeit", "AP", "pa:-Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("-Arbeit-Arbeits", "P", "pa:-Arbeit st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("-Arbeitarbeits", "P", "pa:-Arbeit st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("-ArbeitsArbeit", "AP", "pa:-Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("-ArbeitsArbeits", "PUX", "pa:-Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("-ArbeitsArbeits", "PVX", "pa:-Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("-Arbeits-Arbeit", "AP", "pa:-Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("-Arbeits-Arbeits", "P", "pa:-Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("-Arbeitsarbeits", "P", "pa:-Arbeits st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("arbeitsarbeit", "AP", "pa:arbeits st:Arbeit pa:Arbeit st:Arbeit"),
-////			createProduction("arbeitsarbeits", "PUX", "pa:arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("arbeitsarbeits", "PVX", "pa:arbeits st:Arbeit pa:Arbeits st:Arbeit"),
-////			createProduction("arbeits-Arbeit", "AP", "pa:arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
-////			createProduction("arbeits-Arbeits", "P", "pa:arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
-////			createProduction("arbeitsarbeits", "P", "pa:arbeits st:Arbeit pa:arbeits st:Arbeit"),
-////			createProduction("Arbeitcomputer", "-BC", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitcomputer", "-PUX", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitcomputer", "-PVWX", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeit-Computer", "-BCP", "pa:Arbeit st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeit-Computer", "-P", "pa:Arbeit st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeitcomputer", "-P", "pa:Arbeit st:Arbeit pa:computer st:Computer"),
-////			createProduction("Arbeitscomputer", "-BCPUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeits-Computer", "-BCPUX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeits-Computer", "-PUX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
-////			createProduction("Arbeitscomputer", "D-BCPVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "D-PUVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("Arbeits-Computer", "D-BCPVX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeits-Computer", "D-PVX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("Arbeitscomputer", "D-PVX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
-////			createProduction("-ArbeitComputer", "BCP", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-ArbeitComputer", "PUX", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-ArbeitComputer", "PVWX", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-Arbeit-Computer", "BCP", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("-Arbeit-Computer", "P", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("-Arbeitcomputer", "P", "pa:-Arbeit st:Arbeit pa:computer st:Computer"),
-////			createProduction("-ArbeitsComputer", "BCP", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-ArbeitsComputer", "PUX", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-ArbeitsComputer", "PVWX", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("-Arbeits-Computer", "BCP", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("-Arbeits-Computer", "P", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("-Arbeitscomputer", "P", "pa:-Arbeits st:Arbeit pa:computer st:Computer"),
-////			createProduction("arbeitscomputer", "BCP", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("arbeitscomputer", "PUX", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("arbeitscomputer", "PVWX", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
-////			createProduction("arbeits-Computer", "BCP", "pa:arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("arbeits-Computer", "P", "pa:arbeits st:Arbeit pa:-Computer st:Computer"),
-////			createProduction("arbeitscomputer", "P", "pa:arbeits st:Arbeit pa:computer st:Computer"),
-////			createProduction("Arbeit-", "-W", "pa:Arbeit st:Arbeit pa:- st:-"),
-////			createProduction("Arbeits-", "-PUWX", "pa:Arbeits st:Arbeit pa:- st:-"),
-////			createProduction("Arbeits-", "D-PVWX", "pa:Arbeits st:Arbeit pa:- st:-"),
-////			createProduction("-Arbeit-", "PW", "pa:-Arbeit st:Arbeit pa:- st:-"),
-////			createProduction("-Arbeits-", "PW", "pa:-Arbeits st:Arbeit pa:- st:-"),
-////			createProduction("arbeits-", "PW", "pa:arbeits st:Arbeit pa:- st:-"),
-////			createProduction("Computerarbeit", "-A", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
-////			createProduction("Computerarbeits", "-PUX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("Computerarbeits", "-PVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("Computer-Arbeit", "-AP", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
-////			createProduction("Computer-Arbeits", "-P", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
-////			createProduction("Computerarbeits", "-P", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
-////			createProduction("Computerarbeit", "-APUX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
-////			createProduction("Computerarbeits", "-PUVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("Computer-Arbeit", "-APUX", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
-////			createProduction("Computer-Arbeits", "-PUX", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
-////			createProduction("Computerarbeits", "-PUX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
-////			createProduction("Computerarbeit", "D-APVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
-////			createProduction("Computerarbeits", "D-PUVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("Computerarbeits", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("Computer-Arbeit", "D-APVWX", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
-////			createProduction("Computer-Arbeits", "D-PVWX", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
-////			createProduction("Computerarbeits", "D-PVWX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
-////			createProduction("-ComputerArbeit", "AP", "pa:-Computer st:Computer pa:Arbeit st:Arbeit"),
-////			createProduction("-ComputerArbeits", "PUX", "pa:-Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("-ComputerArbeits", "PVX", "pa:-Computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("-Computer-Arbeit", "AP", "pa:-Computer st:Computer pa:-Arbeit st:Arbeit"),
-////			createProduction("-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
-////			createProduction("-Computerarbeits", "P", "pa:-Computer st:Computer pa:arbeits st:Arbeit"),
-////			createProduction("computerarbeit", "AP", "pa:computer st:Computer pa:Arbeit st:Arbeit"),
-////			createProduction("computerarbeits", "PUX", "pa:computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("computerarbeits", "PVX", "pa:computer st:Computer pa:Arbeits st:Arbeit"),
-////			createProduction("computer-Arbeit", "AP", "pa:computer st:Computer pa:-Arbeit st:Arbeit"),
-////			createProduction("computer-Arbeits", "P", "pa:computer st:Computer pa:-Arbeits st:Arbeit"),
-////			createProduction("computerarbeits", "P", "pa:computer st:Computer pa:arbeits st:Arbeit"),
-////			createProduction("Computercomputer", "-BC", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computercomputer", "-PUX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computercomputer", "-PVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computer-Computer", "-BCP", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computer-Computer", "-P", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computercomputer", "-P", "pa:Computer st:Computer pa:computer st:Computer"),
-////			createProduction("Computercomputer", "-BCPUX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computercomputer", "-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computer-Computer", "-BCPUX", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computer-Computer", "-PUX", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computercomputer", "-PUX", "pa:Computer st:Computer pa:computer st:Computer"),
-////			createProduction("Computercomputer", "D-BCPVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computercomputer", "D-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computercomputer", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("Computer-Computer", "D-BCPVWX", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computer-Computer", "D-PVWX", "pa:Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("Computercomputer", "D-PVWX", "pa:Computer st:Computer pa:computer st:Computer"),
-////			createProduction("-ComputerComputer", "BCP", "pa:-Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("-ComputerComputer", "PUX", "pa:-Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("-ComputerComputer", "PVWX", "pa:-Computer st:Computer pa:Computer st:Computer"),
-////			createProduction("-Computer-Computer", "BCP", "pa:-Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("-Computer-Computer", "P", "pa:-Computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("-Computercomputer", "P", "pa:-Computer st:Computer pa:computer st:Computer"),
-////			createProduction("computercomputer", "BCP", "pa:computer st:Computer pa:Computer st:Computer"),
-////			createProduction("computercomputer", "PUX", "pa:computer st:Computer pa:Computer st:Computer"),
-////			createProduction("computercomputer", "PVWX", "pa:computer st:Computer pa:Computer st:Computer"),
-////			createProduction("computer-Computer", "BCP", "pa:computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("computer-Computer", "P", "pa:computer st:Computer pa:-Computer st:Computer"),
-////			createProduction("computercomputer", "P", "pa:computer st:Computer pa:computer st:Computer"),
-////			createProduction("Computer-", "-W", "pa:Computer st:Computer pa:- st:-"),
-////			createProduction("Computer-", "-PUWX", "pa:Computer st:Computer pa:- st:-"),
-////			createProduction("Computer-", "D-PVWX", "pa:Computer st:Computer pa:- st:-"),
-////			createProduction("-Computer-", "PW", "pa:-Computer st:Computer pa:- st:-"),
-////			createProduction("computer-", "PW", "pa:computer st:Computer pa:- st:-"),
-////			createProduction("-Arbeit", "AW", "pa:- st:- pa:Arbeit st:Arbeit"),
-////			createProduction("-Arbeits", "PUWX", "pa:- st:- pa:Arbeits st:Arbeit"),
-////			createProduction("-Arbeits", "PVWX", "pa:- st:- pa:Arbeits st:Arbeit"),
-////			createProduction("--Arbeit", "APW", "pa:- st:- pa:-Arbeit st:Arbeit"),
-////			createProduction("--Arbeits", "PW", "pa:- st:- pa:-Arbeits st:Arbeit"),
-////			createProduction("-arbeits", "PW", "pa:- st:- pa:arbeits st:Arbeit"),
-////			createProduction("-Computer", "BCW", "pa:- st:- pa:Computer st:Computer"),
-////			createProduction("-Computer", "PUWX", "pa:- st:- pa:Computer st:Computer"),
-////			createProduction("-Computer", "PVWX", "pa:- st:- pa:Computer st:Computer"),
-////			createProduction("--Computer", "BCPW", "pa:- st:- pa:-Computer st:Computer"),
-////			createProduction("--Computer", "PW", "pa:- st:- pa:-Computer st:Computer"),
-////			createProduction("-computer", "PW", "pa:- st:- pa:computer st:Computer"),
-////			createProduction("--", "W", "pa:- st:- pa:- st:-")
+//		List<Inflection> expected = Arrays.asList(
+////			createInflection("Arbeitarbeit", "-A", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("Arbeitarbeits", "-PUX", "pa:Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeitarbeits", "-PVX", "pa:Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeit-Arbeit", "-AP", "pa:Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("Arbeit-Arbeits", "-P", "pa:Arbeit st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("Arbeitarbeits", "-P", "pa:Arbeit st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeit", "-APUX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeits-Arbeit", "-APUX", "pa:Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("Arbeits-Arbeits", "-PUX", "pa:Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeit", "D-APVX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "D-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("Arbeits-Arbeit", "D-APVX", "pa:Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("Arbeits-Arbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("Arbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("-ArbeitArbeit", "AP", "pa:-Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("-ArbeitArbeits", "PUX", "pa:-Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("-ArbeitArbeits", "PVX", "pa:-Arbeit st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("-Arbeit-Arbeit", "AP", "pa:-Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("-Arbeit-Arbeits", "P", "pa:-Arbeit st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("-Arbeitarbeits", "P", "pa:-Arbeit st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("-ArbeitsArbeit", "AP", "pa:-Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("-ArbeitsArbeits", "PUX", "pa:-Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("-ArbeitsArbeits", "PVX", "pa:-Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("-Arbeits-Arbeit", "AP", "pa:-Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("-Arbeits-Arbeits", "P", "pa:-Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("-Arbeitsarbeits", "P", "pa:-Arbeits st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("arbeitsarbeit", "AP", "pa:arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+////			createInflection("arbeitsarbeits", "PUX", "pa:arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("arbeitsarbeits", "PVX", "pa:arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+////			createInflection("arbeits-Arbeit", "AP", "pa:arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
+////			createInflection("arbeits-Arbeits", "P", "pa:arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+////			createInflection("arbeitsarbeits", "P", "pa:arbeits st:Arbeit pa:arbeits st:Arbeit"),
+////			createInflection("Arbeitcomputer", "-BC", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitcomputer", "-PUX", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitcomputer", "-PVWX", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeit-Computer", "-BCP", "pa:Arbeit st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeit-Computer", "-P", "pa:Arbeit st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeitcomputer", "-P", "pa:Arbeit st:Arbeit pa:computer st:Computer"),
+////			createInflection("Arbeitscomputer", "-BCPUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeits-Computer", "-BCPUX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeits-Computer", "-PUX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
+////			createInflection("Arbeitscomputer", "D-BCPVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "D-PUVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("Arbeits-Computer", "D-BCPVX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeits-Computer", "D-PVX", "pa:Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("Arbeitscomputer", "D-PVX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
+////			createInflection("-ArbeitComputer", "BCP", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-ArbeitComputer", "PUX", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-ArbeitComputer", "PVWX", "pa:-Arbeit st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-Arbeit-Computer", "BCP", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("-Arbeit-Computer", "P", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("-Arbeitcomputer", "P", "pa:-Arbeit st:Arbeit pa:computer st:Computer"),
+////			createInflection("-ArbeitsComputer", "BCP", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-ArbeitsComputer", "PUX", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-ArbeitsComputer", "PVWX", "pa:-Arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("-Arbeits-Computer", "BCP", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("-Arbeits-Computer", "P", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("-Arbeitscomputer", "P", "pa:-Arbeits st:Arbeit pa:computer st:Computer"),
+////			createInflection("arbeitscomputer", "BCP", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("arbeitscomputer", "PUX", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("arbeitscomputer", "PVWX", "pa:arbeits st:Arbeit pa:Computer st:Computer"),
+////			createInflection("arbeits-Computer", "BCP", "pa:arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("arbeits-Computer", "P", "pa:arbeits st:Arbeit pa:-Computer st:Computer"),
+////			createInflection("arbeitscomputer", "P", "pa:arbeits st:Arbeit pa:computer st:Computer"),
+////			createInflection("Arbeit-", "-W", "pa:Arbeit st:Arbeit pa:- st:-"),
+////			createInflection("Arbeits-", "-PUWX", "pa:Arbeits st:Arbeit pa:- st:-"),
+////			createInflection("Arbeits-", "D-PVWX", "pa:Arbeits st:Arbeit pa:- st:-"),
+////			createInflection("-Arbeit-", "PW", "pa:-Arbeit st:Arbeit pa:- st:-"),
+////			createInflection("-Arbeits-", "PW", "pa:-Arbeits st:Arbeit pa:- st:-"),
+////			createInflection("arbeits-", "PW", "pa:arbeits st:Arbeit pa:- st:-"),
+////			createInflection("Computerarbeit", "-A", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+////			createInflection("Computerarbeits", "-PUX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("Computerarbeits", "-PVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("Computer-Arbeit", "-AP", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
+////			createInflection("Computer-Arbeits", "-P", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
+////			createInflection("Computerarbeits", "-P", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
+////			createInflection("Computerarbeit", "-APUX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+////			createInflection("Computerarbeits", "-PUVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("Computer-Arbeit", "-APUX", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
+////			createInflection("Computer-Arbeits", "-PUX", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
+////			createInflection("Computerarbeits", "-PUX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
+////			createInflection("Computerarbeit", "D-APVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+////			createInflection("Computerarbeits", "D-PUVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("Computerarbeits", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("Computer-Arbeit", "D-APVWX", "pa:Computer st:Computer pa:-Arbeit st:Arbeit"),
+////			createInflection("Computer-Arbeits", "D-PVWX", "pa:Computer st:Computer pa:-Arbeits st:Arbeit"),
+////			createInflection("Computerarbeits", "D-PVWX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
+////			createInflection("-ComputerArbeit", "AP", "pa:-Computer st:Computer pa:Arbeit st:Arbeit"),
+////			createInflection("-ComputerArbeits", "PUX", "pa:-Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("-ComputerArbeits", "PVX", "pa:-Computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("-Computer-Arbeit", "AP", "pa:-Computer st:Computer pa:-Arbeit st:Arbeit"),
+////			createInflection("-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
+////			createInflection("-Computerarbeits", "P", "pa:-Computer st:Computer pa:arbeits st:Arbeit"),
+////			createInflection("computerarbeit", "AP", "pa:computer st:Computer pa:Arbeit st:Arbeit"),
+////			createInflection("computerarbeits", "PUX", "pa:computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("computerarbeits", "PVX", "pa:computer st:Computer pa:Arbeits st:Arbeit"),
+////			createInflection("computer-Arbeit", "AP", "pa:computer st:Computer pa:-Arbeit st:Arbeit"),
+////			createInflection("computer-Arbeits", "P", "pa:computer st:Computer pa:-Arbeits st:Arbeit"),
+////			createInflection("computerarbeits", "P", "pa:computer st:Computer pa:arbeits st:Arbeit"),
+////			createInflection("Computercomputer", "-BC", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computercomputer", "-PUX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computercomputer", "-PVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computer-Computer", "-BCP", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computer-Computer", "-P", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computercomputer", "-P", "pa:Computer st:Computer pa:computer st:Computer"),
+////			createInflection("Computercomputer", "-BCPUX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computercomputer", "-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computer-Computer", "-BCPUX", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computer-Computer", "-PUX", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computercomputer", "-PUX", "pa:Computer st:Computer pa:computer st:Computer"),
+////			createInflection("Computercomputer", "D-BCPVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computercomputer", "D-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computercomputer", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("Computer-Computer", "D-BCPVWX", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computer-Computer", "D-PVWX", "pa:Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("Computercomputer", "D-PVWX", "pa:Computer st:Computer pa:computer st:Computer"),
+////			createInflection("-ComputerComputer", "BCP", "pa:-Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("-ComputerComputer", "PUX", "pa:-Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("-ComputerComputer", "PVWX", "pa:-Computer st:Computer pa:Computer st:Computer"),
+////			createInflection("-Computer-Computer", "BCP", "pa:-Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("-Computer-Computer", "P", "pa:-Computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("-Computercomputer", "P", "pa:-Computer st:Computer pa:computer st:Computer"),
+////			createInflection("computercomputer", "BCP", "pa:computer st:Computer pa:Computer st:Computer"),
+////			createInflection("computercomputer", "PUX", "pa:computer st:Computer pa:Computer st:Computer"),
+////			createInflection("computercomputer", "PVWX", "pa:computer st:Computer pa:Computer st:Computer"),
+////			createInflection("computer-Computer", "BCP", "pa:computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("computer-Computer", "P", "pa:computer st:Computer pa:-Computer st:Computer"),
+////			createInflection("computercomputer", "P", "pa:computer st:Computer pa:computer st:Computer"),
+////			createInflection("Computer-", "-W", "pa:Computer st:Computer pa:- st:-"),
+////			createInflection("Computer-", "-PUWX", "pa:Computer st:Computer pa:- st:-"),
+////			createInflection("Computer-", "D-PVWX", "pa:Computer st:Computer pa:- st:-"),
+////			createInflection("-Computer-", "PW", "pa:-Computer st:Computer pa:- st:-"),
+////			createInflection("computer-", "PW", "pa:computer st:Computer pa:- st:-"),
+////			createInflection("-Arbeit", "AW", "pa:- st:- pa:Arbeit st:Arbeit"),
+////			createInflection("-Arbeits", "PUWX", "pa:- st:- pa:Arbeits st:Arbeit"),
+////			createInflection("-Arbeits", "PVWX", "pa:- st:- pa:Arbeits st:Arbeit"),
+////			createInflection("--Arbeit", "APW", "pa:- st:- pa:-Arbeit st:Arbeit"),
+////			createInflection("--Arbeits", "PW", "pa:- st:- pa:-Arbeits st:Arbeit"),
+////			createInflection("-arbeits", "PW", "pa:- st:- pa:arbeits st:Arbeit"),
+////			createInflection("-Computer", "BCW", "pa:- st:- pa:Computer st:Computer"),
+////			createInflection("-Computer", "PUWX", "pa:- st:- pa:Computer st:Computer"),
+////			createInflection("-Computer", "PVWX", "pa:- st:- pa:Computer st:Computer"),
+////			createInflection("--Computer", "BCPW", "pa:- st:- pa:-Computer st:Computer"),
+////			createInflection("--Computer", "PW", "pa:- st:- pa:-Computer st:Computer"),
+////			createInflection("-computer", "PW", "pa:- st:- pa:computer st:Computer"),
+////			createInflection("--", "W", "pa:- st:- pa:- st:-")
 //		);
 //		Assertions.assertEquals(expected, words);
 //	}

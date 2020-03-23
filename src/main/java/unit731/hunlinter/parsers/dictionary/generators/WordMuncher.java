@@ -5,10 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.SetHelper;
 
@@ -65,7 +65,7 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			forEach(originators, production -> LOGGER.trace("Inferred word: {}", production));
+			forEach(originators, inflection -> LOGGER.trace("Inferred inflection: {}", inflection));
 		return originators;
 	}
 
@@ -84,17 +84,17 @@ public class WordMuncher{
 					if(originatingWord != null){
 						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-						Production[] productions = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
-						//remove base production
-						productions = ArrayUtils.remove(productions, WordGenerator.BASE_PRODUCTION_INDEX);
+						Inflection[] inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+						//remove base inflection
+						inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
 
 						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
-						if(productions.length != 1)
+						if(inflections.length != 1)
 							continue;
 
-						final String[] baseProductionPartOfSpeech = productions[0].getMorphologicalFieldPartOfSpeech();
-						if(baseProductionPartOfSpeech.length == 0 && partOfSpeech.length == 0
-								|| baseProductionPartOfSpeech != null && Arrays.equals(baseProductionPartOfSpeech, partOfSpeech))
+						final String[] baseInflectionPartOfSpeech = inflections[0].getMorphologicalFieldPartOfSpeech();
+						if(baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
+								|| baseInflectionPartOfSpeech != null && Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech))
 							originators.add(originatorEntry);
 					}
 				}
@@ -102,26 +102,26 @@ public class WordMuncher{
 		return originators;
 	}
 
-	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
-		final List<Production> originatingRules = new ArrayList<>();
+	private List<Inflection> extractAllAffixes(final String word, final String partOfSpeech){
+		final List<Inflection> originatingRules = new ArrayList<>();
 		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, affixData);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
-			final List<Production> originatingRulesFromEntry = new ArrayList<>();
+			final List<Inflection> originatingRulesFromEntry = new ArrayList<>();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
-						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
+						final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
 						if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
 							originatingRulesFromEntry.add(originatingRule);
 					}
 				}
 			if(!originatingRulesFromEntry.isEmpty()){
-				//originatingRulesFromEntry should not have productions from identical word
-				final Map<String, List<Production>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, DictionaryEntry::getWord);
+				//originatingRulesFromEntry should not have inflections from identical word
+				final Map<String, List<Inflection>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, DictionaryEntry::getWord);
 				boolean identicalOriginatingWord = false;
-				for(final List<Production> prods : wordBucket.values())
+				for(final List<Inflection> prods : wordBucket.values())
 					if(prods.size() > 1){
 						identicalOriginatingWord = true;
 						break;

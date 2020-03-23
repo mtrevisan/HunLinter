@@ -1,7 +1,8 @@
 package unit731.hunlinter.languages;
 
 import java.text.MessageFormat;
-import unit731.hunlinter.parsers.vos.Production;
+
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -21,9 +22,9 @@ public class LetterMatcherEntry{
 		this.correctRule = correctRule;
 	}
 
-	public void match(final Production production){
+	public void match(final Inflection inflection){
 		for(final String flag : wrongFlags)
-			if(production.hasContinuationFlag(flag))
+			if(inflection.hasContinuationFlag(flag))
 				throw new LinterException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}
 

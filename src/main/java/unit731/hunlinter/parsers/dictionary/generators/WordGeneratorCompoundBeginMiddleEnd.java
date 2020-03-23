@@ -9,7 +9,7 @@ import java.util.Objects;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
@@ -28,12 +28,12 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_BEGIN, AffixOption.COMPOUND_MIDDLE,
 	 * and AffixOption.COMPOUND_END
 	 *
-	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
+	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule
 	 * @param limit	Limit result count
-	 * @return	The list of productions
+	 * @return	The list of inflections
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	Production[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
+	Inflection[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
@@ -55,7 +55,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -70,9 +70,9 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
-			final Production[] productions = applyAffixRules(dicEntry, false, null);
-			for(final Production production : productions){
-				final Map<String, List<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
+			final Inflection[] inflections = applyAffixRules(dicEntry, false, null);
+			for(final Inflection inflection : inflections){
+				final Map<String, List<DictionaryEntry>> distribution = inflection.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
 				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 			}

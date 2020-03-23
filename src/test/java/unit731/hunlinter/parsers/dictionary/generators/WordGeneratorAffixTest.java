@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ConversionTable;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.FileHelper;
 
@@ -55,21 +55,21 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/AÜ";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "AÜ", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "ÜÖü", "st:foo"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("foosbar", "Ü", "st:foo"), words[2]);
-		Assertions.assertEquals(createProduction("foosbaz", "Ü", "st:foo"), words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("unfoo", "A", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("unfoos", "Öü", "st:foo"), words[5]);
-		Assertions.assertEquals(createProduction("unfoosbar", null, "st:foo"), words[6]);
-		Assertions.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words[7]);
+		//base inflection
+		Assertions.assertEquals(createInflection("foo", "AÜ", "st:foo"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("foos", "ÜÖü", "st:foo"), words[1]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("foosbar", "Ü", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosbaz", "Ü", "st:foo"), words[3]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("unfoo", "A", "st:foo"), words[4]);
+		Assertions.assertEquals(createInflection("unfoos", "Öü", "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[7]);
 	}
 
 	@Test
@@ -90,21 +90,21 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/999,54321";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "999,54321", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "54321,214,216", "st:foo"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("foosbar", "54321", "st:foo"), words[2]);
-		Assertions.assertEquals(createProduction("foosbaz", "54321", "st:foo"), words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("unfoo", "999", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("unfoos", "214,216", "st:foo"), words[5]);
-		Assertions.assertEquals(createProduction("unfoosbar", null, "st:foo"), words[6]);
-		Assertions.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words[7]);
+		//base inflections
+		Assertions.assertEquals(createInflection("foo", "999,54321", "st:foo"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("foos", "54321,214,216", "st:foo"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("foosbar", "54321", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosbaz", "54321", "st:foo"), words[3]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("unfoo", "999", "st:foo"), words[4]);
+		Assertions.assertEquals(createInflection("unfoos", "214,216", "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[7]);
 	}
 
 	@Test
@@ -124,21 +124,21 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/A3";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "A3", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "312", "st:foo"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("foosbar", "3", "st:foo"), words[2]);
-		Assertions.assertEquals(createProduction("foosbaz", "3", "st:foo"), words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("unfoo", "A", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("unfoos", "12", "st:foo"), words[5]);
-		Assertions.assertEquals(createProduction("unfoosbar", null, "st:foo"), words[6]);
-		Assertions.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words[7]);
+		//base inflections
+		Assertions.assertEquals(createInflection("foo", "A3", "st:foo"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("foos", "312", "st:foo"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("foosbar", "3", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosbaz", "3", "st:foo"), words[3]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("unfoo", "A", "st:foo"), words[4]);
+		Assertions.assertEquals(createInflection("unfoos", "12", "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[7]);
 	}
 
 	@Test
@@ -159,21 +159,21 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/zx09";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(8, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "zx09", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foos", "09g?1G", "st:foo"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("foosbar", "09", "st:foo"), words[2]);
-		Assertions.assertEquals(createProduction("foosbaz", "09", "st:foo"), words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("unfoo", "zx", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("unfoos", "g?1G", "st:foo"), words[5]);
-		Assertions.assertEquals(createProduction("unfoosbar", null, "st:foo"), words[6]);
-		Assertions.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words[7]);
+		//base inflections
+		Assertions.assertEquals(createInflection("foo", "zx09", "st:foo"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("foos", "09g?1G", "st:foo"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("foosbar", "09", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosbaz", "09", "st:foo"), words[3]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("unfoo", "zx", "st:foo"), words[4]);
+		Assertions.assertEquals(createInflection("unfoos", "g?1G", "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[7]);
 	}
 
 
@@ -193,15 +193,15 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("a", "A", "st:a"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aa", null, "st:a"), words[1]);
-		Assertions.assertEquals(createProduction("ac", null, "st:a"), words[2]);
-		Assertions.assertEquals(createProduction("ae", null, "st:a"), words[3]);
+		//base inflections
+		Assertions.assertEquals(createInflection("a", "A", "st:a"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aa", null, "st:a"), words[1]);
+		Assertions.assertEquals(createInflection("ac", null, "st:a"), words[2]);
+		Assertions.assertEquals(createInflection("ae", null, "st:a"), words[3]);
 	}
 
 
@@ -221,18 +221,18 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(5, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("aa", "S1", "st:aa"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aas1", "S2P1", "st:aa"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words[3]);
-		Assertions.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words[4]);
+		//base inflections
+		Assertions.assertEquals(createInflection("aa", "S1", "st:aa"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aas1", "S2P1", "st:aa"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[3]);
+		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[4]);
 	}
 
 	@Test
@@ -251,17 +251,17 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("aa", "S1", "st:aa"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aas1", "S2", "st:aa"), words[1]);
-		//prefix productions
-		//twofold productions
-		Assertions.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words[2]);
-		Assertions.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words[3]);
+		//base inflections
+		Assertions.assertEquals(createInflection("aa", "S1", "st:aa"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aas1", "S2", "st:aa"), words[1]);
+		//prefix inflectionss
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
+		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[3]);
 	}
 
 	@Test
@@ -280,19 +280,19 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1P1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("aa", "S1P1", "st:aa"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("p1aa", "S1", "st:aa"), words[3]);
-		Assertions.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words[4]);
-		Assertions.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words[5]);
+		//base inflections
+		Assertions.assertEquals(createInflection("aa", "S1P1", "st:aa"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aas1", "P1S2", "st:aa"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("p1aa", "S1", "st:aa"), words[3]);
+		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[4]);
+		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[5]);
 	}
 
 	@Test
@@ -311,19 +311,19 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/P1S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("aa", "P1S1", "st:aa"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("p1aa", "S1", "st:aa"), words[3]);
-		Assertions.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words[4]);
-		Assertions.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words[5]);
+		//base inflections
+		Assertions.assertEquals(createInflection("aa", "P1S1", "st:aa"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aas1", "P1S2", "st:aa"), words[1]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("p1aa", "S1", "st:aa"), words[3]);
+		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[4]);
+		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[5]);
 	}
 
 	@Test
@@ -345,27 +345,27 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/ABCDE";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(14, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("a", "ABCDE", "st:a"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aa", "E", "st:a"), words[1]);
-		Assertions.assertEquals(createProduction("ab", "EA", "st:a"), words[2]);
-		Assertions.assertEquals(createProduction("ac", "E", "st:a"), words[3]);
-		Assertions.assertEquals(createProduction("ad", "EA", "st:a"), words[4]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("aba", "E", "st:a"), words[5]);
-		Assertions.assertEquals(createProduction("ada", "E", "st:a"), words[6]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("ea", "ABCD", "st:a"), words[7]);
-		Assertions.assertEquals(createProduction("eaa", null, "st:a"), words[8]);
-		Assertions.assertEquals(createProduction("eab", "A", "st:a"), words[9]);
-		Assertions.assertEquals(createProduction("eac", null, "st:a"), words[10]);
-		Assertions.assertEquals(createProduction("ead", "A", "st:a"), words[11]);
-		Assertions.assertEquals(createProduction("eaba", null, "st:a"), words[12]);
-		Assertions.assertEquals(createProduction("eada", null, "st:a"), words[13]);
+		//base inflections
+		Assertions.assertEquals(createInflection("a", "ABCDE", "st:a"), words[0]);
+		//suffix inflectionss
+		Assertions.assertEquals(createInflection("aa", "E", "st:a"), words[1]);
+		Assertions.assertEquals(createInflection("ab", "EA", "st:a"), words[2]);
+		Assertions.assertEquals(createInflection("ac", "E", "st:a"), words[3]);
+		Assertions.assertEquals(createInflection("ad", "EA", "st:a"), words[4]);
+		//prefix inflectionss
+		Assertions.assertEquals(createInflection("aba", "E", "st:a"), words[5]);
+		Assertions.assertEquals(createInflection("ada", "E", "st:a"), words[6]);
+		//twofold inflectionss
+		Assertions.assertEquals(createInflection("ea", "ABCD", "st:a"), words[7]);
+		Assertions.assertEquals(createInflection("eaa", null, "st:a"), words[8]);
+		Assertions.assertEquals(createInflection("eab", "A", "st:a"), words[9]);
+		Assertions.assertEquals(createInflection("eac", null, "st:a"), words[10]);
+		Assertions.assertEquals(createInflection("ead", "A", "st:a"), words[11]);
+		Assertions.assertEquals(createInflection("eaba", null, "st:a"), words[12]);
+		Assertions.assertEquals(createInflection("eada", null, "st:a"), words[13]);
 	}
 
 
@@ -398,13 +398,13 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("a", "A", "st:a"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("b", null, "st:a"), words[1]);
+		//base inflection
+		Assertions.assertEquals(createInflection("a", "A", "st:a"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("b", null, "st:a"), words[1]);
 	}
 
 
@@ -486,27 +486,27 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/ABCDE";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(14, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("a", "ABCDE", "st:a"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("aa", "E", "st:a"), words[1]);
-		Assertions.assertEquals(createProduction("ba", "EA", "st:a"), words[2]);
-		Assertions.assertEquals(createProduction("ca", "E", "st:a"), words[3]);
-		Assertions.assertEquals(createProduction("da", "EA", "st:a"), words[4]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("aba", "E", "st:a"), words[5]);
-		Assertions.assertEquals(createProduction("ada", "E", "st:a"), words[6]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("ae", "ABCD", "st:a"), words[7]);
-		Assertions.assertEquals(createProduction("aae", null, "st:a"), words[8]);
-		Assertions.assertEquals(createProduction("bae", "A", "st:a"), words[9]);
-		Assertions.assertEquals(createProduction("cae", null, "st:a"), words[10]);
-		Assertions.assertEquals(createProduction("dae", "A", "st:a"), words[11]);
-		Assertions.assertEquals(createProduction("abae", null, "st:a"), words[12]);
-		Assertions.assertEquals(createProduction("adae", null, "st:a"), words[13]);
+		//base inflection
+		Assertions.assertEquals(createInflection("a", "ABCDE", "st:a"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("aa", "E", "st:a"), words[1]);
+		Assertions.assertEquals(createInflection("ba", "EA", "st:a"), words[2]);
+		Assertions.assertEquals(createInflection("ca", "E", "st:a"), words[3]);
+		Assertions.assertEquals(createInflection("da", "EA", "st:a"), words[4]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("aba", "E", "st:a"), words[5]);
+		Assertions.assertEquals(createInflection("ada", "E", "st:a"), words[6]);
+		//twofold inflections
+		Assertions.assertEquals(createInflection("ae", "ABCD", "st:a"), words[7]);
+		Assertions.assertEquals(createInflection("aae", null, "st:a"), words[8]);
+		Assertions.assertEquals(createInflection("bae", "A", "st:a"), words[9]);
+		Assertions.assertEquals(createInflection("cae", null, "st:a"), words[10]);
+		Assertions.assertEquals(createInflection("dae", "A", "st:a"), words[11]);
+		Assertions.assertEquals(createInflection("abae", null, "st:a"), words[12]);
+		Assertions.assertEquals(createInflection("adae", null, "st:a"), words[13]);
 	}
 
 	@Test
@@ -523,16 +523,16 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "ouro/B";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("ouro", "B", "st:ouro"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("metouro", "A", "st:ouro"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("tekmetouro", null, "st:ouro"), words[2]);
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("ouro", "B", "st:ouro"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("metouro", "A", "st:ouro"), words[1]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("tekmetouro", null, "st:ouro"), words[2]);
+		//twofold inflections
 	}
 
 	@Test
@@ -549,16 +549,16 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "ⲟⲩⲣⲟ/B";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ"), words[2]);
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ"), words[1]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ"), words[2]);
+		//twofold inflections
 	}
 
 	@Test
@@ -608,15 +608,15 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "A", "st:foo"), words[0]);
-		//suffix productions
-		//prefix productions
-		Assertions.assertEquals(createProduction("foosbaz", null, "st:foo"), words[1]);
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("foo", "A", "st:foo"), words[0]);
+		//suffix inflections
+		//prefix inflections
+		Assertions.assertEquals(createInflection("foosbaz", null, "st:foo"), words[1]);
+		//twofold inflections
 	}
 
 	@Test
@@ -637,22 +637,22 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/AC";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(9, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "AC", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foo-suf", "CB", "st:foo"), words[1]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("foo-suf-bar", "C", "st:foo"), words[2]);
-		Assertions.assertEquals(createProduction("foo-pseudosuf-bar", "C", "st:foo"), words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("pre-foo", "A", "st:foo"), words[4]);
-		Assertions.assertEquals(createProduction("pre-foo-suf", "B", "st:foo"), words[5]);
-		Assertions.assertEquals(createProduction("pre-foo-pseudosuf", "B", "st:foo"), words[6]);
-		Assertions.assertEquals(createProduction("pre-foo-suf-bar", null, "st:foo"), words[7]);
-		Assertions.assertEquals(createProduction("pre-foo-pseudosuf-bar", null, "st:foo"), words[8]);
+		//base inflection
+		Assertions.assertEquals(createInflection("foo", "AC", "st:foo"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("foo-suf", "CB", "st:foo"), words[1]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("foo-suf-bar", "C", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foo-pseudosuf-bar", "C", "st:foo"), words[3]);
+		//twofold inflections
+		Assertions.assertEquals(createInflection("pre-foo", "A", "st:foo"), words[4]);
+		Assertions.assertEquals(createInflection("pre-foo-suf", "B", "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("pre-foo-pseudosuf", "B", "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("pre-foo-suf-bar", null, "st:foo"), words[7]);
+		Assertions.assertEquals(createInflection("pre-foo-pseudosuf-bar", null, "st:foo"), words[8]);
 	}
 
 
@@ -674,17 +674,17 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "nagy/C";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("nagy", "C", "st:nagy"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("nagyobb", null, "st:nagy"), words[1]);
-		//prefix productions
-		//twofold productions
-		Assertions.assertEquals(createProduction("legnagyobb", null, "st:nagy"), words[2]);
-		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words[3]);
+		//base inflection
+		Assertions.assertEquals(createInflection("nagy", "C", "st:nagy"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("nagyobb", null, "st:nagy"), words[1]);
+		//prefix inflections
+		//twofold inflections
+		Assertions.assertEquals(createInflection("legnagyobb", null, "st:nagy"), words[2]);
+		Assertions.assertEquals(createInflection("legeslegnagyobb", null, "st:nagy"), words[3]);
 	}
 
 	@Test
@@ -705,15 +705,15 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "nagy/CX";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.length);
-		//base production
-		//suffix productions
-		//prefix productions
-		//twofold productions
-		Assertions.assertEquals(createProduction("legnagyobb", null, "st:nagy"), words[0]);
-		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words[1]);
+		//base inflection
+		//suffix inflections
+		//prefix inflections
+		//twofold inflections
+		Assertions.assertEquals(createInflection("legnagyobb", null, "st:nagy"), words[0]);
+		Assertions.assertEquals(createInflection("legeslegnagyobb", null, "st:nagy"), words[1]);
 	}
 
 	@Test
@@ -744,29 +744,29 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "bark/abe";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(17, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("bark", "abe", "st:bark"), words[0]);
-		//suffix productions
-		//twofold productions
-		Assertions.assertEquals(createProduction("abark", "be", "st:bark"), words[1]);
-		Assertions.assertEquals(createProduction("nbark", "be", "st:bark"), words[2]);
-		Assertions.assertEquals(createProduction("tbark", "be", "st:bark"), words[3]);
-		Assertions.assertEquals(createProduction("ybark", "be", "st:bark"), words[4]);
-		Assertions.assertEquals(createProduction("abarki", null, "st:bark"), words[5]);
-		Assertions.assertEquals(createProduction("nbarki", null, "st:bark"), words[6]);
-		Assertions.assertEquals(createProduction("tbarki", null, "st:bark"), words[7]);
-		Assertions.assertEquals(createProduction("ybarki", null, "st:bark"), words[8]);
-		Assertions.assertEquals(createProduction("abarkun", null, "st:bark"), words[9]);
-		Assertions.assertEquals(createProduction("nbarkun", null, "st:bark"), words[10]);
-		Assertions.assertEquals(createProduction("tbarkun", null, "st:bark"), words[11]);
-		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words[12]);
-		Assertions.assertEquals(createProduction("abarkn", null, "st:bark"), words[13]);
-		Assertions.assertEquals(createProduction("nbarkn", null, "st:bark"), words[14]);
-		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words[15]);
-		Assertions.assertEquals(createProduction("ybarkn", null, "st:bark"), words[16]);
+		//base inflection
+		Assertions.assertEquals(createInflection("bark", "abe", "st:bark"), words[0]);
+		//suffix inflections
+		//twofold inflections
+		Assertions.assertEquals(createInflection("abark", "be", "st:bark"), words[1]);
+		Assertions.assertEquals(createInflection("nbark", "be", "st:bark"), words[2]);
+		Assertions.assertEquals(createInflection("tbark", "be", "st:bark"), words[3]);
+		Assertions.assertEquals(createInflection("ybark", "be", "st:bark"), words[4]);
+		Assertions.assertEquals(createInflection("abarki", null, "st:bark"), words[5]);
+		Assertions.assertEquals(createInflection("nbarki", null, "st:bark"), words[6]);
+		Assertions.assertEquals(createInflection("tbarki", null, "st:bark"), words[7]);
+		Assertions.assertEquals(createInflection("ybarki", null, "st:bark"), words[8]);
+		Assertions.assertEquals(createInflection("abarkun", null, "st:bark"), words[9]);
+		Assertions.assertEquals(createInflection("nbarkun", null, "st:bark"), words[10]);
+		Assertions.assertEquals(createInflection("tbarkun", null, "st:bark"), words[11]);
+		Assertions.assertEquals(createInflection("ybarkun", null, "st:bark"), words[12]);
+		Assertions.assertEquals(createInflection("abarkn", null, "st:bark"), words[13]);
+		Assertions.assertEquals(createInflection("nbarkn", null, "st:bark"), words[14]);
+		Assertions.assertEquals(createInflection("tbarkn", null, "st:bark"), words[15]);
+		Assertions.assertEquals(createInflection("ybarkn", null, "st:bark"), words[16]);
 	}
 
 
@@ -787,15 +787,15 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "drink/S	po:noun";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(2, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("drink", "S", "st:drink po:noun"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:noun is:plur"), words[1]);
-		//prefix productions
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("drink", "S", "st:drink po:noun"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:noun is:plur"), words[1]);
+		//prefix inflections
+		//twofold inflections
 
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
@@ -803,18 +803,18 @@ class WordGeneratorAffixTest extends TestBase{
 		words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words[1]);
-		Assertions.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[2]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
+		//base inflection
+		Assertions.assertEquals(createInflection("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words[1]);
+		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[2]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words[3]);
-		//twofold productions
-		Assertions.assertEquals(createProduction("undrinkable", "S", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
+		//twofold inflections
+		Assertions.assertEquals(createInflection("undrinkable", "S", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
 			words[4]);
-		Assertions.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
+		Assertions.assertEquals(createInflection("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words[5]);
 	}
 
@@ -836,17 +836,17 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo", "AB", "st:foo"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foox", null, "st:foo"), words[1]);
-		Assertions.assertEquals(createProduction("fooy", "A", "st:foo"), words[2]);
-		//prefix productions
-		Assertions.assertEquals(createProduction("fooyx", null, "st:foo"), words[3]);
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("foo", "AB", "st:foo"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("foox", null, "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("fooy", "A", "st:foo"), words[2]);
+		//prefix inflections
+		Assertions.assertEquals(createInflection("fooyx", null, "st:foo"), words[3]);
+		//twofold inflections
 	}
 
 
@@ -864,16 +864,16 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo\\/bar/AB";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(3, words.length);
-		//base production
-		Assertions.assertEquals(createProduction("foo/bar", "AB", "st:foo/bar"), words[0]);
-		//suffix productions
-		Assertions.assertEquals(createProduction("foo/barx", null, "st:foo/bar"), words[1]);
-		Assertions.assertEquals(createProduction("foo/bary/z", null, "st:foo/bar"), words[2]);
-		//prefix productions
-		//twofold productions
+		//base inflection
+		Assertions.assertEquals(createInflection("foo/bar", "AB", "st:foo/bar"), words[0]);
+		//suffix inflections
+		Assertions.assertEquals(createInflection("foo/barx", null, "st:foo/bar"), words[1]);
+		Assertions.assertEquals(createInflection("foo/bary/z", null, "st:foo/bar"), words[2]);
+		//prefix inflections
+		//twofold inflections
 	}
 
 
@@ -889,7 +889,7 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "forbidden/!s";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Production[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertTrue(words.length == 0);
 	}

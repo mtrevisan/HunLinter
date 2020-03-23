@@ -4,7 +4,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +33,9 @@ class TestBase{
 		wordGenerator = new WordGenerator(affixData, dicParser);
 	}
 
-	protected Production createProduction(String word, String continuationFlags, String morphologicalFields){
+	protected Inflection createInflection(String word, String continuationFlags, String morphologicalFields){
 		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
+		return new Inflection(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 }

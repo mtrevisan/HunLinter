@@ -11,7 +11,7 @@ import java.util.function.Function;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -23,19 +23,19 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final BiConsumer<Production, Integer> productionReader, final Runnable completed){
+			final BiConsumer<Inflection, Integer> inflectionReader, final Runnable completed){
 		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
 			.withParallelProcessing());
 
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(productionReader);
+		Objects.requireNonNull(inflectionReader);
 
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
-			for(final Production production : productions)
-				productionReader.accept(production, indexData.getIndex());
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			for(final Inflection inflection : inflections)
+				inflectionReader.accept(inflection, indexData.getIndex());
 		};
 
 		getWorkerData()

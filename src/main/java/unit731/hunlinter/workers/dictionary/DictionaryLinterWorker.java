@@ -11,7 +11,7 @@ import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -34,14 +34,14 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Production production : productions){
+			for(final Inflection inflection : inflections){
 				try{
-					checker.checkProduction(production);
+					checker.checkInflection(inflection);
 				}
 				catch(final Exception e){
-					throw wrapException(e, production, indexData);
+					throw wrapException(e, inflection, indexData);
 				}
 			}
 		};
@@ -60,10 +60,10 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		setProcessor(step1);
 	}
 
-	private LinterException wrapException(final Exception e, final Production production, final IndexDataPair<String> data){
+	private LinterException wrapException(final Exception e, final Inflection inflection, final IndexDataPair<String> data){
 		final StringBuffer sb = new StringBuffer(e.getMessage());
-		if(production.hasProductionRules())
-			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		if(inflection.hasInflectionRules())
+			sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 		return new LinterException(sb.toString(), data);
 	}
 

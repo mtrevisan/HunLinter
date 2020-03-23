@@ -10,7 +10,7 @@ import java.util.Objects;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.PermutationsWithRepetitions;
 
@@ -28,13 +28,13 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	/**
 	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_FLAG
 	 *
-	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
+	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule
 	 * @param limit	Limit result count
 	 * @param maxCompounds	Maximum compound count
-	 * @return	The list of productions
+	 * @return	The list of inflections
 	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
-	Production[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
@@ -50,12 +50,12 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		//check if it's possible to compound some words
 		if(inputs.isEmpty())
-			return new Production[0];
+			return new Inflection[0];
 
 		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
-		final List<List<Production[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -75,22 +75,22 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result;
 	}
 
-	private List<List<Production[]>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
-		final Map<Integer, Production[]> dicEntries = new HashMap<>();
-		final List<List<Production[]>> list = new ArrayList<>();
+	private List<List<Inflection[]>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+		final Map<Integer, Inflection[]> dicEntries = new HashMap<>();
+		final List<List<Inflection[]>> list = new ArrayList<>();
 		for(final int[] permutation : permutations){
-			final List<Production[]> productions = generateCompound(permutation, dicEntries, inputs);
-			if(productions != null)
-				list.add(productions);
+			final List<Inflection[]> inflections = generateCompound(permutation, dicEntries, inputs);
+			if(inflections != null)
+				list.add(inflections);
 		}
 		return list;
 	}
 
-	private List<Production[]> generateCompound(final int[] permutation, final Map<Integer, Production[]> dicEntries,
-			final List<DictionaryEntry> inputs){
-		final List<Production[]> expandedPermutationEntries = new ArrayList<>();
+	private List<Inflection[]> generateCompound(final int[] permutation, final Map<Integer, Inflection[]> dicEntries,
+															  final List<DictionaryEntry> inputs){
+		final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
 		for(final int index : permutation){
-			final Production[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
+			final Inflection[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
 			if(list.length > 0)
 				expandedPermutationEntries.add(list);
 		}

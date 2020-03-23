@@ -25,7 +25,7 @@ public class DictionaryStatistics implements Closeable{
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
 
-	private int totalProductions;
+	private int totalInflections;
 	private int longestWordCountByCharacters;
 	private int longestWordCountBySyllabes;
 	private int compoundWords;
@@ -47,8 +47,8 @@ public class DictionaryStatistics implements Closeable{
 		orthography = BaseBuilder.getOrthography(language);
 	}
 
-	public int getTotalProductions(){
-		return totalProductions;
+	public int getTotalInflections(){
+		return totalInflections;
 	}
 
 	public int getLongestWordCountByCharacters(){
@@ -94,7 +94,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized boolean hasSyllabeStatistics(){
-		return (totalProductions > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
+		return (totalInflections > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 	}
 
 	public void addData(final String word){
@@ -123,14 +123,14 @@ public class DictionaryStatistics implements Closeable{
 				compoundWords ++;
 			if(subword.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalProductions ++;
+			totalInflections++;
 		}
 		else{
 			lengthsFrequencies.addValue(word.length());
 			storeLongestWord(word);
 			if(word.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalProductions ++;
+			totalInflections++;
 		}
 	}
 
@@ -171,7 +171,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized void clear(){
-		totalProductions = 0;
+		totalInflections = 0;
 		longestWordCountByCharacters = 0;
 		longestWordCountBySyllabes = 0;
 		lengthsFrequencies.clear();

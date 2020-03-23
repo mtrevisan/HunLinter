@@ -351,7 +351,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillStatisticData(){
-		final long totalWords = statistics.getTotalProductions();
+		final long totalWords = statistics.getTotalInflections();
 		if(totalWords > 0){
 			fillBaseStatistics();
 			if(statistics.hasSyllabeStatistics())
@@ -368,7 +368,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillBaseStatistics(){
-		final long totalWords = statistics.getTotalProductions();
+		final long totalWords = statistics.getTotalInflections();
 		final int uniqueWords = statistics.getUniqueWords();
 		final int contractedWords = statistics.getContractedWords();
 		final Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();

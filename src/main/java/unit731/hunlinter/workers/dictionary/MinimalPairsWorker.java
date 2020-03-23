@@ -28,7 +28,7 @@ import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Production;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -123,11 +123,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					try{
 						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final Production[] productions = wordGenerator.applyAffixRules(dicEntry);
+						final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-						for(final Production production : productions)
-							if(checker.shouldBeProcessedForMinimalPair(production)){
-								list.add(production.getWord());
+						for(final Inflection inflection : inflections)
+							if(checker.shouldBeProcessedForMinimalPair(inflection)){
+								list.add(inflection.getWord());
 
 								sleepOnPause();
 							}
