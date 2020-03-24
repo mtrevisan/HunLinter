@@ -6,7 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.languages.LetterMatcherEntry;
 import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -47,6 +51,33 @@ public class SmithWatermanAlignment{
 		private int lastIndexA;
 		private int lastIndexB;
 		private Deque<Character> operations;
+
+
+		@Override
+		public boolean equals(final Object obj){
+			if(obj == this)
+				return true;
+			if(obj == null || obj.getClass() != getClass())
+				return false;
+
+			final Trace rhs = (Trace)obj;
+			return new EqualsBuilder()
+				.append(firstIndexA, rhs.firstIndexA)
+				.append(firstIndexB, rhs.firstIndexB)
+				.append(lastIndexA, rhs.lastIndexA)
+				.append(lastIndexB, rhs.lastIndexB)
+				.isEquals();
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(firstIndexA)
+				.append(firstIndexB)
+				.append(lastIndexA)
+				.append(lastIndexB)
+				.toHashCode();
+		}
 	}
 
 

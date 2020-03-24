@@ -1,7 +1,10 @@
 package unit731.hunlinter.parsers.vos;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.services.system.LoopHelper;
+import unit731.hunlinter.services.text.SmithWatermanAlignment;
 
 import java.util.Objects;
 
@@ -70,6 +73,29 @@ public class RuleEntry{
 
 	public boolean isProductiveFor(final String word){
 		return (LoopHelper.match(entries, entry -> entry.canApplyTo(word)) != null);
+	}
+
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final RuleEntry rhs = (RuleEntry)obj;
+		return new EqualsBuilder()
+			.append(type, rhs.type)
+			.append(flag, rhs.flag)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(type)
+			.append(flag)
+			.toHashCode();
 	}
 
 }
