@@ -1,6 +1,10 @@
 package unit731.hunlinter.services;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class ArrayHelper{
 
 	private ArrayHelper(){}
@@ -55,16 +59,52 @@ public class ArrayHelper{
 	}
 
 	public static byte[] subarray(final byte[] source, final int start){
-		if(start == 0)
+		return subarray(source, start, source.length);
+	}
+
+	public static byte[] subarray(final byte[] source, final int start, final int end){
+		if(start == 0 && end == source.length)
 			return source;
 
-		final int subLen = source.length - start;
-		if(subLen < 0)
-			throw new StringIndexOutOfBoundsException(subLen);
-
+		final int subLen = end - start;
 		final byte[] destination = new byte[subLen];
 		System.arraycopy(source, start, destination, 0, subLen);
 		return destination;
+	}
+
+	/**
+	 * Splits the provided text into an array, using whitespace as the separator.
+	 * Whitespace is defined by Character.isWhitespace(char).
+	 */
+	public static byte[][] split(final byte[] source){
+		final int len = source.length;
+		if(len == 0)
+			return new byte[0][];
+
+		final List<byte[]> list = new ArrayList<>();
+		int i = 0;
+		int start = 0;
+		boolean match = false;
+		while(i < len){
+			if(Character.isWhitespace(source[i])){
+				if(match){
+					list.add(subarray(source, start, i));
+					match = false;
+				}
+
+				i ++;
+				start = i;
+			}
+			else{
+				match = true;
+				i ++;
+			}
+		}
+
+		if(match)
+			list.add(subarray(source, start, i));
+
+		return list.toArray(byte[][]::new);
 	}
 
 }
