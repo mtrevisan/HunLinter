@@ -64,7 +64,7 @@ public class HyphenationOptionsParser{
 		return managed;
 	}
 
-	private String extractValue(String line){
+	private String extractValue(final String line){
 		final String[] components = StringUtils.split(line);
 		return components[1].trim();
 	}

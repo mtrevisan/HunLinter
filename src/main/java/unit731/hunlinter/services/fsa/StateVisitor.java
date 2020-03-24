@@ -9,6 +9,6 @@ package unit731.hunlinter.services.fsa;
  */
 public interface StateVisitor{
 
-	boolean accept(int state);
+	boolean accept(final int state);
 
 }

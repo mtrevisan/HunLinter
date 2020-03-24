@@ -88,7 +88,7 @@ public class SmithWatermanAlignment{
 	private final double[][] scores;
 
 
-	public SmithWatermanAlignment(String a, String b){
+	public SmithWatermanAlignment(final String a, final String b){
 		x = RegexHelper.split(a, UNICODE_SPLITTER);
 		y = RegexHelper.split(b, UNICODE_SPLITTER);
 
@@ -122,11 +122,11 @@ public class SmithWatermanAlignment{
 		return traces;
 	}
 
-	private double matching(int i, int j){
+	private double matching(final int i, final int j){
 		return scores[i - 1][j - 1] + matchingCost(i, j);
 	}
 
-	private double insertion(int i, int j){
+	private double insertion(final int i, final int j){
 		int highest = 0;
 		for(int k = 1; k < j; k ++)
 			if(scores[i][k] > scores[i][highest])
@@ -134,7 +134,7 @@ public class SmithWatermanAlignment{
 		return scores[i][highest] + insertionCost(j - highest);
 	}
 
-	private double deletion(int i, int j){
+	private double deletion(final int i, final int j){
 		int highest = 0;
 		for(int k = 1; k < i; k ++)
 			if(scores[k][j] > scores[highest][j])
@@ -142,21 +142,21 @@ public class SmithWatermanAlignment{
 		return scores[highest][j] + deletionCost(i - highest);
 	}
 
-	private double matchingCost(int i, int j){
+	private double matchingCost(final int i, final int j){
 		if(i == 0 || j == 0)
 			return COST_GAP;
 		return (x[i - 1].equals(y[j - 1])? COST_MATCH: COST_MISMATCH);
 	}
 
-	private double insertionCost(double k){
+	private double insertionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private double deletionCost(double k){
+	private double deletionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(double maxScore){
+	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
 		Stack<Pair<Integer, Integer>> maxScores = new Stack<>();
 		for(int j = 1; j <= m; j ++)

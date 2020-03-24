@@ -157,7 +157,7 @@ public class SetHelper{
 		}
 
 		int count = 0;
-		for(T e : a)
+		for(final T e : a)
 			if(b.contains(e))
 				count ++;
 		return count;

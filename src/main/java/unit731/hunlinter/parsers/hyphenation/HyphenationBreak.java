@@ -160,15 +160,15 @@ public class HyphenationBreak{
 		return manageInside(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);
 	}
 
-	private String reduceKey(String key){
+	private String reduceKey(final String key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private boolean isStarting(String key){
+	private boolean isStarting(final String key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(String key){
+	private boolean isEnding(final String key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 

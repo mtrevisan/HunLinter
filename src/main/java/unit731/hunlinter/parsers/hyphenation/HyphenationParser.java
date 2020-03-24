@@ -489,7 +489,7 @@ public class HyphenationParser{
 		//write custom hyphenations
 		final List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
 		customs.sort(comparator);
-		for(String rule : customs)
+		for(final String rule : customs)
 			writeln(writer, rule);
 	}
 

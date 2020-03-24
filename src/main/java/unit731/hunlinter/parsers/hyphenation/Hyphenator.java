@@ -111,7 +111,7 @@ public class Hyphenator implements HyphenatorInterface{
 	 * @param options	The hyphenation options
 	 * @return the hyphenation breakpoints object
 	 */
-	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns,
+	private HyphenationBreak hyphenate(String word, final Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns,
 			final HyphenationParser.Level level, final HyphenationOptions options){
 		//clear already present word boundaries' characters
 		word = RegexHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
