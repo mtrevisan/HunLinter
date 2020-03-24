@@ -95,6 +95,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 				//encode lines
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
+				encodedLines.sort(Comparator.naturalOrder());
 
 //				forEach(encodedLines, line -> writeLine(writer, line));
 //				forEach(encodedLines, line -> list.add(collator.getCollationKey(line)));
