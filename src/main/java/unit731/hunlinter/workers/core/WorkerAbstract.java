@@ -46,7 +46,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		this.processor = processor;
 	}
 
-	public final WorkerData getWorkerData(){
+	public final WD getWorkerData(){
 		return workerData;
 	}
 

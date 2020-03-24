@@ -54,10 +54,11 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
-		ParserHelper.assertLinesCount(lines);
+		if(!workerData.isNoHeader())
+			ParserHelper.assertLinesCount(lines);
 
 		final List<IndexDataPair<String>> entries = new ArrayList<>();
-		for(int lineIndex = 1; lineIndex < lines.size(); lineIndex ++){
+		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
 			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 				continue;
@@ -78,10 +79,11 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
-		ParserHelper.assertLinesCount(lines);
+		if(!workerData.isNoHeader())
+			ParserHelper.assertLinesCount(lines);
 
 		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, lines.size());
-		for(int lineIndex = 1; lineIndex < lines.size(); lineIndex ++){
+		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
 			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 				continue;

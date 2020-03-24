@@ -7,6 +7,8 @@ public class WorkerDataParser<P> extends WorkerData{
 
 	private final P parser;
 
+	private boolean noHeader;
+
 
 	public WorkerDataParser(final String workerName, final P parser){
 		super(workerName);
@@ -18,6 +20,15 @@ public class WorkerDataParser<P> extends WorkerData{
 
 	public P getParser(){
 		return parser;
+	}
+
+	public final WorkerDataParser<P> withNoHeader(){
+		noHeader = true;
+		return this;
+	}
+
+	final boolean isNoHeader(){
+		return noHeader;
 	}
 
 }

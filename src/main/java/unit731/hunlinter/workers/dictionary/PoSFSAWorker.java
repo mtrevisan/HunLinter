@@ -150,7 +150,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
-			writeLine(writer, "0");
 			processLines(dicPath, charset, lineProcessor);
 			closeWriter(writer);
 
@@ -213,6 +212,7 @@ System.out.println(watch.toStringMillis());
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
 
 			getWorkerData()
+				.withNoHeader()
 				.withSequentialProcessing();
 
 			processLines(file.toPath(), charset, fsaProcessor);
