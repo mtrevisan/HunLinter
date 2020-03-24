@@ -164,7 +164,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
-		final Inflection[] inflections;
+		Inflection[] inflections;
 		final StringBuffer flags = new StringBuffer();
 		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::append));
 		final Inflection p = Inflection.createFromCompound(compoundWord, flags.toString(), compoundEntries, strategy);
@@ -176,7 +176,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
-				removeTwofolds(inflections);
+				inflections = removeTwofolds(inflections);
 		}
 		return inflections;
 	}
@@ -270,10 +270,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return new String[][]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals.toArray(String[]::new)};
 	}
 
-	private void removeTwofolds(final Inflection[] prods){
+	private Inflection[] removeTwofolds(Inflection[] prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
+			prods = removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
+		return prods;
 	}
 
 	//is word a non–compound with a REP substitution (see checkcompoundrep)?

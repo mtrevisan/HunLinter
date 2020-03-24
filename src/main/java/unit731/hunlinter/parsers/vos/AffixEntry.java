@@ -165,7 +165,7 @@ public class AffixEntry{
 	 * @return	The list of new morphological fields
 	 */
 	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
-		final String[] mf = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
+		String[] mf = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
 		final String[] amf = (morphologicalFields != null? morphologicalFields: new String[0]);
 
 		//NOTE: part–of–speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
@@ -174,7 +174,7 @@ public class AffixEntry{
 		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
 			MorphologicalTag.TERMINAL_PREFIX);
 		//remove inflectional and terminal suffixes
-		removeIf(mf, field ->
+		mf = removeIf(mf, field ->
 			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
 			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
 

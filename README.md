@@ -305,6 +305,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - substituted charting library
 - added undo/redo capabilities on input fields
 - completely revised thread management
+- fixed a nasty memory leak
 - reduced memory footprint by ?%
 - augmented speed-up by ?%
 - various minor bugfixes and code revisions
