@@ -1,6 +1,8 @@
 package unit731.hunlinter.parsers.enums;
 
-import static unit731.hunlinter.services.system.LoopHelper.match;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public enum InflectionTag{
@@ -47,6 +49,12 @@ public enum InflectionTag{
 	NORDIC("nordic", "n");
 
 
+	private static final Map<String, InflectionTag> VALUES = new HashMap<>();
+	static{
+		for(final InflectionTag tag : EnumSet.allOf(InflectionTag.class))
+			VALUES.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);
+	}
+
 	private final String code;
 	private final String[] tags;
 
@@ -57,8 +65,7 @@ public enum InflectionTag{
 	}
 
 	public static InflectionTag createFromCodeAndValue(final String codeAndValue){
-		return match(values(), tag -> codeAndValue.endsWith(tag.code)
-			&& codeAndValue.charAt(codeAndValue.length() - tag.code.length() - 1) == ':');
+		return VALUES.get(codeAndValue);
 	}
 
 	public String getCode(){

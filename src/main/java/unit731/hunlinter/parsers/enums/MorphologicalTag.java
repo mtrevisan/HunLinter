@@ -1,11 +1,13 @@
 package unit731.hunlinter.parsers.enums;
 
-import static unit731.hunlinter.services.system.LoopHelper.match;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 
+/** Default morphological fields */
 public enum MorphologicalTag{
 
-	//default morphological fields:
 	STEM("st:"),
 	ALLOMORPH("al:"),
 	PART_OF_SPEECH("po:"),
@@ -27,6 +29,12 @@ public enum MorphologicalTag{
 	FLAG("fl:");
 
 
+	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>();
+	static{
+		for(final MorphologicalTag tag : EnumSet.allOf(MorphologicalTag.class))
+			VALUES.put(tag.getCode(), tag);
+	}
+
 	private final String code;
 
 
@@ -35,7 +43,7 @@ public enum MorphologicalTag{
 	}
 
 	public static MorphologicalTag createFromCode(final String code){
-		return match(values(), tag -> tag.isSupertypeOf(code));
+		return VALUES.get(code.substring(0, 3));
 	}
 
 	public String getCode(){

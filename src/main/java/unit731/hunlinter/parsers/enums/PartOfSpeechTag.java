@@ -1,6 +1,8 @@
 package unit731.hunlinter.parsers.enums;
 
-import static unit731.hunlinter.services.system.LoopHelper.match;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public enum PartOfSpeechTag{
@@ -91,6 +93,12 @@ ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	UNIT_OF_MEASURE("unit_of_measure", "UOM");
 
 
+	private static final Map<String, PartOfSpeechTag> VALUES = new HashMap<>();
+	static{
+		for(final PartOfSpeechTag tag : EnumSet.allOf(PartOfSpeechTag.class))
+			VALUES.put(MorphologicalTag.PART_OF_SPEECH.getCode() + tag.code, tag);
+	}
+
 	private final String code;
 	private final String tag;
 
@@ -101,8 +109,7 @@ ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	}
 
 	public static PartOfSpeechTag createFromCodeAndValue(final String codeAndValue){
-		return match(values(), tag -> codeAndValue.endsWith(tag.code)
-			&& codeAndValue.charAt(codeAndValue.length() - tag.code.length() - 1) == ':');
+		return VALUES.get(codeAndValue);
 	}
 
 	public String getCode(){
