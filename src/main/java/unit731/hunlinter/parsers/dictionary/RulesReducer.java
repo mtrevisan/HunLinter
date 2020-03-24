@@ -688,13 +688,17 @@ public class RulesReducer{
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
 
-		//extract rules (skip the header)
-		final List<AffixEntry> entries = new ArrayList<>();
-		forEach(reducedRules.subList(1, reducedRules.size()),
-			reducedRule -> entries.add(new AffixEntry(reducedRule, strategy, null, null)));
-
 		final AffixType type = ruleToBeReduced.getType();
-		final RuleEntry overriddenRule = new RuleEntry((type == AffixType.SUFFIX), ruleToBeReduced.combinableChar(), entries);
+
+		//extract rules (skip the header)
+		final AffixEntry[] entries = new AffixEntry[reducedRules.size() - 1];
+		for(int i = 0; i < reducedRules.size() - 1; i ++){
+			final String reducedRule = reducedRules.get(i + 1);
+			entries[i] = new AffixEntry(reducedRule, type, flag, strategy, null, null);
+		}
+
+		final RuleEntry overriddenRule = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
+		overriddenRule.setEntries(entries);
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 			final Inflection[] originalInflections = wordGenerator.applyAffixRules(dicEntry);

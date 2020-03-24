@@ -1,8 +1,8 @@
 package unit731.hunlinter.parsers.vos;
 
 import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.system.LoopHelper;
 
-import java.util.List;
 import java.util.Objects;
 
 
@@ -12,20 +12,28 @@ public class RuleEntry{
 	private static final char NOT_COMBINABLE = 'N';
 
 
-	private final boolean suffix;
+	private final AffixType type;
+	/** ID used to represent the affix */
+	private final String flag;
 	//cross product flag
 	private final boolean combinable;
-	private final List<AffixEntry> entries;
+	private AffixEntry[] entries;
 //private final List<AffixEntry> prefixEntries;
 //private final List<AffixEntry> suffixEntries;
 
 
-	public RuleEntry(final boolean suffix, final char combinable, final List<AffixEntry> entries){
-		Objects.requireNonNull(entries);
+	public RuleEntry(final AffixType type, final String flag, final char combinable){
+		Objects.requireNonNull(type);
+		Objects.requireNonNull(flag);
 
-		this.suffix = suffix;
+		this.type = type;
+		this.flag = flag;
 		this.combinable = (combinable == COMBINABLE);
+	}
+
+	public void setEntries(final AffixEntry... entries){
 		this.entries = entries;
+		LoopHelper.forEach(entries, entry -> entry.setParent(this));
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
@@ -40,8 +48,12 @@ public class RuleEntry{
 //	this.suffixEntries = suffixEntries;
 //}
 
-	public boolean isSuffix(){
-		return suffix;
+	public AffixType getType(){
+		return type;
+	}
+
+	public String getFlag(){
+		return flag;
 	}
 
 	public boolean isCombinable(){
@@ -52,19 +64,12 @@ public class RuleEntry{
 		return (isCombinable()? COMBINABLE: NOT_COMBINABLE);
 	}
 
-	public AffixType getType(){
-		return (isSuffix()? AffixType.SUFFIX: AffixType.PREFIX);
-	}
-
-	public List<AffixEntry> getEntries(){
+	public AffixEntry[] getEntries(){
 		return entries;
 	}
 
 	public boolean isProductiveFor(final String word){
-		for(final AffixEntry entry : entries)
-			if(entry.canApplyTo(word))
-				return true;
-		return false;
+		return (LoopHelper.match(entries, entry -> entry.canApplyTo(word)) != null);
 	}
 
 }

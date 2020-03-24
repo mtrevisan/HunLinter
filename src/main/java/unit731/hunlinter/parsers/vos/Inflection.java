@@ -1,5 +1,6 @@
 package unit731.hunlinter.parsers.vos;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -71,7 +72,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	private Inflection(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-							 final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
+			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
@@ -80,7 +81,7 @@ public class Inflection extends DictionaryEntry{
 
 	/* NOTE: used for testing purposes */
 	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
-							final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
+			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
 			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
@@ -152,7 +153,7 @@ public class Inflection extends DictionaryEntry{
 
 			final long[] suffixesAffixesCount = new long[2];
 			for(int idx = startIndex + 1; idx < appliedRules.length; idx ++)
-				suffixesAffixesCount[appliedRules[idx].isSuffix()? 1: 0] ++;
+				suffixesAffixesCount[appliedRules[idx].getType() == AffixType.SUFFIX? 1: 0] ++;
 			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);
 		}
 		return false;
@@ -202,11 +203,17 @@ public class Inflection extends DictionaryEntry{
 		forEach(prefixInflection,
 			code -> forEach(InflectionTag.createFromCodeAndValue(code).getTags(), sj::add));
 
-		final String suffix = POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj;
+		final byte[] suffix = (POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj).getBytes(StandardCharsets.UTF_8);
 		//extract stem
 		final List<String> stem = bucket.get(MorphologicalTag.STEM);
-		for(int i = 0; i < stem.size(); i ++)
-			stem.set(i, stem.get(i) + suffix);
+		for(int i = 0; i < stem.size(); i ++){
+			final byte[] s = stem.get(i).getBytes(StandardCharsets.UTF_8);
+			final int offset = s.length - 3;
+			final byte[] ss = new byte[offset + suffix.length];
+			System.arraycopy(s, 3, ss, 0, offset);
+			System.arraycopy(suffix, 0, ss, offset, suffix.length);
+			stem.set(i, new String(ss, StandardCharsets.UTF_8));
+		}
 		return stem;
 	}
 

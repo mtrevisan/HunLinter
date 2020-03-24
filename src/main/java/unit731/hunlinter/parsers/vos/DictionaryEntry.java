@@ -292,7 +292,7 @@ public class DictionaryEntry{
 				}
 
 				if(rule instanceof RuleEntry){
-					if(((RuleEntry) rule).isSuffix())
+					if(((RuleEntry)rule).getType() == AffixType.SUFFIX)
 						suffixes[indexSuffix ++] = affix;
 					else
 						prefixes[indexPrefix ++] = affix;

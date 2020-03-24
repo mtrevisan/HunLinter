@@ -61,17 +61,18 @@ public class WorkerManager{
 			final String workerName = workerNameWorker.getKey();
 			final WorkerAbstract<?> worker = workerNameWorker.getValue();
 			if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
-				final Runnable onEnd = () -> ON_ENDS.get(workerName).accept(worker);
 //				final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				GUIUtils.askUserToAbort(worker, parentFrame, onEnd, null);
+				GUIUtils.askUserToAbort(worker, parentFrame, null, null);
 			}
 		}
 	}
 
 	public void callOnEnd(final String workerName){
-		final Consumer<WorkerAbstract<?>> onEnding = ON_ENDS.get(workerName);
+		final Consumer<WorkerAbstract<?>> onEnding = ON_ENDS.remove(workerName);
 		if(onEnding != null)
 			onEnding.accept(WORKERS.get(workerName));
+		//release memory
+		WORKERS.remove(workerName);
 	}
 
 	public void createProjectLoaderWorker(final Consumer<WorkerAbstract<?>> onStart, final Runnable completed, final Consumer<Exception> cancelled){

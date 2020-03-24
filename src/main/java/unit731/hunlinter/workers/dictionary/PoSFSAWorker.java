@@ -34,8 +34,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.CollationKey;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +83,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			throw new RuntimeException(e);
 //		}
 
+//		final Collator collator = Collator.getInstance();
+//		final List<CollationKey> list = new ArrayList<>();
 		final List<String> list = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
@@ -92,7 +97,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
 
 //				forEach(encodedLines, line -> writeLine(writer, line));
-				list.addAll(encodedLines);
+//				forEach(encodedLines, line -> list.add(collator.getCollationKey(line)));
+				forEach(encodedLines, list::add);
 			});
 		};
 		final FSABuilder builder = new FSABuilder();
@@ -126,7 +132,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
-//			.withParallelProcessing()
+			.withParallelProcessing()
 //			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
@@ -179,9 +185,11 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.removeDuplicates()
 				.build();
 			try{
-TimeWatch watch = TimeWatch.start();
-	list.sort(Comparator.naturalOrder());
 //				sorter.sort(file, options, file);
+TimeWatch watch = TimeWatch.start();
+				list.sort(Comparator.naturalOrder());
+//for(CollationKey key : list)
+//	key.getSourceString();
 watch.stop();
 System.out.println(watch.toStringMillis());
 			}

@@ -1,6 +1,5 @@
 package unit731.hunlinter.services;
 
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -90,8 +89,7 @@ public class RegexHelper{
 
 
 	public static Matcher matcher(final String text, final Pattern pattern){
-		final CharBuffer buffer = CharBuffer.wrap(text);
-		return pattern.matcher(buffer);
+		return pattern.matcher(text);
 	}
 
 	public static boolean find(final String text, final Pattern pattern){

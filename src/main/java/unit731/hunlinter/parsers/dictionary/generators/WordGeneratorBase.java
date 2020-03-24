@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
@@ -45,7 +46,7 @@ class WordGeneratorBase{
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
 	protected Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
-														final RuleEntry overriddenRule){
+			final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return new Inflection[0];
@@ -84,7 +85,7 @@ class WordGeneratorBase{
 	}
 
 	private Inflection[] collectInflections(final Inflection baseInflection, final Inflection[] onefoldInflections,
-														 final Inflection[] twofoldInflections, final Inflection[] lastfoldInflections){
+			final Inflection[] twofoldInflections, final Inflection[] lastfoldInflections){
 		final int size = 1 + onefoldInflections.length + twofoldInflections.length
 			+ (lastfoldInflections != null? lastfoldInflections.length: 0);
 		final Inflection[] inflections = new Inflection[size];
@@ -113,13 +114,13 @@ class WordGeneratorBase{
 	}
 
 	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
-																final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String[][] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
 	private Inflection[] getTwofoldInflections(final Inflection[] onefoldInflections, final boolean isCompound,
-															 final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		Inflection[] twofoldInflections = new Inflection[0];
 		for(final Inflection inflection : onefoldInflections)
 			if(inflection.isCombinable()){
@@ -182,11 +183,11 @@ class WordGeneratorBase{
 			boolean lastPrefixNeedAffix = false;
 			for(int i = appliedRules.length - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
 				final AffixEntry appliedRule = appliedRules[i];
-				if(appliedRule.isSuffix() && !lastSuffix){
+				if(appliedRule.getType() == AffixType.SUFFIX && !lastSuffix){
 					lastSuffix = true;
 					lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 				}
-				if(!appliedRule.isSuffix() && !lastPrefix){
+				if(appliedRule.getType() != AffixType.SUFFIX && !lastPrefix){
 					lastPrefix = true;
 					lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 				}
@@ -197,7 +198,7 @@ class WordGeneratorBase{
 	}
 
 	private Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes,
-													 final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
@@ -212,11 +213,12 @@ class WordGeneratorBase{
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);
 				//override with the given rule
-				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
+				if(overriddenRule != null && affix.equals(overriddenRule.getEntries()[0].getFlag()))
 					rule = overriddenRule;
 
 				String[] currentPostponedAffixes = ArrayUtils.clone(postponedAffixes);
-				if(dicEntry.getLastAppliedRule() != null && dicEntry.getLastAppliedRule().isSuffix() ^ rule.isSuffix())
+				if(dicEntry.getLastAppliedRule() != null
+						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
 					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
 				final Inflection[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
 				inflections = ArrayUtils.addAll(inflections, prods);
@@ -225,12 +227,12 @@ class WordGeneratorBase{
 	}
 
 	private Inflection[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
-													final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
 		RuleEntry rule = affixData.getData(affix);
 		//override with the given rule
-		if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
+		if(overriddenRule != null && affix.equals(overriddenRule.getEntries()[0].getFlag()))
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))
@@ -259,8 +261,8 @@ class WordGeneratorBase{
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
 					final boolean appliedRuleContainsCircumfix = (match(appliedRules,
-						appliedRule -> (entry.isSuffix() ^ appliedRule.isSuffix()) && appliedRule.hasContinuationFlag(circumfixFlag)) != null);
-					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
+						appliedRule -> (entry.getType() == AffixType.SUFFIX ^ appliedRule.getType() == AffixType.SUFFIX) && appliedRule.hasContinuationFlag(circumfixFlag)) != null);
+					removeCircumfixFlag = (entryContainsCircumfix && (entry.getType() == AffixType.SUFFIX ^ appliedRuleContainsCircumfix));
 				}
 
 				//produce the new word

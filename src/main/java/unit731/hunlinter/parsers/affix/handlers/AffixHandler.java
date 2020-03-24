@@ -3,11 +3,13 @@ package unit731.hunlinter.parsers.affix.handlers;
 import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
@@ -26,55 +28,66 @@ public class AffixHandler implements Handler{
 	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
 	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
 
+	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: ''{0}''");
+	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: ''{0}''");
+	//warning
+	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");
+
 
 	@Override
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
-			final boolean isSuffix = AffixType.SUFFIX.is(context.getRuleType());
+			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
 				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
-			final List<AffixEntry> entries = readEntries(context, strategy, getData);
+			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
+			final AffixEntry[] entries = readEntries(context, strategy, getData);
+			parent.setEntries(entries);
 
-			addData.accept(ruleFlag, new RuleEntry(isSuffix, combinable, entries));
+			addData.accept(ruleFlag, parent);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	private List<AffixEntry> readEntries(final ParsingContext context, final FlagParsingStrategy strategy,
+	private AffixEntry[] readEntries(final ParsingContext context, final FlagParsingStrategy strategy,
 			final Function<AffixOption, List<String>> getData) throws IOException{
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
 
 		final Scanner scanner = context.getScanner();
-		final AffixType ruleType = AffixType.createFromCode(context.getRuleType());
-		final String ruleFlag = context.getFirstParameter();
+		final AffixType parentType = AffixType.createFromCode(context.getRuleType());
+		final String parentFlag = context.getFirstParameter();
 
 		//List<AffixEntry> prefixEntries = new ArrayList<>();
 		//List<AffixEntry> suffixEntries = new ArrayList<>();
 		final List<String> aliasesFlag = getData.apply(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = getData.apply(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
-		final List<AffixEntry> entries = new ArrayList<>(numEntries);
+		int offset = 0;
+		final AffixEntry[] entries = new AffixEntry[numEntries];
 		for(int i = 0; i < numEntries; i ++){
 			if(!scanner.hasNextLine())
 				throw new EOFException("Unexpected EOF while reading file");
 
 			line = scanner.nextLine();
-			final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
+			final AffixEntry entry = new AffixEntry(line, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
+//com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
-			checkValidity(entry, ruleType, ruleFlag);
 
-			if(entries.contains(entry))
+			checkValidity(parentType, parentFlag, line, entry);
+
+
+			if(ArrayUtils.contains(entries, entry))
 				throw new LinterException(DUPLICATED_LINE.format(new Object[0]));
 
-			final boolean inserted = entries.add(entry);
+			entries[offset ++] = entry;
 
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
@@ -90,10 +103,11 @@ public class AffixHandler implements Handler{
 		return entries;
 	}
 
-	private void checkValidity(final AffixEntry entry, final AffixType ruleType, final String ruleFlag){
-		if(entry.getType() != ruleType)
+	private void checkValidity(final AffixType ruleType, final String ruleFlag, final String line, final AffixEntry entry){
+		final String ruleTypeCode = ruleType.getOption().getCode();
+		if(!line.startsWith(ruleTypeCode))
 			throw new LinterException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
-		if(!ruleFlag.equals(entry.getFlag()))
+		if(!line.startsWith(ruleTypeCode + StringUtils.SPACE + ruleFlag))
 			throw new LinterException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
 
 		entry.validate();

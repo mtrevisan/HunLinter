@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.beust.jcommander.Strings;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -29,6 +32,8 @@ public class AffixEntry{
 
 	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0}");
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
+	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected ''{0}'', got ''{1}''");
+	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected ''{0}'', got ''{1}''");
 	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: ''{0}''");
 	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: ''{0}''");
 	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: ''{0}''");
@@ -48,25 +53,22 @@ public class AffixEntry{
 	private static final String ZERO = "0";
 
 
-	private final AffixType affixType;
-	/** ID used to represent the affix */
-	private final String flag;
-	final String[] continuationFlags;
-	/** condition that must be met before the affix can be applied */
-	private final String condition;
+	private RuleEntry parent;
+
 	/** string to strip */
 	private final String removing;
 	private final int removingLength;
 	/** string to append */
 	private final String appending;
 	private final int appendingLength;
+	final String[] continuationFlags;
+	/** condition that must be met before the affix can be applied */
+	private final String condition;
 	final String[] morphologicalFields;
 
-	private final String entry;
 
-
-	public AffixEntry(final String line, final FlagParsingStrategy strategy, final List<String> aliasesFlag,
-			final List<String> aliasesMorphologicalField){
+	public AffixEntry(final String line, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
+			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -74,8 +76,8 @@ public class AffixEntry{
 		if(lineParts.length < 4 || lineParts.length > 6)
 			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY)}));
 
-		final String ruleType = lineParts[0];
-		this.flag = lineParts[1];
+		final AffixType type = AffixType.createFromCode(lineParts[0]);
+		final String flag = lineParts[1];
 		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		final Matcher m = RegexHelper.matcher(lineParts[3], PATTERN_LINE);
 		if(!m.find())
@@ -85,7 +87,6 @@ public class AffixEntry{
 		condition = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
-		affixType = AffixType.createFromCode(ruleType);
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -93,15 +94,23 @@ public class AffixEntry{
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 		appendingLength = appending.length();
 
-		checkValidity(condition, removal, line);
-
-
-		entry = line;
+		checkValidity(parentType, type, parentFlag, flag, removal, line);
 	}
 
-	private void checkValidity(final String condition, final String removal, final String line){
+	public void setParent(final RuleEntry parent){
+		Objects.requireNonNull(parent);
+
+		this.parent = parent;
+	}
+
+	private void checkValidity(final AffixType parentType, final AffixType type, final String parentFlag, final String flag,
+			final String removal, final String line){
+		if(parentType != type)
+			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type}));
+		if(!parentFlag.equals(flag))
+			throw new LinterException(WRONG_FLAG.format(new Object[]{parentFlag, flag}));
 		if(removingLength > 0){
-			if(isSuffix()){
+			if(parentType == AffixType.SUFFIX){
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
@@ -114,14 +123,6 @@ public class AffixEntry{
 					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
 			}
 		}
-	}
-
-	public AffixType getType(){
-		return affixType;
-	}
-
-	public String getFlag(){
-		return flag;
 	}
 
 	public String getAppending(){
@@ -178,7 +179,7 @@ public class AffixEntry{
 			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
 
 		//add morphological fields from the applied affix
-		return (isSuffix()? ArrayUtils.addAll(mf, amf): ArrayUtils.addAll(amf, mf));
+		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(mf, amf): ArrayUtils.addAll(amf, mf));
 	}
 
 	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
@@ -198,14 +199,18 @@ public class AffixEntry{
 		return list.toArray(new String[0]);
 	}
 
-	public final boolean isSuffix(){
-		return (affixType == AffixType.SUFFIX);
-	}
-
 	public void validate(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
 		if(!filteredFields.isEmpty())
 			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
+	}
+
+	public AffixType getType(){
+		return parent.getType();
+	}
+
+	public String getFlag(){
+		return parent.getFlag();
 	}
 
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
@@ -224,7 +229,7 @@ public class AffixEntry{
 			return true;
 
 		final int wordLength = word.length();
-		if(affixType == AffixType.PREFIX){
+		if(parent.getType() == AffixType.PREFIX){
 			if(wordLength >= conditionLength && word.startsWith(condition))
 				return true;
 
@@ -275,21 +280,21 @@ public class AffixEntry{
 	}
 
 	public boolean canInverseApplyTo(final String word){
-		return (affixType == AffixType.PREFIX? word.startsWith(appending): word.endsWith(appending));
+		return (parent.getType() == AffixType.SUFFIX? word.endsWith(appending): word.startsWith(appending));
 	}
 
 	public String applyRule(final String word, final boolean isFullstrip){
 		if(!isFullstrip && word.length() == removingLength)
 			throw new LinterException(CANNOT_FULL_STRIP.format(new Object[]{word}));
 
-		return (isSuffix()?
+		return (parent.getType() == AffixType.SUFFIX?
 			word.substring(0, word.length() - removingLength) + appending:
 			appending + word.substring(removingLength));
 	}
 
 	//NOTE: {#canInverseApplyTo} should be called to verify applicability
 	public String undoRule(final String word){
-		return (isSuffix()?
+		return (parent.getType() == AffixType.SUFFIX?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));
 	}
@@ -309,7 +314,17 @@ public class AffixEntry{
 
 	@Override
 	public String toString(){
-		return StringUtils.replaceChars(entry, TAB, StringUtils.SPACE);
+		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		sj.add(parent.getType().getOption().getCode())
+			.add(parent.getFlag())
+			.add(removing)
+			.add(appending);
+		if(continuationFlags != null && continuationFlags.length > 0)
+			sj.add(SLASH + Strings.join(StringUtils.EMPTY, continuationFlags));
+		sj.add(condition);
+		if(morphologicalFields != null && morphologicalFields.length > 0)
+			sj.add(Strings.join(StringUtils.EMPTY, morphologicalFields));
+		return sj.toString();
 	}
 
 	@Override
@@ -320,22 +335,24 @@ public class AffixEntry{
 			return false;
 
 		final AffixEntry rhs = (AffixEntry)obj;
-		return new EqualsBuilder()
-			.append(affixType, rhs.affixType)
-			.append(flag, rhs.flag)
+		final EqualsBuilder builder = new EqualsBuilder()
+			.append(parent != null, rhs.parent != null)
 			.append(continuationFlags, rhs.continuationFlags)
 			.append(condition, rhs.condition)
 			.append(removing, rhs.removing)
 			.append(appending, rhs.appending)
-			.append(morphologicalFields, rhs.morphologicalFields)
-			.isEquals();
+			.append(morphologicalFields, rhs.morphologicalFields);
+		if(parent != null)
+			builder.append(parent.getType(), rhs.parent.getType())
+				.append(parent.getFlag(), rhs.parent.getFlag());
+		return builder.isEquals();
 	}
 
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(affixType)
-			.append(flag)
+			.append(parent.getType())
+			.append(parent.getFlag())
 			.append(continuationFlags)
 			.append(condition)
 			.append(removing)

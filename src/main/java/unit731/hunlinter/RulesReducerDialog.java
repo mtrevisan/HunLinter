@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -23,6 +24,7 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.affix.RulesReducerWorker;
@@ -197,7 +199,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
 		final List<String> affixEntries = affixes.stream()
-			.map(affix -> (affix.isSuffix()? AffixOption.SUFFIX: AffixOption.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
+			.map(affix -> (affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX)
+				+ StringUtils.SPACE + affix.getEntries()[0].getFlag())
 			.sorted()
 			.collect(Collectors.toList());
 
@@ -217,9 +220,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			final String header = sj.add(rule.getType().getOption().getCode())
 				.add(flag)
 				.add(Character.toString(rule.combinableChar()))
-				.add(Integer.toString(rule.getEntries().size()))
+				.add(Integer.toString(rule.getEntries().length))
 				.toString();
-			final String rules = rule.getEntries().stream()
+			final String rules = Arrays.stream(rule.getEntries())
 				.map(AffixEntry::toString)
 				.collect(Collectors.joining(StringUtils.LF));
 			currentSetTextArea.setText(header + StringUtils.LF + rules);
