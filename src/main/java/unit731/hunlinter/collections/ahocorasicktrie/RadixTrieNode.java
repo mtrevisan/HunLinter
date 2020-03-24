@@ -177,6 +177,31 @@ public class RadixTrieNode{
 		return success.keySet();
 	}
 
+	public Map<Character, RadixTrieNode> getSuccess(){
+		return success;
+	}
+
+	public int getId(){
+		return id;
+	}
+
+	public void setId(final int id){
+		this.id = id;
+	}
+
+
+	@Override
+	public String toString(){
+		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
+			.append("depth", depth)
+			.append("id", id)
+			.append("childrenIds", childrenIds)
+			.append("success", success.keySet())
+			.append("failureId", (failure == null? "-1": failure.id))
+			.append("failure", failure)
+			.toString();
+	}
+
 	@Override
 	public boolean equals(final Object obj){
 		if(obj == this)
@@ -203,30 +228,6 @@ public class RadixTrieNode{
 			.append(success)
 			.append(failure)
 			.toHashCode();
-	}
-
-	@Override
-	public String toString(){
-		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
-			.append("depth", depth)
-			.append("id", id)
-			.append("childrenIds", childrenIds)
-			.append("success", success.keySet())
-			.append("failureId", (failure == null? "-1": failure.id))
-			.append("failure", failure)
-			.toString();
-	}
-
-	public Map<Character, RadixTrieNode> getSuccess(){
-		return success;
-	}
-
-	public int getId(){
-		return id;
-	}
-
-	public void setId(final int id){
-		this.id = id;
 	}
 
 }
