@@ -195,16 +195,7 @@ public class LineEntry implements Serializable{
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(removal)
-			.append(addition)
-			.append(condition)
-			.toHashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -216,6 +207,15 @@ public class LineEntry implements Serializable{
 			.append(addition, other.addition)
 			.append(condition, other.condition)
 			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(removal)
+			.append(addition)
+			.append(condition)
+			.toHashCode();
 	}
 
 }

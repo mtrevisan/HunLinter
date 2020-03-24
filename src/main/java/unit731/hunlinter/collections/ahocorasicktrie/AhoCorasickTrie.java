@@ -1,7 +1,10 @@
 package unit731.hunlinter.collections.ahocorasicktrie;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.collections.ahocorasicktrie.dtos.HitProcessor;
 import unit731.hunlinter.collections.ahocorasicktrie.dtos.SearchResult;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +221,36 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	public boolean isInitialized(){
 		return (output != null);
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final AhoCorasickTrie rhs = (AhoCorasickTrie)obj;
+		return new EqualsBuilder()
+			.append(base, rhs.base)
+			.append(next, rhs.next)
+			.append(check, rhs.check)
+			.append(output, rhs.output)
+			.append(outerValue, rhs.outerValue)
+			.append(keyLength, rhs.keyLength)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(base)
+			.append(next)
+			.append(check)
+			.append(output)
+			.append(outerValue)
+			.append(keyLength)
+			.toHashCode();
 	}
 
 }

@@ -341,7 +341,7 @@ public class DictionaryMetadata{
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
 	public static DictionaryMetadata read(final InputStream metadataStream) throws IOException{
-		final Map<DictionaryAttribute, String> map = new HashMap<>();
+		final Map<DictionaryAttribute, String> map = new EnumMap<>(DictionaryAttribute.class);
 		final Properties properties = new Properties();
 		properties.load(new InputStreamReader(metadataStream, StandardCharsets.UTF_8));
 

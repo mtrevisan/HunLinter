@@ -10,6 +10,8 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.InflectionTag;
@@ -244,6 +246,28 @@ public class Inflection extends DictionaryEntry{
 			sj.add(subsj.toString());
 		}
 		return sj.toString();
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(this == obj)
+			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
+
+		final Inflection other = (Inflection)obj;
+		return new EqualsBuilder()
+			.appendSuper(super.equals(obj))
+			.append(appliedRules, other.appliedRules)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.appendSuper(super.hashCode())
+			.append(appliedRules)
+			.toHashCode();
 	}
 
 }

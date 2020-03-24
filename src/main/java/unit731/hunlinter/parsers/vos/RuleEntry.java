@@ -4,7 +4,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.services.system.LoopHelper;
-import unit731.hunlinter.services.text.SmithWatermanAlignment;
 
 import java.util.Objects;
 

@@ -7,6 +7,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.swing.SwingWorker;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -180,6 +182,27 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
 		workerData.callCancelledCallback(null);
+	}
+
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final WorkerAbstract<?> rhs = (WorkerAbstract<?>)obj;
+		return new EqualsBuilder()
+			.append(workerData.getWorkerName(), rhs.workerData.getWorkerName())
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(workerData.getWorkerName())
+			.toHashCode();
 	}
 
 }

@@ -343,22 +343,25 @@ public class AffixEntry{
 			.append(appending, rhs.appending)
 			.append(morphologicalFields, rhs.morphologicalFields);
 		if(parent != null)
-			builder.append(parent.getType(), rhs.parent.getType())
+			builder
+				.append(parent.getType(), rhs.parent.getType())
 				.append(parent.getFlag(), rhs.parent.getFlag());
 		return builder.isEquals();
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(parent.getType())
-			.append(parent.getFlag())
+		final HashCodeBuilder builder = new HashCodeBuilder()
 			.append(continuationFlags)
 			.append(condition)
 			.append(removing)
 			.append(appending)
-			.append(morphologicalFields)
-			.toHashCode();
+			.append(morphologicalFields);
+		if(parent != null)
+			builder
+				.append(parent.getType())
+				.append(parent.getFlag());
+		return builder.toHashCode();
 	}
 
 }

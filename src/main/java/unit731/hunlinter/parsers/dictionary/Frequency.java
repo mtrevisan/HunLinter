@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.services.system.Memoizer;
 
 
@@ -169,6 +172,26 @@ public class Frequency<T extends Comparable<?>>{
 				.append(String.format(Locale.ROOT, "%." + getDecimals(getPercentOf(value)) + "f%%", getPercentOf(value) * 100.))
 				.append('\n');
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(this == obj)
+			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
+
+		final Frequency other = (Frequency)obj;
+		return new EqualsBuilder()
+			.append(frequencies, other.frequencies)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(frequencies)
+			.toHashCode();
 	}
 
 }

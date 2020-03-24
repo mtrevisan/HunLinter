@@ -1,5 +1,8 @@
 package unit731.hunlinter.workers.core;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -66,6 +69,26 @@ public class WorkerData{
 
 	final boolean isRelaunchException(){
 		return relaunchException;
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final WorkerData rhs = (WorkerData)obj;
+		return new EqualsBuilder()
+			.append(workerName, rhs.workerName)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(workerName)
+			.toHashCode();
 	}
 
 }

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -168,6 +170,26 @@ public class HyphenationBreak{
 
 	private boolean isEnding(String key){
 		return (key.charAt(key.length() - 1) == '$');
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(this == obj)
+			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
+
+		final HyphenationBreak other = (HyphenationBreak)obj;
+		return new EqualsBuilder()
+			.append(indexesAndRules, other.indexesAndRules)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(indexesAndRules)
+			.toHashCode();
 	}
 
 }
