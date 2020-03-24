@@ -44,7 +44,7 @@ class GraphemeVEC{
 		if(RegexHelper.find(word, DIPHTONG1))
 			return true;
 
-		final Matcher m = DIPHTONG2.matcher(word);
+		final Matcher m = RegexHelper.matcher(word, DIPHTONG2);
 		return (m.find() && m.start() != WordVEC.getIndexOfStress(word));
 	}
 

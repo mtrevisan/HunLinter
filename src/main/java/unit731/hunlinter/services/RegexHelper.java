@@ -1,5 +1,6 @@
 package unit731.hunlinter.services;
 
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -55,7 +56,7 @@ public class RegexHelper{
 	}
 
 	public static String[] extract(final String text, final Pattern pattern, final int limit){
-		final Matcher matcher = pattern.matcher(text);
+		final Matcher matcher = matcher(text, pattern);
 		return (limit >= 0? extractWithLimit(matcher, limit): extractUnlimited(matcher));
 	}
 
@@ -87,20 +88,24 @@ public class RegexHelper{
 		return component;
 	}
 
-	//FIXME is there a way to optimize this find?
+
+	public static Matcher matcher(final String text, final Pattern pattern){
+		final CharBuffer buffer = CharBuffer.wrap(text);
+		return pattern.matcher(buffer);
+	}
+
 	public static boolean find(final String text, final Pattern pattern){
-		return pattern.matcher(text)
+		return matcher(text, pattern)
 			.find();
 	}
 
 	public static boolean matches(final String text, final Pattern pattern){
-		return pattern.matcher(text)
+		return matcher(text, pattern)
 			.matches();
 	}
 
-	//FIXME is there a way to optimize this replaceAll?
 	public static String replaceAll(final String text, final Pattern pattern, final String replacement){
-		return pattern.matcher(text)
+		return matcher(text, pattern)
 			.replaceAll(replacement);
 	}
 

@@ -456,7 +456,7 @@ public class HyphenationParser{
 	}
 
 	public static int getIndexOfBreakpoint(final String rule){
-		final Matcher m = PATTERN_AUGMENTED_RULE_HYPHEN_INDEX.matcher(rule);
+		final Matcher m = RegexHelper.matcher(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
 		m.find();
 		return m.start();
 	}

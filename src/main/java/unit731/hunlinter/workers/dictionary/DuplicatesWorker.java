@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +31,6 @@ import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -123,16 +121,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 			DuplicatesDictionaryBaseData.getInstance());
 
 		final File dicFile = dicParser.getDicFile();
-		try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
-			String line = ParserHelper.assertLinesCount(scanner);
+		try{
+			//read entire file in memory
+			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
+			ParserHelper.assertLinesCount(lines);
 
-			long readSoFar = line.getBytes(charset).length + 2;
+			long readSoFar = lines.get(0).getBytes(charset).length + 2;
 
 			int lineIndex = 1;
 			final long totalSize = dicFile.length();
-			while(scanner.hasNextLine()){
-				line = scanner.nextLine();
-				lineIndex ++;
+			for(; lineIndex < lines.size(); lineIndex ++){
+				final String line = lines.get(lineIndex);
 				readSoFar += line.getBytes(charset).length + 2;
 
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
@@ -185,16 +184,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
-			try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
-				String line = ParserHelper.assertLinesCount(scanner);
+			try{
+				//read entire file in memory
+				final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
+				ParserHelper.assertLinesCount(lines);
 
-				long readSoFar = line.getBytes(charset).length + 2;
+				long readSoFar = lines.get(0).getBytes(charset).length + 2;
 
 				int lineIndex = 1;
 				final long totalSize = dicFile.length();
-				while(scanner.hasNextLine()){
-					line = scanner.nextLine();
-					lineIndex ++;
+				for(; lineIndex < lines.size(); lineIndex ++){
+					final String line = lines.get(lineIndex);
 					readSoFar += line.getBytes(charset).length + 2;
 
 					if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){

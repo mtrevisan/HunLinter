@@ -72,7 +72,7 @@ public class DictionaryEntry{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		final Matcher m = PATTERN_ENTRY.matcher(line);
+		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 		if(!m.find())
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 
@@ -118,7 +118,7 @@ public class DictionaryEntry{
 //	public static String extractWord(final String line){
 //		Objects.requireNonNull(line);
 //
-//		final Matcher m = PATTERN_ENTRY.matcher(line);
+//		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 //		if(!m.find())
 //			throw new HunLintException("Cannot parse dictionary line '" + line + "'");
 //

@@ -259,7 +259,7 @@ public class Hyphenator implements HyphenatorInterface{
 					final int index = HyphenationParser.getIndexOfBreakpoint(RegexHelper.clear(augmentedPatternData,
 						HyphenationParser.PATTERN_WORD_INITIAL));
 
-					final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(augmentedPatternData);
+					final Matcher m = RegexHelper.matcher(augmentedPatternData, HyphenationParser.PATTERN_AUGMENTED_RULE);
 					if(m.find()){
 						final String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
 						addAfter = m.group(HyphenationParser.PARAM_ADD_AFTER);

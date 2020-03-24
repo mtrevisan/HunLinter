@@ -82,7 +82,7 @@ public class WordTokenizer implements WordTokenizerInterface{
 
 		//find all urls and emails, substitute with placeholder
 		final List<String> unbreakableText = new ArrayList<>();
-		text = PATTERN_UNBREAKABLE.matcher(text)
+		text = RegexHelper.matcher(text, PATTERN_UNBREAKABLE)
 			.replaceAll(m -> {
 				unbreakableText.add(m.group(1));
 				return placeholder;

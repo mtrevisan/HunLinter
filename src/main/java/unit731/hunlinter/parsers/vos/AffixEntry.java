@@ -77,7 +77,7 @@ public class AffixEntry{
 		final String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
-		final Matcher m = PATTERN_LINE.matcher(lineParts[3]);
+		final Matcher m = RegexHelper.matcher(lineParts[3], PATTERN_LINE);
 		if(!m.find())
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);

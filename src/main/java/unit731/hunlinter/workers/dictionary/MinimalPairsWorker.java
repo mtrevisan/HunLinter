@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -34,7 +33,6 @@ import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.text.HammingDistance;
 import unit731.hunlinter.services.ParserHelper;
 
@@ -105,19 +103,19 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	}
 
 	private List<String> extractWords(){
-		final List<String> list = new ArrayList();
+		final List<String> list = new ArrayList<>();
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
-		int currentLine = 0;
-		final int totalLines = FileHelper.countLines(dicFile.toPath());
-		try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
-			ParserHelper.assertLinesCount(scanner);
-			currentLine ++;
 
-			while(scanner.hasNextLine()){
-				final String line = scanner.nextLine();
-				currentLine ++;
+		try{
+			//read entire file in memory
+			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
+			ParserHelper.assertLinesCount(lines);
+
+			final int totalLines = lines.size();
+			for(int currentLine = 1; currentLine < totalLines; currentLine ++){
+				final String line = lines.get(currentLine);
 
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					try{
