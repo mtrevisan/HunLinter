@@ -39,6 +39,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -88,7 +89,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
-//		final List<String> list = new ArrayList<>();
+		final ArrayList<String> list = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -100,9 +101,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
 				encodedLines.sort(Comparator.naturalOrder());
 
-				forEach(encodedLines, line -> writeLine(writer, line));
+//				forEach(encodedLines, line -> writeLine(writer, line));
 //				forEach(encodedLines, line -> list.add(collator.getCollationKey(line)));
-//				forEach(encodedLines, list::add);
+				forEach(encodedLines, list::add);
 			});
 		};
 		final FSABuilder builder = new FSABuilder();
@@ -148,7 +149,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			closeWriter(writer);
 
 			return supportFile;
-//			return null;
 		};
 		final Function<File, File> step2 = file -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create support file (step 2/4)");
@@ -188,14 +188,17 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.build();
 			try{
 TimeWatch watch = TimeWatch.start();
-				sorter.sort(file, options, file);
-//				list.sort(Comparator.naturalOrder());
+//				sorter.sort(file, options, file);
+//				list.sort(Comparator.nullsFirst(Comparator.naturalOrder()));
+				list.trimToSize();
+				list.sort(Comparator.naturalOrder());
 //for(CollationKey key : list)
 //	key.getSourceString();
 watch.stop();
 System.out.println(watch.toStringMillis());
 			}
 			catch(final Exception e){
+e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 
@@ -208,7 +211,10 @@ System.out.println(watch.toStringMillis());
 				.withNoHeader()
 				.withSequentialProcessing();
 
+TimeWatch watch = TimeWatch.start();
 			processLines(file.toPath(), charset, fsaProcessor);
+watch.stop();
+System.out.println(watch.toStringMillis());
 
 			if(!file.delete())
 				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
