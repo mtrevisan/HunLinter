@@ -152,7 +152,7 @@ public class FileHelper{
 			sj.add(line);
 		final String content = sj.toString();
 
-		final File file = createDeleteOnExitFile((filename != null? filename: "test"), extension);
+		final File file = createDeleteOnExitFile((filename != null? filename: "hunlinter-test"), extension);
 		Files.writeString(file.toPath(), content);
 		return file;
 	}

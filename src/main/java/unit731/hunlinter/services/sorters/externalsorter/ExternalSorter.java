@@ -94,7 +94,7 @@ public class ExternalSorter{
 				else
 					temporaryList.sort(comparator);
 
-				final File chunkFile = FileHelper.createDeleteOnExitFile("chunk", ".dat");
+				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseTemporaryAsZip())
 					out = new GZIPOutputStream(out, options.getZipBufferSize()){
