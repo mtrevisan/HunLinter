@@ -9,10 +9,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.ParserHelper;
 
@@ -51,6 +57,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
+
 	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
@@ -70,19 +77,32 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 	private void processLinesParallel(final List<IndexDataPair<String>> entries, final int totalEntries,
 		final Consumer<IndexDataPair<String>> dataProcessor){
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, totalEntries);
 		entries.parallelStream()
 			.forEach(innerProcessor);
 	}
 
 	private void processLinesSequential(final Path path, final Charset charset,
 			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
+		final long fileSize = path.toFile().length();
+		final long availableMemory = JavaHelper.estimateAvailableMemory();
+
+		//choose between load all file in memory and read one line at a time:
+		if((fileSize << 1) < availableMemory)
+			processLinesSequentialByLine(path, charset, dataProcessor);
+		else
+			processLinesSequentialBySize(path, charset, dataProcessor, fileSize);
+	}
+
+	private void processLinesSequentialByLine(final Path path, final Charset charset,
+			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
 		if(!workerData.isNoHeader())
 			ParserHelper.assertLinesCount(lines);
 
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor, lines.size());
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, lines.size());
+
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
 			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
@@ -92,14 +112,58 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
-	private Consumer<IndexDataPair<String>> createInnerProcessor(final Consumer<IndexDataPair<String>> dataProcessor,
-			final int totalEntries){
+	private void processLinesSequentialBySize(final Path path, final Charset charset,
+			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize) throws IOException{
+		//read one line at a time
+		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+			long lineSize = 0l;
+			if(!workerData.isNoHeader()){
+				final String line = ParserHelper.assertLinesCount(scanner);
+				lineSize = StringHelper.rawBytesLength(line);
+			}
+
+			final BiConsumer<IndexDataPair<String>, Long> innerProcessor = createInnerProcessorBySize(dataProcessor, fileSize);
+
+			int lineIndex = (workerData.isNoHeader()? 0: 1);
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
+				lineSize += StringHelper.rawBytesLength(line);
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+					continue;
+
+				innerProcessor.accept(IndexDataPair.of(lineIndex ++, line), lineSize);
+			}
+		}
+	}
+
+	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final Consumer<IndexDataPair<String>> dataProcessor,
+			final long totalEntries){
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 
 				setProgress(processingIndex.incrementAndGet(), totalEntries);
+
+				sleepOnPause();
+			}
+			catch(final LinterException e){
+				throw e;
+			}
+			catch(final Exception e){
+				throw new LinterException(e, data);
+			}
+		};
+	}
+
+	private BiConsumer<IndexDataPair<String>, Long> createInnerProcessorBySize(
+			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize){
+		final AtomicLong processingIndex = new AtomicLong(0l);
+		return (data, readSoFar) -> {
+			try{
+				dataProcessor.accept(data);
+
+				setProgress(processingIndex.addAndGet(readSoFar), fileSize);
 
 				sleepOnPause();
 			}

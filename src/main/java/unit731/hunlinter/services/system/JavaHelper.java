@@ -13,9 +13,19 @@ public class JavaHelper{
 
 	private JavaHelper(){}
 
-	public static long getUsedMemory(){
-		final Runtime runtime =Runtime.getRuntime();
-		return runtime.totalMemory() - runtime.freeMemory();
+	/**
+	 * This method calls the garbage collector and then returns the free memory.
+	 * This avoids problems with applications where the GC hasn't reclaimed memory and reports no available memory.
+	 *
+	 * @return estimated available memory
+	 */
+	public static long estimateAvailableMemory(){
+		System.gc();
+
+		//http://stackoverflow.com/questions/12807797/java-get-available-memory
+		final Runtime r = Runtime.getRuntime();
+		final long allocatedMemory = r.totalMemory() - r.freeMemory();
+		return r.maxMemory() - allocatedMemory;
 	}
 
 	public static boolean isInterruptedException(final Exception exception){

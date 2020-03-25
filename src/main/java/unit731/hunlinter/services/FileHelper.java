@@ -6,8 +6,8 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -157,28 +157,45 @@ public class FileHelper{
 	}
 
 	public static Scanner createScanner(final Path path, final Charset charset) throws IOException{
-		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
-			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
-		return new Scanner(bomis, charset);
+		return createScanner(path, charset, 0);
 	}
 
-	public static Scanner createScannerForZIP(final File file, final Charset charset, final int inputBufferSize)
+	public static Scanner createScanner(final Path path, final Charset charset, final int inputBufferSize)
 			throws IOException{
-		final GZIPInputStream zipis = new GZIPInputStream(new FileInputStream(file), inputBufferSize);
-		final BOMInputStream bomis = new BOMInputStream(zipis, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
+		InputStream is = Files.newInputStream(path);
+		if(isGZipped(path.toFile()))
+			is = new GZIPInputStream(is, inputBufferSize);
+		return createScanner(is, charset);
+	}
+
+	private static Scanner createScanner(final InputStream is, final Charset charset){
+		final BOMInputStream bomis = new BOMInputStream(is, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new Scanner(bomis, charset);
 	}
 
-	public static long getGZIPUncompressedSize(final File file){
+	public static long getFileSize(final File file){
 		long size = -1l;
-		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
-			raf.seek(raf.length() - Integer.BYTES);
-			final int n = raf.readInt();
-			size = Integer.toUnsignedLong(Integer.reverseBytes(n));
+		if(isGZipped(file)){
+			try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
+				raf.seek(raf.length() - Integer.BYTES);
+				final int n = raf.readInt();
+				size = Integer.toUnsignedLong(Integer.reverseBytes(n));
+			}
+			catch(final Exception ignored){}
 		}
-		catch(final Exception ignored){}
+		else
+			size = file.length();
 		return size;
+	}
+
+	public static boolean isGZipped(final File file){
+		int magic = 0;
+		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
+			magic = (raf.read() & 0xFF | ((raf.read() << 8) & 0xFF00));
+		}
+		catch(final Throwable ignored){}
+		return (magic == GZIPInputStream.GZIP_MAGIC);
 	}
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform

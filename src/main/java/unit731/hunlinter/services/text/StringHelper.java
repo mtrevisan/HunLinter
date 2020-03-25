@@ -169,6 +169,24 @@ public class StringHelper{
 		return text.getBytes(StandardCharsets.UTF_8);
 	}
 
+	public static int rawBytesLength(final CharSequence sequence){
+		int count = 0;
+		for(int i = 0; i < sequence.length(); i ++){
+			final char ch = sequence.charAt(i);
+			if(ch <= 0x7F)
+				count ++;
+			else if(ch <= 0x07FF)
+				count += 2;
+			else if(Character.isHighSurrogate(ch)){
+				count += 4;
+				i ++;
+			}
+			else
+				count += 3;
+		}
+		return count;
+	}
+
 	/**
 	 * Converts an array of bytes into a string representing the hexadecimal values of each byte in order
 	 *

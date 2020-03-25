@@ -39,11 +39,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.CollationKey;
-import java.text.Collator;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -111,9 +107,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<IndexDataPair<String>> fsaProcessor = indexData -> {
-			if(indexData.getIndex() > 0){
+			try{
 				final byte[] chs = StringHelper.getRawBytes(indexData.getData());
 				builder.add(chs);
+			}
+			catch(Exception e){
+				e.printStackTrace();
 			}
 		};
 //		final Runnable completed = () -> {
@@ -188,9 +187,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.maxTemporaryFileSize(500_000_000l)
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-				.useInputAsZip()
 				.useTemporaryAsZip()
-				.useOutputAsZip()
+				.writeOutputAsZip()
 				.removeDuplicates()
 				.build();
 			try{

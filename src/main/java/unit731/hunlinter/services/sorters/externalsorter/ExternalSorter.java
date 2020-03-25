@@ -23,6 +23,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -49,20 +50,13 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
-		final Scanner scanner;
-		final long dataLength;
-		if(options.isUseInputAsZip()){
-			scanner = FileHelper.createScannerForZIP(file, options.getCharset(), options.getZipBufferSize());
+		final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize());
 
-			//extract uncompressed file size
-			dataLength = FileHelper.getGZIPUncompressedSize(file);
-		}
-		else{
-			scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
+		//extract uncompressed file size
+		final long dataLength = FileHelper.getFileSize(file);
 
-			dataLength = file.length();
-		}
-		final long blockSize = estimateBestSizeOfBlocks(dataLength, options, estimateAvailableMemory());
+		final long availableMemory = JavaHelper.estimateAvailableMemory();
+		final long blockSize = estimateBestSizeOfBlocks(dataLength, options, availableMemory);
 		return splitAndSortFiles(scanner, options, blockSize);
 	}
 
@@ -118,22 +112,8 @@ public class ExternalSorter{
 	}
 
 	/**
-	 * This method calls the garbage collector and then returns the free memory.
-	 * This avoids problems with applications where the GC hasn't reclaimed memory and reports no available memory.
-	 *
-	 * @return estimated available memory
-	 */
-	private long estimateAvailableMemory(){
-		System.gc();
-
-		//http://stackoverflow.com/questions/12807797/java-get-available-memory
-		final Runtime r = Runtime.getRuntime();
-		final long allocatedMemory = r.totalMemory() - r.freeMemory();
-		return r.maxMemory() - allocatedMemory;
-	}
-
-	/**
-	 * we divide the file into small blocks. If the blocks are too small, we shall create too many temporary files. If they are too big, we shall
+	 * Divide the file into small blocks.
+	 * If the blocks are too small, we shall create too many temporary files. If they are too big, we shall
 	 * be using too much memory.
 	 *
 	 * @param sizeOfFile how much data (in bytes) can we expect
@@ -222,7 +202,7 @@ public class ExternalSorter{
 		}
 
 		OutputStream out = new FileOutputStream(outputFile);
-		if(options.isUseOutputAsZip())
+		if(options.isWriteOutputAsZip())
 			out = new GZIPOutputStream(out, options.getZipBufferSize()){
 				{
 					def.setLevel(Deflater.BEST_SPEED);

@@ -29,28 +29,25 @@ public class ExternalSorterOptions{
 	private final int maxTemporaryFiles;
 	/** Maximum size of temporary file allowed [B] */
 	private final long maxTemporaryFileSize;
-	/** Whether to use ZIP for input files */
-	private final boolean useInputAsZip;
 	/** Whether to use ZIP for temporary files */
 	private final boolean useTemporaryAsZip;
 	/** Whether to use ZIP for output file */
-	private final boolean useOutputAsZip;
+	private final boolean writeOutputAsZip;
 	/** ZIP buffer size [B] */
 	private final int zipBufferSize;
 
 
 	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
 			final boolean sortInParallel, final int maxTemporaryFiles, final long maxTemporaryFileSize,
-			final boolean useInputAsZip, final boolean useTemporaryAsZip, final boolean useOutputAsZip, final int zipBufferSize){
+			final boolean useTemporaryAsZip, final boolean writeOutputAsZip, final int zipBufferSize){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
 		this.sortInParallel = sortInParallel;
 		this.maxTemporaryFiles = maxTemporaryFiles;
 		this.maxTemporaryFileSize = maxTemporaryFileSize;
-		this.useInputAsZip = useInputAsZip;
 		this.useTemporaryAsZip = useTemporaryAsZip;
-		this.useOutputAsZip = useOutputAsZip;
+		this.writeOutputAsZip = writeOutputAsZip;
 		this.zipBufferSize = zipBufferSize;
 	}
 
@@ -68,9 +65,8 @@ public class ExternalSorterOptions{
 		private boolean maxTemporaryFiles$set;
 		private long maxTemporaryFileSize;
 		private boolean maxTemporaryFileSize$set;
-		private boolean useInputAsZip;
 		private boolean useTemporaryAsZip;
-		private boolean useOutputAsZip;
+		private boolean writeOutputAsZip;
 		private int zipBufferSize;
 		private boolean zipBufferSize$set;
 
@@ -109,18 +105,13 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder useInputAsZip(){
-			useInputAsZip = true;
-			return this;
-		}
-
 		public ExternalSorterOptionsBuilder useTemporaryAsZip(){
 			useTemporaryAsZip = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder useOutputAsZip(){
-			useOutputAsZip = true;
+		public ExternalSorterOptionsBuilder writeOutputAsZip(){
+			writeOutputAsZip = true;
 			return this;
 		}
 
@@ -135,7 +126,7 @@ public class ExternalSorterOptions{
 			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
 				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
 				(maxTemporaryFileSize$set? maxTemporaryFileSize: MAX_TEMPORARY_FILE_SIZE_UNLIMITED),
-				useInputAsZip, useTemporaryAsZip, useOutputAsZip,
+				useTemporaryAsZip, writeOutputAsZip,
 				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT));
 		}
 
@@ -165,16 +156,12 @@ public class ExternalSorterOptions{
 		return maxTemporaryFileSize;
 	}
 
-	public boolean isUseInputAsZip(){
-		return useInputAsZip;
-	}
-
 	public boolean isUseTemporaryAsZip(){
 		return useTemporaryAsZip;
 	}
 
-	public boolean isUseOutputAsZip(){
-		return useOutputAsZip;
+	public boolean isWriteOutputAsZip(){
+		return writeOutputAsZip;
 	}
 
 	public int getZipBufferSize(){

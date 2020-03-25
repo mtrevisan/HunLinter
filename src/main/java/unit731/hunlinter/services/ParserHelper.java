@@ -8,6 +8,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class ParserHelper{
@@ -29,6 +30,16 @@ public class ParserHelper{
 		String line = lines.get(0);
 		if(!NumberUtils.isCreatable(line))
 			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+	}
+
+	public static String assertLinesCount(final Scanner scanner) throws IOException{
+		if(!scanner.hasNextLine())
+			throw new EOFException("Unexpected EOF while reading file");
+		final String line = scanner.nextLine();
+		if(!NumberUtils.isCreatable(line))
+			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+
+		return line;
 	}
 
 }
