@@ -24,4 +24,9 @@ public class IndexDataPair<T>{
 		return data;
 	}
 
+	@Override
+	public String toString(){
+		return index + ": " + data;
+	}
+
 }

@@ -107,13 +107,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<IndexDataPair<String>> fsaProcessor = indexData -> {
-			try{
-				final byte[] chs = StringHelper.getRawBytes(indexData.getData());
-				builder.add(chs);
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
+			final byte[] chs = StringHelper.getRawBytes(indexData.getData());
+			builder.add(chs);
 		};
 //		final Runnable completed = () -> {
 //			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");

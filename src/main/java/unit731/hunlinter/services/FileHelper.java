@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -157,7 +158,7 @@ public class FileHelper{
 	}
 
 	public static Scanner createScanner(final Path path, final Charset charset) throws IOException{
-		return createScanner(path, charset, 0);
+		return createScanner(path, charset, 2048);
 	}
 
 	public static Scanner createScanner(final Path path, final Charset charset, final int inputBufferSize)
@@ -187,6 +188,23 @@ public class FileHelper{
 		else
 			size = file.length();
 		return size;
+	}
+
+	public static List<String> readAllLines(final Path path, final Charset charset) throws IOException{
+		return readAllLines(path, charset, 2048);
+	}
+
+	public static List<String> readAllLines(final Path path, final Charset charset, final int inputBufferSize) throws IOException{
+		final List<String> lines;
+		if(isGZipped(path.toFile())){
+			lines = new ArrayList<>();
+			final Scanner scanner = createScanner(path, charset, inputBufferSize);
+			while(scanner.hasNextLine())
+				lines.add(scanner.nextLine());
+		}
+		else
+			lines = Files.readAllLines(path, charset);
+		return lines;
 	}
 
 	public static boolean isGZipped(final File file){

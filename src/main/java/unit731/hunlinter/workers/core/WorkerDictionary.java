@@ -97,7 +97,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	private void processLinesSequentialByLine(final Path path, final Charset charset,
 			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
 		//read entire file in memory
-		final List<String> lines = Files.readAllLines(path, charset);
+		final List<String> lines = FileHelper.readAllLines(path, charset);
 		if(!workerData.isNoHeader())
 			ParserHelper.assertLinesCount(lines);
 
