@@ -302,9 +302,9 @@ public class StringList implements Iterable<String>{
 			action.accept(elementData[i]);
 	}
 
-//	public void sort(final Comparator<? super String> comparator){
-//		TimSort.sort(elementData, 0, size, comparator);
-//	}
+	public void sort(final Comparator<? super String> comparator){
+		HeapSort.sort(elementData, 0, size, comparator);
+	}
 
 	public void sortParallel(final Comparator<? super String> comparator){
 		trimToSize();
@@ -314,8 +314,8 @@ public class StringList implements Iterable<String>{
 	}
 
 	/** Assume the list is already sorted! */
-//	public void removeDuplicates(){
-//		TimSort.removeDuplicates(elementData);
-//	}
+	public void removeDuplicates(){
+		SorterHelper.removeDuplicates(elementData);
+	}
 
 }

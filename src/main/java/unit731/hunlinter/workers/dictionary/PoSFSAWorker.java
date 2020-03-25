@@ -16,6 +16,7 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.system.TimeWatch;
@@ -89,7 +90,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
-		final ArrayList<String> list = new ArrayList<>();
+//		final ArrayList<String> list = new ArrayList<>();
+		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -137,7 +139,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
-			.withParallelProcessing()
+//			.withParallelProcessing()
 			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
@@ -190,7 +192,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 TimeWatch watch = TimeWatch.start();
 //				sorter.sort(file, options, file);
 //				list.sort(Comparator.nullsFirst(Comparator.naturalOrder()));
-				list.trimToSize();
+//				list.trimToSize();
 				list.sort(Comparator.naturalOrder());
 //for(CollationKey key : list)
 //	key.getSourceString();
@@ -198,7 +200,6 @@ watch.stop();
 System.out.println(watch.toStringMillis());
 			}
 			catch(final Exception e){
-e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 

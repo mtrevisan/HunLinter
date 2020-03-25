@@ -31,7 +31,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 /**
  * @see <a href="https://github.com/Dgleish/ExternalSort/blob/master/src/uk/ac/cam/amd96/fjava/tick0/ExternalSort.java">DGleish External Sort</a>
- * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java<a/>, version 0.4.4, 11/3/2020
+ * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</a>, version 0.4.4, 11/3/2020
  */
 public class ExternalSorter{
 
