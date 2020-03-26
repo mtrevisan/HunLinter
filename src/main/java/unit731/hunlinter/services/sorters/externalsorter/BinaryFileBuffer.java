@@ -1,8 +1,9 @@
 package unit731.hunlinter.services.sorters.externalsorter;
 
-import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Scanner;
 
 
 /**
@@ -10,25 +11,26 @@ import java.util.Objects;
  *
  * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</a>, version 0.4.4, 11/3/2020
  */
-class BinaryFileBuffer{
+class BinaryFileBuffer implements Closeable{
 
-	protected final BufferedReader br;
+	protected final Scanner scanner;
 	private String cache;
 
 
-	BinaryFileBuffer(final BufferedReader r) throws IOException{
-		Objects.requireNonNull(r);
+	BinaryFileBuffer(final Scanner scanner){
+		Objects.requireNonNull(scanner);
 
-		br = r;
+		this.scanner = scanner;
 
-		reload();
+		readNextLine();
 	}
 
+	@Override
 	public void close() throws IOException{
-		br.close();
+		scanner.close();
 	}
 
-	public boolean empty(){
+	public boolean isEmpty(){
 		return (cache == null);
 	}
 
@@ -36,14 +38,14 @@ class BinaryFileBuffer{
 		return cache;
 	}
 
-	public String pop() throws IOException{
+	public String pop(){
 		final String answer = peek();
-		reload();
+		readNextLine();
 		return answer;
 	}
 
-	private void reload() throws IOException{
-		cache = br.readLine();
+	private void readNextLine(){
+		cache = (scanner.hasNextLine()? scanner.nextLine(): null);
 	}
 
 }

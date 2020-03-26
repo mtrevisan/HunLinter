@@ -1,31 +1,24 @@
 package unit731.hunlinter.services.sorters.externalsorter;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Scanner;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.system.JavaHelper;
 
-import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
@@ -37,11 +30,14 @@ public class ExternalSorter{
 
 	public void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
 		final List<File> files = splitAndSortFiles(inputFile, options);
-		mergeSortedFiles(files, options, outputFile);
+
+		if(!files.isEmpty())
+			mergeSortedFiles(files, options, outputFile);
 	}
 
 	/**
-	 * This will simply load the file by blocks of lines, then sort them in-memory, and write the result to temporary files that have to be
+	 * This will simply load the file by blocks of lines, then sort them in-memory,
+	 * and write the result to temporary files that have to be
 	 * merged later.
 	 *
 	 * @param file	Some flat file
@@ -50,31 +46,14 @@ public class ExternalSorter{
 	 * @throws IOException generic IO exception
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
-		final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize());
-
 		//extract uncompressed file size
 		final long dataLength = FileHelper.getFileSize(file);
-
 		final long availableMemory = JavaHelper.estimateAvailableMemory();
 		final long blockSize = estimateBestSizeOfBlocks(dataLength, options, availableMemory);
-		return splitAndSortFiles(scanner, options, blockSize);
-	}
 
-	/**
-	 * This will simply load the file by blocks of lines, then sort them in-memory, and write the result to temporary files that have to be
-	 * merged later.
-	 *
-	 * @param scanner	Data source
-	 * @param options	Sorting options
-	 * @param blockSize	Block size [B]
-	 * @return a list of temporary flat files
-	 * @throws IOException generic IO exception
-	 */
-	private List<File> splitAndSortFiles(final Scanner scanner, final ExternalSorterOptions options, final long blockSize)
-			throws IOException{
-		final List<File> files = new ArrayList<>();
-		try(scanner){
-			List<String> temporaryList = new ArrayList<>();
+		final List<File> files = new ArrayList<>((int)Math.ceil(dataLength / blockSize));
+		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize())){
+			final StringList temporaryList = new StringList(5_000_000);
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
@@ -82,18 +61,18 @@ public class ExternalSorter{
 				while(currentBlockSize < blockSize && scanner.hasNextLine()){
 					final String line = scanner.nextLine();
 					temporaryList.add(line);
+
 					currentBlockSize += StringSizeEstimator.estimatedSizeOf(line);
 				}
 
 				//sort list
 				final Comparator<String> comparator = options.getComparator();
 				if(options.isSortInParallel())
-					temporaryList = temporaryList.stream()
-						.sorted(comparator)
-						.collect(Collectors.toList());
+					temporaryList.sortParallel(comparator);
 				else
 					temporaryList.sort(comparator);
 
+				//store chunk
 				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseTemporaryAsZip())
@@ -103,8 +82,11 @@ public class ExternalSorter{
 						}
 					};
 				saveChunk(temporaryList, options, out);
+
+				//add chunk to list of chunks
 				files.add(chunkFile);
 
+				//prepare for next iteration
 				temporaryList.clear();
 			}
 		}
@@ -146,31 +128,18 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final List<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private void saveChunk(final StringList sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
-			if(options.isRemoveDuplicates()){
-				String lastLine = null;
-				final Iterator<String> itr = sortedLines.iterator();
-				if(itr.hasNext()){
-					lastLine = itr.next();
-					writer.write(lastLine);
+			final boolean removeDuplicates = options.isRemoveDuplicates();
+			String lastLine = null;
+			for(final String line : sortedLines)
+				//skip duplicated lines
+				if(!removeDuplicates || !line.equals(lastLine)){
+					writer.write(line);
 					writer.newLine();
-				}
-				while(itr.hasNext()){
-					final String r = itr.next();
-					//skip duplicated lines
-					if(!r.equals(lastLine)){
-						writer.write(r);
-						writer.newLine();
-						lastLine = r;
-					}
-				}
-			}
-			else
-				for(final String r : sortedLines){
-					writer.write(r);
-					writer.newLine();
+
+					lastLine = line;
 				}
 		}
 	}
@@ -184,21 +153,20 @@ public class ExternalSorter{
 	 * @return The number of lines sorted
 	 * @throws IOException generic IO exception
 	 */
-	private int mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
+	private void mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
-		final List<BinaryFileBuffer> bfbs = new ArrayList<>(files.size());
-		for(final File f : files){
-			if(f.length() == 0)
+		final Comparator<String> comparator = options.getComparator();
+		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),
+			(i, j) -> comparator.compare(i.peek(), j.peek()));
+		for(final File file : files){
+			if(file.length() == 0)
 				continue;
 
-			final InputStream in = new FileInputStream(f);
-			final InputStreamReader isr;
-			if(options.isUseTemporaryAsZip())
-				isr = new InputStreamReader(new GZIPInputStream(in, options.getZipBufferSize()), options.getCharset());
+			final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset());
+			if(scanner.hasNextLine())
+				queue.add(new BinaryFileBuffer(scanner));
 			else
-				isr = new InputStreamReader(in, options.getCharset());
-			final BinaryFileBuffer bfb = new BinaryFileBuffer(new BufferedReader(isr));
-			bfbs.add(bfb);
+				scanner.close();
 		}
 
 		OutputStream out = new FileOutputStream(outputFile);
@@ -208,91 +176,50 @@ public class ExternalSorter{
 					def.setLevel(Deflater.BEST_SPEED);
 				}
 			};
-		final BufferedWriter fbw = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()));
-
-		final int rowCounter = mergeSortedFiles(fbw, options, bfbs);
+		mergeSortedFiles(out, options, queue);
 		forEach(files, File::delete);
-		return rowCounter;
 	}
 
 	/**
 	 * This merges several BinaryFileBuffer to an output writer.
 	 *
-	 * @param writer	A buffer where we write the data
+	 * @param out	The output stream where writing the data
 	 * @param options	Sorting options
-	 * @param buffers	Where the data should be read
+	 * @param queue	Where the data should be read
 	 * @return The number of lines sorted
 	 * @throws IOException generic IO exception
-	 *
 	 */
-	private int mergeSortedFiles(final BufferedWriter writer, final ExternalSorterOptions options,
-			final List<BinaryFileBuffer> buffers) throws IOException{
-		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11,
-			(i, j) -> options.getComparator().compare(i.peek(), j.peek()));
-		applyIf(buffers, Predicate.not(BinaryFileBuffer::empty), queue::add);
-		int rowCounter = 0;
-		try(writer){
-			if(options.isRemoveDuplicates())
-				rowCounter = mergeSortRemoveDuplicates(queue, writer, rowCounter);
-			else
-				rowCounter = mergeSort(queue, writer, rowCounter);
+	private void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options,
+			final Queue<BinaryFileBuffer> queue) throws IOException{
+		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
+			mergeSort(queue, options.isRemoveDuplicates(), writer);
 		}
 		finally{
 			for(final BinaryFileBuffer buffer : queue)
 				buffer.close();
 		}
-		return rowCounter;
 	}
 
-	private int mergeSortRemoveDuplicates(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer,
-			int rowCounter) throws IOException{
+	private void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer)
+			throws IOException{
 		String lastLine = null;
-		if(!queue.isEmpty()){
-			final BinaryFileBuffer buffer = queue.poll();
-			lastLine = buffer.pop();
-			writer.write(lastLine);
-			writer.newLine();
-			rowCounter ++;
-			if(buffer.empty())
-				buffer.br.close();
-			else
-				//add it back
-				queue.add(buffer);
-		}
 		while(!queue.isEmpty()){
-			final BinaryFileBuffer bfb = queue.poll();
-			final String line = bfb.pop();
+			final BinaryFileBuffer buffer = queue.poll();
+			final String line = buffer.pop();
+
 			//skip duplicated lines
-			if(!line.equals(lastLine)){
+			if(!removeDuplicates || !line.equals(lastLine)){
 				writer.write(line);
 				writer.newLine();
 				lastLine = line;
 			}
-			rowCounter ++;
-			if(bfb.empty())
-				bfb.br.close();
-			else
-				//add it back
-				queue.add(bfb);
-		}
-		return rowCounter;
-	}
 
-	private int mergeSort(final PriorityQueue<BinaryFileBuffer> queue, final BufferedWriter writer, int rowCounter)
-			throws IOException{
-		while(!queue.isEmpty()){
-			final BinaryFileBuffer buffer = queue.poll();
-			final String line = buffer.pop();
-			writer.write(line);
-			writer.newLine();
-			rowCounter ++;
-			if(buffer.empty())
-				buffer.br.close();
+			if(buffer.isEmpty())
+				buffer.close();
 			else
 				//add it back
 				queue.add(buffer);
 		}
-		return rowCounter;
 	}
 
 }

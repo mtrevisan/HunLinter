@@ -6,8 +6,11 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -22,7 +25,6 @@ import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -77,14 +79,14 @@ public class FileHelper{
 		}
 	}
 
-	public static byte[] compressData(final byte[] bytes) throws IOException{
+	public static byte[] compressData(final byte[] bytes, final int level) throws IOException{
 		if(bytes == null || bytes.length== 0)
 			return new byte[0];
 
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try(final GZIPOutputStream gzip = new GZIPOutputStream(os, 2048){
 			{
-				def.setLevel(Deflater.BEST_COMPRESSION);
+				def.setLevel(level);
 			}
 		}){
 			gzip.write(bytes);
@@ -136,6 +138,16 @@ public class FileHelper{
 		final File file = File.createTempFile(filename, extension);
 		file.deleteOnExit();
 		return file;
+	}
+
+	public static BufferedWriter createGZIPWriter(final File file, final Charset charset, final int inputBufferSize,
+			final int level) throws IOException{
+		final OutputStream out = new GZIPOutputStream(new FileOutputStream(file), inputBufferSize){
+			{
+				def.setLevel(level);
+			}
+		};
+		return new BufferedWriter(new OutputStreamWriter(out, charset));
 	}
 
 	public static File createDeleteOnExitFile(final String filename, final String extension, final byte[] bytes)
@@ -215,6 +227,7 @@ public class FileHelper{
 		catch(final Throwable ignored){}
 		return (magic == GZIPInputStream.GZIP_MAGIC);
 	}
+
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
 	public static boolean browse(File file) throws IOException, InterruptedException{

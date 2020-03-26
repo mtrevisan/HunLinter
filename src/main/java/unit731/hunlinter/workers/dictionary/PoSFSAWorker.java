@@ -16,7 +16,6 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
-import unit731.hunlinter.services.sorters.StringList;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.system.TimeWatch;
@@ -30,17 +29,13 @@ import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -48,7 +43,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -77,12 +71,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final BufferedWriter writer;
 		try{
 			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
-			final OutputStream out = new GZIPOutputStream(new FileOutputStream(supportFile), 2048){
-				{
-					def.setLevel(Deflater.BEST_SPEED);
-				}
-			};
-			writer = new BufferedWriter(new OutputStreamWriter(out, charset));
+			writer = FileHelper.createGZIPWriter(supportFile, charset, 2048, Deflater.BEST_SPEED);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e);
@@ -91,7 +80,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
 //		final ArrayList<String> list = new ArrayList<>();
-		final StringList list = new StringList();
+//		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -100,12 +89,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 				final List<String> lines = inflection.toStringPoSFSA();
 
 				//encode lines
-				final List<String> encodedLines = encode(lines, separator, sequenceEncoder);
-				encodedLines.sort(Comparator.naturalOrder());
+				encode(lines, separator, sequenceEncoder);
+				lines.sort(Comparator.naturalOrder());
 
-//				forEach(encodedLines, line -> writeLine(writer, line));
-//				forEach(encodedLines, line -> list.add(collator.getCollationKey(line)));
-				forEach(encodedLines, list::add);
+				forEach(lines, line -> writeLine(writer, line));
+//				forEach(lines, line -> list.add(collator.getCollationKey(line)));
+//				forEach(lines, list::add);
 			});
 		};
 		final FSABuilder builder = new FSABuilder();
@@ -139,7 +128,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		};
 
 		getWorkerData()
-//			.withParallelProcessing()
+			.withParallelProcessing()
 			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
@@ -153,35 +142,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 			return supportFile;
 		};
 		final Function<File, File> step2 = file -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create support file (step 2/4)");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting (step 2/4)");
 
 			setProgress(0);
-
-			final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-			final File outputInfoFile = new File(filenameNoExtension + ".info");
-			if(!outputInfoFile.exists()){
-				final List<String> content = Arrays.asList(
-					"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
-					"fsa.dict.encoding=" + charset.name().toLowerCase(),
-					"fsa.dict.encoder=prefix");
-				try{
-					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-				}
-				catch(final Exception e){
-					throw new RuntimeException(e);
-				}
-			}
-
-			setProgress(50);
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
 
 			//sort file & remove duplicates
 			final ExternalSorter sorter = new ExternalSorter();
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
 				.sortInParallel()
-				.maxTemporaryFileSize(500_000_000l)
+				.maxTemporaryFileSize(400_000_000l)
 				//lexical order
 				.comparator(Comparator.naturalOrder())
 				.useTemporaryAsZip()
@@ -190,10 +160,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.build();
 			try{
 TimeWatch watch = TimeWatch.start();
-//				sorter.sort(file, options, file);
+				sorter.sort(file, options, file);
 //				list.sort(Comparator.nullsFirst(Comparator.naturalOrder()));
 //				list.trimToSize();
-				list.sort(Comparator.naturalOrder());
+//				list.sort(Comparator.naturalOrder());
 //for(CollationKey key : list)
 //	key.getSourceString();
 watch.stop();
@@ -268,7 +238,7 @@ System.out.println(watch.toStringMillis());
 		}
 	}
 
-	private List<String> encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
+	private void encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
 		ByteBuffer target = ByteBuffer.allocate(0);
@@ -312,8 +282,6 @@ System.out.println(watch.toStringMillis());
 
 			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
 		}
-
-		return words;
 	}
 
 	private static int indexOf(final byte separator, final byte[] row, int fromIndex){

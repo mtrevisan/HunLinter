@@ -56,8 +56,8 @@ public class StringList implements Iterable<String>{
 			elementData = new String[initialCapacity];
 		else if(initialCapacity == 0)
 			elementData = EMPTY_ELEMENTDATA;
-
-		throw new IllegalArgumentException("Illegal capacity: " + initialCapacity);
+		else
+			throw new IllegalArgumentException("Illegal capacity: " + initialCapacity);
 	}
 
 	public StringList(){
