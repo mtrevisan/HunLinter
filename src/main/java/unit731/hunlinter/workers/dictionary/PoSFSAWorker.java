@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.zip.Deflater;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -71,7 +70,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final BufferedWriter writer;
 		try{
 			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
-			writer = FileHelper.createGZIPWriter(supportFile, charset, 2048, Deflater.BEST_SPEED);
+			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e);
@@ -151,11 +150,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
 				.sortInParallel()
-				.maxTemporaryFileSize(400_000_000l)
+				//400 > 2.5 GB
+				//300 > ? GB
+				.maxTemporaryFileSize(300_000_000l)
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-				.useTemporaryAsZip()
-				.writeOutputAsZip()
+//				.useTemporaryAsZip()
+//				.writeOutputAsZip()
 				.removeDuplicates()
 				.build();
 			try{
