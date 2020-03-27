@@ -111,8 +111,8 @@ public class FSABuilder{
 			throw new IllegalArgumentException("Automaton already built");
 		final int len = sequence.length;
 		if(previous != null && len > 0 && compare(previous, previousLength, sequence, len) > 0)
-			throw new IllegalArgumentException("Input must be sorted: " + Arrays.toString(Arrays.copyOf(previous, previousLength))
-				+ " >= " + Arrays.toString(Arrays.copyOfRange(sequence, 0, len)));
+			throw new IllegalArgumentException("Input must be sorted: '" + new String(Arrays.copyOf(previous, previousLength))
+				+ "' >= '" + new String(Arrays.copyOfRange(sequence, 0, len)) + "'");
 
 		setPrevious(sequence, len);
 

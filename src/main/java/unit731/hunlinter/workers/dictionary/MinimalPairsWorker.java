@@ -150,7 +150,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private void writeSupportFile(final File file, final List<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
-			LoopHelper.forEach(list, line -> writeLine(writer, line));
+			LoopHelper.forEach(list, line -> writeLine(writer, line, System.lineSeparator()));
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

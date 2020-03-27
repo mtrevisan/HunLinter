@@ -177,10 +177,10 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 
-	protected void writeLine(final BufferedWriter writer, final String line){
+	protected synchronized void writeLine(final BufferedWriter writer, final String line, final String lineSeparator){
 		try{
 			writer.write(line);
-			writer.newLine();
+			writer.write(lineSeparator);
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e);

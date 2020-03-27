@@ -1,5 +1,6 @@
 package unit731.hunlinter.workers.dictionary;
 
+import morfologik.tools.DictCompile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -89,9 +90,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 				//encode lines
 				encode(lines, separator, sequenceEncoder);
-				lines.sort(Comparator.naturalOrder());
 
-				forEach(lines, line -> writeLine(writer, line));
+				forEach(lines, line -> writeLine(writer, line, StringUtils.LF));
 //				forEach(lines, line -> list.add(collator.getCollationKey(line)));
 //				forEach(lines, list::add);
 			});
@@ -101,32 +101,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final byte[] chs = StringHelper.getRawBytes(indexData.getData());
 			builder.add(chs);
 		};
-//		final Runnable completed = () -> {
-//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
-//
-//			try{
-//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-//				final File outputInfoFile = new File(filenameNoExtension + ".info");
-//				if(!outputInfoFile.exists()){
-//					final List<String> content = Arrays.asList(
-//						"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
-//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-//						"fsa.dict.encoder=prefix");
-//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-//				}
-//
-//				buildFSA(new ArrayList<>(words), outputFile.toString(), filenameNoExtension + ".dict");
-//
-//				finalizeProcessing("File written: " + filenameNoExtension + ".dict");
-//
-//				FileHelper.browse(outputFile);
-//			}
-//			catch(final Exception e){
-//				LOGGER.warn("Exception while creating the FSA file for Part–of–Speech", e);
-//			}
-//		};
 
 		getWorkerData()
+			//better not be parallel: here may be problems in writing the initial list
 			.withParallelProcessing()
 			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
@@ -150,23 +127,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
 				.sortInParallel()
-				//400 > 2.5 GB
-				//300 > ? GB
-				.maxTemporaryFileSize(300_000_000l)
 				//lexical order
 				.comparator(Comparator.naturalOrder())
-//				.useTemporaryAsZip()
-//				.writeOutputAsZip()
 				.removeDuplicates()
+				.lineSeparator(StringUtils.LF)
 				.build();
 			try{
 TimeWatch watch = TimeWatch.start();
 				sorter.sort(file, options, file);
-//				list.sort(Comparator.nullsFirst(Comparator.naturalOrder()));
-//				list.trimToSize();
-//				list.sort(Comparator.naturalOrder());
-//for(CollationKey key : list)
-//	key.getSourceString();
 watch.stop();
 System.out.println(watch.toStringMillis());
 			}
@@ -193,6 +161,23 @@ System.out.println(watch.toStringMillis());
 
 			return builder.complete();
 		};
+		final Function<Void, FSA> step3bis = ignored -> {
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+
+			getWorkerData()
+				.withNoHeader()
+				.withSequentialProcessing();
+
+final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.sorted.encoded.dat";
+final File file = new File(input);
+
+			processLines(file.toPath(), charset, fsaProcessor);
+
+			if(!file.delete())
+				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
+
+			return builder.complete();
+		};
 		final Function<FSA, File> step4 = fsa -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
 
@@ -212,6 +197,7 @@ System.out.println(watch.toStringMillis());
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+//		setProcessor(step3bis.andThen(step4).andThen(step5));
 	}
 
 	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
@@ -293,6 +279,23 @@ System.out.println(watch.toStringMillis());
 			fromIndex ++;
 		}
 		return -1;
+	}
+
+
+	public static void main(final String[] args){
+		final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.noEncoded.dat";
+		final String[] buildOptions = {
+			"--overwrite",
+			"--accept-cr",
+			"--exit", "false",
+			"--format", "CFSA2",
+			"--input", input
+		};
+		TimeWatch watch = TimeWatch.start();
+		DictCompile.main(buildOptions);
+		watch.stop();
+		//153/251 s
+		System.out.println(watch.toStringMillis());
 	}
 
 }

@@ -141,13 +141,10 @@ public class CFSA2Serializer implements FSASerializer{
 
 		labelsIndex = new byte[1 + Math.min(labelAndCount.size(), CFSA2.LABEL_INDEX_SIZE)];
 		invertedLabelsIndex = new int[256];
-		int i = labelsIndex.length - 1;
-		for(final IntIntHolder p : labelAndCount){
+		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); --i){
+			final IntIntHolder p = labelAndCount.pollFirst();
 			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte)p.a;
-
-			if((-- i) < 0)
-				break;
 		}
 	}
 

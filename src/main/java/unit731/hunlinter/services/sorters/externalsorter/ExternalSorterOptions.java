@@ -35,11 +35,13 @@ public class ExternalSorterOptions{
 	private final boolean writeOutputAsZip;
 	/** ZIP buffer size [B] */
 	private final int zipBufferSize;
+	/** Line separator for output file */
+	private final String lineSeparator;
 
 
 	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
 			final boolean sortInParallel, final int maxTemporaryFiles, final long maxTemporaryFileSize,
-			final boolean useTemporaryAsZip, final boolean writeOutputAsZip, final int zipBufferSize){
+			final boolean useTemporaryAsZip, final boolean writeOutputAsZip, final int zipBufferSize, final String lineSeparator){
 		this.charset = charset;
 		this.comparator = comparator;
 		this.removeDuplicates = removeDuplicates;
@@ -49,6 +51,7 @@ public class ExternalSorterOptions{
 		this.useTemporaryAsZip = useTemporaryAsZip;
 		this.writeOutputAsZip = writeOutputAsZip;
 		this.zipBufferSize = zipBufferSize;
+		this.lineSeparator = lineSeparator;
 	}
 
 	public static ExternalSorterOptionsBuilder builder(){
@@ -69,6 +72,7 @@ public class ExternalSorterOptions{
 		private boolean writeOutputAsZip;
 		private int zipBufferSize;
 		private boolean zipBufferSize$set;
+		private String lineSeparator;
 
 
 		ExternalSorterOptionsBuilder(){}
@@ -121,13 +125,19 @@ public class ExternalSorterOptions{
 			return this;
 		}
 
+		public ExternalSorterOptionsBuilder lineSeparator(final String lineSeparator){
+			this.lineSeparator = lineSeparator;
+			return this;
+		}
+
 		@Override
 		public ExternalSorterOptions build(){
 			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
 				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
 				(maxTemporaryFileSize$set? maxTemporaryFileSize: MAX_TEMPORARY_FILE_SIZE_UNLIMITED),
 				useTemporaryAsZip, writeOutputAsZip,
-				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT));
+				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT),
+				lineSeparator);
 		}
 
 	}
@@ -166,6 +176,10 @@ public class ExternalSorterOptions{
 
 	public int getZipBufferSize(){
 		return zipBufferSize;
+	}
+
+	public String getLineSeparator(){
+		return lineSeparator;
 	}
 
 }

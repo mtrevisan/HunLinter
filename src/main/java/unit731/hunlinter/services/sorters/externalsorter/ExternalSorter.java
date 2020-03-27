@@ -73,7 +73,7 @@ public class ExternalSorter{
 					temporaryList.sort(comparator);
 
 				//store chunk
-				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-chunk", ".dat");
+				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-pos-chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseTemporaryAsZip())
 					out = new GZIPOutputStream(out, options.getZipBufferSize()){
@@ -192,7 +192,7 @@ public class ExternalSorter{
 	private void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options,
 			final Queue<BinaryFileBuffer> queue) throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
-			mergeSort(queue, options.isRemoveDuplicates(), writer);
+			mergeSort(queue, options.isRemoveDuplicates(), writer, options.getLineSeparator());
 		}
 		finally{
 			for(final BinaryFileBuffer buffer : queue)
@@ -200,8 +200,8 @@ public class ExternalSorter{
 		}
 	}
 
-	private void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer)
-			throws IOException{
+	private void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer,
+			final String lineSeparator) throws IOException{
 		String lastLine = null;
 		while(!queue.isEmpty()){
 			final BinaryFileBuffer buffer = queue.poll();
@@ -210,7 +210,7 @@ public class ExternalSorter{
 			//skip duplicated lines
 			if(!removeDuplicates || !line.equals(lastLine)){
 				writer.write(line);
-				writer.newLine();
+				writer.write(lineSeparator);
 				lastLine = line;
 			}
 
