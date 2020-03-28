@@ -63,7 +63,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			builder.add(chs);
 		};
 //		final Runnable completed = () -> {
-//			LOGGER.info(ParserManager.MARKER_APPLICATION, "Post-processing");
+//			resetProcessing("Post-processing");
 //
 //			try{
 //				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
@@ -100,7 +100,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return words;
 		};
 		final Function<Set<String>, FSA> step2 = uniqueWordsSet -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 2/3)");
+			resetProcessing("Create FSA (step 2/3)");
 
 			//lexical order
 			final List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
@@ -111,7 +111,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return builder.complete();
 		};
 		final Function<FSA, File> step3 = fsa -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 3/3)");
+			resetProcessing("Compress FSA (step 3/3)");
 
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();

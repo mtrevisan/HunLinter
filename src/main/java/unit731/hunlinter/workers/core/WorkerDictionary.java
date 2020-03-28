@@ -32,9 +32,6 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor);
 
-		//FIXME to be transferred into resetProcessing
-		setProgress(0);
-
 		try{
 			if(workerData.isParallelProcessing()){
 				//load dictionary

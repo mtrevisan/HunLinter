@@ -79,7 +79,7 @@ public class WordlistWorker extends WorkerDictionary{
 			return outputFile;
 		};
 		final Function<File, File> step2 = file -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting");
+			resetProcessing("Sorting");
 
 			//sort file & remove duplicates
 			final ExternalSorter sorter = new ExternalSorter();
