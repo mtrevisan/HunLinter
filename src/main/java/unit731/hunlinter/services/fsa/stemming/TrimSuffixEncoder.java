@@ -49,7 +49,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, 1 + target.remaining() - sharedPrefix);
 
-		assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
+		//assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
 
 		final byte suffixTrimCode = (byte)(truncateBytes + 'A');
 		reuse.put(suffixTrimCode).put(target.array(), sharedPrefix, target.remaining() - sharedPrefix).flip();
@@ -63,7 +63,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
-		assert encoded.remaining() >= 1;
+		//assert encoded.remaining() >= 1;
 
 		int suffixTrimCode = encoded.get(encoded.position());
 		int truncateBytes = (suffixTrimCode - 'A') & 0xFF;
@@ -75,8 +75,8 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, len1 + len2);
 
-		assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
-		assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
+		//assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
+		//assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
 
 		reuse.put(source.array(), 0, len1).put(encoded.array(), 1, len2).flip();
 

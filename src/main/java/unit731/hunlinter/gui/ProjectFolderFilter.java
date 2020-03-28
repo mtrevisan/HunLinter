@@ -52,7 +52,7 @@ public class ProjectFolderFilter extends FileFilter{
 	 *
 	 * @return	The description of this filter
 	 */
-	public String getDescription() {
+	public String getDescription(){
 		return description;
 	}
 

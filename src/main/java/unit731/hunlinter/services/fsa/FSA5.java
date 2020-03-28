@@ -206,7 +206,7 @@ public class FSA5 extends FSA{
 	@Override
 	public int getEndNode(int arc){
 		final int nodeOffset = getDestinationNodeOffset(arc);
-		assert nodeOffset != 0: "No target node for terminal arcs.";
+		//assert nodeOffset != 0: "No target node for terminal arcs.";
 		return nodeOffset;
 	}
 
@@ -241,7 +241,7 @@ public class FSA5 extends FSA{
 	 */
 	@Override
 	public int getRightLanguageCount(int node){
-		assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
+		//assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
 		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
 	}
 

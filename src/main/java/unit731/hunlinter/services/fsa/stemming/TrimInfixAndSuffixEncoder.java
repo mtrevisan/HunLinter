@@ -43,8 +43,8 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 
 
 	public ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, ByteBuffer reuse){
-		assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
-		assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
+		//assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
+		//assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
 
 		//Search for the infix that can be encoded and remove from `source`
 		//to get a maximum-length prefix of `target`. This could be done more efficiently
@@ -110,7 +110,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
-		assert encoded.remaining() >= 3;
+		//assert encoded.remaining() >= 3;
 
 		final int p = encoded.position();
 		int infixIndex = (encoded.get(p) - 'A') & 0xFF;
@@ -127,8 +127,8 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		final int len2 = encoded.remaining() - 3;
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, infixIndex + len1 + len2);
 
-		assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
-		assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
+		//assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
+		//assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
 
 		reuse.put(source.array(), 0, infixIndex);
 		reuse.put(source.array(), infixIndex + infixLength, len1);

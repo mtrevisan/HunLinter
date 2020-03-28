@@ -106,7 +106,7 @@ public class BufferUtils{
 	 * consumed (mark is set and reset).
 	 */
 	public static CharBuffer bytesToChars(final CharsetDecoder decoder, final ByteBuffer bytes, CharBuffer chars){
-		assert decoder.malformedInputAction() == CodingErrorAction.REPORT;
+		//assert decoder.malformedInputAction() == CodingErrorAction.REPORT;
 
 		chars = clearAndEnsureCapacity(chars, (int) (bytes.remaining() * decoder.maxCharsPerByte()));
 
@@ -124,9 +124,9 @@ public class BufferUtils{
 		}
 
 		//this should be guaranteed by ensuring max. capacity
-		assert cr.isUnderflow();
+		//assert cr.isUnderflow();
 		cr = decoder.flush(chars);
-		assert cr.isUnderflow();
+		//assert cr.isUnderflow();
 
 		chars.flip();
 		bytes.reset();
@@ -156,9 +156,9 @@ public class BufferUtils{
 			}
 		}
 
-		assert cr.isUnderflow();  // This should be guaranteed by ensuring max. capacity.
+		//assert cr.isUnderflow();  // This should be guaranteed by ensuring max. capacity.
 		cr = encoder.flush(bytes);
-		assert cr.isUnderflow();
+		//assert cr.isUnderflow();
 
 		bytes.flip();
 		chars.reset();

@@ -202,8 +202,8 @@ public class CFSA2 extends FSA{
 	public int getEndNode(final int arc){
 		final int nodeOffset = getDestinationNodeOffset(arc);
 
-		assert nodeOffset != 0 : "Can't follow a terminal arc: " + arc;
-		assert nodeOffset < arcs.length : "Node out of bounds.";
+		//assert nodeOffset != 0 : "Can't follow a terminal arc: " + arc;
+		//assert nodeOffset < arcs.length : "Node out of bounds.";
 
 		return nodeOffset;
 	}
@@ -300,7 +300,7 @@ public class CFSA2 extends FSA{
 		if((flag & BIT_TARGET_NEXT) == 0)
 			offset = skipVInt(offset);
 
-		assert offset < this.arcs.length;
+		//assert offset < this.arcs.length;
 
 		return offset;
 	}
@@ -318,7 +318,7 @@ public class CFSA2 extends FSA{
 
 	/** Return the byte-length of a v-coded int */
 	static int vIntLength(int value){
-		assert value >= 0: "Can't v-code negative integers.";
+		//assert value >= 0: "Can't v-code negative integers.";
 
 		int bytes;
 		for(bytes = 1; value >= 0x80; bytes ++)
