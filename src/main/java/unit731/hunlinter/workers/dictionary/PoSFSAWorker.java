@@ -4,7 +4,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.InflectionTag;
@@ -20,9 +19,6 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
-import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
-import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
-import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -32,10 +28,8 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -44,7 +38,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,15 +66,15 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final File supportFile;
-		final BufferedWriter writer;
-		try{
-			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
-			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
-		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
-		}
+//		final File supportFile;
+//		final BufferedWriter writer;
+//		try{
+//			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
+//			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
+//		}
+//		catch(final IOException e){
+//			throw new RuntimeException(e);
+//		}
 
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
@@ -109,9 +102,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
-			//better not be parallel: here may be problems in writing the initial list
 			.withParallelProcessing()
-			.withDataCancelledCallback(e -> closeWriter(writer))
+//			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
 		final Function<Void, Void> step1 = ignored -> {
@@ -120,7 +112,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 TimeWatch watch = TimeWatch.start();
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
-			closeWriter(writer);
+//			closeWriter(writer);
 watch.stop();
 System.out.println("1: " + watch.toStringMillis());
 
