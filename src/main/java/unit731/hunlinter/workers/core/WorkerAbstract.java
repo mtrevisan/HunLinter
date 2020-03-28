@@ -69,9 +69,9 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		return null;
 	}
 
-	protected Void resetProcessing(final String message){
+	protected Void resetProcessing(final String message, final Object... params){
 		setProgress(0);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
 	}

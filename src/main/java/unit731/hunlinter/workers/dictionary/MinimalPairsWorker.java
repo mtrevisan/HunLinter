@@ -81,14 +81,12 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			return outputFile;
 		};
 		final Function<File, Map<String, List<String>>> step2 = supportFile -> {
-			setProgress(0);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting minimal pairs (step 2/3)");
+			resetProcessing("Extracting minimal pairs (step 2/3)");
 
 			return extractMinimalPairs(outputFile);
 		};
 		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
-			setProgress(0);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Reordering minimal pairs (step 3/3)");
+			resetProcessing("Reordering minimal pairs (step 3/3)");
 
 			createMinimalPairsFile(outputFile, minimalPairs);
 

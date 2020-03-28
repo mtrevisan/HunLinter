@@ -179,8 +179,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final ArrayList<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Extracting duplicates (step 2/3)");
-			setProgress(0);
+			resetProcessing("Extracting duplicates (step 2/3)");
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
