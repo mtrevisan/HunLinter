@@ -157,7 +157,7 @@ public class SerializerTestBase{
 	}
 
 	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
-		byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
+		byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream(), null).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
 		FSATestUtils.checkCorrect(in, fsa);
@@ -178,7 +178,7 @@ public class SerializerTestBase{
 
 		byte[] fsaData = createSerializer()
 			.serializeWithNumbers()
-			.serialize(s, new ByteArrayOutputStream())
+			.serialize(s, new ByteArrayOutputStream(), null)
 			.toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));

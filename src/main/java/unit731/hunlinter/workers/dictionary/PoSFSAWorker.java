@@ -129,7 +129,7 @@ TimeWatch watch = TimeWatch.start();
 			encodings.trimToSize();
 //			closeWriter(writer);
 watch.stop();
-System.out.println("1: " + watch.toStringMillis());
+System.out.println(watch.toStringMillis());
 
 			return encodings;
 		};
@@ -144,7 +144,7 @@ TimeWatch watch = TimeWatch.start();
 				sleepOnPause();
 			});
 watch.stop();
-System.out.println("2: " + watch.toStringMillis());
+System.out.println(watch.toStringMillis());
 //			final ExternalSorter sorter = new ExternalSorter();
 //			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 //				.charset(charset)
@@ -167,7 +167,7 @@ System.out.println("2: " + watch.toStringMillis());
 			return list;
 		};
 		final Function<List<byte[]>, FSA> step3 = list -> {
-			resetProcessing("Create FSA (step 3/4)");
+			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -183,7 +183,7 @@ TimeWatch watch = TimeWatch.start();
 				sleepOnPause();
 			}
 watch.stop();
-System.out.println("3: " + watch.toStringMillis());
+System.out.println(watch.toStringMillis());
 
 //			if(!file.delete())
 //				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
@@ -191,14 +191,18 @@ System.out.println("3: " + watch.toStringMillis());
 			return builder.complete();
 		};
 		final Function<FSA, File> step4 = fsa -> {
-			resetProcessing("Compress FSA (step 4/4)");
+			resetProcessing("Compressing FSA (step 4/4)");
 
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 TimeWatch watch = TimeWatch.start();
-				serializer.serialize(fsa, os);
+				serializer.serialize(fsa, os, (index, total) -> {
+					setProgress(index, total);
+
+					sleepOnPause();
+				});
 watch.stop();
-System.out.println("4: " + watch.toStringMillis());
+System.out.println(watch.toStringMillis());
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 

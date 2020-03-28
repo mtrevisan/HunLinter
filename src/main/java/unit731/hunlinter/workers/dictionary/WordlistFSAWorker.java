@@ -116,7 +116,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
-				serializer.serialize(fsa, os);
+				serializer.serialize(fsa, os, null);
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 

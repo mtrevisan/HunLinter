@@ -117,7 +117,7 @@ class CFSA2SerializerTest{
 	}
 
 	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
-		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream()).toByteArray();
+		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream(), null).toByteArray();
 
 		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
 		FSATestUtils.checkCorrect(in, fsa);
@@ -136,7 +136,7 @@ class CFSA2SerializerTest{
 		FSABuilder builder = new FSABuilder();
 		FSA fsa1 = builder.build(in);
 
-		byte[] fsaData = createSerializer().serializeWithNumbers().serialize(fsa1, new ByteArrayOutputStream()).toByteArray();
+		byte[] fsaData = createSerializer().serializeWithNumbers().serialize(fsa1, new ByteArrayOutputStream(), null).toByteArray();
 
 		FSA fsa2 = FSA.read(new ByteArrayInputStream(fsaData));
 
