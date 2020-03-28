@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import unit731.hunlinter.workers.core.IndexDataPair;
 
 
 /**
@@ -29,6 +32,28 @@ public class HunSpellRegexWordGenerator{
 		GeneratedElement(final List<String> word, final int stateIndex){
 			this.word = word;
 			this.stateIndex = stateIndex;
+		}
+
+		@Override
+		public boolean equals(final Object obj){
+			if(obj == this)
+				return true;
+			if(obj == null || obj.getClass() != getClass())
+				return false;
+
+			final GeneratedElement rhs = (GeneratedElement)obj;
+			return new EqualsBuilder()
+				.append(word, rhs.word)
+				.append(stateIndex, rhs.stateIndex)
+				.isEquals();
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(word)
+				.append(stateIndex)
+				.toHashCode();
 		}
 
 	}

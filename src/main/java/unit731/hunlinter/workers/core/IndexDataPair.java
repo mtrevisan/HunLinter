@@ -1,5 +1,8 @@
 package unit731.hunlinter.workers.core;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 
 public class IndexDataPair<T>{
 
@@ -27,6 +30,28 @@ public class IndexDataPair<T>{
 	@Override
 	public String toString(){
 		return index + ": " + data;
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final IndexDataPair<?> rhs = (IndexDataPair<?>)obj;
+		return new EqualsBuilder()
+			.append(index, rhs.index)
+			.append(data, rhs.data)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(index)
+			.append(data)
+			.toHashCode();
 	}
 
 }

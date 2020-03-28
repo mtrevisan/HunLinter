@@ -19,6 +19,7 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
+import unit731.hunlinter.services.sorters.HeapSort;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -37,8 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +50,17 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private static final Logger LOGGER = LoggerFactory.getLogger(PoSFSAWorker.class);
 
 	public static final String WORKER_NAME = "Part–of–Speech FSA Extractor";
+
+	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
+	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
+
+
+	//encoding support variables:
+	private ByteBuffer encoded = ByteBuffer.allocate(0);
+	private ByteBuffer source = ByteBuffer.allocate(0);
+	private ByteBuffer target = ByteBuffer.allocate(0);
+	private ByteBuffer tag = ByteBuffer.allocate(0);
+	private ByteBuffer assembled = ByteBuffer.allocate(0);
 
 
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
@@ -79,13 +89,17 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
 //		final ArrayList<String> list = new ArrayList<>();
-		final List<Inflection> inflections = new ArrayList<>(50_000_000);
+		final ArrayList<byte[]> encodings = new ArrayList<>(50_000_000);
 //		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] currentInflections = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			inflections.addAll(Arrays.asList(currentInflections));
+			final List<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
+
+			encodings.addAll(currentEncodings);
+
+			sleepOnPause();
 
 //			forEach(currentInflections, inflection -> {
 //				final List<String> lines = inflection.toStringPoSFSA(sequenceEncoder);
@@ -102,44 +116,35 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
-			.withParallelProcessing()
+//			.withParallelProcessing()
 //			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
-		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/5)");
+		final Function<Void, List<byte[]>> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
 TimeWatch watch = TimeWatch.start();
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
+			encodings.trimToSize();
 //			closeWriter(writer);
 watch.stop();
 System.out.println("1: " + watch.toStringMillis());
 
-			return null;
-		};
-		final Function<Void, List<byte[]>> step2 = ignored -> {
-			resetProcessing("Encoding lines (step 2/5)");
-
-TimeWatch watch = TimeWatch.start();
-			final List<byte[]> encodings = encode(inflections, separator, sequenceEncoder);
-watch.stop();
-System.out.println("2: " + watch.toStringMillis());
-
 			return encodings;
 		};
-		final Function<List<byte[]>, List<byte[]>> step3 = encodings -> {
-			resetProcessing("Sorting (step 3/5)");
+		final Function<List<byte[]>, List<byte[]>> step2 = list -> {
+			resetProcessing("Sorting (step 2/4)");
 
 TimeWatch watch = TimeWatch.start();
-			//remove duplicates & sort file
-			encodings = new ArrayList<>(new HashSet<>(encodings));
+			//sort file
+			HeapSort.sort(list, FSABuilder.LEXICAL_ORDERING, (index, total) -> {
+				setProgress(index, total);
 
-			setProgress(50);
-
-			Collections.sort(encodings, FSABuilder.LEXICAL_ORDERING);
+				sleepOnPause();
+			});
 watch.stop();
-System.out.println("3: " + watch.toStringMillis());
+System.out.println("2: " + watch.toStringMillis());
 //			final ExternalSorter sorter = new ExternalSorter();
 //			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 //				.charset(charset)
@@ -159,10 +164,10 @@ System.out.println("3: " + watch.toStringMillis());
 //				throw new RuntimeException(e);
 //			}
 
-			return encodings;
+			return list;
 		};
-		final Function<List<byte[]>, FSA> step4 = encodings -> {
-			resetProcessing("Create FSA (step 4/5)");
+		final Function<List<byte[]>, FSA> step3 = list -> {
+			resetProcessing("Create FSA (step 3/4)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -170,28 +175,30 @@ System.out.println("3: " + watch.toStringMillis());
 
 TimeWatch watch = TimeWatch.start();
 			int index = 0;
-			for(final byte[] encoding : encodings){
+			for(final byte[] encoding : list){
 				fsaProcessor.accept(IndexDataPair.of(index, encoding));
 
-				setProgress(++ index, encodings.size());
+				setProgress(++ index, list.size());
+
+				sleepOnPause();
 			}
 watch.stop();
-System.out.println("4: " + watch.toStringMillis());
+System.out.println("3: " + watch.toStringMillis());
 
 //			if(!file.delete())
 //				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step5 = fsa -> {
-			resetProcessing("Compress FSA (step 5/5)");
+		final Function<FSA, File> step4 = fsa -> {
+			resetProcessing("Compress FSA (step 4/4)");
 
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 TimeWatch watch = TimeWatch.start();
 				serializer.serialize(fsa, os);
 watch.stop();
-System.out.println("5: " + watch.toStringMillis());
+System.out.println("4: " + watch.toStringMillis());
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
@@ -203,8 +210,8 @@ System.out.println("5: " + watch.toStringMillis());
 				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step6 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5).andThen(step6));
+		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
 	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
@@ -232,77 +239,65 @@ System.out.println("5: " + watch.toStringMillis());
 		}
 	}
 
-	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
-	private static final String SINGLE_STEM_NOT_PRESENT = "Stem not unique";
-	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
-
-	private List<byte[]> encode(final List<Inflection> inflections, final byte separator,
+	private List<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
-		ByteBuffer encoded = ByteBuffer.allocate(0);
-		ByteBuffer source = ByteBuffer.allocate(0);
-		ByteBuffer target = ByteBuffer.allocate(0);
-		ByteBuffer tag = ByteBuffer.allocate(0);
-		ByteBuffer assembled = ByteBuffer.allocate(0);
 		final List<byte[]> out = new ArrayList<>();
-		int index = 0;
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
+			final String word = inflection.getWord();
 
 			//extract Part-of-Speech
 			final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
 			if(pos.size() != 1)
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
 			//extract stem
-			final List<String> stem = bucket.get(MorphologicalTag.STEM);
-			if(stem.size() != 1)
-				throw new LinterException(SINGLE_STEM_NOT_PRESENT);
+			final List<String> stems = bucket.get(MorphologicalTag.STEM);
+			for(final String stem : stems){
+				final byte[] inflectionStem = StringHelper.getRawBytes(stem);
+				source = BufferUtils.clearAndEnsureCapacity(source, inflectionStem.length - 3);
+				source.put(inflectionStem, 3, inflectionStem.length - 3);
+				source.flip();
 
-			final byte[] inflectionStem = StringHelper.getRawBytes(stem.get(0));
-			source = BufferUtils.clearAndEnsureCapacity(source, inflectionStem.length - 3);
-			source.put(inflectionStem, 3, inflectionStem.length - 3);
-			source.flip();
+				final byte[] inflectedWord = StringHelper.getRawBytes(word);
+				target = BufferUtils.clearAndEnsureCapacity(target, inflectedWord.length);
+				target.put(inflectedWord);
+				target.flip();
 
-			final byte[] inflectedWord = StringHelper.getRawBytes(inflection.getWord());
-			target = BufferUtils.clearAndEnsureCapacity(target, inflectedWord.length);
-			target.put(inflectedWord);
-			target.flip();
+				//extract Inflection
+				final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
+				final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 
-			//extract Inflection
-			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
-			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
-
-			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
-			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
-			if(suffixInflection != null)
-				for(final String code : suffixInflection)
-					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
-						tag.put(POS_FSA_TAG_SEPARATOR)
-							.put(StringHelper.getRawBytes(t));
-			if(prefixInflection != null)
-				for(final String code : prefixInflection)
-					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
-						tag.put(POS_FSA_TAG_SEPARATOR)
-							.put(StringHelper.getRawBytes(t));
-			tag.flip();
+				tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
+				tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
+				if(suffixInflection != null)
+					for(final String code : suffixInflection)
+						for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+							tag.put(POS_FSA_TAG_SEPARATOR)
+								.put(StringHelper.getRawBytes(t));
+				if(prefixInflection != null)
+					for(final String code : prefixInflection)
+						for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+							tag.put(POS_FSA_TAG_SEPARATOR)
+								.put(StringHelper.getRawBytes(t));
+				tag.flip();
 
 
-			encoded = sequenceEncoder.encode(target, source, encoded);
+				encoded = sequenceEncoder.encode(target, source, encoded);
 
-			assembled = BufferUtils.clearAndEnsureCapacity(assembled,
-				target.capacity() + 1 + encoded.capacity() + 1 + tag.remaining());
-			assembled.put(target);
-			assembled.put(separator);
-			assembled.put(encoded);
-			if(tag.hasRemaining()){
+				assembled = BufferUtils.clearAndEnsureCapacity(assembled,
+					target.capacity() + 1 + encoded.capacity() + 1 + tag.remaining());
+				assembled.put(target);
 				assembled.put(separator);
-				assembled.put(tag);
+				assembled.put(encoded);
+				if(tag.hasRemaining()){
+					assembled.put(separator);
+					assembled.put(tag);
+				}
+				assembled.flip();
+
+				out.add(BufferUtils.toArray(assembled));
 			}
-			assembled.flip();
-
-			out.add(BufferUtils.toArray(assembled));
-
-			setProgress(++ index, inflections.size());
 		}
 		return out;
 	}

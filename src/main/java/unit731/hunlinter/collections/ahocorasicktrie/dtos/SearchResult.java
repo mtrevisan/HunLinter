@@ -1,6 +1,10 @@
 package unit731.hunlinter.collections.ahocorasicktrie.dtos;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+
 /**
  * A result output
  *
@@ -41,6 +45,30 @@ public class SearchResult<V>{
 	@Override
 	public String toString(){
 		return "[" + start + ":" + end + "] = " + value;
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final SearchResult<?> rhs = (SearchResult<?>)obj;
+		return new EqualsBuilder()
+			.append(start, rhs.start)
+			.append(end, rhs.end)
+			.append(value, rhs.value)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(start)
+			.append(end)
+			.append(value)
+			.toHashCode();
 	}
 
 }
