@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  *
  * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
-public class TrimSuffixEncoder implements ISequenceEncoder{
+public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 	/**
 	 * Maximum encodable single-byte code.

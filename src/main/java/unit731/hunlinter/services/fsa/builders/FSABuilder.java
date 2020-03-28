@@ -143,6 +143,7 @@ public class FSABuilder{
 
 		//save last sequence's length so that we don't need to calculate it again
 		activePathLen = len;
+//System.out.println(Arrays.toString(serialized));
 	}
 
 	/**
@@ -298,6 +299,7 @@ public class FSABuilder{
 			throw new IllegalArgumentException("Not an arc multiply: " + byteCount + " mod " + ConstantArcSizeFSA.ARC_SIZE);
 
 		int h = 0;
+		//FIXME remove division
 		for(int arcs = byteCount / ConstantArcSizeFSA.ARC_SIZE; -- arcs >= 0; start += ConstantArcSizeFSA.ARC_SIZE){
 			h = 17 * h + getArcLabel(start);
 			h = 17 * h + getArcTarget(start);

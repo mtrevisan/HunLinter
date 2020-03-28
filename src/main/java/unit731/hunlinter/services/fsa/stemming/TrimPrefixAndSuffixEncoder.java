@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 
 
 /**
- * Encodes <code>dst</code> relative to <code>src</code> by trimming whatever
- * non-equal suffix and prefix <code>src</code> and <code>dst</code> have. The
+ * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
+ * non-equal suffix and prefix <code>source</code> and <code>target</code> have. The
  * output code is (bytes):
  *
  * <pre>
@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
  * </pre>
  *
  * where (<code>P</code> - 'A') bytes should be trimmed from the start of
- * <code>src</code>, (<code>K</code> - 'A') bytes should be trimmed from the
- * end of <code>src</code> and then the <code>suffix</code> should be appended
+ * <code>source</code>, (<code>K</code> - 'A') bytes should be trimmed from the
+ * end of <code>source</code> and then the <code>suffix</code> should be appended
  * to the resulting byte sequence.
  *
  * <p>
@@ -22,39 +22,39 @@ import java.nio.ByteBuffer;
  * </p>
  *
  * <pre>
- * src: abc
- * dst: abcd
+ * source: abc
+ * targer: abcd
  * encoded: AAd
  *
- * src: abc
- * dst: xyz
+ * source: abc
+ * target: xyz
  * encoded: ADxyz
  * </pre>
  *
  * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
  */
-public class TrimPrefixAndSuffixEncoder implements ISequenceEncoder{
+public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 
-	/**
-	 * Maximum encodable single-byte code.
-	 */
+	/** Maximum encodable single-byte code */
 	private static final int REMOVE_EVERYTHING = 255;
 
-	public ByteBuffer encode(ByteBuffer reuse, ByteBuffer source, ByteBuffer target){
-		// Search for the maximum matching subsequence that can be encoded.
+
+	public ByteBuffer encode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer target){
+		//search for the maximum matching subsequence that can be encoded
 		int maxSubsequenceLength = 0;
 		int maxSubsequenceIndex = 0;
 		for(int i = 0; i < source.remaining(); i ++){
-			// prefix at i => shared subsequence (infix)
-			int sharedPrefix = BufferUtils.sharedPrefixLength(source, i, target, 0);
-			// Only update maxSubsequenceLength if we will be able to encode it.
-			if(sharedPrefix > maxSubsequenceLength && i < REMOVE_EVERYTHING && (source.remaining() - (i + sharedPrefix)) < REMOVE_EVERYTHING){
+			//prefix at i => shared subsequence (infix)
+			final int sharedPrefix = BufferUtils.sharedPrefixLength(source, i, target, 0);
+			//only update maxSubsequenceLength if we will be able to encode it
+			if(sharedPrefix > maxSubsequenceLength && i < REMOVE_EVERYTHING
+					&& (source.remaining() - (i + sharedPrefix)) < REMOVE_EVERYTHING){
 				maxSubsequenceLength = sharedPrefix;
 				maxSubsequenceIndex = i;
 			}
 		}
 
-		// Determine how much to remove (and where) from src to get a prefix of dst.
+		//determine how much to remove (and where) from src to get a prefix of dst.
 		int truncatePrefixBytes = maxSubsequenceIndex;
 		int truncateSuffixBytes = (source.remaining() - (maxSubsequenceIndex + maxSubsequenceLength));
 		if(truncatePrefixBytes >= REMOVE_EVERYTHING || truncateSuffixBytes >= REMOVE_EVERYTHING){
@@ -80,7 +80,7 @@ public class TrimPrefixAndSuffixEncoder implements ISequenceEncoder{
 		return 2;
 	}
 
-	public ByteBuffer decode(ByteBuffer reuse, ByteBuffer source, ByteBuffer encoded){
+	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
 		assert encoded.remaining() >= 2;
 
 		final int p = encoded.position();

@@ -74,8 +74,8 @@ public class BufferUtils{
 	}
 
 	/**
-	 * @param buffer The buffer to read from.
-	 * @return Returns the remaining bytes from the buffer copied to an array.
+	 * @param buffer	The buffer to read from.
+	 * @return	The remaining bytes from the buffer copied to an array.
 	 */
 	public static byte[] toArray(final ByteBuffer buffer){
 		final byte[] dst = new byte[buffer.remaining()];
@@ -85,9 +85,7 @@ public class BufferUtils{
 		return dst;
 	}
 
-	/**
-	 * Compute the length of the shared prefix between two byte sequences.
-	 */
+	/** Compute the length of the shared prefix between two byte sequences */
 	static int sharedPrefixLength(final ByteBuffer a, int aStart, final ByteBuffer b, int bStart){
 		int i = 0;
 		final int max = Math.min(a.remaining() - aStart, b.remaining() - bStart);
@@ -98,9 +96,7 @@ public class BufferUtils{
 		return i;
 	}
 
-	/**
-	 * Compute the length of the shared prefix between two byte sequences.
-	 */
+	/** Compute the length of the shared prefix between two byte sequences */
 	static int sharedPrefixLength(final ByteBuffer a, final ByteBuffer b){
 		return sharedPrefixLength(a, 0, b, 0);
 	}
