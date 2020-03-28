@@ -1,6 +1,5 @@
 package unit731.hunlinter.workers.dictionary;
 
-import morfologik.tools.DictCompile;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,7 +15,7 @@ import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
-import unit731.hunlinter.services.fsa.stemming.ISequenceEncoder;
+import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import unit731.hunlinter.services.system.TimeWatch;
@@ -64,7 +63,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
 		final byte separator = metadata.getSeparator();
-		final ISequenceEncoder sequenceEncoder = metadata.getSequenceEncoderType().get();
+		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
 		final File supportFile;
@@ -225,7 +224,7 @@ final File file = new File(input);
 		}
 	}
 
-	private void encode(final List<String> words, final byte separator, final ISequenceEncoder sequenceEncoder){
+	private void encode(final List<String> words, final byte separator, final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
 		ByteBuffer target = ByteBuffer.allocate(0);
@@ -292,7 +291,7 @@ final File file = new File(input);
 			"--input", input
 		};
 		TimeWatch watch = TimeWatch.start();
-		DictCompile.main(buildOptions);
+		morfologik.tools.DictCompile.main(buildOptions);
 		watch.stop();
 		//153/251 s
 		System.out.println(watch.toStringMillis());
