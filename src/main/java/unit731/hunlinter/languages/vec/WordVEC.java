@@ -73,7 +73,7 @@ public class WordVEC{
 		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 
-	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
+	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>(5);
 	static{
 		ACUTE_STRESSES.put("a", "à");
 		ACUTE_STRESSES.put("e", "é");

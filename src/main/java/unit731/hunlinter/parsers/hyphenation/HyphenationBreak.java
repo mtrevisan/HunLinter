@@ -22,7 +22,7 @@ public class HyphenationBreak{
 			int syllabesCount);
 	}
 
-	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = new HashMap<>();
+	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = new HashMap<>(4);
 	static{
 		NO_HYPHENATION_MANAGE_METHODS.put("  ", HyphenationBreak::manageInside);
 		NO_HYPHENATION_MANAGE_METHODS.put("^ ", HyphenationBreak::manageStartsWith);

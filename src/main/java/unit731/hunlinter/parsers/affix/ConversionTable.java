@@ -38,7 +38,7 @@ public class ConversionTable{
 	private static final String KEY_WHOLE = reduceKey("^$");
 	private static final String ZERO = "0";
 
-	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>();
+	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>(4);
 	static{
 		CONVERSION_TABLE_ADD_METHODS.put(KEY_INSIDE, ConversionTable::convertInside);
 		CONVERSION_TABLE_ADD_METHODS.put(KEY_STARTS_WITH, ConversionTable::convertStartsWith);

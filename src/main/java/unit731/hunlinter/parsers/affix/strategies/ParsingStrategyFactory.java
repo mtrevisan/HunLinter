@@ -12,7 +12,7 @@ public class ParsingStrategyFactory{
 	private static final MessageFormat UNKNOWN_TYPE = new MessageFormat("Unknown strategy type: {0}");
 
 
-	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>();
+	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>(4);
 	static{
 		STRATEGIES.put(null, CharsetParsingStrategy.getASCIIInstance());
 		STRATEGIES.put("UTF-8", CharsetParsingStrategy.getUTF8Instance());
