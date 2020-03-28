@@ -17,19 +17,17 @@ import java.nio.ByteBuffer;
 public interface SequenceEncoderInterface{
 
 	/**
-	 * Encodes <code>target</code> relative to <code>source</code>,
-	 * optionally reusing the provided {@link ByteBuffer}.
+	 * Encodes <code>target</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
-	 * @param reuse	Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
-	 * @param source	The source byte sequence.
-	 * @param target	The target byte sequence to encode relative to <code>source</code>
+	 * @param source   The source byte sequence.
+	 * @param target   The target byte sequence to encode relative to <code>source</code>
+	 * @param reuse   Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
 	 * @return	The {@link ByteBuffer} with encoded <code>target</code>.
 	 */
-	ByteBuffer encode(final ByteBuffer reuse, final ByteBuffer source, final ByteBuffer target);
+	ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, final ByteBuffer reuse);
 
 	/**
-	 * Decodes <code>encoded</code> relative to <code>source</code>,
-	 * optionally reusing the provided {@link ByteBuffer}.
+	 * Decodes <code>encoded</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param reuse	Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
 	 * @param source	The source byte sequence.

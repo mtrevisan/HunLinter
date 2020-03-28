@@ -4,15 +4,15 @@ import java.nio.ByteBuffer;
 
 
 /**
- * Encodes <code>dst</code> relative to <code>src</code> by trimming whatever
- * non-equal suffix and infix <code>src</code> and <code>dst</code> have. The
+ * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
+ * non-equal suffix and infix <code>source</code> and <code>target</code> have. The
  * output code is (bytes):
  *
  * <pre>
  * {X}{L}{K}{suffix}
  * </pre>
  *
- * where <code>src's</code> infix at position (<code>X</code> - 'A') and of
+ * where <code>source</code>'s infix at position (<code>X</code> - 'A') and of
  * length (<code>L</code> - 'A') should be removed, then (<code>K</code> -
  * 'A') bytes should be trimmed from the end and then the <code>suffix</code>
  * should be appended to the resulting byte sequence.
@@ -22,13 +22,13 @@ import java.nio.ByteBuffer;
  * </p>
  *
  * <pre>
- * src: ayz
- * dst: abc
- * encoded: AACbc
+ * source:	ayz
+ * target:	abc
+ * encoded:	AACbc
  *
- * src: aillent
- * dst: aller
- * encoded: BBCr
+ * source:	aillent
+ * target:	aller
+ * encoded:	BBCr
  * </pre>
  *
  * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
@@ -42,36 +42,35 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	private ByteBuffer scratch = ByteBuffer.allocate(0);
 
 
-	public ByteBuffer encode(ByteBuffer reuse, ByteBuffer source, ByteBuffer target){
+	public ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, ByteBuffer reuse){
 		assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
-
 		assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
 
-		// Search for the infix that can we can encode and remove from src
-		// to get a maximum-length prefix of dst. This could be done more efficiently
-		// by running a smarter longest-common-subsequence algorithm and some pruning (?).
+		//Search for the infix that can be encoded and remove from `source`
+		//to get a maximum-length prefix of `target`. This could be done more efficiently
+		//by running a smarter longest-common-subsequence algorithm and some pruning (?).
 		//
-		// For now, naive loop should do.
+		//For now, naive loop should do.
 
-		// There can be only two positions for the infix to delete:
-		// 1) we remove leading bytes, even if they are partially matching (but a longer match exists somewhere later on).
-		// 2) we leave max. matching prefix and remove non-matching bytes that follow.
+		//There can be only two positions for the infix to delete:
+		//	1) we remove leading bytes, even if they are partially matching (but a longer match exists somewhere later on)
+		//	2) we leave maximum matching prefix and remove non-matching bytes that follow
 		int maxInfixIndex = 0;
 		int maxSubsequenceLength = BufferUtils.sharedPrefixLength(source, target);
 		int maxInfixLength = 0;
-		for(int i : new int[]{0, maxSubsequenceLength}){
+		for(final int i : new int[]{0, maxSubsequenceLength}){
 			for(int j = 1; j <= source.remaining() - i; j ++){
-				// Compute temporary src with the infix removed.
-				// Concatenate in scratch space for simplicity.
+				//compute temporary `source` with the infix removed
+				//concatenate in scratch space for simplicity
 				final int len2 = source.remaining() - (i + j);
 				scratch = BufferUtils.clearAndEnsureCapacity(scratch, i + len2);
 				scratch.put(source.array(), 0, i);
 				scratch.put(source.array(), i + j, len2);
 				scratch.flip();
 
-				int sharedPrefix = BufferUtils.sharedPrefixLength(scratch, target);
+				final int sharedPrefix = BufferUtils.sharedPrefixLength(scratch, target);
 
-				// Only update maxSubsequenceLength if we will be able to encode it.
+				//only update `maxSubsequenceLength` if we will be able to encode it
 				if(sharedPrefix > 0 && sharedPrefix > maxSubsequenceLength && i < REMOVE_EVERYTHING && j < REMOVE_EVERYTHING){
 					maxSubsequenceLength = sharedPrefix;
 					maxInfixIndex = i;
@@ -82,8 +81,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 
 		int truncateSuffixBytes = source.remaining() - (maxInfixLength + maxSubsequenceLength);
 
-		// Special case: if we're removing the suffix in the infix code, move it
-		// to the suffix code instead.
+		//special case: if we're removing the suffix in the infix code, move it to the suffix code instead
 		if(truncateSuffixBytes == 0 && maxInfixIndex + maxInfixLength == source.remaining()){
 			truncateSuffixBytes = maxInfixLength;
 			maxInfixIndex = maxInfixLength = 0;
@@ -97,9 +95,9 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		final int len1 = target.remaining() - maxSubsequenceLength;
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, 3 + len1);
 
-		reuse.put((byte) ((maxInfixIndex + 'A') & 0xFF));
-		reuse.put((byte) ((maxInfixLength + 'A') & 0xFF));
-		reuse.put((byte) ((truncateSuffixBytes + 'A') & 0xFF));
+		reuse.put((byte)((maxInfixIndex + 'A') & 0xFF));
+		reuse.put((byte)((maxInfixLength + 'A') & 0xFF));
+		reuse.put((byte)((truncateSuffixBytes + 'A') & 0xFF));
 		reuse.put(target.array(), maxSubsequenceLength, len1);
 		reuse.flip();
 
@@ -111,7 +109,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		return 3;
 	}
 
-	public ByteBuffer decode(ByteBuffer reuse, ByteBuffer source, ByteBuffer encoded){
+	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
 		assert encoded.remaining() >= 3;
 
 		final int p = encoded.position();
@@ -130,7 +128,6 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, infixIndex + len1 + len2);
 
 		assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
-
 		assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
 
 		reuse.put(source.array(), 0, infixIndex);

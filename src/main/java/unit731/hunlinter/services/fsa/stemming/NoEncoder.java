@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 public class NoEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public ByteBuffer encode(ByteBuffer reuse, ByteBuffer source, ByteBuffer target){
+	public ByteBuffer encode(ByteBuffer source, ByteBuffer target, ByteBuffer reuse){
 		reuse = BufferUtils.clearAndEnsureCapacity(reuse, target.remaining());
 
 		target.mark();

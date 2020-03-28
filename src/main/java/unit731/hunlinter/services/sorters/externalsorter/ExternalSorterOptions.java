@@ -17,6 +17,8 @@ public class ExternalSorterOptions{
 	/** Default ZIP buffer size [B] */
 	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
 
+	private static final String LINE_SEPARATOR_DEFAULT = System.lineSeparator();
+
 
 	private final Charset charset;
 	/** String comparator */
@@ -51,7 +53,7 @@ public class ExternalSorterOptions{
 		this.useTemporaryAsZip = useTemporaryAsZip;
 		this.writeOutputAsZip = writeOutputAsZip;
 		this.zipBufferSize = zipBufferSize;
-		this.lineSeparator = (lineSeparator != null? lineSeparator: System.lineSeparator());
+		this.lineSeparator = (lineSeparator != null? lineSeparator: LINE_SEPARATOR_DEFAULT);
 	}
 
 	public static ExternalSorterOptionsBuilder builder(){

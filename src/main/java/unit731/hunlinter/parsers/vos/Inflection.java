@@ -1,10 +1,7 @@
 package unit731.hunlinter.parsers.vos;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -12,18 +9,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.enums.InflectionTag;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
-import unit731.hunlinter.services.SetHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class Inflection extends DictionaryEntry{
-
-	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
@@ -31,7 +21,6 @@ public class Inflection extends DictionaryEntry{
 	private static final String POS_FIELD_PREFIX = ":";
 
 	public static final String POS_FSA_SEPARATOR = ",";
-	private static final String POS_FSA_TAG_SEPARATOR = "+";
 
 
 	private AffixEntry[] appliedRules;
@@ -169,6 +158,10 @@ public class Inflection extends DictionaryEntry{
 		return (morphologicalFields != null? StringUtils.join(morphologicalFields, StringUtils.SPACE): StringUtils.EMPTY);
 	}
 
+	public String[] getMorphologicalFieldsAsArray(){
+		return morphologicalFields;
+	}
+
 	@Override
 	public boolean isCompound(){
 		return (compoundEntries != null && compoundEntries.length > 0);
@@ -181,45 +174,6 @@ public class Inflection extends DictionaryEntry{
 			return word + POS_FIELD_PREFIX + StringUtils.join(pos, StringUtils.SPACE);
 		}
 		return word;
-	}
-
-	public List<String> toStringPoSFSA(){
-		//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
-		final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags();
-
-		//extract Part-of-Speech
-		final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
-		if(pos.size() != 1)
-			throw new LinterException(SINGLE_POS_NOT_PRESENT);
-
-		//extract Inflection
-		final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
-		final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
-
-		final StringJoiner sj = new StringJoiner(POS_FSA_TAG_SEPARATOR);
-		sj.add(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag());
-		forEach(suffixInflection,
-			code -> forEach(InflectionTag.createFromCodeAndValue(code).getTags(), sj::add));
-		forEach(prefixInflection,
-			code -> forEach(InflectionTag.createFromCodeAndValue(code).getTags(), sj::add));
-
-		final byte[] suffix = (POS_FSA_SEPARATOR + word + POS_FSA_SEPARATOR + sj).getBytes(StandardCharsets.UTF_8);
-		//extract stem
-		final List<String> stem = bucket.get(MorphologicalTag.STEM);
-		for(int i = 0; i < stem.size(); i ++){
-			final byte[] s = stem.get(i).getBytes(StandardCharsets.UTF_8);
-			final int offset = s.length - 3;
-			final byte[] ss = new byte[offset + suffix.length];
-			System.arraycopy(s, 3, ss, 0, offset);
-			System.arraycopy(suffix, 0, ss, offset, suffix.length);
-			stem.set(i, new String(ss, StandardCharsets.UTF_8));
-		}
-		return stem;
-	}
-
-	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
-	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(){
-		return SetHelper.bucket(morphologicalFields, MorphologicalTag::createFromCode, MorphologicalTag.class);
 	}
 
 	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){

@@ -7,9 +7,13 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.enums.InflectionTag;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
@@ -18,12 +22,14 @@ import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import unit731.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
+import unit731.hunlinter.services.system.LoopHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -33,17 +39,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class PoSFSAWorker extends WorkerDictionary{
@@ -79,27 +86,27 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
 //		final ArrayList<String> list = new ArrayList<>();
+		final List<Inflection> inflections = new ArrayList<>(50_000_000);
 //		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final Inflection[] currentInflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, inflection -> {
-				final List<String> lines = inflection.toStringPoSFSA();
+			inflections.addAll(Arrays.asList(currentInflections));
+
+//			forEach(currentInflections, inflection -> {
+//				final List<String> lines = inflection.toStringPoSFSA(sequenceEncoder);
 
 				//encode lines
-				encode(lines, separator, sequenceEncoder);
+//				encode(lines, separator, sequenceEncoder);
 
-				forEach(lines, line -> writeLine(writer, line, StringUtils.LF));
+//				forEach(lines, line -> writeLine(writer, line, StringUtils.LF));
 //				forEach(lines, line -> list.add(collator.getCollationKey(line)));
 //				forEach(lines, list::add);
-			});
+//			});
 		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<IndexDataPair<String>> fsaProcessor = indexData -> {
-			final byte[] chs = StringHelper.getRawBytes(indexData.getData());
-			builder.add(chs);
-		};
+		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
 			//better not be parallel: here may be problems in writing the initial list
@@ -107,82 +114,92 @@ public class PoSFSAWorker extends WorkerDictionary{
 			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
-		final Function<Void, File> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/4)");
+		final Function<Void, Void> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/5)");
 
+TimeWatch watch = TimeWatch.start();
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
 			closeWriter(writer);
-
-			return supportFile;
-		};
-		final Function<File, File> step2 = file -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sorting (step 2/4)");
-
-			setProgress(0);
-
-			//sort file & remove duplicates
-			final ExternalSorter sorter = new ExternalSorter();
-			final ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(charset)
-				.sortInParallel()
-				//lexical order
-				.comparator(Comparator.naturalOrder())
-				.removeDuplicates()
-				.lineSeparator(StringUtils.LF)
-				.build();
-			try{
-TimeWatch watch = TimeWatch.start();
-				sorter.sort(file, options, file);
 watch.stop();
-System.out.println(watch.toStringMillis());
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
+System.out.println("1: " + watch.toStringMillis());
 
-			return file;
+			return null;
 		};
-		final Function<File, FSA> step3 = file -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
+		final Function<Void, List<byte[]>> step2 = ignored -> {
+			resetProcessing("Encoding lines (step 2/5)");
+
+TimeWatch watch = TimeWatch.start();
+			final List<byte[]> encodings = encode(inflections, separator, sequenceEncoder);
+watch.stop();
+System.out.println("2: " + watch.toStringMillis());
+
+			return encodings;
+		};
+		final Function<List<byte[]>, List<byte[]>> step3 = encodings -> {
+			resetProcessing("Sorting (step 3/5)");
+
+TimeWatch watch = TimeWatch.start();
+			//remove duplicates & sort file
+			encodings = new ArrayList<>(new HashSet<>(encodings));
+
+			setProgress(50);
+
+			Collections.sort(encodings, FSABuilder.LEXICAL_ORDERING);
+watch.stop();
+System.out.println("3: " + watch.toStringMillis());
+//			final ExternalSorter sorter = new ExternalSorter();
+//			final ExternalSorterOptions options = ExternalSorterOptions.builder()
+//				.charset(charset)
+//				.sortInParallel()
+//				//lexical order
+//				.comparator(Comparator.naturalOrder())
+//				.removeDuplicates()
+//				.lineSeparator(StringUtils.LF)
+//				.build();
+//			try{
+//TimeWatch watch = TimeWatch.start();
+//				sorter.sort(file, options, file);
+//watch.stop();
+//System.out.println(watch.toStringMillis());
+//			}
+//			catch(final Exception e){
+//				throw new RuntimeException(e);
+//			}
+
+			return encodings;
+		};
+		final Function<List<byte[]>, FSA> step4 = encodings -> {
+			resetProcessing("Create FSA (step 4/5)");
 
 			getWorkerData()
 				.withNoHeader()
 				.withSequentialProcessing();
 
 TimeWatch watch = TimeWatch.start();
-			processLines(file.toPath(), charset, fsaProcessor);
+			int index = 0;
+			for(final byte[] encoding : encodings){
+				fsaProcessor.accept(IndexDataPair.of(index, encoding));
+
+				setProgress(++ index, encodings.size());
+			}
 watch.stop();
-System.out.println(watch.toStringMillis());
+System.out.println("4: " + watch.toStringMillis());
 
-			if(!file.delete())
-				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
-
-			return builder.complete();
-		};
-		final Function<Void, FSA> step3bis = ignored -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Create FSA (step 3/4)");
-
-			getWorkerData()
-				.withNoHeader()
-				.withSequentialProcessing();
-
-final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.sorted.encoded.dat";
-final File file = new File(input);
-
-			processLines(file.toPath(), charset, fsaProcessor);
-
-			if(!file.delete())
-				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
+//			if(!file.delete())
+//				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step4 = fsa -> {
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Compress FSA (step 4/4)");
+		final Function<FSA, File> step5 = fsa -> {
+			resetProcessing("Compress FSA (step 5/5)");
 
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
+TimeWatch watch = TimeWatch.start();
 				serializer.serialize(fsa, os);
+watch.stop();
+System.out.println("5: " + watch.toStringMillis());
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
@@ -194,9 +211,8 @@ final File file = new File(input);
 				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
-//		setProcessor(step3bis.andThen(step4).andThen(step5));
+		final Function<File, Void> step6 = WorkerManager.openFolderStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5).andThen(step6));
 	}
 
 	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
@@ -224,39 +240,65 @@ final File file = new File(input);
 		}
 	}
 
-	private void encode(final List<String> words, final byte separator, final SequenceEncoderInterface sequenceEncoder){
+	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
+	private static final String SINGLE_STEM_NOT_PRESENT = "Stem not unique";
+	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
+
+	private List<byte[]> encode(final List<Inflection> inflections, final byte separator,
+			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
 		ByteBuffer target = ByteBuffer.allocate(0);
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
-		for(int i = 0, max = words.size(); i < max; i ++){
-			final byte[] row = StringHelper.getRawBytes(words.get(i));
-			final int sep1 = indexOf(separator, row, 0);
-			int sep2 = indexOf(separator, row, sep1 + 1);
-			if(sep2 < 0)
-				sep2 = row.length;
+		final List<byte[]> out = new ArrayList<>();
+		int index = 0;
+		for(final Inflection inflection : inflections){
+			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
+			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
 
-			source = BufferUtils.clearAndEnsureCapacity(source, sep1);
-			source.put(row, 0, sep1);
+			//extract Part-of-Speech
+			final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
+			if(pos.size() != 1)
+				throw new LinterException(SINGLE_POS_NOT_PRESENT);
+			//extract stem
+			final List<String> stem = bucket.get(MorphologicalTag.STEM);
+			if(stem.size() != 1)
+				throw new LinterException(SINGLE_STEM_NOT_PRESENT);
+
+			final byte[] inflectionStem = StringHelper.getRawBytes(stem.get(0));
+			source = BufferUtils.clearAndEnsureCapacity(source, inflectionStem.length - 3);
+			source.put(inflectionStem, 3, inflectionStem.length - 3);
 			source.flip();
 
-			final int len = sep2 - (sep1 + 1);
-			target = BufferUtils.clearAndEnsureCapacity(target, len);
-			target.put(row, sep1 + 1, len);
+			final byte[] inflectedWord = StringHelper.getRawBytes(inflection.getWord());
+			target = BufferUtils.clearAndEnsureCapacity(target, inflectedWord.length);
+			target.put(inflectedWord);
 			target.flip();
 
-			final int len2 = row.length - (sep2 + 1);
-			tag = BufferUtils.clearAndEnsureCapacity(tag, len2);
-			if(len2 > 0)
-				tag.put(row, sep2 + 1, len2);
+			//extract Inflection
+			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
+			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
+
+			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
+			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
+			if(suffixInflection != null)
+				for(final String code : suffixInflection)
+					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+						tag.put(POS_FSA_TAG_SEPARATOR)
+							.put(StringHelper.getRawBytes(t));
+			if(prefixInflection != null)
+				for(final String code : prefixInflection)
+					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+						tag.put(POS_FSA_TAG_SEPARATOR)
+							.put(StringHelper.getRawBytes(t));
 			tag.flip();
 
-			encoded = sequenceEncoder.encode(encoded, target, source);
+
+			encoded = sequenceEncoder.encode(target, source, encoded);
 
 			assembled = BufferUtils.clearAndEnsureCapacity(assembled,
-				target.remaining() + 1 + encoded.remaining() + 1 + tag.remaining());
-
+				target.capacity() + 1 + encoded.capacity() + 1 + tag.remaining());
 			assembled.put(target);
 			assembled.put(separator);
 			assembled.put(encoded);
@@ -266,8 +308,17 @@ final File file = new File(input);
 			}
 			assembled.flip();
 
-			words.set(i, new String(BufferUtils.toArray(assembled), StandardCharsets.UTF_8));
+			out.add(BufferUtils.toArray(assembled));
+
+			setProgress(++ index, inflections.size());
 		}
+		return out;
+	}
+
+	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
+	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
+		return SetHelper.bucket(inflection.getMorphologicalFieldsAsArray(), MorphologicalTag::createFromCode,
+			MorphologicalTag.class);
 	}
 
 	private static int indexOf(final byte separator, final byte[] row, int fromIndex){
@@ -282,7 +333,7 @@ final File file = new File(input);
 
 
 	public static void main(final String[] args){
-		final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.noEncoded.dat";
+		final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.dat";
 		final String[] buildOptions = {
 			"--overwrite",
 			"--accept-cr",
@@ -290,11 +341,10 @@ final File file = new File(input);
 			"--format", "CFSA2",
 			"--input", input
 		};
-		TimeWatch watch = TimeWatch.start();
+TimeWatch watch = TimeWatch.start();
 		morfologik.tools.DictCompile.main(buildOptions);
-		watch.stop();
-		//153/251 s
-		System.out.println(watch.toStringMillis());
+watch.stop();
+System.out.println(watch.toStringMillis());
 	}
 
 }

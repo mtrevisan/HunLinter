@@ -77,7 +77,7 @@ public class BufferUtils{
 	 * @param buffer	The buffer to read from.
 	 * @return	The remaining bytes from the buffer copied to an array.
 	 */
-	public static byte[] toArray(final ByteBuffer buffer){
+	public static synchronized byte[] toArray(final ByteBuffer buffer){
 		final byte[] dst = new byte[buffer.remaining()];
 		buffer.mark();
 		buffer.get(dst);

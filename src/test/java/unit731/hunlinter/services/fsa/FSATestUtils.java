@@ -162,7 +162,7 @@ public class FSATestUtils{
 
 		// recurse.
 		for(char chr : labels1){
-			byte label = (byte) chr;
+			byte label = (byte)chr;
 			fromRoot.push(Character.isLetterOrDigit(chr)? Character.toString(chr): Integer.toString(chr));
 
 			arc1 = fsa1.getArc(node1, label);
