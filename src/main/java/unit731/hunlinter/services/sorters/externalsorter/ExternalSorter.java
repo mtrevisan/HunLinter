@@ -137,7 +137,7 @@ public class ExternalSorter{
 				//skip duplicated lines
 				if(!removeDuplicates || !line.equals(lastLine)){
 					writer.write(line);
-					writer.newLine();
+					writer.write(options.getLineSeparator());
 
 					lastLine = line;
 				}

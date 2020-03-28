@@ -51,7 +51,7 @@ public class ExternalSorterOptions{
 		this.useTemporaryAsZip = useTemporaryAsZip;
 		this.writeOutputAsZip = writeOutputAsZip;
 		this.zipBufferSize = zipBufferSize;
-		this.lineSeparator = lineSeparator;
+		this.lineSeparator = (lineSeparator != null? lineSeparator: System.lineSeparator());
 	}
 
 	public static ExternalSorterOptionsBuilder builder(){
