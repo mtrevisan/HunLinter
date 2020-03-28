@@ -215,13 +215,18 @@ public class AffixData{
 		return productive;
 	}
 
-	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
-		final ArrayList<AffixEntry> list = new ArrayList<>(entries.length);
-		applyIf(entries,
-			entry -> entry.canApplyTo(word),
-			list::add);
-		list.trimToSize();
-		return list;
+	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
+		final AffixEntry[] list = new AffixEntry[entries.length];
+		int offset = 0;
+		final int size = (entries != null? entries.length: 0);
+		for(int i = 0; i < size; i ++){
+			final AffixEntry entry = entries[i];
+			if(entry.canApplyTo(word))
+				list[offset ++] = entry;
+		}
+		final AffixEntry[] out = new AffixEntry[offset];
+		System.arraycopy(list, 0, out, 0, offset);
+		return out;
 	}
 
 	public List<String> applyReplacementTable(final String word){

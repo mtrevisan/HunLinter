@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -249,8 +248,8 @@ class WordGeneratorBase{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 
 		final String word = dicEntry.getWord();
-		final List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
-		if(applicableAffixes.isEmpty())
+		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
+		if(applicableAffixes.length == 0)
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' and word '" + word + "'");
 
 		Inflection[] inflections = new Inflection[0];
