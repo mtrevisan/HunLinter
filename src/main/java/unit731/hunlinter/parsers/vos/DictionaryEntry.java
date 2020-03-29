@@ -28,7 +28,6 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
-import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
 
@@ -194,24 +193,29 @@ public class DictionaryEntry{
 		return null;
 	}
 
-	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		final Map<String, List<DictionaryEntry>> result = new HashMap<>();
-		applyIf(continuationFlags,
-			affixData::isManagedByCompoundRule,
-			flag -> result.computeIfAbsent(flag, k -> new ArrayList<>(1)).add(this));
+	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
+		final Map<String, DictionaryEntry[]> result = new HashMap<>();
+		final int size = (continuationFlags != null? continuationFlags.length: 0);
+		for(int i = 0; i < size; i ++){
+			final String cf = continuationFlags[i];
+			if(affixData.isManagedByCompoundRule(cf)){
+				final DictionaryEntry[] v = result.get(cf);
+				result.put(cf, (v != null? ArrayUtils.add(v, this): new DictionaryEntry[]{this}));
+			}
+		}
 		return result;
 	}
 
-	public Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
+	public Map<String, DictionaryEntry[]> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
-		final Map<String, List<DictionaryEntry>> distribution = new HashMap<>(3);
-		distribution.put(compoundBeginFlag, new ArrayList<>());
-		distribution.put(compoundMiddleFlag, new ArrayList<>());
-		distribution.put(compoundEndFlag, new ArrayList<>());
+		final Map<String, DictionaryEntry[]> distribution = new HashMap<>(3);
+		distribution.put(compoundBeginFlag, new DictionaryEntry[0]);
+		distribution.put(compoundMiddleFlag, new DictionaryEntry[0]);
+		distribution.put(compoundEndFlag, new DictionaryEntry[0]);
 		forEach(continuationFlags, flag -> {
-			final List<DictionaryEntry> entries = distribution.get(flag);
+			final DictionaryEntry[] entries = distribution.get(flag);
 			if(entries != null)
-				entries.add(this);
+				distribution.put(flag, ArrayUtils.add(entries, this));
 		});
 		return distribution;
 	}

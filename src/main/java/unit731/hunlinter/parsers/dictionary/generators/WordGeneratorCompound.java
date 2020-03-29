@@ -61,7 +61,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	protected List<List<Inflection[]>> generateCompounds(final List<List<String>> permutations,
-																		  final Map<String, List<DictionaryEntry>> inputs){
+			final Map<String, DictionaryEntry[]> inputs){
 		final List<List<Inflection[]>> entries = new ArrayList<>();
 		final Map<String, Inflection[]> dicEntries = new HashMap<>();
 		outer:
@@ -307,22 +307,24 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others */
-	protected Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
-			final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		final List<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
+	protected Map<String, DictionaryEntry[]> mergeDistributions(final Map<String, DictionaryEntry[]> compoundRules,
+			final Map<String, DictionaryEntry[]> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
+		final List<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
-		final Map<String, List<DictionaryEntry>> map = new HashMap<>();
-		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
-			final List<DictionaryEntry> entries = m.getValue();
-			final List<DictionaryEntry> value = new ArrayList<>(entries.size());
-			forEach(entries, entry -> {
+		final Map<String, DictionaryEntry[]> map = new HashMap<>();
+		for(final Map.Entry<String, DictionaryEntry[]> m : list){
+			final DictionaryEntry[] entries = m.getValue();
+			DictionaryEntry[] value = new DictionaryEntry[0];
+			final int size = (entries != null? entries.length: 0);
+			for(int i = 0; i < size; i ++){
+				final DictionaryEntry entry = entries[i];
 				if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-					value.add(entry);
-			});
+					value = ArrayUtils.add(value, entry);
+			}
 			final String key = m.getKey();
-			map.computeIfAbsent(key, k -> new ArrayList<>(1))
-				.addAll(value);
+			final DictionaryEntry[] v = map.get(key);
+			map.put(key, (v != null? ArrayUtils.addAll(v, value): value));
 		}
 		return map;
 	}

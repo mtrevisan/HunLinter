@@ -46,7 +46,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		loadDictionaryForInclusionTest();
 
 		//extract map flag -> dictionary entries
-		final Map<String, List<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
+		final Map<String, DictionaryEntry[]> inputs = extractCompoundRules(inputCompounds);
 
 		final String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 
@@ -62,21 +62,21 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	}
 
 	/** Extract a map of flag > dictionary entry from input compounds */
-	private Map<String, List<DictionaryEntry>> extractCompoundRules(final String[] inputCompounds){
+	private Map<String, DictionaryEntry[]> extractCompoundRules(final String[] inputCompounds){
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
-		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>();
+		Map<String, DictionaryEntry[]> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
-			final Map<String, List<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);
+			final Map<String, DictionaryEntry[]> distribution = dicEntry.distributeByCompoundRule(affixData);
 			compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 		}
 		return compoundRules;
 	}
 
-	private void checkCompoundRuleInputCorrectness(final Map<String, List<DictionaryEntry>> inputs,
+	private void checkCompoundRuleInputCorrectness(final Map<String, DictionaryEntry[]> inputs,
 			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
@@ -84,7 +84,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 					StringUtils.join(compoundRuleComponents, StringUtils.EMPTY)}));
 	}
 
-	private boolean raiseError(final Map<String, List<DictionaryEntry>> inputs, final String component){
+	private boolean raiseError(final Map<String, DictionaryEntry[]> inputs, final String component){
 		final char chr = (component.length() == 1? component.charAt(0): 0);
 		return (chr != '*' && chr != '?' && inputs.get(component) == null);
 	}
