@@ -241,7 +241,7 @@ public class RulesReducer{
 
 			final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
-			final Set<String> addition = new HashSet<>();
+			final Set<String> addition = new HashSet<>(list.size());
 			forEach(list, add -> addition.add(add.substring(keyLength)));
 			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
 			if(rules.contains(newEntry)){
@@ -480,7 +480,7 @@ public class RulesReducer{
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 			//extract negated group
-			final Set<Character> childrenGroup = new HashSet<>();
+			final Set<Character> childrenGroup = new HashSet<>(bubbles.size());
 			forEach(bubbles,
 				child -> childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1)));
 
@@ -627,7 +627,7 @@ public class RulesReducer{
 				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				final Set<Character> group = new HashSet<>();
+				final Set<Character> group = new HashSet<>(similarities.size());
 				forEach(similarities, entry -> group.add(RegexSequencer.splitSequence(entry.condition)[1].charAt(0)));
 				final String condition = StringUtils.join(commonPreCondition) + RegexHelper.makeGroup(group, comparator)
 					+ StringUtils.join(commonPostCondition);

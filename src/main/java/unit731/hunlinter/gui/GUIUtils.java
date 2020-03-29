@@ -55,10 +55,10 @@ public class GUIUtils{
 	private static final String KEY_REDO = "Redo";
 
 
-	private static String languageSample;
-	private static final List<String> familyNamesAll = new ArrayList<>();
-	private static final List<String> familyNamesMonospaced = new ArrayList<>();
-	private static Font currentFont = FontChooserDialog.getDefaultFont();
+	private static String LANGUAGE_SAMPLE;
+	private static final List<String> FAMILY_NAMES_ALL = new ArrayList<>();
+	private static final List<String> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
+	private static Font CURRENT_FONT = FontChooserDialog.getDefaultFont();
 
 	private static final class WidthFontPair{
 		private final double width;
@@ -111,18 +111,18 @@ public class GUIUtils{
 	private GUIUtils(){}
 
 	public static Font chooseBestFont(final String languageSample){
-		Font bestFont = currentFont;
+		Font bestFont = CURRENT_FONT;
 		if(!canCurrentFontDisplay(languageSample)){
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 
 			final Function<String, WidthFontPair> widthFontPair = fontName -> {
-				final Font currentFont = new Font(fontName, Font.PLAIN, GUIUtils.currentFont.getSize());
+				final Font currentFont = new Font(fontName, Font.PLAIN, GUIUtils.CURRENT_FONT.getSize());
 				final double w = getStringBounds(currentFont, languageSample)
 					.getWidth();
 				return WidthFontPair.of(w, currentFont);
 			};
-			final List<String> fontNames = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
+			final List<String> fontNames = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 
 			WidthFontPair bestPair = null;
 			for(final String fontName : fontNames){
@@ -130,7 +130,7 @@ public class GUIUtils{
 				if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
 					bestPair = doubleFontPair;
 			}
-			bestFont = (bestPair != null? bestPair.getFont(): currentFont);
+			bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
 		}
 		return getDefaultHeightFont(bestFont);
 	}
@@ -147,27 +147,27 @@ public class GUIUtils{
 	public static void extractFonts(final String languageSample){
 		Objects.requireNonNull(languageSample);
 
-		if(!languageSample.equals(GUIUtils.languageSample)){
-			GUIUtils.languageSample = languageSample;
+		if(!languageSample.equals(GUIUtils.LANGUAGE_SAMPLE)){
+			GUIUtils.LANGUAGE_SAMPLE = languageSample;
 
-			familyNamesAll.clear();
-			familyNamesMonospaced.clear();
+			FAMILY_NAMES_ALL.clear();
+			FAMILY_NAMES_MONOSPACED.clear();
 
 			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getAvailableFontFamilyNames();
 			for(final String familyName : familyNames){
 				final Font font = new Font(familyName, Font.PLAIN, 20);
 				if(font.canDisplayUpTo(languageSample) < 0){
-					familyNamesAll.add(familyName);
+					FAMILY_NAMES_ALL.add(familyName);
 					if(isMonospaced(font))
-						familyNamesMonospaced.add(familyName);
+						FAMILY_NAMES_MONOSPACED.add(familyName);
 				}
 			}
 		}
 	}
 
 	public static boolean canCurrentFontDisplay(final String languageSample){
-		return (currentFont.canDisplayUpTo(languageSample) < 0);
+		return (CURRENT_FONT.canDisplayUpTo(languageSample) < 0);
 	}
 
 	private static boolean isMonospaced(final Font font){
@@ -177,15 +177,15 @@ public class GUIUtils{
 	}
 
 	public static List<String> getFamilyNamesAll(){
-		return familyNamesAll;
+		return FAMILY_NAMES_ALL;
 	}
 
 	public static List<String> getFamilyNamesMonospaced(){
-		return familyNamesMonospaced;
+		return FAMILY_NAMES_MONOSPACED;
 	}
 
 	public static Font getCurrentFont(){
-		return currentFont;
+		return CURRENT_FONT;
 	}
 
 	public static void addFontableProperty(final JComponent... components){
@@ -193,8 +193,8 @@ public class GUIUtils{
 	}
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
-		if(!font.equals(currentFont)){
-			currentFont = font;
+		if(!font.equals(CURRENT_FONT)){
+			CURRENT_FONT = font;
 
 			forEach(parentFrames, parentFrame -> updateComponent(parentFrame, font));
 		}

@@ -83,9 +83,7 @@ public class LineEntry implements Serializable{
 		this.addition = addition;
 		this.condition = condition;
 
-		from = new HashSet<>();
-		if(words != null)
-			from.addAll(words);
+		from = (words != null? new HashSet<>(words): new HashSet<>());
 	}
 
 	public List<String> extractFromEndingWith(final String suffix){
@@ -126,7 +124,7 @@ public class LineEntry implements Serializable{
 	}
 
 	private Set<String> extractRuleSpine(final LineEntry rule){
-		final Set<String> parentBones = new HashSet<>();
+		final Set<String> parentBones = new HashSet<>(rule.addition.size());
 		for(final String add : rule.addition){
 			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
 				.length();
@@ -140,7 +138,7 @@ public class LineEntry implements Serializable{
 	}
 
 	public static Set<Character> extractGroup(final int indexFromLast, final Set<String> words){
-		final Set<Character> group = new HashSet<>();
+		final Set<Character> group = new HashSet<>(words.size());
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
