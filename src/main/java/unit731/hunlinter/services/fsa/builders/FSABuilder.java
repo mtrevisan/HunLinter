@@ -30,35 +30,43 @@ public class FSABuilder{
 	/** Internal serialized FSA buffer expand ratio */
 	private final int bufferGrowthSize;
 	/**
-	 * Holds serialized and mutable states. Each state is a sequential list of
-	 * arcs, the last arc is marked with {@link ConstantArcSizeFSA#BIT_ARC_LAST}.
+	 * Holds serialized and mutable states.
+	 * Each state is a sequential list of arcs, the last arc is marked with {@link ConstantArcSizeFSA#BIT_ARC_LAST}.
 	 */
 	private byte[] serialized = new byte[0];
 	/**
-	 * Number of bytes already taken in {@link #serialized}. Start from 1 to keep
-	 * 0 a sentinel value (for the hash set and final state).
+	 * Number of bytes already taken in {@link #serialized}.
+	 * Start from 1 to keep 0 a sentinel value (for the hash set and final state).
 	 */
 	private int size;
-	/** States on the "active path" (still mutable). Values are addresses of each state's first arc. */
+
+	/**
+	 * States on the "active path" (still mutable).
+	 * Values are addresses of each state's first arc.
+	 */
 	private int[] activePath = new int[0];
 	/** Current length of the active path */
 	private int activePathLen;
+
 	/** The next offset at which an arc will be added to the given state on {@link #activePath} */
 	private int[] nextArcOffset = new int[0];
-	/** Root state. If negative, the automaton has been built already and cannot be extended */
+	/** Root state (if negative, the automaton has been built already and cannot be extended) */
 	private int root;
 	/**
-	 * An epsilon state. The first and only arc of this state points either to the
+	 * An epsilon state.
+	 * The first and only arc of this state points either to the
 	 * root or to the terminal state, indicating an empty automaton.
 	 */
 	private final int epsilon;
+
 	/**
-	 * Hash set of state addresses in {@link #serialized}, hashed by
-	 * {@link #hash(int, int)}. Zero reserved for an unoccupied slot.
+	 * Hash set of state addresses in {@link #serialized}, hashed by {@link #hash(int, int)}.
+	 * Zero reserved for an unoccupied slot.
 	 */
 	private int[] hashSet = new int[2];
 	/** Number of entries currently stored in {@link #hashSet} */
 	private int hashSize;
+
 	/**
 	 * Previous sequence added to the automaton in {@link #add(byte[])}.
 	 * Used in assertions only.
