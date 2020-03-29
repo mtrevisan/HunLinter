@@ -47,7 +47,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	private static final FileSystem FILE_SYSTEM_DEFAULT = FileSystems.getDefault();
 
 	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT
-		= new HashMap<>(3);
+		= new HashMap<>(2);
 	static{
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified);
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);

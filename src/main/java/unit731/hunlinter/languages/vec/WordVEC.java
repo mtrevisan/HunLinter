@@ -5,8 +5,6 @@ import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -73,14 +71,10 @@ public class WordVEC{
 		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 
-	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>(5);
-	static{
-		ACUTE_STRESSES.put("a", "à");
-		ACUTE_STRESSES.put("e", "é");
-		ACUTE_STRESSES.put("i", "í");
-		ACUTE_STRESSES.put("o", "ó");
-		ACUTE_STRESSES.put("u", "ú");
-	}
+	//NOTE: must be sorted!
+	private static final char[] SIMPLE_VOWELS_ARRAY = "aeiou".toCharArray();
+	//NOTE: must be sorted!
+	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "àéíóú".toCharArray();
 
 
 	private WordVEC(){}
@@ -166,8 +160,8 @@ public class WordVEC{
 //	}
 
 	private static char addStressAcute(final char chr){
-		final String c = String.valueOf(chr);
-		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
+		final int stressedIndex = Arrays.binarySearch(SIMPLE_VOWELS_ARRAY, chr);
+		return ACUTE_STRESSED_VOWELS_ARRAY[stressedIndex];
 	}
 
 	public static String markDefaultStress(String word){
