@@ -2,7 +2,6 @@ package unit731.hunlinter.languages.vec;
 
 import java.text.MessageFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -203,8 +202,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private String getRuleToCheckNorthernPlural(final String word){
-		final List<String> subwords = hyphenator.splitIntoCompounds(word);
-		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1))
+		final String[] subwords = hyphenator.splitIntoCompounds(word);
+		return (!WordVEC.hasStressedGrapheme(subwords[subwords.length - 1])
 			|| RegexHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 			NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 	}

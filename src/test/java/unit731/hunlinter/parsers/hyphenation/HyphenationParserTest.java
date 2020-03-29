@@ -2,7 +2,6 @@ package unit731.hunlinter.parsers.hyphenation;
 
 import unit731.hunlinter.languages.BaseBuilder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -276,7 +275,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate("abcd", "a=bcd", HyphenationParser.Level.NON_COMPOUND);
 
-		Assertions.assertEquals(Arrays.asList("a", "bcd"), hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -697,7 +696,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
-		Assertions.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes());
 	}
 
 }

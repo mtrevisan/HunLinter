@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -375,7 +373,7 @@ final int iconSize = 17;
 		formerHyphenationText = text;
 
 		String count = null;
-		List<String> rules = Collections.emptyList();
+		String[] rules = new String[0];
 		if(StringUtils.isNotBlank(text)){
 			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 

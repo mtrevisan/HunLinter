@@ -103,12 +103,12 @@ public class DictionaryStatistics implements Closeable{
 
 	public synchronized void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
-			final List<String> syllabes = hyphenation.getSyllabes();
+			final String[] syllabes = hyphenation.getSyllabes();
 
 			final List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
 			if(!stressIndexes.isEmpty())
 				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
-			syllabeLengthsFrequencies.addValue(syllabes.size());
+			syllabeLengthsFrequencies.addValue(syllabes.length);
 			final StringBuffer sb = new StringBuffer();
 			for(final String syllabe : syllabes){
 				sb.append(syllabe);
@@ -148,8 +148,8 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	private synchronized void storeHyphenation(final Hyphenation hyphenation){
-		final List<String> syllabes = hyphenation.getSyllabes();
-		final int syllabeCount = syllabes.size();
+		final String[] syllabes = hyphenation.getSyllabes();
+		final int syllabeCount = syllabes.length;
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
 			longestWordsBySyllabes.add(hyphenation);

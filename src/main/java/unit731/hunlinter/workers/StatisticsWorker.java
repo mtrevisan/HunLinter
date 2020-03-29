@@ -8,8 +8,6 @@ import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.awt.Frame;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -58,8 +56,8 @@ public class StatisticsWorker extends WorkerDictionary{
 			for(final Inflection inflection : inflections){
 				//collect statistics
 				final String word = inflection.getWord();
-				final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): Collections.emptyList());
-				if(subwords.isEmpty())
+				final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
+				if(subwords.length == 0)
 					dicStatistics.addData(word);
 				else
 					for(final String subword : subwords){

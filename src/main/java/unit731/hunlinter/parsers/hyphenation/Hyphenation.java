@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.hyphenation;
 
-import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -8,14 +7,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Hyphenation{
 
-	private final List<String> syllabes;
-	private final List<String> compounds;
-	private final List<String> rules;
+	private final String[] syllabes;
+	private final String[] compounds;
+	private final String[] rules;
 	private final String breakCharacter;
 
 
-	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules,
-			final String breakCharacter){
+	public Hyphenation(final String[] syllabes, final String[] compounds, final String[] rules, final String breakCharacter){
 		Objects.requireNonNull(syllabes);
 		Objects.requireNonNull(compounds);
 		Objects.requireNonNull(rules);
@@ -27,15 +25,15 @@ public class Hyphenation{
 		this.breakCharacter = breakCharacter;
 	}
 
-	public List<String> getSyllabes(){
+	public String[] getSyllabes(){
 		return syllabes;
 	}
 
-	public List<String> getCompounds(){
+	public String[] getCompounds(){
 		return compounds;
 	}
 
-	public List<String> getRules(){
+	public String[] getRules(){
 		return rules;
 	}
 
@@ -51,7 +49,7 @@ public class Hyphenation{
 		int k = -1;
 		final int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
-			final String syllabe = syllabes.get(i);
+			final String syllabe = syllabes[i];
 			idx -= syllabe.length();
 			if(idx < 0){
 				k = i;
@@ -66,11 +64,11 @@ public class Hyphenation{
 	 * @return the syllabe at the given (global) index
 	 */
 	public String getSyllabe(final int idx){
-		return syllabes.get(getSyllabeIndex(idx));
+		return syllabes[getSyllabeIndex(idx)];
 	}
 
 	public int countSyllabes(){
-		return syllabes.size();
+		return syllabes.length;
 	}
 
 	/**
@@ -78,7 +76,7 @@ public class Hyphenation{
 	 * @return the syllabe at the given (relative) index
 	 */
 	public String getAt(final int idx){
-		return syllabes.get(restoreRelativeIndex(idx));
+		return syllabes[restoreRelativeIndex(idx)];
 	}
 
 	private int restoreRelativeIndex(final int idx){
@@ -86,11 +84,11 @@ public class Hyphenation{
 	}
 
 	public boolean isHyphenated(){
-		return !rules.isEmpty();
+		return (rules.length > 0);
 	}
 
 	public boolean isCompound(){
-		return (compounds.size() > 1);
+		return (compounds.length > 1);
 	}
 
 	@Override
