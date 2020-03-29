@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.vos;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -22,8 +21,6 @@ import unit731.hunlinter.services.ArraySet;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
-import static unit731.hunlinter.services.system.LoopHelper.applyIf;
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
@@ -187,21 +184,24 @@ public class AffixEntry{
 	}
 
 	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
-		final List<String[]> mf = new ArrayList<>(compoundEntries != null? compoundEntries.length: 0);
-		forEach(compoundEntries, compoundEntry -> {
-			final String compound = compoundEntry.getWord();
-			mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.PART.attachValue(compound)}, compoundEntry.morphologicalFields));
-		});
+		int size = 0;
+		for(final DictionaryEntry compoundEntry : compoundEntries)
+			size += compoundEntry.morphologicalFields.length + 1;
 
-		final List<String> list = new ArrayList<>();
-		for(final String[] strings : mf)
-			forEach(strings, list::add);
-		return list.toArray(new String[0]);
+		int offset = 0;
+		final String[] mf = new String[size];
+		for(final DictionaryEntry compoundEntry : compoundEntries){
+			final String compound = compoundEntry.getWord();
+			mf[offset ++] = MorphologicalTag.PART.attachValue(compound);
+			for(final String cemf : compoundEntry.morphologicalFields)
+				mf[offset ++] = cemf;
+		}
+		return mf;
 	}
 
 	public void validate(){
-		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
-		if(!filteredFields.isEmpty())
+		final String[] filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
+		if(filteredFields.length > 0)
 			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
 	}
 
@@ -213,13 +213,15 @@ public class AffixEntry{
 		return parent.getFlag();
 	}
 
-	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		final String tag = morphologicalTag.getCode();
-		final int purgeTag = tag.length();
-		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.length: 0);
-		applyIf(morphologicalFields,
-			df -> df.startsWith(tag),
-			df -> collector.add(df.substring(purgeTag)));
+	private String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		String[] collector = new String[0];
+		if(morphologicalFields != null){
+			final String tag = morphologicalTag.getCode();
+			final int purgeTag = tag.length();
+			for(final String mf : morphologicalFields)
+				if(mf.startsWith(tag))
+					collector = ArrayUtils.add(collector, mf.substring(purgeTag));
+		}
 		return collector;
 	}
 
