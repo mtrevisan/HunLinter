@@ -237,11 +237,14 @@ public class DictionaryEntry{
 			return new String[0];
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		final List<String> list = new ArrayList<>(morphologicalFields.length);
-		applyIf(morphologicalFields,
-			mf -> mf.startsWith(tag),
-			list::add);
-		return list.toArray(String[]::new);
+		String[] list = new String[0];
+		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		for(int i = 0; i < size; i ++){
+			final String mf = morphologicalFields[i];
+			if(mf.startsWith(tag))
+				list = ArrayUtils.add(list, mf);
+		}
+		return list;
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
