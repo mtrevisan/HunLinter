@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -46,13 +47,13 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		loadDictionaryForInclusionTest();
 
 		//extract list of dictionary entries
-		final List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
+		final DictionaryEntry[] inputs = extractCompoundFlags(inputCompounds);
 
 		//check if it's possible to compound some words
-		if(inputs.isEmpty())
+		if(inputs.length == 0)
 			return new Inflection[0];
 
-		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
+		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.length, maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
 		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
@@ -60,22 +61,22 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return applyCompound(entries, limit);
 	}
 
-	private List<DictionaryEntry> extractCompoundFlags(final String[] inputCompounds){
+	private DictionaryEntry[] extractCompoundFlags(final String[] inputCompounds){
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final List<DictionaryEntry> result = new ArrayList<>();
+		DictionaryEntry[] result = new DictionaryEntry[0];
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
 			//filter input set by minimum length and forbidden flag
 			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
-				result.add(dicEntry);
+				result = ArrayUtils.add(result, dicEntry);
 		}
 		return result;
 	}
 
-	private List<List<Inflection[]>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+	private List<List<Inflection[]>> generateCompounds(final List<int[]> permutations, final DictionaryEntry[] inputs){
 		final Map<Integer, Inflection[]> dicEntries = new HashMap<>();
 		final List<List<Inflection[]>> list = new ArrayList<>();
 		for(final int[] permutation : permutations){
@@ -87,10 +88,10 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	}
 
 	private List<Inflection[]> generateCompound(final int[] permutation, final Map<Integer, Inflection[]> dicEntries,
-															  final List<DictionaryEntry> inputs){
+			final DictionaryEntry[] inputs){
 		final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
 		for(final int index : permutation){
-			final Inflection[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs.get(idx), true, null));
+			final Inflection[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs[idx], true, null));
 			if(list.length > 0)
 				expandedPermutationEntries.add(list);
 		}
