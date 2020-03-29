@@ -8,7 +8,6 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.beust.jcommander.Strings;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -54,10 +53,8 @@ public class AffixEntry{
 
 	/** string to strip */
 	private final String removing;
-	private final int removingLength;
 	/** string to append */
 	private final String appending;
-	private final int appendingLength;
 	final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	private final String condition;
@@ -87,9 +84,7 @@ public class AffixEntry{
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
-		removingLength = removing.length();
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
-		appendingLength = appending.length();
 
 		checkValidity(parentType, type, parentFlag, flag, removal, line);
 	}
@@ -106,7 +101,7 @@ public class AffixEntry{
 			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type}));
 		if(!parentFlag.equals(flag))
 			throw new LinterException(WRONG_FLAG.format(new Object[]{parentFlag, flag}));
-		if(removingLength > 0){
+		if(removing.length() > 0){
 			if(parentType == AffixType.SUFFIX){
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
@@ -286,19 +281,19 @@ public class AffixEntry{
 	}
 
 	public String applyRule(final String word, final boolean isFullstrip){
-		if(!isFullstrip && word.length() == removingLength)
+		if(!isFullstrip && word.length() == removing.length())
 			throw new LinterException(CANNOT_FULL_STRIP.format(new Object[]{word}));
 
 		return (parent.getType() == AffixType.SUFFIX?
-			word.substring(0, word.length() - removingLength) + appending:
-			appending + word.substring(removingLength));
+			word.substring(0, word.length() - removing.length()) + appending:
+			appending + word.substring(removing.length()));
 	}
 
 	//NOTE: {#canInverseApplyTo} should be called to verify applicability
 	public String undoRule(final String word){
 		return (parent.getType() == AffixType.SUFFIX?
-			word.substring(0, word.length() - appendingLength) + removing:
-			removing + word.substring(appendingLength));
+			word.substring(0, word.length() - appending.length()) + removing:
+			removing + word.substring(appending.length()));
 	}
 
 	public String toStringWithMorphologicalFields(final FlagParsingStrategy strategy){
@@ -322,10 +317,10 @@ public class AffixEntry{
 			.add(removing)
 			.add(appending);
 		if(continuationFlags != null && continuationFlags.length > 0)
-			sj.add(SLASH + Strings.join(StringUtils.EMPTY, continuationFlags));
+			sj.add(SLASH + String.join(StringUtils.EMPTY, continuationFlags));
 		sj.add(condition);
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sj.add(Strings.join(StringUtils.EMPTY, morphologicalFields));
+			sj.add(String.join(StringUtils.EMPTY, morphologicalFields));
 		return sj.toString();
 	}
 

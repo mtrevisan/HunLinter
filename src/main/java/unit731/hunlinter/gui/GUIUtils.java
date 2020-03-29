@@ -30,7 +30,8 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.FontChooserDialog;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.core.WorkerAbstract;
@@ -59,6 +60,53 @@ public class GUIUtils{
 	private static final List<String> familyNamesMonospaced = new ArrayList<>();
 	private static Font currentFont = FontChooserDialog.getDefaultFont();
 
+	private static final class WidthFontPair{
+		private final double width;
+		private final Font font;
+
+		public static WidthFontPair of(final double width, final Font font){
+			return new WidthFontPair(width, font);
+		}
+
+		private WidthFontPair(final double width, final Font font){
+			this.width = width;
+			this.font = font;
+		}
+
+		public double getWidth(){
+			return width;
+		}
+
+		public Font getFont(){
+			return font;
+		}
+
+		@Override
+		public String toString(){
+			return width + ": " + font.getName();
+		}
+
+		@Override
+		public boolean equals(final Object obj){
+			if(obj == this)
+				return true;
+			if(obj == null || obj.getClass() != getClass())
+				return false;
+
+			final WidthFontPair rhs = (WidthFontPair)obj;
+			return new EqualsBuilder()
+				.append(font, rhs.font)
+				.isEquals();
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(font)
+				.toHashCode();
+		}
+	}
+
 
 	private GUIUtils(){}
 
@@ -68,21 +116,21 @@ public class GUIUtils{
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 
-			final Function<String, Pair<Double, Font>> widthFontPair = fontName -> {
+			final Function<String, WidthFontPair> widthFontPair = fontName -> {
 				final Font currentFont = new Font(fontName, Font.PLAIN, GUIUtils.currentFont.getSize());
 				final double w = getStringBounds(currentFont, languageSample)
 					.getWidth();
-				return Pair.of(w, currentFont);
+				return WidthFontPair.of(w, currentFont);
 			};
 			final List<String> fontNames = (familyNamesMonospaced.isEmpty()? familyNamesAll: familyNamesMonospaced);
 
-			Pair<Double, Font> bestPair = null;
+			WidthFontPair bestPair = null;
 			for(final String fontName : fontNames){
-				final Pair<Double, Font> doubleFontPair = widthFontPair.apply(fontName);
-				if(bestPair == null || doubleFontPair.getKey() > bestPair.getKey())
+				final WidthFontPair doubleFontPair = widthFontPair.apply(fontName);
+				if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
 					bestPair = doubleFontPair;
 			}
-			bestFont = (bestPair != null? bestPair.getValue(): currentFont);
+			bestFont = (bestPair != null? bestPair.getFont(): currentFont);
 		}
 		return getDefaultHeightFont(bestFont);
 	}

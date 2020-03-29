@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.Orthography;
@@ -131,12 +129,11 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public List<Integer> getStressIndexFromLast(final String[] syllabes){
-		final int size = syllabes.length - 1;
-		return IntStream.rangeClosed(0, size)
-			.filter(i -> hasStressedGrapheme(syllabes[size - i]))
-			.boxed()
-			.collect(Collectors.toList());
+	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
+		for(int i = syllabes.length - 1; i >= 0; i --)
+			if(hasStressedGrapheme(syllabes[i]))
+				return i;
+		return -1;
 	}
 
 	@Override

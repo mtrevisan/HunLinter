@@ -105,9 +105,9 @@ public class DictionaryStatistics implements Closeable{
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
 			final String[] syllabes = hyphenation.getSyllabes();
 
-			final List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
-			if(!stressIndexes.isEmpty())
-				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
+			final int stressIndex = orthography.getStressedSyllabeIndexFromLast(syllabes);
+			if(stressIndex >= 0)
+				stressFromLastFrequencies.addValue(stressIndex);
 			syllabeLengthsFrequencies.addValue(syllabes.length);
 			final StringBuffer sb = new StringBuffer();
 			for(final String syllabe : syllabes){

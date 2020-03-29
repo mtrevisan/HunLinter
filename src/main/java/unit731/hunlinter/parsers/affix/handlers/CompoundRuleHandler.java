@@ -31,11 +31,10 @@ public class CompoundRuleHandler implements Handler{
 	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
-			checkValidity(context);
+			final int numEntries = checkValidity(context);
 
 			final Scanner scanner = context.getScanner();
 
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			final Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				if(!scanner.hasNextLine())
@@ -64,12 +63,14 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
-	private void checkValidity(final ParsingContext context){
+	private int checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+
+		return numEntries;
 	}
 
 	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){

@@ -1,7 +1,5 @@
 package unit731.hunlinter.languages;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -75,8 +73,8 @@ public class Orthography{
 	 * @param syllabes	The list of syllabes
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
-	public List<Integer> getStressIndexFromLast(final String[] syllabes){
-		return Collections.emptyList();
+	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
+		return -1;
 	}
 
 	public int countGraphemes(final String word){
