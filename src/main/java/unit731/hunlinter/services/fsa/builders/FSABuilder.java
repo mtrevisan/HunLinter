@@ -22,24 +22,26 @@ public class FSABuilder{
 	/** Maximum number of labels from a single state */
 	private final static int MAX_LABELS = 256;
 
-	/** A comparator comparing full byte arrays. Unsigned byte comparisons ('C'-locale) */
-	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) ->
-		compare(o1, o1.length, o2, o2.length);
+	/** A comparator comparing full byte arrays. Unsigned byte comparisons */
+	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) -> compare(o1, o1.length, o2, o2.length);
 
 
 	/** Internal serialized FSA buffer expand ratio */
 	private final int bufferGrowthSize;
 	/**
-	 * Holds serialized and mutable states. Each state is a sequential list of
-	 * arcs, the last arc is marked with {@link ConstantArcSizeFSA#BIT_ARC_LAST}.
+	 * Holds serialized and mutable states.
+	 * Each state is a sequential list of arcs, the last arc is marked with {@link ConstantArcSizeFSA#BIT_ARC_LAST}.
 	 */
 	private byte[] serialized = new byte[0];
 	/**
-	 * Number of bytes already taken in {@link #serialized}. Start from 1 to keep
-	 * 0 a sentinel value (for the hash set and final state).
+	 * Number of bytes already taken in {@link #serialized}.
+	 * Start from 1 to keep 0 a sentinel value (for the hash set and final state).
 	 */
 	private int size;
-	/** States on the "active path" (still mutable). Values are addresses of each state's first arc. */
+	/**
+	 * States on the "active path" (still mutable).
+	 * Values are addresses of each state's first arc.
+	 */
 	private int[] activePath = new int[0];
 	/** Current length of the active path */
 	private int activePathLen;
@@ -52,20 +54,20 @@ public class FSABuilder{
 	 * root or to the terminal state, indicating an empty automaton.
 	 */
 	private final int epsilon;
+
 	/**
-	 * Hash set of state addresses in {@link #serialized}, hashed by
-	 * {@link #hash(int, int)}. Zero reserved for an unoccupied slot.
+	 * Hash set of state addresses in {@link #serialized}, hashed by {@link #hash(int, int)}.
+	 * Zero reserved for an unoccupied slot.
 	 */
 	private int[] hashSet = new int[2];
 	/** Number of entries currently stored in {@link #hashSet} */
 	private int hashSize;
+
 	/**
 	 * Previous sequence added to the automaton in {@link #add(byte[])}.
 	 * Used in assertions only.
 	 */
 	private byte[] previous;
-	/** {@link #previous} sequence's length, used in assertions only */
-	private int previousLength;
 
 
 	public FSABuilder(){
@@ -110,8 +112,8 @@ public class FSABuilder{
 		if(serialized == null)
 			throw new IllegalArgumentException("Automaton already built");
 		final int len = sequence.length;
-		if(previous != null && len > 0 && compare(previous, previousLength, sequence, len) > 0)
-			throw new IllegalArgumentException("Input must be sorted: '" + new String(Arrays.copyOf(previous, previousLength))
+		if(previous != null && len > 0 && compare(previous, previous.length, sequence, len) > 0)
+			throw new IllegalArgumentException("Input must be sorted: '" + new String(Arrays.copyOf(previous, previous.length))
 				+ "' >= '" + new String(Arrays.copyOfRange(sequence, 0, len)) + "'");
 
 		setPrevious(sequence, len);
@@ -347,7 +349,6 @@ public class FSABuilder{
 			previous = new byte[length];
 
 		System.arraycopy(sequence, 0, previous, 0, length);
-		previousLength = length;
 	}
 
 	/**
