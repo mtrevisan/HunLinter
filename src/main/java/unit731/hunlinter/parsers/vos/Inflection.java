@@ -140,7 +140,7 @@ public class Inflection extends DictionaryEntry{
 				if(appliedRules[startIndex --].hasContinuationFlag(circumfixFlag))
 					break;
 
-			final long[] suffixesAffixesCount = new long[2];
+			final int[] suffixesAffixesCount = new int[2];
 			for(int idx = startIndex + 1; idx < appliedRules.length; idx ++)
 				suffixesAffixesCount[appliedRules[idx].getType() == AffixType.SUFFIX? 1: 0] ++;
 			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);

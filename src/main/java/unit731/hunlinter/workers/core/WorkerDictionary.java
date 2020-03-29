@@ -74,7 +74,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 	private void processLinesParallel(final List<IndexDataPair<String>> entries, final int totalEntries,
-		final Consumer<IndexDataPair<String>> dataProcessor){
+			final Consumer<IndexDataPair<String>> dataProcessor){
 		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, totalEntries);
 		entries.parallelStream()
 			.forEach(innerProcessor);

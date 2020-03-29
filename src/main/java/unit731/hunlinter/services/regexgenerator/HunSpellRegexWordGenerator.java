@@ -10,7 +10,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import unit731.hunlinter.workers.core.IndexDataPair;
 
 
 /**
