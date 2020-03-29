@@ -42,14 +42,14 @@ public final class Digraph<T>{
 	 *
 	 * @param graph	The digraph to copy
 	 */
-	public Digraph(Digraph<T> graph){
-		int vertices = graph.adjacency.size();
+	public Digraph(final Digraph<T> graph){
+		final int vertices = graph.adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			Stack<Pair<Integer, T>> reverse = new Stack<>();
-			for(Pair<Integer, T> w : graph.adjacency.get(v))
+			final Stack<Pair<Integer, T>> reverse = new Stack<>();
+			for(final Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
-			for(Pair<Integer, T> w : reverse)
+			for(final Pair<Integer, T> w : reverse)
 				addEdge(v, w.getKey(), w.getValue());
 		}
 	}
@@ -94,11 +94,11 @@ public final class Digraph<T>{
 	 * @return	the reverse of the digraph
 	 */
 	public Digraph<T> reverse(){
-		Digraph<T> reverse = new Digraph<>();
-		int vertices = adjacency.size();
+		final Digraph<T> reverse = new Digraph<>();
+		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
-			for(Pair<Integer, T> w : transitions)
+			final Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
+			for(final Pair<Integer, T> w : transitions)
 				reverse.addEdge(w.getKey(), v, w.getValue());
 		}
 		return reverse;

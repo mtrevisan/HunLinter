@@ -49,7 +49,7 @@ public class WordCountWorker extends WorkerDictionary{
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			totalInflections.addAndGet(inflections.length);
-			for(Inflection inflection : inflections)
+			for(final Inflection inflection : inflections)
 				dictionary.add(inflection.getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
