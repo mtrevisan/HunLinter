@@ -131,6 +131,8 @@ TimeWatch watch = TimeWatch.start();
 watch.stop();
 System.out.println(watch.toStringMillis());
 
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(encodings));
+//byte[] 2 105 197 936
 			return encodings;
 		};
 		final Function<List<byte[]>, List<byte[]>> step2 = list -> {
@@ -253,7 +255,7 @@ System.out.println(watch.toStringMillis());
 
 			//extract Part-of-Speech
 			final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
-			if(pos.size() != 1)
+			if(pos == null || pos.size() != 1)
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
 			//extract stem
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);

@@ -23,8 +23,7 @@ public class FSABuilder{
 	private final static int MAX_LABELS = 256;
 
 	/** A comparator comparing full byte arrays. Unsigned byte comparisons ('C'-locale) */
-	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) ->
-		compare(o1, o1.length, o2, o2.length);
+	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) -> compare(o1, o1.length, o2, o2.length);
 
 
 	/** Internal serialized FSA buffer expand ratio */
@@ -172,8 +171,12 @@ public class FSABuilder{
 		}
 
 		final FSA fsa = new ConstantArcSizeFSA(Arrays.copyOf(serialized, size), epsilon);
+
+		//clear support data:
 		serialized = null;
 		hashSet = null;
+		previous = null;
+
 		return fsa;
 	}
 

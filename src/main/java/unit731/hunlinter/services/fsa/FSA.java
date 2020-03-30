@@ -262,7 +262,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		final FSA fsa = read(stream);
 		if(!clazz.isInstance(fsa))
 			throw new IOException(String.format(Locale.ROOT, "Expected FSA type %s, but read an incompatible type %s.",
-				clazz.getName(), fsa.getClass().getName()));
+				clazz.getSimpleName(), fsa.getClass().getSimpleName()));
 
 		return clazz.cast(fsa);
 	}
