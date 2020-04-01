@@ -55,14 +55,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
 
 
-	//encoding support variables:
-	private ByteBuffer encoded = ByteBuffer.allocate(0);
-	private ByteBuffer source = ByteBuffer.allocate(0);
-	private ByteBuffer target = ByteBuffer.allocate(0);
-	private ByteBuffer tag = ByteBuffer.allocate(0);
-	private ByteBuffer assembled = ByteBuffer.allocate(0);
-
-
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
@@ -116,7 +108,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
-//			.withParallelProcessing()
+			.withParallelProcessing()
 //			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withRelaunchException();
 
@@ -247,6 +239,12 @@ System.out.println(watch.toStringMillis());
 
 	private List<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
+		ByteBuffer encoded = ByteBuffer.allocate(0);
+		ByteBuffer source = ByteBuffer.allocate(0);
+		ByteBuffer target = ByteBuffer.allocate(0);
+		ByteBuffer tag = ByteBuffer.allocate(0);
+		ByteBuffer assembled = ByteBuffer.allocate(0);
+
 		final List<byte[]> out = new ArrayList<>();
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM

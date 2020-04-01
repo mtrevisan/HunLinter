@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -86,8 +85,7 @@ public class WordlistWorker extends WorkerDictionary{
 			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(charset)
 				.sortInParallel()
-				//lexical order
-				.comparator(Comparator.naturalOrder())
+				.comparator(dicParser.getComparator())
 				.useTemporaryAsZip()
 				.removeDuplicates()
 				.build();
