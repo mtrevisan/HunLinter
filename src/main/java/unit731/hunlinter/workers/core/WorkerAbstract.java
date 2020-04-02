@@ -62,6 +62,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	protected Void prepareProcessing(final String message){
+		System.gc();
+
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
@@ -70,6 +72,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	protected Void resetProcessing(final String message, final Object... params){
+		System.gc();
+
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
@@ -78,6 +82,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	protected void finalizeProcessing(final String message){
 		watch.stop();
+
+		System.gc();
 
 		setProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());

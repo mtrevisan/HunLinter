@@ -354,6 +354,8 @@ public class GUIUtils{
 		if(answer == JOptionPane.YES_OPTION){
 			worker.cancel();
 
+			System.gc();
+
 			Optional.ofNullable(onAbort)
 				.ifPresent(Runnable::run);
 		}

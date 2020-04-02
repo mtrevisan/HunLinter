@@ -17,7 +17,7 @@ public class TimeWatch{
 
 
 	private TimeWatch(){
-		start = System.nanoTime();
+		reset();
 	}
 
 	public static TimeWatch start(){
