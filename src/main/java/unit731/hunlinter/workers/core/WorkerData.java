@@ -12,7 +12,7 @@ public class WorkerData{
 	private final String workerName;
 
 	private boolean parallelProcessing;
-	private boolean relaunchException = true;
+	private boolean relaunchException;
 
 	private Runnable completed;
 	private Consumer<Exception> cancelled;

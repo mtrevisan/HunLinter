@@ -38,7 +38,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				final List<IndexDataPair<String>> entries = loadFile(path, charset);
 
 				//process dictionary
-				processLinesParallel(entries, entries.size(), dataProcessor);
+				processLinesParallel(entries, dataProcessor);
 			}
 			else
 				processLinesSequential(path, charset, dataProcessor);
@@ -73,9 +73,9 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		return entries;
 	}
 
-	private void processLinesParallel(final List<IndexDataPair<String>> entries, final int totalEntries,
+	private void processLinesParallel(final List<IndexDataPair<String>> entries,
 			final Consumer<IndexDataPair<String>> dataProcessor){
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, totalEntries);
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, entries.size());
 		entries.parallelStream()
 			.forEach(innerProcessor);
 	}
@@ -136,7 +136,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final Consumer<IndexDataPair<String>> dataProcessor,
 			final long totalEntries){
-		final AtomicInteger processingIndex = new AtomicInteger(0);
+		final AtomicInteger processingIndex = new AtomicInteger(1);
 		return data -> {
 			try{
 				dataProcessor.accept(data);

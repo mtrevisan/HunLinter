@@ -117,8 +117,8 @@ public class WordVEC{
 
 	//[aeiou][^aeiou]*$
 	private static int getLastUnstressedVowelIndex(final String word, int lastLetterIndex){
-		while(lastLetterIndex > 0){
-			final char chr = word.charAt(-- lastLetterIndex);
+		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
+			final char chr = word.charAt(lastLetterIndex);
 			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
 				break;
 		}

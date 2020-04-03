@@ -140,7 +140,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void stressCheck(final Inflection inflection){
-		final String derivedWord = inflection.getWord();
+		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
 		final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
 		if(!derivedWord.equals(unmarkedDefaultStressWord))
 			throw new LinterException(UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
