@@ -57,11 +57,11 @@ public class DictionarySorterAction extends AbstractAction{
 				if(evt.getValueIsAdjusting())
 					workerManager.createSorterWorker(
 						() -> {
-							dialog.setVisible(false);
 							final int selectedRow = dialog.getSelectedIndex();
 							return (parserManager.getDicParser().isInBoundary(selectedRow)? selectedRow: null);
 						},
 						worker -> {
+							dialog.setVisible(false);
 							setEnabled(false);
 
 							worker.addPropertyChangeListener(propertyChangeListener);

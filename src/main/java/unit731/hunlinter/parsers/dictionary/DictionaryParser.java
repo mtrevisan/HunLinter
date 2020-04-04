@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.text.StringHelper;
 
 
 public class DictionaryParser{
@@ -124,7 +123,6 @@ public class DictionaryParser{
 				}
 
 				byteIndex += line.getBytes(charset).length + 2;
-				lineIndex ++;
 			}
 			//filter out single word that doesn't need to be sorted
 			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
