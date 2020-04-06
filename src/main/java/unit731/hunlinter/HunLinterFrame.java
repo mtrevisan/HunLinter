@@ -666,9 +666,9 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
-		if((exc instanceof ProjectNotFoundException)){
+		if(exc instanceof ProjectNotFoundException){
 			//remove the file from the recent projects menu
-			recentProjectsMenu.removeEntry(((ProjectNotFoundException) exc).getProjectPath().toString());
+			recentProjectsMenu.removeEntry(((ProjectNotFoundException)exc).getProjectPath().toString());
 
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
