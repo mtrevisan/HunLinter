@@ -145,11 +145,12 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 				sleepOnPause();
 			}
-			catch(final LinterException e){
-				throw e;
-			}
 			catch(final Exception e){
-				throw new LinterException(e, data);
+				final LinterException le = new LinterException(e.getMessage(), e.getCause(), data);;
+				manageException(le);
+
+				if(workerData.isCancelOnException())
+					throw le;
 			}
 		};
 	}

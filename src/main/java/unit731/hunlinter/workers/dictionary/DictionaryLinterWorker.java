@@ -41,7 +41,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 					checker.checkInflection(inflection);
 				}
 				catch(final Exception e){
-					throw wrapException(e, inflection, indexData);
+					final LinterException wrappedException = wrapException(e, inflection, indexData);
+					manageException(wrappedException);
 				}
 			}
 		};
@@ -61,10 +62,10 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 	}
 
 	private LinterException wrapException(final Exception e, final Inflection inflection, final IndexDataPair<String> data){
-		final StringBuffer sb = new StringBuffer(e.getMessage());
+		String message = e.getMessage();
 		if(inflection.hasInflectionRules())
-			sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
-		return new LinterException(sb.toString(), data);
+			message += " (via " + inflection.getRulesSequence() + ")";
+		return new LinterException(message, data);
 	}
 
 }

@@ -110,7 +110,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		getWorkerData()
 			.withParallelProcessing()
 //			.withDataCancelledCallback(e -> closeWriter(writer))
-			.withRelaunchException();
+			.withCancelOnException();
 
 		final Function<Void, List<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");

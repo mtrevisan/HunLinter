@@ -12,7 +12,7 @@ public class WorkerData{
 	private final String workerName;
 
 	private boolean parallelProcessing;
-	private boolean relaunchException;
+	private boolean cancelOnException;
 
 	private Runnable completed;
 	private Consumer<Exception> cancelled;
@@ -38,8 +38,8 @@ public class WorkerData{
 		return this;
 	}
 
-	public final WorkerData withRelaunchException(){
-		relaunchException = true;
+	public final WorkerData withCancelOnException(){
+		cancelOnException = true;
 		return this;
 	}
 
@@ -67,8 +67,8 @@ public class WorkerData{
 		return parallelProcessing;
 	}
 
-	final boolean isRelaunchException(){
-		return relaunchException;
+	final boolean isCancelOnException(){
+		return cancelOnException;
 	}
 
 	@Override

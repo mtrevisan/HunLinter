@@ -15,7 +15,7 @@ public class LinterException extends RuntimeException{
 	private final FixActionType fixActionType;
 
 
-	public LinterException(final Exception cause, final Object data){
+	public LinterException(final Throwable cause, final Object data){
 		super(cause);
 
 		this.data = IndexDataPair.of(-1, data);
@@ -23,7 +23,7 @@ public class LinterException extends RuntimeException{
 		fixActionType = null;
 	}
 
-	public LinterException(final Exception cause, final IndexDataPair<?> data){
+	public LinterException(final Throwable cause, final IndexDataPair<?> data){
 		super(cause);
 
 		this.data = data;
@@ -31,17 +31,25 @@ public class LinterException extends RuntimeException{
 		fixActionType = null;
 	}
 
-	public LinterException(final String description){
-		this(description, null, null, null);
+	public LinterException(final String message, final Throwable cause, final IndexDataPair<?> data){
+		super(message, cause);
+
+		this.data = data;
+		fix = null;
+		fixActionType = null;
 	}
 
-	public LinterException(final String description, final IndexDataPair<?> data){
-		this(description, data, null, null);
+	public LinterException(final String message){
+		this(message, null, null, null);
 	}
 
-	public LinterException(final String description, final IndexDataPair<?> data, final Runnable fix,
+	public LinterException(final String message, final IndexDataPair<?> data){
+		this(message, data, null, null);
+	}
+
+	public LinterException(final String message, final IndexDataPair<?> data, final Runnable fix,
 			final FixActionType fixActionType){
-		super(description);
+		super(message);
 
 		this.data = data;
 		this.fix = fix;

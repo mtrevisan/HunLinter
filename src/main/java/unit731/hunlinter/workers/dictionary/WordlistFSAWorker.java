@@ -2,7 +2,6 @@ package unit731.hunlinter.workers.dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -89,7 +88,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //		};
 //
 		getWorkerData()
-			.withRelaunchException();
+			.withCancelOnException();
 
 		final Function<Void, Set<String>> step1 = ignored -> {
 			prepareProcessing("Extract words (step 1/3)");

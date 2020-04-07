@@ -56,7 +56,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			processor.apply(null);
 		}
 		catch(final Exception e){
-			if(workerData.isRelaunchException())
+			if(workerData.isCancelOnException())
 				cancel(e);
 		}
 		return null;

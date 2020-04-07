@@ -121,6 +121,8 @@
 				<version>3.8.1</version>
 				<configuration>
 					<showDeprecation>true</showDeprecation>
+					<source>14</source>
+					<target>14</target>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -147,8 +149,8 @@
 		<main.class>unit731.hunlinter.HunLinterFrame</main.class>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>13</maven.compiler.source>
-		<maven.compiler.target>13</maven.compiler.target>
+		<maven.compiler.source>14</maven.compiler.source>
+		<maven.compiler.target>14</maven.compiler.target>
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
@@ -156,6 +158,9 @@
 		<!-- Apache -->
 		<org.apache.commons.text.version>1.8</org.apache.commons.text.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
+
+		<!-- FastUtil -->
+		<fastutil.version>8.3.1</fastutil.version>
 
 		<!-- jFreeChart -->
 		<org.jfree.jfreechart.version>1.5.0</org.jfree.jfreechart.version>
@@ -167,7 +172,7 @@
 		<com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
 
 		<!-- CarrotSearch sizeof -->
-<!--		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
+		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>
 
 		<!-- Logging -->
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
@@ -178,18 +183,30 @@
 
 	<dependencies>
 		<!-- Apache -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>${org.apache.commons.text.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${org.apache.commons.io.version}</version>
 		</dependency>
 
+		<!-- FastUtil -->
+		<!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
+<!--		<dependency>-->
+<!--			<groupId>it.unimi.dsi</groupId>-->
+<!--			<artifactId>fastutil</artifactId>-->
+<!--			<version>${fastutil.version}</version>-->
+<!--		</dependency>-->
+
+
 		<!-- jFreeChart -->
+		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
@@ -204,6 +221,7 @@
 		</dependency>
 
 		<!-- JSON -->
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
@@ -224,6 +242,7 @@
 <!--		</dependency>-->
 
 		<!-- Logging -->
+		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -231,6 +250,7 @@
 		</dependency>
 
 		<!-- JUnit -->
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
