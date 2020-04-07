@@ -173,7 +173,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	/**
-	 * Worker cancelled itself due to an internal exception
+	 * Worker cancels itself due to an internal exception
 	 *
 	 * @param exception	Exception that causes the cancellation
 	 */
