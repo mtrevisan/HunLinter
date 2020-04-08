@@ -23,6 +23,8 @@ public class HyphenationOptionsParser{
 
 	private static final String NO_HYPHEN_SEPARATOR = ",";
 
+	private static final char[] NEW_LINE = {'\n'};
+
 
 	private final HyphenationOptions nonCompoundOptions = new HyphenationOptions(2);
 	private final HyphenationOptions compoundOptions = new HyphenationOptions(0);
@@ -90,7 +92,7 @@ public class HyphenationOptionsParser{
 		writer.write(key);
 		writer.write(StringUtils.SPACE);
 		writer.write(value);
-		writer.write(StringUtils.LF);
+		writer.write(NEW_LINE);
 	}
 
 }

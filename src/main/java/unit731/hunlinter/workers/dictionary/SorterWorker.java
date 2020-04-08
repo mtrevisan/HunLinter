@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,8 @@ public class SorterWorker extends WorkerDictionary{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SorterWorker.class);
 
 	public static final String WORKER_NAME = "Sorting";
+
+	private static final byte[] NEW_LINE = {'\r', '\n'};
 
 	private final DictionaryParser dicParser;
 	private final File dicFile;
@@ -105,8 +106,7 @@ public class SorterWorker extends WorkerDictionary{
 			accessor.seek(startIndex);
 			for(final String line : chunk){
 				accessor.write(line.getBytes(charset));
-				accessor.writeBytes(StringUtils.CR);
-				accessor.writeBytes(StringUtils.LF);
+				accessor.write(NEW_LINE);
 			}
 			accessor.close();
 		}

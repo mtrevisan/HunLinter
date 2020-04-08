@@ -49,6 +49,8 @@ public class ThesaurusParser{
 	private static final Pattern PATTERN_FILTER_EMPTY = RegexHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = RegexHelper.pattern("(,|\\|)+");
 
+	private static final char[] NEW_LINE = {'\n'};
+
 	private final ThesaurusDictionary dictionary;
 
 
@@ -237,23 +239,22 @@ public class ThesaurusParser{
 				){
 			//save charset
 			indexWriter.write(charset.name());
-			indexWriter.write(StringUtils.LF);
+			indexWriter.write(NEW_LINE);
 			//save counter
 			indexWriter.write(Integer.toString(dictionary.size()));
-			indexWriter.write(StringUtils.LF);
+			indexWriter.write(NEW_LINE);
 			//save charset
 			dataWriter.write(charset.name());
-			dataWriter.write(StringUtils.LF);
+			indexWriter.write(NEW_LINE);
 			//save data
 			int idx = charset.name().length() + 1;
-			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
 			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();
 			for(final ThesaurusEntry synonym : synonyms){
 				synonym.saveToIndex(indexWriter, idx);
 
 				final int synonymsLength = synonym.saveToData(dataWriter, charset);
 
-				idx += synonym.getDefinition().getBytes(charset).length + synonymsLength + doubleLineTerminatorLength;
+				idx += synonym.getDefinition().getBytes(charset).length + synonymsLength + 2;
 			}
 		}
 	}

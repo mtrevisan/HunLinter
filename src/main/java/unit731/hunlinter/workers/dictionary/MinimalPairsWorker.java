@@ -45,6 +45,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 	private static final String SLASH = "/";
 
+	private static final char[] NEW_LINE = {'\r', '\n'};
+
 
 	private final DictionaryCorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
@@ -148,7 +150,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private void writeSupportFile(final File file, final List<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
-			LoopHelper.forEach(list, line -> writeLine(writer, line, System.lineSeparator()));
+			LoopHelper.forEach(list, line -> writeLine(writer, line, NEW_LINE));
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

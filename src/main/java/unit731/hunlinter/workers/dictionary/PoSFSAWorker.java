@@ -112,7 +112,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withCancelOnException();
 
-		final Function<Void, List<byte[]>> step1 = ignored -> {
+		final Function<Void, ArrayList<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 TimeWatch watch = TimeWatch.start();
@@ -127,7 +127,7 @@ System.out.println(watch.toStringMillis());
 //byte[] 2 105 197 936
 			return encodings;
 		};
-		final Function<List<byte[]>, List<byte[]>> step2 = list -> {
+		final Function<ArrayList<byte[]>, ArrayList<byte[]>> step2 = list -> {
 			resetProcessing("Sorting (step 2/4)");
 
 TimeWatch watch = TimeWatch.start();
@@ -160,7 +160,7 @@ System.out.println(watch.toStringMillis());
 
 			return list;
 		};
-		final Function<List<byte[]>, FSA> step3 = list -> {
+		final Function<ArrayList<byte[]>, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
@@ -178,6 +178,8 @@ TimeWatch watch = TimeWatch.start();
 			}
 watch.stop();
 System.out.println(watch.toStringMillis());
+			list.clear();
+			list.trimToSize();
 
 //			if(!file.delete())
 //				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());

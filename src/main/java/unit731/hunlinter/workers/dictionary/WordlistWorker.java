@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -32,6 +31,8 @@ public class WordlistWorker extends WorkerDictionary{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordlistWorker.class);
 
 	public static final String WORKER_NAME = "Wordlist";
+
+	private static final char[] NEW_LINE = {'\n'};
 
 	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES}
 
@@ -62,7 +63,7 @@ public class WordlistWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), StringUtils.LF));
+			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), NEW_LINE));
 		};
 
 		getWorkerData()

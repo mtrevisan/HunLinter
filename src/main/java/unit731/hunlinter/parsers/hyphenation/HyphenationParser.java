@@ -109,6 +109,8 @@ public class HyphenationParser{
 
 	public static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
 
+	private static final char[] NEW_LINE = {'\n'};
+
 	public enum Level{NON_COMPOUND, COMPOUND}
 
 
@@ -495,7 +497,7 @@ public class HyphenationParser{
 
 	private void writeln(final BufferedWriter writer, final String line) throws IOException{
 		writer.write(line);
-		writer.write(StringUtils.LF);
+		writer.write(NEW_LINE);
 	}
 
 	/**

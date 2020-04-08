@@ -28,6 +28,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public static final String PART_OF_SPEECH_SEPARATOR = PIPE + ":";
 	public static final String SYNONYMS_SEPARATOR = PIPE + ",";
 
+	private static final char[] NEW_LINE = {'\n'};
+
 
 	private final String definition;
 	private final List<SynonymsEntry> synonyms;
@@ -121,7 +123,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		writer.write(definition);
 		writer.write(ThesaurusEntry.PIPE);
 		writer.write(Integer.toString(idx));
-		writer.write(StringUtils.LF);
+		writer.write(NEW_LINE);
 	}
 
 	public int saveToData(final BufferedWriter dataWriter, final Charset charset) throws IOException{
@@ -131,11 +133,11 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		for(final SynonymsEntry synonym : synonyms){
 			final String s = synonym.toString();
 			dataWriter.write(s);
-			dataWriter.write(StringUtils.LF);
+			dataWriter.write(NEW_LINE);
 
 			synonymsLength += s.getBytes(charset).length;
 		}
-		return synonymsLength + StringUtils.LF.length() * synonymsEntries;
+		return synonymsLength + NEW_LINE.length * synonymsEntries;
 	}
 
 	@Override
