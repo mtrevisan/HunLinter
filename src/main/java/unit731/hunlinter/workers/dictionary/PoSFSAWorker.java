@@ -20,6 +20,7 @@ import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.GrowableByteArray;
+import unit731.hunlinter.services.sorters.HeapSort;
 import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
@@ -131,22 +132,23 @@ System.out.println(watch.toStringMillis());
 TimeWatch watch = TimeWatch.start();
 			//sort list
 			//83729 ms
-//			HeapSort.sort(list, FSABuilder.LEXICAL_ORDERING, percent -> {
-//				setProgress(percent, 100);
-//
-//				sleepOnPause();
-//			});
-			//8788 ms
-			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
+			HeapSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
 				setProgress(percent, 100);
 
 				sleepOnPause();
 			});
+			//8788 ms
+//			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
+//				setProgress(percent, 100);
+//
+//				sleepOnPause();
+//			});
 watch.stop();
 System.out.println(watch.toStringMillis());
-for(int i = 1; i < list.limit; i ++)
+for(int i = 1; i < list.limit; i ++){
 	if(FSABuilder.LEXICAL_ORDERING.compare(list.data[i - 1], list.data[i]) > 0)
 		System.out.println();
+}
 
 //			final ExternalSorter sorter = new ExternalSorter();
 //			final ExternalSorterOptions options = ExternalSorterOptions.builder()
