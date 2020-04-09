@@ -80,9 +80,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
-//		final ArrayList<String> list = new ArrayList<>();
 		final GrowableByteArray encodings = new GrowableByteArray(40_000_000, 1.2f);
-//		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);

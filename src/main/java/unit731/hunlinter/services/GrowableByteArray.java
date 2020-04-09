@@ -30,17 +30,17 @@ public class GrowableByteArray{
 		this.growthRate = growthRate;
 	}
 
-	public void add(final byte[] elem){
+	public synchronized void add(final byte[] elem){
 		grow(1);
 
 		data[limit ++] = elem;
 	}
 
-	public void addAll(final byte[][] array){
+	public synchronized void addAll(final byte[][] array){
 		addAll(array, array.length);
 	}
 
-	public void addAll(final GrowableByteArray array){
+	public synchronized void addAll(final GrowableByteArray array){
 		addAll(array.data, array.limit);
 	}
 
@@ -57,17 +57,17 @@ public class GrowableByteArray{
 			data = Arrays.copyOf(data, data.length + (int)Math.ceil(delta * growthRate));
 	}
 
-	public boolean isEmpty(){
+	public synchronized boolean isEmpty(){
 		return (limit == 0);
 	}
 
-	public void clear(){
+	public synchronized void clear(){
 		data = null;
 		limit = -1;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public synchronized boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
@@ -81,7 +81,7 @@ public class GrowableByteArray{
 	}
 
 	@Override
-	public int hashCode(){
+	public synchronized int hashCode(){
 		return new HashCodeBuilder()
 			.append(data)
 			.append(limit)

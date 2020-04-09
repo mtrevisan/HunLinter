@@ -31,17 +31,17 @@ public class GrowableArray<T>{
 		this.growthRate = growthRate;
 	}
 
-	public void add(final T elem){
+	public synchronized void add(final T elem){
 		grow(1);
 
 		data[limit ++] = elem;
 	}
 
-	public void addAll(final T[] array){
+	public synchronized void addAll(final T[] array){
 		addAll(array, array.length);
 	}
 
-	public void addAll(final GrowableArray<T> array){
+	public synchronized void addAll(final GrowableArray<T> array){
 		addAll(array.data, array.limit);
 	}
 
@@ -52,11 +52,11 @@ public class GrowableArray<T>{
 		limit += size;
 	}
 
-	public void addAllUnique(final T[] array){
+	public synchronized void addAllUnique(final T[] array){
 		addAllUnique(array, array.length);
 	}
 
-	public void addAllUnique(final GrowableArray<T> array){
+	public synchronized void addAllUnique(final GrowableArray<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
@@ -72,7 +72,7 @@ public class GrowableArray<T>{
 		return (indexOf(elem) >= 0);
 	}
 
-	public void remove(final T elem){
+	public synchronized void remove(final T elem){
 		int index = limit;
 		while(limit > 0 && (index = lastIndexOf(elem, index)) >= 0){
 			final int delta = limit - index - 1;
@@ -86,7 +86,7 @@ public class GrowableArray<T>{
 		return indexOf(elem, 0);
 	}
 
-	public int indexOf(final T elem, final int startIndex){
+	public synchronized int indexOf(final T elem, final int startIndex){
 		int i;
 		if(elem == null){
 			for(i = startIndex; i < data.length; i ++)
@@ -101,7 +101,7 @@ public class GrowableArray<T>{
 		return -1;
 	}
 
-	public int lastIndexOf(final T elem, final int startIndex){
+	public synchronized int lastIndexOf(final T elem, final int startIndex){
 		int i;
 		if(elem == null){
 			for(i = startIndex - 1; i >= 0; i --)
@@ -126,12 +126,12 @@ public class GrowableArray<T>{
 		return data.getClass().getComponentType();
 	}
 
-	public boolean isEmpty(){
+	public synchronized boolean isEmpty(){
 		return (limit == 0);
 	}
 
 	/** NOTE: this method should NOT be called at all because it is inefficient */
-	public T[] extractCopyOrNull(){
+	public synchronized T[] extractCopyOrNull(){
 		if(isEmpty())
 			return null;
 
@@ -141,13 +141,13 @@ public class GrowableArray<T>{
 		return reducedData;
 	}
 
-	public void clear(){
+	public synchronized void clear(){
 		data = null;
 		limit = -1;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public synchronized boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
@@ -161,7 +161,7 @@ public class GrowableArray<T>{
 	}
 
 	@Override
-	public int hashCode(){
+	public synchronized int hashCode(){
 		return new HashCodeBuilder()
 			.append(data)
 			.append(limit)
