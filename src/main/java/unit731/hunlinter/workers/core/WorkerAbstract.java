@@ -174,6 +174,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 * @param exception	Exception that causes the cancellation
 	 */
 	protected void cancel(final Exception exception){
+exception.printStackTrace();
 		if(!JavaHelper.isInterruptedException(exception)){
 			LOGGER.error(exception != null? ExceptionHelper.getMessage(exception): "Generic error");
 

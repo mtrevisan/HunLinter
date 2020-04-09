@@ -9,6 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.GrowableArray;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -42,11 +43,11 @@ public class Inflection extends DictionaryEntry{
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
 			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
-		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+		final GrowableArray<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = new AffixEntry[]{appliedEntry};
 		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
-		return new Inflection(word, continuationFlags, morphologicalFields, combinable,
+		return new Inflection(word, continuationFlags.extractCopyOrNull(), morphologicalFields, combinable,
 			appliedRules, compoundEntries);
 	}
 

@@ -19,7 +19,8 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
-import unit731.hunlinter.services.sorters.HeapSort;
+import unit731.hunlinter.services.GrowableByteArray;
+import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -36,7 +37,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -81,13 +81,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 //		final Collator collator = Collator.getInstance();
 //		final List<CollationKey> list = new ArrayList<>();
 //		final ArrayList<String> list = new ArrayList<>();
-		final ArrayList<byte[]> encodings = new ArrayList<>(50_000_000);
+		final GrowableByteArray encodings = new GrowableByteArray(40_000_000, 1.2f);
 //		final StringList list = new StringList();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final List<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
+			final GrowableByteArray currentEncodings = encode(inflections, separator, sequenceEncoder);
 
 			encodings.addAll(currentEncodings);
 
@@ -112,13 +112,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 //			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withCancelOnException();
 
-		final Function<Void, ArrayList<byte[]>> step1 = ignored -> {
+		final Function<Void, GrowableByteArray> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 TimeWatch watch = TimeWatch.start();
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
-			encodings.trimToSize();
+
 //			closeWriter(writer);
 watch.stop();
 System.out.println(watch.toStringMillis());
@@ -127,18 +127,29 @@ System.out.println(watch.toStringMillis());
 //byte[] 2 105 197 936
 			return encodings;
 		};
-		final Function<ArrayList<byte[]>, ArrayList<byte[]>> step2 = list -> {
+		final Function<GrowableByteArray, GrowableByteArray> step2 = list -> {
 			resetProcessing("Sorting (step 2/4)");
 
 TimeWatch watch = TimeWatch.start();
-			//sort file
-			HeapSort.sort(list, FSABuilder.LEXICAL_ORDERING, (index, total) -> {
-				setProgress(index, total);
+			//sort list
+			//83729 ms
+//			HeapSort.sort(list, FSABuilder.LEXICAL_ORDERING, percent -> {
+//				setProgress(percent, 100);
+//
+//				sleepOnPause();
+//			});
+			//8788 ms
+			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
+				setProgress(percent, 100);
 
 				sleepOnPause();
 			});
 watch.stop();
 System.out.println(watch.toStringMillis());
+for(int i = 1; i < list.limit; i ++)
+	if(FSABuilder.LEXICAL_ORDERING.compare(list.data[i - 1], list.data[i]) > 0)
+		System.out.println();
+
 //			final ExternalSorter sorter = new ExternalSorter();
 //			final ExternalSorterOptions options = ExternalSorterOptions.builder()
 //				.charset(charset)
@@ -160,7 +171,7 @@ System.out.println(watch.toStringMillis());
 
 			return list;
 		};
-		final Function<ArrayList<byte[]>, FSA> step3 = list -> {
+		final Function<GrowableByteArray, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
@@ -168,18 +179,19 @@ System.out.println(watch.toStringMillis());
 				.withSequentialProcessing();
 
 TimeWatch watch = TimeWatch.start();
-			int index = 0;
-			for(final byte[] encoding : list){
+			for(int index = 0; index < list.limit; index ++){
+				final byte[] encoding = list.data[index];
 				fsaProcessor.accept(IndexDataPair.of(index, encoding));
 
-				setProgress(++ index, list.size());
+				setProgress(index, list.limit);
 
 				sleepOnPause();
 			}
 watch.stop();
 System.out.println(watch.toStringMillis());
+
+			//release memory
 			list.clear();
-			list.trimToSize();
 
 //			if(!file.delete())
 //				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
@@ -239,7 +251,7 @@ System.out.println(watch.toStringMillis());
 		}
 	}
 
-	private List<byte[]> encode(final Inflection[] inflections, final byte separator,
+	private GrowableByteArray encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
@@ -247,7 +259,7 @@ System.out.println(watch.toStringMillis());
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
 
-		final List<byte[]> out = new ArrayList<>();
+		final GrowableByteArray out = new GrowableByteArray(1.2f);
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
@@ -259,6 +271,8 @@ System.out.println(watch.toStringMillis());
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
 			//extract stem
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);
+			final byte[][] encodedStems = new byte[stems.size()][];
+			int position = 0;
 			for(final String stem : stems){
 				final byte[] inflectionStem = StringHelper.getRawBytes(stem);
 				source = BufferUtils.clearAndEnsureCapacity(source, inflectionStem.length - 3);
@@ -302,8 +316,9 @@ System.out.println(watch.toStringMillis());
 				}
 				assembled.flip();
 
-				out.add(BufferUtils.toArray(assembled));
+				encodedStems[position ++] = BufferUtils.toArray(assembled);
 			}
+			out.addAll(encodedStems);
 		}
 		return out;
 	}

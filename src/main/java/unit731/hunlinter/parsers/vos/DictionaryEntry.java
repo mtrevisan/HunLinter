@@ -24,6 +24,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.GrowableArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -260,7 +261,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public String[][] extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public GrowableArray<String>[] extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -273,16 +274,13 @@ public class DictionaryEntry{
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
 		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
-		String[] terminals = new String[maxSize];
-		String[] prefixes = new String[maxSize];
-		String[] suffixes = new String[maxSize];
+		final GrowableArray<String> terminals = GrowableArray.createExact(String.class, maxSize);
+		final GrowableArray<String> prefixes = GrowableArray.createExact(String.class, maxSize);
+		final GrowableArray<String> suffixes = GrowableArray.createExact(String.class, maxSize);
 		if(continuationFlags != null){
-			int indexTerminal = 0;
-			int indexPrefix = 0;
-			int indexSuffix = 0;
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
-					terminals[indexTerminal ++] = affix;
+					terminals.add(affix);
 					continue;
 				}
 
@@ -299,18 +297,13 @@ public class DictionaryEntry{
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry)rule).getType() == AffixType.SUFFIX)
-						suffixes[indexSuffix ++] = affix;
+						suffixes.add(affix);
 					else
-						prefixes[indexPrefix ++] = affix;
+						prefixes.add(affix);
 				}
 				else
-					terminals[indexTerminal ++] = affix;
+					terminals.add(affix);
 			}
-
-			//trim arrays
-			terminals = Arrays.copyOf(terminals, indexTerminal);
-			prefixes = Arrays.copyOf(prefixes, indexPrefix);
-			suffixes = Arrays.copyOf(suffixes, indexSuffix);
 		}
 
 		return new Affixes(prefixes, suffixes, terminals);

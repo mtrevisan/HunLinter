@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded as two ASCII characters whose codes
@@ -60,11 +58,12 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public String joinFlags(final String[] flags){
-		if(flags == null || flags.length == 0)
+	protected String joinFlags(final String[] flags, final int size){
+		if(flags == null || size == 0)
 			return StringUtils.EMPTY;
 
-		forEach(flags, this::validate);
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
 
 		return StringUtils.join(flags, StringUtils.EMPTY);
 	}

@@ -69,12 +69,12 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public String joinFlags(final String[] flags){
-		if(flags == null || flags.length == 0)
+	protected String joinFlags(final String[] flags, final int size){
+		if(flags == null || size == 0)
 			return StringUtils.EMPTY;
 
-		for(final String flag : flags)
-			validate(flag);
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
 
 		return StringUtils.join(flags, StringUtils.EMPTY);
 	}

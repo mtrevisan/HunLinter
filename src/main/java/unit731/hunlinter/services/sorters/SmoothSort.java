@@ -1,7 +1,6 @@
 package unit731.hunlinter.services.sorters;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -58,7 +57,7 @@ public class SmoothSort{
 		Objects.requireNonNull(comparator);
 
 		if(high - low >= 866_988_873){
-			//array too big to sort using this method
+			//array too big to sort using this method, switch to heapsort
 			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
 		}
@@ -153,6 +152,9 @@ public class SmoothSort{
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
 		}
+
+		if(progressCallback != null)
+			progressCallback.accept(100);
 	}
 
 	private static <T> void sift(final T[] data, int pshift, int head, final Comparator<? super T> comparator){
@@ -170,20 +172,17 @@ public class SmoothSort{
 				break;
 
 			if(comparator.compare(data[lf], data[rt]) >= 0){
-System.out.println("lf"+head+"|"+data[lf]);
 				data[head] = data[lf];
 				head = lf;
 				pshift -= 1;
 			}
 			else{
-System.out.println("rt"+head+"|"+data[rt]);
 				data[head] = data[rt];
 				head = rt;
 				pshift -= 2;
 			}
 		}
 
-System.out.println("val"+head+"|"+val);
 		data[head] = val;
 	}
 
@@ -210,7 +209,6 @@ System.out.println("val"+head+"|"+val);
 					break;
 			}
 
-System.out.println("h'"+head+"|"+data[stepson]);
 			data[head] = data[stepson];
 
 			head = stepson;
@@ -221,30 +219,32 @@ System.out.println("h'"+head+"|"+data[stepson]);
 		}
 
 		if(!isTrusty){
-System.out.println("h\""+head+"|"+val);
 			data[head] = val;
 			sift(data, pshift, head, comparator);
 		}
 	}
 
 
-	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator){
-		sort(data, 0, data.size(), comparator, null);
+	public static void sort(final byte[][] data, final Comparator<? super byte[]> comparator){
+		sort(data, 0, data.length, comparator, null);
 	}
 
-	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator,
+	public static void sort(final byte[][] data, final Comparator<? super byte[]> comparator,
 			final Consumer<Integer> progressCallback){
-		sort(data, 0, data.size(), comparator, progressCallback);
+		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static void sort(final List<byte[]> data, final int low, final int high, final Comparator<? super byte[]> comparator){
+	public static void sort(final byte[][] data, final int low, final int high, final Comparator<? super byte[]> comparator){
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized void sort(final List<byte[]> data, final int low, int high,
-			final Comparator<? super byte[]> comparator, final Consumer<Integer> progressCallback){
-		if(high - low > 866_988_873){
-			//list too big to sort using this method
+	public static synchronized void sort(final byte[][] data, int low, int high, final Comparator<? super byte[]> comparator,
+			final Consumer<Integer> progressCallback){
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(comparator);
+
+		if(high - low >= 866_988_873){
+			//array too big to sort using this method, switch to heapsort
 			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
 		}
@@ -254,16 +254,16 @@ System.out.println("h\""+head+"|"+val);
 		//the offset of the first element of the prefix into m
 		int head = low;
 
-		//These variables need a little explaining. If our string of heaps
-		//is of length 38, then the heaps will be of size 25+9+3+1, which are
+		//These variables need a little explaining.
+		//If our string of heaps is of length 38, then the heaps will be of size 25+9+3+1, which are
 		//Leonardo numbers 6, 4, 2, 1.
-		//Turning this into a binary number, we get b01010110 = 0x56. We represent
+		//Turning this into a binary number, we get 0b01010110 = 0x56. We represent
 		//this number as a pair of numbers by right-shifting all the zeros and
-		//storing the mantissa and exponent as "p" and "pshift".
+		//storing the mantissa and exponent as `p` and `pshift`.
 		//This is handy, because the exponent is the index into L[] giving the
 		//size of the rightmost heap, and because we can instantly find out if
 		//the rightmost two heaps are consecutive Leonardo numbers by checking
-		//(p&3)==3
+		//`(p & 3) == 3`
 
 		//the bitmap of the current standard concatenation >> pshift
 		int p = 1;
@@ -313,7 +313,7 @@ System.out.println("h\""+head+"|"+val);
 		progressIndex = 50;
 		while(pshift != 1 || p != 1){
 			if(pshift <= 1){
-				//block of length 1, no fiddling needed
+				//block of length 1. No fiddling needed
 				final int trail = Integer.numberOfTrailingZeros(p & ~1);
 				p >>>= trail;
 				pshift += trail;
@@ -323,14 +323,15 @@ System.out.println("h\""+head+"|"+val);
 				p ^= 7;
 				pshift -= 2;
 
-				//This block gets broken into three bits
-				//The rightmost bit is a block of length 1
-				//The left hand part is split into two, a block of length LP[pshift+1] and one of LP[pshift]
-				//Both these two are appropriately heapified, but the root nodes are not necessarily in order
-				//We therefore semitrinkle both of them
+				//This block gets broken into three bits. The rightmost
+				//bit is a block of length 1. The left hand part is split into
+				//two, a block of length LP[pshift+1] and one of LP[pshift].
+				//Both these two are appropriately heapified, but the root
+				//nodes are not necessarily in order. We therefore semitrinkle
+				//both of them
 
 				trinkle(data, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
-				trinkle(data, p, pshift, head, true, comparator);
+				trinkle(data, p, pshift, head - 1, true, comparator);
 			}
 
 			head --;
@@ -338,53 +339,50 @@ System.out.println("h\""+head+"|"+val);
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
 		}
+
+		if(progressCallback != null)
+			progressCallback.accept(100);
 	}
 
-	private static void sift(final List<byte[]> data, int pshift, int head, final Comparator<? super byte[]> comparator){
+	private static void sift(final byte[][] data, int pshift, int head, final Comparator<? super byte[]> comparator){
 		//we do not use Floyd's improvements to the heapsort sift, because we
 		//are not doing what heapsort does - always moving nodes from near
 		//the bottom of the tree to the root.
 
-		final byte[] val = data.get(head);
+		final byte[] val = data[head];
 
 		while(pshift > 1){
 			final int rt = head - 1;
 			final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
 
-			final byte[] lfElement = data.get(lf);
-			final byte[] rtElement = data.get(rt);
-			if(comparator.compare(val, lfElement) >= 0 && comparator.compare(val, rtElement) >= 0)
+			if(comparator.compare(val, data[lf]) >= 0 && comparator.compare(val, data[rt]) >= 0)
 				break;
 
-			if(comparator.compare(lfElement, rtElement) >= 0){
-System.out.println("lf"+head+"|"+new String(lfElement));
-				data.set(head, lfElement);
+			if(comparator.compare(data[lf], data[rt]) >= 0){
+				data[head] = data[lf];
 				head = lf;
 				pshift -= 1;
 			}
 			else{
-System.out.println("rt"+head+"|"+new String(rtElement));
-				data.set(head, rtElement);
+				data[head] = data[rt];
 				head = rt;
 				pshift -= 2;
 			}
 		}
 
-System.out.println("val"+head+"|"+new String(val));
-		data.set(head, val);
+		data[head] = val;
 	}
 
-	private static void trinkle(final List<byte[]> data, int p, int pshift, int head, boolean isTrusty,
+	private static void trinkle(final byte[][] data, int p, int pshift, int head, boolean isTrusty,
 			final Comparator<? super byte[]> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
-		final byte[] val = data.get(head);
+		final byte[] val = data[head];
 
 		while(p != 1){
 			final int stepson = head - LEONARDO_NUMBER[pshift];
-			final byte[] stepsonElement = data.get(stepson);
 
-			if(comparator.compare(stepsonElement, val) <= 0)
+			if(comparator.compare(data[stepson], val) <= 0)
 				//current node is greater than head, sift
 				break;
 
@@ -393,13 +391,12 @@ System.out.println("val"+head+"|"+new String(val));
 			if(!isTrusty && pshift > 1){
 				final int rt = head - 1;
 				final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
-				if(comparator.compare(data.get(rt), stepsonElement) >= 0
-						|| comparator.compare(data.get(lf), stepsonElement) >= 0)
+				if(comparator.compare(data[rt], data[stepson]) >= 0
+					|| comparator.compare(data[lf], data[stepson]) >= 0)
 					break;
 			}
 
-System.out.println("h'"+head+"|"+new String(stepsonElement));
-			data.set(head, stepsonElement);
+			data[head] = data[stepson];
 
 			head = stepson;
 			final int trail = Integer.numberOfTrailingZeros(p & ~1);
@@ -409,8 +406,7 @@ System.out.println("h'"+head+"|"+new String(stepsonElement));
 		}
 
 		if(!isTrusty){
-System.out.println("h\""+head+"|"+new String(val));
-			data.set(head, val);
+			data[head] = val;
 			sift(data, pshift, head, comparator);
 		}
 	}

@@ -16,7 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.services.ArraySet;
+import unit731.hunlinter.services.GrowableArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -133,14 +133,15 @@ public class AffixEntry{
 		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
-		final ArraySet<String> flags = new ArraySet<>();
+	public GrowableArray<String> combineContinuationFlags(final String[] otherContinuationFlags){
+		final int size = (otherContinuationFlags != null? otherContinuationFlags.length: 0)
+			+ (continuationFlags != null? continuationFlags.length: 0);
+		final GrowableArray<String> flags = GrowableArray.createExact(String.class, size);
 		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)
-			flags.addAll(Arrays.asList(continuationFlags));
-		final int size = flags.size();
-		return (size > 0? flags.toArray(String[]::new): null);
+			flags.addAllUnique(continuationFlags);
+		return flags;
 	}
 
 	//FIXME is this documentation updated/true?

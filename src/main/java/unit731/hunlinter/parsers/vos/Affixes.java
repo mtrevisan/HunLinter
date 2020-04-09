@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.vos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.GrowableArray;
 
 
 public class Affixes{
@@ -10,23 +11,20 @@ public class Affixes{
 	public static final int INDEX_SUFFIXES = 1;
 	public static final int INDEX_TERMINALS = 2;
 
-	private final String[] prefixes;
-	private final String[] suffixes;
-	private final String[] terminals;
+	private final GrowableArray<String> prefixes;
+	private final GrowableArray<String> suffixes;
+	private final GrowableArray<String> terminals;
 
 
-	public Affixes(final String[] prefixes, final String[] suffixes, final String[] terminals){
+	public Affixes(final GrowableArray<String> prefixes, final GrowableArray<String> suffixes,
+			final GrowableArray<String> terminals){
 		this.prefixes = prefixes;
 		this.suffixes = suffixes;
 		this.terminals = terminals;
 	}
 
-	public String[] getTerminals(){
-		return terminals;
-	}
-
-	public String[][] extractAllAffixes(final boolean reverseAffixes){
-		return new String[][]{
+	public GrowableArray<String>[] extractAllAffixes(final boolean reverseAffixes){
+		return new GrowableArray[]{
 			(reverseAffixes? suffixes: prefixes),
 			(reverseAffixes? prefixes: suffixes),
 			terminals};

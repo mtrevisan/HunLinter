@@ -2,12 +2,9 @@ package unit731.hunlinter.services.sorters;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
 
 
@@ -133,23 +130,6 @@ public class SmoothSortTest{
 		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
-	}
-
-	@Test
-	void randomInt2(){
-		int len = 10;
-		List<byte[]> data = new ArrayList<>(len);
-		for(int i = 0; i < len; i ++)
-			data.add((""+RND.nextInt()).getBytes());
-
-		SmoothSort.sort(data, FSABuilder.LEXICAL_ORDERING);
-
-		assertSort(data);
-	}
-
-	private void assertSort(List<byte[]> data){
-		for(int i = 1; i < data.size(); i ++)
-			Assertions.assertTrue(FSABuilder.LEXICAL_ORDERING.compare(data.get(i - 1), data.get(i)) <= 0);
 	}
 
 

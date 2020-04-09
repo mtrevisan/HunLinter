@@ -85,7 +85,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags(null);
+		String continuationFlags = strategy.joinFlags((String[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
