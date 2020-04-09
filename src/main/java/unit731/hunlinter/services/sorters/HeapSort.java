@@ -14,27 +14,27 @@ import java.util.function.Consumer;
  */
 public class HeapSort{
 
-	public static <T extends Comparable<T>> void sort(final T[] array, final Comparator<? super T> comparator){
-		sort(array, 0, array.length, comparator);
+	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator){
+		sort(data, 0, data.length, comparator);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, final Comparator<? super T> comparator,
+	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
-		sort(array, 0, array.length, comparator, progressCallback);
+		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, int low, final int high,
+	public static <T extends Comparable<T>> void sort(final T[] data, int low, final int high,
 			final Comparator<? super T> comparator){
-		sort(array, low, high, comparator, null);
+		sort(data, low, high, comparator, null);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, int low, final int high,
+	public static synchronized <T extends Comparable<T>> void sort(final T[] data, int low, final int high,
 			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
-		Objects.requireNonNull(array);
+		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);
-		assert low < high && low < array.length && high <= array.length;
+		assert low < high && low < data.length && high <= data.length;
 
-		final int progressStep = (int)Math.ceil((array.length << 1) / 100.f);
+		final int progressStep = (int)Math.ceil((data.length << 1) / 100.f);
 		if(progressCallback != null)
 			progressCallback.accept(0);
 
@@ -46,18 +46,18 @@ public class HeapSort{
 			return;
 		}
 
-		buildMaxHeap(array, low, high, comparator, progressStep, progressCallback);
+		buildMaxHeap(data, low, high, comparator, progressStep, progressCallback);
 
 		//The following loop maintains the invariants that a[0:end] is a heap and every element
 		//beyond `end` is greater than everything before it (so a[end:count] is in sorted order)
-		int progress = array.length;
+		int progress = data.length;
 		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
-			swap(array, low, heapsize);
+			swap(data, low, heapsize);
 
 			//sift down:
-			siftDown(array, low, heapsize, comparator);
+			siftDown(data, low, heapsize, comparator);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
@@ -65,18 +65,18 @@ public class HeapSort{
 	}
 
 	/** Build the heap in array a so that largest value is at the root */
-	private static <T> void buildMaxHeap(final T[] array, final int low, final int high, final Comparator<? super T> comparator,
+	private static <T> void buildMaxHeap(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
 			final int progressStep, final Consumer<Integer> progressCallback){
 		int progress = 0;
 		for(int heapsize = low + 1; heapsize < high; heapsize ++){
 			//if child is bigger than parent
-			if(comparator.compare(array[heapsize], array[parent(heapsize)]) > 0){
+			if(comparator.compare(data[heapsize], data[parent(heapsize)]) > 0){
 				//swap child and parent until parent is smaller
 				int node = heapsize;
 				while(node > 0){
 					final int parent = parent(node);
-					if(comparator.compare(array[node], array[parent]) > 0)
-						swap(array, node, parent);
+					if(comparator.compare(data[node], data[parent]) > 0)
+						swap(data, node, parent);
 					node = parent;
 				}
 			}
@@ -86,7 +86,7 @@ public class HeapSort{
 		}
 	}
 
-	private static <T> void siftDown(final T[] array, final int low, final int heapsize, final Comparator<? super T> comparator){
+	private static <T> void siftDown(final T[] data, final int low, final int heapsize, final Comparator<? super T> comparator){
 		//index of the element being moved down the tree
 		int parent = low;
 		int leftChild;
@@ -94,43 +94,43 @@ public class HeapSort{
 			leftChild = 2 * parent + 1;
 
 			//if left child is smaller than right child
-			if(leftChild < heapsize - 1 && comparator.compare(array[leftChild], array[leftChild + 1]) < 0)
+			if(leftChild < heapsize - 1 && comparator.compare(data[leftChild], data[leftChild + 1]) < 0)
 				//point index variable to right child
 				leftChild ++;
 
 			//if parent is smaller than left child, then swapping parent with left child
-			if(leftChild < heapsize && comparator.compare(array[parent], array[leftChild]) < 0)
-				swap(array, parent, leftChild);
+			if(leftChild < heapsize && comparator.compare(data[parent], data[leftChild]) < 0)
+				swap(data, parent, leftChild);
 
 			parent = leftChild;
 		}while(leftChild < heapsize);
 	}
 
-	private static <T> void swap(final T[] array, final int i, final int j){
-		final T temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
+	private static <T> void swap(final T[] data, final int i, final int j){
+		final T temp = data[i];
+		data[i] = data[j];
+		data[j] = temp;
 	}
 
 
-	public static void sort(final List<byte[]> array, final Comparator<? super byte[]> comparator){
-		sort(array, 0, array.size(), comparator, null);
+	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator){
+		sort(data, 0, data.size(), comparator, null);
 	}
 
-	public static void sort(final List<byte[]> array, final Comparator<? super byte[]> comparator,
+	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator,
 			final Consumer<Integer> progressCallback){
-		sort(array, 0, array.size(), comparator, progressCallback);
+		sort(data, 0, data.size(), comparator, progressCallback);
 	}
 
-	public static void sort(final List<byte[]> array, int low, final int high, final Comparator<? super byte[]> comparator){
-		sort(array, low, high, comparator, null);
+	public static void sort(final List<byte[]> data, int low, final int high, final Comparator<? super byte[]> comparator){
+		sort(data, low, high, comparator, null);
 	}
 
-	public static void sort(final List<byte[]> array, int low, final int high, final Comparator<? super byte[]> comparator,
-			final Consumer<Integer> progressCallback){
-		Objects.requireNonNull(array);
+	public static synchronized void sort(final List<byte[]> data, int low, final int high,
+			final Comparator<? super byte[]> comparator, final Consumer<Integer> progressCallback){
+		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);
-		final int length = array.size();
+		final int length = data.size();
 		assert low < high && low < length && high <= length;
 
 		final int progressStep = (int)Math.ceil((length << 1) / 100.f);
@@ -145,7 +145,7 @@ public class HeapSort{
 			return;
 		}
 
-		buildMaxHeap(array, low, high, comparator, progressStep, progressCallback);
+		buildMaxHeap(data, low, high, comparator, progressStep, progressCallback);
 
 		//The following loop maintains the invariants that a[0:end] is a heap and every element
 		//beyond `end` is greater than everything before it (so a[end:count] is in sorted order)
@@ -153,10 +153,10 @@ public class HeapSort{
 		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
-			swap(array, low, heapsize);
+			swap(data, low, heapsize);
 
 			//sift down:
-			siftDown(array, low, heapsize, comparator);
+			siftDown(data, low, heapsize, comparator);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
@@ -164,18 +164,18 @@ public class HeapSort{
 	}
 
 	/** Build the heap in array a so that largest value is at the root */
-	private static void buildMaxHeap(final List<byte[]> array, final int low, final int high,
+	private static void buildMaxHeap(final List<byte[]> data, final int low, final int high,
 			final Comparator<? super byte[]> comparator, final int progressStep, final Consumer<Integer> progressCallback){
 		int progress = 0;
 		for(int heapsize = low + 1; heapsize < high; heapsize ++){
 			//if child is bigger than parent
-			if(comparator.compare(array.get(heapsize), array.get(parent(heapsize))) > 0){
+			if(comparator.compare(data.get(heapsize), data.get(parent(heapsize))) > 0){
 				//swap child and parent until parent is smaller
 				int node = heapsize;
 				while(node > 0){
 					final int parent = parent(node);
-					if(comparator.compare(array.get(node), array.get(parent)) > 0)
-						swap(array, node, parent);
+					if(comparator.compare(data.get(node), data.get(parent)) > 0)
+						swap(data, node, parent);
 					node = parent;
 				}
 			}
@@ -185,7 +185,7 @@ public class HeapSort{
 		}
 	}
 
-	private static void siftDown(final List<byte[]> array, final int low, final int heapsize,
+	private static void siftDown(final List<byte[]> data, final int low, final int heapsize,
 			final Comparator<? super byte[]> comparator){
 		//index of the element being moved down the tree
 		int parent = low;
@@ -194,22 +194,22 @@ public class HeapSort{
 			leftChild = 2 * parent + 1;
 
 			//if left child is smaller than right child
-			if(leftChild < heapsize - 1 && comparator.compare(array.get(leftChild), array.get(leftChild + 1)) < 0)
+			if(leftChild < heapsize - 1 && comparator.compare(data.get(leftChild), data.get(leftChild + 1)) < 0)
 				//point index variable to right child
 				leftChild ++;
 
 			//if parent is smaller than left child, then swapping parent with left child
-			if(leftChild < heapsize && comparator.compare(array.get(parent), array.get(leftChild)) < 0)
-				swap(array, parent, leftChild);
+			if(leftChild < heapsize && comparator.compare(data.get(parent), data.get(leftChild)) < 0)
+				swap(data, parent, leftChild);
 
 			parent = leftChild;
 		}while(leftChild < heapsize);
 	}
 
-	private static void swap(final List<byte[]> array, final int i, final int j){
-		final byte[] temp = array.get(i);
-		array.set(i, array.get(j));
-		array.set(j, temp);
+	private static void swap(final List<byte[]> data, final int i, final int j){
+		final byte[] temp = data.get(i);
+		data.set(i, data.get(j));
+		data.set(j, temp);
 	}
 
 

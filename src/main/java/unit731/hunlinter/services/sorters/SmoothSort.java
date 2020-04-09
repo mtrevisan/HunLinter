@@ -38,28 +38,28 @@ public class SmoothSort{
 //	}
 
 
-	public static <T extends Comparable<T>> void sort(final T[] array, final Comparator<? super T> comparator){
-		sort(array, 0, array.length, comparator, null);
+	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator){
+		sort(data, 0, data.length, comparator, null);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, final Comparator<? super T> comparator,
+	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
-		sort(array, 0, array.length, comparator, progressCallback);
+		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, final int low, final int high,
+	public static <T extends Comparable<T>> void sort(final T[] data, final int low, final int high,
 			final Comparator<? super T> comparator){
-		sort(array, low, high, comparator, null);
+		sort(data, low, high, comparator, null);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] array, int low, int high, final Comparator<? super T> comparator,
-			final Consumer<Integer> progressCallback){
-		Objects.requireNonNull(array);
+	public static synchronized <T extends Comparable<T>> void sort(final T[] data, int low, int high,
+			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
+		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);
 
 		if(high - low >= 866_988_873){
 			//array too big to sort using this method
-			HeapSort.sort(array, low, high, comparator, progressCallback);
+			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
 		}
 
@@ -90,7 +90,7 @@ public class SmoothSort{
 			if((p & 3) == 3){
 				//add 1 by merging the first two blocks into a larger one
 				//the next Leonardo number is one bigger
-				sift(array, pshift, head, comparator);
+				sift(data, pshift, head, comparator);
 				p >>>= 2;
 				pshift += 2;
 			}
@@ -98,10 +98,10 @@ public class SmoothSort{
 				//adding a new block of length 1
 				if(LEONARDO_NUMBER[pshift - 1] >= high - head)
 					//this block is its final size
-					trinkle(array, p, pshift, head, false, comparator);
+					trinkle(data, p, pshift, head, false, comparator);
 				else
 					//this block will get merged, just make it trusty
-					sift(array, pshift, head, comparator);
+					sift(data, pshift, head, comparator);
 
 				if(pshift == 1){
 					//LP[1] is being used, so we add use LP[0]
@@ -121,7 +121,7 @@ public class SmoothSort{
 				progressCallback.accept(++ progressIndex);
 		}
 
-		trinkle(array, p, pshift, head, false, comparator);
+		trinkle(data, p, pshift, head, false, comparator);
 
 
 		progressIndex = 50;
@@ -144,8 +144,8 @@ public class SmoothSort{
 				//nodes are not necessarily in order. We therefore semitrinkle
 				//both of them
 
-				trinkle(array, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
-				trinkle(array, p, pshift, head - 1, true, comparator);
+				trinkle(data, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
+				trinkle(data, p, pshift, head - 1, true, comparator);
 			}
 
 			head --;
@@ -155,45 +155,48 @@ public class SmoothSort{
 		}
 	}
 
-	private static <T> void sift(final T[] input, int pshift, int head, final Comparator<? super T> comparator){
+	private static <T> void sift(final T[] data, int pshift, int head, final Comparator<? super T> comparator){
 		//we do not use Floyd's improvements to the heapsort sift, because we
 		//are not doing what heapsort does - always moving nodes from near
 		//the bottom of the tree to the root.
 
-		final T val = input[head];
+		final T val = data[head];
 
 		while(pshift > 1){
 			final int rt = head - 1;
 			final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
 
-			if(comparator.compare(val, input[lf]) >= 0 && comparator.compare(val, input[rt]) >= 0)
+			if(comparator.compare(val, data[lf]) >= 0 && comparator.compare(val, data[rt]) >= 0)
 				break;
 
-			if(comparator.compare(input[lf], input[rt]) >= 0){
-				input[head] = input[lf];
+			if(comparator.compare(data[lf], data[rt]) >= 0){
+System.out.println("lf"+head+"|"+data[lf]);
+				data[head] = data[lf];
 				head = lf;
 				pshift -= 1;
 			}
 			else{
-				input[head] = input[rt];
+System.out.println("rt"+head+"|"+data[rt]);
+				data[head] = data[rt];
 				head = rt;
 				pshift -= 2;
 			}
 		}
 
-		input[head] = val;
+System.out.println("val"+head+"|"+val);
+		data[head] = val;
 	}
 
-	private static <T> void trinkle(final T[] input, int p, int pshift, int head, boolean isTrusty,
+	private static <T> void trinkle(final T[] data, int p, int pshift, int head, boolean isTrusty,
 			final Comparator<? super T> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
-		final T val = input[head];
+		final T val = data[head];
 
 		while(p != 1){
 			final int stepson = head - LEONARDO_NUMBER[pshift];
 
-			if(comparator.compare(input[stepson], val) <= 0)
+			if(comparator.compare(data[stepson], val) <= 0)
 				//current node is greater than head, sift
 				break;
 
@@ -202,12 +205,13 @@ public class SmoothSort{
 			if(!isTrusty && pshift > 1){
 				final int rt = head - 1;
 				final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
-				if(comparator.compare(input[rt], input[stepson]) >= 0
-						|| comparator.compare(input[lf], input[stepson]) >= 0)
+				if(comparator.compare(data[rt], data[stepson]) >= 0
+						|| comparator.compare(data[lf], data[stepson]) >= 0)
 					break;
 			}
 
-			input[head] = input[stepson];
+System.out.println("h'"+head+"|"+data[stepson]);
+			data[head] = data[stepson];
 
 			head = stepson;
 			final int trail = Integer.numberOfTrailingZeros(p & ~1);
@@ -217,30 +221,31 @@ public class SmoothSort{
 		}
 
 		if(!isTrusty){
-			input[head] = val;
-			sift(input, pshift, head, comparator);
+System.out.println("h\""+head+"|"+val);
+			data[head] = val;
+			sift(data, pshift, head, comparator);
 		}
 	}
 
 
-	public static void sort(final List<byte[]> array, final Comparator<? super byte[]> comparator){
-		sort(array, 0, array.size(), comparator, null);
+	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator){
+		sort(data, 0, data.size(), comparator, null);
 	}
 
-	public static void sort(final List<byte[]> array, final Comparator<? super byte[]> comparator,
+	public static void sort(final List<byte[]> data, final Comparator<? super byte[]> comparator,
 			final Consumer<Integer> progressCallback){
-		sort(array, 0, array.size(), comparator, progressCallback);
+		sort(data, 0, data.size(), comparator, progressCallback);
 	}
 
-	public static void sort(final List<byte[]> array, final int low, final int high, final Comparator<? super byte[]> comparator){
-		sort(array, low, high, comparator, null);
+	public static void sort(final List<byte[]> data, final int low, final int high, final Comparator<? super byte[]> comparator){
+		sort(data, low, high, comparator, null);
 	}
 
-	public static void sort(final List<byte[]> array, final int low, int high, final Comparator<? super byte[]> comparator,
-			final Consumer<Integer> progressCallback){
+	public static synchronized void sort(final List<byte[]> data, final int low, int high,
+			final Comparator<? super byte[]> comparator, final Consumer<Integer> progressCallback){
 		if(high - low > 866_988_873){
 			//list too big to sort using this method
-			HeapSort.sort(array, low, high, comparator, progressCallback);
+			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
 		}
 
@@ -271,7 +276,7 @@ public class SmoothSort{
 			if((p & 3) == 3){
 				//add 1 by merging the first two blocks into a larger one
 				//the next Leonardo number is one bigger
-				sift(array, pshift, head, comparator);
+				sift(data, pshift, head, comparator);
 				p >>>= 2;
 				pshift += 2;
 			}
@@ -279,10 +284,10 @@ public class SmoothSort{
 				//adding a new block of length 1
 				if(LEONARDO_NUMBER[pshift - 1] >= high - head)
 					//this block is its final size
-					trinkle(array, p, pshift, head, false, comparator);
+					trinkle(data, p, pshift, head, false, comparator);
 				else
 					//this block will get merged, just make it trusty
-					sift(array, pshift, head, comparator);
+					sift(data, pshift, head, comparator);
 
 				if(pshift == 1){
 					//LP[1] is being used, so we add use LP[0]
@@ -302,7 +307,7 @@ public class SmoothSort{
 				progressCallback.accept(++ progressIndex);
 		}
 
-		trinkle(array, p, pshift, head, false, comparator);
+		trinkle(data, p, pshift, head, false, comparator);
 
 
 		progressIndex = 50;
@@ -324,8 +329,8 @@ public class SmoothSort{
 				//Both these two are appropriately heapified, but the root nodes are not necessarily in order
 				//We therefore semitrinkle both of them
 
-				trinkle(array, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
-				trinkle(array, p, pshift, head, true, comparator);
+				trinkle(data, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
+				trinkle(data, p, pshift, head, true, comparator);
 			}
 
 			head --;
@@ -335,46 +340,49 @@ public class SmoothSort{
 		}
 	}
 
-	private static void sift(final List<byte[]> input, int pshift, int head, final Comparator<? super byte[]> comparator){
+	private static void sift(final List<byte[]> data, int pshift, int head, final Comparator<? super byte[]> comparator){
 		//we do not use Floyd's improvements to the heapsort sift, because we
 		//are not doing what heapsort does - always moving nodes from near
 		//the bottom of the tree to the root.
 
-		final byte[] val = input.get(head);
+		final byte[] val = data.get(head);
 
 		while(pshift > 1){
 			final int rt = head - 1;
 			final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
 
-			final byte[] lfElement = input.get(lf);
-			final byte[] rtElement = input.get(rt);
+			final byte[] lfElement = data.get(lf);
+			final byte[] rtElement = data.get(rt);
 			if(comparator.compare(val, lfElement) >= 0 && comparator.compare(val, rtElement) >= 0)
 				break;
 
 			if(comparator.compare(lfElement, rtElement) >= 0){
-				input.set(head, lfElement);
+System.out.println("lf"+head+"|"+new String(lfElement));
+				data.set(head, lfElement);
 				head = lf;
 				pshift -= 1;
 			}
 			else{
-				input.set(head, rtElement);
+System.out.println("rt"+head+"|"+new String(rtElement));
+				data.set(head, rtElement);
 				head = rt;
 				pshift -= 2;
 			}
 		}
 
-		input.set(head, val);
+System.out.println("val"+head+"|"+new String(val));
+		data.set(head, val);
 	}
 
-	private static void trinkle(final List<byte[]> input, int p, int pshift, int head, boolean isTrusty,
+	private static void trinkle(final List<byte[]> data, int p, int pshift, int head, boolean isTrusty,
 			final Comparator<? super byte[]> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
-		final byte[] val = input.get(head);
+		final byte[] val = data.get(head);
 
 		while(p != 1){
 			final int stepson = head - LEONARDO_NUMBER[pshift];
-			final byte[] stepsonElement = input.get(stepson);
+			final byte[] stepsonElement = data.get(stepson);
 
 			if(comparator.compare(stepsonElement, val) <= 0)
 				//current node is greater than head, sift
@@ -385,12 +393,13 @@ public class SmoothSort{
 			if(!isTrusty && pshift > 1){
 				final int rt = head - 1;
 				final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
-				if(comparator.compare(input.get(rt), stepsonElement) >= 0
-						|| comparator.compare(input.get(lf), stepsonElement) >= 0)
+				if(comparator.compare(data.get(rt), stepsonElement) >= 0
+						|| comparator.compare(data.get(lf), stepsonElement) >= 0)
 					break;
 			}
 
-			input.set(head, stepsonElement);
+System.out.println("h'"+head+"|"+new String(stepsonElement));
+			data.set(head, stepsonElement);
 
 			head = stepson;
 			final int trail = Integer.numberOfTrailingZeros(p & ~1);
@@ -400,8 +409,9 @@ public class SmoothSort{
 		}
 
 		if(!isTrusty){
-			input.set(head, val);
-			sift(input, pshift, head, comparator);
+System.out.println("h\""+head+"|"+new String(val));
+			data.set(head, val);
+			sift(data, pshift, head, comparator);
 		}
 	}
 
