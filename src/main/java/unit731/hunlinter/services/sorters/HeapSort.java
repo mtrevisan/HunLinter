@@ -13,21 +13,21 @@ import java.util.function.Consumer;
  */
 public class HeapSort{
 
-	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator){
+	public static <T extends Comparable<? super T>> void sort(final T[] data, final Comparator<? super T> comparator){
 		sort(data, 0, data.length, comparator);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator,
+	public static <T extends Comparable<? super T>> void sort(final T[] data, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
 		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] data, int low, final int high,
+	public static <T extends Comparable<? super T>> void sort(final T[] data, int low, final int high,
 			final Comparator<? super T> comparator){
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T extends Comparable<T>> void sort(final T[] data, int low, final int high,
+	public static synchronized <T extends Comparable<? super T>> void sort(final T[] data, int low, final int high,
 			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);

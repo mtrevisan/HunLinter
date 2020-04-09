@@ -9,6 +9,7 @@ import java.util.function.Consumer;
  * https://github.com/ChrisKitching/JavaExternalSort/blob/master/src/uk/ac/cam/cdk23/fjava/tick0/SmoothSort.java
  * https://github.com/molgenis/systemsgenetics/blob/master/genetica-libraries/src/main/java/umcg/genetica/util/SmoothSort.java
  * https://www.keithschwarz.com/smoothsort/
+ * https://www.keithschwarz.com/interesting/code/?dir=smoothsort
  */
 public class SmoothSort{
 
@@ -37,26 +38,26 @@ public class SmoothSort{
 //	}
 
 
-	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator){
+	public static <T extends Comparable<? super T>> void sort(final T[] data, final Comparator<? super T> comparator){
 		sort(data, 0, data.length, comparator, null);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] data, final Comparator<? super T> comparator,
+	public static <T extends Comparable<? super T>> void sort(final T[] data, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
 		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static <T extends Comparable<T>> void sort(final T[] data, final int low, final int high,
+	public static <T extends Comparable<? super T>> void sort(final T[] data, final int low, final int high,
 			final Comparator<? super T> comparator){
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T extends Comparable<T>> void sort(final T[] data, int low, int high,
+	public static synchronized <T extends Comparable<? super T>> void sort(final T[] data, int low, int high,
 			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);
 
-		if(high - low >= 866_988_873){
+		if(high - low > LEONARDO_NUMBER[LEONARDO_NUMBER.length - 1]){
 			//array too big to sort using this method, switch to heapsort
 			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
@@ -143,7 +144,9 @@ public class SmoothSort{
 				//nodes are not necessarily in order. We therefore semitrinkle
 				//both of them
 
+				//trinkle first child (head - LEONARDO_NUMBER[pshift] - 1)
 				trinkle(data, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
+				//trinkle second child (head - 1)
 				trinkle(data, p, pshift, head - 1, true, comparator);
 			}
 
@@ -157,36 +160,35 @@ public class SmoothSort{
 			progressCallback.accept(100);
 	}
 
+	/** Rebalance the tree using the standard "bubble-down" approach */
 	private static <T> void sift(final T[] data, int pshift, int head, final Comparator<? super T> comparator){
-		//we do not use Floyd's improvements to the heapsort sift, because we
-		//are not doing what heapsort does - always moving nodes from near
-		//the bottom of the tree to the root.
-
-		final T val = data[head];
-
+		//loop until the current node has no children, which happens when the order of the tree is 0 or 1
 		while(pshift > 1){
-			final int rt = head - 1;
+			//first child
 			final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
+			//second child
+			final int rt = head - 1;
 
-			if(comparator.compare(val, data[lf]) >= 0 && comparator.compare(val, data[rt]) >= 0)
-				break;
+			//select larger child (first has order `k - 1`, second has order `k - 2`)
+			final int largerChild = (comparator.compare(data[lf], data[rt]) >= 0? lf: rt);
 
-			if(comparator.compare(data[lf], data[rt]) >= 0){
-				data[head] = data[lf];
-				head = lf;
-				pshift -= 1;
-			}
-			else{
-				data[head] = data[rt];
-				head = rt;
-				pshift -= 2;
-			}
+			//if the root is bigger than this child, we're done
+			if(comparator.compare(data[head], data[largerChild]) >= 0)
+				return;
+
+			//otherwise, swap down and update order
+			data[head] = data[largerChild];
+			head = largerChild;
+			pshift -= (largerChild == lf? 1: 2);
 		}
-
-		data[head] = val;
 	}
 
-	private static <T> void trinkle(final T[] data, int p, int pshift, int head, boolean isTrusty,
+	/**
+	 * Given an implicit Leonardo heap that has just had an element inserted into it at the very end, along with the
+	 * size list for that heap, rectifies the heap structure by shuffling the new root down to the proper position
+	 * and rebalancing the target heap
+	 */
+	private static <T> void trinkle(final T[] data, int p, int pshift, int head, boolean trusty,
 			final Comparator<? super T> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
@@ -201,7 +203,7 @@ public class SmoothSort{
 
 			//no need to check this if we know the current node is trusty,
 			//because we just checked the head (which is val, in the first iteration)
-			if(!isTrusty && pshift > 1){
+			if(!trusty && pshift > 1){
 				final int rt = head - 1;
 				final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
 				if(comparator.compare(data[rt], data[stepson]) >= 0
@@ -215,10 +217,10 @@ public class SmoothSort{
 			final int trail = Integer.numberOfTrailingZeros(p & ~1);
 			p >>>= trail;
 			pshift += trail;
-			isTrusty = false;
+			trusty = false;
 		}
 
-		if(!isTrusty){
+		if(!trusty){
 			data[head] = val;
 			sift(data, pshift, head, comparator);
 		}
@@ -243,7 +245,7 @@ public class SmoothSort{
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);
 
-		if(high - low >= 866_988_873){
+		if(high - low > LEONARDO_NUMBER[LEONARDO_NUMBER.length - 1]){
 			//array too big to sort using this method, switch to heapsort
 			HeapSort.sort(data, low, high, comparator, progressCallback);
 			return;
@@ -330,7 +332,9 @@ public class SmoothSort{
 				//nodes are not necessarily in order. We therefore semitrinkle
 				//both of them
 
+				//trinkle first child (head - LEONARDO_NUMBER[pshift] - 1)
 				trinkle(data, p >>> 1, pshift + 1, head - LEONARDO_NUMBER[pshift] - 1, true, comparator);
+				//trinkle second child (head - 1)
 				trinkle(data, p, pshift, head - 1, true, comparator);
 			}
 
@@ -344,36 +348,35 @@ public class SmoothSort{
 			progressCallback.accept(100);
 	}
 
+	/** Rebalance the tree using the standard "bubble-down" approach */
 	private static void sift(final byte[][] data, int pshift, int head, final Comparator<? super byte[]> comparator){
-		//we do not use Floyd's improvements to the heapsort sift, because we
-		//are not doing what heapsort does - always moving nodes from near
-		//the bottom of the tree to the root.
-
-		final byte[] val = data[head];
-
+		//loop until the current node has no children, which happens when the order of the tree is 0 or 1
 		while(pshift > 1){
-			final int rt = head - 1;
+			//first child
 			final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
+			//second child
+			final int rt = head - 1;
 
-			if(comparator.compare(val, data[lf]) >= 0 && comparator.compare(val, data[rt]) >= 0)
-				break;
+			//select larger child (first has order `k - 1`, second has order `k - 2`)
+			final int largerChild = (comparator.compare(data[lf], data[rt]) >= 0? lf: rt);
 
-			if(comparator.compare(data[lf], data[rt]) >= 0){
-				data[head] = data[lf];
-				head = lf;
-				pshift -= 1;
-			}
-			else{
-				data[head] = data[rt];
-				head = rt;
-				pshift -= 2;
-			}
+			//if the root is bigger than this child, we're done
+			if(comparator.compare(data[head], data[largerChild]) >= 0)
+				return;
+
+			//otherwise, swap down and update order
+			data[head] = data[largerChild];
+			head = largerChild;
+			pshift -= (largerChild == lf? 1: 2);
 		}
-
-		data[head] = val;
 	}
 
-	private static void trinkle(final byte[][] data, int p, int pshift, int head, boolean isTrusty,
+	/**
+	 * Given an implicit Leonardo heap that has just had an element inserted into it at the very end, along with the
+	 * size list for that heap, rectifies the heap structure by shuffling the new root down to the proper position
+	 * and rebalancing the target heap
+	 */
+	private static void trinkle(final byte[][] data, int p, int pshift, int head, boolean trusty,
 			final Comparator<? super byte[]> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
@@ -388,11 +391,11 @@ public class SmoothSort{
 
 			//no need to check this if we know the current node is trusty,
 			//because we just checked the head (which is val, in the first iteration)
-			if(!isTrusty && pshift > 1){
+			if(!trusty && pshift > 1){
 				final int rt = head - 1;
 				final int lf = head - 1 - LEONARDO_NUMBER[pshift - 2];
 				if(comparator.compare(data[rt], data[stepson]) >= 0
-					|| comparator.compare(data[lf], data[stepson]) >= 0)
+						|| comparator.compare(data[lf], data[stepson]) >= 0)
 					break;
 			}
 
@@ -402,10 +405,10 @@ public class SmoothSort{
 			final int trail = Integer.numberOfTrailingZeros(p & ~1);
 			p >>>= trail;
 			pshift += trail;
-			isTrusty = false;
+			trusty = false;
 		}
 
-		if(!isTrusty){
+		if(!trusty){
 			data[head] = val;
 			sift(data, pshift, head, comparator);
 		}
