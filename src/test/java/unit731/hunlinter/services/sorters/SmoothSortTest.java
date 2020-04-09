@@ -2,13 +2,16 @@ package unit731.hunlinter.services.sorters;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import unit731.hunlinter.services.fsa.builders.FSABuilder;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 
-public class HeapSortTest{
+public class SmoothSortTest{
 
 	private static final Comparator<Object> NATURAL_ORDER = (first, second) -> ((Comparable<Object>)first).compareTo(second);
 
@@ -23,7 +26,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = 666;
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 
@@ -41,7 +44,7 @@ public class HeapSortTest{
 		for(int i = endStart; i < len; i ++)
 			data[i] = RND.nextInt(endStart + 10);
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -55,7 +58,7 @@ public class HeapSortTest{
 		for(int i = 0; i < 3; i ++)
 			swap(data, RND.nextInt(data.length), RND.nextInt(data.length));
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -67,7 +70,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = i;
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -79,7 +82,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = RND.nextInt(4);
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -91,7 +94,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = Integer.toString(i);
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -103,7 +106,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = len - i;
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -115,7 +118,7 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = HUGE.add(BigInteger.valueOf(RND.nextInt(len)));
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
 	}
@@ -127,9 +130,26 @@ public class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = RND.nextInt();
 
-		HeapSort.sort(data, NATURAL_ORDER);
+		SmoothSort.sort(data, NATURAL_ORDER);
 
 		assertSort(data);
+	}
+
+	@Test
+	void randomInt2(){
+		int len = 10;
+		List<byte[]> data = new ArrayList<>(len);
+		for(int i = 0; i < len; i ++)
+			data.add((""+RND.nextInt()).getBytes());
+
+		SmoothSort.sort(data, FSABuilder.LEXICAL_ORDERING);
+
+		assertSort(data);
+	}
+
+	private void assertSort(List<byte[]> data){
+		for(int i = 1; i < data.size(); i ++)
+			Assertions.assertTrue(FSABuilder.LEXICAL_ORDERING.compare(data.get(i - 1), data.get(i)) <= 0);
 	}
 
 

@@ -3,7 +3,6 @@ package unit731.hunlinter.services.sorters;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
@@ -19,32 +18,57 @@ public class HeapSort{
 		sort(array, 0, array.length, comparator);
 	}
 
+	public static <T extends Comparable<T>> void sort(final T[] array, final Comparator<? super T> comparator,
+			final Consumer<Integer> progressCallback){
+		sort(array, 0, array.length, comparator, progressCallback);
+	}
+
 	public static <T extends Comparable<T>> void sort(final T[] array, int low, final int high,
 			final Comparator<? super T> comparator){
+		sort(array, low, high, comparator, null);
+	}
+
+	public static <T extends Comparable<T>> void sort(final T[] array, int low, final int high,
+			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(array);
 		Objects.requireNonNull(comparator);
 		assert low < high && low < array.length && high <= array.length;
 
-		if(high - low < 2)
+		final int progressStep = (int)Math.ceil((array.length << 1) / 100.f);
+		if(progressCallback != null)
+			progressCallback.accept(0);
+
+		if(high - low < 2){
+			if(progressCallback != null)
+				progressCallback.accept(100);
+
 			//arrays of size 0 and 1 are always sorted
 			return;
+		}
 
-		buildMaxHeap(array, low, high, comparator);
+		buildMaxHeap(array, low, high, comparator, progressStep, progressCallback);
 
 		//The following loop maintains the invariants that a[0:end] is a heap and every element
 		//beyond `end` is greater than everything before it (so a[end:count] is in sorted order)
+		int progress = array.length;
+		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
 			swap(array, low, heapsize);
 
 			//sift down:
 			siftDown(array, low, heapsize, comparator);
+
+			if(progressCallback != null && ++ progress % progressStep == 0)
+				progressCallback.accept(++ progressIndex);
 		}
 	}
 
 	/** Build the heap in array a so that largest value is at the root */
-	private static <T> void buildMaxHeap(final T[] array, final int low, final int high, final Comparator<? super T> comparator){
-		for(int heapsize = low + 1; heapsize < high; heapsize ++)
+	private static <T> void buildMaxHeap(final T[] array, final int low, final int high, final Comparator<? super T> comparator,
+			final int progressStep, final Consumer<Integer> progressCallback){
+		int progress = 0;
+		for(int heapsize = low + 1; heapsize < high; heapsize ++){
 			//if child is bigger than parent
 			if(comparator.compare(array[heapsize], array[parent(heapsize)]) > 0){
 				//swap child and parent until parent is smaller
@@ -56,6 +80,10 @@ public class HeapSort{
 					node = parent;
 				}
 			}
+
+			if(progressCallback != null && (heapsize - low) % progressStep == 0)
+				progressCallback.accept(++ progress);
+		}
 	}
 
 	private static <T> void siftDown(final T[] array, final int low, final int heapsize, final Comparator<? super T> comparator){
@@ -90,7 +118,7 @@ public class HeapSort{
 	}
 
 	public static void sort(final List<byte[]> array, final Comparator<? super byte[]> comparator,
-			final BiConsumer<Integer, Integer> progressCallback){
+			final Consumer<Integer> progressCallback){
 		sort(array, 0, array.size(), comparator, progressCallback);
 	}
 
@@ -99,31 +127,30 @@ public class HeapSort{
 	}
 
 	public static void sort(final List<byte[]> array, int low, final int high, final Comparator<? super byte[]> comparator,
-			final BiConsumer<Integer, Integer> progressCallback){
+			final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(array);
 		Objects.requireNonNull(comparator);
-		assert low < high && low < array.size() && high <= array.size();
+		final int length = array.size();
+		assert low < high && low < length && high <= length;
 
-		final int maxProgress = array.size() << 1;
-		final Consumer<Integer> callback = (progressCallback != null?
-			index -> progressCallback.accept(index, maxProgress):
-			null);
-		if(callback != null)
-			callback.accept(0);
+		final int progressStep = (int)Math.ceil((length << 1) / 100.f);
+		if(progressCallback != null)
+			progressCallback.accept(0);
 
 		if(high - low < 2){
-			if(callback != null)
-				callback.accept(maxProgress);
+			if(progressCallback != null)
+				progressCallback.accept(100);
 
 			//arrays of size 0 and 1 are always sorted
 			return;
 		}
 
-		buildMaxHeap(array, low, high, comparator, callback);
+		buildMaxHeap(array, low, high, comparator, progressStep, progressCallback);
 
 		//The following loop maintains the invariants that a[0:end] is a heap and every element
 		//beyond `end` is greater than everything before it (so a[end:count] is in sorted order)
-		int progressIndex = maxProgress >>> 1;
+		int progress = length;
+		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
 			swap(array, low, heapsize);
@@ -131,15 +158,15 @@ public class HeapSort{
 			//sift down:
 			siftDown(array, low, heapsize, comparator);
 
-			if(callback != null)
-				callback.accept(++ progressIndex);
+			if(progressCallback != null && ++ progress % progressStep == 0)
+				progressCallback.accept(++ progressIndex);
 		}
 	}
 
 	/** Build the heap in array a so that largest value is at the root */
 	private static void buildMaxHeap(final List<byte[]> array, final int low, final int high,
-			final Comparator<? super byte[]> comparator, final Consumer<Integer> progressCallback){
-		int progressIndex = 0;
+			final Comparator<? super byte[]> comparator, final int progressStep, final Consumer<Integer> progressCallback){
+		int progress = 0;
 		for(int heapsize = low + 1; heapsize < high; heapsize ++){
 			//if child is bigger than parent
 			if(comparator.compare(array.get(heapsize), array.get(parent(heapsize))) > 0){
@@ -153,8 +180,8 @@ public class HeapSort{
 				}
 			}
 
-			if(progressCallback != null)
-				progressCallback.accept(++ progressIndex);
+			if(progressCallback != null && (heapsize - low) % progressStep == 0)
+				progressCallback.accept(++ progress);
 		}
 	}
 
