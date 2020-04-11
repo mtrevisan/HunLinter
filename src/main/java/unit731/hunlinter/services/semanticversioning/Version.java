@@ -87,8 +87,8 @@ public class Version implements Comparable<Version>{
 
 		final String[] tokens = StringUtils.split(version, DOT, 3);
 		final String patchOnly = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX)[2];
-		if(hasLeadingZeroes(tokens[0]) || hasLeadingZeroes(tokens[1]) || hasLeadingZeroes(patchOnly))
-			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeroes");
+		if(hasLeadingZeros(tokens[0]) || hasLeadingZeros(tokens[1]) || hasLeadingZeros(patchOnly))
+			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
 		major = Integer.parseInt(tokens[0]);
 		minor = Integer.parseInt(tokens[1]);
@@ -104,7 +104,7 @@ public class Version implements Comparable<Version>{
 			for(final String pr : preRelease){
 				final boolean numeric = StringUtils.isNumeric(pr);
 				if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
-					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeroes");
+					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 				if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
 					throw new IllegalArgumentException("Argument is not a valid version");
 			}
@@ -124,7 +124,7 @@ public class Version implements Comparable<Version>{
 			throw new IllegalArgumentException("Argument is not a valid version");
 	}
 
-	private boolean hasLeadingZeroes(final String token){
+	private boolean hasLeadingZeros(final String token){
 		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 

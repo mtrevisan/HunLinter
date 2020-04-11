@@ -15,11 +15,11 @@ class VersionTest{
 	}
 
 	@Test
-	void shouldRaiseErrorIfNumericIdentifierHasLeadingZeroes(){
+	void shouldRaiseErrorIfNumericIdentifierHasLeadingZeros(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
 			() -> new Version("01.1.0"));
 
-		Assertions.assertEquals("Numeric identifier MUST NOT contain leading zeroes", exception.getMessage());
+		Assertions.assertEquals("Numeric identifier MUST NOT contain leading zeros", exception.getMessage());
 	}
 
 	@Test

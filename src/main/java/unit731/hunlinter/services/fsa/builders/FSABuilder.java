@@ -22,8 +22,18 @@ public class FSABuilder{
 	/** Maximum number of labels from a single state */
 	private final static int MAX_LABELS = 256;
 
-	/** A comparator comparing full byte arrays. Unsigned byte comparisons ('C'-locale) */
-	public static final Comparator<byte[]> LEXICAL_ORDERING = (o1, o2) -> compare(o1, o1.length, o2, o2.length);
+	/**
+	 * A comparator that compares two {@code byte} arrays <a
+	 * href="http://en.wikipedia.org/wiki/Lexicographical_order">lexicographically</a>. That is, it
+	 * compares the first pair of values that follow any common prefix, or when one array is a
+	 * prefix of the other, treats the shorter array as the lesser. For example,
+	 * {@code [] < [0x01] < [0x01, 0x7F] < [0x01, 0x80] < [0x02]}. Values are treated as unsigned.
+	 *
+	 * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
+	 * support only identity equality), but it is consistent with {@link
+	 * java.util.Arrays#equals(byte[], byte[])}.
+	 */
+	public static final Comparator<byte[]> LEXICAL_ORDERING = LexicographicalComparatorHolder.lexicographicalComparator();
 
 
 	/** Internal serialized FSA buffer expand ratio */
@@ -66,14 +76,6 @@ public class FSABuilder{
 	/** Number of entries currently stored in {@link #hashSet} */
 	private int hashSize;
 
-	/**
-	 * Previous sequence added to the automaton in {@link #add(byte[])}.
-	 * Used in assertions only.
-	 */
-	private byte[] previous;
-	/** {@link #previous} sequence's length, used in assertions only */
-	private int previousLength;
-
 
 	public FSABuilder(){
 		this(BUFFER_GROWTH_SIZE);
@@ -109,7 +111,7 @@ public class FSABuilder{
 
 	/**
 	 * Add a single sequence of bytes to the FSA.
-	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence.
+	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence!
 	 *
 	 * @param sequence The array holding input sequence of bytes.
 	 */
@@ -117,11 +119,6 @@ public class FSABuilder{
 		if(serialized == null)
 			throw new IllegalArgumentException("Automaton already built");
 		final int len = sequence.length;
-		if(previous != null && len > 0 && compare(previous, previousLength, sequence, len) > 0)
-			throw new IllegalArgumentException("Input must be sorted: '" + new String(Arrays.copyOf(previous, previousLength))
-				+ "' >= '" + new String(Arrays.copyOfRange(sequence, 0, len)) + "'");
-
-		setPrevious(sequence, len);
 
 		//determine common prefix length
 		final int commonPrefix = commonPrefix(sequence, len);
@@ -150,7 +147,6 @@ public class FSABuilder{
 
 		//save last sequence's length so that we don't need to calculate it again
 		activePathLen = len;
-//System.out.println(Arrays.toString(serialized));
 	}
 
 	/**
@@ -175,7 +171,6 @@ public class FSABuilder{
 		//clear support data:
 		serialized = null;
 		hashSet = null;
-		previous = null;
 
 		return fsa;
 	}
@@ -350,32 +345,6 @@ public class FSABuilder{
 	private void expandBuffers(){
 		if(serialized.length < size + ConstantArcSizeFSA.ARC_SIZE * MAX_LABELS)
 			serialized = Arrays.copyOf(serialized, serialized.length + bufferGrowthSize);
-	}
-
-	/** Copy <code>current</code> into an internal buffer */
-	private void setPrevious(final byte[] sequence, final int length){
-		if(previous == null || previous.length < length)
-			previous = new byte[length];
-
-		System.arraycopy(sequence, 0, previous, 0, length);
-		previousLength = length;
-	}
-
-	/**
-	 * Lexicographic order of input sequences. By default, consistent with the "C"
-	 * sort (absolute value of bytes, 0-255).
-	 */
-	private static int compare(final byte[] s1, final int len1, final byte[] s2, final int len2){
-		int start1 = 0;
-		int start2 = 0;
-		final int max = Math.min(len1, len2);
-		for(int i = 0; i < max; i ++){
-			final byte c1 = s1[start1 ++];
-			final byte c2 = s2[start2 ++];
-			if(c1 != c2)
-				return (c1 & 0xFF) - (c2 & 0xFF);
-		}
-		return len1 - len2;
 	}
 
 }

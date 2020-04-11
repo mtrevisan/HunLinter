@@ -264,7 +264,7 @@ public class SmoothSort{
 		//instantly find out if the rightmost two heaps are consecutive Leonardo numbers by checking `(pMantissa & 3) == 3`
 
 		//the bitmap of the current standard concatenation >> pshift
-		int pMantissa = 1;
+		long pMantissa = 1l;
 		int pExponent = 1;
 
 		int progress = 0;
@@ -309,10 +309,10 @@ public class SmoothSort{
 
 
 		progressIndex = 50;
-		while(pExponent != 1 || pMantissa != 1){
+		while(pExponent != 1 || pMantissa != 1l){
 			if(pExponent <= 1){
 				//block of length 1. No fiddling needed
-				final int trail = Integer.numberOfTrailingZeros(pMantissa & ~1);
+				final int trail = Long.numberOfTrailingZeros(pMantissa & ~1);
 				pMantissa >>>= trail;
 				pExponent += trail;
 			}
@@ -375,13 +375,13 @@ public class SmoothSort{
 	 * size list for that heap, rectifies the heap structure by shuffling the new root down to the proper position
 	 * and rebalancing the target heap
 	 */
-	private static void trinkle(final byte[][] data, int pMantissa, int pExponent, int head, boolean trusty,
+	private static void trinkle(final byte[][] data, long pMantissa, int pExponent, int head, boolean trusty,
 			final Comparator<? super byte[]> comparator){
 		//Heap with root at head has the heap property - now restoring the string property
 
 		final byte[] val = data[head];
 
-		while(pMantissa != 1){
+		while(pMantissa != 1l){
 			final int stepson = head - LEONARDO_NUMBER[pExponent];
 
 			if(comparator.compare(data[stepson], val) <= 0)
@@ -401,7 +401,7 @@ public class SmoothSort{
 			data[head] = data[stepson];
 
 			head = stepson;
-			final int trail = Integer.numberOfTrailingZeros(pMantissa & ~1);
+			final int trail = Long.numberOfTrailingZeros(pMantissa & ~1);
 			pMantissa >>>= trail;
 			pExponent += trail;
 			trusty = false;
