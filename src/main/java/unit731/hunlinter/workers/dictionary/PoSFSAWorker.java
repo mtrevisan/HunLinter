@@ -68,18 +68,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-//		final File supportFile;
-//		final BufferedWriter writer;
-//		try{
-//			supportFile = FileHelper.createDeleteOnExitFile("hunlinter-pos", ".dat");
-//			writer = Files.newBufferedWriter(supportFile.toPath(), charset);
-//		}
-//		catch(final IOException e){
-//			throw new RuntimeException(e);
-//		}
-
-//		final Collator collator = Collator.getInstance();
-//		final List<CollationKey> list = new ArrayList<>();
 		final GrowableByteArray encodings = new GrowableByteArray(40_000_000, 1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
@@ -96,64 +84,25 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 		getWorkerData()
 			.withParallelProcessing()
-//			.withDataCancelledCallback(e -> closeWriter(writer))
 			.withCancelOnException();
 
 		final Function<Void, GrowableByteArray> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
-TimeWatch watch = TimeWatch.start();
 			processLines(dicPath, charset, lineProcessor);
-watch.stop();
-System.out.println(watch.toStringMillis());
-
-//			closeWriter(writer);
 
 			return encodings;
 		};
 		final Function<GrowableByteArray, GrowableByteArray> step2 = list -> {
 			resetProcessing("Sorting (step 2/4)");
 
-TimeWatch watch = TimeWatch.start();
 			//sort list
-			//83729 ms
-//			HeapSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
-//				setProgress(percent, 100);
-//
-//				sleepOnPause();
-//			});
-			//8788 ms
 			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
 				setProgress(percent, 100);
 
 				sleepOnPause();
 			});
-watch.stop();
-System.out.println(watch.toStringMillis());
-for(int i = 1; i < list.limit; i ++){
-	if(FSABuilder.LEXICAL_ORDERING.compare(list.data[i - 1], list.data[i]) > 0)
-		System.out.println("cu: " + i);
-}
-
-//			final ExternalSorter sorter = new ExternalSorter();
-//			final ExternalSorterOptions options = ExternalSorterOptions.builder()
-//				.charset(charset)
-//				.sortInParallel()
-//				//lexical order
-//				.comparator(Comparator.naturalOrder())
-//				.removeDuplicates()
-//				.lineSeparator(StringUtils.LF)
-//				.build();
-//			try{
-//TimeWatch watch = TimeWatch.start();
-//				sorter.sort(file, options, file);
-//watch.stop();
-//System.out.println(watch.toStringMillis());
-//			}
-//			catch(final Exception e){
-//				throw new RuntimeException(e);
-//			}
 
 			return list;
 		};
@@ -169,6 +118,9 @@ TimeWatch watch = TimeWatch.start();
 				final byte[] encoding = list.data[index];
 				fsaProcessor.accept(IndexDataPair.of(index, encoding));
 
+				//release memory
+				list.data[index] = null;
+
 				setProgress(index, list.limit);
 
 				sleepOnPause();
@@ -178,9 +130,6 @@ System.out.println(watch.toStringMillis());
 
 			//release memory
 			list.clear();
-
-//			if(!file.delete())
-//				LOGGER.warn("Cannot delete support file {}", file.getAbsolutePath());
 
 			return builder.complete();
 		};

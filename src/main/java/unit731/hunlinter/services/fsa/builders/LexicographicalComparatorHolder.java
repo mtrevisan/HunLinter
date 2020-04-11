@@ -12,8 +12,7 @@ import java.util.Comparator;
  * Provides a lexicographical comparator implementation; either a Java implementation or a faster
  * implementation based on {@link sun.misc.Unsafe}.
  *
- * <p>Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't
- * available.
+ * <p>Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't available.
  */
 public class LexicographicalComparatorHolder{
 
