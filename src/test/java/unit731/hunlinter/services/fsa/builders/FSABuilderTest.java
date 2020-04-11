@@ -9,6 +9,7 @@ import unit731.hunlinter.services.text.StringHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -114,6 +115,90 @@ class FSABuilderTest{
 		for(int i = 0; i < bytes.length; i ++)
 			bytes[i] = (byte)(alphabetMin + rnd.nextInt(alphabetMax - alphabetMin + 1));
 		return bytes;
+	}
+
+
+	private static final byte LEAST = 0;
+	private static final byte GREATEST = (byte)255;
+
+	@Test
+	void lexicographicalComparator(){
+		List<byte[]> ordered = Arrays.asList(
+			new byte[]{},
+			new byte[]{LEAST},
+			new byte[]{LEAST, LEAST},
+			new byte[]{LEAST, (byte)1},
+			new byte[]{(byte)1},
+			new byte[]{(byte)1, LEAST},
+			new byte[]{GREATEST, GREATEST - (byte)1},
+			new byte[]{GREATEST, GREATEST},
+			new byte[]{GREATEST, GREATEST, GREATEST});
+
+		//the Unsafe implementation if it's available (otherwise, the Java implementation)
+		Comparator<byte[]> comparator = FSABuilder.lexicographicalComparator();
+		testComparator(comparator, ordered);
+
+		//the Java implementation
+		Comparator<byte[]> javaImpl = FSABuilder.lexicographicalComparatorJavaImpl();
+		testComparator(javaImpl, ordered);
+
+		//the custom implementation
+		Comparator<byte[]> customImpl = FSABuilder.LEXICAL_ORDERING;
+		testComparator(customImpl, ordered);
+	}
+
+	@Test
+	void lexicographicalComparatorLongInputs(){
+		Random rnd = new Random();
+		final List<Comparator<byte[]>> comparators = Arrays.asList(
+			FSABuilder.lexicographicalComparator(),
+			FSABuilder.lexicographicalComparatorJavaImpl());
+		for(Comparator<byte[]> comparator : comparators){
+			for(int trials = 10; trials -- > 0; ){
+				byte[] left = new byte[1 + rnd.nextInt(32)];
+				rnd.nextBytes(left);
+				byte[] right = left.clone();
+				Assertions.assertTrue(comparator.compare(left, right) == 0);
+				int i = rnd.nextInt(left.length);
+				left[i] ^= (byte)(1 + rnd.nextInt(255));
+				Assertions.assertTrue(comparator.compare(left, right) != 0);
+				Assertions.assertEquals(comparator.compare(left, right) > 0, (left[i] & 0xFF) - (right[i] & 0xFF) > 0);
+			}
+		}
+	}
+
+	/**
+	 * Asserts that all pairs of {@code T} values within {@code valuesInExpectedOrder} are ordered
+	 * consistently between their order within {@code valuesInExpectedOrder} and the order implied by
+	 * the given {@code comparator}.
+	 *
+	 * <p>In detail, this method asserts
+	 *
+	 * <ul>
+	 *   <li><i>reflexivity</i>: {@code comparator.compare(t, t) = 0} for all {@code t} in {@code
+	 *       valuesInExpectedOrder}; and
+	 *   <li><i>consistency</i>: {@code comparator.compare(ti, tj) < 0} and {@code
+	 *       comparator.compare(tj, ti) > 0} for {@code i < j}, where {@code ti =
+	 *       valuesInExpectedOrder.get(i)} and {@code tj = valuesInExpectedOrder.get(j)}.
+	 * </ul>
+	 */
+	private static <T> void testComparator(Comparator<? super T> comparator, List<T> valuesInExpectedOrder){
+		//this does an O(n^2) test of all pairs of values in both orders
+		for(int i = 0; i < valuesInExpectedOrder.size(); i ++){
+			T t = valuesInExpectedOrder.get(i);
+
+			for(int j = 0; j < i; j ++){
+				T lesser = valuesInExpectedOrder.get(j);
+				Assertions.assertTrue(comparator.compare(lesser, t) < 0, comparator + ".compare(" + lesser + ", " + t + ")");
+			}
+
+			Assertions.assertEquals(0, comparator.compare(t, t), comparator + ".compare(" + t + ", " + t + ")");
+
+			for(int j = i + 1; j < valuesInExpectedOrder.size(); j ++){
+				T greater = valuesInExpectedOrder.get(j);
+				Assertions.assertTrue(comparator.compare(greater, t) > 0, comparator + ".compare(" + greater + ", " + t + ")");
+			}
+		}
 	}
 
 }

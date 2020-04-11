@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * https://github.com/apple/foundationdb/blob/master/bindings/java/src/main/com/apple/foundationdb/tuple/ByteArrayUtil.java
+ */
 public class ArrayHelper{
 
 	private ArrayHelper(){}

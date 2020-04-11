@@ -61,6 +61,10 @@ public class GrowableByteArray{
 		return (limit == 0);
 	}
 
+	public synchronized void reset(){
+		limit = 0;
+	}
+
 	public synchronized void clear(){
 		data = null;
 		limit = -1;

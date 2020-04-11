@@ -101,8 +101,7 @@ public class SorterWorker extends WorkerDictionary{
 	}
 
 	private void mergeSectionsToDictionary(final File dicFile, final String[] chunk, final int startIndex, final Charset charset){
-		try{
-			final RandomAccessFile accessor = new RandomAccessFile(dicFile, "rwd");
+		try(final RandomAccessFile accessor = new RandomAccessFile(dicFile, "rwd")){
 			accessor.seek(startIndex);
 			for(final String line : chunk){
 				accessor.write(line.getBytes(charset));
