@@ -132,12 +132,15 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final Consumer<IndexDataPair<String>> dataProcessor,
 			final long totalEntries){
-		final AtomicInteger processingIndex = new AtomicInteger(1);
+		final AtomicInteger progress = new AtomicInteger(1);
+		final AtomicInteger progressIndex = new AtomicInteger(1);
+		final int progressStep = (int)Math.ceil(totalEntries / 100.f);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.incrementAndGet(), totalEntries);
+				if(progress.incrementAndGet() % progressStep == 0)
+					setProgress(progressIndex.incrementAndGet(), 100);
 
 				sleepOnPause();
 			}
@@ -153,12 +156,15 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 	private BiConsumer<IndexDataPair<String>, Long> createInnerProcessorBySize(
 			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize){
-		final AtomicLong processingIndex = new AtomicLong(0l);
+		final AtomicLong progress = new AtomicLong(1);
+		final AtomicInteger progressIndex = new AtomicInteger(1);
+		final int progressStep = (int)Math.ceil(fileSize / 100.f);
 		return (data, readSoFar) -> {
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.addAndGet(readSoFar), fileSize);
+				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
+					setProgress(progressIndex.incrementAndGet(), 100);
 
 				sleepOnPause();
 			}
