@@ -303,7 +303,7 @@ public class StringList implements Iterable<String>{
 	}
 
 	public void sort(final Comparator<? super String> comparator){
-		HeapSort.sort(elementData, 0, size, comparator);
+		SmoothSort.sort(elementData, 0, size, comparator);
 	}
 
 	public void sortParallel(final Comparator<? super String> comparator){

@@ -20,7 +20,6 @@ import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.GrowableByteArray;
-import unit731.hunlinter.services.sorters.HeapSort;
 import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
@@ -91,17 +90,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			encodings.addAll(currentEncodings);
 
 			sleepOnPause();
-
-//			forEach(currentInflections, inflection -> {
-//				final List<String> lines = inflection.toStringPoSFSA(sequenceEncoder);
-
-				//encode lines
-//				encode(lines, separator, sequenceEncoder);
-
-//				forEach(lines, line -> writeLine(writer, line, StringUtils.LF));
-//				forEach(lines, line -> list.add(collator.getCollationKey(line)));
-//				forEach(lines, list::add);
-//			});
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
@@ -114,16 +102,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<Void, GrowableByteArray> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
-TimeWatch watch = TimeWatch.start();
 			final Path dicPath = dicParser.getDicFile().toPath();
+TimeWatch watch = TimeWatch.start();
 			processLines(dicPath, charset, lineProcessor);
-
-//			closeWriter(writer);
 watch.stop();
 System.out.println(watch.toStringMillis());
 
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(encodings));
-//byte[] 2 105 197 936
+//			closeWriter(writer);
+
 			return encodings;
 		};
 		final Function<GrowableByteArray, GrowableByteArray> step2 = list -> {
@@ -132,22 +118,22 @@ System.out.println(watch.toStringMillis());
 TimeWatch watch = TimeWatch.start();
 			//sort list
 			//83729 ms
-			HeapSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
-				setProgress(percent, 100);
-
-				sleepOnPause();
-			});
-			//8788 ms
-//			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
+//			HeapSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
 //				setProgress(percent, 100);
 //
 //				sleepOnPause();
 //			});
+			//8788 ms
+			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
+				setProgress(percent, 100);
+
+				sleepOnPause();
+			});
 watch.stop();
 System.out.println(watch.toStringMillis());
 for(int i = 1; i < list.limit; i ++){
 	if(FSABuilder.LEXICAL_ORDERING.compare(list.data[i - 1], list.data[i]) > 0)
-		System.out.println();
+		System.out.println("cu: " + i);
 }
 
 //			final ExternalSorter sorter = new ExternalSorter();
