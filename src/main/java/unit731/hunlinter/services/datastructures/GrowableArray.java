@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.datastructures;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -19,6 +19,10 @@ public class GrowableArray<T>{
 
 	public static <T> GrowableArray<T> createExact(final Class<T> cl, final int size){
 		return new GrowableArray<>(cl, size, GROWTH_DEFAULT);
+	}
+
+	public GrowableArray(final Class<T> cl){
+		this(cl, 0, GROWTH_DEFAULT);
 	}
 
 	public GrowableArray(final Class<T> cl, final float growthRate){
@@ -87,14 +91,13 @@ public class GrowableArray<T>{
 	}
 
 	public synchronized int indexOf(final T elem, final int startIndex){
-		int i;
 		if(elem == null){
-			for(i = startIndex; i < data.length; i ++)
+			for(int i = startIndex; i < data.length; i ++)
 				if(data[i] == null)
 					return i;
 		}
 		else{
-			for(i = startIndex; i < data.length; i ++)
+			for(int i = startIndex; i < data.length; i ++)
 				if(elem.equals(data[i]))
 					return i;
 		}
@@ -102,14 +105,13 @@ public class GrowableArray<T>{
 	}
 
 	public synchronized int lastIndexOf(final T elem, final int startIndex){
-		int i;
 		if(elem == null){
-			for(i = startIndex - 1; i >= 0; i --)
+			for(int i = startIndex - 1; i >= 0; i --)
 				if(data[i] == null)
 					return i;
 		}
 		else{
-			for(i = startIndex - 1; i >= 0; i --)
+			for(int i = startIndex - 1; i >= 0; i --)
 				if(elem.equals(data[i]))
 					return i;
 		}
@@ -139,6 +141,10 @@ public class GrowableArray<T>{
 		final T[] reducedData = (T[])Array.newInstance(type, limit);
 		System.arraycopy(data, 0, reducedData, 0, limit);
 		return reducedData;
+	}
+
+	public synchronized void reset(){
+		limit = 0;
 	}
 
 	public synchronized void clear(){

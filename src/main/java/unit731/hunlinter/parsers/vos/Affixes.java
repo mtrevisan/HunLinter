@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.vos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 
 
 public class Affixes{

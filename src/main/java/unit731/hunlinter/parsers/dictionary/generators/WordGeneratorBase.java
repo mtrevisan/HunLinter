@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

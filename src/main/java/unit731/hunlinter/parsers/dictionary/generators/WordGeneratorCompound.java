@@ -19,7 +19,7 @@ import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.ArraySet;
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;

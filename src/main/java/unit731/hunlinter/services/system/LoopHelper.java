@@ -1,7 +1,7 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.ArrayUtils;
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 
 import java.util.Arrays;
 import java.util.Collection;

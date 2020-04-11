@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.SetHelper;
 

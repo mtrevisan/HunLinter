@@ -22,7 +22,7 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.GrowableArray;
+import unit731.hunlinter.services.datastructures.GrowableArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
 
