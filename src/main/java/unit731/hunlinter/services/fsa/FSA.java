@@ -1,9 +1,8 @@
 package unit731.hunlinter.services.fsa;
 
 import com.carrotsearch.hppc.IntArrayDeque;
-import com.carrotsearch.hppc.IntDeque;
-import com.carrotsearch.hppc.IntStack;
 import com.carrotsearch.hppc.cursors.IntCursor;
+import unit731.hunlinter.services.datastructures.DynamicIntArray;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -178,12 +177,12 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @param v   Visitor to receive traversal calls.
 	 */
 	public void visitPostOrder(final StateVisitor v){
-		final IntStack stack = new IntStack();
+		final DynamicIntArray stack = new DynamicIntArray();
 		//push root node to first stack
 		stack.push(getRootNode());
 
 		//post-order traversal stack
-		final IntDeque out = new IntArrayDeque();
+		final IntArrayDeque out = new IntArrayDeque();
 
 		//loop while first stack is not empty
 		while(!stack.isEmpty()){

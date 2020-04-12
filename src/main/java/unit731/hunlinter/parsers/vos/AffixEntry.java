@@ -143,7 +143,7 @@ public class AffixEntry{
 		}
 		if(continuationFlags != null)
 			System.arraycopy(continuationFlags, 0, flags, offset, continuationFlags.length);
-		return flags;
+		return (flags.length > 0? flags: null);
 	}
 
 	//FIXME is this documentation updated/true?

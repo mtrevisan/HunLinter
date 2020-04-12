@@ -20,7 +20,7 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.datastructures.SetHelper;
+import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 

@@ -12,7 +12,7 @@ import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.datastructures.SetHelper;
+import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;

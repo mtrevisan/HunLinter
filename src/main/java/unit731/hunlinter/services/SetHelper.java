@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.datastructures;
+package unit731.hunlinter.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;

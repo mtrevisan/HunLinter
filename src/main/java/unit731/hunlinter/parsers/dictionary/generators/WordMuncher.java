@@ -10,7 +10,7 @@ import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.services.datastructures.SetHelper;
+import unit731.hunlinter.services.SetHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
