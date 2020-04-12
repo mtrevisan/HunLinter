@@ -98,11 +98,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
+TimeWatch watch = TimeWatch.start();
 			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
 				setProgress(percent, 100);
 
 				sleepOnPause();
 			});
+watch.stop();
+System.out.println(watch.toStringMillis());
 
 			return list;
 		};
