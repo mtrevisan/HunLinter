@@ -16,6 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -135,15 +136,12 @@ public class AffixEntry{
 	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
 		final int size = (otherContinuationFlags != null? otherContinuationFlags.length: 0)
 			+ (continuationFlags != null? continuationFlags.length: 0);
-		final String[] flags = new String[size];
-		int offset = 0;
-		if(otherContinuationFlags != null && otherContinuationFlags.length > 0){
-			System.arraycopy(otherContinuationFlags, 0, flags, offset, otherContinuationFlags.length);
-			offset += otherContinuationFlags.length;
-		}
+		final FixedArray<String> flags = new FixedArray<>(String.class, size);
+		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
+			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)
-			System.arraycopy(continuationFlags, 0, flags, offset, continuationFlags.length);
-		return (flags.length > 0? flags: null);
+			flags.addAllUnique(continuationFlags);
+		return flags.extractCopyOrNull();
 	}
 
 	//FIXME is this documentation updated/true?
