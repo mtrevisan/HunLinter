@@ -15,6 +15,7 @@ import unit731.hunlinter.services.FileHelper;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.services.fsa.FSA;
+import unit731.hunlinter.services.fsa.builders.LexicographicalComparator;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
@@ -99,11 +100,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			//sort list
 TimeWatch watch = TimeWatch.start();
-			SmoothSort.sort(list.data, 0, list.limit, FSABuilder.LEXICAL_ORDERING, percent -> {
-				setProgress(percent, 100);
+			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
+				percent -> {
+					setProgress(percent, 100);
 
-				sleepOnPause();
-			});
+					sleepOnPause();
+				});
 watch.stop();
 System.out.println(watch.toStringMillis());
 

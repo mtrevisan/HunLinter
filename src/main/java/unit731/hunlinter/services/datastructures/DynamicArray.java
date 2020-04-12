@@ -5,9 +5,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Iterator;
 
 
-public class DynamicArray<T>{
+public class DynamicArray<T> implements Iterable<T>{
 
 	private static final float GROWTH_DEFAULT = 1.2f;
 
@@ -84,6 +85,21 @@ public class DynamicArray<T>{
 				System.arraycopy(data, index + 1, data, index, delta);
 			data[-- limit] = null;
 		}
+	}
+
+	@Override
+	public synchronized Iterator<T> iterator(){
+		return new Iterator<T>(){
+			private int idx = 0;
+
+			public boolean hasNext(){
+				return (idx < limit);
+			}
+
+			public T next(){
+				return data[idx ++];
+			}
+		};
 	}
 
 	public int indexOf(final T elem){

@@ -4,9 +4,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 
 
-public class FixedArray<T>{
+public class FixedArray<T> implements Iterable<T>{
 
 	public T[] data;
 	public int limit;
@@ -63,6 +64,21 @@ public class FixedArray<T>{
 				System.arraycopy(data, index + 1, data, index, delta);
 			data[-- limit] = null;
 		}
+	}
+
+	@Override
+	public synchronized Iterator<T> iterator(){
+		return new Iterator<T>(){
+			private int idx = 0;
+
+			public boolean hasNext(){
+				return (idx < limit);
+			}
+
+			public T next(){
+				return data[idx ++];
+			}
+		};
 	}
 
 	public int indexOf(final T elem){

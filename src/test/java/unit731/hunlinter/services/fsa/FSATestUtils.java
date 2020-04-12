@@ -2,7 +2,8 @@ package unit731.hunlinter.services.fsa;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
-import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.datastructures.DynamicArray;
+import unit731.hunlinter.services.fsa.builders.LexicographicalComparator;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,7 +42,7 @@ public class FSATestUtils{
 	}
 
 	/** Check if the DFSA is correct with respect to the given input */
-	public static void checkCorrect(final byte[][] input, final FSA fsa){
+	public static void checkCorrect(final DynamicArray<byte[]> input, final FSA fsa){
 		//(1) All input sequences are in the right language
 		final Set<ByteBuffer> rl = new HashSet<>();
 		for(final ByteBuffer bb : fsa)
@@ -100,7 +101,7 @@ public class FSATestUtils{
 
 			public boolean accept(int state){
 				List<byte[]> rightLanguage = allSequences(fsa, state);
-				Collections.sort(rightLanguage, FSABuilder.LEXICAL_ORDERING);
+				Collections.sort(rightLanguage, LexicographicalComparator.lexicographicalComparator());
 
 				sb.setLength(0);
 				for(byte[] seq : rightLanguage)

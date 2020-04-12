@@ -7,6 +7,7 @@ import unit731.hunlinter.services.fsa.FSAFlags;
 import unit731.hunlinter.services.fsa.FSATestUtils;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.serializers.FSASerializer;
+import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +26,7 @@ public class SerializerTestBase{
 	protected FSASerializer createSerializer(){
 		return new CFSA2Serializer();
 	}
+
 
 	@Test
 	public void testA() throws IOException{
@@ -134,10 +136,11 @@ public class SerializerTestBase{
 	}
 
 	private void testBuiltIn(FSA fsa) throws IOException{
+TimeWatch watch = TimeWatch.start();
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
 			input.add(Arrays.copyOf(bb.array(), bb.remaining()));
-		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
+		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
 		FSABuilder builder = new FSABuilder();
 		FSA root = builder.build(input);

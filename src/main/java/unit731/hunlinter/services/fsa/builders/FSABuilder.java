@@ -3,7 +3,6 @@ package unit731.hunlinter.services.fsa.builders;
 import unit731.hunlinter.services.fsa.FSA;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 
 /**
@@ -21,19 +20,6 @@ public class FSABuilder{
 	private final static int BUFFER_GROWTH_SIZE = 5 * MB;
 	/** Maximum number of labels from a single state */
 	private final static int MAX_LABELS = 256;
-
-	/**
-	 * A comparator that compares two {@code byte} arrays <a
-	 * href="http://en.wikipedia.org/wiki/Lexicographical_order">lexicographically</a>. That is, it
-	 * compares the first pair of values that follow any common prefix, or when one array is a
-	 * prefix of the other, treats the shorter array as the lesser. For example,
-	 * {@code [] < [0x01] < [0x01, 0x7F] < [0x01, 0x80] < [0x02]}. Values are treated as unsigned.
-	 *
-	 * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
-	 * support only identity equality), but it is consistent with {@link
-	 * java.util.Arrays#equals(byte[], byte[])}.
-	 */
-	public static final Comparator<byte[]> LEXICAL_ORDERING = LexicographicalComparatorHolder.lexicographicalComparator();
 
 
 	/** Internal serialized FSA buffer expand ratio */

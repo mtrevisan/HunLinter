@@ -9,26 +9,30 @@ import java.util.Comparator;
 
 
 /**
- * Provides a lexicographical comparator implementation; either a Java implementation or a faster
- * implementation based on {@link sun.misc.Unsafe}.
+ * Provides a <a href="http://en.wikipedia.org/wiki/Lexicographical_order">lexicographical comparator</a> implementation;
+ * either a Java implementation or a faster implementation based on {@link sun.misc.Unsafe}.
  *
  * <p>Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't available.
+ *
+ * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
+ * support only identity equality), but it is consistent with {@link
+ * java.util.Arrays#equals(byte[], byte[])}.
  */
-public class LexicographicalComparatorHolder{
+public class LexicographicalComparator{
 
 	private static final int UNSIGNED_MASK = 0xFF;
 
-	private static final String UNSAFE_COMPARATOR_NAME = LexicographicalComparatorHolder.class.getName() + "$UnsafeComparator";
+	private static final String UNSAFE_COMPARATOR_NAME = LexicographicalComparator.class.getName() + "$UnsafeComparator";
 
 	private static final Comparator<byte[]> BEST_COMPARATOR = getBestComparator();
 
 
 	public static Comparator<byte[]> lexicographicalComparator(){
-		return LexicographicalComparatorHolder.BEST_COMPARATOR;
+		return LexicographicalComparator.BEST_COMPARATOR;
 	}
 
 	public static Comparator<byte[]> lexicographicalComparatorJavaImpl(){
-		return LexicographicalComparatorHolder.PureJavaComparator.INSTANCE;
+		return LexicographicalComparator.PureJavaComparator.INSTANCE;
 	}
 
 	enum UnsafeComparator implements Comparator<byte[]>{

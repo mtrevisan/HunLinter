@@ -6,6 +6,7 @@ import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.FSATestUtils;
+import unit731.hunlinter.services.fsa.builders.LexicographicalComparator;
 import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.ByteArrayInputStream;
@@ -98,7 +99,7 @@ class CFSA2SerializerTest{
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa1)
 			input.add(bb.array());
-		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
+		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
 		FSABuilder builder = new FSABuilder();
 		FSA fsa2 = builder.build(input);

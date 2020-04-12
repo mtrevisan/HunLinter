@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Random;
 
 
-class LexicographicalComparatorHolderTest{
+class LexicographicalComparatorTest{
 
 	@Test
 	void testLexicographicOrder(){
 		List<byte[]> input = Arrays.asList(new byte[]{0}, new byte[]{1}, new byte[]{(byte)0xFF});
-		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
+		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
 		//check if lexical ordering is consistent with absolute byte value
 		Assertions.assertEquals(0, input.get(0)[0]);
@@ -66,7 +66,7 @@ class LexicographicalComparatorHolderTest{
 		final Random rnd = new Random(System.currentTimeMillis());
 		for(int i = 0; i < count; i ++)
 			input.add(randomByteSequence(rnd, lengthMin, lengthMax, alphabetMin, alphabetMax));
-		Collections.sort(input, FSABuilder.LEXICAL_ORDERING);
+		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 		return input;
 	}
 
@@ -96,24 +96,23 @@ class LexicographicalComparatorHolderTest{
 			new byte[]{GREATEST, GREATEST, GREATEST});
 
 		//the Unsafe implementation if it's available (otherwise, the Java implementation)
-		Comparator<byte[]> comparator = LexicographicalComparatorHolder.lexicographicalComparator();
+		Comparator<byte[]> comparator = LexicographicalComparator.lexicographicalComparator();
 		testComparator(comparator, ordered);
 
 		//the Java implementation
-		Comparator<byte[]> javaImpl = LexicographicalComparatorHolder.lexicographicalComparatorJavaImpl();
+		Comparator<byte[]> javaImpl = LexicographicalComparator.lexicographicalComparatorJavaImpl();
 		testComparator(javaImpl, ordered);
 
 		//the custom implementation
-		Comparator<byte[]> customImpl = FSABuilder.LEXICAL_ORDERING;
-		testComparator(customImpl, ordered);
+		testComparator(LexicographicalComparator.lexicographicalComparator(), ordered);
 	}
 
 	@Test
 	void lexicographicalComparatorLongInputs(){
 		Random rnd = new Random();
 		final List<Comparator<byte[]>> comparators = Arrays.asList(
-			LexicographicalComparatorHolder.lexicographicalComparator(),
-			LexicographicalComparatorHolder.lexicographicalComparatorJavaImpl());
+			LexicographicalComparator.lexicographicalComparator(),
+			LexicographicalComparator.lexicographicalComparatorJavaImpl());
 		for(Comparator<byte[]> comparator : comparators){
 			for(int trials = 10; trials -- > 0; ){
 				byte[] left = new byte[1 + rnd.nextInt(32)];
