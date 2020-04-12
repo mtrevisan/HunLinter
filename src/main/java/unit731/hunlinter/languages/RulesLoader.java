@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.datastructures.SetHelper;
 
 
 public class RulesLoader{

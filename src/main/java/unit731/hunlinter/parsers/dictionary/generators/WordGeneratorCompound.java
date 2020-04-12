@@ -18,10 +18,10 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.ArraySet;
+import unit731.hunlinter.services.datastructures.ArraySet;
 import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.datastructures.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.collectIf;
