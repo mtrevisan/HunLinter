@@ -22,7 +22,6 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
 
@@ -216,15 +215,16 @@ public class AffixData{
 		return productive;
 	}
 
-	public static FixedArray<AffixEntry> extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
-		final FixedArray<AffixEntry> list = new FixedArray<>(AffixEntry.class, entries.length);
+	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
+		int limit = 0;
+		final AffixEntry[] list = new AffixEntry[entries.length];
 		final int size = (entries != null? entries.length: 0);
 		for(int i = 0; i < size; i ++){
 			final AffixEntry entry = entries[i];
 			if(entry.canApplyTo(word))
-				list.add(entry);
+				list[limit ++] = entry;
 		}
-		return list;
+		return Arrays.copyOf(list, limit);
 	}
 
 	public List<String> applyReplacementTable(final String word){

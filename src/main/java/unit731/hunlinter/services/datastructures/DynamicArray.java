@@ -4,23 +4,40 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 
-public class FixedArray<T>{
+public class DynamicArray<T>{
+
+	private static final float GROWTH_DEFAULT = 1.2f;
+
 
 	public T[] data;
 	public int limit;
+	private final float growthRate;
 
 
-	public FixedArray(final Class<T> cl){
-		this(cl, 0);
+	public static <T> DynamicArray<T> createExact(final Class<T> cl, final int size){
+		return new DynamicArray<>(cl, size, GROWTH_DEFAULT);
 	}
 
-	public FixedArray(final Class<T> cl, final int capacity){
+	public DynamicArray(final Class<T> cl){
+		this(cl, 0, GROWTH_DEFAULT);
+	}
+
+	public DynamicArray(final Class<T> cl, final float growthRate){
+		this(cl, 0, growthRate);
+	}
+
+	public DynamicArray(final Class<T> cl, final int capacity, final float growthRate){
 		data = (T[])Array.newInstance(cl, capacity);
+
+		this.growthRate = growthRate;
 	}
 
 	public synchronized void add(final T elem){
+		grow(1);
+
 		data[limit ++] = elem;
 	}
 
@@ -28,11 +45,13 @@ public class FixedArray<T>{
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final FixedArray<T> array){
+	public synchronized void addAll(final DynamicArray<T> array){
 		addAll(array.data, array.limit);
 	}
 
 	private void addAll(final T[] array, final int size){
+		grow(size);
+
 		System.arraycopy(array, 0, data, limit, size);
 		limit += size;
 	}
@@ -41,11 +60,13 @@ public class FixedArray<T>{
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final FixedArray<T> array){
+	public synchronized void addAllUnique(final DynamicArray<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
 	private void addAllUnique(final T[] array, final int size){
+		grow(size);
+
 		for(int i = 0; i < size; i ++)
 			if(!contains(array[i]))
 				data[limit ++] = array[i];
@@ -97,6 +118,12 @@ public class FixedArray<T>{
 		return -1;
 	}
 
+	private void grow(final int size){
+		final int delta = limit - data.length + size;
+		if(delta > 0)
+			data = Arrays.copyOf(data, data.length + (int)Math.ceil(delta * growthRate));
+	}
+
 	private Class<?> getDataType(){
 		return data.getClass().getComponentType();
 	}
@@ -132,7 +159,7 @@ public class FixedArray<T>{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final FixedArray<?> rhs = (FixedArray<?>)obj;
+		final DynamicArray<?> rhs = (DynamicArray<?>)obj;
 		return new EqualsBuilder()
 			.append(data, rhs.data)
 			.append(limit, rhs.limit)

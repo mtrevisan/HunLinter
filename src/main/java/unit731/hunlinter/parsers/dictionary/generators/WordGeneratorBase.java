@@ -250,13 +250,12 @@ class WordGeneratorBase{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 
 		final String word = dicEntry.getWord();
-		final FixedArray<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
-		if(applicableAffixes.isEmpty())
+		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
+		if(applicableAffixes.length == 0)
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' and word '" + word + "'");
 
 		Inflection[] inflections = new Inflection[0];
-		for(int i = 0; i < applicableAffixes.limit; i ++){
-			final AffixEntry entry = applicableAffixes.data[i];
+		for(final AffixEntry entry : applicableAffixes){
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
