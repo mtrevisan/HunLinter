@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.vos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.datastructures.DynamicArray;
+import unit731.hunlinter.services.datastructures.FixedArray;
 
 
 public class Affixes{
@@ -11,20 +11,20 @@ public class Affixes{
 	public static final int INDEX_SUFFIXES = 1;
 	public static final int INDEX_TERMINALS = 2;
 
-	private final DynamicArray<String> prefixes;
-	private final DynamicArray<String> suffixes;
-	private final DynamicArray<String> terminals;
+	private final FixedArray<String> prefixes;
+	private final FixedArray<String> suffixes;
+	private final FixedArray<String> terminals;
 
 
-	public Affixes(final DynamicArray<String> prefixes, final DynamicArray<String> suffixes,
-			final DynamicArray<String> terminals){
+	public Affixes(final FixedArray<String> prefixes, final FixedArray<String> suffixes,
+			final FixedArray<String> terminals){
 		this.prefixes = prefixes;
 		this.suffixes = suffixes;
 		this.terminals = terminals;
 	}
 
-	public DynamicArray<String>[] extractAllAffixes(final boolean reverseAffixes){
-		return new DynamicArray[]{
+	public FixedArray<String>[] extractAllAffixes(final boolean reverseAffixes){
+		return new FixedArray[]{
 			(reverseAffixes? suffixes: prefixes),
 			(reverseAffixes? prefixes: suffixes),
 			terminals};

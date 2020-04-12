@@ -22,7 +22,7 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.datastructures.DynamicArray;
+import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
 
@@ -216,8 +216,8 @@ public class AffixData{
 		return productive;
 	}
 
-	public static DynamicArray<AffixEntry> extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
-		final DynamicArray<AffixEntry> list = DynamicArray.createExact(AffixEntry.class, entries.length);
+	public static FixedArray<AffixEntry> extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
+		final FixedArray<AffixEntry> list = new FixedArray<>(AffixEntry.class, entries.length);
 		final int size = (entries != null? entries.length: 0);
 		for(int i = 0; i < size; i ++){
 			final AffixEntry entry = entries[i];

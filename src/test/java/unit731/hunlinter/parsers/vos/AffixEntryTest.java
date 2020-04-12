@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -72,9 +71,9 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", AffixType.SUFFIX, "M0", strategy, null, null);
 
-		DynamicArray<String> combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
+		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
 
-		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags.extractCopyOrNull());
+		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags);
 	}
 
 	@Test

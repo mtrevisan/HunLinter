@@ -24,7 +24,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.services.datastructures.DynamicArray;
+import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -261,7 +261,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public DynamicArray<String>[] extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public FixedArray<String>[] extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -274,9 +274,9 @@ public class DictionaryEntry{
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
 		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
-		final DynamicArray<String> terminals = DynamicArray.createExact(String.class, maxSize);
-		final DynamicArray<String> prefixes = DynamicArray.createExact(String.class, maxSize);
-		final DynamicArray<String> suffixes = DynamicArray.createExact(String.class, maxSize);
+		final FixedArray<String> terminals = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> prefixes = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> suffixes = new FixedArray<>(String.class, maxSize);
 		if(continuationFlags != null){
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
