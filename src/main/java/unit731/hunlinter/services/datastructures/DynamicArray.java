@@ -3,71 +3,68 @@ package unit731.hunlinter.services.datastructures;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 
-public class GrowableIntArray{
+public class DynamicArray<T>{
 
-	protected static final float GROWTH_DEFAULT = 1.2f;
+	private static final float GROWTH_DEFAULT = 1.2f;
 
 
-	public int[] data;
+	public T[] data;
 	public int limit;
 	private final float growthRate;
 
 
-	public static GrowableIntArray createExact(final int size){
-		return new GrowableIntArray(size, GROWTH_DEFAULT);
+	public static <T> DynamicArray<T> createExact(final Class<T> cl, final int size){
+		return new DynamicArray<>(cl, size, GROWTH_DEFAULT);
 	}
 
-	public GrowableIntArray(){
-		this(0, GROWTH_DEFAULT);
+	public DynamicArray(final Class<T> cl){
+		this(cl, 0, GROWTH_DEFAULT);
 	}
 
-	public GrowableIntArray(final float growthRate){
-		this(0, growthRate);
+	public DynamicArray(final Class<T> cl, final float growthRate){
+		this(cl, 0, growthRate);
 	}
 
-	public GrowableIntArray(final int capacity, final float growthRate){
-		data = new int[capacity];
+	public DynamicArray(final Class<T> cl, final int capacity, final float growthRate){
+		data = (T[])Array.newInstance(cl, capacity);
 
 		this.growthRate = growthRate;
 	}
 
-	public synchronized void add(final int elem){
+	public synchronized void add(final T elem){
 		grow(1);
 
 		data[limit ++] = elem;
 	}
 
-	public synchronized void push(final int elem){
-		add(elem);
-	}
-
-	public synchronized void addAll(final int[] array){
+	public synchronized void addAll(final T[] array){
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final GrowableIntArray array){
+	public synchronized void addAll(final DynamicArray<T> array){
 		addAll(array.data, array.limit);
 	}
 
-	private void addAll(final int[] array, final int size){
+	private void addAll(final T[] array, final int size){
 		grow(size);
 
 		System.arraycopy(array, 0, data, limit, size);
 		limit += size;
 	}
 
-	public synchronized void addAllUnique(final int[] array){
+	public synchronized void addAllUnique(final T[] array){
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final GrowableIntArray array){
+	public synchronized void addAllUnique(final DynamicArray<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
-	private void addAllUnique(final int[] array, final int size){
+	private void addAllUnique(final T[] array, final int size){
 		grow(size);
 
 		for(int i = 0; i < size; i ++)
@@ -75,39 +72,49 @@ public class GrowableIntArray{
 				data[limit ++] = array[i];
 	}
 
-	public boolean contains(final int elem){
+	public boolean contains(final T elem){
 		return (indexOf(elem) >= 0);
 	}
 
-	public synchronized void remove(final int elem){
+	public synchronized void remove(final T elem){
 		int index = limit;
 		while(limit > 0 && (index = lastIndexOf(elem, index)) >= 0){
 			final int delta = limit - index - 1;
 			if(delta > 0)
 				System.arraycopy(data, index + 1, data, index, delta);
-			limit --;
+			data[-- limit] = null;
 		}
 	}
 
-	public synchronized int pop(){
-		return data[-- limit];
-	}
-
-	public int indexOf(final int elem){
+	public int indexOf(final T elem){
 		return indexOf(elem, 0);
 	}
 
-	public synchronized int indexOf(final int elem, final int startIndex){
-		for(int i = startIndex; i < data.length; i ++)
-			if(data[i] == elem)
-				return i;
+	public synchronized int indexOf(final T elem, final int startIndex){
+		if(elem == null){
+			for(int i = startIndex; i < data.length; i ++)
+				if(data[i] == null)
+					return i;
+		}
+		else{
+			for(int i = startIndex; i < data.length; i ++)
+				if(elem.equals(data[i]))
+					return i;
+		}
 		return -1;
 	}
 
-	public synchronized int lastIndexOf(final int elem, final int startIndex){
-		for(int i = startIndex - 1; i >= 0; i --)
-			if(data[i] == elem)
-				return i;
+	public synchronized int lastIndexOf(final T elem, final int startIndex){
+		if(elem == null){
+			for(int i = startIndex - 1; i >= 0; i --)
+				if(data[i] == null)
+					return i;
+		}
+		else{
+			for(int i = startIndex - 1; i >= 0; i --)
+				if(elem.equals(data[i]))
+					return i;
+		}
 		return -1;
 	}
 
@@ -126,11 +133,12 @@ public class GrowableIntArray{
 	}
 
 	/** NOTE: this method should NOT be called at all because it is inefficient */
-	public synchronized int[] extractCopyOrNull(){
+	public synchronized T[] extractCopyOrNull(){
 		if(isEmpty())
 			return null;
 
-		final int[] reducedData = new int[limit];
+		final Class<?> type = getDataType();
+		final T[] reducedData = (T[])Array.newInstance(type, limit);
 		System.arraycopy(data, 0, reducedData, 0, limit);
 		return reducedData;
 	}
@@ -151,7 +159,7 @@ public class GrowableIntArray{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final GrowableIntArray rhs = (GrowableIntArray)obj;
+		final DynamicArray<?> rhs = (DynamicArray<?>)obj;
 		return new EqualsBuilder()
 			.append(data, rhs.data)
 			.append(limit, rhs.limit)

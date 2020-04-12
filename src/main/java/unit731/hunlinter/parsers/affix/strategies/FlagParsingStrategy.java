@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.services.datastructures.GrowableArray;
+import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.SetHelper;
 
@@ -46,10 +46,10 @@ public abstract class FlagParsingStrategy{
 	/**
 	 * Compose the given array of String into one flag stream
 	 *
-	 * @param flags	GrowableArray of String to compose into flags
+	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	public String joinFlags(final GrowableArray<String> flags){
+	public String joinFlags(final DynamicArray<String> flags){
 		return joinFlags(flags.data, flags.limit);
 	}
 

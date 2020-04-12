@@ -1,7 +1,7 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.ArrayUtils;
-import unit731.hunlinter.services.datastructures.GrowableArray;
+import unit731.hunlinter.services.datastructures.DynamicArray;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,7 +16,7 @@ public class LoopHelper{
 	private LoopHelper(){}
 
 
-	public static <T> void forEach(final GrowableArray<T> array, final Consumer<T> fun){
+	public static <T> void forEach(final DynamicArray<T> array, final Consumer<T> fun){
 		final int size = (array != null? array.limit: 0);
 		for(int i = 0; i < size; i ++)
 			fun.accept(array.data[i]);

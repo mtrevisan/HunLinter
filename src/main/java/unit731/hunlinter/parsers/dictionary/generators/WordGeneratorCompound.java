@@ -19,7 +19,7 @@ import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.ArraySet;
-import unit731.hunlinter.services.datastructures.GrowableArray;
+import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.services.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -115,7 +115,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					final GrowableArray<String>[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					final DynamicArray<String>[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
 					if(forbiddenWordFlag == null
 							|| !continuationFlags[Affixes.INDEX_PREFIXES].contains(forbiddenWordFlag)
 							&& !continuationFlags[Affixes.INDEX_SUFFIXES].contains(forbiddenWordFlag)
@@ -159,7 +159,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
-			final GrowableArray<String>[] continuationFlags){
+			final DynamicArray<String>[] continuationFlags){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
@@ -260,18 +260,18 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	private GrowableArray<String>[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
+	private DynamicArray<String>[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
-		final GrowableArray<String>[] prefixes = compoundEntries[0]
+		final DynamicArray<String>[] prefixes = compoundEntries[0]
 			.extractAllAffixes(affixData, false);
-		final GrowableArray<String>[] suffixes = compoundEntries[compoundEntries.length - 1]
+		final DynamicArray<String>[] suffixes = compoundEntries[compoundEntries.length - 1]
 			.extractAllAffixes(affixData, false);
-		final GrowableArray<String> terminals = GrowableArray.createExact(String.class, prefixes.length + suffixes.length);
+		final DynamicArray<String> terminals = DynamicArray.createExact(String.class, prefixes.length + suffixes.length);
 		terminals.addAll(prefixes[Affixes.INDEX_TERMINALS]);
 		terminals.addAllUnique(suffixes[Affixes.INDEX_TERMINALS]);
 		terminals.remove(compoundFlag);
 
-		return new GrowableArray[]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals};
+		return new DynamicArray[]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals};
 	}
 
 	private Inflection[] removeTwofolds(Inflection[] prods){

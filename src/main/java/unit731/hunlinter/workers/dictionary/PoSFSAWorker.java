@@ -19,7 +19,7 @@ import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
-import unit731.hunlinter.services.datastructures.GrowableByteArrayArray;
+import unit731.hunlinter.services.datastructures.DynamicArray;
 import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
@@ -68,12 +68,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final GrowableByteArrayArray encodings = new GrowableByteArrayArray(40_000_000, 1.2f);
+		final DynamicArray<byte[]> encodings = new DynamicArray<>(byte[].class, 40_000_000, 1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final GrowableByteArrayArray currentEncodings = encode(inflections, separator, sequenceEncoder);
+			final DynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
 
 			encodings.addAll(currentEncodings);
 
@@ -86,7 +86,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		final Function<Void, GrowableByteArrayArray> step1 = ignored -> {
+		final Function<Void, DynamicArray<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
@@ -94,7 +94,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return encodings;
 		};
-		final Function<GrowableByteArrayArray, GrowableByteArrayArray> step2 = list -> {
+		final Function<DynamicArray<byte[]>, DynamicArray<byte[]>> step2 = list -> {
 			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
@@ -106,7 +106,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return list;
 		};
-		final Function<GrowableByteArrayArray, FSA> step3 = list -> {
+		final Function<DynamicArray<byte[]>, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
@@ -186,7 +186,7 @@ System.out.println(watch.toStringMillis());
 		}
 	}
 
-	private GrowableByteArrayArray encode(final Inflection[] inflections, final byte separator,
+	private DynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
@@ -194,7 +194,7 @@ System.out.println(watch.toStringMillis());
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
 
-		final GrowableByteArrayArray out = new GrowableByteArrayArray(1.2f);
+		final DynamicArray<byte[]> out = new DynamicArray<>(byte[].class, 1.2f);
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
