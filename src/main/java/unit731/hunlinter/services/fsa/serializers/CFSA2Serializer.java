@@ -21,7 +21,7 @@ import java.util.EnumSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
 /**
@@ -87,12 +87,12 @@ public class CFSA2Serializer implements FSASerializer{
 	 * @see #serializeWithNumbers()
 	 */
 	@Override
-	public <T extends OutputStream> T serialize(final FSA fsa, final T os, final BiConsumer<Integer, Integer> progressCallback)
+	public <T extends OutputStream> T serialize(final FSA fsa, final T os, final Consumer<Integer> progressCallback)
 			throws IOException{
 		//calculate the most frequent labels and build indexed labels dictionary
 		computeLabelsIndex(fsa);
 		if(progressCallback != null)
-			progressCallback.accept(1, 5);
+			progressCallback.accept(20);
 
 		//calculate the number of bytes required for the node data, if serializing with numbers
 		numbers = (serializeWithNumbers? FSAUtils.rightLanguageForAllStates(fsa): new IntIntHashMap());
@@ -100,7 +100,7 @@ public class CFSA2Serializer implements FSASerializer{
 		//linearize all the states, optimizing their layout
 		final IntArrayList linearized = linearize(fsa);
 		if(progressCallback != null)
-			progressCallback.accept(2, 5);
+			progressCallback.accept(40);
 
 		//emit the header
 		FSAHeader.write(os, CFSA2.VERSION);
@@ -109,7 +109,7 @@ public class CFSA2Serializer implements FSASerializer{
 		if(serializeWithNumbers)
 			fsaFlags.add(FSAFlags.NUMBERS);
 		if(progressCallback != null)
-			progressCallback.accept(3, 5);
+			progressCallback.accept(60);
 
 		final short flagsMask = FSAFlags.getMask(fsaFlags);
 		os.write((flagsMask >> 8) & 0xFF);
@@ -119,7 +119,7 @@ public class CFSA2Serializer implements FSASerializer{
 		os.write(labelsIndex.length);
 		os.write(labelsIndex);
 		if(progressCallback != null)
-			progressCallback.accept(4, 5);
+			progressCallback.accept(80);
 
 		//emit the automaton
 		final int size = emitNodes(fsa, os, linearized);
@@ -127,7 +127,7 @@ public class CFSA2Serializer implements FSASerializer{
 			throw new IllegalArgumentException("Size changed in the final pass: " + size);
 
 		if(progressCallback != null)
-			progressCallback.accept(5, 5);
+			progressCallback.accept(100);
 
 		return os;
 	}

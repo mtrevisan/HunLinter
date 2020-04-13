@@ -110,7 +110,7 @@ class WordGeneratorBase{
 
 
 	private Inflection getBaseInflection(final DictionaryEntry dicEntry){
-		return Inflection.clone(dicEntry);
+		return Inflection.createFromDicitonaryEntry(dicEntry);
 	}
 
 	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,

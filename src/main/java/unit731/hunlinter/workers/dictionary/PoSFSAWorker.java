@@ -22,7 +22,6 @@ import unit731.hunlinter.services.fsa.stemming.BufferUtils;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.sorters.SmoothSort;
-import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
@@ -69,17 +68,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 45_000_000, 1.2f);
+		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(dicEntry));
-System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(inflections));
-//288 = dicEntry
-//296 = inflections
-//80 = currentEncodings
-//56 = currentEncodings.data
+
 			final SimpleDynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
 
 			encodings.addAll(currentEncodings);
@@ -90,7 +84,7 @@ System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(inflectio
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
-//			.withParallelProcessing()
+			.withParallelProcessing()
 			.withCancelOnException();
 
 		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
@@ -105,15 +99,12 @@ System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(inflectio
 			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
-TimeWatch watch = TimeWatch.start();
 			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
 				percent -> {
 					setProgress(percent, 100);
 
 					sleepOnPause();
 				});
-watch.stop();
-System.out.println(watch.toStringMillis());
 
 			return list;
 		};
@@ -124,7 +115,6 @@ System.out.println(watch.toStringMillis());
 				.withNoHeader()
 				.withSequentialProcessing();
 
-TimeWatch watch = TimeWatch.start();
 			for(int index = 0; index < list.limit; index ++){
 				final byte[] encoding = list.data[index];
 				fsaProcessor.accept(IndexDataPair.of(index, encoding));
@@ -136,8 +126,6 @@ TimeWatch watch = TimeWatch.start();
 
 				sleepOnPause();
 			}
-watch.stop();
-System.out.println(watch.toStringMillis());
 
 			//release memory
 			list.clear();
@@ -149,14 +137,11 @@ System.out.println(watch.toStringMillis());
 
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
-TimeWatch watch = TimeWatch.start();
-				serializer.serialize(fsa, os, (index, total) -> {
-					setProgress(index, total);
+				serializer.serialize(fsa, os, percent -> {
+					setProgress(percent, 100);
 
 					sleepOnPause();
 				});
-watch.stop();
-System.out.println(watch.toStringMillis());
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
@@ -197,6 +182,7 @@ System.out.println(watch.toStringMillis());
 		}
 	}
 
+	//FIXME improve memory usage?
 	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
@@ -276,19 +262,19 @@ System.out.println(watch.toStringMillis());
 	}
 
 
-	public static void main(final String[] args){
-		final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.dat";
-		final String[] buildOptions = {
-			"--overwrite",
-			"--accept-cr",
-			"--exit", "false",
-			"--format", "CFSA2",
-			"--input", input
-		};
-TimeWatch watch = TimeWatch.start();
-		morfologik.tools.DictCompile.main(buildOptions);
-watch.stop();
-System.out.println(watch.toStringMillis());
-	}
+//	public static void main(final String[] args){
+//		final String input = "C:\\Users\\mauro\\AppData\\Local\\Temp\\hunlinter-pos.dat";
+//		final String[] buildOptions = {
+//			"--overwrite",
+//			"--accept-cr",
+//			"--exit", "false",
+//			"--format", "CFSA2",
+//			"--input", input
+//		};
+//TimeWatch watch = TimeWatch.start();
+//		morfologik.tools.DictCompile.main(buildOptions);
+//watch.stop();
+//System.out.println(watch.toStringMillis());
+//	}
 
 }

@@ -6,7 +6,7 @@ import unit731.hunlinter.services.fsa.FSAFlags;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
 /**
@@ -26,7 +26,7 @@ public interface FSASerializer{
 	 * @return Returns <code>T</code> for chaining.
 	 * @throws IOException Rethrown if an I/O error occurs.
 	 */
-	<T extends OutputStream> T serialize(final FSA fsa, final T os, final BiConsumer<Integer, Integer> progressCallback) throws IOException;
+	<T extends OutputStream> T serialize(final FSA fsa, final T os, final Consumer<Integer> progressCallback) throws IOException;
 
 	/**
 	 * @return Returns the set of flags supported by the serializer (and the output automaton).
