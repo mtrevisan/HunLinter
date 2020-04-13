@@ -7,7 +7,6 @@ import unit731.hunlinter.services.fsa.FSAFlags;
 import unit731.hunlinter.services.fsa.FSATestUtils;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.serializers.FSASerializer;
-import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.ByteArrayInputStream;
@@ -136,7 +135,6 @@ public class SerializerTestBase{
 	}
 
 	private void testBuiltIn(FSA fsa) throws IOException{
-TimeWatch watch = TimeWatch.start();
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
 			input.add(Arrays.copyOf(bb.array(), bb.remaining()));

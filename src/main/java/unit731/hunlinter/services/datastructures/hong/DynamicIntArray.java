@@ -5,11 +5,11 @@ package unit731.hunlinter.services.datastructures.hong;
  * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays</a>
  * @see <a href="https://github.com/LHongy/DynamicArray">DynamicArray</a>
  */
-public class DynamicArray<T>{
+public class DynamicIntArray{
 
 	private static final int CAPACITY_DEFAULT = 4;
 
-	private Object[] blocks;
+	private IntBlock[] blocks;
 	//number of Blocks in `blocks`
 	private int sizeOfBlocks;
 	//number of elements in DynamicArray
@@ -22,10 +22,10 @@ public class DynamicArray<T>{
 	private SuperBlock lastSuperBlock;
 
 
-	public DynamicArray(){
-		blocks = new Object[CAPACITY_DEFAULT];
+	public DynamicIntArray(){
+		blocks = new IntBlock[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
-		blocks[0] = new Block<>(1);
+		blocks[0] = new IntBlock(1);
 
 		//SB0 has only one Block, and that Block can only have one element
 		lastSuperBlock = new SuperBlock(true, 1, 1, 0);
@@ -41,14 +41,14 @@ public class DynamicArray<T>{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized T get(final int i){
+	public synchronized int get(final int i){
 		// We need to find which Block contains the requested element, also in what position of that Block.
 		// locate() gives us a Location object.
 		// The object will contain the index of Block that we want,
 		// and also the index of element in the Block.
 		final Location location = new Location(i);
 		// Use the blockIndex in the Location object to find the Block.
-		final Block<T> block = (Block<T>)blocks[location.block];
+		final IntBlock block = blocks[location.block];
 		// Use the elementIndex in the Location object to find the element within the Block.
 		return block.data[location.element];
 	}
@@ -57,14 +57,13 @@ public class DynamicArray<T>{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized void set(final int index, final T x){
+	public synchronized void set(final int index, final int x){
 		final Location location = new Location(index);
-		final Block<T> block = (Block<T>)blocks[location.block];
+		final IntBlock block = blocks[location.block];
 		//use the elementIndex in the Location object to set the element within the Block to x
 		block.data[location.element] = x;
 	}
 
-	@SuppressWarnings("unchecked")
 	// Allocates one more spaces in the DynamicArray. This may
 	// require the creation of a Block and the last SuperBlock may change.
 	// Also, expandArray is called if the `blocks` is full when
@@ -72,7 +71,7 @@ public class DynamicArray<T>{
 	// Called by add.
 	// Target complexity: O(1)
 	private void grow(){
-		Block<T> lastDataBlock = (Block<T>)blocks[indexOfLastDataBlock];
+		IntBlock lastDataBlock = blocks[indexOfLastDataBlock];
 
 		// If the last Block is full, we need to make a new Block.
 		if(lastDataBlock.isFull()){
@@ -99,11 +98,11 @@ public class DynamicArray<T>{
 			// Create a new Block, use lastSuperBlock to figure out how many elements the Block can store.
 			// Update the fields, also lastSuperBlock has one more Block in it, so incrementCurrentNumberOfDataBlocks.
 			indexOfLastDataBlock ++;
-			blocks[sizeOfBlocks ++] = new Block<>(lastSuperBlock.maxNumberOfElementsPerBlock);
+			blocks[sizeOfBlocks ++] = new IntBlock(lastSuperBlock.maxNumberOfElementsPerBlock);
 			numberOfEmptyDataBlocks ++;
 			lastSuperBlock.incrementCurrentNumberOfDataBlocks();
 			//since we create a new Block, we need to update variable lastDataBlock.
-			lastDataBlock = (Block<T>)blocks[indexOfLastDataBlock];
+			lastDataBlock = blocks[indexOfLastDataBlock];
 		}
 		lastDataBlock.grow();
 		if(numberOfEmptyDataBlocks == 1){
@@ -116,37 +115,36 @@ public class DynamicArray<T>{
 
 	}
 
-	public synchronized void push(final T x){
+	public synchronized void push(final int x){
 		add(x);
 	}
 
 	// Grows the DynamicArray by one space, increases the size of the
 	// DynamicArray, and sets the last element to x.
 	// Target complexity: O(1)
-	public synchronized void add(final T x){
+	public synchronized void add(final int x){
 		grow();
 
 		size ++;
 		set(size - 1, x);
 	}
 
-	public synchronized void addAll(final DynamicArray<T> array){
+	public synchronized void addAll(final DynamicIntArray array){
 		for(int i = 0; i < array.size; i ++)
 			add(array.get(i));
 	}
 
-	public synchronized void addAll(final T[] array){
-		for(int i = 0; i < array.length; i ++)
-			add(array[i]);
+	public synchronized void addAll(final int[] array){
+		for(final int value : array)
+			add(value);
 	}
 
-	public synchronized T pop(){
-		final T elem = get(size - 1);
+	public synchronized int pop(){
+		final int elem = get(size - 1);
 		remove();
 		return elem;
 	}
 
-	@SuppressWarnings("unchecked")
 	// Write a null value to the last element, shrinks the DynamicArray by one
 	// space, and decreases the size of the DynamicArray. A Block may be
 	// deleted and the last SuperBlock may change.
@@ -156,8 +154,7 @@ public class DynamicArray<T>{
 	// called.
 	// Target complexity: O(1)
 	public synchronized void remove(){
-		set(size - 1, null);
-		final Block<T> lastNonEmptyDataBlock = (Block<T>)blocks[indexOfLastNonEmptyDataBlock];
+		final IntBlock lastNonEmptyDataBlock = blocks[indexOfLastNonEmptyDataBlock];
 		lastNonEmptyDataBlock.shrink();
 		size --;
 
@@ -206,7 +203,7 @@ public class DynamicArray<T>{
 	// Decreases the length of the `blocks` by half. Create a new
 	// `blocks` and copy the Blocks from the old one to this new array.
 	private void shrinkArray(){
-		final Object[] newBlocks = new Object[blocks.length / 2];
+		final IntBlock[] newBlocks = new IntBlock[blocks.length / 2];
 		if(sizeOfBlocks >= 0)
 			System.arraycopy(blocks, 0, newBlocks, 0, sizeOfBlocks);
 		blocks = newBlocks;
@@ -215,7 +212,7 @@ public class DynamicArray<T>{
 	// Doubles the length of the `blocks`. Create a new
 	// `blocks` and copy the Blocks from the old one to this new array.
 	private void expandArray(){
-		final Object[] newBlocks = new Object[blocks.length * 2];
+		final IntBlock[] newBlocks = new IntBlock[blocks.length * 2];
 		if(sizeOfBlocks >= 0)
 			System.arraycopy(blocks, 0, newBlocks, 0, sizeOfBlocks);
 		blocks = newBlocks;
