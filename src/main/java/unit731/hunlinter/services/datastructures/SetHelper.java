@@ -3,7 +3,6 @@ package unit731.hunlinter.services.datastructures;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -41,21 +40,6 @@ public class SetHelper{
 		final Set<T> set = new TreeSet<>(comparator);
 		set.addAll(Arrays.asList(values));
 		return set;
-	}
-
-	public static <T> Set<T> emptySet(){
-		return Collections.emptySet();
-	}
-
-	/**
-	 * Returns {@code true} if the specified set have no elements (A = ∅).
-	 *
-	 * @param <T>	The type of the values contained into the set
-	 * @param set	Set
-	 * @return	The emptiness of {@code set}
-	 */
-	public static <T> boolean isEmpty(final Set<T> set){
-		return set.isEmpty();
 	}
 
 	/**
