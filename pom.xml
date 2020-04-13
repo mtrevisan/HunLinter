@@ -8,13 +8,56 @@
 
 	<packaging>jar</packaging>
 
+	<properties>
+		<main.class>unit731.hunlinter.HunLinterFrame</main.class>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>14</maven.compiler.source>
+		<maven.compiler.target>14</maven.compiler.target>
+
+		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+		<!-- Build -->
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+
+		<!-- Apache -->
+		<org.apache.commons-text.version>1.8</org.apache.commons-text.version>
+		<org.apache.commons-io.version>2.6</org.apache.commons-io.version>
+
+		<!-- FastUtil -->
+<!--		<fastutil.version>8.3.1</fastutil.version>-->
+
+		<!-- jFreeChart -->
+		<org.jfree.jfreechart.version>1.5.0</org.jfree.jfreechart.version>
+
+		<!-- Morfologik -->
+		<org.carrot2.morfologik-tools.version>2.1.7</org.carrot2.morfologik-tools.version>
+
+		<!-- JSON -->
+		<com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
+
+		<!-- CarrotSearch sizeof -->
+		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>
+
+		<!-- Logging -->
+		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
+
+		<!-- JUnit -->
+		<org.junit.jupiter.version>5.6.2</org.junit.jupiter.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<!-- Source -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>${maven-source-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -28,13 +71,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
+				<version>${maven-deploy-plugin.version}</version>
 			</plugin>
 			<!-- JavaDoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>${maven-javadoc-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -66,7 +109,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.2</version>
+				<version>${maven-shade-plugin.version}</version>
 				<executions>
 					<execution>
 						<!-- Run shade goal on package phase -->
@@ -118,7 +161,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<showDeprecation>true</showDeprecation>
 					<source>13</source>
@@ -145,55 +188,19 @@
 		</resources>
 	</build>
 
-	<properties>
-		<main.class>unit731.hunlinter.HunLinterFrame</main.class>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>14</maven.compiler.source>
-		<maven.compiler.target>14</maven.compiler.target>
-
-		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-		<build.timestamp>${maven.build.timestamp}</build.timestamp>
-
-		<!-- Apache -->
-		<org.apache.commons.text.version>1.8</org.apache.commons.text.version>
-		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
-
-		<!-- FastUtil -->
-		<fastutil.version>8.3.1</fastutil.version>
-
-		<!-- jFreeChart -->
-		<org.jfree.jfreechart.version>1.5.0</org.jfree.jfreechart.version>
-
-		<!-- Morfologik -->
-		<org.carrot2.morfologik-tools.version>2.1.7</org.carrot2.morfologik-tools.version>
-
-		<!-- JSON -->
-		<com.googlecode.json-simple.version>1.1.1</com.googlecode.json-simple.version>
-
-		<!-- CarrotSearch sizeof -->
-		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>
-
-		<!-- Logging -->
-		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
-
-		<!-- JUnit -->
-		<org.junit.jupiter.version>5.6.1</org.junit.jupiter.version>
-	</properties>
-
 	<dependencies>
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>${org.apache.commons.text.version}</version>
+			<version>${org.apache.commons-text.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>${org.apache.commons.io.version}</version>
+			<version>${org.apache.commons-io.version}</version>
 		</dependency>
 
 		<!-- FastUtil -->
@@ -235,11 +242,11 @@
 		</dependency>
 
 		<!-- Memory usage -->
-<!--		<dependency>-->
-<!--			<groupId>com.carrotsearch</groupId>-->
-<!--			<artifactId>java-sizeof</artifactId>-->
-<!--			<version>${com.carrotsearch.sizeof.version}</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>java-sizeof</artifactId>
+			<version>${com.carrotsearch.sizeof.version}</version>
+		</dependency>
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->

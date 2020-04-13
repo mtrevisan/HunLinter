@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 
-public class DynamicArray<T> implements Iterable<T>{
+public class SimpleDynamicArray<T> implements Iterable<T>{
 
 	private static final float GROWTH_DEFAULT = 1.2f;
 
@@ -18,19 +18,19 @@ public class DynamicArray<T> implements Iterable<T>{
 	private final float growthRate;
 
 
-	public static <T> DynamicArray<T> createExact(final Class<T> cl, final int size){
-		return new DynamicArray<>(cl, size, GROWTH_DEFAULT);
+	public static <T> SimpleDynamicArray<T> createExact(final Class<T> cl, final int size){
+		return new SimpleDynamicArray<>(cl, size, GROWTH_DEFAULT);
 	}
 
-	public DynamicArray(final Class<T> cl){
+	public SimpleDynamicArray(final Class<T> cl){
 		this(cl, 0, GROWTH_DEFAULT);
 	}
 
-	public DynamicArray(final Class<T> cl, final float growthRate){
+	public SimpleDynamicArray(final Class<T> cl, final float growthRate){
 		this(cl, 0, growthRate);
 	}
 
-	public DynamicArray(final Class<T> cl, final int capacity, final float growthRate){
+	public SimpleDynamicArray(final Class<T> cl, final int capacity, final float growthRate){
 		data = (T[])Array.newInstance(cl, capacity);
 
 		this.growthRate = growthRate;
@@ -46,7 +46,7 @@ public class DynamicArray<T> implements Iterable<T>{
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final DynamicArray<T> array){
+	public synchronized void addAll(final SimpleDynamicArray<T> array){
 		addAll(array.data, array.limit);
 	}
 
@@ -61,7 +61,7 @@ public class DynamicArray<T> implements Iterable<T>{
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final DynamicArray<T> array){
+	public synchronized void addAllUnique(final SimpleDynamicArray<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
@@ -175,7 +175,7 @@ public class DynamicArray<T> implements Iterable<T>{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final DynamicArray<?> rhs = (DynamicArray<?>)obj;
+		final SimpleDynamicArray<?> rhs = (SimpleDynamicArray<?>)obj;
 		return new EqualsBuilder()
 			.append(data, rhs.data)
 			.append(limit, rhs.limit)
