@@ -14,7 +14,6 @@ import unit731.hunlinter.services.fsa.builders.LexicographicalComparator;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
-import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.text.StringHelper;
@@ -31,15 +30,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class WordlistFSAWorker extends WorkerDictionary{
@@ -62,8 +56,6 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
-//		final byte separator = metadata.getSeparator();
-//		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
 		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
@@ -163,7 +155,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final List<String> content = Arrays.asList(
 				"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 				"fsa.dict.encoding=" + charset.name().toLowerCase(),
-				"fsa.dict.encoder=prefix");
+				"fsa.dict.encoder=prefix",
+				"fsa.dict.speller.convert-case=true");
 			try{
 				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 			}
