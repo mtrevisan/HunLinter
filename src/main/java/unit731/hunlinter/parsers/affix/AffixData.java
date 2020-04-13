@@ -227,6 +227,21 @@ public class AffixData{
 		return Arrays.copyOf(list, limit);
 	}
 
+	public String getReplacementPairs(){
+		return ((ConversionTable)getData(AffixOption.REPLACEMENT_TABLE))
+			.extractAsList();
+	}
+
+	public String getEquivalentChars(){
+		return ((RelationTable)getData(AffixOption.RELATION_TABLE))
+			.extractAsList();
+	}
+
+	public String getInputConversions(){
+		return ((ConversionTable)getData(AffixOption.INPUT_CONVERSION_TABLE))
+			.extractAsList();
+	}
+
 	public List<String> applyReplacementTable(final String word){
 		final ConversionTable table = getData(AffixOption.REPLACEMENT_TABLE);
 		return (table != null? table.applyConversionTable(word): Collections.emptyList());

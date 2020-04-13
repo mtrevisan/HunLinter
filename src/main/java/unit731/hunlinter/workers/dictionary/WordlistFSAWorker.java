@@ -4,6 +4,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -29,6 +30,9 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -43,19 +47,22 @@ public class WordlistFSAWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Wordlist FSA Extractor";
 
 
-	public WordlistFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
+	public WordlistFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
 			.withCancelOnException();
 
+		Objects.requireNonNull(affixData);
+		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
 		final Charset charset = dicParser.getCharset();
-		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
+		final DictionaryMetadata metadata = readMetadata(affixData, charset, outputFile);
 
 
 		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
@@ -148,15 +155,27 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
-	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
+	private DictionaryMetadata readMetadata(final AffixData affixData, final Charset charset, final File outputFile){
 		final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
 		final File outputInfoFile = new File(filenameNoExtension + ".info");
 		if(!outputInfoFile.exists()){
-			final List<String> content = Arrays.asList(
+			final List<String> content = new ArrayList<>(Arrays.asList(
+				"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 				"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 				"fsa.dict.encoding=" + charset.name().toLowerCase(),
-				"fsa.dict.encoder=prefix",
-				"fsa.dict.speller.convert-case=true");
+				"fsa.dict.encoder=prefix"));
+			if(affixData.getLanguage() != null)
+				content.add("fsa.dict.speller.locale=" + affixData.getLanguage());
+			final String replacementPairs = affixData.getReplacementPairs();
+			if(replacementPairs != null)
+				content.add("fsa.dict.speller.replacement-pairs=" + replacementPairs);
+			final String equivalentChars = affixData.getEquivalentChars();
+			if(equivalentChars != null)
+				content.add("fsa.dict.speller.equivalent-chars=" + equivalentChars);
+			final String inputConversions = affixData.getInputConversions();
+			if(inputConversions != null)
+				content.add("fsa.dict.input-conversion=" + inputConversions);
+
 			try{
 				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
 			}

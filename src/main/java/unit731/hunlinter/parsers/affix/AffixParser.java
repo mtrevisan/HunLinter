@@ -20,6 +20,7 @@ import unit731.hunlinter.parsers.affix.handlers.ConversionTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.CopyOverAsNumberHandler;
 import unit731.hunlinter.parsers.affix.handlers.CopyOverHandler;
 import unit731.hunlinter.parsers.affix.handlers.Handler;
+import unit731.hunlinter.parsers.affix.handlers.RelationTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
@@ -35,7 +36,7 @@ import unit731.hunlinter.services.RegexHelper;
  *		General:
  *			SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
  *		Suggestions:
- *			TRY (only read), NOSUGGEST (only read), REP
+ *			TRY (only read), NOSUGGEST (only read), REP, MAP (only read)
  *		Compounding:
  *			BREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG,
  *			COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE,
@@ -44,6 +45,8 @@ import unit731.hunlinter.services.RegexHelper;
  *			PFX, SFX
  *		Others:
  *			CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
+ *
+ * @see <a href="http://manpages.ubuntu.com/manpages/trusty/en/man4/hunspell.4.html">Ubuntu manuals 4</a>
  */
 public class AffixParser{
 
@@ -67,6 +70,7 @@ public class AffixParser{
 	private static final Handler REPLACEMENT_TABLE = new ConversionTableHandler(AffixOption.REPLACEMENT_TABLE);
 	private static final Handler INPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.INPUT_CONVERSION_TABLE);
 	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.OUTPUT_CONVERSION_TABLE);
+	private static final Handler RELATION_TABLE = new RelationTableHandler(AffixOption.RELATION_TABLE);
 
 	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new HashMap<>();
 	static{
@@ -94,7 +98,7 @@ public class AffixParser{
 //		PARSING_HANDLERS.put(AffixOption.NO_NGRAM_SUGGEST, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixOption.SUGGESTIONS_WITH_DOTS, COPY_OVER);
 		PARSING_HANDLERS.put(AffixOption.REPLACEMENT_TABLE, REPLACEMENT_TABLE);
-//		PARSING_HANDLERS.put(AffixOption.MAP_TABLE, MAP);
+		PARSING_HANDLERS.put(AffixOption.RELATION_TABLE, RELATION_TABLE);
 //		PARSING_HANDLERS.put(AffixOption.PHONE_TABLE, MAP);
 //		PARSING_HANDLERS.put(AffixOption.WARN, MAP);
 //		PARSING_HANDLERS.put(AffixOption.FORBID_WARN, MAP);

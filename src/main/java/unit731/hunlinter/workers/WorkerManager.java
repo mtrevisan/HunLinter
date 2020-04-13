@@ -58,7 +58,6 @@ public class WorkerManager{
 
 	public void checkForAbortion(){
 		for(final Map.Entry<String, WorkerAbstract<?>> workerNameWorker : WORKERS.entrySet()){
-			final String workerName = workerNameWorker.getKey();
 			final WorkerAbstract<?> worker = workerNameWorker.getValue();
 			if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 //				final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -198,8 +197,8 @@ public class WorkerManager{
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
-				worker = new WordlistFSAWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
-					outputFile);
+				worker = new WordlistFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
+					parserManager.getWordGenerator(), outputFile);
 				WORKERS.put(workerName, worker);
 				ON_ENDS.put(workerName, onEnd);
 
@@ -215,8 +214,8 @@ public class WorkerManager{
 		if(worker == null || worker.isDone()){
 			final File outputFile = preStart.get();
 			if(outputFile != null){
-				worker = new PoSFSAWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
-					outputFile);
+				worker = new PoSFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
+					parserManager.getWordGenerator(), outputFile);
 				WORKERS.put(workerName, worker);
 				ON_ENDS.put(workerName, onEnd);
 

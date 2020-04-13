@@ -10,7 +10,7 @@ import unit731.hunlinter.services.system.Memoizer;
 
 public class RegexSequencer{
 
-	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\[\\^?)(?![^\\[]+\\])");
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";

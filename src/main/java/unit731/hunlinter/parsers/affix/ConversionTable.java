@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -55,7 +56,7 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public void parseConversionTable(final ParsingContext context){
+	public void parse(final ParsingContext context){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -189,6 +190,13 @@ public class ConversionTable{
 		final String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))
 			conversions.add(ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
+	}
+
+	public String extractAsList(){
+		return table.values().stream()
+			.flatMap(List::stream)
+			.map(entry -> entry.getKey() + StringUtils.SPACE + entry.getValue())
+			.collect(Collectors.joining(", "));
 	}
 
 	@Override
