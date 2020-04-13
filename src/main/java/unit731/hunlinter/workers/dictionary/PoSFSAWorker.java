@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.datastructures.SetHelper;
-import unit731.hunlinter.services.datastructures.DynamicArray;
+import unit731.hunlinter.services.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.builders.LexicographicalComparator;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
@@ -69,12 +69,18 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final DynamicArray<byte[]> encodings = new DynamicArray<>(byte[].class, 40_000_000, 1.2f);
+		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 45_000_000, 1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+			final String line = indexData.getData();
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-			final DynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
+System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(dicEntry));
+System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(inflections));
+//288 = dicEntry
+//296 = inflections
+//80 = currentEncodings
+//56 = currentEncodings.data
+			final SimpleDynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
 
 			encodings.addAll(currentEncodings);
 
@@ -84,10 +90,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
 
 		getWorkerData()
-			.withParallelProcessing()
+//			.withParallelProcessing()
 			.withCancelOnException();
 
-		final Function<Void, DynamicArray<byte[]>> step1 = ignored -> {
+		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
@@ -95,7 +101,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return encodings;
 		};
-		final Function<DynamicArray<byte[]>, DynamicArray<byte[]>> step2 = list -> {
+		final Function<SimpleDynamicArray<byte[]>, SimpleDynamicArray<byte[]>> step2 = list -> {
 			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
@@ -111,7 +117,7 @@ System.out.println(watch.toStringMillis());
 
 			return list;
 		};
-		final Function<DynamicArray<byte[]>, FSA> step3 = list -> {
+		final Function<SimpleDynamicArray<byte[]>, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
@@ -191,7 +197,7 @@ System.out.println(watch.toStringMillis());
 		}
 	}
 
-	private DynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
+	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer encoded = ByteBuffer.allocate(0);
 		ByteBuffer source = ByteBuffer.allocate(0);
@@ -199,7 +205,7 @@ System.out.println(watch.toStringMillis());
 		ByteBuffer tag = ByteBuffer.allocate(0);
 		ByteBuffer assembled = ByteBuffer.allocate(0);
 
-		final DynamicArray<byte[]> out = new DynamicArray<>(byte[].class, 1.2f);
+		final SimpleDynamicArray<byte[]> out = new SimpleDynamicArray<>(byte[].class, inflections.length, 1.2f);
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
