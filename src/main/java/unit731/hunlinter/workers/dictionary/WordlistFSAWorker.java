@@ -1,5 +1,7 @@
 package unit731.hunlinter.workers.dictionary;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -9,19 +11,25 @@ import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.services.fsa.builders.FSABuilder;
+import unit731.hunlinter.services.fsa.stemming.DictionaryMetadata;
+import unit731.hunlinter.services.fsa.stemming.SequenceEncoderInterface;
+import unit731.hunlinter.services.sorters.SmoothSort;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,82 +48,92 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 
 	public WordlistFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
-		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing());
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
+
 		final Charset charset = dicParser.getCharset();
+		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
+		final byte separator = metadata.getSeparator();
+		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
 		final Set<String> words = new HashSet<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+			final String line = indexData.getData();
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			forEach(inflections, prod -> words.add(prod.toString()));
+
+			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<String> fsaProcessor = word -> {
-			final byte[] chs = StringHelper.getRawBytes(word);
-			builder.add(chs);
-		};
-//		final Runnable completed = () -> {
-//			resetProcessing("Post-processing");
-//
-//			try{
-//				final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-//
-//				final File outputInfoFile = new File(filenameNoExtension + ".info");
-//				if(!outputInfoFile.exists()){
-//					final List<String> content = Arrays.asList(
-//						"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
-//						"fsa.dict.encoding=" + charset.name().toLowerCase(),
-//						"fsa.dict.encoder=prefix");
-//					FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-//				}
-//
-//				buildFSA(new ArrayList<>(words), filenameNoExtension + ".dict");
-//
-//				finalizeProcessing("File written: " + outputFile.getAbsolutePath());
-//
-//				FileHelper.browse(outputFile);
-//			}
-//			catch(final Exception e){
-//				LOGGER.warn("Exception while creating the FSA file for wordlist", e);
-//			}
-//		};
-//
-		getWorkerData()
-			.withCancelOnException();
+		final Consumer<byte[]> fsaProcessor = builder::add;
 
 		final Function<Void, Set<String>> step1 = ignored -> {
-			prepareProcessing("Extract words (step 1/3)");
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
 
 			return words;
 		};
-		final Function<Set<String>, FSA> step2 = uniqueWordsSet -> {
-			resetProcessing("Create FSA (step 2/3)");
+		final Function<Set<String>, String[]> step2 = set -> {
+			resetProcessing("Sorting (step 2/4)");
 
-			//lexical order
-			final List<String> uniqueWords = new ArrayList<>(uniqueWordsSet);
-			Collections.sort(uniqueWords);
+			//sort list
+			final String[] uniqueWords = set.toArray(String[]::new);
+			SmoothSort.sort(uniqueWords, Comparator.naturalOrder(),
+				percent -> {
+					setProgress(percent, 100);
 
-//			executeReadProcessNoIndex(fsaProcessor, uniqueWords);
+					sleepOnPause();
+				});
+
+			return uniqueWords;
+		};
+		final Function<String[], FSA> step3 = list -> {
+			resetProcessing("Creating FSA (step 3/4)");
+
+			getWorkerData()
+				.withNoHeader()
+				.withSequentialProcessing();
+
+			int progress = 0;
+			int progressIndex = 0;
+			final int progressStep = (int)Math.ceil(list.length / 100.f);
+			for(int index = 0; index < list.length; index ++){
+				final byte[] encoding = StringHelper.getRawBytes(list[index]);
+				fsaProcessor.accept(encoding);
+
+				//release memory
+				list[index] = null;
+
+				if(++ progress % progressStep == 0)
+					setProgress(++ progressIndex, 100);
+
+				sleepOnPause();
+			}
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step3 = fsa -> {
-			resetProcessing("Compress FSA (step 3/3)");
+		final Function<FSA, File> step4 = fsa -> {
+			resetProcessing("Compress FSA (step 4/4)");
 
-			//FIXME
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
-				serializer.serialize(fsa, os, null);
+				serializer.serialize(fsa, os, percent -> {
+					setProgress(percent, 100);
+
+					sleepOnPause();
+				});
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
@@ -124,11 +142,36 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				return outputFile;
 			}
 			catch(final Exception e){
-				throw new RuntimeException(e);
+				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step4 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
+		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+	}
+
+	private DictionaryMetadata readMetadata(final Charset charset, final File outputFile){
+		final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
+		final File outputInfoFile = new File(filenameNoExtension + ".info");
+		if(!outputInfoFile.exists()){
+			final List<String> content = Arrays.asList(
+				"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
+				"fsa.dict.encoding=" + charset.name().toLowerCase(),
+				"fsa.dict.encoder=prefix");
+			try{
+				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e);
+			}
+		}
+
+		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
+		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
+			return DictionaryMetadata.read(is);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 	}
 
 }

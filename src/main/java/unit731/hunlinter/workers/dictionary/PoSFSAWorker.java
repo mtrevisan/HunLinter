@@ -58,6 +58,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 	public PoSFSAWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
+
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
@@ -81,11 +85,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<IndexDataPair<byte[]>> fsaProcessor = indexData -> builder.add(indexData.getData());
-
-		getWorkerData()
-			.withParallelProcessing()
-			.withCancelOnException();
+		final Consumer<byte[]> fsaProcessor = builder::add;
 
 		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/4)");
@@ -115,14 +115,18 @@ public class PoSFSAWorker extends WorkerDictionary{
 				.withNoHeader()
 				.withSequentialProcessing();
 
+			int progress = 0;
+			int progressIndex = 0;
+			final int progressStep = (int)Math.ceil(list.limit / 100.f);
 			for(int index = 0; index < list.limit; index ++){
 				final byte[] encoding = list.data[index];
-				fsaProcessor.accept(IndexDataPair.of(index, encoding));
+				fsaProcessor.accept(encoding);
 
 				//release memory
 				list.data[index] = null;
 
-				setProgress(index, list.limit);
+				if(++ progress % progressStep == 0)
+					setProgress(++ progressIndex, 100);
 
 				sleepOnPause();
 			}
