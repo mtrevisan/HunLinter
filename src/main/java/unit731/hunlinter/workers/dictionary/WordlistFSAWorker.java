@@ -60,8 +60,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 		final DictionaryMetadata metadata = readMetadata(charset, outputFile);
-		final byte separator = metadata.getSeparator();
-		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
+//		final byte separator = metadata.getSeparator();
+//		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
 		final Set<String> words = new HashSet<>();
