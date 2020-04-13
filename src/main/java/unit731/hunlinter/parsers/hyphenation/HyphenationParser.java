@@ -29,7 +29,7 @@ import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

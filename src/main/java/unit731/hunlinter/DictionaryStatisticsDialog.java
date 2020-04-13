@@ -41,7 +41,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{

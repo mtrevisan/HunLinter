@@ -1,8 +1,8 @@
-package unit731.hunlinter.services.datastructures.hong;
+package unit731.hunlinter.services.datastructures.dynamicarray;
 
 
 /**
- * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays</a>
+ * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays in optimal time and space</a>
  * @see <a href="https://github.com/LHongy/DynamicArray">DynamicArray</a>
  */
 public class DynamicArray<T>{

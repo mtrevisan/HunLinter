@@ -1,6 +1,6 @@
 package unit731.hunlinter.services.fsa;
 
-import unit731.hunlinter.services.datastructures.hong.DynamicIntArray;
+import unit731.hunlinter.services.datastructures.dynamicarray.DynamicIntArray;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

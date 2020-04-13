@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;

@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.datastructures;
 
 import org.apache.commons.lang3.ArrayUtils;
 

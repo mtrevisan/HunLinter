@@ -15,8 +15,7 @@ import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.sorters.StringList;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

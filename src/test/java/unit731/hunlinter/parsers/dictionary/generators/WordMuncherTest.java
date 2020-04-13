@@ -7,7 +7,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.File;
 import java.io.IOException;

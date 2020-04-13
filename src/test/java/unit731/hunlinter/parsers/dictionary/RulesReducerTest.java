@@ -16,8 +16,8 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.datastructures.SetHelper;
 
 
 class RulesReducerTest{

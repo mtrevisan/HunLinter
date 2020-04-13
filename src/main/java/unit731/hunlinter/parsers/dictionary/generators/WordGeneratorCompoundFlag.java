@@ -13,7 +13,7 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.PermutationsWithRepetitions;
+import unit731.hunlinter.services.text.PermutationsWithRepetitions;
 
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{

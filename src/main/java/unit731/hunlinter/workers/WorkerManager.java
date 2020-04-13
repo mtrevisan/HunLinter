@@ -6,7 +6,7 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.workers.dictionary.CompoundRulesWorker;

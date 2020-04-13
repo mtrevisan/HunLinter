@@ -1,4 +1,4 @@
-package unit731.hunlinter.services.datastructures.hong;
+package unit731.hunlinter.services.datastructures.dynamicarray;
 
 
 /**

@@ -1,4 +1,7 @@
-package unit731.hunlinter.services.sorters;
+package unit731.hunlinter.services.sorters.externalsorter;
+
+import unit731.hunlinter.services.sorters.SmoothSort;
+import unit731.hunlinter.services.sorters.SorterHelper;
 
 import java.util.Arrays;
 import java.util.Collection;

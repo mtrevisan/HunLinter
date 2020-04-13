@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.text;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;

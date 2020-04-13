@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.File;

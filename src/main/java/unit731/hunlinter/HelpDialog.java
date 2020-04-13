@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 

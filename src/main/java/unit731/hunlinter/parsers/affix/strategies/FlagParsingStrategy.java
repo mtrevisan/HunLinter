@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers.affix.strategies;
 
 import unit731.hunlinter.services.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.datastructures.SetHelper;
 
 import java.text.MessageFormat;
 import java.util.Set;

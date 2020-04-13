@@ -1,4 +1,4 @@
-package unit731.hunlinter.services;
+package unit731.hunlinter.services.system;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;

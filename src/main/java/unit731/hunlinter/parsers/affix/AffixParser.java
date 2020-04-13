@@ -25,7 +25,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.RegexHelper;
 
