@@ -34,8 +34,11 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 
 	public DictionaryInclusionTestWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing());
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
 
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(wordGenerator);

@@ -56,8 +56,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 	public MinimalPairsWorker(final String language, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator, final File outputFile){
-		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing());
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
 
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);

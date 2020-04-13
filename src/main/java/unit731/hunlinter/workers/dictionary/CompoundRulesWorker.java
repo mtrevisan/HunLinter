@@ -24,8 +24,11 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final BiConsumer<Inflection, Integer> inflectionReader, final Runnable completed){
-		super((WorkerDataParser<DictionaryParser>)new WorkerDataParser<>(WORKER_NAME, dicParser)
-			.withParallelProcessing());
+		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(inflectionReader);

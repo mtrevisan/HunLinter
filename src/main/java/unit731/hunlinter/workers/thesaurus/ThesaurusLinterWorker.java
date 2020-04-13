@@ -28,8 +28,11 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser){
-		super((WorkerDataParser<ThesaurusParser>)new WorkerDataParser<>(WORKER_NAME, theParser)
-			.withParallelProcessing());
+		super(new WorkerDataParser<>(WORKER_NAME, theParser));
+
+		getWorkerData()
+			.withParallelProcessing()
+			.withCancelOnException();
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
