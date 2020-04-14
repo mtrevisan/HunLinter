@@ -173,7 +173,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			throws IOException{
 		final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
 		if(!metadataPath.toFile().exists())
-			MetadataBuilder.create(affixData, metadataPath, charset);
+			MetadataBuilder.create(affixData, "PREFIX", metadataPath, charset);
 
 		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
 			return MetadataBuilder.read(metadataPath);

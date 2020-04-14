@@ -20,6 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 
 
+/**
+ * @see <a href="http://wiki.languagetool.org/hunspell-support>LanguageTool - Spell check</a>
+ * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
+ */
 public class MetadataBuilder{
 
 	private MetadataBuilder(){}
@@ -36,12 +40,13 @@ public class MetadataBuilder{
 		}
 	}
 
-	public static void create(final AffixData affixData, final Path outputPath, final Charset charset) throws IOException{
+	public static void create(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
+			throws IOException{
 		final List<String> content = new ArrayList<>(Arrays.asList(
 			"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 			"fsa.dict.encoding=" + charset.name().toLowerCase(),
-			"fsa.dict.encoder=prefix"));
+			"fsa.dict.encoder=" + encoder));
 		if(affixData.getLanguage() != null)
 			content.add("fsa.dict.speller.locale=" + affixData.getLanguage());
 		final String replacementPairs = affixData.getReplacementPairs();
