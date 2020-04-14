@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 /**
  * Time complexity (best/average/worst): O(n * log(n))
- * Space complaxity: O(1)
+ * Space complexity: O(1)
  *
  * @see <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a>
  */

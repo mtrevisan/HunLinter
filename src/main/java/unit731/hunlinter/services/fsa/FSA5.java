@@ -65,7 +65,7 @@ import java.util.Set;
  * gtl+1                           (gtl = gotoLength)
  * </pre>
  *
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class FSA5 extends FSA{
 

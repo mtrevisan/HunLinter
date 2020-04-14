@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 /**
  * No relative encoding at all (full target form is returned).
  *
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class NoEncoder implements SequenceEncoderInterface{
 

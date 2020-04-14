@@ -8,7 +8,6 @@ class IntBlock{
 
 
 	IntBlock(final int capacity){
-		//noinspection unchecked
 		data = new int[capacity];
 	}
 

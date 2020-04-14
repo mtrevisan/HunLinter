@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  * encoded:	BBCr
  * </pre>
  *
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 

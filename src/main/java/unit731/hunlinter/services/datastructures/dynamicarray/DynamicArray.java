@@ -48,6 +48,7 @@ public class DynamicArray<T>{
 		// and also the index of element in the Block.
 		final Location location = new Location(i);
 		// Use the blockIndex in the Location object to find the Block.
+		//noinspection unchecked
 		final Block<T> block = (Block<T>)blocks[location.block];
 		// Use the elementIndex in the Location object to find the element within the Block.
 		return block.data[location.element];
@@ -59,6 +60,7 @@ public class DynamicArray<T>{
 	// Target complexity: O(1)
 	public synchronized void set(final int index, final T x){
 		final Location location = new Location(index);
+		//noinspection unchecked
 		final Block<T> block = (Block<T>)blocks[location.block];
 		//use the elementIndex in the Location object to set the element within the Block to x
 		block.data[location.element] = x;

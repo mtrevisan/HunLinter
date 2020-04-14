@@ -76,7 +76,7 @@ public class SmoothSort{
 		//This is handy, because the exponent is the index into L[] giving the size of the rightmost heap, and because we can
 		//instantly find out if the rightmost two heaps are consecutive Leonardo numbers by checking `(pMantissa & 3) == 3`
 
-		//the bitmap of the current standard concatenation >> pshift
+		//the bitmap of the current standard concatenation >> pExponent
 		long pMantissa = 1l;
 		int pExponent = 1;
 
@@ -136,11 +136,11 @@ public class SmoothSort{
 
 				//This block gets broken into three bits.
 				//The rightmost bit is a block of length 1.
-				//The left hand part is split into two, a block of length LP[pshift+1] and one of LP[pshift].
+				//The left hand part is split into two, a block of length LP[pExponent + 1] and one of LP[pExponent].
 				//Both these two are appropriately heapified, but the root nodes are not necessarily in order. We therefore
 				//semi-trinkle both of them
 
-				//trinkle first child (head - LEONARDO_NUMBER[pshift] - 1)
+				//trinkle first child (head - LEONARDO_NUMBER[pExponent] - 1)
 				trinkle(data, pMantissa >>> 1, pExponent + 1, head - LEONARDO_NUMBER[pExponent] - 1, true, comparator);
 				//trinkle second child (head - 1)
 				trinkle(data, pMantissa, pExponent, head - 1, true, comparator);
@@ -263,7 +263,7 @@ public class SmoothSort{
 		//This is handy, because the exponent is the index into L[] giving the size of the rightmost heap, and because we can
 		//instantly find out if the rightmost two heaps are consecutive Leonardo numbers by checking `(pMantissa & 3) == 3`
 
-		//the bitmap of the current standard concatenation >> pshift
+		//the bitmap of the current standard concatenation >> pExponent
 		long pMantissa = 1l;
 		int pExponent = 1;
 
@@ -323,11 +323,11 @@ public class SmoothSort{
 
 				//This block gets broken into three bits.
 				//The rightmost bit is a block of length 1.
-				//The left hand part is split into two, a block of length LP[pshift+1] and one of LP[pshift].
+				//The left hand part is split into two, a block of length LP[pExponent + 1] and one of LP[pExponent].
 				//Both these two are appropriately heapified, but the root nodes are not necessarily in order. We therefore
 				//semi-trinkle both of them
 
-				//trinkle first child (head - LEONARDO_NUMBER[pshift] - 1)
+				//trinkle first child (head - LEONARDO_NUMBER[pExponent] - 1)
 				trinkle(data, pMantissa >>> 1, pExponent + 1, head - LEONARDO_NUMBER[pExponent] - 1, true, comparator);
 				//trinkle second child (head - 1)
 				trinkle(data, pMantissa, pExponent, head - 1, true, comparator);

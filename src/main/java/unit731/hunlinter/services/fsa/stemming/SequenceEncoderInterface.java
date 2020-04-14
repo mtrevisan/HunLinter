@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * and more repetitive (which results in higher compression rates).
  *
  * <p>See example implementation for details.
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public interface SequenceEncoderInterface{
 
