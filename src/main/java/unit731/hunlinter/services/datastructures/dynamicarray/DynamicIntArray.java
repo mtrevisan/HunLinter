@@ -23,6 +23,10 @@ public class DynamicIntArray{
 
 
 	public DynamicIntArray(){
+		clear();
+	}
+
+	public synchronized void clear(){
 		blocks = new IntBlock[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new IntBlock(1);
@@ -33,8 +37,10 @@ public class DynamicIntArray{
 		lastSuperBlock.incrementCurrentNumberOfDataBlocks();
 
 		sizeOfBlocks = 1;
+		size = 0;
 		numberOfEmptyDataBlocks = 1;
 		indexOfLastNonEmptyDataBlock = - 1;
+		indexOfLastDataBlock = 0;
 	}
 
 	// Returns the element at position i in the DynamicArray.
@@ -143,6 +149,11 @@ public class DynamicIntArray{
 		final int elem = get(size - 1);
 		remove();
 		return elem;
+	}
+
+	public synchronized void shrink(final int size){
+		while(size > size)
+			remove();
 	}
 
 	// Write a null value to the last element, shrinks the DynamicArray by one

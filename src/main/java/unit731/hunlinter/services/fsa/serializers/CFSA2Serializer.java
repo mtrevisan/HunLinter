@@ -1,13 +1,10 @@
 package unit731.hunlinter.services.fsa.serializers;
 
-import com.carrotsearch.hppc.BoundedProportionalArraySizingStrategy;
-import com.carrotsearch.hppc.IntArrayList;
 import com.carrotsearch.hppc.IntIntHashMap;
-import com.carrotsearch.hppc.IntStack;
-import com.carrotsearch.hppc.cursors.IntCursor;
 import com.carrotsearch.hppc.cursors.IntIntCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.services.datastructures.dynamicarray.DynamicIntArray;
 import unit731.hunlinter.services.fsa.CFSA2;
 import unit731.hunlinter.services.fsa.FSA;
 import unit731.hunlinter.services.fsa.FSAFlags;
@@ -98,7 +95,7 @@ public class CFSA2Serializer implements FSASerializer{
 		numbers = (serializeWithNumbers? FSAUtils.rightLanguageForAllStates(fsa): new IntIntHashMap());
 
 		//linearize all the states, optimizing their layout
-		final IntArrayList linearized = linearize(fsa);
+		final DynamicIntArray linearized = linearize(fsa);
 		if(progressCallback != null)
 			progressCallback.accept(40);
 
@@ -168,32 +165,31 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Linearization of states */
-	private IntArrayList linearize(final FSA fsa) throws IOException{
+	private DynamicIntArray linearize(final FSA fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
 		final IntIntHashMap inLinkCount = computeInlinkCount(fsa);
 
 		//ordered states for serialization
-		final IntArrayList linearized = new IntArrayList(0,
-			new BoundedProportionalArraySizingStrategy(1_000, 10_000, 1.5f));
+		final DynamicIntArray linearized = new DynamicIntArray();
 
 		//determine which states should be linearized first (at fixed positions) so as to minimize the place occupied by
 		//goto fields
 		final int[] states = computeFirstStates(inLinkCount, Integer.MAX_VALUE, 2);
 
 		//compute initial addresses, without node rearrangements
-		final int serializedSize = linearizeAndCalculateOffsets(fsa, new IntArrayList(), linearized, offsets);
+		final int serializedSize = linearizeAndCalculateOffsets(fsa, new DynamicIntArray(), linearized, offsets);
 
 		//probe for better node arrangements by selecting between [lower, upper] nodes from the potential candidate nodes list
-		final IntArrayList sublist = new IntArrayList();
-		sublist.buffer = states;
-		sublist.elementsCount = states.length;
+		final DynamicIntArray sublist = new DynamicIntArray();
+		sublist.addAll(states);
 
-		//probe the initial region a little bit, looking for optimal cut. It can't be binary search because the result isn't monotonic
+		//probe the initial region a little bit, looking for optimal cut (it can't be binary search
+		//because the result isn't monotonic)
 		LOGGER.trace("Compacting, initial output size: {}", serializedSize);
 		int cutAt = 0;
 		for(int cut = Math.min(25, states.length); cut <= Math.min(150, states.length); cut += 25){
-			sublist.elementsCount = cut;
+			sublist.shrink(cut);
 
 			final int newSize = linearizeAndCalculateOffsets(fsa, sublist, linearized, offsets);
 			LOGGER.trace("Moved {} states, output size: {}", sublist.size(), newSize);
@@ -204,7 +200,7 @@ public class CFSA2Serializer implements FSASerializer{
 		}
 
 		//cut at the calculated point and repeat linearization
-		sublist.elementsCount = cutAt;
+		sublist.shrink(cutAt);
 		final int size = linearizeAndCalculateOffsets(fsa, sublist, linearized, offsets);
 		LOGGER.trace("{} states moved, final size: {}", sublist.size(), size);
 
@@ -212,10 +208,10 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
-	private int linearizeAndCalculateOffsets(final FSA fsa, final IntArrayList states, final IntArrayList linearized,
+	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
 			final IntIntHashMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
-		final IntStack nodes = new IntStack();
+		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
 
 		//linearize states with most in-links first
@@ -234,8 +230,8 @@ public class CFSA2Serializer implements FSASerializer{
 
 		//calculate new state offsets. This is iterative. We start with maximum potential offsets and recalculate until converged
 		final int maxOffset = Integer.MAX_VALUE;
-		for(final IntCursor c : linearized)
-			offsets.put(c.value, maxOffset);
+		for(int i = 0; i < linearized.size(); i ++)
+			offsets.put(linearized.get(i), maxOffset);
 
 		int i;
 		int j = 0;
@@ -245,8 +241,8 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Add a state to linearized list */
-	private void linearizeState(final FSA fsa, final IntStack nodes, final IntArrayList linearized, final BitSet visited,
-			final int node){
+	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
+			final BitSet visited, final int node){
 		linearized.add(node);
 		visited.set(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
@@ -291,7 +287,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private IntIntHashMap computeInlinkCount(final FSA fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
 		final BitSet visited = new BitSet();
-		final IntStack nodes = new IntStack();
+		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
 
 		while(!nodes.isEmpty()){
@@ -314,7 +310,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Update arc offsets assuming the given goto length */
-	private int emitNodes(final FSA fsa, final OutputStream os, final IntArrayList linearized) throws IOException{
+	private int emitNodes(final FSA fsa, final OutputStream os, final DynamicIntArray linearized) throws IOException{
 		int offset = 0;
 
 		//add epsilon state
@@ -324,9 +320,8 @@ public class CFSA2Serializer implements FSASerializer{
 
 		boolean offsetsChanged = false;
 		final int max = linearized.size();
-		for(final IntCursor c : linearized){
-			final int state = c.value;
-			final int nextState = (c.index + 1 < max? linearized.get(c.index + 1): NO_STATE);
+		for(int index = 0, state = linearized.get(index); index < max; index ++){
+			final int nextState = (index + 1 < max? linearized.get(index + 1): NO_STATE);
 
 			if(os == null){
 				offsetsChanged |= (offsets.get(state) != offset);
@@ -338,6 +333,8 @@ public class CFSA2Serializer implements FSASerializer{
 
 			offset += emitNodeData(os, serializeWithNumbers? numbers.get(state): 0);
 			offset += emitNodeArcs(fsa, os, state, nextState);
+
+			state = nextState;
 		}
 
 		return (offsetsChanged? offset: 0);
