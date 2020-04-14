@@ -242,11 +242,9 @@ public class DictionaryEntry{
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
 		String[] list = new String[0];
-		for(int i = 0; i < morphologicalFields.length; i ++){
-			final String mf = morphologicalFields[i];
+		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
 				list = ArrayUtils.add(list, mf);
-		}
 		return list;
 	}
 
@@ -255,12 +253,13 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * @param affixData	Affix data
-	 * @param reverse	Whether the complex prefixes is used
+	 * @param affixData   Affix data
+	 * @param reverse   Whether the complex prefixes is used
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public FixedArray<String>[] extractAllAffixes(final AffixData affixData, final boolean reverse){
+	@SuppressWarnings("rawtypes")
+	public FixedArray[] extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}

@@ -42,16 +42,11 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 			return null;
 
 		final Inflection inflection = inflections.get(rowIndex);
-		switch(columnIndex){
-			case 0:
-				return inflection.getWord();
-
-			case 1:
-				return inflection.getMorphologicalFields();
-
-			default:
-				return null;
-		}
+		return switch(columnIndex){
+			case 0 -> inflection.getWord();
+			case 1 -> inflection.getMorphologicalFields();
+			default -> null;
+		};
 	}
 
 	@Override

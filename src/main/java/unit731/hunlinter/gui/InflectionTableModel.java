@@ -43,25 +43,14 @@ public class InflectionTableModel extends AbstractTableModel implements HunLinte
 			return null;
 
 		final Inflection inflection = inflections.get(rowIndex);
-		switch(columnIndex){
-			case 0:
-				return inflection.getWord();
-
-			case 1:
-				return inflection.getMorphologicalFields();
-
-			case 2:
-				return inflection.getAppliedRule(0);
-
-			case 3:
-				return inflection.getAppliedRule(1);
-
-			case 4:
-				return inflection.getAppliedRule(2);
-
-			default:
-				return null;
-		}
+		return switch(columnIndex){
+			case 0 -> inflection.getWord();
+			case 1 -> inflection.getMorphologicalFields();
+			case 2 -> inflection.getAppliedRule(0);
+			case 3 -> inflection.getAppliedRule(1);
+			case 4 -> inflection.getAppliedRule(2);
+			default -> null;
+		};
 	}
 
 	@Override

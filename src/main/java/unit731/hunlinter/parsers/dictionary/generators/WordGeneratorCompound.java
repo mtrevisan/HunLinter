@@ -115,12 +115,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					final FixedArray<String>[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					@SuppressWarnings("rawtypes")
+					final FixedArray[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					//noinspection unchecked
 					if(forbiddenWordFlag == null
 							|| !continuationFlags[Affixes.INDEX_PREFIXES].contains(forbiddenWordFlag)
 							&& !continuationFlags[Affixes.INDEX_SUFFIXES].contains(forbiddenWordFlag)
 							&& !continuationFlags[Affixes.INDEX_TERMINALS].contains(forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
+						@SuppressWarnings("unchecked")
 						final Inflection[] newInflections = generateInflections(compoundWord, compoundEntries, continuationFlags);
 						final Inflection[] subInflections = ArrayUtils.subarray(newInflections,
 							0, Math.min(limit - inflections.size(), newInflections.length));
@@ -260,6 +263,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
+	@SuppressWarnings("rawtypes")
 	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
 		final FixedArray<String>[] prefixes = compoundEntries[0]

@@ -230,6 +230,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
+		@SuppressWarnings("unchecked")
 		final AhoCorasickTrie<? super V> rhs = (AhoCorasickTrie<? super V>)obj;
 		return new EqualsBuilder()
 			.append(base, rhs.base)

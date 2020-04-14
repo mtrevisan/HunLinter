@@ -115,7 +115,7 @@ class WordGeneratorBase{
 
 	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final FixedArray<String>[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		final FixedArray[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
@@ -139,7 +139,7 @@ class WordGeneratorBase{
 	private void checkTwofoldCorrectness(final Inflection[] twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Inflection prod : twofoldInflections){
-			final FixedArray<String>[] affixes = prod.extractAllAffixes(affixData, false);
+			final FixedArray[] affixes = prod.extractAllAffixes(affixData, false);
 			final FixedArray<String> aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
 			if(!aff.isEmpty()){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);

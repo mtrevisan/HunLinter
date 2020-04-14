@@ -181,6 +181,7 @@ public class Frequency<T extends Comparable<?>>{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
+		@SuppressWarnings("unchecked")
 		final Frequency<? super T> other = (Frequency<? super T>)obj;
 		return new EqualsBuilder()
 			.append(frequencies, other.frequencies)

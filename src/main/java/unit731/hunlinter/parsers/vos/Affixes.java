@@ -23,6 +23,7 @@ public class Affixes{
 		this.terminals = terminals;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public FixedArray[] extractAllAffixes(final boolean reverseAffixes){
 		return new FixedArray[]{
 			(reverseAffixes? suffixes: prefixes),

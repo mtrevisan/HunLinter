@@ -231,17 +231,11 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 */
 	public static FSA read(final InputStream stream) throws IOException{
 		final FSAHeader header = FSAHeader.read(stream);
-		switch(header.version){
-			case FSA5.VERSION:
-				return new FSA5(stream);
-
-			case CFSA2.VERSION:
-				return new CFSA2(stream);
-
-			default:
-				throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x",
-					header.version & 0xFF));
-		}
+		return switch(header.version){
+			case FSA5.VERSION -> new FSA5(stream);
+			case CFSA2.VERSION -> new CFSA2(stream);
+			default -> throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x", header.version & 0xFF));
+		};
 	}
 
 	/**

@@ -42,16 +42,11 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 			return null;
 
 		final CorrectionEntry correction = corrections.get(rowIndex);
-		switch(columnIndex){
-			case 0:
-				return correction.getIncorrectForm();
-
-			case 1:
-				return correction.getCorrectForm();
-
-			default:
-				return null;
-		}
+		return switch(columnIndex){
+			case 0 -> correction.getIncorrectForm();
+			case 1 -> correction.getCorrectForm();
+			default -> null;
+		};
 	}
 
 	@Override
