@@ -50,7 +50,7 @@ public class ExternalSorter{
 		final long availableMemory = JavaHelper.estimateAvailableMemory();
 		final long blockSize = estimateBestSizeOfBlocks(dataLength, options, availableMemory);
 
-		final List<File> files = new ArrayList<>((int)Math.ceil(dataLength / blockSize));
+		final List<File> files = new ArrayList<>((int)Math.ceil((double)dataLength / blockSize));
 		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize())){
 			final StringList temporaryList = new StringList(5_000_000);
 			while(scanner.hasNextLine()){
@@ -149,7 +149,6 @@ public class ExternalSorter{
 	 * @param files The {@link List} of sorted {@link File}s to be merged
 	 * @param options	Sorting options
 	 * @param outputFile The output {@link File} to merge the results to
-	 * @return The number of lines sorted
 	 * @throws IOException generic IO exception
 	 */
 	private void mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
@@ -185,7 +184,6 @@ public class ExternalSorter{
 	 * @param out	The output stream where writing the data
 	 * @param options	Sorting options
 	 * @param queue	Where the data should be read
-	 * @return The number of lines sorted
 	 * @throws IOException generic IO exception
 	 */
 	private void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options,
