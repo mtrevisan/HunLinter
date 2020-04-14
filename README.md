@@ -1,7 +1,7 @@
 HunLinter
 ==========
 
-![Java-13+](https://img.shields.io/badge/java-13%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java-14+](https://img.shields.io/badge/java-14%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 <a href="https://codeclimate.com/github/mtrevisan/HunLinter/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
 
@@ -64,7 +64,7 @@ HunLinter
     10. [Sentence exceptions](#screenshots-sentence-exceptions)
     11. [Word exceptions](#screenshots-word-exceptions)
 7. [Changelog](#changelog)
-    1. [version 1.10.1](#changelog-1.10.1)
+    1. [version 2.0.0](#changelog-2.0.0)
     2. [version 1.10.0](#changelog-1.10.0)
     3. [version 1.9.1](#changelog-1.9.1)
     4. [version 1.9.0](#changelog-1.9.0)
@@ -296,18 +296,19 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
-<a name="changelog-1.10.1"></a>
-### version 1.11.0 - 20200xxx
+<a name="changelog-2.0.0"></a>
+### version 2.0.0 - 20200xxx
 - made update process stoppable
 - added a linter for thesaurus
 - added a menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
-- fixed a bug on hyphenation: when the same rule is added (with different breakpoints), the old one is lost
+- fixed a bug on hyphenation: when the same rule is being added (with different breakpoints), the old one is being lost
 - substituted charting library
 - added undo/redo capabilities on input fields
 - completely revised thread management
 - fixed a nasty memory leak
-- reduced memory footprint by ?%
-- augmented speed-up by ?%
+- reduced compiled size by ?% (? to )
+- reduced memory footprint by ?% (? to 630M)
+- augmented speed-up by ?% (? to 2m27s)
 - various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>

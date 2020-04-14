@@ -164,8 +164,8 @@
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<showDeprecation>true</showDeprecation>
-					<source>13</source>
-					<target>13</target>
+					<source>14</source>
+					<target>14</target>
 				</configuration>
 			</plugin>
 		</plugins>
