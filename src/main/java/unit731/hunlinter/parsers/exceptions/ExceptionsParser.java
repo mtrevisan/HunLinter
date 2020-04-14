@@ -103,18 +103,15 @@ public class ExceptionsParser{
 
 	public void modify(final TagChangeType changeType, final List<String> tags){
 		switch(changeType){
-			case ADD:
+			case ADD -> {
 				dictionary.addAll(tags);
 				dictionary.sort(comparator);
-				break;
-
-			case REMOVE:
-				dictionary.removeAll(tags);
-				break;
-
-			case SET:
+			}
+			case REMOVE -> dictionary.removeAll(tags);
+			case SET -> {
 				dictionary.clear();
 				dictionary.addAll(tags);
+			}
 		}
 	}
 

@@ -288,12 +288,14 @@ public class FileHelper{
 		try{
 			switch(action){
 				case OPEN:
+					//noinspection ConstantConditions
 					desktop.open((File)parameter);
 					done = true;
 					break;
 
 				case BROWSE:
 					if(DownloaderHelper.hasInternetConnectivity()){
+						//noinspection ConstantConditions
 						desktop.browse(new URI((String)parameter));
 						done = true;
 					}
@@ -301,6 +303,7 @@ public class FileHelper{
 
 				case MAIL:
 					if(DownloaderHelper.hasInternetConnectivity()){
+						//noinspection ConstantConditions
 						desktop.mail(new URI((String)parameter));
 						done = true;
 					}

@@ -48,33 +48,25 @@ public class DictionaryMetadata{
 	private static final EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES = EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
 
 	/**
-	 * A separator character between fields (stem, lemma, form). The character
-	 * must be within byte range (FSA uses bytes internally).
+	 * A separator character between fields (stem, lemma, form).
+	 * The character must be within byte range (FSA uses bytes internally).
 	 */
 	protected byte separator;
 	private char separatorChar;
 
-	/**
-	 * Encoding used for converting bytes to characters and vice versa.
-	 */
+	/** Encoding used for converting bytes to characters and vice-versa */
 	private String encoding;
 
 	private Charset charset;
 	private Locale locale = Locale.getDefault();
 
-	/**
-	 * Replacement pairs for non-obvious candidate search in a speller dictionary.
-	 */
+	/** Replacement pairs for non-obvious candidate search in a speller dictionary */
 	private Map<String, List<String>> replacementPairs = new HashMap<>();
 
-	/**
-	 * Conversion pairs for input conversion, for example to replace ligatures.
-	 */
+	/** Conversion pairs for input conversion, for example to replace ligatures */
 	private Map<String, String> inputConversion = new HashMap<>();
 
-	/**
-	 * Conversion pairs for output conversion, for example to replace ligatures.
-	 */
+	/** Conversion pairs for output conversion, for example to replace ligatures */
 	private Map<String, String> outputConversion = new HashMap<>();
 
 	/**
@@ -85,25 +77,18 @@ public class DictionaryMetadata{
 	 */
 	private Map<Character, List<Character>> equivalentChars = new HashMap<>();
 
-	/**
-	 * All attributes.
-	 */
+	/** All attributes */
 	private final EnumMap<DictionaryAttribute, String> attributes;
 
-	/**
-	 * All "enabled" boolean attributes.
-	 */
+	/** All "enabled" boolean attributes */
 	private final EnumMap<DictionaryAttribute, Boolean> boolAttributes;
 
-	/**
-	 * Sequence encoder.
-	 */
+	/** Sequence encoder */
 	private EncoderType encoderType;
 
-	/**
-	 * Expected metadata file extension.
-	 */
+	/** Expected metadata file extension */
 	public final static String METADATA_FILE_EXTENSION = "info";
+
 
 	/**
 	 * @return Return all metadata attributes.
@@ -112,7 +97,6 @@ public class DictionaryMetadata{
 		return Collections.unmodifiableMap(attributes);
 	}
 
-	// Cached attrs.
 	public String getEncoding(){ return encoding; }
 
 	public byte getSeparator(){ return separator; }
@@ -127,7 +111,6 @@ public class DictionaryMetadata{
 
 	public Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
 
-	// Dynamically fetched.
 	public boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
 
 	public boolean isIgnoringPunctuation(){ return boolAttributes.get(DictionaryAttribute.IGNORE_PUNCTUATION); }
@@ -166,75 +149,28 @@ public class DictionaryMetadata{
 
 			//run validation and conversion on all of them
 			final Object value = e.getKey().fromString(e.getValue());
+			//just run validation
 			switch(e.getKey()){
-				case ENCODING:
+				case ENCODING -> {
 					this.encoding = e.getValue();
-					if(!Charset.isSupported(encoding))
+					if(! Charset.isSupported(encoding))
 						throw new IllegalArgumentException("Encoding not supported on this JVM: " + encoding);
-
 					this.charset = (Charset)value;
-					break;
-
-				case SEPARATOR:
-					this.separatorChar = (Character)value;
-					break;
-
-				case LOCALE:
-					this.locale = (Locale)value;
-					break;
-
-				case ENCODER:
-					this.encoderType = (EncoderType)value;
-					break;
-
-				case INPUT_CONVERSION:{
-					@SuppressWarnings("unchecked")
-					Map<String, String> gvalue = (Map<String, String>)value;
-					this.inputConversion = gvalue;
 				}
-				break;
-
-				case OUTPUT_CONVERSION:{
-					@SuppressWarnings("unchecked")
-					Map<String, String> gvalue = (Map<String, String>)value;
-					this.outputConversion = gvalue;
-				}
-				break;
-
-				case REPLACEMENT_PAIRS:{
-					@SuppressWarnings("unchecked")
-					Map<String, List<String>> gvalue = (Map<String, List<String>>)value;
-					this.replacementPairs = gvalue;
-				}
-				break;
-
-				case EQUIVALENT_CHARS:{
-					@SuppressWarnings("unchecked")
-					Map<Character, List<Character>> gvalue = (Map<Character, List<Character>>)value;
-					this.equivalentChars = gvalue;
-				}
-				break;
-
-				case IGNORE_PUNCTUATION:
-				case IGNORE_NUMBERS:
-				case IGNORE_CAMEL_CASE:
-				case IGNORE_ALL_UPPERCASE:
-				case IGNORE_DIACRITICS:
-				case CONVERT_CASE:
-				case RUN_ON_WORDS:
-				case FREQUENCY_INCLUDED:
-					this.boolAttributes.put(e.getKey(), (Boolean)value);
-					break;
-
-				case AUTHOR:
-				case LICENSE:
-				case CREATION_DATE:
-					//just run validation
-					e.getKey().fromString(e.getValue());
-					break;
-
-				default:
-					throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());
+				case SEPARATOR -> this.separatorChar = (Character)value;
+				case LOCALE -> this.locale = (Locale)value;
+				case ENCODER -> this.encoderType = (EncoderType)value;
+				case INPUT_CONVERSION -> //noinspection unchecked
+					this.inputConversion = (Map<String, String>)value;
+				case OUTPUT_CONVERSION -> //noinspection unchecked
+					this.outputConversion = (Map<String, String>)value;
+				case REPLACEMENT_PAIRS -> //noinspection unchecked
+					this.replacementPairs = (Map<String, List<String>>)value;
+				case EQUIVALENT_CHARS -> //noinspection unchecked
+					this.equivalentChars = (Map<Character, List<Character>>)value;
+				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> this.boolAttributes.put(e.getKey(), (Boolean)value);
+				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
+				default -> throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());
 			}
 		}
 

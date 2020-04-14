@@ -266,8 +266,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	@SuppressWarnings("rawtypes")
 	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
+		//noinspection unchecked
 		final FixedArray<String>[] prefixes = compoundEntries[0]
 			.extractAllAffixes(affixData, false);
+		//noinspection unchecked
 		final FixedArray<String>[] suffixes = compoundEntries[compoundEntries.length - 1]
 			.extractAllAffixes(affixData, false);
 		final FixedArray<String> terminals = new FixedArray<>(String.class, prefixes.length + suffixes.length);

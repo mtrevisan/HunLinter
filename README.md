@@ -306,9 +306,9 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - added undo/redo capabilities on input fields
 - completely revised thread management
 - fixed a nasty memory leak
-- reduced compiled size by 47.8% (from 6 201 344 B to 2 961 408 B)
-- reduced memory footprint by 13.5% (for dictionary linter: from 728 MB to 630 MB)
-- increased speed-up by 51.7% (for dictionary linter: from 4m 44s to 2m 27s)
+- reduced compiled size by 48% (from 6 201 344 B to 2 961 408 B)
+- reduced memory footprint by 14% (for dictionary linter: from 728 MB to 630 MB)
+- increased speed by 52% (for dictionary linter: from 4m 44s to 2m 27s)
 - various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>

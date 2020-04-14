@@ -51,16 +51,11 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			return null;
 
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
-		switch(columnIndex){
-			case 0:
-				return thesaurus.getDefinition();
-
-			case 1:
-				return TAG.format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
-
-			default:
-				return null;
-		}
+		return switch(columnIndex){
+			case 0 -> thesaurus.getDefinition();
+			case 1 -> TAG.format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
+			default -> null;
+		};
 	}
 
 	@Override

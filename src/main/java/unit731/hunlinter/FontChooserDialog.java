@@ -228,15 +228,15 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	private void familyNameTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_familyNameTextFieldKeyReleased
 		int index = familyNameList.getSelectedIndex();
 		switch(evt.getKeyCode()){
-			case KeyEvent.VK_UP:
+			case KeyEvent.VK_UP -> {
 				index --;
 				familyNameList.setSelectedIndex(Math.max(index, 0));
-				break;
-
-			case KeyEvent.VK_DOWN:
+			}
+			case KeyEvent.VK_DOWN -> {
 				index ++;
 				final int listSize = familyNameList.getModel().getSize();
 				familyNameList.setSelectedIndex(index < listSize? index: listSize - 1);
+			}
 		}
 	}//GEN-LAST:event_familyNameTextFieldKeyReleased
 

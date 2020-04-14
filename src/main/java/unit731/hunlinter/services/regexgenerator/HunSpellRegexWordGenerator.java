@@ -76,28 +76,23 @@ public class HunSpellRegexWordGenerator{
 			final int operatorIndex = i + offset + 1;
 			final char next = (operatorIndex < size && regexpParts[operatorIndex].length() == 1?
 				regexpParts[operatorIndex].charAt(0): 0);
+			//zero or more
+			//skip operator
+			//zero or one
+			//skip operator
+			//one
 			switch(next){
-				//zero or more
-				case '*':
+				case '*' -> {
 					graph.addEdge(i, i + 1);
 					graph.addEdge(i, i, regexpParts[operatorIndex - 1]);
-
-					//skip operator
 					offset ++;
-					break;
-
-				//zero or one
-				case '?':
+				}
+				case '?' -> {
 					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
 					graph.addEdge(i, i + 1);
-
-					//skip operator
 					offset ++;
-					break;
-
-				default:
-					//one
-					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
+				}
+				default -> graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
 			}
 		}
 
