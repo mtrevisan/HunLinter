@@ -306,9 +306,9 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - added undo/redo capabilities on input fields
 - completely revised thread management
 - fixed a nasty memory leak
-- reduced compiled size by ?% (? to 2 961 408 B)
-- reduced memory footprint by ?% (? to 630M)
-- augmented speed-up by ?% (? to 2m27s)
+- reduced compiled size by ?% (from 6 201 344 B to 2 961 408 B)
+- reduced memory footprint by ?% (from 728 MB to 630 MB)
+- augmented speed-up by ?% (from 4m 44s to 2m 27s)
 - various minor bugfixes and code revisions
 
 <a name="changelog-1.10.0"></a>
