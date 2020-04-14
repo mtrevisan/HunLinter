@@ -9,7 +9,7 @@ import java.util.function.Consumer;
  * https://github.com/ChrisKitching/JavaExternalSort/blob/master/src/uk/ac/cam/cdk23/fjava/tick0/SmoothSort.java
  * https://github.com/molgenis/systemsgenetics/blob/master/genetica-libraries/src/main/java/umcg/genetica/util/SmoothSort.java
  * @see <a href="https://www.keithschwarz.com/smoothsort/">Smoothsort Demystified</a>
- * @see <a href="https://www.keithschwarz.com/interesting/code/?dir=smoothsort>Smoothsort Demystified - source code</a>
+ * @see <a href="https://www.keithschwarz.com/interesting/code/?dir=smoothsort">Smoothsort Demystified - source code</a>
  * https://code.google.com/archive/p/combsortcs2p-and-other-sorting-algorithms/wikis/SmoothSort.wiki
  */
 public class SmoothSort{

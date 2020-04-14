@@ -10,12 +10,12 @@ public class SorterHelper{
 
 	private SorterHelper(){}
 
-	/** Assume the array is already sorted! */
+	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array){
 		return removeDuplicates(array, 0, array.length);
 	}
 
-	/** Assume the array is already sorted! */
+	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array, final int low, final int high){
 		//fetch all the duplicates
 		final Set<T> set = new HashSet<>();

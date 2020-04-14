@@ -122,7 +122,11 @@ public class FixedArray<T> implements Iterable<T>{
 		return (limit == 0);
 	}
 
-	/** NOTE: this method should NOT be called at all because it is inefficient */
+	/**
+	 * NOTE: this method should NOT be called at all because it is inefficient
+	 *
+	 * @return	A copy of the array
+	 */
 	public synchronized T[] extractCopyOrNull(){
 		if(isEmpty())
 			return null;

@@ -21,7 +21,7 @@ import java.util.List;
 
 
 /**
- * @see <a href="http://wiki.languagetool.org/hunspell-support>LanguageTool - Spell check</a>
+ * @see <a href="http://wiki.languagetool.org/hunspell-support">LanguageTool - Spell check</a>
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
  */
 public class MetadataBuilder{
