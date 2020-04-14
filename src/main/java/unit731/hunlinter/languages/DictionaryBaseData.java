@@ -1,6 +1,6 @@
 package unit731.hunlinter.languages;
 
-import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 
 
 public class DictionaryBaseData extends BloomFilterParameters{

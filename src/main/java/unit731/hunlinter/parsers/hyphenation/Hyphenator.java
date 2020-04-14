@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.collections.ahocorasicktrie.dtos.SearchResult;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.system.LoopHelper;
 

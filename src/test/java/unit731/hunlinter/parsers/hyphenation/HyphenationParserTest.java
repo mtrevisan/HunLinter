@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunlinter.services.RegexHelper;
 
 

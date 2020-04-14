@@ -1,7 +1,7 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.ArrayUtils;
-import unit731.hunlinter.services.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.FixedArray;
 
 import java.util.Arrays;
 import java.util.Collection;

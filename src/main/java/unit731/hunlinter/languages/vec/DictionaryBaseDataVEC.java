@@ -1,6 +1,6 @@
 package unit731.hunlinter.languages.vec;
 
-import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 
 
 public class DictionaryBaseDataVEC extends BloomFilterParameters{

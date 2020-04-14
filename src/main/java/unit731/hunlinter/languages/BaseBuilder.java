@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
-import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import unit731.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunlinter.languages.vec.OrthographyVEC;

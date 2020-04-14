@@ -32,7 +32,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.allMatch;

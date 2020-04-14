@@ -16,7 +16,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.services.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 

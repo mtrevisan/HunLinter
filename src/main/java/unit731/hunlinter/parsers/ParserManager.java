@@ -2,7 +2,7 @@ package unit731.hunlinter.parsers;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.interfaces.HunLintable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
