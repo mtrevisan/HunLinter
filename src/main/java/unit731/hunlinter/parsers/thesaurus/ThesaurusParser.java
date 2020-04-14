@@ -245,7 +245,7 @@ public class ThesaurusParser{
 			indexWriter.write(NEW_LINE);
 			//save charset
 			dataWriter.write(charset.name());
-			indexWriter.write(NEW_LINE);
+			dataWriter.write(NEW_LINE);
 			//save data
 			int idx = charset.name().length() + 1;
 			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();

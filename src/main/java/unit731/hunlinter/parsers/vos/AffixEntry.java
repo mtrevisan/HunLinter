@@ -222,8 +222,7 @@ public class AffixEntry{
 	}
 
 	public boolean canApplyTo(final String word){
-		final int conditionLength = condition.length();
-		if(conditionLength == 1 && condition.charAt(0) == '.')
+		if(condition.length() == 1 && condition.charAt(0) == '.')
 			return true;
 
 		return (parent.getType() == AffixType.PREFIX?
@@ -232,55 +231,55 @@ public class AffixEntry{
 	}
 
 	private boolean canApplyToPrefix(final String word){
-		final int wordLength = word.length();
-		final int conditionLength = condition.length();
-		if(wordLength >= conditionLength && word.startsWith(condition))
+		if(word.startsWith(condition))
 			return true;
 
+		final char[] wrd = word.toCharArray();
+		final char[] cond = condition.toCharArray();
 		int i, j;
-		for(i = 0, j = 0; i < wordLength && j < conditionLength; i ++, j ++){
-			if(condition.charAt(j) == '['){
-				final boolean neg = (condition.charAt(j + 1) == '^');
+		for(i = 0, j = 0; i < wrd.length && j < cond.length; i ++, j ++){
+			if(cond[j] == '['){
+				final boolean neg = (cond[j + 1] == '^');
 				boolean in = false;
 				do{
 					j ++;
 					//noinspection IfStatementMissingBreakInLoop
-					if(word.charAt(i) == condition.charAt(j))
+					if(wrd[i] == cond[j])
 						in = true;
-				}while(j < conditionLength - 1 && condition.charAt(j) != ']');
-				if(neg == in || j == conditionLength - 1 && condition.charAt(j) != ']')
+				}while(j < cond.length - 1 && cond[j] != ']');
+				if(neg == in || j == cond.length - 1 && cond[j] != ']')
 					return false;
 			}
-			else if(condition.charAt(j) != word.charAt(i))
+			else if(cond[j] != wrd[i])
 				return false;
 		}
-		return (j >= conditionLength);
+		return (j >= cond.length);
 	}
 
 	private boolean canApplyToSuffix(final String word){
-		final int wordLength = word.length();
-		final int conditionLength = condition.length();
-		if(wordLength >= conditionLength && word.endsWith(condition))
+		if(word.endsWith(condition))
 			return true;
 
+		final char[] wrd = word.toCharArray();
+		final char[] cond = condition.toCharArray();
 		int i, j;
-		for(i = wordLength - 1, j = conditionLength - 1; i >= 0 && j >= 0; i --, j --){
-			if(condition.charAt(j) == ']'){
+		for(i = wrd.length - 1, j = cond.length - 1; i >= 0 && j >= 0; i --, j --){
+			if(cond[j] == ']'){
 				boolean in = false;
 				do{
 					j --;
 					//noinspection IfStatementMissingBreakInLoop
-					if(word.charAt(i) == condition.charAt(j))
+					if(wrd[i] == cond[j])
 						in = true;
-				}while(j > 0 && condition.charAt(j) != '[');
-				if(j == 0 && condition.charAt(j) != '[')
+				}while(j > 0 && cond[j] != '[');
+				if(j == 0 && cond[j] != '[')
 					return false;
 
-				final boolean neg = (condition.charAt(j + 1) == '^');
+				final boolean neg = (cond[j + 1] == '^');
 				if(neg == in)
 					return false;
 			}
-			else if(condition.charAt(j) != word.charAt(i))
+			else if(cond[j] != wrd[i])
 				return false;
 		}
 		return (j < 0);
