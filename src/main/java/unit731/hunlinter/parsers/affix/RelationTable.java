@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.affix;
 
-import com.beust.jcommander.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -26,7 +25,7 @@ public class RelationTable{
 
 	//TODO
 	//aß(ss) > a, ß, ss
-	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\()(?![^\\(]+\\))");
+	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\()(?![^\\(]*\\))");
 
 
 	private final AffixOption affixOption;
@@ -79,7 +78,7 @@ public class RelationTable{
 
 	public String extractAsList(){
 		return table.stream()
-			.map(list -> Strings.join(StringUtils.SPACE, list))
+			.map(list -> String.join(StringUtils.SPACE, list))
 			.collect(Collectors.joining(", "));
 	}
 
