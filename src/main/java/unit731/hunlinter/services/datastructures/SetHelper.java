@@ -212,9 +212,9 @@ public class SetHelper{
 		return union;
 	}
 
-	public static <K extends Enum, V> Map<K, List<V>> bucket(final V[] entries, final Function<V, K> keyMapper,
-			final Class<K> enumClass){
-		final Map<K, List<V>> bucket = new EnumMap<>(enumClass);
+	public static <K extends Enum<K>, V> Map<K, List<V>> bucket(final V[] entries, final Function<V, K> keyMapper,
+		final Class<K> enumClass){
+		final EnumMap<K, List<V>> bucket = new EnumMap<>(enumClass);
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			if(key != null)
@@ -236,7 +236,7 @@ public class SetHelper{
 	}
 
 	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper,
-			final BiConsumer<V, V> mergeFunction){
+		final BiConsumer<V, V> mergeFunction){
 		final Map<K, V> compaction = new HashMap<>();
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
