@@ -43,6 +43,11 @@ public class CFSA2Serializer implements FSASerializer{
 	/** No-state id */
 	private final static int NO_STATE = -1;
 
+	private static final Comparator<IntIntHolder> COMPARATOR = (o1, o2) -> {
+		final int countDiff = o2.b - o1.b;
+		return (countDiff == 0? o1.a - o2.a: countDiff);
+	};
+
 
 	/**
 	 * <code>true</code> if we should serialize with numbers.
@@ -140,11 +145,7 @@ public class CFSA2Serializer implements FSASerializer{
 		});
 
 		//order by descending frequency of counts and increasing label value
-		final Comparator<IntIntHolder> comparator = (o1, o2) -> {
-			final int countDiff = o2.b - o1.b;
-			return (countDiff == 0? o1.a - o2.a: countDiff);
-		};
-		final TreeSet<IntIntHolder> labelAndCount = new TreeSet<>(comparator);
+		final TreeSet<IntIntHolder> labelAndCount = new TreeSet<>(COMPARATOR);
 		for(int label = 0; label < countByValue.length; label ++)
 			if(countByValue[label] > 0)
 				labelAndCount.add(new IntIntHolder(label, countByValue[label]));
@@ -169,7 +170,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private DynamicIntArray linearize(final FSA fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
-		final IntIntHashMap inLinkCount = computeInlinkCount(fsa);
+		final IntIntHashMap inLinkCount = computeInLinkCount(fsa);
 
 		//ordered states for serialization
 		final DynamicIntArray linearized = new DynamicIntArray();
@@ -256,19 +257,14 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length */
 	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInlinkCount){
-		final Comparator<IntIntHolder> comparator = (o1, o2) -> {
-			final int v = o1.a - o2.a;
-			return (v == 0? o1.b - o2.b: v);
-		};
-
-		final PriorityQueue<IntIntHolder> stateInlink = new PriorityQueue<>(1, comparator);
+		final PriorityQueue<IntIntHolder> stateInlink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
 		for(final IntIntCursor c : inLinkCount)
 			if(c.value > minInlinkCount){
 				scratch.a = c.value;
 				scratch.b = c.key;
 
-				if(stateInlink.size() < maxStates || comparator.compare(scratch, stateInlink.peek()) > 0){
+				if(stateInlink.size() < maxStates || COMPARATOR.compare(scratch, stateInlink.peek()) > 0){
 					stateInlink.add(new IntIntHolder(c.value, c.key));
 					if(stateInlink.size() > maxStates)
 						stateInlink.remove();
@@ -285,7 +281,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute in-link count for each state */
-	private IntIntHashMap computeInlinkCount(final FSA fsa){
+	private IntIntHashMap computeInLinkCount(final FSA fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
