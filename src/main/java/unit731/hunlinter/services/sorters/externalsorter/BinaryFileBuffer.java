@@ -1,7 +1,6 @@
 package unit731.hunlinter.services.sorters.externalsorter;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -26,7 +25,7 @@ class BinaryFileBuffer implements Closeable{
 	}
 
 	@Override
-	public void close() throws IOException{
+	public void close(){
 		scanner.close();
 	}
 

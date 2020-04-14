@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 
 /**
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class BufferUtils{
 
@@ -125,7 +125,7 @@ public class BufferUtils{
 
 		//this should be guaranteed by ensuring max. capacity
 		//assert cr.isUnderflow();
-		cr = decoder.flush(chars);
+		decoder.flush(chars);
 		//assert cr.isUnderflow();
 
 		chars.flip();
@@ -157,7 +157,7 @@ public class BufferUtils{
 		}
 
 		//assert cr.isUnderflow();  // This should be guaranteed by ensuring max. capacity.
-		cr = encoder.flush(bytes);
+		encoder.flush(bytes);
 		//assert cr.isUnderflow();
 
 		bytes.flip();

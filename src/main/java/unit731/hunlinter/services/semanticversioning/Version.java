@@ -22,8 +22,8 @@ public class Version implements Comparable<Version>{
 	private final Integer major;
 	private final Integer minor;
 	private final Integer patch;
-	private String[] preRelease;
-	private String[] build;
+	private final String[] preRelease;
+	private final String[] build;
 
 
 	/**

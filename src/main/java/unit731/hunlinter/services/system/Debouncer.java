@@ -2,7 +2,6 @@ package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.parsers.vos.RuleEntry;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -96,6 +95,7 @@ public class Debouncer<T>{
 			if(obj == null || obj.getClass() != getClass())
 				return false;
 
+			@SuppressWarnings("unchecked")
 			final TimerTask rhs = (TimerTask)obj;
 			return new EqualsBuilder()
 				.append(key, rhs.key)

@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
  * An iterator that traverses the right language of a given node (all sequences
  * reachable from a given node).
  *
- * @see "org.carrot2.morfologik-parent, 2.1.8-SNAPSHOT, 2020-01-02"
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
@@ -90,18 +90,17 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 */
 	@Override
 	public ByteBuffer next(){
+		final ByteBuffer cache;
 		if(nextElement != null){
-			final ByteBuffer cache = nextElement;
+			cache = nextElement;
 			nextElement = null;
-			return cache;
 		}
 		else{
-			final ByteBuffer cache = advance();
+			cache = advance();
 			if(cache == null)
 				throw new NoSuchElementException();
-
-			return cache;
 		}
+		return cache;
 	}
 
 	/** Advances to the next available final state. */
