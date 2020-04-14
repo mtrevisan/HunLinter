@@ -239,19 +239,21 @@ public class AffixEntry{
 		int i, j;
 		for(i = 0, j = 0; i < wrd.length && j < cond.length; i ++, j ++){
 			if(cond[j] == '['){
+				//search inside group
 				final boolean neg = (cond[j + 1] == '^');
 				boolean in = false;
 				do{
 					j ++;
 					//noinspection IfStatementMissingBreakInLoop
-					if(wrd[i] == cond[j])
+					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j < cond.length - 1 && cond[j] != ']');
+				//cope with negation inside group
 				if(neg == in || j == cond.length - 1 && cond[j] != ']')
-					return false;
+					break;
 			}
 			else if(cond[j] != wrd[i])
-				return false;
+				break;
 		}
 		return (j >= cond.length);
 	}
@@ -265,22 +267,24 @@ public class AffixEntry{
 		int i, j;
 		for(i = wrd.length - 1, j = cond.length - 1; i >= 0 && j >= 0; i --, j --){
 			if(cond[j] == ']'){
+				//search inside group
 				boolean in = false;
 				do{
 					j --;
 					//noinspection IfStatementMissingBreakInLoop
-					if(wrd[i] == cond[j])
+					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j > 0 && cond[j] != '[');
 				if(j == 0 && cond[j] != '[')
-					return false;
+					break;
 
+				//cope with negation inside group
 				final boolean neg = (cond[j + 1] == '^');
 				if(neg == in)
-					return false;
+					break;
 			}
 			else if(cond[j] != wrd[i])
-				return false;
+				break;
 		}
 		return (j < 0);
 	}
