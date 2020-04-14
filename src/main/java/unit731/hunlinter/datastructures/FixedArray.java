@@ -87,30 +87,42 @@ public class FixedArray<T> implements Iterable<T>{
 	}
 
 	public synchronized int indexOf(final T elem, final int startIndex){
-		if(elem == null){
-			for(int i = startIndex; i < data.length; i ++)
-				if(data[i] == null)
-					return i;
-		}
-		else{
-			for(int i = startIndex; i < data.length; i ++)
-				if(elem.equals(data[i]))
-					return i;
-		}
+		return (elem != null?
+			indexOfNonNull(elem, startIndex):
+			indexOfNull(startIndex));
+	}
+
+	private int indexOfNull(final int startIndex){
+		for(int i = startIndex; i < data.length; i ++)
+			if(data[i] == null)
+				return i;
+		return -1;
+	}
+
+	private int indexOfNonNull(final T elem, final int startIndex){
+		for(int i = startIndex; i < data.length; i ++)
+			if(elem.equals(data[i]))
+				return i;
 		return -1;
 	}
 
 	public synchronized int lastIndexOf(final T elem, final int startIndex){
-		if(elem == null){
-			for(int i = startIndex - 1; i >= 0; i --)
-				if(data[i] == null)
-					return i;
-		}
-		else{
-			for(int i = startIndex - 1; i >= 0; i --)
-				if(elem.equals(data[i]))
-					return i;
-		}
+		return (elem != null?
+			lastIndexOfNonNull(elem, startIndex):
+			lastIndexOfNull(startIndex));
+	}
+
+	private int lastIndexOfNull(final int startIndex){
+		for(int i = startIndex - 1; i >= 0; i --)
+			if(data[i] == null)
+				return i;
+		return -1;
+	}
+
+	private int lastIndexOfNonNull(final T elem, final int startIndex){
+		for(int i = startIndex - 1; i >= 0; i --)
+			if(elem.equals(data[i]))
+				return i;
 		return -1;
 	}
 
