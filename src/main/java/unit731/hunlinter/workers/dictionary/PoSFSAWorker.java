@@ -1,7 +1,5 @@
 package unit731.hunlinter.workers.dictionary;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -12,7 +10,7 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.enums.PartOfSpeechTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.fsa.builders.MetadataBuilder;
 import unit731.hunlinter.services.datastructures.SetHelper;
 import unit731.hunlinter.services.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.services.fsa.FSA;
@@ -33,15 +31,12 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,7 +69,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 		final Charset charset = dicParser.getCharset();
-		final DictionaryMetadata metadata = readMetadata(affixData, charset, outputFile);
+		final DictionaryMetadata metadata;
+		try{
+			metadata = readMetadata(affixData, outputFile, charset);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
 		final byte separator = metadata.getSeparator();
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
@@ -168,41 +169,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
-	private DictionaryMetadata readMetadata(final AffixData affixData, final Charset charset, final File outputFile){
-		final String filenameNoExtension = FilenameUtils.removeExtension(outputFile.getAbsolutePath());
-		final File outputInfoFile = new File(filenameNoExtension + ".info");
-		if(!outputInfoFile.exists()){
-			final List<String> content = new ArrayList<>(Arrays.asList(
-				"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
-				"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
-				"fsa.dict.encoding=" + charset.name().toLowerCase(),
-				"fsa.dict.encoder=prefix"));
-			if(affixData.getLanguage() != null)
-				content.add("fsa.dict.speller.locale=" + affixData.getLanguage());
-			final String replacementPairs = affixData.getReplacementPairs();
-			if(replacementPairs != null)
-				content.add("fsa.dict.speller.replacement-pairs=" + replacementPairs);
-			final String equivalentChars = affixData.getEquivalentChars();
-			if(equivalentChars != null)
-				content.add("fsa.dict.speller.equivalent-chars=" + equivalentChars);
-			final String inputConversions = affixData.getInputConversions();
-			if(inputConversions != null)
-				content.add("fsa.dict.input-conversion=" + inputConversions);
+	private DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)
+			throws IOException{
+		final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
+		if(!metadataPath.toFile().exists())
+			MetadataBuilder.create(affixData, metadataPath, charset);
 
-			try{
-				FileHelper.saveFile(outputInfoFile.toPath(), StringUtils.CR, charset, content);
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
-		}
-
-		final Path metadataPath = DictionaryMetadata.getExpectedMetadataLocation(outputFile.toPath());
 		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
-			return DictionaryMetadata.read(is);
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+			return MetadataBuilder.read(metadataPath);
 		}
 	}
 
