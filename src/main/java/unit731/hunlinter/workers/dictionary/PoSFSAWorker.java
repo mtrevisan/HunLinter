@@ -193,44 +193,45 @@ public class PoSFSAWorker extends WorkerDictionary{
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
-			final String word = inflection.getWord();
 
 			//extract Part-of-Speech
 			final List<String> pos = bucket.get(MorphologicalTag.PART_OF_SPEECH);
 			if(pos == null || pos.size() != 1)
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
+
+			final String word = inflection.getWord();
+			final byte[] inflectedWord = StringHelper.getRawBytes(word);
+			target = BufferUtils.clearAndEnsureCapacity(target, inflectedWord.length);
+			target.put(inflectedWord);
+			target.flip();
+
 			//extract stem
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);
 			final byte[][] encodedStems = new byte[stems.size()][];
+
+			//extract Inflection
+			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
+			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
+			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
+			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
+			if(suffixInflection != null)
+				for(final String code : suffixInflection)
+					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+						tag.put(POS_FSA_TAG_SEPARATOR)
+							.put(StringHelper.getRawBytes(t));
+			if(prefixInflection != null)
+				for(final String code : prefixInflection)
+					for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
+						tag.put(POS_FSA_TAG_SEPARATOR)
+							.put(StringHelper.getRawBytes(t));
+			tag.flip();
+
 			int position = 0;
 			for(final String stem : stems){
 				final byte[] inflectionStem = StringHelper.getRawBytes(stem);
 				source = BufferUtils.clearAndEnsureCapacity(source, inflectionStem.length - 3);
 				source.put(inflectionStem, 3, inflectionStem.length - 3);
 				source.flip();
-
-				final byte[] inflectedWord = StringHelper.getRawBytes(word);
-				target = BufferUtils.clearAndEnsureCapacity(target, inflectedWord.length);
-				target.put(inflectedWord);
-				target.flip();
-
-				//extract Inflection
-				final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
-				final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
-
-				tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
-				tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
-				if(suffixInflection != null)
-					for(final String code : suffixInflection)
-						for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
-							tag.put(POS_FSA_TAG_SEPARATOR)
-								.put(StringHelper.getRawBytes(t));
-				if(prefixInflection != null)
-					for(final String code : prefixInflection)
-						for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
-							tag.put(POS_FSA_TAG_SEPARATOR)
-								.put(StringHelper.getRawBytes(t));
-				tag.flip();
 
 
 				encoded = sequenceEncoder.encode(target, source, encoded);

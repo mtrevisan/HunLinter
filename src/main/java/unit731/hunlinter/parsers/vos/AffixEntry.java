@@ -101,7 +101,7 @@ public class AffixEntry{
 			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type}));
 		if(!parentFlag.equals(flag))
 			throw new LinterException(WRONG_FLAG.format(new Object[]{parentFlag, flag}));
-		if(removing.length() > 0){
+		if(!removing.isEmpty()){
 			if(parentType == AffixType.SUFFIX){
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
@@ -226,55 +226,64 @@ public class AffixEntry{
 		if(conditionLength == 1 && condition.charAt(0) == '.')
 			return true;
 
+		return (parent.getType() == AffixType.PREFIX?
+			canApplyToPrefix(word):
+			canApplyToSuffix(word));
+	}
+
+	private boolean canApplyToPrefix(final String word){
 		final int wordLength = word.length();
-		if(parent.getType() == AffixType.PREFIX){
-			if(wordLength >= conditionLength && word.startsWith(condition))
-				return true;
+		final int conditionLength = condition.length();
+		if(wordLength >= conditionLength && word.startsWith(condition))
+			return true;
 
-			int i, j;
-			for(i = 0, j = 0; i < wordLength && j < conditionLength; i ++, j ++){
-				if(condition.charAt(j) == '['){
-					final boolean neg = (condition.charAt(j + 1) == '^');
-					boolean in = false;
-					do{
-						j ++;
-						//noinspection IfStatementMissingBreakInLoop
-						if(word.charAt(i) == condition.charAt(j))
-							in = true;
-					}while(j < conditionLength - 1 && condition.charAt(j) != ']');
-					if(neg == in || j == conditionLength - 1 && condition.charAt(j) != ']')
-						return false;
-				}
-				else if(condition.charAt(j) != word.charAt(i))
+		int i, j;
+		for(i = 0, j = 0; i < wordLength && j < conditionLength; i ++, j ++){
+			if(condition.charAt(j) == '['){
+				final boolean neg = (condition.charAt(j + 1) == '^');
+				boolean in = false;
+				do{
+					j ++;
+					//noinspection IfStatementMissingBreakInLoop
+					if(word.charAt(i) == condition.charAt(j))
+						in = true;
+				}while(j < conditionLength - 1 && condition.charAt(j) != ']');
+				if(neg == in || j == conditionLength - 1 && condition.charAt(j) != ']')
 					return false;
 			}
-			return (j >= conditionLength);
+			else if(condition.charAt(j) != word.charAt(i))
+				return false;
 		}
-		else{
-			if(wordLength >= conditionLength && word.endsWith(condition))
-				return true;
+		return (j >= conditionLength);
+	}
 
-			int i, j;
-			for(i = wordLength - 1, j = conditionLength - 1; i >= 0 && j >= 0; i --, j --){
-				if(condition.charAt(j) == ']'){
-					boolean in = false;
-					do{
-						j --;
-						//noinspection IfStatementMissingBreakInLoop
-						if(word.charAt(i) == condition.charAt(j))
-							in = true;
-					}while(j > 0 && condition.charAt(j) != '[');
-					if(j == 0 && condition.charAt(j) != '[')
-						return false;
-					final boolean neg = (condition.charAt(j + 1) == '^');
-					if(neg == in)
-						return false;
-				}
-				else if(condition.charAt(j) != word.charAt(i))
+	private boolean canApplyToSuffix(final String word){
+		final int wordLength = word.length();
+		final int conditionLength = condition.length();
+		if(wordLength >= conditionLength && word.endsWith(condition))
+			return true;
+
+		int i, j;
+		for(i = wordLength - 1, j = conditionLength - 1; i >= 0 && j >= 0; i --, j --){
+			if(condition.charAt(j) == ']'){
+				boolean in = false;
+				do{
+					j --;
+					//noinspection IfStatementMissingBreakInLoop
+					if(word.charAt(i) == condition.charAt(j))
+						in = true;
+				}while(j > 0 && condition.charAt(j) != '[');
+				if(j == 0 && condition.charAt(j) != '[')
+					return false;
+
+				final boolean neg = (condition.charAt(j + 1) == '^');
+				if(neg == in)
 					return false;
 			}
-			return (j < 0);
+			else if(condition.charAt(j) != word.charAt(i))
+				return false;
 		}
+		return (j < 0);
 	}
 
 	public boolean canInverseApplyTo(final String word){
