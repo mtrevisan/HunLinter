@@ -113,6 +113,7 @@ public class LoopHelper{
 		indices[0] = index;
 
 		int count;
+		//noinspection StatementWithEmptyBody
 		for(count = 1; (index = indexOf(array, filter, indices[count - 1] + 1)) != -1; indices[count ++] = index){}
 
 		return ArrayUtils.removeAll(array, Arrays.copyOf(indices, count));

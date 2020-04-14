@@ -110,7 +110,6 @@ public class SorterWorker extends WorkerDictionary{
 				accessor.write(line.getBytes(charset));
 				accessor.write(NEW_LINE);
 			}
-			accessor.close();
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

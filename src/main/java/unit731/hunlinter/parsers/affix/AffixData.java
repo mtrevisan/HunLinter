@@ -217,8 +217,8 @@ public class AffixData{
 
 	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
 		int limit = 0;
-		final AffixEntry[] list = new AffixEntry[entries.length];
 		final int size = (entries != null? entries.length: 0);
+		final AffixEntry[] list = new AffixEntry[size];
 		for(int i = 0; i < size; i ++){
 			final AffixEntry entry = entries[i];
 			if(entry.canApplyTo(word))

@@ -13,7 +13,7 @@ public class DynamicIntArray{
 	//number of Blocks in `blocks`
 	private int sizeOfBlocks;
 	//number of elements in DynamicArray
-	private int size;
+	private volatile int size;
 	private int numberOfEmptyDataBlocks;
 	private int indexOfLastNonEmptyDataBlock;
 	private int indexOfLastDataBlock;
@@ -151,8 +151,8 @@ public class DynamicIntArray{
 		return elem;
 	}
 
-	public synchronized void shrink(final int size){
-		while(size > size)
+	public synchronized void shrink(final int newSize){
+		while(size > newSize)
 			remove();
 	}
 

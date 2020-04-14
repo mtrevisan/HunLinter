@@ -260,7 +260,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	private FixedArray<String>[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
+	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
 		final FixedArray<String>[] prefixes = compoundEntries[0]
 			.extractAllAffixes(affixData, false);

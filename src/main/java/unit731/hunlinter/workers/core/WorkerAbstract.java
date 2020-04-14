@@ -62,6 +62,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		return null;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	protected Void prepareProcessing(final String message){
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
@@ -70,6 +71,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		return null;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	protected Void resetProcessing(final String message, final Object... params){
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);

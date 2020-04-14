@@ -13,7 +13,7 @@ public class DynamicArray<T>{
 	//number of Blocks in `blocks`
 	private int sizeOfBlocks;
 	//number of elements in DynamicArray
-	private int size;
+	private volatile int size;
 	private int numberOfEmptyDataBlocks;
 	private int indexOfLastNonEmptyDataBlock;
 	private int indexOfLastDataBlock;
@@ -138,14 +138,19 @@ public class DynamicArray<T>{
 	}
 
 	public synchronized void addAll(final T[] array){
-		for(int i = 0; i < array.length; i ++)
-			add(array[i]);
+		for(final T t : array)
+			add(t);
 	}
 
 	public synchronized T pop(){
 		final T elem = get(size - 1);
 		remove();
 		return elem;
+	}
+
+	public synchronized void shrink(final int newSize){
+		while(size > newSize)
+			remove();
 	}
 
 	@SuppressWarnings("unchecked")

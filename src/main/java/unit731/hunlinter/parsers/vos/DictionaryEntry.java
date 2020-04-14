@@ -242,8 +242,7 @@ public class DictionaryEntry{
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
 		String[] list = new String[0];
-		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
-		for(int i = 0; i < size; i ++){
+		for(int i = 0; i < morphologicalFields.length; i ++){
 			final String mf = morphologicalFields[i];
 			if(mf.startsWith(tag))
 				list = ArrayUtils.add(list, mf);

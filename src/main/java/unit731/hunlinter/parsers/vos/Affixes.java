@@ -23,7 +23,7 @@ public class Affixes{
 		this.terminals = terminals;
 	}
 
-	public FixedArray<String>[] extractAllAffixes(final boolean reverseAffixes){
+	public FixedArray[] extractAllAffixes(final boolean reverseAffixes){
 		return new FixedArray[]{
 			(reverseAffixes? suffixes: prefixes),
 			(reverseAffixes? prefixes: suffixes),

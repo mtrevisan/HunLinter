@@ -31,6 +31,7 @@ public class LexicographicalComparator{
 		return LexicographicalComparator.BEST_COMPARATOR;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	public static Comparator<byte[]> lexicographicalComparatorJavaImpl(){
 		return LexicographicalComparator.PureJavaComparator.INSTANCE;
 	}

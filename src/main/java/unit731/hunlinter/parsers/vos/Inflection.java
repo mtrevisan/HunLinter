@@ -49,7 +49,7 @@ public class Inflection extends DictionaryEntry{
 		return new Inflection(word, continuationFlags, morphologicalFields, combinable, appliedRules, compoundEntries);
 	}
 
-	public static Inflection createFromDicitonaryEntry(final DictionaryEntry dicEntry){
+	public static Inflection createFromDictionaryEntry(final DictionaryEntry dicEntry){
 		return new Inflection(dicEntry);
 	}
 

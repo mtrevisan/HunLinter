@@ -247,6 +247,7 @@ public class SetHelper{
 		return new ArrayList<>(compaction.values());
 	}
 
+	@SafeVarargs
 	public static <V> Set<V> getDuplicates(final V... list){
 		final Set<V> uniques = new HashSet<>();
 		final Set<V> duplicates = new HashSet<>();
