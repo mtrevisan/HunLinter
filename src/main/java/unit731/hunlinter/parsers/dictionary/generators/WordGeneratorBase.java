@@ -191,7 +191,7 @@ class WordGeneratorBase{
 					lastSuffix = true;
 					lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 				}
-				if(appliedRule.getType() != AffixType.SUFFIX && !lastPrefix){
+				if(appliedRule.getType() == AffixType.PREFIX && !lastPrefix){
 					lastPrefix = true;
 					lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 				}
