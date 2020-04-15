@@ -53,7 +53,7 @@ public class WordVEC{
 		}
 	}
 
-	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au");
+	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
 	private static final String NO_STRESS_AVER = "^(?:r[aeiï]|ar)?g?(?:ar)?[àé]-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(?:r[aeiï]|ar)?(?:(?:s[ae]r)?[àé]|[sx]é)-?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -74,9 +74,9 @@ public class WordVEC{
 	}
 
 	//NOTE: must be sorted!
-	private static final char[] SIMPLE_VOWELS_ARRAY = "aeiou".toCharArray();
+	private static final char[] SIMPLE_VOWELS_ARRAY = "AEIOUaeiouÏÜïü".toCharArray();
 	//NOTE: must be sorted!
-	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "àéíóú".toCharArray();
+	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "ÀÉÍÓÚàéíóúÍÚíú".toCharArray();
 
 
 	private WordVEC(){}
