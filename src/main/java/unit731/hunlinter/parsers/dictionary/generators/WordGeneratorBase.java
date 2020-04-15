@@ -187,13 +187,19 @@ class WordGeneratorBase{
 			boolean lastPrefixNeedAffix = false;
 			for(int i = appliedRules.length - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
 				final AffixEntry appliedRule = appliedRules[i];
-				if(appliedRule.getType() == AffixType.SUFFIX && !lastSuffix){
-					lastSuffix = true;
-					lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
-				}
-				if(appliedRule.getType() == AffixType.PREFIX && !lastPrefix){
-					lastPrefix = true;
-					lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
+				switch(appliedRule.getType()){
+					case SUFFIX -> {
+						if(!lastSuffix){
+							lastSuffix = true;
+							lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
+						}
+					}
+					case PREFIX -> {
+						if(!lastPrefix){
+							lastPrefix = true;
+							lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
+						}
+					}
 				}
 			}
 			hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
