@@ -16,15 +16,18 @@ import java.nio.ByteBuffer;
  */
 public interface SequenceEncoderInterface{
 
+	/** Maximum encodable single-byte code */
+	int REMOVE_EVERYTHING = 255;
+
+
 	/**
 	 * Encodes <code>target</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param source   The source byte sequence.
 	 * @param target   The target byte sequence to encode relative to <code>source</code>
-	 * @param reuse   Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
 	 * @return	The {@link ByteBuffer} with encoded <code>target</code>.
 	 */
-	ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, final ByteBuffer reuse);
+	byte[] encode(final byte[] source, final byte[] target);
 
 	/**
 	 * Decodes <code>encoded</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
@@ -34,17 +37,6 @@ public interface SequenceEncoderInterface{
 	 * @param encoded	The {@linkplain #encode previously encoded} byte sequence.
 	 * @return	The {@link ByteBuffer} with decoded <code>target</code>.
 	 */
-	ByteBuffer decode(final ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded);
-
-	/**
-	 * The number of encoded form's prefix bytes that should be ignored (needed for separator lookup).
-	 * An ugly workaround for GH-85, should be fixed by prior knowledge of whether the dictionary contains tags;
-	 * then we can scan for separator right-to-left.
-	 *
-	 * @return	The number of bytes
-	 * @see "https://github.com/morfologik/morfologik-stemming/issues/85"
-	 */
-	@Deprecated
-	int prefixBytes();
+	byte[] decode(final byte[] source, final byte[] encoded);
 
 }

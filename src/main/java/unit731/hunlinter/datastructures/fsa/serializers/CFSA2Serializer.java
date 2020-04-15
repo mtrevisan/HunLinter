@@ -256,27 +256,26 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length */
-	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInlinkCount){
-		final PriorityQueue<IntIntHolder> stateInlink = new PriorityQueue<>(1, COMPARATOR);
+	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInLinkCount){
+		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
 		for(final IntIntCursor c : inLinkCount)
-			if(c.value > minInlinkCount){
+			if(c.value > minInLinkCount){
 				scratch.a = c.value;
 				scratch.b = c.key;
 
-				if(stateInlink.size() < maxStates || COMPARATOR.compare(scratch, stateInlink.peek()) > 0){
-					stateInlink.add(new IntIntHolder(c.value, c.key));
-					if(stateInlink.size() > maxStates)
-						stateInlink.remove();
+				if(stateInLink.size() < maxStates || COMPARATOR.compare(scratch, stateInLink.peek()) > 0){
+					stateInLink.add(new IntIntHolder(c.value, c.key));
+					if(stateInLink.size() > maxStates)
+						stateInLink.remove();
 				}
 			}
 
-		final int[] states = new int[stateInlink.size()];
-		for(int position = states.length; !stateInlink.isEmpty(); ){
-			final IntIntHolder i = stateInlink.remove();
+		final int[] states = new int[stateInLink.size()];
+		for(int position = states.length; !stateInLink.isEmpty(); ){
+			final IntIntHolder i = stateInLink.remove();
 			states[-- position] = i.b;
 		}
-
 		return states;
 	}
 

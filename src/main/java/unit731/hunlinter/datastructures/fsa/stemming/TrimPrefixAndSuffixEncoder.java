@@ -1,7 +1,5 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
-import java.nio.ByteBuffer;
-
 
 /**
  * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
@@ -35,73 +33,53 @@ import java.nio.ByteBuffer;
  */
 public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 
-	/** Maximum encodable single-byte code */
-	private static final int REMOVE_EVERYTHING = 255;
-
-
-	public ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, ByteBuffer reuse){
+	@Override
+	public byte[] encode(final byte[] source, final byte[] target){
 		//search for the maximum matching subsequence that can be encoded
 		int maxSubsequenceLength = 0;
 		int maxSubsequenceIndex = 0;
-		for(int i = 0; i < source.remaining(); i ++){
+		for(int i = 0; i < source.length; i ++){
 			//prefix at i => shared subsequence (infix)
 			final int sharedPrefix = BufferUtils.sharedPrefixLength(source, i, target, 0);
 			//only update maxSubsequenceLength if we will be able to encode it
 			if(sharedPrefix > maxSubsequenceLength && i < REMOVE_EVERYTHING
-					&& (source.remaining() - (i + sharedPrefix)) < REMOVE_EVERYTHING){
+					&& (source.length - (i + sharedPrefix)) < REMOVE_EVERYTHING){
 				maxSubsequenceLength = sharedPrefix;
 				maxSubsequenceIndex = i;
 			}
 		}
 
 		//determine how much to remove (and where) from `source` to get a prefix of `target`
-		//FIXME needed?
 		int truncatePrefixBytes = maxSubsequenceIndex;
-		int truncateSuffixBytes = (source.remaining() - (maxSubsequenceIndex + maxSubsequenceLength));
+		int truncateSuffixBytes = (source.length - (maxSubsequenceIndex + maxSubsequenceLength));
 		if(truncatePrefixBytes >= REMOVE_EVERYTHING || truncateSuffixBytes >= REMOVE_EVERYTHING){
-			maxSubsequenceIndex = maxSubsequenceLength = 0;
+			maxSubsequenceLength = 0;
 			truncatePrefixBytes = truncateSuffixBytes = REMOVE_EVERYTHING;
 		}
 
-		final int len1 = target.remaining() - maxSubsequenceLength;
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, 2 + len1);
-
-		//assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
-
-		reuse.put((byte)((truncatePrefixBytes + 'A') & 0xFF));
-		reuse.put((byte)((truncateSuffixBytes + 'A') & 0xFF));
-		reuse.put(target.array(), maxSubsequenceLength, len1);
-		reuse.flip();
-		return reuse;
+		final int len1 = target.length - maxSubsequenceLength;
+		final byte[] encoded = new byte[2 + len1];
+		encoded[0] = (byte)((truncatePrefixBytes + 'A') & 0xFF);
+		encoded[1] = (byte)((truncateSuffixBytes + 'A') & 0xFF);
+		System.arraycopy(target, 0, encoded, 2, len1);
+		return encoded;
 	}
 
 	@Override
-	public int prefixBytes(){
-		return 2;
-	}
-
-	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
-		//assert encoded.remaining() >= 2;
-
-		final int p = encoded.position();
-		int truncatePrefixBytes = (encoded.get(p) - 'A') & 0xFF;
-		int truncateSuffixBytes = (encoded.get(p + 1) - 'A') & 0xFF;
+	public byte[] decode(final byte[] source, final byte[] encoded){
+		int truncatePrefixBytes = (encoded[0] - 'A') & 0xFF;
+		int truncateSuffixBytes = (encoded[1] - 'A') & 0xFF;
 		if(truncatePrefixBytes == REMOVE_EVERYTHING || truncateSuffixBytes == REMOVE_EVERYTHING){
-			truncatePrefixBytes = source.remaining();
+			truncatePrefixBytes = source.length;
 			truncateSuffixBytes = 0;
 		}
 
-		//assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
-		//assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
-
-		final int len1 = source.remaining() - (truncateSuffixBytes + truncatePrefixBytes);
-		final int len2 = encoded.remaining() - 2;
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, len1 + len2);
-
-		reuse.put(source.array(), truncatePrefixBytes, len1);
-		reuse.put(encoded.array(), 2, len2);
-		reuse.flip();
-		return reuse;
+		final int len1 = source.length - (truncateSuffixBytes + truncatePrefixBytes);
+		final int len2 = encoded.length - 2;
+		final byte[] decoded = new byte[len1 + len2];
+		System.arraycopy(source, truncatePrefixBytes, decoded, 0, len1);
+		System.arraycopy(encoded, 2, decoded, len1, len2);
+		return decoded;
 	}
 
 	@Override

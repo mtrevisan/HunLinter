@@ -1,7 +1,5 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
-import java.nio.ByteBuffer;
-
 
 /**
  * No relative encoding at all (full target form is returned).
@@ -11,30 +9,13 @@ import java.nio.ByteBuffer;
 public class NoEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public ByteBuffer encode(ByteBuffer source, ByteBuffer target, ByteBuffer reuse){
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, target.remaining());
-
-		target.mark();
-		reuse.put(target).flip();
-		target.reset();
-
-		return reuse;
+	public byte[] encode(final byte[] source, final byte[] target){
+		return target;
 	}
 
 	@Override
-	public ByteBuffer decode(ByteBuffer reuse, ByteBuffer source, ByteBuffer encoded){
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, encoded.remaining());
-
-		encoded.mark();
-		reuse.put(encoded).flip();
-		encoded.reset();
-
-		return reuse;
-	}
-
-	@Override
-	public int prefixBytes(){
-		return 0;
+	public byte[] decode(final byte[] source, final byte[] encoded){
+		return encoded;
 	}
 
 	@Override

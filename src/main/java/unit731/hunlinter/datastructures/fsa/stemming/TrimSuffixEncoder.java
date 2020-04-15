@@ -1,7 +1,5 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
-import java.nio.ByteBuffer;
-
 
 /**
  * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
@@ -33,54 +31,36 @@ import java.nio.ByteBuffer;
  */
 public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
-	/**
-	 * Maximum encodable single-byte code.
-	 */
-	private static final int REMOVE_EVERYTHING = 255;
-
-
-	public ByteBuffer encode(final ByteBuffer source, final ByteBuffer target, ByteBuffer reuse){
+	@Override
+	public byte[] encode(final byte[] source, final byte[] target){
 		int sharedPrefix = BufferUtils.sharedPrefixLength(source, target);
-		int truncateBytes = source.remaining() - sharedPrefix;
+		int truncateBytes = source.length - sharedPrefix;
 		if(truncateBytes >= REMOVE_EVERYTHING){
 			truncateBytes = REMOVE_EVERYTHING;
 			sharedPrefix = 0;
 		}
 
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, 1 + target.remaining() - sharedPrefix);
-
-		//assert target.hasArray() && target.position() == 0 && target.arrayOffset() == 0;
-
+		final byte[] encoded = new byte[1 + target.length - sharedPrefix];
 		final byte suffixTrimCode = (byte)(truncateBytes + 'A');
-		reuse.put(suffixTrimCode).put(target.array(), sharedPrefix, target.remaining() - sharedPrefix).flip();
-
-		return reuse;
+		encoded[0] = suffixTrimCode;
+		System.arraycopy(target, 0, encoded, 1, target.length - sharedPrefix);
+		return encoded;
 	}
 
 	@Override
-	public int prefixBytes(){
-		return 1;
-	}
-
-	public ByteBuffer decode(ByteBuffer reuse, final ByteBuffer source, final ByteBuffer encoded){
-		//assert encoded.remaining() >= 1;
-
-		int suffixTrimCode = encoded.get(encoded.position());
+	public byte[] decode(final byte[] source, final byte[] encoded){
+		final int suffixTrimCode = encoded[0];
 		int truncateBytes = (suffixTrimCode - 'A') & 0xFF;
 		if(truncateBytes == REMOVE_EVERYTHING)
-			truncateBytes = source.remaining();
+			truncateBytes = source.length;
 
-		final int len1 = source.remaining() - truncateBytes;
-		final int len2 = encoded.remaining() - 1;
+		final int len1 = source.length - truncateBytes;
+		final int len2 = encoded.length - 1;
 
-		reuse = BufferUtils.clearAndEnsureCapacity(reuse, len1 + len2);
-
-		//assert source.hasArray() && source.position() == 0 && source.arrayOffset() == 0;
-		//assert encoded.hasArray() && encoded.position() == 0 && encoded.arrayOffset() == 0;
-
-		reuse.put(source.array(), 0, len1).put(encoded.array(), 1, len2).flip();
-
-		return reuse;
+		final byte[] decoded = new byte[len1 + len2];
+		System.arraycopy(source, 0, decoded, 0, len1);
+		System.arraycopy(encoded, 1, decoded, len1, len2);
+		return decoded;
 	}
 
 	@Override
