@@ -2098,7 +2098,7 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "ni", "[^kn]", Arrays.asList("odamam", "adamam")),
+			new LineEntry("0", "ni", "[^n]", Arrays.asList("odamam", "adamam")),
 			new LineEntry("0", "–ni", "n", Arrays.asList("etneŧon", "etneson", "nitneson")),
 			new LineEntry("0", "i", "[^k]", Arrays.asList("odamam", "etneŧon", "etneson", "nitneson", "adamam"))
 		);
@@ -2109,7 +2109,7 @@ class RulesReducerTest{
 			"PFX +0 Y 3",
 			"PFX +0 0 in– n",
 			"PFX +0 0 i [^k]",
-			"PFX +0 0 in [^kn]"
+			"PFX +0 0 in [^n]"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 

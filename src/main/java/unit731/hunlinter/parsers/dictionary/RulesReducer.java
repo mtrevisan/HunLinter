@@ -15,6 +15,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -149,16 +150,32 @@ public class RulesReducer{
 		}
 	}
 
-	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
+	List<LineEntry> reduceRules(final List<LineEntry> plainRules){
+		return reduceRules(plainRules, null);
+	}
+
+	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final Consumer<Integer> progressCallback){
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
+		if(progressCallback != null)
+			progressCallback.accept(20);
+
 		compactedRules = compactRules(compactedRules);
+
+		if(progressCallback != null)
+			progressCallback.accept(40);
 
 		//reshuffle originating list to place the correct inflections in the correct rule
 		compactedRules = makeAdditionsDisjoint(compactedRules);
 
+		if(progressCallback != null)
+			progressCallback.accept(50);
+
 		final Map<Integer, Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
 		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
+
+		if(progressCallback != null)
+			progressCallback.accept(60);
 
 		mergeSimilarRules(compactedRules);
 
@@ -389,8 +406,11 @@ public class RulesReducer{
 						finalRules.remove(alreadyPresentRule);
 
 						notPresentConditions.addAll(parentGroup);
+						//keep the two sets disjoint
+						overallLastGroup.removeAll(parentGroup);
 					}
 
+					//if intersection between notPresentConditions and overallLastGroup is not empty
 					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()?
 						RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition:
 						RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
@@ -684,7 +704,12 @@ public class RulesReducer{
 		return list;
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
+	void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
+		checkReductionCorrectness(flag, reducedRules, originalLines, null);
+	}
+
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines,
+			final Consumer<Integer> progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
@@ -698,6 +723,9 @@ public class RulesReducer{
 			entries[i] = new AffixEntry(reducedRule, type, flag, strategy, null, null);
 		}
 
+		int progress = 0;
+		int progressIndex = 0;
+		final int progressStep = (int)Math.ceil(originalLines.size() / 100.f);
 		final RuleEntry overriddenRule = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
 		overriddenRule.setEntries(entries);
 		for(final String line : originalLines){
@@ -709,6 +737,9 @@ public class RulesReducer{
 			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
 				throw new LinterException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
+
+			if(progressCallback != null && ++ progress % progressStep == 0)
+				progressCallback.accept(++ progressIndex);
 		}
 	}
 

@@ -76,35 +76,43 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+			prepareProcessing("Reading dictionary file (step 1/3)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 
+			return null;
+		};
+		final Function<Void, List<LineEntry>> step2 = ignored -> {
+			resetProcessing("Extracting minimal rules (step 2/3)");
+
+			final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules, percent -> {
+				setProgress(percent, 100);
+
+				sleepOnPause();
+			});
+
+			return compactedRules;
+		};
+		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
+			resetProcessing("Check correctness (step 3/3)");
+
+			final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
+
+			rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines, percent -> {
+				setProgress(percent, 100);
+
+				sleepOnPause();
+			});
+
+			forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
+
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		final Function<Void, Void> step2 = ignored -> {
-			try{
-				final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules);
-
-				final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
-
-				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines);
-
-				forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
-			}
-			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());
-
-				e.printStackTrace();
-			}
-
-			return null;
-		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
 }
