@@ -2069,6 +2069,53 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
+	@Test
+	void casePrefix7() throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			"PFX +0 Y 3",
+			"PFX +0 0 in [^ƚn]",
+			"PFX +0 0 in– n",
+			"PFX +0 0 i [lƚmnñrs]"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "+0";
+		AffixType affixType = AffixType.PREFIX;
+		List<String> words = Arrays.asList("konplèto", "kòmodo", "kuranŧa", "mamada", "mamado", "nosente", "nosentin", "noŧente");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("0", "ni", "[^kn]", Arrays.asList("odamam", "adamam")),
+			new LineEntry("0", "–ni", "n", Arrays.asList("etneŧon", "etneson", "nitneson")),
+			new LineEntry("0", "i", "[^k]", Arrays.asList("odamam", "etneŧon", "etneson", "nitneson", "adamam"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"PFX +0 Y 3",
+			"PFX +0 0 in– n",
+			"PFX +0 0 i [^k]",
+			"PFX +0 0 in [^kn]"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();
