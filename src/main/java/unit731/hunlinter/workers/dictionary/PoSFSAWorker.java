@@ -185,7 +185,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
-		ByteBuffer assembled = ByteBuffer.allocate(0);
 
 		final SimpleDynamicArray<byte[]> out = new SimpleDynamicArray<>(byte[].class, inflections.length, 1.2f);
 		for(final Inflection inflection : inflections){
@@ -224,18 +223,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 				final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
 
-				assembled = BufferUtils.clearAndEnsureCapacity(assembled,
-					inflectedWord.length + 1 + encoded.length + 1 + tag.remaining());
-				assembled.put(inflectedWord);
-				assembled.put(separator);
-				assembled.put(encoded);
+				final byte[] assembled = new byte[inflectedWord.length + 1 + encoded.length + 1 + tag.remaining()];
+				System.arraycopy(inflectedWord, 0, assembled, 0, inflectedWord.length);
+				assembled[inflectedWord.length] = separator;
+				System.arraycopy(encoded, 0, assembled, inflectedWord.length + 1, encoded.length);
 				if(tag.hasRemaining()){
-					assembled.put(separator);
-					assembled.put(tag);
+					assembled[inflectedWord.length + 1 + encoded.length] = separator;
+					System.arraycopy(tag.array(), 0, assembled, inflectedWord.length + 1 + encoded.length + 1,
+						tag.remaining());
 				}
-				assembled.flip();
-
-				encodedStems[position ++] = BufferUtils.toArray(assembled);
+				encodedStems[position ++] = assembled;
 			}
 			out.addAll(encodedStems);
 		}
