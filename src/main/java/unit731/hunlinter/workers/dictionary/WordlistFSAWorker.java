@@ -2,6 +2,7 @@ package unit731.hunlinter.workers.dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -36,6 +37,11 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Wordlist FSA Extractor";
 
+
+	public WordlistFSAWorker(final ParserManager parserManager, final File outputFile){
+		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(),
+			outputFile);
+	}
 
 	public WordlistFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final File outputFile){

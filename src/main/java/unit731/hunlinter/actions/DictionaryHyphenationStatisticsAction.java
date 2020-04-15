@@ -40,7 +40,7 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(false)
+			worker -> setEnabled(true)
 		);
 	}
 

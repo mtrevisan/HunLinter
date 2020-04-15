@@ -34,6 +34,10 @@ public class WordCountWorker extends WorkerDictionary{
 	private final BloomFilterInterface<String> dictionary;
 
 
+	public WordCountWorker(final ParserManager parserManager){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator());
+	}
+
 	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 

@@ -277,6 +277,10 @@ public class AffixParser{
 		return data;
 	}
 
+	public String getLanguage(){
+		return data.getLanguage();
+	}
+
 	public void clear(){
 		data.clear();
 	}

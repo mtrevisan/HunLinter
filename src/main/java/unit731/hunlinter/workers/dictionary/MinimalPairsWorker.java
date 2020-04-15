@@ -54,6 +54,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private final Comparator<String> comparator;
 
 
+	public MinimalPairsWorker(final ParserManager parserManager, final File outputFile){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator(),
+			outputFile);
+	}
+
 	public MinimalPairsWorker(final String language, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));

@@ -2,6 +2,8 @@ package unit731.hunlinter.workers;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
@@ -29,10 +31,16 @@ public class StatisticsWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Statistics";
 
+	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
+
 	private final DictionaryStatistics dicStatistics;
-	private final HyphenatorInterface hyphenator;
 	private final Orthography orthography;
 
+
+	public StatisticsWorker(final ParserManager parserManager, final boolean performHyphenationStatistics, final Frame parent){
+		this(parserManager.getAffParser(), parserManager.getDicParser(),
+			(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), parent);
+	}
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
@@ -49,24 +57,47 @@ public class StatisticsWorker extends WorkerDictionary{
 		final AffixData affixData = affParser.getAffixData();
 		final String language = affixData.getLanguage();
 		dicStatistics = new DictionaryStatistics(language, affixData.getCharset());
-		this.hyphenator = hyphenator;
 		orthography = BaseBuilder.getOrthography(language);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			try{
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Inflection inflection : inflections){
-				//collect statistics
-				final String word = inflection.getWord();
-				final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
-				if(subwords.length == 0)
-					dicStatistics.addData(word);
-				else
-					for(final String subword : subwords){
-						final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
-						dicStatistics.addData(word, hyph);
-					}
+				for(final Inflection inflection : inflections){
+					//collect statistics
+					final String word = inflection.getWord();
+					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
+					if(subwords.length == 0)
+						dicStatistics.addData(word);
+					else
+						for(final String subword : subwords){
+							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
+							dicStatistics.addData(word, hyph);
+						}
+				}
+			}
+			}catch(Exception e){
+				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+
+				for(final Inflection inflection : inflections){
+					//collect statistics
+					final String word = inflection.getWord();
+					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
+					if(subwords.length == 0)
+						dicStatistics.addData(word);
+					else
+						for(final String subword : subwords){
+							try{
+								orthography.markDefaultStress(subword);
+							}
+							catch(Exception e1){
+								orthography.markDefaultStress(subword);
+							}
+						}
+				}
 			}
 		};
 		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
@@ -97,10 +128,6 @@ public class StatisticsWorker extends WorkerDictionary{
 			return null;
 		};
 		setProcessor(step1.andThen(step2));
-	}
-
-	public boolean isPerformingHyphenationStatistics(){
-		return (hyphenator != null);
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -21,6 +22,11 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Compound rules extraction";
 
+
+	public CompoundRulesWorker(final ParserManager parserManager, final BiConsumer<Inflection, Integer> inflectionReader,
+			final Runnable completed){
+		this(parserManager.getDicParser(), parserManager.getWordGenerator(), inflectionReader, completed);
+	}
 
 	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final BiConsumer<Inflection, Integer> inflectionReader, final Runnable completed){

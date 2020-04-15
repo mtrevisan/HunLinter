@@ -81,6 +81,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private final BloomFilterParameters dictionaryBaseData;
 
 
+	public DuplicatesWorker(final ParserManager parserManager, final File outputFile){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), outputFile);
+	}
+
 	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator,
 			final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));

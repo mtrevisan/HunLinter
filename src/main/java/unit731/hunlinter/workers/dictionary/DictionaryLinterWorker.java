@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -22,6 +23,10 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Dictionary linter";
 
+
+	public DictionaryLinterWorker(final ParserManager parserManager){
+		this(parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator());
+	}
 
 	public DictionaryLinterWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator){

@@ -67,7 +67,8 @@ public class DictionarySorterAction extends AbstractAction{
 							worker.addPropertyChangeListener(propertyChangeListener);
 							worker.execute();
 						},
-						worker -> setEnabled(true));
+						worker -> setEnabled(true)
+					);
 			});
 			dialog.addWindowListener(new WindowAdapter(){
 				@Override

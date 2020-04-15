@@ -46,7 +46,7 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
-					parserManager.getAffixData().getLanguage() + "-PoS.dict").toFile(): null);
+					parserManager.getLanguage() + "-PoS.dict").toFile(): null);
 			},
 			worker -> {
 				setEnabled(false);

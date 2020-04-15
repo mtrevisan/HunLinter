@@ -309,7 +309,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	public void initialize(){
-		final String language = parserManager.getAffixData().getLanguage();
+		final String language = parserManager.getLanguage();
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())

@@ -100,6 +100,10 @@ public class ParserManager implements FileChangeListener{
 		return affParser.getAffixData();
 	}
 
+	public String getLanguage(){
+		return affParser.getLanguage();
+	}
+
 	public AidParser getAidParser(){
 		return aidParser;
 	}
@@ -184,7 +188,7 @@ public class ParserManager implements FileChangeListener{
 		if(hypFile != null && hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
-			final String language = affParser.getAffixData().getLanguage();
+			final String language = affParser.getLanguage();
 			final Comparator<String> comparator = BaseBuilder.getComparator(language);
 			hypParser = new HyphenationParser(comparator);
 			hypParser.parse(hypFile);
@@ -271,7 +275,7 @@ public class ParserManager implements FileChangeListener{
 		if(sexFile != null && sexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Sentence Exceptions file: {}", sexFile.getName());
 
-			final String language = affParser.getAffixData().getLanguage();
+			final String language = affParser.getLanguage();
 			sexParser.parse(sexFile, language);
 
 			if(hunLintable != null)
@@ -287,7 +291,7 @@ public class ParserManager implements FileChangeListener{
 		if(wexFile != null && wexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Word Exceptions file: {}", wexFile.getName());
 
-			final String language = affParser.getAffixData().getLanguage();
+			final String language = affParser.getLanguage();
 			wexParser.parse(wexFile, language);
 
 			if(hunLintable != null)
@@ -328,7 +332,7 @@ public class ParserManager implements FileChangeListener{
 
 
 	public File getAidFile(){
-		return Path.of(FOLDER_AID, affParser.getAffixData().getLanguage() + EXTENSION_AID)
+		return Path.of(FOLDER_AID, affParser.getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
 
@@ -402,7 +406,7 @@ public class ParserManager implements FileChangeListener{
 	}
 
 	public void createPackage(){
-		packager.createPackage(packager.getProjectPath(), getAffixData().getLanguage());
+		packager.createPackage(packager.getProjectPath(), getLanguage());
 	}
 
 }

@@ -40,7 +40,7 @@ public class SelectFontAction extends AbstractAction{
 		Consumer<Font> onSelection = font -> {
 			GUIUtils.setCurrentFont(font, parentFrame);
 
-			final String language = parserManager.getAffixData().getLanguage();
+			final String language = parserManager.getLanguage();
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};

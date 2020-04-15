@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,18 +35,20 @@ public class SorterWorker extends WorkerDictionary{
 	private final Comparator<String> comparator;
 
 
-	public SorterWorker(final Packager packager, final ParserManager parserManager, final int lineIndex){
+	public SorterWorker(final File dicFile, final ParserManager parserManager, final int lineIndex){
 		super(new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser()));
+
+		Objects.requireNonNull(dicFile);
 
 		getWorkerData()
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		dicFile = packager.getDictionaryFile();
+		this.dicFile = dicFile;
 		dicParser = parserManager.getDicParser();
 		final Charset charset = dicParser.getCharset();
 
-		comparator = BaseBuilder.getComparator(parserManager.getAffixData().getLanguage());
+		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Pair<Integer, Integer>> boundary = dicParser.getBoundary(lineIndex);
 
 		final Function<Void, String[]> step1 = ignored -> {

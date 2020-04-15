@@ -37,6 +37,10 @@ public class WordlistWorker extends WorkerDictionary{
 	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES}
 
 
+	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final File outputFile){
+		this(parserManager.getDicParser(), parserManager.getWordGenerator(), type, outputFile);
+	}
+
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
 			final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));

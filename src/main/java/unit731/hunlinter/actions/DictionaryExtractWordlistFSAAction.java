@@ -46,7 +46,7 @@ public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 			() -> {
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
-					parserManager.getAffixData().getLanguage() + "-wordlist.dict").toFile(): null);
+					parserManager.getLanguage() + "-wordlist.dict").toFile(): null);
 			},
 			worker -> {
 				setEnabled(false);

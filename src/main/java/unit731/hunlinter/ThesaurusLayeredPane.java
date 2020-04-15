@@ -248,7 +248,7 @@ final int iconSize = 17;
    }//GEN-LAST:event_addButtonActionPerformed
 
 	public void initialize(){
-		final String language = parserManager.getAffixData().getLanguage();
+		final String language = parserManager.getLanguage();
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));

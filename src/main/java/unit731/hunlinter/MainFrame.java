@@ -571,7 +571,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				mainTabbedPane.setSelectedIndex(0);
 
 
-			final String language = parserManager.getAffixData().getLanguage();
+			final String language = parserManager.getLanguage();
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?

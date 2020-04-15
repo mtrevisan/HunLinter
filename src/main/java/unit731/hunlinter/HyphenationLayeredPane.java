@@ -365,7 +365,7 @@ final int iconSize = 17;
 	}
 
 	private void hyphenate(){
-		final String language = parserManager.getAffixData().getLanguage();
+		final String language = parserManager.getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String text = orthography.correctOrthography(wordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
@@ -403,7 +403,7 @@ final int iconSize = 17;
 	}
 
 	private void hyphenateAddRule(){
-		final String language = parserManager.getAffixData().getLanguage();
+		final String language = parserManager.getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(wordTextField.getText());
 		final String addedRule = orthography.correctOrthography(addRuleTextField.getText().toLowerCase(Locale.ROOT));

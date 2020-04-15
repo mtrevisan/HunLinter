@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
@@ -38,6 +39,10 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
+
+	public HyphenationLinterWorker(final ParserManager parserManager){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator());
+	}
 
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator){
