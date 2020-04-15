@@ -35,7 +35,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 		try{
 			table.setRowHeight(row, getPreferredSize().height + 4);
 		}
-		catch(final ArrayIndexOutOfBoundsException ignored){}
+		catch(final IndexOutOfBoundsException ignored){}
 
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)?
