@@ -89,7 +89,6 @@ public class ProjectLoaderAction extends AbstractAction{
 					final Font temporaryFont = temporarilyChooseAFont();
 //FIXME
 //					parsingResultTextArea.setFont(temporaryFont);
-
 //FIXME
 //					filOpenProjectMenuItem.setEnabled(false);
 
