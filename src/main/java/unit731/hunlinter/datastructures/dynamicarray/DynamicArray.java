@@ -23,6 +23,10 @@ public class DynamicArray<T>{
 
 
 	public DynamicArray(){
+		clear();
+	}
+
+	public synchronized void clear(){
 		blocks = new Object[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new Block<>(1);
@@ -33,8 +37,10 @@ public class DynamicArray<T>{
 		lastSuperBlock.incrementCurrentNumberOfDataBlocks();
 
 		sizeOfBlocks = 1;
+		size = 0;
 		numberOfEmptyDataBlocks = 1;
-		indexOfLastNonEmptyDataBlock = - 1;
+		indexOfLastNonEmptyDataBlock = -1;
+		indexOfLastDataBlock = 0;
 	}
 
 	// Returns the element at position i in the DynamicArray.
@@ -66,20 +72,21 @@ public class DynamicArray<T>{
 		block.data[location.element] = x;
 	}
 
+	/**
+	 * Allocates one more spaces in the DynamicArray.
+	 * This may require the creation of a Block and the last SuperBlock may change.
+	 * Also, expandArray is called if the `blocks` is full when a Block is created.
+	 * Called by add.
+	 * Target complexity: O(1)
+	 */
 	@SuppressWarnings("unchecked")
-	// Allocates one more spaces in the DynamicArray. This may
-	// require the creation of a Block and the last SuperBlock may change.
-	// Also, expandArray is called if the `blocks` is full when
-	// a Block is created.
-	// Called by add.
-	// Target complexity: O(1)
 	private void grow(){
 		Block<T> lastDataBlock = (Block<T>)blocks[indexOfLastDataBlock];
 
-		// If the last Block is full, we need to make a new Block.
+		//if the last Block is full, we need to make a new Block
 		if(lastDataBlock.isFull()){
 			if(sizeOfBlocks == blocks.length)
-				//`blocks` is full, need to expand.
+				//`blocks` is full, need to expand
 				expandArray();
 
 			//if the lastSuperBlock is full of Blocks, we need to create a new SuperBlock and increment numberOfSuperBlocks
@@ -153,15 +160,15 @@ public class DynamicArray<T>{
 			remove();
 	}
 
+	/**
+	 * Write a null value to the last element, shrinks the DynamicArray by one space, and decreases the size of the DynamicArray.
+	 * A Block may be deleted and the last SuperBlock may change.
+	 * Also, shrinkArray is called if the `blocks` is less than or equal to a quarter full when a Block is deleted.
+	 * Target complexity: O(1)
+	 *
+	 * @throws IllegalStateException	If the DynamicArray is empty when remove is called
+	 */
 	@SuppressWarnings("unchecked")
-	// Write a null value to the last element, shrinks the DynamicArray by one
-	// space, and decreases the size of the DynamicArray. A Block may be
-	// deleted and the last SuperBlock may change.
-	// Also, shrinkArray is called if the `blocks` is less than or equal
-	// to a quarter full when a Block is deleted.
-	// Throws IllegalStateException if the DynamicArray is empty when remove is
-	// called.
-	// Target complexity: O(1)
 	public synchronized void remove(){
 		set(size - 1, null);
 		final Block<T> lastNonEmptyDataBlock = (Block<T>)blocks[indexOfLastNonEmptyDataBlock];
@@ -178,16 +185,16 @@ public class DynamicArray<T>{
 		//if we have two empty Blocks, we have to delete the last one.
 		if(numberOfEmptyDataBlocks == 2){
 			//set the last empty Block to null
-			// --sizeOfBlocks gives us the index of last Block, also decrement sizeOfBlocks.
+			//-- sizeOfBlocks gives us the index of last Block, also decrement sizeOfBlocks
 			blocks[-- sizeOfBlocks] = null;
-			// Update the fields, also lastSuperBlock has one less Block in it, so decrementCurrentNumberOfDataBlocks.
+			//update the fields, also `lastSuperBlock` has one less Block in it, so `decrementCurrentNumberOfDataBlocks`
 			numberOfEmptyDataBlocks --;
 			indexOfLastDataBlock --;
 			lastSuperBlock.decrementCurrentNumberOfDataBlocks();
 
-			// The length of `blocks` should never be less than 4
+			//the length of `blocks` should never be less than 4
 			if(sizeOfBlocks <= blocks.length / 4 && blocks.length > 4)
-				// Need to shrink
+				//need to shrink
 				shrinkArray();
 
 			// If the lastSuperBlock has no Blocks in it,
@@ -210,8 +217,10 @@ public class DynamicArray<T>{
 		}
 	}
 
-	// Decreases the length of the `blocks` by half. Create a new
-	// `blocks` and copy the Blocks from the old one to this new array.
+	/**
+	 * Decreases the length of the `blocks` by half.
+	 * Create a new `blocks` and copy the Blocks from the old one to this new array.
+	 */
 	private void shrinkArray(){
 		final Object[] newBlocks = new Object[blocks.length / 2];
 		if(sizeOfBlocks >= 0)
@@ -219,8 +228,10 @@ public class DynamicArray<T>{
 		blocks = newBlocks;
 	}
 
-	// Doubles the length of the `blocks`. Create a new
-	// `blocks` and copy the Blocks from the old one to this new array.
+	/**
+	 * Doubles the length of the `blocks`.
+	 * Create a new `blocks` and copy the Blocks from the old one to this new array.
+	 */
 	private void expandArray(){
 		final Object[] newBlocks = new Object[blocks.length * 2];
 		if(sizeOfBlocks >= 0)
@@ -229,8 +240,7 @@ public class DynamicArray<T>{
 	}
 
 	// Returns the size of the DynamicArray which is the number of elements that
-	// have been added to it with the add(x) method but not removed.  The size
-	// does not correspond to the capacity of the array.
+	// have been added to it with the add(x) method but not removed.
 	public synchronized int size(){
 		return size;
 	}
