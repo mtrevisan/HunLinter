@@ -34,24 +34,26 @@ public class ProjectLoaderAction extends AbstractAction{
 	private final Path projectPath;
 	private final Packager packager;
 	private final WorkerManager workerManager;
+	private final Consumer<Font> initialize;
 	private final Runnable completed;
 	private final Consumer<Exception> cancelled;
 	private final PropertyChangeListener propertyChangeListener;
 
 
 	public ProjectLoaderAction(final Path projectPath, final Packager packager, final WorkerManager workerManager,
-			final Runnable completed, final Consumer<Exception> cancelled, final PropertyChangeListener propertyChangeListener){
+			final Consumer<Font> initialize, final Runnable completed, final Consumer<Exception> cancelled,
+			final PropertyChangeListener propertyChangeListener){
 		super("project.load");
 
+		Objects.requireNonNull(projectPath);
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(completed);
-		Objects.requireNonNull(cancelled);
 		Objects.requireNonNull(propertyChangeListener);
 
 		this.projectPath = projectPath;
 		this.packager = packager;
 		this.workerManager = workerManager;
+		this.initialize = initialize;
 		this.completed = completed;
 		this.cancelled = cancelled;
 		this.propertyChangeListener = propertyChangeListener;
@@ -65,7 +67,7 @@ public class ProjectLoaderAction extends AbstractAction{
 		workerManager.createProjectLoaderWorker(
 			worker -> {
 				try{
-					packager.reload(projectPath != null? projectPath: packager.getProjectPath());
+					packager.reload(projectPath);
 
 					final List<String> availableLanguages = packager.getAvailableLanguages();
 					final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
@@ -87,10 +89,8 @@ public class ProjectLoaderAction extends AbstractAction{
 						+ packager.getLanguage());
 
 					final Font temporaryFont = temporarilyChooseAFont();
-//FIXME
-//					parsingResultTextArea.setFont(temporaryFont);
-//FIXME
-//					filOpenProjectMenuItem.setEnabled(false);
+					if(initialize != null)
+						initialize.accept(temporaryFont);
 
 					worker.addPropertyChangeListener(propertyChangeListener);
 					worker.execute();

@@ -2,7 +2,6 @@ package unit731.hunlinter;
 
 import java.awt.*;
 
-import org.xml.sax.SAXException;
 import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
 import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
@@ -38,21 +37,16 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.text.DefaultCaret;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
@@ -62,16 +56,13 @@ import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
-import unit731.hunlinter.workers.ProjectLoaderWorker;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.log.ApplicationLogAppender;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.RecentItems;
 
 
@@ -87,11 +78,11 @@ import unit731.hunlinter.services.RecentItems;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
  */
-public class HunLinterFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
+public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(HunLinterFrame.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
 	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private final static String FONT_SIZE_PREFIX = "font.size.";
@@ -105,11 +96,10 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	private RecentFilesMenu recentProjectsMenu;
 
-	private ProjectLoaderWorker prjLoaderWorker;
 	private final WorkerManager workerManager;
 
 
-	public HunLinterFrame(){
+	public MainFrame(){
 		packager = new Packager();
 		parserManager = new ParserManager(packager, this);
 		workerManager = new WorkerManager(packager, parserManager, this);
@@ -475,28 +465,6 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		//FIXME introduce a checkAbortion case?
-		if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
-			prjLoaderWorker.pause();
-
-			final Object[] options = {"Abort", "Cancel"};
-			final int answer = JOptionPane.showOptionDialog(this,
-				"Do you really want to abort the project loader task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				prjLoaderWorker.cancel();
-
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "Project loader aborted");
-
-				prjLoaderWorker = null;
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				prjLoaderWorker.resume();
-
-				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			}
-		}
-
 		workerManager.checkForAbortion();
 	}
 
@@ -512,66 +480,23 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 	}
 
 	@Override
-	public void loadFileInternal(final Path projectPath){
+	public void loadFileInternal(Path projectPath){
 		//clear all
 		loadFileCancelled(null);
-
 		clearAllParsers();
 
 		mainTabbedPane.setSelectedIndex(0);
 
 
-		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
-			try{
-				packager.reload(projectPath != null? projectPath: packager.getProjectPath());
-
-				final List<String> availableLanguages = packager.getAvailableLanguages();
-				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
-				if(availableLanguages.size() > 1){
-					//choose between available languages
-					final Consumer<String> onSelection = language::set;
-					final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, this);
-					GUIUtils.addCancelByEscapeKey(dialog);
-					dialog.setLocationRelativeTo(this);
-					dialog.setVisible(true);
-
-					if(!dialog.languageChosen())
-						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
-				}
-				//load appropriate files based on current language
-				packager.extractConfigurationFolders(language.get());
-
-				setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : "
-					+ packager.getLanguage());
-
-				temporarilyChooseAFont(packager.getAffixFile().toPath());
-
-				prjLoaderWorker = new ProjectLoaderWorker(packager, parserManager, this::loadFileCompleted, this::loadFileCancelled);
-				prjLoaderWorker.addPropertyChangeListener(this);
-				prjLoaderWorker.execute();
-
-				filOpenProjectMenuItem.setEnabled(false);
-			}
-			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
-				loadFileCancelled(e);
-
-				LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
-
-				LOGGER.error("A bad error occurred while loading the project", e);
-			}
-		}
-	}
-
-	/** Chooses one font (in case of reading errors) */
-	private void temporarilyChooseAFont(final Path basePath){
-		try{
-			final String content = new String(Files.readAllBytes(basePath));
-			final String[] extractions = RegexHelper.extract(content, ProjectLoaderAction.LANGUAGE_SAMPLE_EXTRACTOR, 10);
-			final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
-				.mapToObj(Character::toString).collect(Collectors.toSet()));
-			parsingResultTextArea.setFont(GUIUtils.chooseBestFont(sample));
-		}
-		catch(final IOException ignored){}
+		projectPath = (projectPath != null? projectPath: packager.getProjectPath());
+		final Consumer<Font> initialize = temporaryFont -> {
+			parsingResultTextArea.setFont(temporaryFont);
+			filOpenProjectMenuItem.setEnabled(false);
+		};
+		final ProjectLoaderAction projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
+			initialize, this::loadFileCompleted, this::loadFileCancelled, this);
+		final ActionEvent event = new ActionEvent(filEmptyRecentProjectsMenuItem, -1, "openProject");
+		projectLoaderAction.actionPerformed(event);
 	}
 
 	private void setCurrentFont(){
@@ -828,7 +753,7 @@ public class HunLinterFrame extends JFrame implements ActionListener, PropertyCh
 		}
 
 		//create and display the form
-		JavaHelper.executeOnEventDispatchThread(() -> (new HunLinterFrame()).setVisible(true));
+		JavaHelper.executeOnEventDispatchThread(() -> (new MainFrame()).setVisible(true));
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

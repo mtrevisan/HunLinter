@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<main.class>unit731.hunlinter.HunLinterFrame</main.class>
+		<main.class>unit731.hunlinter.MainFrame</main.class>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>14</maven.compiler.source>
