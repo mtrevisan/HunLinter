@@ -256,7 +256,7 @@ public class WorkerManager{
 	}
 
 	public void createCompoundRulesWorker(final Consumer<WorkerAbstract<?>> onStart,
-													  final Consumer<List<Inflection>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
+			final Consumer<List<Inflection>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
 		final String workerName = CompoundRulesWorker.WORKER_NAME;
 		WorkerAbstract<?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
@@ -277,6 +277,7 @@ public class WorkerManager{
 			onStart.accept(worker);
 		}
 	}
+
 
 	public static Function<File, Void> openFileStep(final Logger logger){
 		return file -> {

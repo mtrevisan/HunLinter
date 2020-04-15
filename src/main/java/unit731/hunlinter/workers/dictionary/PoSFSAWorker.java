@@ -28,11 +28,9 @@ import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -176,12 +174,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 		if(!metadataPath.toFile().exists())
 			MetadataBuilder.create(affixData, "prefix", metadataPath, charset);
 
-		try(final InputStream is = new BufferedInputStream(Files.newInputStream(metadataPath))){
-			return MetadataBuilder.read(metadataPath);
-		}
+		return MetadataBuilder.read(metadataPath);
 	}
 
-	//FIXME improve memory usage?
 	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
