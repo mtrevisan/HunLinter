@@ -74,192 +74,101 @@ public class WorkerManager{
 		WORKERS.remove(workerName);
 	}
 
-	public void createProjectLoaderWorker(final Consumer<WorkerAbstract<?>> onStart, final Runnable completed, final Consumer<Exception> cancelled){
-		final String workerName = ProjectLoaderWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			worker = new ProjectLoaderWorker(packager, parserManager, completed, cancelled);
-			WORKERS.put(workerName, worker);
-
-			onStart.accept(worker);
-		}
+	public void createProjectLoaderWorker(final Consumer<WorkerAbstract<?>> onStart, final Runnable completed,
+			final Consumer<Exception> cancelled){
+		final Supplier<WorkerAbstract<?>> creator = () -> new ProjectLoaderWorker(packager, parserManager, completed, cancelled);
+		createWorker(ProjectLoaderWorker.WORKER_NAME, creator, onStart, null);
 	}
 
 	public void createDictionaryLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = DictionaryLinterWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			worker = new DictionaryLinterWorker(parserManager.getDicParser(), parserManager.getChecker(),
+		final Supplier<WorkerAbstract<?>> creator = () ->
+			new DictionaryLinterWorker(parserManager.getDicParser(), parserManager.getChecker(),
 				parserManager.getWordGenerator());
-			WORKERS.put(workerName, worker);
-			ON_ENDS.put(workerName, onEnd);
-
-			onStart.accept(worker);
-		}
+		createWorker(DictionaryLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createWordCountWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = WordCountWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			worker = new WordCountWorker(parserManager.getAffParser().getAffixData().getLanguage(),
+		final Supplier<WorkerAbstract<?>> creator = () ->
+			new WordCountWorker(parserManager.getAffParser().getAffixData().getLanguage(),
 				parserManager.getDicParser(), parserManager.getWordGenerator());
-			WORKERS.put(workerName, worker);
-			ON_ENDS.put(workerName, onEnd);
-
-			onStart.accept(worker);
-		}
+		createWorker(WordCountWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createDuplicatesWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = DuplicatesWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final File outputFile = preStart.get();
-			if(outputFile != null){
-				worker = new DuplicatesWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
-					parserManager.getWordGenerator(), outputFile);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<File, WorkerAbstract<?>> creator = outputFile ->
+			new DuplicatesWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
+				parserManager.getWordGenerator(), outputFile);
+		createWorker(DuplicatesWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createSorterWorker(final Supplier<Integer> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = SorterWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final Integer selectedRow = preStart.get();
-			if(selectedRow != null){
-				worker = new SorterWorker(packager, parserManager, selectedRow);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<Integer, WorkerAbstract<?>> creator = selectedRow ->
+			new SorterWorker(packager, parserManager, selectedRow);
+		createWorker(SorterWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createThesaurusLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = ThesaurusLinterWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			worker = new ThesaurusLinterWorker(parserManager.getTheParser());
-			WORKERS.put(workerName, worker);
-			ON_ENDS.put(workerName, onEnd);
-
-			onStart.accept(worker);
-		}
+		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterWorker(parserManager.getTheParser());
+		createWorker(ThesaurusLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = StatisticsWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
+		final Supplier<WorkerAbstract<?>> creator = () -> {
 			final Boolean performHyphenationStatistics = preStart.get();
-			worker = new StatisticsWorker(parserManager.getAffParser(), parserManager.getDicParser(),
+			return new StatisticsWorker(parserManager.getAffParser(), parserManager.getDicParser(),
 				(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), parentFrame);
-			WORKERS.put(workerName, worker);
-			ON_ENDS.put(workerName, onEnd);
-
-			onStart.accept(worker);
-		}
+		};
+		createWorker(StatisticsWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,
 			final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = WordlistWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final File outputFile = preStart.get();
-			if(outputFile != null){
-				worker = new WordlistWorker(parserManager.getDicParser(), parserManager.getWordGenerator(), type,
-					outputFile);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<File, WorkerAbstract<?>> creator = outputFile ->
+			new WordlistWorker(parserManager.getDicParser(), parserManager.getWordGenerator(), type,
+				outputFile);
+		createWorker(WordlistWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createWordlistFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = WordlistFSAWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final File outputFile = preStart.get();
-			if(outputFile != null){
-				worker = new WordlistFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
-					parserManager.getWordGenerator(), outputFile);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<File, WorkerAbstract<?>> creator = outputFile ->
+			new WordlistFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
+				parserManager.getWordGenerator(), outputFile);
+		createWorker(WordlistFSAWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createPoSFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = PoSFSAWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final File outputFile = preStart.get();
-			if(outputFile != null){
-				worker = new PoSFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
-					parserManager.getWordGenerator(), outputFile);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<File, WorkerAbstract<?>> creator = outputFile ->
+			new PoSFSAWorker(parserManager.getAffParser().getAffixData(), parserManager.getDicParser(),
+				parserManager.getWordGenerator(), outputFile);
+		createWorker(PoSFSAWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createMinimalPairsWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = MinimalPairsWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			final File outputFile = preStart.get();
-			if(outputFile != null){
-				worker = new MinimalPairsWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
-					parserManager.getChecker(), parserManager.getWordGenerator(), outputFile);
-				WORKERS.put(workerName, worker);
-				ON_ENDS.put(workerName, onEnd);
-
-				onStart.accept(worker);
-			}
-		}
+		final Function<File, WorkerAbstract<?>> creator = outputFile ->
+			new MinimalPairsWorker(parserManager.getAffixData().getLanguage(), parserManager.getDicParser(),
+				parserManager.getChecker(), parserManager.getWordGenerator(), outputFile);
+		createWorker(MinimalPairsWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
 	public void createHyphenationLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = HyphenationLinterWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
-			worker = new HyphenationLinterWorker(parserManager.getAffParser().getAffixData().getLanguage(),
+		final Supplier<WorkerAbstract<?>> creator = () ->
+			new HyphenationLinterWorker(parserManager.getAffParser().getAffixData().getLanguage(),
 				parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator());
-			WORKERS.put(workerName, worker);
-			ON_ENDS.put(workerName, onEnd);
-
-			onStart.accept(worker);
-		}
+		createWorker(HyphenationLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createCompoundRulesWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<List<Inflection>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
-		final String workerName = CompoundRulesWorker.WORKER_NAME;
-		WorkerAbstract<?> worker = WORKERS.get(workerName);
-		if(worker == null || worker.isDone()){
+		final Supplier<WorkerAbstract<?>> creator = () -> {
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();
 			final String compoundFlag = affixData.getCompoundFlag();
@@ -269,12 +178,37 @@ public class WorkerManager{
 					compounds.add(inflection);
 			};
 			final Runnable completed = () -> onComplete.accept(compounds);
-			worker = new CompoundRulesWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
+			return new CompoundRulesWorker(parserManager.getDicParser(), parserManager.getWordGenerator(),
 				inflectionReader, completed);
+		};
+		createWorker(CompoundRulesWorker.WORKER_NAME, creator, onStart, onEnd);
+	}
+
+
+	private void createWorker(final String workerName, final Supplier<WorkerAbstract<?>> creator,
+			final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+		WorkerAbstract<?> worker = WORKERS.get(workerName);
+		if(worker == null || worker.isDone()){
+			worker = creator.get();
 			WORKERS.put(workerName, worker);
 			ON_ENDS.put(workerName, onEnd);
 
 			onStart.accept(worker);
+		}
+	}
+
+	private <T> void createWorker(final String workerName, final Function<T, WorkerAbstract<?>> creator,
+			final Supplier<T> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+		WorkerAbstract<?> worker = WORKERS.get(workerName);
+		if(worker == null || worker.isDone()){
+			final T param = preStart.get();
+			if(param != null){
+				worker = creator.apply(param);
+				WORKERS.put(workerName, worker);
+				ON_ENDS.put(workerName, onEnd);
+
+				onStart.accept(worker);
+			}
 		}
 	}
 
