@@ -230,16 +230,17 @@ public class RulesReducer{
 	}
 
 	//add each key, remove the list from the addition
-	private List<String> retrieveAdditionsToBeRemoved(final List<LineEntry> rules, final LineEntry rule, final List<LineEntry> temporaryRules,
-			final Map<String, List<String>> lcss, final List<String> keys){
+	private List<String> retrieveAdditionsToBeRemoved(final List<LineEntry> rules, final LineEntry rule,
+			final List<LineEntry> temporaryRules, final Map<String, List<String>> lcss, final List<String> keys){
 		final List<String> additionsToBeRemoved = new ArrayList<>();
 		for(final String key : keys){
 			final int keyLength = key.length();
-			final String condition = rule.condition.substring(keyLength);
-			if(condition.isEmpty())
+			final int conditionLength = rule.condition.length() - keyLength;
+			if(conditionLength <= 0)
 				break;
 
-			final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
+			final String condition = rule.condition.substring(keyLength);
+			final String removal = (conditionLength <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
 			final Set<String> addition = new HashSet<>(list.size());
 			forEach(list, add -> addition.add(add.substring(keyLength)));
