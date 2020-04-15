@@ -60,7 +60,6 @@ public class StatisticsWorker extends WorkerDictionary{
 		orthography = BaseBuilder.getOrthography(language);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			try{
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -75,27 +74,6 @@ public class StatisticsWorker extends WorkerDictionary{
 						for(final String subword : subwords){
 							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
 							dicStatistics.addData(word, hyph);
-						}
-				}
-			}
-			}catch(Exception e){
-				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-				for(final Inflection inflection : inflections){
-					//collect statistics
-					final String word = inflection.getWord();
-					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
-					if(subwords.length == 0)
-						dicStatistics.addData(word);
-					else
-						for(final String subword : subwords){
-							try{
-								orthography.markDefaultStress(subword);
-							}
-							catch(Exception e1){
-								orthography.markDefaultStress(subword);
-							}
 						}
 				}
 			}
