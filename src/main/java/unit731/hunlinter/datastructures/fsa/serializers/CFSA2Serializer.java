@@ -7,8 +7,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import unit731.hunlinter.datastructures.fsa.CFSA2;
 import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.FSAFlags;
-import unit731.hunlinter.datastructures.fsa.FSAHeader;
+import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
 
 import java.io.IOException;
 import java.io.OutputStream;

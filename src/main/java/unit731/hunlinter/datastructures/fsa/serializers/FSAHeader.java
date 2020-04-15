@@ -1,4 +1,4 @@
-package unit731.hunlinter.datastructures.fsa;
+package unit731.hunlinter.datastructures.fsa.serializers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,15 +17,19 @@ public class FSAHeader{
 	private static final int FSA_MAGIC3 = 's';
 	private static final int FSA_MAGIC4 = 'a';
 	/** FSA magic (4 bytes) */
-	static final int FSA_MAGIC = (FSA_MAGIC1 << 24) | (FSA_MAGIC2 << 16) | (FSA_MAGIC3 << 8) | FSA_MAGIC4;
+	private static final int FSA_MAGIC = (FSA_MAGIC1 << 24) | (FSA_MAGIC2 << 16) | (FSA_MAGIC3 << 8) | FSA_MAGIC4;
 
 
 	/** FSA version number */
-	final byte version;
+	private final byte version;
 
 
 	FSAHeader(final byte version){
 		this.version = version;
+	}
+
+	public byte getVersion(){
+		return version;
 	}
 
 	/**

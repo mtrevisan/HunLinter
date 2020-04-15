@@ -1,7 +1,7 @@
 package unit731.hunlinter.datastructures.fsa.serializers;
 
 import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.FSAFlags;
+import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
 
 import java.io.IOException;
 import java.io.OutputStream;

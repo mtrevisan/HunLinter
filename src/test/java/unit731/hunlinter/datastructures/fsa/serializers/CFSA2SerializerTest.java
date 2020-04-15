@@ -3,7 +3,7 @@ package unit731.hunlinter.datastructures.fsa.serializers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.FSAFlags;
+import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
 import unit731.hunlinter.datastructures.fsa.builders.FSABuilder;
 import unit731.hunlinter.datastructures.fsa.FSATestUtils;
 import unit731.hunlinter.datastructures.fsa.builders.LexicographicalComparator;

@@ -1,6 +1,8 @@
 package unit731.hunlinter.datastructures.fsa;
 
 import unit731.hunlinter.datastructures.dynamicarray.DynamicIntArray;
+import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
+import unit731.hunlinter.datastructures.fsa.serializers.FSAHeader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -231,10 +233,10 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 */
 	public static FSA read(final InputStream stream) throws IOException{
 		final FSAHeader header = FSAHeader.read(stream);
-		return switch(header.version){
+		return switch(header.getVersion()){
 			case FSA5.VERSION -> new FSA5(stream);
 			case CFSA2.VERSION -> new CFSA2(stream);
-			default -> throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x", header.version & 0xFF));
+			default -> throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x", header.getVersion() & 0xFF));
 		};
 	}
 

@@ -3,7 +3,6 @@ package unit731.hunlinter.datastructures.fsa.builders;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.FSAFlags;
 import unit731.hunlinter.datastructures.fsa.FSATestUtils;
 import unit731.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import unit731.hunlinter.datastructures.fsa.serializers.FSASerializer;

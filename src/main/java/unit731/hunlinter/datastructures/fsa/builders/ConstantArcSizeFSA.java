@@ -1,7 +1,6 @@
 package unit731.hunlinter.datastructures.fsa.builders;
 
 import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.FSAFlags;
 
 import java.util.Collections;
 import java.util.Set;

@@ -1,5 +1,7 @@
 package unit731.hunlinter.datastructures.fsa;
 
+import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
