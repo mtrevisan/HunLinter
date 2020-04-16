@@ -244,8 +244,8 @@ e.printStackTrace();
 			for(final String stem : stems){
 				//source
 				byte[] inflectionStem = StringHelper.getRawBytes(stem);
-				//remove the initial part `po:`
-				inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length - 3);
+				//remove the initial part `st:`
+				inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length);
 
 				final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
 
