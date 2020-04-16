@@ -73,7 +73,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 		//encode word characters into bytes in the same encoding as the FSA's
 		final byte[] wordAsByteArray = word.getBytes(dictionary.metadata.getCharset());
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
-			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
+			throw new IllegalArgumentException("No valid input can contain the separator: " + word);
 
 		forms.reset();
 
@@ -122,7 +122,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 				}
 			}
 		}
-		else if(match.kind != FSAMatchResult.NO_MATCH){
+		else if(match.kind == FSAMatchResult.EXACT_MATCH){
 			//this case is somewhat confusing: we should have hit the separator first...
 			//I don't really know how to deal with it at the time being.
 			throw new IllegalArgumentException("what?!?!");

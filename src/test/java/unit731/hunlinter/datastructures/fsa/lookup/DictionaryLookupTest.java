@@ -58,33 +58,33 @@ class DictionaryLookupTest{
 		assertNoStemFor(s, "martygalski");
 	}
 
+	@Test
+	void inputConversion() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
+		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecz\\apospolit\\a"));
+
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "krowa\\apospolit\\a"));
+	}
+
+	@Test
+	void infixDictionaries() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej"));
+		Assertions.assertArrayEquals(new String[]{"Rzeczycki", "adj:pl:nom:m"}, stem(s, "Rzeczyccy"));
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecząpospolitą"));
+		//this word is not in the dictionary
+		assertNoStemFor(s, "martygalski");
+		//this word uses characters that are outside of the encoding range of the dictionary
+		assertNoStemFor(s, "Rzeczyckiõh");
+	}
+
 //	@Test
-//	void testInputConversion() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecz\\apospolit\\a"));
-//
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "krowa\\apospolit\\a"));
-//	}
-//
-//	@Test
-//	void testInfixDictionaries() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-infix.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej"));
-//		Assertions.assertArrayEquals(new String[]{"Rzeczycki", "adj:pl:nom:m"}, stem(s, "Rzeczyccy"));
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecząpospolitą"));
-//		//this word is not in the dictionary
-//		assertNoStemFor(s, "martygalski");
-//		//this word uses characters that are outside of the encoding range of the dictionary
-//		assertNoStemFor(s, "Rzeczyckiõh");
-//	}
-//
-//	@Test
-//	void testWordDataIterator() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-infix.dict");
+//	void wordDataIterator() throws IOException{
+//		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		final Set<String> entries = new HashSet<>();
@@ -94,15 +94,18 @@ class DictionaryLookupTest{
 //		//make sure a sample of the entries is present
 //		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
 //	}
-//
+
 //	@Test
-//	void testWordDataCloning() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-infix.dict");
+//	void wordDataCloning() throws IOException{
+//		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		List<WordData> words = new ArrayList<>();
 //		for(WordData wd : s){
-//			WordData clone = wd.clone();
+//			WordData clone = new WordData();
+//			clone.setWord(wd.getWord());
+//			clone.setStem(wd.getStem());
+//			clone.setTag(wd.getTag());
 //			words.add(clone);
 //		}
 //
@@ -110,10 +113,10 @@ class DictionaryLookupTest{
 //		final DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
 //		int i = 0;
 //		for(WordData wd : s2){
-//			WordData clone = words.get(i++);
-//			assertEqualSequences(clone.getStem(), wd.getStem());
-//			assertEqualSequences(clone.getTag(), wd.getTag());
-//			assertEqualSequences(clone.getWord(), wd.getWord());
+//			WordData clone = words.get(i ++);
+//			Assertions.assertArrayEquals(clone.getStem(), wd.getStem());
+//			Assertions.assertArrayEquals(clone.getTag(), wd.getTag());
+//			Assertions.assertEquals(clone.getWord(), wd.getWord());
 //		}
 //
 //		//check collections contract
@@ -123,46 +126,41 @@ class DictionaryLookupTest{
 //			Assertions.fail();
 //		}
 //		catch(RuntimeException e){
-//			// Expected.
+//			//expected
+//			System.out.println();
 //		}
 //	}
-//
-//	private void assertEqualSequences(CharSequence s1, CharSequence s2){
-//		Assertions.assertEquals(s1.toString(), s2.toString());
-//	}
-//
+
+	@Test
+	void multibyteEncodingUTF8() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/diacritics-utf8.dict");
+		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		Assertions.assertArrayEquals(new String[]{"merge", "001"}, stem(s, "mergeam"));
+		Assertions.assertArrayEquals(new String[]{"merge", "002"}, stem(s, "merseserăm"));
+	}
+
 //	@Test
-//	void testMultibyteEncodingUTF8() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-diacritics-utf8.dict");
-//		Dictionary read = Dictionary.read(url);
-//		final DictionaryLookup s = new DictionaryLookup(read);
-//
-//		Assertions.assertArrayEquals(new String[]{"merge", "001"}, stem(s, "mergeam"));
-//		Assertions.assertArrayEquals(new String[]{"merge", "002"}, stem(s, "merseserăm"));
-//	}
-//
-//	@Test
-//	void testSynthesis() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-synth.dict");
+//	void synthesis() throws IOException{
+//		final URL url = getClass().getResource("/services/fsa/lookup/synth.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		Assertions.assertArrayEquals(new String[]{"miała", null}, stem(s, "mieć|verb:praet:sg:ter:f:?perf"));
 //		Assertions.assertArrayEquals(new String[]{"a", null}, stem(s, "a|conj"));
 //		Assertions.assertArrayEquals(new String[]{}, stem(s, "dziecko|subst:sg:dat:n"));
-//
-//		// This word is not in the dictionary.
+//		//this word is not in the dictionary
 //		assertNoStemFor(s, "martygalski");
 //	}
-//
+
 //	@Test
-//	void testInputWithSeparators() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-separators.dict");
+//	void inputWithSeparators() throws IOException{
+//		final URL url = getClass().getResource("/services/fsa/lookup/separators.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		//attemp to reconstruct input sequences using WordData iterator
-//		ArrayList<String> sequences = new ArrayList<>();
+//		List<String> sequences = new ArrayList<>();
 //		for(WordData wd : s)
-//			sequences.add("" + wd.getWord() + " " + wd.getStem() + " " + wd.getTag());
+//			sequences.add(wd.getWord() + " " + toUTF8String(wd.getStem()) + " " + toUTF8String(wd.getTag()));
 //		Collections.sort(sequences);
 //
 //		Assertions.assertEquals("token1 null null", sequences.get(0));
@@ -174,27 +172,23 @@ class DictionaryLookupTest{
 //		Assertions.assertEquals("token7 token2 token3+", sequences.get(6));
 //		Assertions.assertEquals("token8 token2 token3++", sequences.get(7));
 //	}
-//
-//	@Test
-//	void testSeparatorInLookupTerm() throws IOException{
-//		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/lookup/test-separator-in-lookup.fsa"));
-//
-//		DictionaryMetadata metadata = new DictionaryMetadataBuilder()
-//			.separator('+')
-//			.encoding("iso8859-1")
-//			.encoder(EncoderType.INFIX)
-//			.build();
-//
-//		final DictionaryLookup s = new DictionaryLookup(new Dictionary(fsa, metadata));
-//		Assertions.assertEquals(0, s.lookup("l+A").size());
-//	}
-//
-//	@Test
-//	void testGetSeparator() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-separators.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//		Assertions.assertEquals('+', s.getSeparator());
-//	}
+
+	@Test
+	void separatorInLookupTerm() throws IOException{
+		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/lookup/separator-in-lookup.fsa"));
+
+		DictionaryMetadata metadata = new DictionaryMetadataBuilder()
+			.separator('+')
+			.encoding("iso8859-1")
+			.encoder(EncoderType.INFIX)
+			.build();
+
+		final DictionaryLookup s = new DictionaryLookup(new Dictionary(fsa, metadata));
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
+			() -> s.lookup("l+A"));
+		Assertions.assertEquals("No valid input can contain the separator: l+A", exception.getMessage());
+	}
+
 
 	private static void assertNoStemFor(DictionaryLookup s, String word){
 		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
