@@ -13,7 +13,7 @@ import java.util.Set;
 class DictionaryMetadataBuilderTest{
 
 	@Test
-	void testAllConstantsHaveBuilderMethods(){
+	void allConstantsHaveBuilderMethods(){
 		Set<DictionaryAttribute> keySet = new DictionaryMetadataBuilder()
 			.convertCase()
 			.encoding(Charset.defaultCharset())

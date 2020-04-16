@@ -27,7 +27,7 @@ public class SerializerTestBase{
 
 
 	@Test
-	public void testA() throws IOException{
+	void a() throws IOException{
 		List<String> input = Collections.singletonList("a");
 		List<byte[]> in = input.stream()
 			.sorted()
@@ -41,7 +41,7 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testArcsSharing() throws IOException{
+	void arcsSharing() throws IOException{
 		List<String> input = Arrays.asList("acf", "adg", "aeh", "bdg", "beh");
 		List<byte[]> in = input.stream()
 			.sorted()
@@ -55,7 +55,7 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testFSA5SerializerSimple() throws IOException{
+	void fsa5SerializerSimple() throws IOException{
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
 		List<byte[]> in = input.stream()
 			.sorted()
@@ -69,7 +69,7 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testNotMinimal() throws IOException{
+	void notMinimal() throws IOException{
 		List<String> input = Arrays.asList("aba", "b", "ba");
 		List<byte[]> in = input.stream()
 			.sorted()
@@ -83,12 +83,12 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testFSA5Bug0() throws IOException{
+	void fsa5Bug0() throws IOException{
 		checkCorrect(Arrays.asList("3-D+A+JJ", "3-D+A+NN", "4-F+A+NN", "z+A+NN"));
 	}
 
 	@Test
-	public void testFSA5Bug1() throws IOException{
+	void fsa5Bug1() throws IOException{
 		checkCorrect(Arrays.asList("+NP", "n+N", "n+NP"));
 	}
 
@@ -105,7 +105,7 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testEmptyInput() throws IOException{
+	void emptyInput() throws IOException{
 		List<byte[]> input = Collections.emptyList();
 		FSABuilder builder = new FSABuilder();
 		FSA s = builder.build(input);
@@ -114,22 +114,22 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void test_abc() throws IOException{
+	void abc() throws IOException{
 		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa")));
 	}
 
 	@Test
-	public void test_minimal() throws IOException{
+	void minimal() throws IOException{
 		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal.fsa")));
 	}
 
 	@Test
-	public void test_minimal2() throws IOException{
+	void minimal2() throws IOException{
 		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
 	}
 
 	@Test
-	public void test_en_tst() throws IOException{
+	void en_tst() throws IOException{
 		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict")));
 	}
 
@@ -164,7 +164,7 @@ public class SerializerTestBase{
 	}
 
 	@Test
-	public void testAutomatonWithNodeNumbers() throws IOException{
+	void automatonWithNodeNumbers() throws IOException{
 		Assertions.assertTrue(createSerializer().getFlags().contains(FSAFlags.NUMBERS));
 
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");

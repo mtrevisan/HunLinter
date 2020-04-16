@@ -16,7 +16,7 @@ import java.util.Random;
 class LexicographicalComparatorTest{
 
 	@Test
-	void testLexicographicOrder(){
+	void lexicographicOrder(){
 		List<byte[]> input = Arrays.asList(new byte[]{0}, new byte[]{1}, new byte[]{(byte)0xFF});
 		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
@@ -39,7 +39,7 @@ class LexicographicalComparatorTest{
 	}
 
 	@Test
-	void testRandom25000_largerAlphabet(){
+	void random25000_largerAlphabet(){
 		List<byte[]> in = generateRandom(25_000, 1, 20, 0, 255);
 
 		FSABuilder builder = new FSABuilder();
@@ -50,7 +50,7 @@ class LexicographicalComparatorTest{
 	}
 
 	@Test
-	public void testRandom25000_smallAlphabet(){
+	void random25000_smallAlphabet(){
 		List<byte[]> in = generateRandom(40, 1, 20, 0, 3);
 
 		FSABuilder builder = new FSABuilder();

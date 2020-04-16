@@ -8,7 +8,7 @@ import unit731.hunlinter.datastructures.dynamicarray.DynamicArray;
 public class SimpleDynamicArrayTest{
 
 	@Test
-	void testAdd(){
+	void add(){
 		DynamicArray<Integer> array = new DynamicArray<>();
 
 		for(int i = 0; i < 1_000_000; i ++)
@@ -19,7 +19,7 @@ public class SimpleDynamicArrayTest{
 	}
 
 	@Test
-	void testRemove(){
+	void remove(){
 		DynamicArray<Integer> array = new DynamicArray<>();
 
 		for(int i = 0; i < 1_000_000; i ++)

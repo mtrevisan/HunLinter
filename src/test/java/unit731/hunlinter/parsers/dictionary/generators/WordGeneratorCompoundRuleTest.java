@@ -13,7 +13,7 @@ import unit731.hunlinter.services.system.FileHelper;
 class WordGeneratorCompoundRuleTest extends TestBase{
 
 	@Test
-	void testBjörnJacke() throws IOException{
+	void björnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 class FSABuilderTest{
 
 	@Test
-	void testEmptyInput(){
+	void emptyInput(){
 		List<byte[]> input = Collections.emptyList();
 
 		FSABuilder builder = new FSABuilder();
@@ -27,7 +27,7 @@ class FSABuilderTest{
 	}
 
 	@Test
-	void testHashResizeBug(){
+	void hashResizeBug(){
 		List<String> input = Arrays.asList("01", "02", "11", "21");
 		List<byte[]> in = input.stream()
 			.map(StringHelper::getRawBytes)
@@ -41,7 +41,7 @@ class FSABuilderTest{
 	}
 
 	@Test
-	void testSmallInput(){
+	void smallInput(){
 		List<String> input = Arrays.asList("abc", "bbc", "d");
 		List<byte[]> in = input.stream()
 			.map(StringHelper::getRawBytes)
@@ -54,7 +54,7 @@ class FSABuilderTest{
 	}
 
 	@Test
-	void testLexicographicOrder(){
+	void lexicographicOrder(){
 		List<byte[]> input = Arrays.asList(new byte[]{0}, new byte[]{1}, new byte[]{(byte)0xFF});
 		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
@@ -77,7 +77,7 @@ class FSABuilderTest{
 	}
 
 	@Test
-	void testRandom25000_largerAlphabet(){
+	void random25000_largerAlphabet(){
 		List<byte[]> in = generateRandom(25_000, 1, 20, 0, 255);
 
 		FSABuilder builder = new FSABuilder();
@@ -88,7 +88,7 @@ class FSABuilderTest{
 	}
 
 	@Test
-	public void testRandom25000_smallAlphabet(){
+	void random25000_smallAlphabet(){
 		List<byte[]> in = generateRandom(40, 1, 20, 0, 3);
 
 		FSABuilder builder = new FSABuilder();

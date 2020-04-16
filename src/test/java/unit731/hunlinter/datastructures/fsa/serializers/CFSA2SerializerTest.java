@@ -25,37 +25,37 @@ import java.util.stream.Collectors;
 class CFSA2SerializerTest{
 
 	@Test
-	void testEmptyInput() throws IOException{
+	void emptyInput() throws IOException{
 		testInput(Collections.emptyList());
 	}
 
 	@Test
-	void testA() throws IOException{
+	void a() throws IOException{
 		testInput(Collections.singletonList("a"));
 	}
 
 	@Test
-	void testArcsSharing() throws IOException{
+	void arcsSharing() throws IOException{
 		testInput(Arrays.asList("acf", "adg", "aeh", "bdg", "beh"));
 	}
 
 	@Test
-	void testFSA5SerializerSimple() throws IOException{
+	void fsa5SerializerSimple() throws IOException{
 		testInput(Arrays.asList("a", "aba", "ac", "b", "ba", "c"));
 	}
 
 	@Test
-	void testNotMinimal() throws IOException{
+	void notMinimal() throws IOException{
 		testInput(Arrays.asList("aba", "b", "ba"));
 	}
 
 	@Test
-	void testFSA5Bug0() throws IOException{
+	void fsa5Bug0() throws IOException{
 		testInput(Arrays.asList("3-D+A+JJ", "3-D+A+NN", "4-F+A+NN", "z+A+NN"));
 	}
 
 	@Test
-	void testFSA5Bug1() throws IOException{
+	void fsa5Bug1() throws IOException{
 		testInput(Arrays.asList("+NP", "n+N", "n+NP"));
 	}
 
@@ -73,22 +73,22 @@ class CFSA2SerializerTest{
 
 
 	@Test
-	void test_abc() throws IOException{
+	void abc() throws IOException{
 		testInput("abc.fsa");
 	}
 
 	@Test
-	void test_minimal() throws IOException{
+	void minimal() throws IOException{
 		testInput("minimal.fsa");
 	}
 
 	@Test
-	void test_minimal2() throws IOException{
+	void minimal2() throws IOException{
 		testInput("minimal2.fsa");
 	}
 
 	@Test
-	void test_en_tst() throws IOException{
+	void en_tst() throws IOException{
 		testInput("en_tst.dict");
 	}
 
@@ -125,7 +125,7 @@ class CFSA2SerializerTest{
 	}
 
 	@Test
-	void testAutomatonWithNodeNumbers() throws IOException{
+	void automatonWithNodeNumbers() throws IOException{
 		Assertions.assertTrue(createSerializer().getFlags().contains(FSAFlags.NUMBERS));
 
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");

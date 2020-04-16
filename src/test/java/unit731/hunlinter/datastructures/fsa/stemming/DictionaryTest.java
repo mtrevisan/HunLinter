@@ -10,10 +10,10 @@ import java.io.InputStream;
 class DictionaryTest{
 
 	@Test
-	void testReadFromFile() throws IOException{
+	void readFromFile() throws IOException{
 		try(
-				InputStream dictInput = getClass().getResource("/services/fsa/stemming/test-infix.dict").openStream();
-				InputStream infoInput = getClass().getResource("/services/fsa/stemming/test-infix.info").openStream();
+				InputStream dictInput = getClass().getResource("/services/fsa/lookup/infix.dict").openStream();
+				InputStream infoInput = getClass().getResource("/services/fsa/lookup/infix.info").openStream();
 			){
 			Assertions.assertNotNull(Dictionary.read(dictInput, infoInput));
 		}

@@ -10,7 +10,7 @@ import java.util.Arrays;
 class SequenceEncodersTest{
 
 	@Test
-	void testEncodeSamples(){
+	void encodeSamples(){
 		for(final EncoderType encoderType : EncoderType.values()){
 			SequenceEncoderInterface coder = encoderType.get();
 

@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 class BufferUtilsTest{
 
 	@Test
-	void testSharedPrefix(){
+	void sharedPrefix(){
 		Assertions.assertEquals(4, BufferUtils.sharedPrefixLength(toByteArray("abcdef"), toByteArray("abcd__")));
 		Assertions.assertEquals(0, BufferUtils.sharedPrefixLength(toByteArray(""), toByteArray("_")));
 		Assertions.assertEquals(2, BufferUtils.sharedPrefixLength(toByteArray("cd"), toByteArray("cd")));
