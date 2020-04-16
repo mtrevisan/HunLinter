@@ -93,8 +93,6 @@ public class DictionaryLookup implements Iterable<WordData>{
 				while(finalStatesIterator.hasNext()){
 					final ByteBuffer bb = finalStatesIterator.next();
 
-//					assert prefixBytes <= bb.remaining(): sequenceEncoder.getClass() + " >? " + bb.remaining();
-
 					//find the separator byte's position splitting the inflection instructions from the tag
 					final byte[] bbArray = bb.array();
 					int separatorIndex = ArrayUtils.indexOf(bbArray, separator);

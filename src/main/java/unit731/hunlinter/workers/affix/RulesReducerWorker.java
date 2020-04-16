@@ -96,7 +96,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			return compactedRules;
 		};
 		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
-			resetProcessing("Check correctness (step 3/3)");
+			resetProcessing("Verifying correctness (step 3/3)");
 
 			final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
