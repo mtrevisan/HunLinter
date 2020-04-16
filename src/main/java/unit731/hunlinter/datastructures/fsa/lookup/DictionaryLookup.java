@@ -98,6 +98,8 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
 
+		forms.clear();
+
 		//try to find a partial match in the dictionary
 		final FSAMatchResult match = matcher.match(wordAsByteArray, dictionary.fsa.getRootNode());
 
