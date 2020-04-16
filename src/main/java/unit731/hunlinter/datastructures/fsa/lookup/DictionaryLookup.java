@@ -1,6 +1,7 @@
 package unit731.hunlinter.datastructures.fsa.lookup;
 
 import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.datastructures.fsa.ByteSequenceIterator;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.datastructures.fsa.stemming.NoEncoder;
@@ -10,10 +11,8 @@ import unit731.hunlinter.datastructures.fsa.stemming.TrimPrefixAndSuffixEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.TrimSuffixEncoder;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,10 +24,6 @@ import java.util.Objects;
  */
 public class DictionaryLookup implements Iterable<WordData>{
 
-	/** Expand buffers and arrays by this constant */
-	private final static int EXPAND_SIZE = 10;
-
-
 	/** An FSA used for lookups */
 	private final FSATraversal matcher;
 
@@ -36,7 +31,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	private final ByteSequenceIterator finalStatesIterator;
 
 	/** Private internal array of reusable word data objects */
-	private WordData[] forms = new WordData[0];
+	private final SimpleDynamicArray<WordData> forms = new SimpleDynamicArray<>(WordData.class);
 
 	/** The {@link Dictionary} this lookup is using */
 	private final Dictionary dictionary;
@@ -75,7 +70,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @param word	The word (typically inflected) to look up base forms for.
 	 * @return	A list of {@link WordData} entries (possibly empty).
 	 */
-	public List<WordData> lookup(String word){
+	public WordData[] lookup(String word){
 		final byte separator = dictionary.metadata.getSeparator();
 
 		/**
@@ -97,8 +92,6 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
 			word = applyReplacements(word, dictionary.metadata.getInputConversionPairs());
 
-		final List<WordData> formsList = new ArrayList<>();
-
 		//encode word characters into bytes in the same encoding as the FSA's
 		final byte[] wordAsByteArray = word.getBytes(dictionary.metadata.getCharset());
 		Arrays.sort(wordAsByteArray);
@@ -115,24 +108,15 @@ public class DictionaryLookup implements Iterable<WordData>{
 			//the situation when the arc points to a final node should NEVER happen,
 			//after all, we want the word to have SOME base form
 			if(arc != 0 && !dictionary.fsa.isArcFinal(arc)){
-				//there is such a word in the dictionary, return its base forms
-				int formsCount = 0;
-
 				finalStatesIterator.restartFrom(dictionary.fsa.getEndNode(arc));
+				//there is such a word in the dictionary, return its base forms
 				while(finalStatesIterator.hasNext()){
 					final ByteBuffer bb = finalStatesIterator.next();
 					final byte[] ba = bb.array();
 					final int bbSize = bb.remaining();
 
-					if(formsCount >= forms.length){
-						forms = Arrays.copyOf(forms, forms.length + EXPAND_SIZE);
-						for(int k = 0; k < forms.length; k ++)
-							if(forms[k] == null)
-								forms[k] = new WordData();
-					}
-
 					//now, expand the prefix/ suffix 'compression' and store the base form
-					final WordData wordData = forms[formsCount++];
+					final WordData wordData = new WordData();
 					if(dictionary.metadata.getOutputConversionPairs().isEmpty())
 						wordData.setWord(word);
 					else
@@ -160,9 +144,9 @@ public class DictionaryLookup implements Iterable<WordData>{
 						wordData.setTag(new byte[tagSize]);
 						System.arraycopy(ba, sepPos, wordData, 0, tagSize);
 					}
-				}
 
-				formsList.wrap(forms, 0, formsCount);
+					forms.add(wordData);
+				}
 			}
 		}
 		else{
@@ -171,7 +155,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 			 * first... I don't really know how to deal with it at the time being.
 			 */
 		}
-		return formsList;
+		return forms.extractCopyOrNull();
 	}
 
 	/**
