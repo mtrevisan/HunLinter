@@ -127,7 +127,6 @@ public final class FSATraversal{
 		if(node == 0)
 			return new FSAMatchResult(FSAMatchResult.NO_MATCH, start, node);
 
-		final FSA fsa = this.fsa;
 		final int end = start + length;
 		for(int i = start; i < end; i ++){
 			final int arc = fsa.getArc(node, sequence[i]);

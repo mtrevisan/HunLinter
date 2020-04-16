@@ -45,17 +45,17 @@ class DictionaryLookupTest{
 		Assertions.assertEquals("Deprecated encoder keys in metadata. Use fsa.dict.encoder=INFIX", exception.getMessage());
 	}
 
-//	@Test
-//	void prefixDictionaries() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej"));
-//		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecząpospolitą"));
-//
-//		// This word is not in the dictionary.
-//		assertNoStemFor(s, "martygalski");
-//	}
+	@Test
+	void prefixDictionaries() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
+		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej"));
+		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecząpospolitą"));
+
+		//this word is not in the dictionary
+		assertNoStemFor(s, "martygalski");
+	}
 
 //	@Test
 //	void testInputConversion() throws IOException{

@@ -2,7 +2,6 @@ package unit731.hunlinter.datastructures.fsa.lookup;
 
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
-import unit731.hunlinter.datastructures.fsa.ByteSequenceIterator;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.datastructures.fsa.stemming.NoEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
@@ -11,7 +10,6 @@ import unit731.hunlinter.datastructures.fsa.stemming.TrimPrefixAndSuffixEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.TrimSuffixEncoder;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -94,7 +92,6 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 		//encode word characters into bytes in the same encoding as the FSA's
 		final byte[] wordAsByteArray = word.getBytes(dictionary.metadata.getCharset());
-		Arrays.sort(wordAsByteArray);
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
 
@@ -114,40 +111,40 @@ public class DictionaryLookup implements Iterable<WordData>{
 				//there is such a word in the dictionary, return its base forms
 				while(finalStatesIterator.hasNext()){
 					final ByteBuffer bb = finalStatesIterator.next();
-					final byte[] ba = bb.array();
-					final int bbSize = bb.remaining();
-
-					//now, expand the prefix/ suffix 'compression' and store the base form
-					final WordData wordData = new WordData();
-					if(dictionary.metadata.getOutputConversionPairs().isEmpty())
-						wordData.setWord(word);
-					else
-						wordData.setWord(applyReplacements(word, dictionary.metadata.getOutputConversionPairs()));
-
-					//find the separator byte's position splitting the inflection instructions
-					//from the tag
-					assert prefixBytes <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
-
-					int sepPos;
-					for(sepPos = prefixBytes; sepPos < bbSize; sepPos ++)
-						if(ba[sepPos] == separator)
-							break;
-
-					//decode the stem into stem buffer
-					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, ByteBuffer.wrap(ba, 0, sepPos)));
-
-					//skip separator character
-					sepPos ++;
-
-					//decode the tag data
-					final int tagSize = bbSize - sepPos;
-					if(tagSize > 0){
-						//FIXME mmm...
-						wordData.setTag(new byte[tagSize]);
-						System.arraycopy(ba, sepPos, wordData, 0, tagSize);
-					}
-
-					forms.add(wordData);
+//					final byte[] ba = bb.array();
+//					final int bbSize = bb.remaining();
+//
+//					//now, expand the prefix/ suffix 'compression' and store the base form
+//					final WordData wordData = new WordData();
+//					if(dictionary.metadata.getOutputConversionPairs().isEmpty())
+//						wordData.setWord(word);
+//					else
+//						wordData.setWord(applyReplacements(word, dictionary.metadata.getOutputConversionPairs()));
+//
+//					//find the separator byte's position splitting the inflection instructions
+//					//from the tag
+//					assert prefixBytes <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
+//
+//					int sepPos;
+//					for(sepPos = prefixBytes; sepPos < bbSize; sepPos ++)
+//						if(ba[sepPos] == separator)
+//							break;
+//
+//					//decode the stem into stem buffer
+//					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, ByteBuffer.wrap(ba, 0, sepPos)));
+//
+//					//skip separator character
+//					sepPos ++;
+//
+//					//decode the tag data
+//					final int tagSize = bbSize - sepPos;
+//					if(tagSize > 0){
+//						//FIXME mmm...
+//						wordData.setTag(new byte[tagSize]);
+//						System.arraycopy(ba, sepPos, wordData, 0, tagSize);
+//					}
+//
+//					forms.add(wordData);
 				}
 			}
 		}
@@ -156,6 +153,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 			 * this case is somewhat confusing: we should have hit the separator
 			 * first... I don't really know how to deal with it at the time being.
 			 */
+			throw new IllegalArgumentException("what?!?!");
 		}
 		return forms.extractCopyOrNull();
 	}

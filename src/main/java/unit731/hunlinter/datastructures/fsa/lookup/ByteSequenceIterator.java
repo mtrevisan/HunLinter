@@ -1,4 +1,6 @@
-package unit731.hunlinter.datastructures.fsa;
+package unit731.hunlinter.datastructures.fsa.lookup;
+
+import unit731.hunlinter.datastructures.fsa.FSA;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -93,6 +95,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		final ByteBuffer cache;
 		if(nextElement != null){
 			cache = nextElement;
+
 			nextElement = null;
 		}
 		else{
