@@ -37,17 +37,17 @@ class DictionaryLookupTest{
 		Assertions.assertEquals("xxxxxxxx", DictionaryLookup.applyReplacements("____", conversion));
 	}
 
-//	@Test
-//	void testRemovedEncoderProperties(){
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-removed-props.dict");
-//		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
-//			() -> new DictionaryLookup(Dictionary.read(url)));
-//		Assertions.assertEquals(DictionaryAttribute.ENCODER.propertyName, exception.getMessage());
-//	}
-//
+	@Test
+	void testRemovedEncoderProperties(){
+		final URL url = getClass().getResource("/services/fsa/lookup/removed-props.dict");
+		Throwable exception = Assertions.assertThrows(IOException.class,
+			() -> new DictionaryLookup(Dictionary.read(url)));
+		Assertions.assertEquals("Deprecated encoder keys in metadata. Use fsa.dict.encoder=INFIX", exception.getMessage());
+	}
+
 //	@Test
 //	void testPrefixDictionaries() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-prefix.dict");
+//		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej"));
@@ -56,10 +56,10 @@ class DictionaryLookupTest{
 //		// This word is not in the dictionary.
 //		assertNoStemFor(s, "martygalski");
 //	}
-//
+
 //	@Test
 //	void testInputConversion() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/test-prefix.dict");
+//		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecz\\apospolit\\a"));
@@ -194,9 +194,9 @@ class DictionaryLookupTest{
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //		Assertions.assertEquals('+', s.getSeparator());
 //	}
-//
-//	private static String asString(CharSequence s){
-//		return (s != null? s.toString(): null);
+
+//	private static void assertNoStemFor(DictionaryLookup s, String word){
+//		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
 //	}
 //
 //	private static String[] stem(DictionaryLookup s, String word){
@@ -208,8 +208,8 @@ class DictionaryLookupTest{
 //		return result.toArray(String[]::new);
 //	}
 //
-//	private static void assertNoStemFor(DictionaryLookup s, String word){
-//		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
+//	private static String asString(CharSequence s){
+//		return (s != null? s.toString(): null);
 //	}
 
 }
