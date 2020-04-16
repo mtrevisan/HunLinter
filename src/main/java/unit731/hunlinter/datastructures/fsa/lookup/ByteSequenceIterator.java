@@ -22,6 +22,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 */
 	private final static int EXPECTED_MAX_STATES = 15;
 
+
 	/** The FSA to which this iterator belongs. */
 	private final FSA fsa;
 
@@ -30,8 +31,10 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** A buffer for the current sequence of bytes from the current node to the root. */
 	private byte[] buffer = new byte[EXPECTED_MAX_STATES];
+	/** Reusable byte buffer wrapper around {@link #buffer}. */
+	private ByteBuffer bufferWrapper = ByteBuffer.wrap(buffer);
 
-	/** an arc stack for DFS when processing the automaton */
+	/** An arc stack for DFS when processing the automaton. */
 	private int[] arcs = new int[EXPECTED_MAX_STATES];
 	/** current processing depth in {@link #arcs} */
 	private int arcLimit;
@@ -120,8 +123,11 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 			arcs[lastIndex] = fsa.getNextArc(arc);
 
 			//expand buffer if needed
-			if(lastIndex >= buffer.length)
-				buffer = Arrays.copyOf(buffer, Math.max(lastIndex, buffer.length + EXPECTED_MAX_STATES));
+			final int bufferLength = buffer.length;
+			if(lastIndex >= bufferLength){
+				buffer = Arrays.copyOf(buffer, bufferLength + EXPECTED_MAX_STATES);
+				bufferWrapper = ByteBuffer.wrap(buffer);
+			}
 			buffer[lastIndex] = fsa.getArcLabel(arc);
 
 			if(!fsa.isArcTerminal(arc))

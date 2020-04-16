@@ -19,7 +19,7 @@ public class DictionaryMetadataBuilder{
 	private final EnumMap<DictionaryAttribute, String> attrs = new EnumMap<>(DictionaryAttribute.class);
 
 	public DictionaryMetadataBuilder separator(char c){
-		this.attrs.put(DictionaryAttribute.SEPARATOR, Character.toString(c));
+		attrs.put(DictionaryAttribute.SEPARATOR, Character.toString(c));
 		return this;
 	}
 
@@ -28,68 +28,68 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder encoding(String charsetName){
-		this.attrs.put(DictionaryAttribute.ENCODING, charsetName);
+		attrs.put(DictionaryAttribute.ENCODING, charsetName);
 		return this;
 	}
 
 	public DictionaryMetadataBuilder frequencyIncluded(){ return frequencyIncluded(true); }
 
 	public DictionaryMetadataBuilder frequencyIncluded(boolean v){
-		this.attrs.put(DictionaryAttribute.FREQUENCY_INCLUDED, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.FREQUENCY_INCLUDED, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignorePunctuation(){ return ignorePunctuation(true); }
 
 	public DictionaryMetadataBuilder ignorePunctuation(boolean v){
-		this.attrs.put(DictionaryAttribute.IGNORE_PUNCTUATION, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_PUNCTUATION, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreNumbers(){ return ignoreNumbers(true); }
 
 	public DictionaryMetadataBuilder ignoreNumbers(boolean v){
-		this.attrs.put(DictionaryAttribute.IGNORE_NUMBERS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_NUMBERS, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreCamelCase(){ return ignoreCamelCase(true); }
 
 	public DictionaryMetadataBuilder ignoreCamelCase(boolean v){
-		this.attrs.put(DictionaryAttribute.IGNORE_CAMEL_CASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_CAMEL_CASE, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreAllUppercase(){ return ignoreAllUppercase(true); }
 
 	public DictionaryMetadataBuilder ignoreAllUppercase(boolean v){
-		this.attrs.put(DictionaryAttribute.IGNORE_ALL_UPPERCASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_ALL_UPPERCASE, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreDiacritics(){ return ignoreDiacritics(true); }
 
 	public DictionaryMetadataBuilder ignoreDiacritics(boolean v){
-		this.attrs.put(DictionaryAttribute.IGNORE_DIACRITICS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_DIACRITICS, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder convertCase(){ return convertCase(true); }
 
 	public DictionaryMetadataBuilder convertCase(boolean v){
-		this.attrs.put(DictionaryAttribute.CONVERT_CASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.CONVERT_CASE, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder supportRunOnWords(){ return supportRunOnWords(true); }
 
 	public DictionaryMetadataBuilder supportRunOnWords(boolean v){
-		this.attrs.put(DictionaryAttribute.RUN_ON_WORDS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.RUN_ON_WORDS, Boolean.valueOf(v).toString());
 		return this;
 	}
 
 	public DictionaryMetadataBuilder encoder(EncoderType type){
-		this.attrs.put(DictionaryAttribute.ENCODER, type.name());
+		attrs.put(DictionaryAttribute.ENCODER, type.name());
 		return this;
 	}
 
@@ -98,7 +98,7 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder locale(String localeName){
-		this.attrs.put(DictionaryAttribute.LOCALE, localeName);
+		attrs.put(DictionaryAttribute.LOCALE, localeName);
 		return this;
 	}
 
@@ -112,7 +112,7 @@ public class DictionaryMetadataBuilder{
 				builder.append(k).append(StringUtils.SPACE).append(v);
 			}
 		}
-		this.attrs.put(DictionaryAttribute.REPLACEMENT_PAIRS, builder.toString());
+		attrs.put(DictionaryAttribute.REPLACEMENT_PAIRS, builder.toString());
 		return this;
 	}
 
@@ -126,7 +126,7 @@ public class DictionaryMetadataBuilder{
 				builder.append(k).append(StringUtils.SPACE).append(v);
 			}
 		}
-		this.attrs.put(DictionaryAttribute.EQUIVALENT_CHARS, builder.toString());
+		attrs.put(DictionaryAttribute.EQUIVALENT_CHARS, builder.toString());
 		return this;
 	}
 
@@ -138,7 +138,7 @@ public class DictionaryMetadataBuilder{
 				builder.append(", ");
 			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
 		}
-		this.attrs.put(DictionaryAttribute.INPUT_CONVERSION, builder.toString());
+		attrs.put(DictionaryAttribute.INPUT_CONVERSION, builder.toString());
 		return this;
 	}
 
@@ -150,23 +150,23 @@ public class DictionaryMetadataBuilder{
 				builder.append(", ");
 			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
 		}
-		this.attrs.put(DictionaryAttribute.OUTPUT_CONVERSION, builder.toString());
+		attrs.put(DictionaryAttribute.OUTPUT_CONVERSION, builder.toString());
 		return this;
 	}
 
 
 	public DictionaryMetadataBuilder author(String author){
-		this.attrs.put(DictionaryAttribute.AUTHOR, author);
+		attrs.put(DictionaryAttribute.AUTHOR, author);
 		return this;
 	}
 
 	public DictionaryMetadataBuilder creationDate(String creationDate){
-		this.attrs.put(DictionaryAttribute.CREATION_DATE, creationDate);
+		attrs.put(DictionaryAttribute.CREATION_DATE, creationDate);
 		return this;
 	}
 
 	public DictionaryMetadataBuilder license(String license){
-		this.attrs.put(DictionaryAttribute.LICENSE, license);
+		attrs.put(DictionaryAttribute.LICENSE, license);
 		return this;
 	}
 

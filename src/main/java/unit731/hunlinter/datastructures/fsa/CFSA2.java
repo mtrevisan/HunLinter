@@ -148,7 +148,7 @@ public class CFSA2 extends FSA{
 		if(flagBits != FSAFlags.getMask(flags))
 			throw new IOException("Unrecognized flags: 0x" + Integer.toHexString(flagBits));
 
-		this.hasNumbers = flags.contains(FSAFlags.NUMBERS);
+		hasNumbers = flags.contains(FSAFlags.NUMBERS);
 
 		//read mapping dictionary
 		final int labelMappingSize = in.readByte() & 0xFF;
@@ -192,7 +192,6 @@ public class CFSA2 extends FSA{
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(getArcLabel(arc) == label)
 				return arc;
-
 		//an arc labeled with "label" not found
 		return 0;
 	}
@@ -302,7 +301,7 @@ public class CFSA2 extends FSA{
 		if((flag & BIT_TARGET_NEXT) == 0)
 			offset = skipVInt(offset);
 
-		//assert offset < this.arcs.length;
+		//assert offset < arcs.length;
 
 		return offset;
 	}
