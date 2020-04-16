@@ -32,7 +32,6 @@ public interface SequenceEncoderInterface{
 	/**
 	 * Decodes <code>encoded</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
-	 * @param reuse	Reuses the provided {@link ByteBuffer} or allocates a new one if there is not enough remaining space.
 	 * @param source	The source byte sequence.
 	 * @param encoded	The {@linkplain #encode previously encoded} byte sequence.
 	 * @return	The {@link ByteBuffer} with decoded <code>target</code>.

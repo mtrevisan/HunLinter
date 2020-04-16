@@ -130,20 +130,19 @@ public final class FSATraversal{
 		final int end = start + length;
 		for(int i = start; i < end; i ++){
 			final int arc = fsa.getArc(node, sequence[i]);
-			if(arc != 0){
-				if(i + 1 == end && fsa.isArcFinal(arc))
-					//the automaton has an exact match of the input sequence
-					return new FSAMatchResult(FSAMatchResult.EXACT_MATCH, i, node);
-
-				if(fsa.isArcTerminal(arc))
-					//the automaton contains a prefix of the input sequence
-					return new FSAMatchResult(FSAMatchResult.AUTOMATON_HAS_PREFIX, i + 1, node);
-
-				//make a transition along the arc
-				node = fsa.getEndNode(arc);
-			}
-			else
+			if(arc == 0)
 				return new FSAMatchResult((i > start? FSAMatchResult.AUTOMATON_HAS_PREFIX: FSAMatchResult.NO_MATCH), i, node);
+
+			if(i + 1 == end && fsa.isArcFinal(arc))
+				//the automaton has an exact match of the input sequence
+				return new FSAMatchResult(FSAMatchResult.EXACT_MATCH, i, node);
+
+			if(fsa.isArcTerminal(arc))
+				//the automaton contains a prefix of the input sequence
+				return new FSAMatchResult(FSAMatchResult.AUTOMATON_HAS_PREFIX, i + 1, node);
+
+			//make a transition along the arc
+			node = fsa.getEndNode(arc);
 		}
 
 		//the sequence is a prefix of at least one sequence in the automaton

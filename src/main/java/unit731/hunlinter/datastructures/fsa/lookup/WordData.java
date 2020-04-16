@@ -9,13 +9,13 @@ public class WordData{
 
 	/** inflected word form data */
 	private String word;
-	private String stem;
-	private String tag;
+	private byte[] stem;
+	private byte[] tag;
 
 
 	WordData(){}
 
-	WordData(final String stem, final String tag){
+	WordData(final byte[] stem, final byte[] tag){
 		this.stem = stem;
 		this.tag = tag;
 	}
@@ -30,14 +30,14 @@ public class WordData{
 	/**
 	 * @return	Stem data decoded to a character sequence or <code>null</code> if no associated stem data exists.
 	 */
-	public String getStem(){
+	public byte[] getStem(){
 		return stem;
 	}
 
 	/**
 	 * @return	Tag data decoded to a character sequence or <code>null</code> if no associated tag data exists.
 	 */
-	public String getTag(){
+	public byte[] getTag(){
 		return tag;
 	}
 
@@ -45,11 +45,11 @@ public class WordData{
 		this.word = word;
 	}
 
-	void setStem(final String stem){
+	void setStem(final byte[] stem){
 		this.stem = stem;
 	}
 
-	void setTag(final String tag){
+	void setTag(final byte[] tag){
 		this.tag = tag;
 	}
 

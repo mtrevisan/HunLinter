@@ -3,11 +3,7 @@ package unit731.hunlinter.datastructures.fsa.lookup;
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
-import unit731.hunlinter.datastructures.fsa.stemming.NoEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
-import unit731.hunlinter.datastructures.fsa.stemming.TrimInfixAndSuffixEncoder;
-import unit731.hunlinter.datastructures.fsa.stemming.TrimPrefixAndSuffixEncoder;
-import unit731.hunlinter.datastructures.fsa.stemming.TrimSuffixEncoder;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -71,22 +67,6 @@ public class DictionaryLookup implements Iterable<WordData>{
 	public WordData[] lookup(String word){
 		final byte separator = dictionary.metadata.getSeparator();
 
-		/**
-		 * The number of encoded form's prefix bytes that should be ignored (needed for separator lookup).
-		 * An ugly workaround for GH-85, should be fixed by prior knowledge of whether the dictionary contains tags;
-		 * then we can scan for separator right-to-left.
-		 * @see "https://github.com/morfologik/morfologik-stemming/issues/85"
-		 */
-		int prefixBytes = -1;
-		if(sequenceEncoder instanceof NoEncoder)
-			prefixBytes = 0;
-		else if(sequenceEncoder instanceof TrimSuffixEncoder)
-			prefixBytes = 1;
-		else if(sequenceEncoder instanceof TrimPrefixAndSuffixEncoder)
-			prefixBytes = 2;
-		else if(sequenceEncoder instanceof TrimInfixAndSuffixEncoder)
-			prefixBytes = 3;
-
 		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
 			word = applyReplacements(word, dictionary.metadata.getInputConversionPairs());
 
@@ -95,7 +75,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
 
-		forms.clear();
+		forms.reset();
 
 		//try to find a partial match in the dictionary
 		final FSAMatchResult match = matcher.match(wordAsByteArray, dictionary.fsa.getRootNode());
@@ -111,51 +91,43 @@ public class DictionaryLookup implements Iterable<WordData>{
 				//there is such a word in the dictionary, return its base forms
 				while(finalStatesIterator.hasNext()){
 					final ByteBuffer bb = finalStatesIterator.next();
-//					final byte[] ba = bb.array();
-//					final int bbSize = bb.remaining();
-//
-//					//now, expand the prefix/ suffix 'compression' and store the base form
-//					final WordData wordData = new WordData();
-//					if(dictionary.metadata.getOutputConversionPairs().isEmpty())
-//						wordData.setWord(word);
-//					else
-//						wordData.setWord(applyReplacements(word, dictionary.metadata.getOutputConversionPairs()));
-//
-//					//find the separator byte's position splitting the inflection instructions
-//					//from the tag
-//					assert prefixBytes <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
-//
-//					int sepPos;
-//					for(sepPos = prefixBytes; sepPos < bbSize; sepPos ++)
-//						if(ba[sepPos] == separator)
-//							break;
-//
-//					//decode the stem into stem buffer
-//					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, ByteBuffer.wrap(ba, 0, sepPos)));
-//
-//					//skip separator character
-//					sepPos ++;
-//
-//					//decode the tag data
-//					final int tagSize = bbSize - sepPos;
-//					if(tagSize > 0){
-//						//FIXME mmm...
-//						wordData.setTag(new byte[tagSize]);
-//						System.arraycopy(ba, sepPos, wordData, 0, tagSize);
-//					}
-//
-//					forms.add(wordData);
+
+//					assert prefixBytes <= bb.remaining(): sequenceEncoder.getClass() + " >? " + bb.remaining();
+
+					//find the separator byte's position splitting the inflection instructions from the tag
+					int separatorIndex = ArrayUtils.indexOf(bb.array(), separator);
+
+					//now, expand the prefix/ suffix 'compression' and store the base form
+					final WordData wordData = new WordData();
+					final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
+					wordData.setWord(outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs));
+
+					//decode the stem into stem buffer
+					final byte[] copy = new byte[separatorIndex];
+					System.arraycopy(bb.array(), 0, copy, 0, separatorIndex);
+					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, copy));
+
+					//skip separator character
+					separatorIndex ++;
+
+					//decode the tag data
+					final int tagSize = bb.remaining() - separatorIndex;
+					if(tagSize > 0){
+						final byte[] tag = new byte[tagSize];
+						System.arraycopy(bb.array(), separatorIndex, tag, 0, tagSize);
+						wordData.setTag(tag);
+					}
+
+					forms.add(wordData);
 				}
 			}
 		}
-		else{
-			/*
-			 * this case is somewhat confusing: we should have hit the separator
-			 * first... I don't really know how to deal with it at the time being.
-			 */
+		else if(match.kind != FSAMatchResult.NO_MATCH){
+			//this case is somewhat confusing: we should have hit the separator first...
+			//I don't really know how to deal with it at the time being.
 			throw new IllegalArgumentException("what?!?!");
 		}
-		return forms.extractCopyOrNull();
+		return forms.extractCopy();
 	}
 
 	/**

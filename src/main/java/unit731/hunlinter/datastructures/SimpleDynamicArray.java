@@ -170,6 +170,15 @@ public class SimpleDynamicArray<T> implements Iterable<T>{
 		if(isEmpty())
 			return null;
 
+		return extractCopy();
+	}
+
+	/**
+	 * NOTE: this method should NOT be called at all because it is inefficient
+	 *
+	 * @return	A copy of the array
+	 */
+	public synchronized T[] extractCopy(){
 		final Class<?> type = getDataType();
 		//noinspection unchecked
 		final T[] reducedData = (T[])Array.newInstance(type, limit);

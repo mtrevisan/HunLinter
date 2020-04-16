@@ -191,13 +191,11 @@ public class FSA5 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getArc(int node, byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc)){
+	public int getArc(final int node, final byte label){
+		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(getArcLabel(arc) == label)
 				return arc;
-		}
-
-		// An arc labeled with "label" not found.
+		//an arc labeled with "label" not found
 		return 0;
 	}
 

@@ -11,6 +11,7 @@ import unit731.hunlinter.datastructures.fsa.stemming.EncoderType;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -202,14 +203,14 @@ class DictionaryLookupTest{
 	private static String[] stem(DictionaryLookup s, String word){
 		List<String> result = new ArrayList<>();
 		for(WordData wd : s.lookup(word)){
-			result.add(asString(wd.getStem()));
-			result.add(asString(wd.getTag()));
+			result.add(toUTF8String(wd.getStem()));
+			result.add(toUTF8String(wd.getTag()));
 		}
 		return result.toArray(String[]::new);
 	}
 
-	private static String asString(CharSequence s){
-		return (s != null? s.toString(): null);
+	private static String toUTF8String(byte[] array){
+		return (array != null? new String(array, StandardCharsets.UTF_8): null);
 	}
 
 }

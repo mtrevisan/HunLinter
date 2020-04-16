@@ -192,7 +192,6 @@ public class CFSA2 extends FSA{
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(getArcLabel(arc) == label)
 				return arc;
-
 		//an arc labeled with "label" not found
 		return 0;
 	}
