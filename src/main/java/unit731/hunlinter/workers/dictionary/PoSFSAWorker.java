@@ -204,7 +204,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);
 			final byte[][] encodedStems = new byte[stems.size()][];
 
-			//extract Inflection
+			//extract inflection
 			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
 			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
