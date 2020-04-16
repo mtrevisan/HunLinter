@@ -11,6 +11,7 @@ import unit731.hunlinter.datastructures.fsa.stemming.EncoderType;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -144,27 +145,27 @@ class DictionaryLookupTest{
 		assertNoStemFor(s, "martygalski", d);
 	}
 
-//	@Test
-//	void inputWithSeparators() throws IOException{
-//		URL url = getClass().getResource("/services/fsa/lookup/separators.dict");
-//		Dictionary d = Dictionary.read(url);
-//		DictionaryLookup s = new DictionaryLookup(d);
-//
-//		//attemp to reconstruct input sequences using WordData iterator
-//		List<String> sequences = new ArrayList<>();
-//		for(WordData wd : s)
-//			sequences.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
-//		Collections.sort(sequences);
-//
-//		Assertions.assertEquals("token1 null null", sequences.get(0));
-//		Assertions.assertEquals("token2 null null", sequences.get(1));
-//		Assertions.assertEquals("token3 null +", sequences.get(2));
-//		Assertions.assertEquals("token4 token2 null", sequences.get(3));
-//		Assertions.assertEquals("token5 token2 null", sequences.get(4));
-//		Assertions.assertEquals("token6 token2 +", sequences.get(5));
-//		Assertions.assertEquals("token7 token2 token3+", sequences.get(6));
-//		Assertions.assertEquals("token8 token2 token3++", sequences.get(7));
-//	}
+	@Test
+	void inputWithSeparators() throws IOException{
+		URL url = getClass().getResource("/services/fsa/lookup/separators.dict");
+		Dictionary d = Dictionary.read(url);
+		DictionaryLookup s = new DictionaryLookup(d);
+
+		//attempt to reconstruct input sequences using WordData iterator
+		List<String> sequences = new ArrayList<>();
+		for(WordData wd : s)
+			sequences.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
+		Collections.sort(sequences);
+
+		Assertions.assertEquals("token1  ", sequences.get(0));
+		Assertions.assertEquals("token2  ", sequences.get(1));
+		Assertions.assertEquals("token3  +", sequences.get(2));
+		Assertions.assertEquals("token4 token2 ", sequences.get(3));
+		Assertions.assertEquals("token5 token2 ", sequences.get(4));
+		Assertions.assertEquals("token6 token2 +", sequences.get(5));
+		Assertions.assertEquals("token7 token2 token3+", sequences.get(6));
+		Assertions.assertEquals("token8 token2 token3++", sequences.get(7));
+	}
 
 	@Test
 	void separatorInLookupTerm() throws IOException{
