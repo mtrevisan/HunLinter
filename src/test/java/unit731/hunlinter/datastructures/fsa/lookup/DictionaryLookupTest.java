@@ -99,41 +99,30 @@ class DictionaryLookupTest{
 //		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
 //	}
 
-//	@Test
-//	void wordDataCloning() throws IOException{
-//		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-//		DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		List<WordData> words = new ArrayList<>();
-//		for(WordData wd : s){
-//			WordData clone = new WordData();
-//			clone.setWord(wd.getWord());
-//			clone.setStem(wd.getStem());
-//			clone.setTag(wd.getTag());
-//			words.add(clone);
-//		}
-//
-//		//reiterate and verify that we have the same entries
-//		DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
-//		int i = 0;
-//		for(WordData wd : s2){
-//			WordData clone = words.get(i ++);
-//			Assertions.assertArrayEquals(clone.getStem(), wd.getStem());
-//			Assertions.assertArrayEquals(clone.getTag(), wd.getTag());
-//			Assertions.assertEquals(clone.getWord(), wd.getWord());
-//		}
-//
-//		//check collections contract
-//		Set<WordData> entries = new HashSet<>();
-//		try{
-//			entries.add(words.get(0));
-//			Assertions.fail();
-//		}
-//		catch(RuntimeException e){
-//			//expected
-//			System.out.println();
-//		}
-//	}
+	@Test
+	void wordDataCloning() throws IOException{
+		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		List<WordData> words = new ArrayList<>();
+		for(WordData wd : s){
+			WordData clone = new WordData();
+			clone.setWord(wd.getWord());
+			clone.setStem(wd.getStem());
+			clone.setTag(wd.getTag());
+			words.add(clone);
+		}
+
+		//reiterate and verify that we have the same entries
+		DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
+		int i = 0;
+		for(WordData wd : s2){
+			WordData clone = words.get(i ++);
+			Assertions.assertArrayEquals(clone.getStem(), wd.getStem());
+			Assertions.assertArrayEquals(clone.getTag(), wd.getTag());
+			Assertions.assertArrayEquals(clone.getWord(), wd.getWord());
+		}
+	}
 
 	@Test
 	void multibyteEncodingUTF8() throws IOException{
@@ -211,7 +200,7 @@ class DictionaryLookupTest{
 	}
 
 	private static String toString(byte[] array, Dictionary d){
-		return (array != null? new String(array,d.metadata.getCharset()): "null");
+		return (array != null? new String(array,d.metadata.getCharset()): null);
 	}
 
 }
