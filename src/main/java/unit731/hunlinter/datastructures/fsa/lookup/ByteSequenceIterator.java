@@ -22,6 +22,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 */
 	private final static int EXPECTED_MAX_STATES = 15;
 
+
 	/** The FSA to which this iterator belongs. */
 	private final FSA fsa;
 
@@ -30,13 +31,11 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** A buffer for the current sequence of bytes from the current node to the root. */
 	private byte[] buffer = new byte[EXPECTED_MAX_STATES];
-
 	/** Reusable byte buffer wrapper around {@link #buffer}. */
 	private ByteBuffer bufferWrapper = ByteBuffer.wrap(buffer);
 
 	/** An arc stack for DFS when processing the automaton. */
 	private int[] arcs = new int[EXPECTED_MAX_STATES];
-
 	/** Current processing depth in {@link #arcs}. */
 	private int position;
 
@@ -84,7 +83,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		if(nextElement == null)
 			nextElement = advance();
 
-		return nextElement != null;
+		return (nextElement != null);
 	}
 
 	/**

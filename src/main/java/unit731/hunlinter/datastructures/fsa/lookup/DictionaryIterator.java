@@ -1,12 +1,11 @@
 package unit731.hunlinter.datastructures.fsa.lookup;
 
-import unit731.hunlinter.datastructures.fsa.stemming.BufferUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 
 
@@ -16,25 +15,21 @@ import java.util.Iterator;
  */
 public class DictionaryIterator implements Iterator<WordData>{
 
-	private final Charset charset;
-	private final Iterator<ByteBuffer> entriesIter;
-	private final WordData entry;
-	private final byte separator;
+	private final Dictionary dictionary;
 	private final boolean decodeStems;
 
-	private byte[] inflectedBuffer = new byte[0];
-	private CharBuffer inflectedCharBuffer = CharBuffer.allocate(0);
-	private ByteBuffer temp = ByteBuffer.allocate(0);
+	private final Iterator<ByteBuffer> entriesIter;
 	private final SequenceEncoderInterface sequenceEncoder;
 
+	private CharBuffer inflectedCharBuffer = CharBuffer.allocate(0);
 
-	public DictionaryIterator(final Dictionary dictionary, final Charset charset, final boolean decodeStems){
-		this.entriesIter = dictionary.fsa.iterator();
-		this.separator = dictionary.metadata.getSeparator();
-		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
-		this.charset = charset;
-		this.entry = new WordData();
+
+	public DictionaryIterator(final Dictionary dictionary, final boolean decodeStems){
+		this.dictionary = dictionary;
 		this.decodeStems = decodeStems;
+
+		this.entriesIter = dictionary.fsa.iterator();
+		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
 	}
 
 	public boolean hasNext(){
@@ -42,58 +37,42 @@ public class DictionaryIterator implements Iterator<WordData>{
 	}
 
 	public WordData next(){
-		//FIXME
-//		final ByteBuffer entryBuffer = entriesIter.next();
-//
-//		//entries are typically: inflected<SEP>codedBase<SEP>tag so try to find this split
-//		byte[] ba = entryBuffer.array();
-//		int bbSize = entryBuffer.remaining();
-//
-//		int sepPos;
-//		for(sepPos = 0; sepPos < bbSize; sepPos ++)
-//			if(ba[sepPos] == separator)
-//				break;
-//
-//		if(sepPos == bbSize)
-//			throw new RuntimeException("Invalid dictionary " + "entry format (missing separator).");
-//
-//		inflectedBuffer = new byte[sepPos];
-//		System.arraycopy(ba, 0, inflectedBuffer, 0, sepPos);
-//
-//		inflectedCharBuffer = BufferUtils.bytesToChars(charset, inflectedBuffer, inflectedCharBuffer);
-//		entry.update(inflectedBuffer, inflectedCharBuffer);
-//
-//		temp = BufferUtils.clearAndEnsureCapacity(temp, bbSize - sepPos);
-//		sepPos ++;
-//		temp.put(ba, sepPos, bbSize - sepPos);
-//		temp.flip();
-//
-//		ba = temp.array();
-//		bbSize = temp.remaining();
-//
-//		//find the next separator byte's position splitting word form and tag
-//		assert sequenceEncoder.prefixBytes() <= bbSize: sequenceEncoder.getClass() + " >? " + bbSize;
-//
-//		sepPos = sequenceEncoder.prefixBytes();
-//		for(; sepPos < bbSize; sepPos ++)
-//			if(ba[sepPos] == separator)
-//				break;
-//
-//		//decode the stem into stem buffer
+		final ByteBuffer entryBuffer = entriesIter.next();
+		byte[] array = entryBuffer.array();
+		int limit = entryBuffer.remaining();
+
+		//entries are typically: inflected<SEP>codedBase<SEP>tag so try to find this split:
+
+		//find the separator byte's position splitting the inflection instructions from the tag
+		int separatorIndex = ArrayUtils.indexOf(array, dictionary.metadata.getSeparator());
+		if(separatorIndex == limit)
+			throw new RuntimeException("Invalid dictionary entry format (missing separator).");
+
+		final byte[] inflection = new byte[separatorIndex];
+		System.arraycopy(array, 0, inflection, 0, separatorIndex);
+
+		final WordData entry = new WordData();
+		entry.setWord(inflection);
+
+		//find the next separator byte's position splitting word form and tag
+		final int start = separatorIndex + 1;
+		separatorIndex = ArrayUtils.indexOf(array, dictionary.metadata.getSeparator(), start);
+
+		//decode the stem into stem buffer
 //		if(decodeStems)
-//			entry.stemBuffer = sequenceEncoder.decode(inflectedBuffer, ByteBuffer.wrap(ba, 0, sepPos));
+//			entry.stemBuffer = sequenceEncoder.decode(inflection, ByteBuffer.wrap(array, 0, separatorIndex));
 //		else{
-//			entry.stemBuffer = new byte[sepPos];
-//			System.arraycopy(ba, 0, entry.stemBuffer, 0, sepPos);
+//			entry.stemBuffer = new byte[separatorIndex];
+//			System.arraycopy(array, 0, entry.stemBuffer, 0, separatorIndex);
 //		}
-//
+
 //		//skip separator character, if present
-//		if(sepPos + 1 <= bbSize)
-//			sepPos ++;
+//		if(separatorIndex + 1 <= limit)
+//			separatorIndex ++;
 //
 //		//decode the tag data
-//		entry.tagBuffer = new byte[bbSize - sepPos];
-//		System.arraycopy(ba, sepPos, entry.tagBuffer, 0, bbSize - sepPos);
+//		entry.tagBuffer = new byte[limit - separatorIndex];
+//		System.arraycopy(array, separatorIndex, entry.tagBuffer, 0, limit - separatorIndex);
 
 		return entry;
 	}

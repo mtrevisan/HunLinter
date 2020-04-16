@@ -125,8 +125,8 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * array's index 0.
 	 * </p>
 	 *
-	 * @param node Identifier of the starting node from which to return subsequences.
-	 * @return An iterable over all sequences encoded starting at the given node.
+	 * @param node	Identifier of the starting node from which to return subsequences.
+	 * @return	An iterable over all sequences encoded starting at the given node.
 	 */
 	public Iterable<ByteBuffer> getSequences(final int node){
 		return (node > 0? () -> new ByteSequenceIterator(FSA.this, node): Collections.emptyList());

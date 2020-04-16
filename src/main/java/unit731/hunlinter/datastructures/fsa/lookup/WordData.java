@@ -3,12 +3,14 @@ package unit731.hunlinter.datastructures.fsa.lookup;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.nio.charset.StandardCharsets;
+
 
 /** Stem and tag data associated with a given word */
 public class WordData{
 
 	/** inflected word form data */
-	private String word;
+	private byte[] word;
 	private byte[] stem;
 	private byte[] tag;
 
@@ -23,7 +25,7 @@ public class WordData{
 	/**
 	 * @return	Inflected word form data. Usually the parameter passed to {@link DictionaryLookup#lookup(String)}.
 	 */
-	public String getWord(){
+	public byte[] getWord(){
 		return word;
 	}
 
@@ -41,7 +43,7 @@ public class WordData{
 		return tag;
 	}
 
-	void setWord(final String word){
+	void setWord(final byte[] word){
 		this.word = word;
 	}
 
@@ -79,7 +81,9 @@ public class WordData{
 
 	@Override
 	public String toString(){
-		return "WordData[" + word + "," + stem + "," + tag + "]";
+		return "WordData[" + new String(word, StandardCharsets.UTF_8)
+			+ "," + new String(stem, StandardCharsets.UTF_8)
+			+ "," + new String(tag, StandardCharsets.UTF_8) + "]";
 	}
 
 }

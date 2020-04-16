@@ -85,18 +85,18 @@ class DictionaryLookupTest{
 		assertNoStemFor(s, "Rzeczyckiõh", d);
 	}
 
-//	@Test
-//	void wordDataIterator() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		final Set<String> entries = new HashSet<>();
-//		for(WordData wd : s)
-//			entries.add(wd.getWord() + " " + wd.getStem() + " " + wd.getTag());
-//
-//		//make sure a sample of the entries is present
-//		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
-//	}
+	@Test
+	void wordDataIterator() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+
+		final Set<String> entries = new HashSet<>();
+		for(WordData wd : s)
+			entries.add(wd.getWord() + " " + wd.getStem() + " " + wd.getTag());
+
+		//make sure a sample of the entries is present
+		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
+	}
 
 //	@Test
 //	void wordDataCloning() throws IOException{

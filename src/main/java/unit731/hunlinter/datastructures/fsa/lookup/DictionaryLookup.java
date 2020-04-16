@@ -95,16 +95,18 @@ public class DictionaryLookup implements Iterable<WordData>{
 //					assert prefixBytes <= bb.remaining(): sequenceEncoder.getClass() + " >? " + bb.remaining();
 
 					//find the separator byte's position splitting the inflection instructions from the tag
-					int separatorIndex = ArrayUtils.indexOf(bb.array(), separator);
+					final byte[] bbArray = bb.array();
+					int separatorIndex = ArrayUtils.indexOf(bbArray, separator);
 
 					//now, expand the prefix/ suffix 'compression' and store the base form
 					final WordData wordData = new WordData();
 					final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
-					wordData.setWord(outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs));
+					wordData.setWord((outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs))
+						.getBytes(dictionary.metadata.getCharset()));
 
 					//decode the stem into stem buffer
 					final byte[] copy = new byte[separatorIndex];
-					System.arraycopy(bb.array(), 0, copy, 0, separatorIndex);
+					System.arraycopy(bbArray, 0, copy, 0, separatorIndex);
 					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, copy));
 
 					//skip separator character
@@ -114,7 +116,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 					final int tagSize = bb.remaining() - separatorIndex;
 					if(tagSize > 0){
 						final byte[] tag = new byte[tagSize];
-						System.arraycopy(bb.array(), separatorIndex, tag, 0, tagSize);
+						System.arraycopy(bbArray, separatorIndex, tag, 0, tagSize);
 						wordData.setTag(tag);
 					}
 
@@ -157,7 +159,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary} */
 	@Override
 	public Iterator<WordData> iterator(){
-		return new DictionaryIterator(dictionary, dictionary.metadata.getCharset(), true);
+		return new DictionaryIterator(dictionary, true);
 	}
 
 	public Dictionary getDictionary(){
