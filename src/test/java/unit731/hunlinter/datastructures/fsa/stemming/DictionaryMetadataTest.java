@@ -15,9 +15,8 @@ public class DictionaryMetadataTest{
 
 	@Test
 	public void testWrongSeparator(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/wrong-separator.info"));
-		});
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
+			() -> DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/wrong-separator.info")));
 		Assertions.assertEquals("Attribute fsa.dict.separator must be a single character: \\t+", exception.getMessage());
 	}
 
@@ -40,7 +39,7 @@ public class DictionaryMetadataTest{
 		for(EncoderType encoder : EncoderType.values()){
 			for(Charset charset : Arrays.asList(StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII)){
 				StringWriter sw = new StringWriter();
-				DictionaryMetadata.builder()
+				new DictionaryMetadataBuilder()
 					.encoding(charset)
 					.encoder(encoder)
 					.separator('|')

@@ -203,19 +203,10 @@ public class DictionaryMetadata{
 		return charset;
 	}
 
-	/**
-	 * @return Return sequence encoder type.
-	 */
 	public EncoderType getSequenceEncoderType(){
 		return encoderType;
 	}
 
-	/**
-	 * @return A shortcut returning {@link DictionaryMetadataBuilder}.
-	 */
-	public static DictionaryMetadataBuilder builder(){
-		return new DictionaryMetadataBuilder();
-	}
 
 	/**
 	 * Returns the expected name of the metadata file, based on the name of the
@@ -223,17 +214,12 @@ public class DictionaryMetadata{
 	 * file extension of <code>name</code> and appending
 	 * {@link DictionaryMetadata#METADATA_FILE_EXTENSION}.
 	 *
-	 * @param dictionaryFile The name of the dictionary (<code>*.dict</code>) file.
-	 * @return Returns the expected name of the metadata file.
+	 * @param dictionaryFile	The name of the dictionary (<code>*.dict</code>) file.
+	 * @return	The expected name of the metadata file.
 	 */
 	public static String getExpectedMetadataFileName(final String dictionaryFile){
 		final int dotIndex = dictionaryFile.lastIndexOf('.');
-		final String featuresName;
-		if(dotIndex >= 0)
-			featuresName = dictionaryFile.substring(0, dotIndex) + "." + METADATA_FILE_EXTENSION;
-		else
-			featuresName = dictionaryFile + "." + METADATA_FILE_EXTENSION;
-		return featuresName;
+		return (dotIndex >= 0? dictionaryFile.substring(0, dotIndex): dictionaryFile) + "." + METADATA_FILE_EXTENSION;
 	}
 
 	/**
@@ -247,8 +233,8 @@ public class DictionaryMetadata{
 	/**
 	 * Write dictionary attributes (metadata).
 	 *
-	 * @param writer The writer to write to.
-	 * @throws IOException Thrown when an I/O error occurs.
+	 * @param writer	The writer to write to.
+	 * @throws IOException	Thrown when an I/O error occurs.
 	 */
 	public void write(final Writer writer) throws IOException{
 		final Properties properties = new Properties();
