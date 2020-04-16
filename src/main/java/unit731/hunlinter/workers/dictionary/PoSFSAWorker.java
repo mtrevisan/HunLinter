@@ -209,8 +209,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
 			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
 			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
-			extractInflection(tag, suffixInflection);
-			extractInflection(tag, prefixInflection);
+			extractInflection(suffixInflection, tag);
+			extractInflection(prefixInflection, tag);
 			tag.flip();
 
 			int position = 0;
@@ -220,18 +220,16 @@ public class PoSFSAWorker extends WorkerDictionary{
 				//remove the initial part `po:`
 				inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length - 3);
 
-
 				final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
 
-				final byte[] assembled = new byte[inflectedWord.length + 1 + encoded.length + 1 + tag.remaining()];
-				System.arraycopy(inflectedWord, 0, assembled, 0, inflectedWord.length);
-				assembled[inflectedWord.length] = separator;
-				System.arraycopy(encoded, 0, assembled, inflectedWord.length + 1, encoded.length);
-				if(tag.hasRemaining()){
-					assembled[inflectedWord.length + 1 + encoded.length] = separator;
-					System.arraycopy(tag.array(), 0, assembled, inflectedWord.length + 1 + encoded.length + 1,
-						tag.remaining());
-				}
+				int offset = inflectedWord.length;
+				final byte[] assembled = new byte[offset + 1 + encoded.length + 1 + tag.remaining()];
+				System.arraycopy(inflectedWord, 0, assembled, 0, offset);
+				assembled[offset ++] = separator;
+				System.arraycopy(encoded, 0, assembled, offset, encoded.length);
+				offset += encoded.length;
+				assembled[offset ++] = separator;
+				System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
 				encodedStems[position ++] = assembled;
 			}
 			out.addAll(encodedStems);
@@ -239,11 +237,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return out;
 	}
 
-	private void extractInflection(final ByteBuffer tag, final List<String> suffixInflection){
+	private void extractInflection(final List<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
-			for(final String code : suffixInflection)
-				for(final String t : InflectionTag.createFromCodeAndValue(code).getTags())
-					tag.put(POS_FSA_TAG_SEPARATOR).put(StringHelper.getRawBytes(t));
+			for(final String code : suffixInflection){
+				final String[] tags = InflectionTag.createFromCodeAndValue(code).getTags();
+				for(final String tag : tags)
+					output.put(POS_FSA_TAG_SEPARATOR)
+						.put(StringHelper.getRawBytes(tag));
+			}
 	}
 
 	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
