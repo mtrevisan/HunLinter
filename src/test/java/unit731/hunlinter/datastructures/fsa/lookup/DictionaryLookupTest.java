@@ -144,17 +144,18 @@ class DictionaryLookupTest{
 		Assertions.assertArrayEquals(new String[]{"merge", "002"}, stem(s, "merseserăm", d));
 	}
 
-//	@Test
-//	void synthesis() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/synth.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
-//
-//		Assertions.assertArrayEquals(new String[]{"miała", null}, stem(s, "mieć|verb:praet:sg:ter:f:?perf"));
-//		Assertions.assertArrayEquals(new String[]{"a", null}, stem(s, "a|conj"));
-//		Assertions.assertArrayEquals(new String[]{}, stem(s, "dziecko|subst:sg:dat:n"));
-//		//this word is not in the dictionary
-//		assertNoStemFor(s, "martygalski");
-//	}
+	@Test
+	void synthesis() throws IOException{
+		final URL url = getClass().getResource("/services/fsa/lookup/synth.dict");
+		Dictionary d = Dictionary.read(url);
+		final DictionaryLookup s = new DictionaryLookup(d);
+
+		Assertions.assertArrayEquals(new String[]{"miała", null}, stem(s, "mieć|verb:praet:sg:ter:f:?perf", d));
+		Assertions.assertArrayEquals(new String[]{"a", null}, stem(s, "a|conj", d));
+		Assertions.assertArrayEquals(new String[]{}, stem(s, "dziecko|subst:sg:dat:n", d));
+		//this word is not in the dictionary
+		assertNoStemFor(s, "martygalski", d);
+	}
 
 //	@Test
 //	void inputWithSeparators() throws IOException{
