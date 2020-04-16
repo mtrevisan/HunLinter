@@ -2,9 +2,7 @@ package unit731.hunlinter.datastructures.fsa.lookup;
 
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.fsa.ByteSequenceIterator;
-import unit731.hunlinter.datastructures.fsa.FSA;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
-import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.datastructures.fsa.stemming.NoEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import unit731.hunlinter.datastructures.fsa.stemming.TrimInfixAndSuffixEncoder;
@@ -12,7 +10,6 @@ import unit731.hunlinter.datastructures.fsa.stemming.TrimPrefixAndSuffixEncoder;
 import unit731.hunlinter.datastructures.fsa.stemming.TrimSuffixEncoder;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -35,27 +32,11 @@ public class DictionaryLookup implements Iterable<WordData>{
 	/** An FSA used for lookups */
 	private final FSATraversal matcher;
 
-	/** An iterator for walking along the final states of {@link #fsa} */
+	/** An iterator for walking along the final states of the given FSA */
 	private final ByteSequenceIterator finalStatesIterator;
-
-	/** FSA's root node */
-	private final int rootNode;
 
 	/** Private internal array of reusable word data objects */
 	private WordData[] forms = new WordData[0];
-
-	/**
-	 * Features of the compiled dictionary.
-	 *
-	 * @see DictionaryMetadata
-	 */
-	private final DictionaryMetadata dictionaryMetadata;
-
-	private final Charset charset;
-
-	private final FSA fsa;
-
-	private final byte separator;
 
 	/** The {@link Dictionary} this lookup is using */
 	private final Dictionary dictionary;
@@ -76,15 +57,9 @@ public class DictionaryLookup implements Iterable<WordData>{
 		Objects.requireNonNull(dictionary.metadata);
 
 		this.dictionary = dictionary;
-		this.dictionaryMetadata = dictionary.metadata;
 		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
-		this.rootNode = dictionary.fsa.getRootNode();
-		this.fsa = dictionary.fsa;
-		this.matcher = new FSATraversal(fsa);
-		this.finalStatesIterator = new ByteSequenceIterator(fsa, fsa.getRootNode());
-
-		charset = dictionary.metadata.getCharset();
-		separator = dictionary.metadata.getSeparator();
+		this.matcher = new FSATraversal(dictionary.fsa);
+		this.finalStatesIterator = new ByteSequenceIterator(dictionary.fsa, dictionary.fsa.getRootNode());
 	}
 
 	/**
@@ -101,7 +76,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @return	A list of {@link WordData} entries (possibly empty).
 	 */
 	public List<WordData> lookup(String word){
-		final byte separator = dictionaryMetadata.getSeparator();
+		final byte separator = dictionary.metadata.getSeparator();
 
 		/**
 		 * The number of encoded form's prefix bytes that should be ignored (needed for separator lookup).
@@ -119,13 +94,13 @@ public class DictionaryLookup implements Iterable<WordData>{
 		else if(sequenceEncoder instanceof TrimInfixAndSuffixEncoder)
 			prefixBytes = 3;
 
-		if(!dictionaryMetadata.getInputConversionPairs().isEmpty())
-			word = applyReplacements(word, dictionaryMetadata.getInputConversionPairs());
+		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
+			word = applyReplacements(word, dictionary.metadata.getInputConversionPairs());
 
 		final List<WordData> formsList = new ArrayList<>();
 
 		//encode word characters into bytes in the same encoding as the FSA's
-		final byte[] wordAsByteArray = word.getBytes(charset);
+		final byte[] wordAsByteArray = word.getBytes(dictionary.metadata.getCharset());
 		Arrays.sort(wordAsByteArray);
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
@@ -135,15 +110,15 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 		if(match.kind == FSAMatchResult.PREFIX_MATCH){
 			//the entire sequence exists in the dictionary, a separator should be the next symbol
-			final int arc = fsa.getArc(match.node, separator);
+			final int arc = dictionary.fsa.getArc(match.node, separator);
 
 			//the situation when the arc points to a final node should NEVER happen,
 			//after all, we want the word to have SOME base form
-			if(arc != 0 && !fsa.isArcFinal(arc)){
+			if(arc != 0 && !dictionary.fsa.isArcFinal(arc)){
 				//there is such a word in the dictionary, return its base forms
 				int formsCount = 0;
 
-				finalStatesIterator.restartFrom(fsa.getEndNode(arc));
+				finalStatesIterator.restartFrom(dictionary.fsa.getEndNode(arc));
 				while(finalStatesIterator.hasNext()){
 					final ByteBuffer bb = finalStatesIterator.next();
 					final byte[] ba = bb.array();
@@ -158,10 +133,10 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 					//now, expand the prefix/ suffix 'compression' and store the base form
 					final WordData wordData = forms[formsCount++];
-					if(dictionaryMetadata.getOutputConversionPairs().isEmpty())
+					if(dictionary.metadata.getOutputConversionPairs().isEmpty())
 						wordData.setWord(word);
 					else
-						wordData.setWord(applyReplacements(word, dictionaryMetadata.getOutputConversionPairs()));
+						wordData.setWord(applyReplacements(word, dictionary.metadata.getOutputConversionPairs()));
 
 					//find the separator byte's position splitting the inflection instructions
 					//from the tag
@@ -226,18 +201,11 @@ public class DictionaryLookup implements Iterable<WordData>{
 	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary} */
 	@Override
 	public Iterator<WordData> iterator(){
-		return new DictionaryIterator(dictionary, charset, true);
+		return new DictionaryIterator(dictionary, dictionary.metadata.getCharset(), true);
 	}
 
 	public Dictionary getDictionary(){
 		return dictionary;
-	}
-
-	/**
-	 * @return	The logical separator character splitting inflected form, lemma correction token and a tag
-	 */
-	public byte getSeparator(){
-		return separator;
 	}
 
 }
