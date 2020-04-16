@@ -1,6 +1,7 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -23,15 +24,17 @@ public enum DictionaryAttribute{
 	 */
 	SEPARATOR("fsa.dict.separator"){
 		@Override
-		public Character fromString(final String separator){
+		public Byte fromString(final String separator){
 			if(separator == null || separator.length() != 1)
-				throw new IllegalArgumentException("Attribute " + propertyName + " must be a single character.");
+				throw new IllegalArgumentException("Attribute " + propertyName + " must be a single character: "
+					+ StringEscapeUtils.escapeJava(separator));
 
 			final char charValue = separator.charAt(0);
 			if(Character.isHighSurrogate(charValue) || Character.isLowSurrogate(charValue))
-				throw new IllegalArgumentException("Field separator character cannot be part of a surrogate pair: " + separator);
+				throw new IllegalArgumentException("Field separator character cannot be part of a surrogate pair: "
+					+ StringEscapeUtils.escapeJava(separator));
 
-			return charValue;
+			return (byte)charValue;
 		}
 	},
 
@@ -41,6 +44,9 @@ public enum DictionaryAttribute{
 	ENCODING("fsa.dict.encoding"){
 		@Override
 		public Charset fromString(final String charsetName){
+			if(!Charset.isSupported(charsetName))
+				throw new IllegalArgumentException("Encoding not supported on this JVM: " + charsetName);
+
 			return Charset.forName(charsetName);
 		}
 	},

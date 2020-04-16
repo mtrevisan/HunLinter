@@ -14,6 +14,14 @@ import java.util.Arrays;
 public class DictionaryMetadataTest{
 
 	@Test
+	public void testWrongSeparator(){
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/wrong-separator.info"));
+		});
+		Assertions.assertEquals("Attribute fsa.dict.separator must be a single character: \\t+", exception.getMessage());
+	}
+
+	@Test
 	public void testEscapeSeparator() throws IOException{
 		DictionaryMetadata m = DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/escape-separator.info"));
 

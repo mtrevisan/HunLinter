@@ -138,46 +138,28 @@ public class DictionaryMetadata{
 				throw new IllegalArgumentException("At least one required attributes was not provided: " + attr.propertyName);
 
 		//convert some attributes from the map to local fields for performance reasons:
-		readEncoding(allAttributes);
-
 		for(final Map.Entry<DictionaryAttribute, String> e : allAttributes.entrySet()){
 			//run validation and conversion on all of them
 			final Object value = e.getKey().fromString(e.getValue());
 			//just run validation
 			switch(e.getKey()){
-				case SEPARATOR -> {
-					final char separatorChar = (Character)value;
-					final byte[] separatorBytes = String.valueOf(separatorChar).getBytes(charset);
-					if(separatorBytes.length > 1)
-						throw new IllegalArgumentException("Separator character is not a single byte in encoding " + charset.name()
-							+ ": " + separatorChar);
-
-					this.separator = separatorBytes[0];
-				}
-				case LOCALE -> this.locale = (Locale)value;
-				case ENCODING -> {}
-				case ENCODER -> this.encoderType = (EncoderType)value;
+				case SEPARATOR -> separator = (Byte)value;
+				case LOCALE -> locale = (Locale)value;
+				case ENCODING -> charset = (Charset)value;
+				case ENCODER -> encoderType = (EncoderType)value;
 				case INPUT_CONVERSION -> //noinspection unchecked
-					this.inputConversion = (Map<String, String>)value;
+					inputConversion = (Map<String, String>)value;
 				case OUTPUT_CONVERSION -> //noinspection unchecked
-					this.outputConversion = (Map<String, String>)value;
+					outputConversion = (Map<String, String>)value;
 				case REPLACEMENT_PAIRS -> //noinspection unchecked
-					this.replacementPairs = (Map<String, List<String>>)value;
+					replacementPairs = (Map<String, List<String>>)value;
 				case EQUIVALENT_CHARS -> //noinspection unchecked
-					this.equivalentChars = (Map<Character, List<Character>>)value;
+					equivalentChars = (Map<Character, List<Character>>)value;
 				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> this.boolAttributes.put(e.getKey(), (Boolean)value);
 				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
 				default -> throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());
 			}
 		}
-	}
-
-	private void readEncoding(final Map<DictionaryAttribute, String> attributes){
-		final String encoding = attributes.get(DictionaryAttribute.ENCODING);
-		if(!Charset.isSupported(encoding))
-			throw new IllegalArgumentException("Encoding not supported on this JVM: " + encoding);
-
-		charset = (Charset)DictionaryAttribute.ENCODING.fromString(encoding);
 	}
 
 	/**
