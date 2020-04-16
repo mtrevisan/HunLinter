@@ -1,5 +1,6 @@
 package unit731.hunlinter.datastructures.fsa.lookup;
 
+import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.fsa.ByteSequenceIterator;
 import unit731.hunlinter.datastructures.fsa.FSA;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
@@ -55,9 +56,6 @@ public class DictionaryLookup implements Iterable<WordData>{
 	private final FSA fsa;
 
 	private final byte separator;
-
-	/** Internal reusable buffer for encoding words into byte arrays */
-	private byte[] byteBuffer = new byte[0];
 
 	/** The {@link Dictionary} this lookup is using */
 	private final Dictionary dictionary;
@@ -127,29 +125,22 @@ public class DictionaryLookup implements Iterable<WordData>{
 		final List<WordData> formsList = new ArrayList<>();
 
 		//encode word characters into bytes in the same encoding as the FSA's
-		final char[] wordAsCharArray = word.toCharArray();
-		for(final char chr : wordAsCharArray)
-			if(chr == separator)
-				throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
-		try{
-			byteBuffer = word.getBytes(charset);
-		}
-		catch(final IllegalArgumentException e){
-			//this should be a rare occurrence, but if it happens it means there is no way the dictionary can contain the input word
-			return formsList;
-		}
+		final byte[] wordAsByteArray = word.getBytes(charset);
+		Arrays.sort(wordAsByteArray);
+		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
+			throw new IllegalArgumentException("No valid input can contain the separator as in " + word);
 
 		//try to find a partial match in the dictionary
-		final FSAMatchResult match = matcher.match(byteBuffer, 0, byteBuffer.length, rootNode);
+		final FSAMatchResult match = matcher.match(wordAsByteArray, dictionary.fsa.getRootNode());
 
 		if(match.kind == FSAMatchResult.PREFIX_MATCH){
-			//the entire sequence exists in the dictionary. A separator should be the next symbol
+			//the entire sequence exists in the dictionary, a separator should be the next symbol
 			final int arc = fsa.getArc(match.node, separator);
 
-			//the situation when the arc points to a final node should NEVER
-			//happen. After all, we want the word to have SOME base form
+			//the situation when the arc points to a final node should NEVER happen,
+			//after all, we want the word to have SOME base form
 			if(arc != 0 && !fsa.isArcFinal(arc)){
-				//there is such a word in the dictionary. Return its base forms
+				//there is such a word in the dictionary, return its base forms
 				int formsCount = 0;
 
 				finalStatesIterator.restartFrom(fsa.getEndNode(arc));
@@ -182,7 +173,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 							break;
 
 					//decode the stem into stem buffer
-					wordData.setStem(sequenceEncoder.decode(byteBuffer, ByteBuffer.wrap(ba, 0, sepPos)));
+					wordData.setStem(sequenceEncoder.decode(wordAsByteArray, ByteBuffer.wrap(ba, 0, sepPos)));
 
 					//skip separator character
 					sepPos ++;
@@ -238,17 +229,12 @@ public class DictionaryLookup implements Iterable<WordData>{
 		return new DictionaryIterator(dictionary, charset, true);
 	}
 
-	/**
-	 * @return	The {@link Dictionary} used by this object.
-	 */
 	public Dictionary getDictionary(){
 		return dictionary;
 	}
 
 	/**
-	 * @return	The logical separator character splitting inflected form,
-	 * lemma correction token and a tag. Note that this character is a best-effort
-	 * conversion from a byte and may not be valid in the target encoding (although this is highly unlikely).
+	 * @return	The logical separator character splitting inflected form, lemma correction token and a tag
 	 */
 	public byte getSeparator(){
 		return separator;
