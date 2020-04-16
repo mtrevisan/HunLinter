@@ -135,8 +135,8 @@ public class FSA5 extends FSA{
 	FSA5(InputStream stream) throws IOException{
 		DataInputStream in = new DataInputStream(stream);
 
-		this.filler = in.readByte();
-		this.annotation = in.readByte();
+		filler = in.readByte();
+		annotation = in.readByte();
 		final byte hgtl = in.readByte();
 
 		/*
@@ -144,14 +144,13 @@ public class FSA5 extends FSA{
 		 * ctl and goto fields accordingly.
 		 */
 		flags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
-		if((hgtl & 0xF0) != 0){
+		if((hgtl & 0xF0) != 0)
 			flags.add(FSAFlags.NUMBERS);
-		}
 
 		flags = Collections.unmodifiableSet(flags);
 
-		this.nodeDataLength = (hgtl >>> 4) & 0x0F;
-		this.gtl = hgtl & 0x0F;
+		nodeDataLength = (hgtl >>> 4) & 0x0F;
+		gtl = hgtl & 0x0F;
 
 		arcs = readRemaining(in);
 	}

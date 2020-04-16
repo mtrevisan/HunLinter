@@ -43,7 +43,7 @@ public class Dictionary{
 	 * @param metadata	A map of attributes describing the compression format and other settings not contained in the FSA automaton. For an
 	 *		explanation of available attributes and their possible values, see {@link DictionaryMetadata}.
 	 */
-	public Dictionary(FSA fsa, DictionaryMetadata metadata){
+	public Dictionary(final FSA fsa, final DictionaryMetadata metadata){
 		this.fsa = fsa;
 		this.metadata = metadata;
 	}

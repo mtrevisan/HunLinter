@@ -155,7 +155,7 @@ public class DictionaryMetadata{
 					replacementPairs = (Map<String, List<String>>)value;
 				case EQUIVALENT_CHARS -> //noinspection unchecked
 					equivalentChars = (Map<Character, List<Character>>)value;
-				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> this.boolAttributes.put(e.getKey(), (Boolean)value);
+				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> boolAttributes.put(e.getKey(), (Boolean)value);
 				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
 				default -> throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());
 			}

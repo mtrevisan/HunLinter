@@ -124,10 +124,10 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 			arcs[lastIndex] = fsa.getNextArc(arc);
 
 			//expand buffer if needed
-			final int bufferLength = this.buffer.length;
+			final int bufferLength = buffer.length;
 			if(lastIndex >= bufferLength){
-				this.buffer = Arrays.copyOf(buffer, bufferLength + EXPECTED_MAX_STATES);
-				this.bufferWrapper = ByteBuffer.wrap(buffer);
+				buffer = Arrays.copyOf(buffer, bufferLength + EXPECTED_MAX_STATES);
+				bufferWrapper = ByteBuffer.wrap(buffer);
 			}
 			buffer[lastIndex] = fsa.getArcLabel(arc);
 

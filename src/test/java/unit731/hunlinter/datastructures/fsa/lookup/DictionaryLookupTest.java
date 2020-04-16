@@ -40,7 +40,7 @@ class DictionaryLookupTest{
 
 	@Test
 	void removedEncoderProperties(){
-		final URL url = getClass().getResource("/services/fsa/lookup/removed-props.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/removed-props.dict");
 		Throwable exception = Assertions.assertThrows(IOException.class,
 			() -> new DictionaryLookup(Dictionary.read(url)));
 		Assertions.assertEquals("Deprecated encoder keys in metadata. Use fsa.dict.encoder=INFIX", exception.getMessage());
@@ -48,9 +48,9 @@ class DictionaryLookupTest{
 
 	@Test
 	void prefixDictionaries() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
 		Dictionary d = Dictionary.read(url);
-		final DictionaryLookup s = new DictionaryLookup(d);
+		DictionaryLookup s = new DictionaryLookup(d);
 
 		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej", d));
 		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecząpospolitą", d));
@@ -61,9 +61,9 @@ class DictionaryLookupTest{
 
 	@Test
 	void inputConversion() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
 		Dictionary d = Dictionary.read(url);
-		final DictionaryLookup s = new DictionaryLookup(d);
+		DictionaryLookup s = new DictionaryLookup(d);
 
 		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzecz\\apospolit\\a", d));
 
@@ -72,9 +72,9 @@ class DictionaryLookupTest{
 
 	@Test
 	void infixDictionaries() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
 		Dictionary d = Dictionary.read(url);
-		final DictionaryLookup s = new DictionaryLookup(d);
+		DictionaryLookup s = new DictionaryLookup(d);
 
 		Assertions.assertArrayEquals(new String[]{"Rzeczpospolita", "subst:irreg"}, stem(s, "Rzeczypospolitej", d));
 		Assertions.assertArrayEquals(new String[]{"Rzeczycki", "adj:pl:nom:m"}, stem(s, "Rzeczyccy", d));
@@ -87,12 +87,13 @@ class DictionaryLookupTest{
 
 	@Test
 	void wordDataIterator() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		Dictionary d = Dictionary.read(url);
+		DictionaryLookup s = new DictionaryLookup(d);
 
-		final Set<String> entries = new HashSet<>();
+		Set<String> entries = new HashSet<>();
 		for(WordData wd : s)
-			entries.add(wd.getWord() + " " + wd.getStem() + " " + wd.getTag());
+			entries.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
 
 		//make sure a sample of the entries is present
 		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
@@ -100,8 +101,8 @@ class DictionaryLookupTest{
 
 //	@Test
 //	void wordDataCloning() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-//		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
+//		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+//		DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
 //		List<WordData> words = new ArrayList<>();
 //		for(WordData wd : s){
@@ -113,7 +114,7 @@ class DictionaryLookupTest{
 //		}
 //
 //		//reiterate and verify that we have the same entries
-//		final DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
+//		DictionaryLookup s2 = new DictionaryLookup(Dictionary.read(url));
 //		int i = 0;
 //		for(WordData wd : s2){
 //			WordData clone = words.get(i ++);
@@ -123,7 +124,7 @@ class DictionaryLookupTest{
 //		}
 //
 //		//check collections contract
-//		final Set<WordData> entries = new HashSet<>();
+//		Set<WordData> entries = new HashSet<>();
 //		try{
 //			entries.add(words.get(0));
 //			Assertions.fail();
@@ -136,9 +137,9 @@ class DictionaryLookupTest{
 
 	@Test
 	void multibyteEncodingUTF8() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/diacritics-utf8.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/diacritics-utf8.dict");
 		Dictionary d = Dictionary.read(url);
-		final DictionaryLookup s = new DictionaryLookup(d);
+		DictionaryLookup s = new DictionaryLookup(d);
 
 		Assertions.assertArrayEquals(new String[]{"merge", "001"}, stem(s, "mergeam", d));
 		Assertions.assertArrayEquals(new String[]{"merge", "002"}, stem(s, "merseserăm", d));
@@ -146,9 +147,9 @@ class DictionaryLookupTest{
 
 	@Test
 	void synthesis() throws IOException{
-		final URL url = getClass().getResource("/services/fsa/lookup/synth.dict");
+		URL url = getClass().getResource("/services/fsa/lookup/synth.dict");
 		Dictionary d = Dictionary.read(url);
-		final DictionaryLookup s = new DictionaryLookup(d);
+		DictionaryLookup s = new DictionaryLookup(d);
 
 		Assertions.assertArrayEquals(new String[]{"miała", null}, stem(s, "mieć|verb:praet:sg:ter:f:?perf", d));
 		Assertions.assertArrayEquals(new String[]{"a", null}, stem(s, "a|conj", d));
@@ -159,9 +160,9 @@ class DictionaryLookupTest{
 
 //	@Test
 //	void inputWithSeparators() throws IOException{
-//		final URL url = getClass().getResource("/services/fsa/lookup/separators.dict");
+//		URL url = getClass().getResource("/services/fsa/lookup/separators.dict");
 //		Dictionary d = Dictionary.read(url);
-//		final DictionaryLookup s = new DictionaryLookup(d);
+//		DictionaryLookup s = new DictionaryLookup(d);
 //
 //		//attemp to reconstruct input sequences using WordData iterator
 //		List<String> sequences = new ArrayList<>();
@@ -189,7 +190,7 @@ class DictionaryLookupTest{
 			.encoder(EncoderType.INFIX)
 			.build();
 
-		final DictionaryLookup s = new DictionaryLookup(new Dictionary(fsa, metadata));
+		DictionaryLookup s = new DictionaryLookup(new Dictionary(fsa, metadata));
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
 			() -> s.lookup("l+A"));
 		Assertions.assertEquals("No valid input can contain the separator: l+A", exception.getMessage());

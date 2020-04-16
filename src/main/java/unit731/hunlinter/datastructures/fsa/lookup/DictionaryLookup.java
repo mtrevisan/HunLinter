@@ -46,9 +46,10 @@ public class DictionaryLookup implements Iterable<WordData>{
 		Objects.requireNonNull(dictionary.metadata);
 
 		this.dictionary = dictionary;
-		this.sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
-		this.matcher = new FSATraversal(dictionary.fsa);
-		this.finalStatesIterator = new ByteSequenceIterator(dictionary.fsa, dictionary.fsa.getRootNode());
+
+		sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
+		matcher = new FSATraversal(dictionary.fsa);
+		finalStatesIterator = new ByteSequenceIterator(dictionary.fsa, dictionary.fsa.getRootNode());
 	}
 
 	/**
