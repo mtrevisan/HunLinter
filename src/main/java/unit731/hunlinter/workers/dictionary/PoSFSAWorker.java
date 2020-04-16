@@ -154,15 +154,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<FSA, File> step4 = fsa -> {
 			resetProcessing("Compressing FSA (step 4/5)");
 
-try{
-final DictionaryLookup dictionaryLookup = new DictionaryLookup(new Dictionary(fsa, metadata));
-for(final Iterator<?> i = dictionaryLookup.iterator(); i.hasNext(); i.next()){}
-}
-catch(final Exception e){
-e.printStackTrace();
-throw new RuntimeException(e.getMessage());
-}
-
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
@@ -190,7 +181,6 @@ throw new RuntimeException(e.getMessage());
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
 			}
 			catch(final Exception e){
-e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 
