@@ -4,16 +4,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.datastructures.fsa.FSA;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
-import unit731.hunlinter.datastructures.fsa.stemming.DictionaryAttribute;
 import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadataBuilder;
 import unit731.hunlinter.datastructures.fsa.stemming.EncoderType;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -85,19 +82,19 @@ class DictionaryLookupTest{
 		assertNoStemFor(s, "Rzeczyckiõh", d);
 	}
 
-//	@Test
-//	void wordDataIterator() throws IOException{
-//		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-//		Dictionary d = Dictionary.read(url);
-//		DictionaryLookup s = new DictionaryLookup(d);
-//
-//		Set<String> entries = new HashSet<>();
-//		for(WordData wd : s)
-//			entries.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
-//
-//		//make sure a sample of the entries is present
-//		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
-//	}
+	@Test
+	void wordDataIterator() throws IOException{
+		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+		Dictionary d = Dictionary.read(url);
+		DictionaryLookup s = new DictionaryLookup(d);
+
+		Set<String> entries = new HashSet<>();
+		for(WordData wd : s)
+			entries.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
+
+		//make sure a sample of the entries is present
+		Assertions.assertTrue(entries.containsAll(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f"))));
+	}
 
 	@Test
 	void wordDataCloning() throws IOException{
