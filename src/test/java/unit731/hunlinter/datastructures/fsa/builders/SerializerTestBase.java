@@ -115,22 +115,22 @@ public class SerializerTestBase{
 
 	@Test
 	public void test_abc() throws IOException{
-		testBuiltIn(FSA.read(SerializerTestBase.class.getResourceAsStream("/services/fsa/builders/abc.fsa")));
+		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa")));
 	}
 
 	@Test
 	public void test_minimal() throws IOException{
-		testBuiltIn(FSA.read(SerializerTestBase.class.getResourceAsStream("/services/fsa/builders/minimal.fsa")));
+		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal.fsa")));
 	}
 
 	@Test
 	public void test_minimal2() throws IOException{
-		testBuiltIn(FSA.read(SerializerTestBase.class.getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
+		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
 	}
 
 	@Test
 	public void test_en_tst() throws IOException{
-		testBuiltIn(FSA.read(SerializerTestBase.class.getResourceAsStream("/services/fsa/builders/en_tst.dict")));
+		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict")));
 	}
 
 	private void testBuiltIn(FSA fsa) throws IOException{
