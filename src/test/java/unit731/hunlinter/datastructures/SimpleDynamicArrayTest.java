@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import unit731.hunlinter.datastructures.dynamicarray.DynamicArray;
 
 
-public class SimpleDynamicArrayTest{
+class SimpleDynamicArrayTest{
 
 	@Test
 	void add(){

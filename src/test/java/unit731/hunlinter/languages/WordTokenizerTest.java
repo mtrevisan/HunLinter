@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class WordTokenizerTest{
+class WordTokenizerTest{
 
 	private static final WordTokenizer tokenizer = new WordTokenizer();
 

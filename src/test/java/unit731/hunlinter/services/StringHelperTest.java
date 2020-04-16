@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 
-public class StringHelperTest{
+class StringHelperTest{
 
 	private static class AllCodepointsIterator{
 		//see http://unicode.org/glossary/

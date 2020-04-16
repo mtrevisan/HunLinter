@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class WordTokenizerVECTest{
+class WordTokenizerVECTest{
 
 	private static final WordTokenizer tokenizer = new WordTokenizerVEC();
 

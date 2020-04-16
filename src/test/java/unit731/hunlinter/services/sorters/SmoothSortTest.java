@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 
-public class SmoothSortTest{
+class SmoothSortTest{
 
 	private static final Comparator<Object> NATURAL_ORDER = (first, second) -> ((Comparable<Object>)first).compareTo(second);
 

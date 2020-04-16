@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Random;
 
 
-public class HeapSortTest{
+class HeapSortTest{
 
 	private static final Comparator<Object> NATURAL_ORDER = (first, second) -> ((Comparable<Object>)first).compareTo(second);
 
