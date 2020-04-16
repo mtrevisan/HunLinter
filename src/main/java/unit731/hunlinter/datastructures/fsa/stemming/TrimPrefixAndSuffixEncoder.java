@@ -61,7 +61,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 		final byte[] encoded = new byte[2 + len1];
 		encoded[0] = (byte)((truncatePrefixBytes + 'A') & 0xFF);
 		encoded[1] = (byte)((truncateSuffixBytes + 'A') & 0xFF);
-		System.arraycopy(target, 0, encoded, 2, len1);
+		System.arraycopy(target, maxSubsequenceLength, encoded, 2, len1);
 		return encoded;
 	}
 

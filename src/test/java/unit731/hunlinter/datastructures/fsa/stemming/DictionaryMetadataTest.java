@@ -11,31 +11,31 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 
-public class DictionaryMetadataTest{
+class DictionaryMetadataTest{
 
 	@Test
-	public void testWrongSeparator(){
+	void testWrongSeparator(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
 			() -> DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/wrong-separator.info")));
 		Assertions.assertEquals("Attribute fsa.dict.separator must be a single character: \\t+", exception.getMessage());
 	}
 
 	@Test
-	public void testEscapeSeparator() throws IOException{
+	void testEscapeSeparator() throws IOException{
 		DictionaryMetadata m = DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/escape-separator.info"));
 
 		Assertions.assertEquals((byte)'\t', m.getSeparator());
 	}
 
 	@Test
-	public void testUnicodeSeparator() throws IOException{
+	void testUnicodeSeparator() throws IOException{
 		DictionaryMetadata m = DictionaryMetadata.read(getClass().getResourceAsStream("/services/fsa/stemming/unicode-separator.info"));
 
 		Assertions.assertEquals((byte)'\t', m.getSeparator());
 	}
 
 	@Test
-	public void testWriteMetadata() throws IOException{
+	void testWriteMetadata() throws IOException{
 		for(EncoderType encoder : EncoderType.values()){
 			for(Charset charset : Arrays.asList(StandardCharsets.UTF_8, StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII)){
 				StringWriter sw = new StringWriter();

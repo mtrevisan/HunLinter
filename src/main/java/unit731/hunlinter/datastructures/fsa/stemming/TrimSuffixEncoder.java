@@ -43,7 +43,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 		final byte[] encoded = new byte[1 + target.length - sharedPrefix];
 		final byte suffixTrimCode = (byte)(truncateBytes + 'A');
 		encoded[0] = suffixTrimCode;
-		System.arraycopy(target, 0, encoded, 1, target.length - sharedPrefix);
+		System.arraycopy(target, sharedPrefix, encoded, 1, target.length - sharedPrefix);
 		return encoded;
 	}
 

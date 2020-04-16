@@ -105,7 +105,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		final byte[] decoded = new byte[infixIndex + len1 + len2];
 		System.arraycopy(source, 0, decoded, 0, infixIndex);
 		System.arraycopy(source, infixIndex + infixLength, decoded, infixIndex, len1);
-		System.arraycopy(encoded, 3, decoded, infixIndex << 1, len2);
+		System.arraycopy(encoded, 3, decoded, infixIndex + len1, len2);
 		return decoded;
 	}
 
