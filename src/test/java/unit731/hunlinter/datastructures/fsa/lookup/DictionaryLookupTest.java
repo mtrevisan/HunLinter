@@ -23,7 +23,7 @@ import java.util.Set;
 class DictionaryLookupTest{
 
 	@Test
-	void testApplyReplacements(){
+	void applyReplacements(){
 		Map<String, String> conversion = new HashMap<>();
 		conversion.put("'", "`");
 		conversion.put("fi", "ﬁ");
@@ -38,7 +38,7 @@ class DictionaryLookupTest{
 	}
 
 	@Test
-	void testRemovedEncoderProperties(){
+	void removedEncoderProperties(){
 		final URL url = getClass().getResource("/services/fsa/lookup/removed-props.dict");
 		Throwable exception = Assertions.assertThrows(IOException.class,
 			() -> new DictionaryLookup(Dictionary.read(url)));
@@ -46,7 +46,7 @@ class DictionaryLookupTest{
 	}
 
 //	@Test
-//	void testPrefixDictionaries() throws IOException{
+//	void prefixDictionaries() throws IOException{
 //		final URL url = getClass().getResource("/services/fsa/lookup/prefix.dict");
 //		final DictionaryLookup s = new DictionaryLookup(Dictionary.read(url));
 //
@@ -195,21 +195,21 @@ class DictionaryLookupTest{
 //		Assertions.assertEquals('+', s.getSeparator());
 //	}
 
-//	private static void assertNoStemFor(DictionaryLookup s, String word){
-//		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
-//	}
-//
-//	private static String[] stem(DictionaryLookup s, String word){
-//		List<String> result = new ArrayList<>();
-//		for(WordData wd : s.lookup(word)){
-//			result.add(asString(wd.getStem()));
-//			result.add(asString(wd.getTag()));
-//		}
-//		return result.toArray(String[]::new);
-//	}
-//
-//	private static String asString(CharSequence s){
-//		return (s != null? s.toString(): null);
-//	}
+	private static void assertNoStemFor(DictionaryLookup s, String word){
+		Assertions.assertArrayEquals(new String[]{}, stem(s, word));
+	}
+
+	private static String[] stem(DictionaryLookup s, String word){
+		List<String> result = new ArrayList<>();
+		for(WordData wd : s.lookup(word)){
+			result.add(asString(wd.getStem()));
+			result.add(asString(wd.getTag()));
+		}
+		return result.toArray(String[]::new);
+	}
+
+	private static String asString(CharSequence s){
+		return (s != null? s.toString(): null);
+	}
 
 }
