@@ -1,4 +1,6 @@
-package unit731.hunlinter.datastructures.fsa;
+package unit731.hunlinter.datastructures.fsa.lookup;
+
+import unit731.hunlinter.datastructures.fsa.FSA;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -29,14 +31,10 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	/** A buffer for the current sequence of bytes from the current node to the root. */
 	private byte[] buffer = new byte[EXPECTED_MAX_STATES];
 
-	/** Reusable byte buffer wrapper around {@link #buffer}. */
-	private ByteBuffer bufferWrapper = ByteBuffer.wrap(buffer);
-
-	/** An arc stack for DFS when processing the automaton. */
+	/** an arc stack for DFS when processing the automaton */
 	private int[] arcs = new int[EXPECTED_MAX_STATES];
-
-	/** Current processing depth in {@link #arcs}. */
-	private int position;
+	/** current processing depth in {@link #arcs} */
+	private int arcLimit;
 
 
 	/**
@@ -68,8 +66,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 * @return Returns <code>this</code> for call chaining.
 	 */
 	public ByteSequenceIterator restartFrom(final int node){
-		position = 0;
-		bufferWrapper.clear();
+		arcLimit = 0;
 		nextElement = null;
 
 		pushNode(node);
@@ -82,7 +79,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		if(nextElement == null)
 			nextElement = advance();
 
-		return nextElement != null;
+		return (nextElement != null);
 	}
 
 	/**
@@ -93,6 +90,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		final ByteBuffer cache;
 		if(nextElement != null){
 			cache = nextElement;
+
 			nextElement = null;
 		}
 		else{
@@ -103,18 +101,18 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		return cache;
 	}
 
-	/** Advances to the next available final state. */
+	/** Advances to the next available final state */
 	private ByteBuffer advance(){
-		if(position == 0)
+		if(arcLimit == 0)
 			return null;
 
-		while(position > 0){
-			final int lastIndex = position - 1;
+		while(arcLimit > 0){
+			final int lastIndex = arcLimit - 1;
 			final int arc = arcs[lastIndex];
 
 			if(arc == 0){
-				//remove the current node from the queue.
-				position --;
+				//remove the current node from the queue
+				arcLimit --;
 				continue;
 			}
 
@@ -122,11 +120,8 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 			arcs[lastIndex] = fsa.getNextArc(arc);
 
 			//expand buffer if needed
-			final int bufferLength = this.buffer.length;
-			if(lastIndex >= bufferLength){
-				this.buffer = Arrays.copyOf(buffer, bufferLength + EXPECTED_MAX_STATES);
-				this.bufferWrapper = ByteBuffer.wrap(buffer);
-			}
+			if(lastIndex >= buffer.length)
+				buffer = Arrays.copyOf(buffer, Math.max(lastIndex, buffer.length + EXPECTED_MAX_STATES));
 			buffer[lastIndex] = fsa.getArcLabel(arc);
 
 			if(!fsa.isArcTerminal(arc))
@@ -134,28 +129,28 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 				pushNode(fsa.getEndNode(arc));
 
 			if(fsa.isArcFinal(arc)){
-				bufferWrapper.clear();
-				bufferWrapper.limit(lastIndex + 1);
-				return bufferWrapper;
+				final ByteBuffer wrapper = ByteBuffer.wrap(buffer);
+				wrapper.limit(lastIndex + 1);
+				return wrapper;
 			}
 		}
 
 		return null;
 	}
 
+	/** Descends to a given node, adds its arcs to the stack to be traversed */
+	private void pushNode(final int node){
+		//expand buffers if needed
+		if(arcLimit == arcs.length)
+			arcs = Arrays.copyOf(arcs, arcs.length + EXPECTED_MAX_STATES);
+
+		arcs[arcLimit ++] = fsa.getFirstArc(node);
+	}
+
 	/** Not implemented in this iterator */
 	@Override
 	public void remove(){
 		throw new UnsupportedOperationException("Read-only iterator.");
-	}
-
-	/** Descends to a given node, adds its arcs to the stack to be traversed */
-	private void pushNode(final int node){
-		//expand buffers if needed
-		if(position == arcs.length)
-			arcs = Arrays.copyOf(arcs, arcs.length + EXPECTED_MAX_STATES);
-
-		arcs[position ++] = fsa.getFirstArc(node);
 	}
 
 }

@@ -2,6 +2,7 @@ package unit731.hunlinter.datastructures.fsa;
 
 import unit731.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
+import unit731.hunlinter.datastructures.fsa.lookup.ByteSequenceIterator;
 import unit731.hunlinter.datastructures.fsa.serializers.FSAHeader;
 
 import java.io.ByteArrayOutputStream;
