@@ -140,7 +140,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 		}
 
 		//try to find a partial match in the dictionary
-		final MatchResult match = matcher.match(matchResult, byteBuffer, 0, byteBuffer.length, rootNode);
+		final MatchResult match = matcher.match(byteBuffer, 0, byteBuffer.length, rootNode);
 
 		if(match.kind == MatchResult.SEQUENCE_IS_A_PREFIX){
 			//the entire sequence exists in the dictionary. A separator should be the next symbol

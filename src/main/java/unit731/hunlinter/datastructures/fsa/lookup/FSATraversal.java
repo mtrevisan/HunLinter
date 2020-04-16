@@ -102,59 +102,6 @@ public final class FSATraversal{
 	}
 
 	/**
-	 * Same as {@link #match(byte[], int, int, int)}, but allows passing
-	 * a reusable {@link MatchResult} object so that no intermediate garbage is
-	 * produced.
-	 *
-	 * @param reuse    The {@link MatchResult} to reuse.
-	 * @param sequence Input sequence to look for in the automaton.
-	 * @param start    Start index in the sequence array.
-	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
-	 * @return The same object as <code>reuse</code>, but with updated match {@link MatchResult#kind}
-	 * and other relevant fields.
-	 */
-	public MatchResult match(final MatchResult reuse, final byte[] sequence, final int start, final int length, int node){
-		if(node == 0){
-			reuse.reset(MatchResult.NO_MATCH, start, node);
-			return reuse;
-		}
-
-		final FSA fsa = this.fsa;
-		final int end = start + length;
-		for(int i = start; i < end; i ++){
-			final int arc = fsa.getArc(node, sequence[i]);
-			if(arc != 0){
-				if(i + 1 == end && fsa.isArcFinal(arc)){
-					//the automaton has an exact match of the input sequence
-					reuse.reset(MatchResult.EXACT_MATCH, i, node);
-					return reuse;
-				}
-
-				if(fsa.isArcTerminal(arc)){
-					//the automaton contains a prefix of the input sequence
-					reuse.reset(MatchResult.AUTOMATON_HAS_PREFIX, i + 1, node);
-					return reuse;
-				}
-
-				//make a transition along the arc
-				node = fsa.getEndNode(arc);
-			}
-			else{
-				if(i > start)
-					reuse.reset(MatchResult.AUTOMATON_HAS_PREFIX, i, node);
-				else
-					reuse.reset(MatchResult.NO_MATCH, i, node);
-				return reuse;
-			}
-		}
-
-		//the sequence is a prefix of at least one sequence in the automaton
-		reuse.reset(MatchResult.SEQUENCE_IS_A_PREFIX, 0, node);
-		return reuse;
-	}
-
-	/**
 	 * Finds a matching path in the dictionary for a given sequence of labels from
 	 * <code>sequence</code> and starting at node <code>node</code>.
 	 *
@@ -165,8 +112,32 @@ public final class FSATraversal{
 	 * @return {@link MatchResult} with updated match {@link MatchResult#kind}.
 	 * @see #match(byte[], int)
 	 */
-	public MatchResult match(final byte[] sequence, final int start, final int length, final int node){
-		return match(new MatchResult(), sequence, start, length, node);
+	public MatchResult match(final byte[] sequence, final int start, final int length, int node){
+		if(node == 0)
+			return new MatchResult(MatchResult.NO_MATCH, start, node);
+
+		final FSA fsa = this.fsa;
+		final int end = start + length;
+		for(int i = start; i < end; i ++){
+			final int arc = fsa.getArc(node, sequence[i]);
+			if(arc != 0){
+				if(i + 1 == end && fsa.isArcFinal(arc))
+					//the automaton has an exact match of the input sequence
+					return new MatchResult(MatchResult.EXACT_MATCH, i, node);
+
+				if(fsa.isArcTerminal(arc))
+					//the automaton contains a prefix of the input sequence
+					return new MatchResult(MatchResult.AUTOMATON_HAS_PREFIX, i + 1, node);
+
+				//make a transition along the arc
+				node = fsa.getEndNode(arc);
+			}
+			else
+				return new MatchResult((i > start? MatchResult.AUTOMATON_HAS_PREFIX: MatchResult.NO_MATCH), i, node);
+		}
+
+		//the sequence is a prefix of at least one sequence in the automaton
+		return new MatchResult(MatchResult.SEQUENCE_IS_A_PREFIX, 0, node);
 	}
 
 	/**
