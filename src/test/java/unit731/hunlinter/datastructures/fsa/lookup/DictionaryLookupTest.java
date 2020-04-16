@@ -85,19 +85,19 @@ class DictionaryLookupTest{
 		assertNoStemFor(s, "Rzeczyckiõh", d);
 	}
 
-	@Test
-	void wordDataIterator() throws IOException{
-		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
-		Dictionary d = Dictionary.read(url);
-		DictionaryLookup s = new DictionaryLookup(d);
-
-		Set<String> entries = new HashSet<>();
-		for(WordData wd : s)
-			entries.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
-
-		//make sure a sample of the entries is present
-		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
-	}
+//	@Test
+//	void wordDataIterator() throws IOException{
+//		URL url = getClass().getResource("/services/fsa/lookup/infix.dict");
+//		Dictionary d = Dictionary.read(url);
+//		DictionaryLookup s = new DictionaryLookup(d);
+//
+//		Set<String> entries = new HashSet<>();
+//		for(WordData wd : s)
+//			entries.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
+//
+//		//make sure a sample of the entries is present
+//		Assertions.assertEquals(new HashSet<>(List.of("Rzekunia Rzekuń subst:sg:gen:m", "Rzeczkowskie Rzeczkowski adj:sg:nom.acc.voc:n+adj:pl:acc.nom.voc:f.n", "Rzecząpospolitą Rzeczpospolita subst:irreg", "Rzeczypospolita Rzeczpospolita subst:irreg", "Rzeczypospolitych Rzeczpospolita subst:irreg", "Rzeczyckiej Rzeczycki adj:sg:gen.dat.loc:f")), entries);
+//	}
 
 //	@Test
 //	void wordDataCloning() throws IOException{
@@ -167,7 +167,7 @@ class DictionaryLookupTest{
 //		//attemp to reconstruct input sequences using WordData iterator
 //		List<String> sequences = new ArrayList<>();
 //		for(WordData wd : s)
-//			sequences.add(wd.getWord() + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
+//			sequences.add(toString(wd.getWord(), d) + " " + toString(wd.getStem(), d) + " " + toString(wd.getTag(), d));
 //		Collections.sort(sequences);
 //
 //		Assertions.assertEquals("token1 null null", sequences.get(0));
@@ -211,7 +211,7 @@ class DictionaryLookupTest{
 	}
 
 	private static String toString(byte[] array, Dictionary d){
-		return (array != null? new String(array,d.metadata.getCharset()): null);
+		return (array != null? new String(array,d.metadata.getCharset()): "null");
 	}
 
 }

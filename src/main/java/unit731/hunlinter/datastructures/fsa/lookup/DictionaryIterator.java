@@ -42,7 +42,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 
 		//find the separator byte's position splitting the inflection instructions from the tag
 		int separatorIndex = ArrayUtils.indexOf(array, dictionary.metadata.getSeparator());
-		if(separatorIndex < 0)
+		if(separatorIndex < 0 || separatorIndex > limit)
 			throw new RuntimeException("Invalid dictionary entry format (missing separator).");
 
 		final byte[] inflection = new byte[separatorIndex];
@@ -54,7 +54,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 		//find the next separator byte's position splitting word form and tag
 		final int start = separatorIndex + 1;
 		separatorIndex = ArrayUtils.indexOf(array, dictionary.metadata.getSeparator(), start);
-		if(separatorIndex < 0)
+		if(separatorIndex < 0 || separatorIndex > limit)
 			separatorIndex = limit;
 
 		//decode the stem into stem buffer
