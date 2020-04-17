@@ -23,7 +23,7 @@ public class DictionarySortDialog extends JDialog{
 	private final DictionaryParser dicParser;
 
 
-	public DictionarySortDialog(final DictionaryParser dicParser, final String[] listData, final int firstVisibleItemIndex, final Frame parent){
+	public DictionarySortDialog(final DictionaryParser dicParser, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
 		Objects.requireNonNull(dicParser);
@@ -33,9 +33,6 @@ public class DictionarySortDialog extends JDialog{
 		initComponents();
 
 		setCurrentFont();
-
-		entriesList.setListData(listData);
-		scrollToVisibleIndex(firstVisibleItemIndex);
 
 		lblMessage.setText("Select a section from the list:");
 	}
@@ -106,6 +103,15 @@ public class DictionarySortDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	public void setDictionaryEnabled(final boolean enabled){
+		entriesList.setEnabled(enabled);
+	}
+
+	public void loadLines(final String[] listData, final int firstVisibleItemIndex){
+		entriesList.setListData(listData);
+		scrollToVisibleIndex(firstVisibleItemIndex);
+	}
 
 	private void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();

@@ -10,8 +10,6 @@ import unit731.hunlinter.workers.WorkerManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Objects;
@@ -27,8 +25,6 @@ public class DictionarySorterAction extends AbstractAction{
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
-
-	private int lastDictionarySortVisibleIndex;
 
 
 	public DictionarySorterAction(final ParserManager parserManager, final WorkerManager workerManager,
@@ -50,9 +46,10 @@ public class DictionarySorterAction extends AbstractAction{
 
 		try{
 			final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
-			final String[] lines = parserManager.getDictionaryLines();
-			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), lines,
-				lastDictionarySortVisibleIndex, parentFrame);
+			final DictionarySortDialog dialog = new DictionarySortDialog(parserManager.getDicParser(), parentFrame);
+
+			dialog.loadLines(parserManager.getDictionaryLines(), 0);
+
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parentFrame);
 			dialog.addListSelectionListener(evt -> {
@@ -63,20 +60,24 @@ public class DictionarySorterAction extends AbstractAction{
 							return (parserManager.getDicParser().isInBoundary(selectedRow)? selectedRow: null);
 						},
 						worker -> {
-							dialog.setVisible(false);
-							setEnabled(false);
+							dialog.setDictionaryEnabled(false);
 
 							worker.addPropertyChangeListener(propertyChangeListener);
 							worker.execute();
 						},
-						worker -> setEnabled(true)
+						worker -> {
+							dialog.setDictionaryEnabled(true);
+
+							try{
+								//reload text
+								final int lastVisibleIndex = dialog.getFirstVisibleIndex();
+								dialog.loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
+							}
+							catch(final Exception e){
+								throw new RuntimeException(e);
+							}
+						}
 					);
-			});
-			dialog.addWindowListener(new WindowAdapter(){
-				@Override
-				public void windowDeactivated(final WindowEvent e){
-					lastDictionarySortVisibleIndex = dialog.getFirstVisibleIndex();
-				}
 			});
 			dialog.setVisible(true);
 		}

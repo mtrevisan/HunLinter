@@ -1,21 +1,22 @@
 package unit731.hunlinter.workers.dictionary;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.sorters.SmoothSort;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -46,18 +47,20 @@ public class SorterWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
-		final Map.Entry<Integer, Pair<Integer, Integer>> boundary = dicParser.getBoundary(lineIndex);
-		if(boundary == null)
-			//FIXME what if this happens?
-			return;
+		final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
+		//here `boundary` cannot be null
 
 		final Function<Void, String[]> step1 = ignored -> {
-			prepareProcessing("Splitting dictionary file (step 1/3)");
+			prepareProcessing("Load dictionary file (step 1/3)");
 
-			parserManager.stopFileListener();
-
-			//split dictionary isolating the sorted section
-			final String[] chunk = extractSection(boundary, charset);
+			final String[] chunk;
+			try{
+				//split dictionary isolating the sorted section
+				chunk = extractSection(boundary, charset);
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e.getMessage());
+			}
 
 			setProgress(33);
 
@@ -67,7 +70,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sort selected section (step 2/3)");
 
 			//sort the chosen section
-			Arrays.sort(chunk, comparator);
+			SmoothSort.sort(chunk, comparator);
 
 			setProgress(67);
 
@@ -77,9 +80,9 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Merge sections (step 3/3)");
 
 			//re-merge section
-			mergeSectionsToDictionary(dicFile, chunk, boundary.getValue().getKey(), charset);
+//			mergeSectionsToDictionary(dicFile, chunk, boundary.getValue(), charset);
 
-			dicParser.clear();
+			dicParser.removeBoundary(boundary.getKey());
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
@@ -88,19 +91,20 @@ public class SorterWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
-	private String[] extractSection(final Map.Entry<Integer, Pair<Integer, Integer>> boundary, final Charset charset){
-		try(final RandomAccessFile accessor = new RandomAccessFile(dicParser.getDicFile(), "r")){
+	private String[] extractSection(final Map.Entry<Integer, Integer> boundary, final Charset charset) throws IOException{
+		try(final Scanner scanner = FileHelper.createScanner(dicParser.getDicFile().toPath(), charset)){
 			//skip to begin of chunk
-			accessor.seek(boundary.getValue().getKey());
+			int lineIndex = 0;
+			while(lineIndex ++ < boundary.getKey())
+				scanner.nextLine();
+			lineIndex --;
 
 			//read lines
-			final String[] chunk = new String[boundary.getValue().getValue() - boundary.getKey() + 1];
-			for(int index = 0; index < chunk.length; index ++)
-				chunk[index] = new String(accessor.readLine().getBytes(StandardCharsets.ISO_8859_1), charset);
+			int index = 0;
+			final String[] chunk = new String[boundary.getValue() - boundary.getKey() + 1];
+			while(lineIndex ++ <= boundary.getValue())
+				chunk[index ++] = scanner.nextLine();
 			return chunk;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
 		}
 	}
 
