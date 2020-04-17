@@ -77,6 +77,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
+			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Reading dictionary file (step 1/3)…");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
 			final Charset charset = dicParser.getCharset();
@@ -86,6 +87,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		};
 		final Function<Void, List<LineEntry>> step2 = ignored -> {
 			resetProcessing("Extracting minimal rules (step 2/3)");
+			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules, percent -> {
 				setProgress(percent, 100);
@@ -97,6 +99,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		};
 		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
 			resetProcessing("Verifying correctness (step 3/3)");
+			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Verifying correctness (step 3/3)…");
 
 			final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
@@ -109,6 +112,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Successfully processed");
 
 			return null;
 		};

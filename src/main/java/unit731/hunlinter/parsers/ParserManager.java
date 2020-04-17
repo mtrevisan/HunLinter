@@ -48,6 +48,7 @@ public class ParserManager implements FileChangeListener{
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
+	public static final Marker MARKER_RULE_REDUCER_STATUS = MarkerFactory.getMarker("rule-reducer-status");
 
 	private static final String EXTENSION_AID = ".aid";
 	private static final String FOLDER_AID = "aids";

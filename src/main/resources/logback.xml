@@ -31,6 +31,19 @@
 			<pattern>%msg%n</pattern>
 		</encoder>
 	</appender>
+	<appender name="rule-reducer-status" class="unit731.hunlinter.services.log.ApplicationLogAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+				<marker>rule-reducer-status</marker>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%msg</pattern>
+		</encoder>
+	</appender>
 
 	<logger name="unit731.hunlinter" level="info" />
 
@@ -42,5 +55,6 @@
 		<appender-ref ref="console" />
 		<appender-ref ref="application" />
 		<appender-ref ref="rule-reducer" />
+		<appender-ref ref="rule-reducer-status" />
 	</root>
 </configuration>
