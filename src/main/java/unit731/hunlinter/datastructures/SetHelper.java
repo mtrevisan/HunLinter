@@ -219,26 +219,25 @@ public class SetHelper{
 	}
 
 	public static <K extends Enum<K>, V> Map<K, List<V>> bucket(final V[] entries, final Function<V, K> keyMapper,
-		final Class<K> enumClass){
-		final EnumMap<K, List<V>> bucket = new EnumMap<>(enumClass);
-		for(final V entry : entries){
-			final K key = keyMapper.apply(entry);
-			if(key != null)
-				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
-					.add(entry);
-		}
+			final Class<K> enumClass){
+		final Map<K, List<V>> bucket = new EnumMap<>(enumClass);
+		for(final V entry : entries)
+			processBucketEntry(bucket, keyMapper, entry);
 		return bucket;
 	}
 
 	public static <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
 		final Map<K, List<V>> bucket = new HashMap<>();
-		for(final V entry : entries){
-			final K key = keyMapper.apply(entry);
-			if(key != null)
-				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
-					.add(entry);
-		}
+		for(final V entry : entries)
+			processBucketEntry(bucket, keyMapper, entry);
 		return bucket;
+	}
+
+	private static <K, V> void processBucketEntry(final Map<K, List<V>> bucket, final Function<V, K> keyMapper, final V entry){
+		final K key = keyMapper.apply(entry);
+		if(key != null)
+			bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
+				.add(entry);
 	}
 
 	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper,
