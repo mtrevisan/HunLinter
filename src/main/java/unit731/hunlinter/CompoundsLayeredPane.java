@@ -253,14 +253,13 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             final Inflection[] words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
+				final String[] input = StringUtils.split(inputCompounds, '\n');
             if(inputText.equals(affixData.getCompoundFlag())){
-               int maxCompounds = affixData.getCompoundMaxWordCount();
-               words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit,
-                  maxCompounds);
+               final int maxCompounds = affixData.getCompoundMaxWordCount();
+               words = wordGenerator.applyCompoundFlag(input, limit, maxCompounds);
             }
             else
-					words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText,
-						limit);
+					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
             final CompoundTableModel dm = (CompoundTableModel)table.getModel();
             dm.setInflections(Arrays.asList(words));
@@ -270,7 +269,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          }
       }
       else
-      clearOutputTable(table);
+      	clearOutputTable(table);
    }//GEN-LAST:event_limitComboBoxActionPerformed
 
    private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
