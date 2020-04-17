@@ -68,17 +68,8 @@ public class ConstantArcSizeFSA extends FSA{
 	}
 
 	@Override
-	public int getArc(final int node, final byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			if(getArcLabel(arc) == label)
-				return arc;
-		//an arc labeled with "label" not found
-		return 0;
-	}
-
-	@Override
 	public int getNextArc(final int arc){
-		return (isArcLast(arc)? 0: arc + ARC_SIZE);
+		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
 	@Override
@@ -117,6 +108,10 @@ public class ConstantArcSizeFSA extends FSA{
 	@Override
 	public Set<FSAFlags> getFlags(){
 		return Collections.emptySet();
+	}
+
+	private int skipArc(int offset){
+		return offset + ARC_SIZE;
 	}
 
 }

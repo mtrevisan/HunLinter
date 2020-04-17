@@ -10,7 +10,6 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SetHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -107,7 +107,7 @@ public class FileListenerManager implements FileListener, Runnable{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);
 
-				dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
+				dirPathToListeners.computeIfAbsent(dir, key -> SetHelper.newConcurrentSet())
 					.add(listener);
 			}
 		}
@@ -136,17 +136,13 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){
-		final Set<PathMatcher> filePatterns = newConcurrentSet();
+		final Set<PathMatcher> filePatterns = SetHelper.newConcurrentSet();
 		forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
 
 		listenerToFilePatterns.put(listener, filePatterns);
-	}
-
-	private <T> Set<T> newConcurrentSet(){
-		return Collections.newSetFromMap(new ConcurrentHashMap<>());
 	}
 
 	private PathMatcher matcherForExpression(String pattern){

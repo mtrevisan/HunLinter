@@ -188,25 +188,8 @@ public class CFSA2 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getArc(final int node, final byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			if(getArcLabel(arc) == label)
-				return arc;
-		//an arc labeled with "label" not found
-		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public int getEndNode(final int arc){
-		final int nodeOffset = getDestinationNodeOffset(arc);
-
-		//assert nodeOffset != 0 : "Can't follow a terminal arc: " + arc;
-		//assert nodeOffset < arcs.length : "Node out of bounds.";
-
-		return nodeOffset;
+		return getDestinationNodeOffset(arc);
 	}
 
 	/**

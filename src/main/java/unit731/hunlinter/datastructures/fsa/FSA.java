@@ -51,7 +51,13 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @return	The identifier of an arc leaving <code>node</code> and labeled with <code>label</code>.
 	 * 	An identifier equal to 0 means the node has no outgoing arc labeled <code>label</code>.
 	 */
-	public abstract int getArc(final int node, final byte label);
+	public int getArc(final int node, final byte label){
+		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
+			if(getArcLabel(arc) == label)
+				return arc;
+		//an arc labeled with "label" not found
+		return 0;
+	}
 
 	/**
 	 * @param arc The arc's identifier.

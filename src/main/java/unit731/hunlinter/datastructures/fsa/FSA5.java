@@ -129,19 +129,17 @@ public class FSA5 extends FSA{
 	public final byte annotation;
 
 
-	/**
-	 * Read and wrap a binary automaton in FSA version 5.
-	 */
-	FSA5(InputStream stream) throws IOException{
-		DataInputStream in = new DataInputStream(stream);
+	/** Read and wrap a binary automaton in FSA version 5 */
+	FSA5(final InputStream stream) throws IOException{
+		final DataInputStream in = new DataInputStream(stream);
 
 		filler = in.readByte();
 		annotation = in.readByte();
 		final byte hgtl = in.readByte();
 
 		/*
-		 * Determine if the automaton was compiled with NUMBERS. If so, modify
-		 * ctl and goto fields accordingly.
+		 * Determine if the automaton was compiled with NUMBERS
+		 * If so, modify ctl and goto fields accordingly.
 		 */
 		flags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
 		if((hgtl & 0xF0) != 0)
@@ -171,48 +169,31 @@ public class FSA5 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int getFirstArc(int node){
-		return nodeDataLength + node;
+	public final int getFirstArc(final int node){
+		return (nodeDataLength + node);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final int getNextArc(int arc){
-		if(isArcLast(arc))
-			return 0;
-		else
-			return skipArc(arc);
+	public final int getNextArc(final int arc){
+		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getArc(final int node, final byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			if(getArcLabel(arc) == label)
-				return arc;
-		//an arc labeled with "label" not found
-		return 0;
+	public int getEndNode(final int arc){
+		return getDestinationNodeOffset(arc);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getEndNode(int arc){
-		final int nodeOffset = getDestinationNodeOffset(arc);
-		//assert nodeOffset != 0: "No target node for terminal arcs.";
-		return nodeOffset;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public byte getArcLabel(int arc){
+	public byte getArcLabel(final int arc){
 		return arcs[arc];
 	}
 
@@ -220,16 +201,16 @@ public class FSA5 extends FSA{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isArcFinal(int arc){
-		return (arcs[arc + ADDRESS_OFFSET] & BIT_FINAL_ARC) != 0;
+	public boolean isArcFinal(final int arc){
+		return ((arcs[arc + ADDRESS_OFFSET] & BIT_FINAL_ARC) != 0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean isArcTerminal(int arc){
-		return (0 == getDestinationNodeOffset(arc));
+	public boolean isArcTerminal(final int arc){
+		return (getDestinationNodeOffset(arc) == 0);
 	}
 
 	/**
@@ -238,8 +219,9 @@ public class FSA5 extends FSA{
 	 * language).
 	 */
 	@Override
-	public int getRightLanguageCount(int node){
-		//assert getFlags().contains(FSAFlags.NUMBERS): "This FSA was not compiled with NUMBERS.";
+	public int getRightLanguageCount(final int node){
+		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
+
 		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
 	}
 
@@ -263,41 +245,36 @@ public class FSA5 extends FSA{
 	 * @return Returns true if the argument is the last arc of a node.
 	 * @see #BIT_LAST_ARC
 	 */
-	public boolean isArcLast(int arc){
-		return (arcs[arc + ADDRESS_OFFSET] & BIT_LAST_ARC) != 0;
+	public boolean isArcLast(final int arc){
+		return ((arcs[arc + ADDRESS_OFFSET] & BIT_LAST_ARC) != 0);
 	}
 
 	/**
-	 * @param arc The node's arc identifier.
-	 * @return Returns true if {@link #BIT_TARGET_NEXT} is set for this arc.
+	 * @param arc	The node's arc identifier.
+	 * @return   {@code true} if {@link #BIT_TARGET_NEXT} is set for this arc.
 	 * @see #BIT_TARGET_NEXT
 	 */
-	public boolean isNextSet(int arc){
+	public boolean isNextSet(final int arc){
 		return (arcs[arc + ADDRESS_OFFSET] & BIT_TARGET_NEXT) != 0;
 	}
 
-	/**
-	 * Returns the address of the node pointed to by this arc.
-	 */
-	final int getDestinationNodeOffset(int arc){
-		if(isNextSet(arc)){
-			/* The destination node follows this arc in the array. */
+	/** Returns the address of the node pointed to by this arc */
+	final int getDestinationNodeOffset(final int arc){
+		if(isNextSet(arc))
+			//the destination node follows this arc in the array
 			return skipArc(arc);
-		}
-		else{
-			/*
-			 * The destination node address has to be extracted from the arc's
-			 * goto field.
-			 */
+		else
+			//the destination node address has to be extracted from the arc's goto field
 			return FSAUtils.decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
-		}
 	}
 
-	/**
-	 * Read the arc's layout and skip as many bytes, as needed.
-	 */
-	private int skipArc(int offset){
-		return offset + (isNextSet(offset)? 1 + 1   /* label + flags */: 1 + gtl /* label + flags/address */);
+	/** Read the arc's layout and skip as many bytes, as needed */
+	private int skipArc(final int offset){
+		return offset + (isNextSet(offset)?
+			//label + flags
+			1 + 1:
+			//label + flags/address
+			1 + gtl);
 	}
 
 }
