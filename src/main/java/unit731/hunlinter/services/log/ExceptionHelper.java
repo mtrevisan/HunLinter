@@ -1,6 +1,9 @@
 package unit731.hunlinter.services.log;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.system.LoopHelper;
+
+import java.util.Optional;
 
 
 public class ExceptionHelper{
@@ -44,14 +47,10 @@ public class ExceptionHelper{
 		final StackTraceElement[] stackTrace = t.getStackTrace();
 		StackTraceElement stackTrace0 = null;
 		if(stackTrace.length > 0){
-			stackTrace0 = stackTrace[0];
-			String classPackage = ExceptionHelper.class.getName();
-			classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
-			for(final StackTraceElement trace : stackTrace)
-				if(trace.getClassName().startsWith(classPackage)){
-					stackTrace0 = trace;
-					break;
-				}
+			final String className = ExceptionHelper.class.getName();
+			final String classPackage = className.substring(0, className.indexOf('.') + 1);
+			stackTrace0 = Optional.ofNullable(LoopHelper.match(stackTrace, trace -> trace.getClassName().startsWith(classPackage)))
+				.orElse(stackTrace[0]);
 		}
 		return stackTrace0;
 	}
