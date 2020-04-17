@@ -169,16 +169,10 @@ public class SmoothSort{
 				return;
 
 			//otherwise, swap down and update order
-			swap(data, root, largerChild);
+			SorterHelper.swap(data, root, largerChild);
 			root = largerChild;
 			pExponent -= (largerChild == firstChild? 1: 2);
 		}
-	}
-
-	private static <T> void swap(final T[] data, final int i, final int j){
-		final T temp = data[i];
-		data[i] = data[j];
-		data[j] = temp;
 	}
 
 	/**

@@ -53,7 +53,7 @@ public class HeapSort{
 		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
-			swap(data, low, heapsize);
+			SorterHelper.swap(data, low, heapsize);
 
 			//sift down:
 			siftDown(data, low, heapsize, comparator);
@@ -78,7 +78,7 @@ public class HeapSort{
 				while(node > 0){
 					final int parent = parent(node);
 					if(comparator.compare(data[node], data[parent]) > 0)
-						swap(data, node, parent);
+						SorterHelper.swap(data, node, parent);
 					node = parent;
 				}
 			}
@@ -102,16 +102,10 @@ public class HeapSort{
 
 			//if parent is smaller than left child, then swapping parent with left child
 			if(leftChild < heapsize && comparator.compare(data[parent], data[leftChild]) < 0)
-				swap(data, parent, leftChild);
+				SorterHelper.swap(data, parent, leftChild);
 
 			parent = leftChild;
 		}while(leftChild < heapsize);
-	}
-
-	private static <T> void swap(final T[] data, final int i, final int j){
-		final T temp = data[i];
-		data[i] = data[j];
-		data[j] = temp;
 	}
 
 	private static int parent(final int index){

@@ -10,6 +10,12 @@ public class SorterHelper{
 
 	private SorterHelper(){}
 
+	public static <T> void swap(final T[] data, final int i, final int j){
+		final T temp = data[i];
+		data[i] = data[j];
+		data[j] = temp;
+	}
+
 	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array){
 		return removeDuplicates(array, 0, array.length);
