@@ -24,6 +24,11 @@ public class ParserHelper{
 		return (StringUtils.isBlank(line) || StringUtils.indexOfAny(line, comment) == 0);
 	}
 
+	public static void assertNotEOF(final Scanner scanner) throws EOFException{
+		if(!scanner.hasNextLine())
+			throw new EOFException("Unexpected EOF while reading file");
+	}
+
 	public static void assertLinesCount(final List<String> lines) throws IOException{
 		if(lines.isEmpty())
 			throw new EOFException("Unexpected EOF while reading file");
@@ -33,8 +38,6 @@ public class ParserHelper{
 	}
 
 	public static String assertLinesCount(final Scanner scanner) throws IOException{
-		if(!scanner.hasNextLine())
-			throw new EOFException("Unexpected EOF while reading file");
 		final String line = scanner.nextLine();
 		if(!NumberUtils.isCreatable(line))
 			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));

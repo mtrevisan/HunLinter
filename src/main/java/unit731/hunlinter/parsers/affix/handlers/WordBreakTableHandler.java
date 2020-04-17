@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashSet;
@@ -15,6 +14,7 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 
@@ -42,8 +42,7 @@ public class WordBreakTableHandler implements Handler{
 
 			final Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				if(!scanner.hasNextLine())
-					throw new EOFException("Unexpected EOF while reading file");
+				ParserHelper.assertNotEOF(scanner);
 
 				final String line = scanner.nextLine();
 				final String[] lineParts = StringUtils.split(line);

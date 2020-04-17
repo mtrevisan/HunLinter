@@ -1,6 +1,5 @@
 package unit731.hunlinter.parsers.affix;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -14,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -67,8 +67,7 @@ public class ConversionTable{
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
-				if(!scanner.hasNextLine())
-					throw new EOFException("Unexpected EOF while reading file");
+				ParserHelper.assertNotEOF(scanner);
 
 				final String line = scanner.nextLine();
 				final String[] parts = StringUtils.split(line);

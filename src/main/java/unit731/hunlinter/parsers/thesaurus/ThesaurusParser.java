@@ -1,7 +1,6 @@
 package unit731.hunlinter.parsers.thesaurus;
 
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -74,9 +73,6 @@ public class ThesaurusParser{
 		final Path path = theFile.toPath();
 		final Charset charset = FileHelper.determineCharset(path);
 		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
-			if(!scanner.hasNextLine())
-				throw new EOFException("Unexpected EOF while reading file");
-
 			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
 
