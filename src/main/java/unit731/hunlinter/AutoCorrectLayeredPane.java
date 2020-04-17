@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.TableRenderer;
@@ -40,7 +41,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
-public class AutoCorrectLayeredPane extends JLayeredPane{
+public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectLayeredPane.class);
 
@@ -297,6 +298,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
+	@Override
 	public void initialize(){
 		if(parserManager.getAcoParser().getCorrectionsCounter() > 0){
 			final String language = parserManager.getLanguage();
@@ -311,6 +313,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		incorrectTextField.setFont(currentFont);
@@ -318,6 +321,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		table.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		formerFilterIncorrectText = null;
 		formerFilterCorrectText = null;

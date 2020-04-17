@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.CompoundTableModel;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -41,7 +42,7 @@ import unit731.hunlinter.workers.WorkerManager;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
+public class CompoundsLayeredPane extends JLayeredPane implements ActionListener, PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompoundsLayeredPane.class);
 
@@ -307,6 +308,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		debouncer.call(this);
 	}
 
+	@Override
 	public void initialize(){
 		final String language = parserManager.getLanguage();
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
@@ -343,12 +345,14 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		openAidButton.setEnabled(aidLinesPresent);
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		inputTextArea.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		formerCompoundInputText = null;
 

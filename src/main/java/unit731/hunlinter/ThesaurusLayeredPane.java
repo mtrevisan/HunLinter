@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.TableRenderer;
@@ -38,7 +39,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
-public class ThesaurusLayeredPane extends JLayeredPane{
+public class ThesaurusLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLayeredPane.class);
 
@@ -247,6 +248,7 @@ final int iconSize = 17;
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
+	@Override
 	public void initialize(){
 		final String language = parserManager.getLanguage();
 
@@ -280,12 +282,14 @@ final int iconSize = 17;
 		}
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		synonymsTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		synonymsTextField.setText(null);
 		popupMergeMenuItem.setEnabled(false);

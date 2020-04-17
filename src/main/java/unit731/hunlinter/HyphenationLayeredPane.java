@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
@@ -29,7 +30,7 @@ import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.system.Debouncer;
 
 
-public class HyphenationLayeredPane extends JLayeredPane{
+public class HyphenationLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLayeredPane.class);
 
@@ -298,6 +299,7 @@ final int iconSize = 17;
 
             if(wordTextField.getText() != null){
                formerHyphenationText = null;
+
                hyphenate();
             }
 
@@ -336,10 +338,12 @@ final int iconSize = 17;
       dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed
 
+	@Override
 	public void initialize(){
 		openHypButton.setEnabled(packager.getHyphenationFile() != null);
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		wordTextField.setFont(currentFont);
@@ -348,6 +352,7 @@ final int iconSize = 17;
 		addRuleSyllabationValueLabel.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		openHypButton.setEnabled(false);
 

@@ -424,6 +424,19 @@ public class GUIUtils{
 	}
 
 
+	public static void forEachTabbedPane(final JTabbedPane tabbedPane, final Consumer<PanableInterface> function){
+		for(int i = 0; i < tabbedPane.getComponentCount(); i ++){
+			final Component component = tabbedPane.getComponent(i);
+			if(component.isEnabled() && component instanceof PanableInterface)
+				function.accept((PanableInterface)component);
+		}
+	}
+
+	public static void disableEachTabbedPane(final JTabbedPane tabbedPane){
+		for(int i = 0; i < tabbedPane.getComponentCount(); i ++)
+			tabbedPane.getComponent(i).setEnabled(false);
+	}
+
 	public static int setTabbedPaneEnable(final JTabbedPane tabbedPane, final Component component, final boolean enabled){
 		final int index = tabbedPane.indexOfComponent(component);
 		tabbedPane.setEnabledAt(index, enabled);

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -40,7 +41,7 @@ import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class DictionaryLayeredPane extends JLayeredPane{
+public class DictionaryLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
@@ -222,6 +223,7 @@ final int iconSize = 17;
       );
    }// </editor-fold>//GEN-END:initComponents
 
+	@Override
 	public void initialize(){
 		final String language = parserManager.getLanguage();
 
@@ -262,12 +264,14 @@ final int iconSize = 17;
 		}
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		inputTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		//affix file:
 		openAffButton.setEnabled(false);

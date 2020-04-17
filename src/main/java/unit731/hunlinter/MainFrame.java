@@ -21,6 +21,7 @@ import unit731.hunlinter.actions.ProjectLoaderAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.parsers.HunLintable;
 
@@ -503,13 +504,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		final Font currentFont = GUIUtils.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
 
-		((DictionaryLayeredPane)dicLayeredPane).setCurrentFont();
-		((CompoundsLayeredPane)cmpLayeredPane).setCurrentFont();
-		((ThesaurusLayeredPane)theLayeredPane).setCurrentFont();
-		((HyphenationLayeredPane)hypLayeredPane).setCurrentFont();
-		((AutoCorrectLayeredPane)acoLayeredPane).setCurrentFont();
-		((SentenceExceptionsLayeredPane)sexLayeredPane).setCurrentFont();
-		((WordExceptionsLayeredPane)wexLayeredPane).setCurrentFont();
+		GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::setCurrentFont);
 	}
 
 	private void loadFileCompleted(){
@@ -526,44 +521,39 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			dicLinterMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
+
+
+			GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::initialize);
+
+			//FIXME should be event-driven...
+
+			//dictionary file, part 1:
 			GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+
+			//dictionary file, part 2:
 			final AffixData affixData = parserManager.getAffixData();
 			final Set<String> compoundRules = affixData.getCompoundRules();
 			GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 
-
-			((DictionaryLayeredPane)dicLayeredPane).initialize();
-			((CompoundsLayeredPane)cmpLayeredPane).initialize();
-			((ThesaurusLayeredPane)theLayeredPane).initialize();
-			((HyphenationLayeredPane)hypLayeredPane).initialize();
-			((AutoCorrectLayeredPane)acoLayeredPane).initialize();
-			((SentenceExceptionsLayeredPane)sexLayeredPane).initialize();
-			((WordExceptionsLayeredPane)wexLayeredPane).initialize();
-
-
 			//thesaurus file:
-			if(parserManager.getTheParser().getSynonymsCount() > 0){
-				theMenu.setEnabled(true);
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
-			}
+			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, theMenu.isEnabled());
 
 			//hyphenation file:
-			if(parserManager.getHyphenator() != null){
-				hypMenu.setEnabled(true);
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
-			}
+			hypMenu.setEnabled(parserManager.getHyphenator() != null);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, hypMenu.isEnabled());
 
 			//auto–correct file:
-			if(parserManager.getAcoParser().getCorrectionsCounter() > 0)
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, true);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane,
+				(parserManager.getAcoParser().getCorrectionsCounter() > 0));
 
 			//sentence exceptions file:
-			if(parserManager.getSexParser().getExceptionsCounter() > 0)
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, true);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane,
+				(parserManager.getSexParser().getExceptionsCounter() > 0));
 
 			//word exceptions file:
-			if(parserManager.getWexParser().getExceptionsCounter() > 0)
-				GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, true);
+			GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane,
+				(parserManager.getWexParser().getExceptionsCounter() > 0));
 
 
 			//enable the first tab if the current one was disabled
@@ -599,36 +589,18 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
 
-		((DictionaryLayeredPane)dicLayeredPane).clear();
-		((CompoundsLayeredPane)cmpLayeredPane).clear();
-		((ThesaurusLayeredPane)theLayeredPane).clear();
-		((HyphenationLayeredPane)hypLayeredPane).clear();
-		((AutoCorrectLayeredPane)acoLayeredPane).clear();
-		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
-		((WordExceptionsLayeredPane)wexLayeredPane).clear();
+		GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::clear);
 
 		clearAllParsers();
 
 		//dictionary file:
 		dicMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
-
 		//thesaurus file:
 		theMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
-
 		//hyphenation file:
 		hypMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 
-		//auto–correct file:
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
-
-		//sentence exceptions file:
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
-
-		//word exceptions file:
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+		GUIUtils.disableEachTabbedPane(mainTabbedPane);
 	}
 
 

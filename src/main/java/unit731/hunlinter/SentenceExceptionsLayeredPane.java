@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
@@ -24,7 +25,7 @@ import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.system.Debouncer;
 
 
-public class SentenceExceptionsLayeredPane extends JLayeredPane{
+public class SentenceExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceExceptionsLayeredPane.class);
 
@@ -188,6 +189,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
+	@Override
 	public void initialize(){
 		if(parserManager.getSexParser().getExceptionsCounter() > 0){
 			updateSentenceExceptionsCounter();
@@ -198,11 +200,13 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		tagPanel.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		openSexButton.setEnabled(false);
 		formerFilterSentenceException = null;

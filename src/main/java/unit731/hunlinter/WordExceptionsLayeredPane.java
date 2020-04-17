@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
@@ -25,7 +26,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
 
 
-public class WordExceptionsLayeredPane extends JLayeredPane{
+public class WordExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordExceptionsLayeredPane.class);
 
@@ -191,6 +192,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
+	@Override
 	public void initialize(){
 		if(parserManager.getWexParser().getExceptionsCounter() > 0){
 			final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
@@ -200,11 +202,13 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 		openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 	}
 
+	@Override
 	public void setCurrentFont(){
 		final Font currentFont = GUIUtils.getCurrentFont();
 		tagPanel.setFont(currentFont);
 	}
 
+	@Override
 	public void clear(){
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
