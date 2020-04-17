@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.datastructures.FixedArray;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.datastructures.SetHelper;
 
@@ -43,17 +43,19 @@ public abstract class FlagParsingStrategy{
 		return joinFlags(flags, (flags != null? flags.length: 0));
 	}
 
-	/**
-	 * Compose the given array of String into one flag stream
-	 *
-	 * @param flags	Array of String to compose into flags
-	 * @return Composed flags
-	 */
-	public String joinFlags(final FixedArray<String> flags){
-		return joinFlags(flags.data, flags.limit);
+	public String joinFlags(final String[] flags, final int size){
+		return joinFlags(flags, size, StringUtils.EMPTY);
 	}
 
-	protected abstract String joinFlags(final String[] flags, final int size);
+	protected String joinFlags(final String[] flags, final int size, final String flagSeparator){
+		if(flags == null || size == 0)
+			return StringUtils.EMPTY;
+
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
+
+		return StringUtils.join(flags, flagSeparator);
+	}
 
 	/**
 	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])
