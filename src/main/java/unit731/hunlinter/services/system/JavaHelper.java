@@ -11,6 +11,9 @@ import java.nio.channels.ClosedChannelException;
 
 public class JavaHelper{
 
+	private static final char QUOTATION_MARK = '"';
+
+
 	private JavaHelper(){}
 
 	/**
@@ -45,10 +48,10 @@ public class JavaHelper{
 		//init the command to execute, add the vm args
 		final String fileSeparator = System.getProperty("file.separator");
 		final StringBuffer cmd = new StringBuffer()
-			.append("\"")
+			.append(QUOTATION_MARK)
 			//add java binary
 			.append(System.getProperty("java.home")).append(fileSeparator).append("bin").append(fileSeparator).append("java.exe")
-			.append("\"");
+			.append(QUOTATION_MARK);
 		for(final String arg : ManagementFactory.getRuntimeMXBean().getInputArguments())
 			//if it's the agent argument we ignore it, otherwise the address of the old application and the new one will be in conflict
 			if(!arg.startsWith("-agentlib") && !arg.startsWith("-javaagent"))

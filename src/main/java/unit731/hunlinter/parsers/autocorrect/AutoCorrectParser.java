@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
@@ -33,6 +34,8 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 public class AutoCorrectParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
+
+	private static final String QUOTATION_MARK = "\"";
 
 	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: ''{1}''");
 
@@ -112,9 +115,9 @@ public class AutoCorrectParser{
 	 */
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
-		if(incorrect.contains("'") || incorrect.contains("\""))
+		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE.format(new Object[]{"Incorrect", incorrect}));
-		if(correct.contains("'") || correct.contains("\""))
+		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE.format(new Object[]{"Correct", correct}));
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
