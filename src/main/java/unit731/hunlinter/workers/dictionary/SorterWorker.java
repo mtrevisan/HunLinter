@@ -3,7 +3,6 @@ package unit731.hunlinter.workers.dictionary;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +43,6 @@ public class SorterWorker extends WorkerDictionary{
 			.withCancelOnException();
 
 		dicParser = parserManager.getDicParser();
-		final Charset charset = dicParser.getCharset();
 
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
@@ -56,7 +54,7 @@ public class SorterWorker extends WorkerDictionary{
 			final String[] chunk;
 			try{
 				//split dictionary isolating the sorted section
-				chunk = extractSection(boundary, charset);
+				chunk = extractSection(boundary);
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e.getMessage());
@@ -79,8 +77,8 @@ public class SorterWorker extends WorkerDictionary{
 		final Function<String[], Void> step3 = chunk -> {
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Merge sections (step 3/3)");
 
-			//re-merge section
-//			mergeSectionsToDictionary(dicFile, chunk, boundary.getValue(), charset);
+			//merge section
+			mergeSectionToDictionary(chunk, boundary.getValue());
 
 			dicParser.removeBoundary(boundary.getKey());
 
@@ -91,8 +89,8 @@ public class SorterWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
-	private String[] extractSection(final Map.Entry<Integer, Integer> boundary, final Charset charset) throws IOException{
-		try(final Scanner scanner = FileHelper.createScanner(dicParser.getDicFile().toPath(), charset)){
+	private String[] extractSection(final Map.Entry<Integer, Integer> boundary) throws IOException{
+		try(final Scanner scanner = FileHelper.createScanner(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 			//skip to begin of chunk
 			int lineIndex = 0;
 			while(lineIndex ++ < boundary.getKey())
@@ -108,11 +106,11 @@ public class SorterWorker extends WorkerDictionary{
 		}
 	}
 
-	private void mergeSectionsToDictionary(final File dicFile, final String[] chunk, final int startIndex, final Charset charset){
-		try(final RandomAccessFile accessor = new RandomAccessFile(dicFile, "rwd")){
+	private void mergeSectionToDictionary(final String[] chunk, final int startIndex){
+		try(final RandomAccessFile accessor = new RandomAccessFile(dicParser.getDicFile(), "rwd")){
 			accessor.seek(startIndex);
 			for(final String line : chunk){
-				accessor.write(line.getBytes(charset));
+				accessor.write(line.getBytes(dicParser.getCharset()));
 				accessor.write(NEW_LINE);
 			}
 		}
