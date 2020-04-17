@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -149,8 +148,8 @@ public class DictionaryEntry{
 	 * @param isTerminalAffix	The method used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasNonTerminalContinuationFlags(final Function<String, Boolean> isTerminalAffix){
-		return (match(continuationFlags, Predicate.not(isTerminalAffix::apply)) != null);
+	public boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
+		return (match(continuationFlags, Predicate.not(isTerminalAffix::test)) != null);
 	}
 
 	public int getContinuationFlagCount(){

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,7 +103,7 @@ public class ThesaurusParser{
 	 * @return The duplication result
 	 */
 	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
-			final Function<String, Boolean> duplicatesDiscriminator){
+			final Predicate<String> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
@@ -128,7 +128,7 @@ public class ThesaurusParser{
 			final String duplicatesMessage = duplicates.stream()
 				.map(ThesaurusEntry::getDefinition)
 				.collect(StringHelper.limitingJoin(", ", 5, "…"));
-			forceInsertion = duplicatesDiscriminator.apply(duplicatesMessage);
+			forceInsertion = duplicatesDiscriminator.test(duplicatesMessage);
 		}
 
 		if(forceInsertion)

@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,7 +27,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -84,16 +85,12 @@ public class XMLManager{
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
 	}
 
-	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extractionCondition){
+	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
 		final ArrayList<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			children.ensureCapacity(nodes.getLength());
-			for(int i = 0; i < nodes.getLength(); i ++){
-				final Node item = nodes.item(i);
-				if(extractionCondition.apply(item))
-					children.add(item);
-			}
+			LoopHelper.applyIf(nodes, extractionCondition, children::add);
 		}
 		return children;
 	}

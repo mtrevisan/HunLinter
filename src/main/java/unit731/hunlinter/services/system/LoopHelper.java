@@ -1,6 +1,8 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import unit731.hunlinter.datastructures.FixedArray;
 
 import java.util.Arrays;
@@ -80,6 +82,15 @@ public class LoopHelper{
 			for(final T elem : collection)
 				if(condition.test(elem))
 					fun.accept(elem);
+	}
+
+	public static void applyIf(final NodeList nodes, final Predicate<Node> condition, final Predicate<Node> fun){
+		if(nodes != null)
+			for(int i = 0; i < nodes.getLength(); i ++){
+				final Node node = nodes.item(i);
+				if(condition.test(node))
+					fun.test(node);
+			}
 	}
 
 

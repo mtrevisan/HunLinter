@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -205,7 +205,7 @@ final int iconSize = 17;
       try{
          //try adding the synonyms
          final String synonyms = synonymsTextField.getText();
-         final Function<String, Boolean> duplicatesDiscriminator = message -> {
+         final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part–of–speech and definition(s) '" + message
                + "'.\nForce insertion?", "Duplicate detected",
