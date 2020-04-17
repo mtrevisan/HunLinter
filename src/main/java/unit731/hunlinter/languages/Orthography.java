@@ -10,7 +10,8 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 
 public class Orthography{
 
-	private static final String WRONG_APOSTROPHES = "'‘ʼ";
+	private static final String WRONG_APOSTROPHES = HyphenationParser.APOSTROPHE + "‘";
+	private static final String CORRECT_APOSTROPHES = StringUtils.repeat(HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE, WRONG_APOSTROPHES.length());
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
@@ -24,24 +25,11 @@ public class Orthography{
 	}
 
 	public String correctOrthography(final String word){
-		//apply stress
 		return correctApostrophes(word);
 	}
 
 	protected String correctApostrophes(final String word){
-		String correctedWord = word;
-		if(StringUtils.containsAny(word, WRONG_APOSTROPHES)){
-			final StringBuffer sb = new StringBuffer(word);
-			int index = 0;
-			for(final char chr : word.toCharArray()){
-				if(WRONG_APOSTROPHES.contains(String.valueOf(chr)))
-					sb.setCharAt(index, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
-
-				index ++;
-			}
-			correctedWord = sb.toString();
-		}
-		return correctedWord;
+		return StringUtils.replaceChars(word, WRONG_APOSTROPHES, CORRECT_APOSTROPHES);
 	}
 
 	public boolean[] getSyllabationErrors(final String[] syllabes){
