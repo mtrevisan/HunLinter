@@ -2,7 +2,7 @@ package unit731.hunlinter.datastructures.fsa.stemming;
 
 
 /**
- * No relative encoding at all (full target form is returned).
+ * No encoding (full target form is returned).
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */

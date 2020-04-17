@@ -1,6 +1,9 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
 
+import unit731.hunlinter.services.text.ArrayHelper;
+
+
 /**
  * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
  * non-equal suffix <code>source</code> has. The output code is (bytes):
@@ -33,7 +36,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
 	public byte[] encode(final byte[] source, final byte[] target){
-		int sharedPrefix = BufferUtils.sharedPrefixLength(source, target);
+		int sharedPrefix = ArrayHelper.longestCommonPrefix(source, target);
 		int truncateBytes = source.length - sharedPrefix;
 		if(truncateBytes >= REMOVE_EVERYTHING){
 			truncateBytes = REMOVE_EVERYTHING;
@@ -41,16 +44,15 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 		}
 
 		final byte[] encoded = new byte[1 + target.length - sharedPrefix];
-		final byte suffixTrimCode = (byte)(truncateBytes + 'A');
-		encoded[0] = suffixTrimCode;
+		encoded[0] = encodeValue(truncateBytes);
 		System.arraycopy(target, sharedPrefix, encoded, 1, target.length - sharedPrefix);
 		return encoded;
 	}
 
 	@Override
 	public byte[] decode(final byte[] source, final byte[] encoded){
-		final int suffixTrimCode = encoded[0];
-		int truncateBytes = (suffixTrimCode - 'A') & 0xFF;
+		final byte suffixTrimCode = encoded[0];
+		int truncateBytes = decodeValue(suffixTrimCode);
 		if(truncateBytes == REMOVE_EVERYTHING)
 			truncateBytes = source.length;
 

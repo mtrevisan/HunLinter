@@ -31,24 +31,6 @@ public class BufferUtils{
 	}
 
 	/**
-	 * Ensure the buffer's capacity is large enough to hold a given number
-	 * of elements. If the input buffer is not large enough, a new buffer is allocated
-	 * and returned.
-	 *
-	 * @param elements The required number of elements to be appended to the buffer.
-	 * @param buffer   The buffer to check or <code>null</code> if a new buffer should be
-	 *                 allocated.
-	 * @return Returns the same buffer or a new buffer with the given capacity.
-	 */
-	public static CharBuffer clearAndEnsureCapacity(CharBuffer buffer, final int elements){
-		if(buffer == null || buffer.capacity() < elements)
-			buffer = CharBuffer.allocate(elements);
-		else
-			buffer.clear();
-		return buffer;
-	}
-
-	/**
 	 * @param buffer  The buffer to convert to a string.
 	 * @param charset The charset to use when converting bytes to characters.
 	 * @return A string representation of buffer's content.
@@ -67,18 +49,6 @@ public class BufferUtils{
 		return new String(buf);
 	}
 
-	/**
-	 * @param buffer	The buffer to read from.
-	 * @return	The remaining bytes from the buffer copied to an array.
-	 */
-	public static synchronized byte[] toArray(final ByteBuffer buffer){
-		final byte[] dst = new byte[buffer.remaining()];
-		buffer.mark();
-		buffer.get(dst);
-		buffer.reset();
-		return dst;
-	}
-
 	/** Compute the length of the shared prefix between two byte sequences */
 	static int sharedPrefixLength(final byte[] a, int aStart, final byte[] b, int bStart){
 		int i = 0;
@@ -86,11 +56,6 @@ public class BufferUtils{
 		while(i < max && a[aStart ++] == b[bStart ++])
 			i ++;
 		return i;
-	}
-
-	/** Compute the length of the shared prefix between two byte sequences */
-	static int sharedPrefixLength(final byte[] a, final byte[] b){
-		return sharedPrefixLength(a, 0, b, 0);
 	}
 
 }

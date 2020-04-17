@@ -59,16 +59,16 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 
 		final int len1 = target.length - maxSubsequenceLength;
 		final byte[] encoded = new byte[2 + len1];
-		encoded[0] = (byte)((truncatePrefixBytes + 'A') & 0xFF);
-		encoded[1] = (byte)((truncateSuffixBytes + 'A') & 0xFF);
+		encoded[0] = encodeValue(truncatePrefixBytes);
+		encoded[1] = encodeValue(truncateSuffixBytes);
 		System.arraycopy(target, maxSubsequenceLength, encoded, 2, len1);
 		return encoded;
 	}
 
 	@Override
 	public byte[] decode(final byte[] source, final byte[] encoded){
-		int truncatePrefixBytes = (encoded[0] - 'A') & 0xFF;
-		int truncateSuffixBytes = (encoded[1] - 'A') & 0xFF;
+		int truncatePrefixBytes = decodeValue(encoded[0]);
+		int truncateSuffixBytes = decodeValue(encoded[1]);
 		if(truncatePrefixBytes == REMOVE_EVERYTHING || truncateSuffixBytes == REMOVE_EVERYTHING){
 			truncatePrefixBytes = source.length;
 			truncateSuffixBytes = 0;

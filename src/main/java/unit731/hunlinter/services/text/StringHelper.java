@@ -90,8 +90,8 @@ public class StringHelper{
 	}
 
 	/**
-	 * Returns the longest string {@code suffix} such that {@code a.toString().endsWith(suffix) &&
-	 * b.toString().endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
+	 * Returns the longest string {@code suffix} such that {@code a.endsWith(suffix) &&
+	 * b.endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common suffix, returns the empty string.
 	 */
 	private static String commonSuffix(final String a, final String b){

@@ -38,4 +38,12 @@ public interface SequenceEncoderInterface{
 	 */
 	byte[] decode(final byte[] source, final byte[] encoded);
 
+	default byte encodeValue(final int value){
+		return (byte)(value + 'A');
+	}
+
+	default int decodeValue(final byte value){
+		return ((value - 'A') & 0xFF);
+	}
+
 }
