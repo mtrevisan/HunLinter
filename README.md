@@ -306,6 +306,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - added undo/redo capabilities on input fields
 - completely revised thread management
 - fixed a nasty memory leak
+- now the sort dialog remains open after a sort
 - reduced compiled size by 52% (from 6 201 344 B to 3 002 671 B)
 - reduced memory footprint by 13% (for dictionary linter: from 728 MB to 630 MB)
 - increased speed by 53% (for dictionary linter: from 4m 44s to 2m 13s)
