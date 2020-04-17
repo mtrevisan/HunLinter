@@ -14,6 +14,9 @@ import java.util.Objects;
 
 public class AffixRulesReducerAction extends AbstractAction{
 
+	private static final long serialVersionUID = 2384472624481589969L;
+
+
 	private final ParserManager parserManager;
 
 

@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 
 public class ProjectLoaderAction extends AbstractAction{
 
+	private static final long serialVersionUID = 2457698626251961045L;
+
 	public static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = RegexHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 

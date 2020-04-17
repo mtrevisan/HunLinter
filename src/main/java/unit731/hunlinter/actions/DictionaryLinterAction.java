@@ -10,6 +10,9 @@ import java.util.Objects;
 
 public class DictionaryLinterAction extends AbstractAction{
 
+	private static final long serialVersionUID = -167987952493042223L;
+
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

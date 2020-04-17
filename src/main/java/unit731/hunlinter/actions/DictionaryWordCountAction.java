@@ -10,6 +10,9 @@ import java.util.Objects;
 
 public class DictionaryWordCountAction extends AbstractAction{
 
+	private static final long serialVersionUID = 4648025847847837059L;
+
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

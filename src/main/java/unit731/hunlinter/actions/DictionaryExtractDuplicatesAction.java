@@ -13,6 +13,9 @@ import java.util.Objects;
 
 public class DictionaryExtractDuplicatesAction extends AbstractAction{
 
+	private static final long serialVersionUID = 30252862022089504L;
+
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

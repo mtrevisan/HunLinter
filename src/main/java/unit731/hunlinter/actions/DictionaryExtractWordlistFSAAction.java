@@ -14,6 +14,9 @@ import java.util.Objects;
 
 public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 
+	private static final long serialVersionUID = -471619630768881123L;
+
+
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;

@@ -8,6 +8,8 @@ import java.util.prefs.Preferences;
 
 public class CheckUpdateOnStartupAction extends AbstractAction{
 
+	private static final long serialVersionUID = 2319044845856106299L;
+
 	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 

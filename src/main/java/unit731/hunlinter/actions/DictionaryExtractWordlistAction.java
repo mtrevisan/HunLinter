@@ -14,6 +14,9 @@ import java.util.Objects;
 
 public class DictionaryExtractWordlistAction extends AbstractAction{
 
+	private static final long serialVersionUID = 7870582176463311807L;
+
+
 	private final WordlistWorker.WorkerType type;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;

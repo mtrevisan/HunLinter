@@ -10,6 +10,8 @@ import java.util.Objects;
 
 public class ThesaurusLinterAction extends AbstractAction{
 
+	private static final long serialVersionUID = -8807355872370651224L;
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

@@ -9,6 +9,9 @@ import java.awt.event.ActionEvent;
 
 public class ExitAction extends AbstractAction{
 
+	private static final long serialVersionUID = -3856496810694201902L;
+
+
 	public ExitAction(){
 		super("system.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
 	}

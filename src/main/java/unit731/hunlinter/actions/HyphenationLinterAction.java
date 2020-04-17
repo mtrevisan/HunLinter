@@ -10,6 +10,9 @@ import java.util.Objects;
 
 public class HyphenationLinterAction extends AbstractAction{
 
+	private static final long serialVersionUID = 6891821671117338302L;
+
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

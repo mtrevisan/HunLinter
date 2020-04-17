@@ -19,6 +19,8 @@ import java.util.Objects;
 
 public class DictionarySorterAction extends AbstractAction{
 
+	private static final long serialVersionUID = -3875908108517717837L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionarySorterAction.class);
 
 

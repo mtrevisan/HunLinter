@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 
 public class IssueReporterAction extends AbstractAction{
 
+	private static final long serialVersionUID = -115598226718687073L;
+
 	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";
 
 

@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 
 public class AboutAction extends AbstractAction{
 
+	private static final long serialVersionUID = 4363575204925273954L;
+
+
 	public AboutAction(){
 		super("system.about", new ImageIcon(AboutAction.class.getResource("/help_about.png")));
 	}

@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 
 public class OpenFileAction extends AbstractAction{
 
+	private static final long serialVersionUID = 5234230587473648899L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenFileAction.class);
 
 

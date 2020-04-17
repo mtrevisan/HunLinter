@@ -13,6 +13,9 @@ import java.util.Objects;
 
 public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 
+	private static final long serialVersionUID = -7015649948899909023L;
+
+
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 

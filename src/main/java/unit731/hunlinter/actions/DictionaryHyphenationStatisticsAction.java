@@ -10,6 +10,9 @@ import java.util.Objects;
 
 public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
+	private static final long serialVersionUID = 2257263470973259787L;
+
+
 	private final boolean performHyphenationStatistics;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;

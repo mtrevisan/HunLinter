@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 
 public class OnlineHelpAction extends AbstractAction{
 
+	private static final long serialVersionUID = 4095028068562974115L;
+
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";
 
 

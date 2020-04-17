@@ -14,6 +14,8 @@ import java.net.UnknownHostException;
 
 public class UpdateAction extends AbstractAction{
 
+	private static final long serialVersionUID = -624514803595503205L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAction.class);
 
 

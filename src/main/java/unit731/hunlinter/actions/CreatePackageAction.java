@@ -9,6 +9,9 @@ import java.util.Objects;
 
 public class CreatePackageAction extends AbstractAction{
 
+	private static final long serialVersionUID = 543011360433022458L;
+
+
 	private final ParserManager parserManager;
 
 

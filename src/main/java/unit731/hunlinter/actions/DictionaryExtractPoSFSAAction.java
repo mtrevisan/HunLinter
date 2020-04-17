@@ -14,6 +14,9 @@ import java.util.Objects;
 
 public class DictionaryExtractPoSFSAAction extends AbstractAction{
 
+	private static final long serialVersionUID = -3884387265563163063L;
+
+
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
