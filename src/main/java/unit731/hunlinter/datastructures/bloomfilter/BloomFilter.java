@@ -2,7 +2,6 @@ package unit731.hunlinter.datastructures.bloomfilter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.Objects;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -34,8 +33,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BloomFilter.class);
 
-	private static final MessageFormat WRONG_NUMBER_OF_ELEMENTS = new MessageFormat("Number of elements must be strictly positive");
-	private static final MessageFormat WRONG_FALSE_POSITIVE_PROBABILITY = new MessageFormat("False positive probability must be in ]0, 1[ interval");
+	private static final String WRONG_NUMBER_OF_ELEMENTS = "Number of elements must be strictly positive";
+	private static final String WRONG_FALSE_POSITIVE_PROBABILITY = "False positive probability must be in ]0, 1[ interval";
 
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
@@ -115,9 +114,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(bitArrayType);
 		if(expectedNumberOfElements <= 0)
-			throw new IllegalArgumentException(WRONG_NUMBER_OF_ELEMENTS.format(new Object[0]));
+			throw new IllegalArgumentException(WRONG_NUMBER_OF_ELEMENTS);
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
-			throw new IllegalArgumentException(WRONG_FALSE_POSITIVE_PROBABILITY.format(new Object[0]));
+			throw new IllegalArgumentException(WRONG_FALSE_POSITIVE_PROBABILITY);
 
 		this.charset = charset;
 		expectedElements = expectedNumberOfElements;

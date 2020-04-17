@@ -2,16 +2,14 @@ package unit731.hunlinter.datastructures.bloomfilter;
 
 import unit731.hunlinter.datastructures.bloomfilter.core.BitArrayBuilder;
 
-import java.text.MessageFormat;
-
 
 public abstract class BloomFilterParameters{
 
-	private static final MessageFormat INVALID_NUMBER_OF_ELEMENTS = new MessageFormat("Number of elements must be strict positive");
-	private static final MessageFormat INVALID_FALSE_POSITIVE_PROBABILITY = new MessageFormat("False positive probability must be in ]0, 1[ interval");
-	private static final MessageFormat INVALID_GROW_RATIO = new MessageFormat("Grow ratio when full must be strictly greater than one");
-	private static final MessageFormat INVALID_TIGHTENING_RATIO = new MessageFormat("Tightening ratio must be in the interval ]0, 1[");
-	private static final MessageFormat INVALID_BIT_ARRAY_TYPE = new MessageFormat("Bit array type must be valued");
+	private static final String INVALID_NUMBER_OF_ELEMENTS = "Number of elements must be strict positive";
+	private static final String INVALID_FALSE_POSITIVE_PROBABILITY = "False positive probability must be in ]0, 1[ interval";
+	private static final String INVALID_GROW_RATIO = "Grow ratio when full must be strictly greater than one";
+	private static final String INVALID_TIGHTENING_RATIO = "Tightening ratio must be in the interval ]0, 1[";
+	private static final String INVALID_BIT_ARRAY_TYPE = "Bit array type must be valued";
 
 	public static final double GROW_RATIO_WHEN_FULL_DEFAULT = 2.;
 	public static final double TIGHTENING_RATIO_DEFAULT = 0.85;
@@ -61,15 +59,15 @@ public abstract class BloomFilterParameters{
 
 	public void validate(){
 		if(getExpectedNumberOfElements() <= 0)
-			throw new IllegalArgumentException(INVALID_NUMBER_OF_ELEMENTS.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_NUMBER_OF_ELEMENTS);
 		if(getFalsePositiveProbability() <= 0. || getFalsePositiveProbability() >= 1.)
-			throw new IllegalArgumentException(INVALID_FALSE_POSITIVE_PROBABILITY.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_FALSE_POSITIVE_PROBABILITY);
 		if(getGrowRatioWhenFull() <= 1.)
-			throw new IllegalArgumentException(INVALID_GROW_RATIO.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_GROW_RATIO);
 		if(getTighteningRatio() <= 0. && getTighteningRatio() >= 1.)
-			throw new IllegalArgumentException(INVALID_TIGHTENING_RATIO.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_TIGHTENING_RATIO);
 		if(getBitArrayType() == null)
-			throw new IllegalArgumentException(INVALID_BIT_ARRAY_TYPE.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_BIT_ARRAY_TYPE);
 	}
 
 }

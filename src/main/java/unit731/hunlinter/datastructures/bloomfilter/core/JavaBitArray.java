@@ -1,14 +1,12 @@
 package unit731.hunlinter.datastructures.bloomfilter.core;
 
-import java.text.MessageFormat;
-
 
 /**
  * A fast bit-set implementation that allows direct access to data property so that it can be easily serialized.
  */
 public class JavaBitArray implements BitArray{
 
-	private static final MessageFormat WRONG_NUMBER_OF_BITS = new MessageFormat("Number of bits must be strictly positive");
+	private static final String WRONG_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 
 	/** The data-set */
@@ -22,7 +20,7 @@ public class JavaBitArray implements BitArray{
 	 */
 	public JavaBitArray(final long bits){
 		if(bits <= 0)
-			throw new IllegalArgumentException(WRONG_NUMBER_OF_BITS.format(new Object[0]));
+			throw new IllegalArgumentException(WRONG_NUMBER_OF_BITS);
 
 		data = new long[(int)(bits >>> 6) + 1];
 	}

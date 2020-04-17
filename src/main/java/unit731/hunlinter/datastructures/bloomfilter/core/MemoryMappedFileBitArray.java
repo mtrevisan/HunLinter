@@ -10,7 +10,6 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 
@@ -22,9 +21,10 @@ import java.util.Arrays;
  */
 public class MemoryMappedFileBitArray implements BitArray{
 
-	private static final MessageFormat EMPTY_BACKUP_FILE = new MessageFormat("Backup file cannot be empty/null");
-	private static final MessageFormat INVALID_BACKUP_FILE = new MessageFormat("Backup file doesn''t represent a valid file");
-	private static final MessageFormat INVALID_NUMBER_OF_BITS = new MessageFormat("Number of bits must be strictly positive");
+	private static final String EMPTY_BACKUP_FILE = "Backup file cannot be empty/null";
+	private static final String INVALID_BACKUP_FILE = "Backup file doesn''t represent a valid file";
+	private static final String INVALID_NUMBER_OF_BITS = "Number of bits must be strictly positive";
+
 
 	/** Underlying file that represents the state of the {@link BitArray} */
 	private final RandomAccessFile backingFile;
@@ -38,11 +38,11 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws IOException{
 		if(backingFile == null)
-			throw new IllegalArgumentException(EMPTY_BACKUP_FILE.format(new Object[0]));
+			throw new IllegalArgumentException(EMPTY_BACKUP_FILE);
 		if(backingFile.exists() && !backingFile.isFile())
-			throw new IllegalArgumentException(INVALID_BACKUP_FILE.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_BACKUP_FILE);
 		if(bits <= 0)
-			throw new IllegalArgumentException(INVALID_NUMBER_OF_BITS.format(new Object[0]));
+			throw new IllegalArgumentException(INVALID_NUMBER_OF_BITS);
 
 		//we open in "rwd" mode, to save one i/o operation than in "rws" mode
 		this.backingFile = new RandomAccessFile(backingFile, "rwd");

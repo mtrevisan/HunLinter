@@ -45,7 +45,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
  */
 public class HyphenationParser{
 
-	private static final MessageFormat MORE_THAN_TWO_LEVELS = new MessageFormat("Cannot have more than two levels");
+	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
 	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
 	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
 	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule {0} has an invalid format");
@@ -207,7 +207,7 @@ public class HyphenationParser{
 				//extract next level
 				if(line.equals(NEXT_LEVEL)){
 					if(level == Level.COMPOUND)
-						throw new LinterException(MORE_THAN_TWO_LEVELS.format(new Object[0]));
+						throw new LinterException(MORE_THAN_TWO_LEVELS);
 
 					//start with non–compound level
 					level = Level.COMPOUND;

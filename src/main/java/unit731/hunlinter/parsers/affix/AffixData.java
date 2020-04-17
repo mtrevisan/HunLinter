@@ -32,8 +32,8 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class AffixData{
 
-	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Same flags present in multiple options");
-	private static final MessageFormat CONTAINER_CLOSED = new MessageFormat("Cannot add data, container is closed");
+	private static final String REPEATED_FLAG = "Same flags present in multiple options";
+	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
 	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
 	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
 
@@ -75,7 +75,7 @@ public class AffixData{
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new LinterException(REPEATED_FLAG.format(new Object[0]));
+			throw new LinterException(REPEATED_FLAG);
 	}
 
 	private Map<AffixOption, Object> extractSingleFlags(){
@@ -126,7 +126,7 @@ public class AffixData{
 
 	<T> void addData(final String key, final T value){
 		if(closed)
-			throw new LinterException(CONTAINER_CLOSED.format(new Object[0]));
+			throw new LinterException(CONTAINER_CLOSED);
 		if(data.containsKey(key))
 			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{key}));
 

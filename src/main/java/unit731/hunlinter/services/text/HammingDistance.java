@@ -60,7 +60,7 @@ public class HammingDistance{
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);
 		if(left.length() != right.length())
-			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[0]));
+			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
 
 		boolean found = false;
 		char chrLeft = 0;
