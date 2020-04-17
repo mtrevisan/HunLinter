@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.match;
@@ -79,7 +80,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
-		return new HashSet<>(Arrays.asList(this.partOfSpeeches)).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
+		return SetHelper.setOf(this.partOfSpeeches).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
 	}
 
 	public List<String> getSynonyms(){

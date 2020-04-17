@@ -1,9 +1,7 @@
 package unit731.hunlinter.parsers.vos;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -164,7 +163,7 @@ public class DictionaryEntry{
 
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
-			final Set<String> list = new HashSet<>(Arrays.asList(continuationFlags));
+			final Set<String> list = SetHelper.setOf(continuationFlags);
 			return (match(flags, Predicate.not(list::add)) != null);
 		}
 		return false;

@@ -439,8 +439,7 @@ public class RulesReducer{
 
 		final String preCondition;
 		if(overallLastGroup != null){
-			final Set<Character> group = new HashSet<>(overallLastGroup);
-			group.removeAll(baseGroup);
+			final Set<Character> group = SetHelper.difference(overallLastGroup, baseGroup);
 			if(baseGroup.size() == overallLastGroup.size())
 				preCondition = (parentConditionLength == 0? StringUtils.EMPTY: DOT);
 			else
