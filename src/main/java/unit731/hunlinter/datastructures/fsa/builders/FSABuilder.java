@@ -95,6 +95,12 @@ public class FSABuilder{
 		return complete();
 	}
 
+	public FSA build(final byte[][] input){
+		for(final byte[] chs : input)
+			add(chs);
+		return complete();
+	}
+
 	/**
 	 * Add a single sequence of bytes to the FSA.
 	 * NOTE: The input MUST BE lexicographically greater than any previously added sequence!
