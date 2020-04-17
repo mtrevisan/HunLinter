@@ -433,7 +433,7 @@ public class GUIUtils{
 	public static void forEachTabbedPane(final JTabbedPane tabbedPane, final Consumer<PanableInterface> function){
 		for(int i = 0; i < tabbedPane.getComponentCount(); i ++){
 			final Component component = tabbedPane.getComponent(i);
-			if(component.isEnabled() && component instanceof PanableInterface)
+			if(component instanceof PanableInterface)
 				function.accept((PanableInterface)component);
 		}
 	}
