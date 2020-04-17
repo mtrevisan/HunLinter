@@ -611,13 +611,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearDictionaryParser(){
-		((DictionaryLayeredPane)dicLayeredPane).clear();
-		((CompoundsLayeredPane)cmpLayeredPane).clear();
-		((ThesaurusLayeredPane)theLayeredPane).clear();
+		((PanableInterface)dicLayeredPane).clear();
+		((PanableInterface)cmpLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
@@ -633,7 +631,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearThesaurusParser(){
-		((ThesaurusLayeredPane)theLayeredPane).clear();
+		((PanableInterface)theLayeredPane).clear();
 
 		theMenu.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
@@ -641,7 +639,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearHyphenationParser(){
-		((HyphenationLayeredPane)hypLayeredPane).clear();
+		((PanableInterface)hypLayeredPane).clear();
 
 		hypMenu.setEnabled(false);
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
@@ -649,21 +647,21 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearAutoCorrectParser(){
-		((AutoCorrectLayeredPane)acoLayeredPane).clear();
+		((PanableInterface)acoLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
 	}
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		((SentenceExceptionsLayeredPane)sexLayeredPane).clear();
+		((PanableInterface)sexLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
 	}
 
 	@Override
 	public void clearWordExceptionsParser(){
-		((WordExceptionsLayeredPane)wexLayeredPane).clear();
+		((PanableInterface)wexLayeredPane).clear();
 
 		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
 	}
