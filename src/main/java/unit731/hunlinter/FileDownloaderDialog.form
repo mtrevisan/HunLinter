@@ -143,7 +143,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="whatsNewButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="What's new"/>
+        <Property name="text" type="java.lang.String" value="What&apos;s new"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="whatsNewButtonActionPerformed"/>

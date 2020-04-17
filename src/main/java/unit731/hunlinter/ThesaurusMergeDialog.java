@@ -18,6 +18,8 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class ThesaurusMergeDialog extends JDialog{
 
+	private static final long serialVersionUID = 8375487773986703688L;
+
 	private final SynonymsEntry baseSynonyms;
 	private final String definition;
 	private final List<SynonymsEntry> synonymsEntries;

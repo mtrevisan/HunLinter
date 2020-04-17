@@ -44,6 +44,8 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class CompoundsLayeredPane extends JLayeredPane implements ActionListener, PanableInterface{
 
+	private static final long serialVersionUID = 4289096513559178063L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompoundsLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;

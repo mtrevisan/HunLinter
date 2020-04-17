@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 
 public class LanguageChooserDialog extends javax.swing.JDialog{
 
+	private static final long serialVersionUID = 1343230759230486883L;
+
 	private final Consumer<String> onSelection;
 	private boolean languageChosen;
 

@@ -46,9 +46,9 @@ import unit731.hunlinter.services.system.FileHelper;
 
 public class DictionaryStatisticsDialog extends JDialog{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
-
 	private static final long serialVersionUID = 5762751368059394067l;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
 
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String TAB = "\t";

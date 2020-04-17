@@ -43,6 +43,8 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class DictionaryLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = 7030870103355904749L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
 	private static final String TAB = "\t";

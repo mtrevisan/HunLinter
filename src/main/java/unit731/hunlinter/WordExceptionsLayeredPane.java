@@ -28,6 +28,8 @@ import unit731.hunlinter.services.text.StringHelper;
 
 public class WordExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = -2701221843193072823L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordExceptionsLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;

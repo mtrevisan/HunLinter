@@ -36,9 +36,9 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
-
 	private static final long serialVersionUID = -5660512112885632106L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
 
 
 	private final ParserManager parserManager;

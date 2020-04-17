@@ -32,6 +32,8 @@ import unit731.hunlinter.services.system.Debouncer;
 
 public class HyphenationLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = 67463311214897950L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLayeredPane.class);
 
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = RegexHelper.pattern("[.\\d=-]");

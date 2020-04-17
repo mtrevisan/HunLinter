@@ -29,6 +29,8 @@ import unit731.hunlinter.services.downloader.GITFileData;
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
+	private static final long serialVersionUID = 5026264244292731091L;
+
 	private final String localPath;
 	private final GITFileData remoteObject;
 

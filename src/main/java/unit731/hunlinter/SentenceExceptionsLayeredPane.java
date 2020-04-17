@@ -27,6 +27,8 @@ import unit731.hunlinter.services.system.Debouncer;
 
 public class SentenceExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = -4277472579904204046L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceExceptionsLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;

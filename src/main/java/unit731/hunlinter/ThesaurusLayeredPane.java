@@ -41,6 +41,8 @@ import unit731.hunlinter.services.system.JavaHelper;
 
 public class ThesaurusLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = -6844935166825095145L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;

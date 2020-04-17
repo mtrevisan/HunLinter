@@ -43,6 +43,8 @@ import unit731.hunlinter.services.system.JavaHelper;
 
 public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInterface{
 
+	private static final long serialVersionUID = -5833945357934298046L;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;
