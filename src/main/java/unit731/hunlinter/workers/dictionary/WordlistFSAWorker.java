@@ -2,6 +2,8 @@ package unit731.hunlinter.workers.dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -26,6 +28,7 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -85,7 +88,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Consumer<byte[]> fsaProcessor = builder::add;
 
 		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/4)");
+			prepareProcessing("Reading dictionary file (step 1/5)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
 			processLines(dicPath, charset, lineProcessor);
@@ -93,7 +96,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return encodings;
 		};
 		final Function<SimpleDynamicArray<byte[]>, SimpleDynamicArray<byte[]>> step2 = list -> {
-			resetProcessing("Sorting (step 2/4)");
+			resetProcessing("Sorting (step 2/5)");
 
 			//sort list
 			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
@@ -106,7 +109,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return list;
 		};
 		final Function<SimpleDynamicArray<byte[]>, FSA> step3 = list -> {
-			resetProcessing("Creating FSA (step 3/4)");
+			resetProcessing("Creating FSA (step 3/5)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -134,7 +137,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return builder.complete();
 		};
 		final Function<FSA, File> step4 = fsa -> {
-			resetProcessing("Compress FSA (step 4/4)");
+			resetProcessing("Compress FSA (step 4/5)");
 
 			final CFSA2Serializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
@@ -146,16 +149,30 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
-
 				return outputFile;
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
+		final Function<File, File> step5 = fsa -> {
+			resetProcessing("Verifying correctness (step 5/5)");
+
+			try{
+				//verify by reading
+				DictionaryLookup s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
+				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
+
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+			}
+			catch(final Exception e){
+				throw new RuntimeException(e.getMessage());
+			}
+
+			return outputFile;
+		};
+		final Function<File, Void> step6 = WorkerManager.openFolderStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5).andThen(step6));
 	}
 
 }
