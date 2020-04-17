@@ -96,6 +96,8 @@ public class DictionaryParser{
 			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
 			ParserHelper.assertLinesCount(lines);
 
+			boundaries.clear();
+
 			String prevLine = null;
 			int startSection = -1;
 			boolean needSorting = false;

@@ -606,11 +606,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearAffixParser(){
-		clearDictionaryParser();
-	}
-
-	@Override
-	public void clearDictionaryParser(){
 		((PanableInterface)dicLayeredPane).clear();
 		((PanableInterface)cmpLayeredPane).clear();
 
@@ -622,6 +617,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
 	}
+
+	@Override
+	public void clearDictionaryParser(){}
 
 	@Override
 	public void clearAidParser(){

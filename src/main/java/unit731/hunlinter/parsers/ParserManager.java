@@ -9,11 +9,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,8 +38,6 @@ import unit731.hunlinter.services.filelistener.FileChangeListener;
 import unit731.hunlinter.services.filelistener.FileListenerManager;
 
 import javax.xml.transform.TransformerException;
-
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ParserManager implements FileChangeListener{
@@ -149,15 +147,15 @@ public class ParserManager implements FileChangeListener{
 		flm.unregisterAll();
 
 		final File affFile = packager.getAffixFile();
+		final File dicFile = packager.getDictionaryFile();
 		final File hypFile = packager.getHyphenationFile();
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, hypFile, aidFile, sexFile, wexFile},
+		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
 			null);
-		final List<String> uris = new ArrayList<>(files.length);
-		forEach(files, file -> uris.add(file.getAbsolutePath()));
-		flm.register(this, uris.toArray(String[]::new));
+		for(final File file : files)
+			flm.register(this, file.getAbsolutePath());
 	}
 
 	public void startFileListener(){
@@ -340,15 +338,20 @@ public class ParserManager implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(final Path path){
-		//NOTE: `path` it's only the filename
-		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
+		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toString());
 
-		final Path filePath = Path.of(packager.getProjectPath().toString(), path.toString());
-		if(filePath.toFile().equals(packager.getAffixFile())){
+		final File file = path.toFile();
+		if(file.equals(packager.getAffixFile())){
 			affParser.clear();
 
 			Optional.ofNullable(hunLintable)
 				.ifPresent(HunLintable::clearAffixParser);
+		}
+		else if(file.equals(packager.getDictionaryFile())){
+			dicParser.clear();
+
+			Optional.ofNullable(hunLintable)
+				.ifPresent(HunLintable::clearDictionaryParser);
 		}
 		else if(path.toString().endsWith(EXTENSION_AID)){
 			aidParser.clear();
@@ -356,19 +359,19 @@ public class ParserManager implements FileChangeListener{
 			Optional.ofNullable(hunLintable)
 				.ifPresent(HunLintable::clearAidParser);
 		}
-		else if(filePath.toFile().equals(packager.getAutoCorrectFile())){
+		else if(file.equals(packager.getAutoCorrectFile())){
 			acoParser.clear();
 
 			Optional.ofNullable(hunLintable)
 				.ifPresent(HunLintable::clearAutoCorrectParser);
 		}
-		else if(filePath.toFile().equals(packager.getSentenceExceptionsFile())){
+		else if(file.equals(packager.getSentenceExceptionsFile())){
 			sexParser.clear();
 
 			Optional.ofNullable(hunLintable)
 				.ifPresent(HunLintable::clearSentenceExceptionsParser);
 		}
-		else if(filePath.toFile().equals(packager.getWordExceptionsFile())){
+		else if(file.equals(packager.getWordExceptionsFile())){
 			wexParser.clear();
 
 			Optional.ofNullable(hunLintable)
@@ -386,16 +389,22 @@ public class ParserManager implements FileChangeListener{
 	public void fileModified(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
-		if(hunLintable != null)
+		if(path.toFile().toString().equals(packager.getDictionaryFile().toString())){
+			dicParser.clear();
+
+			Optional.ofNullable(hunLintable)
+				.ifPresent(HunLintable::clearDictionaryParser);
+		}
+		else if(hunLintable != null)
 			hunLintable.loadFileInternal(null);
 	}
 
 
-	public String[] getDictionaryLines() throws IOException{
+	public List<String> getDictionaryLines() throws IOException{
 		final File dicFile = packager.getDictionaryFile();
 		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
-			.toArray(String[]::new);
+			.collect(Collectors.toList());
 	}
 
 	public boolean hasHyphenationRule(final String addedRule, final HyphenationParser.Level level){

@@ -135,17 +135,18 @@ public class FileListenerManager implements FileListener, Runnable{
 		}
 	}
 
-	private void addFilePatterns(FileChangeListener listener, String[] patterns){
+	private void addFilePatterns(final FileChangeListener listener, final String[] patterns){
 		final Set<PathMatcher> filePatterns = SetHelper.newConcurrentSet();
 		forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
 
-		listenerToFilePatterns.put(listener, filePatterns);
+		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>())
+			.addAll(filePatterns);
 	}
 
-	private PathMatcher matcherForExpression(String pattern){
+	private PathMatcher matcherForExpression(final String pattern){
 		return FILE_SYSTEM_DEFAULT.getPathMatcher("glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1));
 	}
 
@@ -179,7 +180,7 @@ public class FileListenerManager implements FileListener, Runnable{
 		}
 	}
 
-	private boolean manageKey(WatchKey key){
+	private boolean manageKey(final WatchKey key){
 		boolean stopWatching = false;
 		final Path dir = getDirPath(key);
 		if(dir == null)
@@ -193,7 +194,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	/** Reset key to allow further events for this key to be processed */
-	private boolean resetKey(WatchKey key, Path dir){
+	private boolean resetKey(final WatchKey key, final Path dir){
 		boolean stopWatching = false;
 		final boolean valid = key.reset();
 		if(!valid){
@@ -228,7 +229,8 @@ public class FileListenerManager implements FileListener, Runnable{
 				final Path dir = getDirPath(key);
 				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
-				forEach(listeners, listener -> listenerMethod.accept(listener, file));
+				final Path path = Path.of(dir.toAbsolutePath().toString(), file.toString());
+				forEach(listeners, listener -> listenerMethod.accept(listener, path));
 			}
 		}
 	}

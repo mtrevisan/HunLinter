@@ -62,20 +62,15 @@ public class DictionarySorterAction extends AbstractAction{
 						worker -> {
 							dialog.setDictionaryEnabled(false);
 
+							parserManager.stopFileListener();
+
 							worker.addPropertyChangeListener(propertyChangeListener);
 							worker.execute();
 						},
 						worker -> {
-							dialog.setDictionaryEnabled(true);
+							parserManager.startFileListener();
 
-							try{
-								//reload text
-								final int lastVisibleIndex = dialog.getFirstVisibleIndex();
-								dialog.loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
-							}
-							catch(final Exception e){
-								throw new RuntimeException(e);
-							}
+							dialog.setDictionaryEnabled(true);
 						}
 					);
 			});

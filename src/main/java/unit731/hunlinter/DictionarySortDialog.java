@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
@@ -50,9 +51,9 @@ public class DictionarySortDialog extends JDialog{
 
       lblMessage.setText("…");
 
-      entriesScrollPane.setBackground(Color.WHITE);
       entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
+      entriesList.setModel(new DefaultListModel<>());
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       entriesScrollPane.setViewportView(entriesList);
 
@@ -108,8 +109,13 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.setEnabled(enabled);
 	}
 
-	public void loadLines(final String[] listData, final int firstVisibleItemIndex){
-		entriesList.setListData(listData);
+	public void loadLines(final List<String> listData, final int firstVisibleItemIndex){
+		scrollToVisibleIndex(0);
+
+		final DefaultListModel<String> model = (DefaultListModel<String>)entriesList.getModel();
+		model.removeAllElements();
+		model.addAll(listData);
+
 		scrollToVisibleIndex(firstVisibleItemIndex);
 	}
 
@@ -150,11 +156,12 @@ public class DictionarySortDialog extends JDialog{
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);
 
+		final int lastItemIndex = entriesList.getModel().getSize() - 1;
 		int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
 		if(boundaryIndex < 0)
-			boundaryIndex = dicParser.getPreviousBoundaryIndex(entriesList.getModel().getSize() - 1);
+			boundaryIndex = dicParser.getPreviousBoundaryIndex(lastItemIndex);
 		final int visibleLines = entriesList.getLastVisibleIndex() - entriesList.getFirstVisibleIndex();
-		final int newIndex = Math.max(boundaryIndex + visibleLines, entriesList.getModel().getSize() - 1);
+		final int newIndex = Math.max(boundaryIndex + visibleLines, lastItemIndex);
 		entriesList.ensureIndexIsVisible(newIndex);
 
 		//correct first item

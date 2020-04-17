@@ -69,16 +69,6 @@ public class FileHelper{
 
 	private FileHelper(){}
 
-	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
-			throws IOException{
-		try(final BufferedWriter writer = Files.newBufferedWriter(path, charset)){
-			for(final String line : content){
-				writer.write(line);
-				writer.write(lineTerminator);
-			}
-		}
-	}
-
 	public static byte[] compressData(final byte[] bytes, final int level) throws IOException{
 		if(bytes == null || bytes.length== 0)
 			return new byte[0];
@@ -134,20 +124,11 @@ public class FileHelper{
 		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
 	}
 
+
 	public static File createDeleteOnExitFile(final String filename, final String extension) throws IOException{
 		final File file = File.createTempFile(filename, extension);
 		file.deleteOnExit();
 		return file;
-	}
-
-	public static BufferedWriter createGZIPWriter(final File file, final Charset charset, final int inputBufferSize,
-			final int level) throws IOException{
-		final OutputStream out = new GZIPOutputStream(new FileOutputStream(file), inputBufferSize){
-			{
-				def.setLevel(level);
-			}
-		};
-		return new BufferedWriter(new OutputStreamWriter(out, charset));
 	}
 
 	public static File createDeleteOnExitFile(final String filename, final String extension, final byte[] bytes)
@@ -168,6 +149,7 @@ public class FileHelper{
 		Files.writeString(file.toPath(), content);
 		return file;
 	}
+
 
 	public static Scanner createScanner(final Path path, final Charset charset) throws IOException{
 		return createScanner(path, charset, 2048);
@@ -202,6 +184,15 @@ public class FileHelper{
 		return size;
 	}
 
+	public static boolean isGZipped(final File file){
+		int magic = 0;
+		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
+			magic = (raf.read() & 0xFF | ((raf.read() << 8) & 0xFF00));
+		}
+		catch(final Throwable ignored){}
+		return (magic == GZIPInputStream.GZIP_MAGIC);
+	}
+
 	public static List<String> readAllLines(final Path path, final Charset charset) throws IOException{
 		return readAllLines(path, charset, 2048);
 	}
@@ -219,13 +210,25 @@ public class FileHelper{
 		return lines;
 	}
 
-	public static boolean isGZipped(final File file){
-		int magic = 0;
-		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
-			magic = (raf.read() & 0xFF | ((raf.read() << 8) & 0xFF00));
+
+	public static BufferedWriter createGZIPWriter(final File file, final Charset charset, final int inputBufferSize,
+		final int level) throws IOException{
+		final OutputStream out = new GZIPOutputStream(new FileOutputStream(file), inputBufferSize){
+			{
+				def.setLevel(level);
+			}
+		};
+		return new BufferedWriter(new OutputStreamWriter(out, charset));
+	}
+
+	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
+		throws IOException{
+		try(final BufferedWriter writer = Files.newBufferedWriter(path, charset)){
+			for(final String line : content){
+				writer.write(line);
+				writer.write(lineTerminator);
+			}
 		}
-		catch(final Throwable ignored){}
-		return (magic == GZIPInputStream.GZIP_MAGIC);
 	}
 
 
