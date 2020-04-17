@@ -38,10 +38,10 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
 	public byte[] encode(final byte[] source, final byte[] target){
-		//Search for the infix that can be encoded and remove from `source`
-		//to get a maximum-length prefix of `target`. This could be done more efficiently
-		//by running a smarter longest-common-subsequence algorithm and some pruning (?).
-		//For now, naive loop should do.
+		//FIXME
+		//Search for the infix that can be encoded and remove from `source` to get a maximum-length prefix of `target`.
+		//This could be done more efficiently by running a smarter longest-common-subsequence algorithm and some pruning (?).
+		//For now, naïve loop should do.
 
 		//There can be only two positions for the infix to delete:
 		//	1) we remove leading bytes, even if they are partially matching (but a longer match exists somewhere later on)
@@ -77,7 +77,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 			maxInfixIndex = maxInfixLength = 0;
 		}
 
-		if(maxInfixIndex >= REMOVE_EVERYTHING || maxInfixLength >= REMOVE_EVERYTHING || truncateSuffixBytes >= REMOVE_EVERYTHING){
+		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
 			maxInfixIndex = maxSubsequenceLength = 0;
 			maxInfixLength = truncateSuffixBytes = REMOVE_EVERYTHING;
 		}

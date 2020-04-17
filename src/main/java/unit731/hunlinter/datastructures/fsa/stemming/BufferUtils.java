@@ -49,13 +49,4 @@ public class BufferUtils{
 		return new String(buf);
 	}
 
-	/** Compute the length of the shared prefix between two byte sequences */
-	static int sharedPrefixLength(final byte[] a, int aStart, final byte[] b, int bStart){
-		int i = 0;
-		final int max = Math.min(a.length - aStart, b.length - bStart);
-		while(i < max && a[aStart ++] == b[bStart ++])
-			i ++;
-		return i;
-	}
-
 }

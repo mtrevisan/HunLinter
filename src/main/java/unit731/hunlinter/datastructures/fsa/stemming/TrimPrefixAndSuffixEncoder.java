@@ -1,6 +1,9 @@
 package unit731.hunlinter.datastructures.fsa.stemming;
 
 
+import unit731.hunlinter.services.text.ArrayHelper;
+
+
 /**
  * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
  * non-equal suffix and prefix <code>source</code> and <code>target</code> have. The
@@ -40,8 +43,8 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 		int maxSubsequenceIndex = 0;
 		for(int i = 0; i < source.length; i ++){
 			//prefix at i => shared subsequence (infix)
-			final int sharedPrefix = BufferUtils.sharedPrefixLength(source, i, target, 0);
-			//only update maxSubsequenceLength if we will be able to encode it
+			final int sharedPrefix = ArrayHelper.longestCommonPrefix(source, i, target, 0);
+			//only update `maxSubsequenceLength` if we will be able to encode it
 			if(sharedPrefix > maxSubsequenceLength && i < REMOVE_EVERYTHING
 					&& (source.length - (i + sharedPrefix)) < REMOVE_EVERYTHING){
 				maxSubsequenceLength = sharedPrefix;
