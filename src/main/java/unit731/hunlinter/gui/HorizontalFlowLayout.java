@@ -91,9 +91,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	private Dimension layoutSize(final Container target, final Function<Component, Dimension> sizeSupplier){
 		synchronized(target.getTreeLock()){
 			//each row must fit with the width allocated to the container
-			Container container = target;
-			while(container.getSize().width == 0 && container.getParent() != null)
-				container = container.getParent();
+			final Container container = getParentContainer(target);
 			final int targetWidth = container.getSize().width;
 
 			final Insets insets = target.getInsets();
@@ -128,14 +126,25 @@ public class HorizontalFlowLayout extends FlowLayout{
 
 			addToDimension(finalDimension, horizontalInsetsAndGap, insets);
 
-			//when using a scroll pane or the DecoratedLookAndFeel we need to make sure the preferred size
-			//is less than the size of the target containter so shrinking the container size works
-			//correctly: removing the horizontal gap is an easy way to do this
-			final Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
-			if(scrollPane != null && target.isValid())
-				finalDimension.width -= getHgap() + 1;
-			return finalDimension;
+			return removeScrollPaneWidth(target, finalDimension);
 		}
+	}
+
+	private Container getParentContainer(final Container child){
+		Container container = child;
+		while(container.getSize().width == 0 && container.getParent() != null)
+			container = container.getParent();
+		return container;
+	}
+
+	private Dimension removeScrollPaneWidth(final Container target, final Dimension finalDimension){
+		//when using a scroll pane or the DecoratedLookAndFeel we need to make sure the preferred size
+		//is less than the size of the target container so shrinking the container size works
+		//correctly: removing the horizontal gap is an easy way to do this
+		final Container scrollPane = SwingUtilities.getAncestorOfClass(JScrollPane.class, target);
+		if(scrollPane != null && target.isValid())
+			finalDimension.width -= getHgap() + 1;
+		return finalDimension;
 	}
 
 	/**
