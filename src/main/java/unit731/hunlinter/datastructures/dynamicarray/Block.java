@@ -7,8 +7,8 @@ class Block<T>{
 	int limit;
 
 
+	@SuppressWarnings("unchecked")
 	Block(final int capacity){
-		//noinspection unchecked
 		data = (T[])new Object[capacity];
 	}
 

@@ -137,7 +137,7 @@ public class GUIUtils{
 
 	public static Font getDefaultHeightFont(final Font font){
 		final Rectangle2D bounds = getStringBounds(font, "I");
-		return font.deriveFont((float)Math.round(font.getSize() * 17.f / bounds.getHeight()));
+		return font.deriveFont(Math.round(font.getSize() * 17.f / bounds.getHeight()));
 	}
 
 	private static Rectangle2D getStringBounds(final Font font, final String text){
@@ -381,6 +381,9 @@ public class GUIUtils{
 		final ActionMap actionMap = field.getActionMap();
 		//create an undo action and add it to the text component
 		actionMap.put(KEY_UNDO, new AbstractAction(KEY_UNDO){
+			private static final long serialVersionUID = -6536021676834946105L;
+
+			@Override
 			public void actionPerformed(ActionEvent evt){
 				if(undo.canUndo()){
 					try{
@@ -392,6 +395,9 @@ public class GUIUtils{
 		});
 		//create a redo action and add it to the text component
 		actionMap.put(KEY_REDO, new AbstractAction(KEY_REDO){
+			private static final long serialVersionUID = -6536021676834946105L;
+
+			@Override
 			public void actionPerformed(ActionEvent evt){
 				if(undo.canRedo()){
 					try{

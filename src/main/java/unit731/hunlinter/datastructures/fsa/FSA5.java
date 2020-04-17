@@ -154,7 +154,7 @@ public class FSA5 extends FSA{
 	}
 
 	/**
-	 * Returns the start node of this automaton.
+	 * @return The start node of this automaton.
 	 */
 	@Override
 	public int getRootNode(){
@@ -214,9 +214,8 @@ public class FSA5 extends FSA{
 	}
 
 	/**
-	 * Returns the number encoded at the given node. The number equals the count
-	 * of the set of suffixes reachable from <code>node</code> (called its right
-	 * language).
+	 * @return	The number encoded at the given node. The number equals the count
+	 *		of the set of suffixes reachable from <code>node</code> (called its right language).
 	 */
 	@Override
 	public int getRightLanguageCount(final int node){

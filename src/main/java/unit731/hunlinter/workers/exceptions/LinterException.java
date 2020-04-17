@@ -6,6 +6,8 @@ import unit731.hunlinter.workers.core.IndexDataPair;
 
 public class LinterException extends RuntimeException{
 
+	private static final long serialVersionUID = 2097260898128903703L;
+
 	public enum FixActionType{ADD, REPLACE, REMOVE}
 
 

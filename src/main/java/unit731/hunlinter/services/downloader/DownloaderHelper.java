@@ -89,7 +89,7 @@ public class DownloaderHelper{
 				final JSONObject obj = (JSONObject)elem;
 				final Version tagName = new Version((String)obj.get(PROPERTY_KEY_TAG_NAME));
 				if(tagName.greaterThan(applicationVersion))
-					whatsNew.add(Pair.of(tagName, (String)((JSONObject)elem).get(PROPERTY_KEY_WHATS_NEW)));
+					whatsNew.add(Pair.of(tagName, (String)obj.get(PROPERTY_KEY_WHATS_NEW)));
 			}
 
 			if(whatsNew.isEmpty())

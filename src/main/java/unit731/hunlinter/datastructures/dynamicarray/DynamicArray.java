@@ -26,7 +26,7 @@ public class DynamicArray<T>{
 		clear();
 	}
 
-	public synchronized void clear(){
+	public final synchronized void clear(){
 		blocks = new Object[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new Block<>(1);
@@ -54,7 +54,7 @@ public class DynamicArray<T>{
 		// and also the index of element in the Block.
 		final Location location = new Location(i);
 		// Use the blockIndex in the Location object to find the Block.
-		//noinspection unchecked
+		@SuppressWarnings("unchecked")
 		final Block<T> block = (Block<T>)blocks[location.block];
 		// Use the elementIndex in the Location object to find the element within the Block.
 		return block.data[location.element];
@@ -66,7 +66,7 @@ public class DynamicArray<T>{
 	// Target complexity: O(1)
 	public synchronized void set(final int index, final T x){
 		final Location location = new Location(index);
-		//noinspection unchecked
+		@SuppressWarnings("unchecked")
 		final Block<T> block = (Block<T>)blocks[location.block];
 		//use the elementIndex in the Location object to set the element within the Block to x
 		block.data[location.element] = x;

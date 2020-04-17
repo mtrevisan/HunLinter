@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 
@@ -30,7 +29,6 @@ public class SorterWorker extends WorkerDictionary{
 	private static final byte[] NEW_LINE = {'\r', '\n'};
 
 	private final DictionaryParser dicParser;
-	private final File dicFile;
 
 	private final Comparator<String> comparator;
 
@@ -44,25 +42,25 @@ public class SorterWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		this.dicFile = dicFile;
 		dicParser = parserManager.getDicParser();
 		final Charset charset = dicParser.getCharset();
 
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Pair<Integer, Integer>> boundary = dicParser.getBoundary(lineIndex);
+		if(boundary == null)
+			//FIXME what if this happens?
+			return;
 
 		final Function<Void, String[]> step1 = ignored -> {
 			prepareProcessing("Splitting dictionary file (step 1/3)");
 
-			String[] chunk = null;
-			if(boundary != null){
-				parserManager.stopFileListener();
+			parserManager.stopFileListener();
 
-				//split dictionary isolating the sorted section
-				chunk = extractSection(boundary, charset);
+			//split dictionary isolating the sorted section
+			final String[] chunk = extractSection(boundary, charset);
 
-				setProgress(33);
-			}
+			setProgress(33);
+
 			return chunk;
 		};
 		final Function<String[], String[]> step2 = chunk -> {

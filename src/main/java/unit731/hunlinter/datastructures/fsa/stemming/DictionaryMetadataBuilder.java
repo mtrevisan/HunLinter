@@ -35,56 +35,56 @@ public class DictionaryMetadataBuilder{
 	public DictionaryMetadataBuilder frequencyIncluded(){ return frequencyIncluded(true); }
 
 	public DictionaryMetadataBuilder frequencyIncluded(boolean v){
-		attrs.put(DictionaryAttribute.FREQUENCY_INCLUDED, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.FREQUENCY_INCLUDED, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignorePunctuation(){ return ignorePunctuation(true); }
 
 	public DictionaryMetadataBuilder ignorePunctuation(boolean v){
-		attrs.put(DictionaryAttribute.IGNORE_PUNCTUATION, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_PUNCTUATION, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreNumbers(){ return ignoreNumbers(true); }
 
 	public DictionaryMetadataBuilder ignoreNumbers(boolean v){
-		attrs.put(DictionaryAttribute.IGNORE_NUMBERS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_NUMBERS, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreCamelCase(){ return ignoreCamelCase(true); }
 
 	public DictionaryMetadataBuilder ignoreCamelCase(boolean v){
-		attrs.put(DictionaryAttribute.IGNORE_CAMEL_CASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_CAMEL_CASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreAllUppercase(){ return ignoreAllUppercase(true); }
 
 	public DictionaryMetadataBuilder ignoreAllUppercase(boolean v){
-		attrs.put(DictionaryAttribute.IGNORE_ALL_UPPERCASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_ALL_UPPERCASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreDiacritics(){ return ignoreDiacritics(true); }
 
 	public DictionaryMetadataBuilder ignoreDiacritics(boolean v){
-		attrs.put(DictionaryAttribute.IGNORE_DIACRITICS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.IGNORE_DIACRITICS, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder convertCase(){ return convertCase(true); }
 
 	public DictionaryMetadataBuilder convertCase(boolean v){
-		attrs.put(DictionaryAttribute.CONVERT_CASE, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.CONVERT_CASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder supportRunOnWords(){ return supportRunOnWords(true); }
 
 	public DictionaryMetadataBuilder supportRunOnWords(boolean v){
-		attrs.put(DictionaryAttribute.RUN_ON_WORDS, Boolean.valueOf(v).toString());
+		attrs.put(DictionaryAttribute.RUN_ON_WORDS, Boolean.toString(v));
 		return this;
 	}
 

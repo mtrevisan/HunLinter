@@ -56,6 +56,8 @@ public class XMLManager{
 	}
 
 
+	private XMLManager(){}
+
 	public static Document parseXMLDocument(final File file) throws SAXException, IOException{
 		final Document doc = DOCUMENT_BUILDER.parse(file);
 		doc.getDocumentElement().normalize();

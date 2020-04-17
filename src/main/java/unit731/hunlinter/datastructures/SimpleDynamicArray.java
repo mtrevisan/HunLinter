@@ -30,8 +30,8 @@ public class SimpleDynamicArray<T> implements Iterable<T>{
 		this(cl, 0, growthRate);
 	}
 
+	@SuppressWarnings("unchecked")
 	public SimpleDynamicArray(final Class<T> cl, final int capacity, final float growthRate){
-		//noinspection unchecked
 		data = (T[])Array.newInstance(cl, capacity);
 
 		this.growthRate = growthRate;
@@ -93,10 +93,12 @@ public class SimpleDynamicArray<T> implements Iterable<T>{
 		return new Iterator<>(){
 			private int idx = 0;
 
+			@Override
 			public boolean hasNext(){
 				return (idx < limit);
 			}
 
+			@Override
 			public T next(){
 				return data[idx ++];
 			}
@@ -180,7 +182,7 @@ public class SimpleDynamicArray<T> implements Iterable<T>{
 	 */
 	public synchronized T[] extractCopy(){
 		final Class<?> type = getDataType();
-		//noinspection unchecked
+		@SuppressWarnings("unchecked")
 		final T[] reducedData = (T[])Array.newInstance(type, limit);
 		System.arraycopy(data, 0, reducedData, 0, limit);
 		return reducedData;

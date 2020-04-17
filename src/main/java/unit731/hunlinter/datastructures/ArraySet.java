@@ -14,14 +14,20 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Serializable{
 
+	private static final long serialVersionUID = -5730118321825456724L;
+
+
 	private class ArrayIterator implements Iterator<E>{
 		//position of next item to return
 		int offset = 0;
 
+		@Override
 		public boolean hasNext(){
 			return (offset < values.length);
 		}
 
+		@Override
+		@SuppressWarnings("unchecked")
 		public E next(){
 			if(offset == values.length)
 				throw new NoSuchElementException();
@@ -30,6 +36,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 			return (E)values[offset ++];
 		}
 
+		@Override
 		public void remove(){
 			values = (values.length == 1? EMPTY_ARRAY: ArrayUtils.remove(values, -- offset));
 		}

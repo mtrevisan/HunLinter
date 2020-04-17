@@ -17,8 +17,8 @@ public class FixedArray<T> implements Iterable<T>{
 		this(cl, 0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public FixedArray(final Class<T> cl, final int capacity){
-		//noinspection unchecked
 		data = (T[])Array.newInstance(cl, capacity);
 	}
 
@@ -72,10 +72,12 @@ public class FixedArray<T> implements Iterable<T>{
 		return new Iterator<>(){
 			private int idx = 0;
 
+			@Override
 			public boolean hasNext(){
 				return (idx < limit);
 			}
 
+			@Override
 			public T next(){
 				return data[idx ++];
 			}
@@ -144,7 +146,7 @@ public class FixedArray<T> implements Iterable<T>{
 			return null;
 
 		final Class<?> type = getDataType();
-		//noinspection unchecked
+		@SuppressWarnings("unchecked")
 		final T[] reducedData = (T[])Array.newInstance(type, limit);
 		System.arraycopy(data, 0, reducedData, 0, limit);
 		return reducedData;

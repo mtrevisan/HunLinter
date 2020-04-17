@@ -36,11 +36,13 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 			final URL url = new URL(remoteObject.downloadUrl);
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
-			final FileOutputStream fos = new FileOutputStream(localPath);
-			final FileChannel fileChannel = fos.getChannel();
-			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
-			fileChannel.close();
-			fos.close();
+			try(
+					final FileOutputStream fos = new FileOutputStream(localPath);
+					final FileChannel fileChannel = fos.getChannel();
+				){
+				fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+				fileChannel.close();
+			}
 		}
 		catch(final Exception e){
 			cancel(true);

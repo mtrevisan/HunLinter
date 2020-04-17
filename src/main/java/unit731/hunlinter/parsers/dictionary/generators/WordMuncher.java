@@ -93,8 +93,8 @@ public class WordMuncher{
 							continue;
 
 						final String[] baseInflectionPartOfSpeech = inflections[0].getMorphologicalFieldPartOfSpeech();
-						if(baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
-								|| baseInflectionPartOfSpeech != null && Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech))
+						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
+								|| Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech)))
 							originators.add(originatorEntry);
 					}
 				}

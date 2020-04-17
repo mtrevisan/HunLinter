@@ -20,6 +20,8 @@ public class ParserHelper{
 	public static final char COMMENT_MARK_PERCENT = '%';
 
 
+	private ParserHelper(){}
+
 	public static boolean isComment(final String line, final char... comment){
 		return (StringUtils.isBlank(line) || StringUtils.indexOfAny(line, comment) == 0);
 	}

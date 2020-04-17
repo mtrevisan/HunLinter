@@ -228,9 +228,9 @@ public class Packager{
 				final String[] locales = extractLocale(child);
 				languageSets.addAll(Arrays.asList(locales));
 			}
-		final List<String> languages = new ArrayList<>(languageSets);
-		Collections.sort(languages);
-		return Collections.unmodifiableList(languages);
+		final List<String> langs = new ArrayList<>(languageSets);
+		Collections.sort(langs);
+		return Collections.unmodifiableList(langs);
 	}
 
 	private void processDictionariesConfigurationFile() throws IOException, SAXException{

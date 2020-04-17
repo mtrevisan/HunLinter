@@ -113,11 +113,11 @@ class WordGeneratorBase{
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		@SuppressWarnings("rawtypes")
 		final FixedArray[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
-		//noinspection unchecked
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 

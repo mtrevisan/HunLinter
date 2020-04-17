@@ -27,6 +27,9 @@ import java.util.function.Function;
  */
 public class HorizontalFlowLayout extends FlowLayout{
 
+	private static final long serialVersionUID = -9089126297688841865L;
+
+
 	/** Constructs a new <code>WrapLayout</code> with a left alignment and a default 5-unit horizontal and vertical gap. */
 	public HorizontalFlowLayout(){
 		super();

@@ -207,7 +207,7 @@ public class StringHelper{
 		if(bytes < 1024l)
 			return bytes + " B";
 
-		final int exponent = (int)(Math.log10((double)bytes) / Math.log10(1024.));
+		final int exponent = (int)(Math.log(bytes) / Math.log(1024.));
 		final char prefix = "KMGTPE".charAt(exponent - 1);
 		final double divisor = Math.pow(1024., exponent);
 		final double result = bytes / divisor;

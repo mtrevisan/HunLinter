@@ -23,14 +23,16 @@ class RBCWrapper implements ReadableByteChannel{
 		this.rbc = rbc;
 	}
 
+	@Override
 	public boolean isOpen(){ return rbc.isOpen(); }
 
+	@Override
 	public int read(final ByteBuffer bb) throws IOException{
 		int readBytes;
 		if((readBytes = rbc.read(bb)) > 0){
 			readSoFar += readBytes;
 
-			final double progress = (expectedSize > 0? (double)readSoFar * 100. / expectedSize: -1.);
+			final double progress = (expectedSize > 0? readSoFar * 100. / expectedSize: -1.);
 			delegate.rbcProgressCallback(this, progress);
 		}
 		return readBytes;
@@ -38,6 +40,7 @@ class RBCWrapper implements ReadableByteChannel{
 
 	public long getReadSoFar(){ return readSoFar; }
 
+	@Override
 	public void close() throws IOException{ rbc.close(); }
 
 }

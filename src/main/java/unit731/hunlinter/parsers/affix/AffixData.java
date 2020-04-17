@@ -207,9 +207,9 @@ public class AffixData{
 		final String convertedWord = applyInputConversionTable(word);
 
 		boolean productive;
-		final Object data = getData(affix);
-		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
-			productive = ((RuleEntry)data).isProductiveFor(convertedWord);
+		final Object affixData = getData(affix);
+		if(affixData != null && RuleEntry.class.isAssignableFrom(affixData.getClass()))
+			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
 		else
 			productive = isManagedByCompoundRule(affix);
 		return productive;

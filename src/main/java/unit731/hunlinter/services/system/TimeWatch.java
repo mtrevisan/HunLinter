@@ -24,7 +24,7 @@ public class TimeWatch{
 		return new TimeWatch();
 	}
 
-	public TimeWatch reset(){
+	public final TimeWatch reset(){
 		start = System.nanoTime();
 		end = 0l;
 		return this;

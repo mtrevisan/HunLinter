@@ -28,10 +28,12 @@ public class DictionaryIterator implements Iterator<WordData>{
 		sequenceEncoder = (decodeStems? dictionary.metadata.getSequenceEncoderType().get(): new NoEncoder());
 	}
 
+	@Override
 	public boolean hasNext(){
 		return entriesItr.hasNext();
 	}
 
+	@Override
 	public WordData next(){
 		final ByteBuffer entryBuffer = entriesItr.next();
 		final byte[] array = entryBuffer.array();

@@ -39,6 +39,8 @@ public class SmoothSort{
 //	}
 
 
+	private SmoothSort(){}
+
 	public static <T> void sort(final T[] data, final Comparator<? super T> comparator){
 		sort(data, 0, data.length, comparator, null);
 	}

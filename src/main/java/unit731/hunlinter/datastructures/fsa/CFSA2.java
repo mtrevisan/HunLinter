@@ -250,6 +250,7 @@ public class CFSA2 extends FSA{
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Set<FSAFlags> getFlags(){
 		return flags;
 	}

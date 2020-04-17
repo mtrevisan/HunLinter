@@ -59,8 +59,6 @@ public class CFSA2Serializer implements FSASerializer{
 	private final IntIntHashMap offsets = new IntIntHashMap();
 	/** A hash map of [state, right-language-count] pairs */
 	private IntIntHashMap numbers;
-	/** Scratch array for serializing vints */
-	private final byte[] scratch = new byte[5];
 	/** The most frequent labels for integrating with the flags field */
 	private byte[] labelsIndex;
 	/**
@@ -76,6 +74,7 @@ public class CFSA2Serializer implements FSASerializer{
 	 *
 	 * @return Returns the same object for easier call chaining.
 	 */
+	@Override
 	public CFSA2Serializer serializeWithNumbers(){
 		serializeWithNumbers = true;
 		return this;
@@ -377,6 +376,7 @@ public class CFSA2Serializer implements FSASerializer{
 		}
 
 		if((flags & CFSA2.BIT_TARGET_NEXT) == 0){
+			final byte[] scratch = new byte[5];
 			final int len = writeVInt(scratch, targetOffset);
 			if(os != null)
 				os.write(scratch, 0, len);
@@ -389,6 +389,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private int emitNodeData(final OutputStream os, final int number) throws IOException{
 		int size = 0;
 		if(serializeWithNumbers){
+			final byte[] scratch = new byte[5];
 			size = writeVInt(scratch, number);
 			if(os != null)
 				os.write(scratch, 0, size);

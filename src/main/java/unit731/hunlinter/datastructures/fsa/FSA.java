@@ -161,6 +161,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * array's index 0.
 	 * </p>
 	 */
+	@Override
 	public final Iterator<ByteBuffer> iterator(){
 		return getSequences().iterator();
 	}

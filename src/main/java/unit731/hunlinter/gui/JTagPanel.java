@@ -19,6 +19,9 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class JTagPanel extends JPanel{
 
+	private static final long serialVersionUID = 665517573169978352L;
+
+
 	private final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged;
 
 
@@ -110,7 +113,10 @@ public class JTagPanel extends JPanel{
 
 	private static class JTagComponent extends JComponent{
 
-		public JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
+		private static final long serialVersionUID = -7410352884175789897L;
+
+
+		JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
 			Objects.requireNonNull(tagRemover);
 
 			setLayout(new BorderLayout());

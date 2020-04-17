@@ -31,8 +31,6 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** A buffer for the current sequence of bytes from the current node to the root. */
 	private byte[] buffer = new byte[EXPECTED_MAX_STATES];
-	/** Reusable byte buffer wrapper around {@link #buffer}. */
-	private ByteBuffer bufferWrapper = ByteBuffer.wrap(buffer);
 
 	/** An arc stack for DFS when processing the automaton. */
 	private int[] arcs = new int[EXPECTED_MAX_STATES];
@@ -124,10 +122,8 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 			//expand buffer if needed
 			final int bufferLength = buffer.length;
-			if(lastIndex >= bufferLength){
+			if(lastIndex >= bufferLength)
 				buffer = Arrays.copyOf(buffer, bufferLength + EXPECTED_MAX_STATES);
-				bufferWrapper = ByteBuffer.wrap(buffer);
-			}
 			buffer[lastIndex] = fsa.getArcLabel(arc);
 
 			if(!fsa.isArcTerminal(arc))
