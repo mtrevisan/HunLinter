@@ -112,6 +112,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private static final String FONT_SIZE_PREFIX = "font.size.";
 	private static final String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
+
 	private final JFileChooser openProjectPathFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -133,11 +134,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
-		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
+		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(
-			parsingResultTextArea);
+		GUIUtils.addFontableProperty(parsingResultTextArea);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -154,7 +154,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				//choose the right icon for the folder
 				@Override
 				public Icon getIcon(final File file){
-					return (Packager.isProjectFolder(file)? projectFolderIcon:
+					return (Packager.isProjectFolder(file)?
+						projectFolderIcon:
 						FileSystemView.getFileSystemView().getSystemIcon(file));
 				}
 			});
@@ -163,7 +164,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 		//check for updates
-		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true)){
+		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true))
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
@@ -173,7 +174,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				}
 				catch(final Exception ignored){}
 			});
-		}
 
 		EventBusService.subscribe(this);
 	}
@@ -497,16 +497,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		parsingResultTextArea.setText(null);
-
-		if(parserManager != null)
-			parserManager.stopFileListener();
-
 		EventBusService.publish(new LoadProjectEvent(basePath));
 	}
 
 	@EventHandler
 	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
+		parsingResultTextArea.setText(null);
+
+		if(parserManager != null)
+			parserManager.stopFileListener();
+
 		//clear all
 		loadFileCancelled(null);
 
@@ -643,6 +643,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAffixParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
@@ -662,6 +663,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearDictionaryParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
@@ -670,6 +672,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAidParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
@@ -680,6 +683,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearThesaurusParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
@@ -693,6 +697,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearHyphenationParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
@@ -706,6 +711,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAutoCorrectParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -718,6 +724,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearSentenceExceptionsParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
@@ -730,6 +737,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearWordExceptionsParser(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 

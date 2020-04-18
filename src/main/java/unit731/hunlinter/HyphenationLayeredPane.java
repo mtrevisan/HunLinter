@@ -345,6 +345,7 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -353,6 +354,7 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void setCurrentFont(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
@@ -365,6 +367,7 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION)
 			return;
 

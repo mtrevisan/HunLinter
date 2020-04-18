@@ -315,6 +315,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -355,6 +356,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void setCurrentFont(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
@@ -365,6 +367,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
@@ -381,6 +384,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clearAid(final Integer actionCommand){
+		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
