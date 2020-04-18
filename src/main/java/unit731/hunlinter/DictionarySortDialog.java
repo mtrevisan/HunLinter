@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
-import unit731.hunlinter.gui.DictionarySortCellRenderer;
+import unit731.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 

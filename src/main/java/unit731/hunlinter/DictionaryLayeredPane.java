@@ -24,7 +24,7 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.models.InflectionTableModel;
-import unit731.hunlinter.gui.TableRenderer;
+import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;

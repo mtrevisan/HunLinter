@@ -1,4 +1,6 @@
-package unit731.hunlinter.gui;
+package unit731.hunlinter.gui.renderers;
+
+import unit731.hunlinter.gui.Watercolors;
 
 import java.awt.Component;
 import java.awt.Font;

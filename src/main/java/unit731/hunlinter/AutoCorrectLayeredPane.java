@@ -28,7 +28,7 @@ import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.models.AutoCorrectTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.TableRenderer;
+import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
