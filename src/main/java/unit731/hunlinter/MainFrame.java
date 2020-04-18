@@ -22,6 +22,7 @@ import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
 import unit731.hunlinter.gui.ProjectFolderFilter;
+import unit731.hunlinter.gui.components.RecentFilesMenu;
 import unit731.hunlinter.gui.events.LoadProjectEvent;
 import unit731.hunlinter.gui.events.TabbedPaneEnableEvent;
 
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIUtils;
-import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
@@ -307,7 +307,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new unit731.hunlinter.gui.RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);

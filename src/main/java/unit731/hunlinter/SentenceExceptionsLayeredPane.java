@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.GUIUtils;
-import unit731.hunlinter.gui.JTagPanel;
+import unit731.hunlinter.gui.components.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
@@ -272,7 +272,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
    private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openSexButton;
    private javax.swing.JScrollPane scrollPane;
-   private unit731.hunlinter.gui.JTagPanel tagPanel;
+   private JTagPanel tagPanel;
    private javax.swing.JTextField textField;
    // End of variables declaration//GEN-END:variables
 }
