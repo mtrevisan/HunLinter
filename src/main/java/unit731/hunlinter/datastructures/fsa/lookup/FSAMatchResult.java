@@ -15,7 +15,7 @@ public class FSAMatchResult{
 	 * The automaton has no match for the input sequence and no sequence in the automaton is a prefix of the input.
 	 * <p>
 	 * Note that to check for a general "input does not exist in the automaton" you have to check for
-	 * both {@link #NO_MATCH} and {@link #AUTOMATON_HAS_PREFIX}.
+	 * both NO_MATCH and {@link #AUTOMATON_HAS_PREFIX}.
 	 */
 	public static final int NO_MATCH = -1;
 

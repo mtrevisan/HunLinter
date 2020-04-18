@@ -149,7 +149,7 @@ public class DictionaryEntry{
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
-		return (match(continuationFlags, Predicate.not(isTerminalAffix::test)) != null);
+		return (match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
 	}
 
 	public int getContinuationFlagCount(){

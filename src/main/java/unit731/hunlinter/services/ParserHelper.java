@@ -39,7 +39,7 @@ public class ParserHelper{
 			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 	}
 
-	public static String assertLinesCount(final Scanner scanner) throws IOException{
+	public static String assertLinesCount(final Scanner scanner){
 		final String line = scanner.nextLine();
 		if(!NumberUtils.isCreatable(line))
 			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));

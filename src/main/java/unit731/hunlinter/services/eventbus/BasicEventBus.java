@@ -210,6 +210,7 @@ public class BasicEventBus implements EventBusInterface{
 		@Override
 		public void run(){
 			try{
+				//noinspection InfiniteLoopStatement
 				while(true)
 					notifySubscribers(queue.take());
 			}
@@ -227,6 +228,7 @@ public class BasicEventBus implements EventBusInterface{
 		@Override
 		public void run(){
 			try{
+				//noinspection InfiniteLoopStatement
 				while(true){
 					final HandlerInfo info = killQueue.take();
 					if(info.getSubscriber() == null)

@@ -497,7 +497,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		clearResultTextArea();
+		parsingResultTextArea.setText(null);
 
 		if(parserManager != null)
 			parserManager.stopFileListener();
@@ -740,10 +740,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		parserManager.getWexParser().clear();
 	}
 
-
-	private void clearResultTextArea(){
-		parsingResultTextArea.setText(null);
-	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt){

@@ -267,11 +267,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	@SuppressWarnings("rawtypes")
 	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
-		//noinspection unchecked
 		@SuppressWarnings("unchecked")
 		final FixedArray<String>[] prefixes = compoundEntries[0]
 			.extractAllAffixes(affixData, false);
-		//noinspection unchecked
 		@SuppressWarnings("unchecked")
 		final FixedArray<String>[] suffixes = compoundEntries[compoundEntries.length - 1]
 			.extractAllAffixes(affixData, false);
