@@ -339,7 +339,7 @@ public class ParserManager implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName().toString());
 
 		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
-			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_DICTIONARY);
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 		else
 			EventBusService.publish(new LoadProjectEvent(packager.getProjectPath()));
 	}

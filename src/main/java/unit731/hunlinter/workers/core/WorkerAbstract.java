@@ -155,7 +155,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	/**
 	 * NOTE: this should be called inside `SwingWorker.doInBackground()` to allow process abortion
 	 */
-	protected void sleepThreadOnPause(){
+	protected void sleepOnPause(){
 		if(paused.get()){
 			PAUSE_LOCK.lock();
 			try{

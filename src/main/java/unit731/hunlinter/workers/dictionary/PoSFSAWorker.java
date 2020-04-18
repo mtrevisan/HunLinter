@@ -97,7 +97,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			encodings.addAll(currentEncodings);
 
-			sleepThreadOnPause();
+			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<byte[]> fsaProcessor = builder::add;
@@ -118,7 +118,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 				percent -> {
 					setProgress(percent, 100);
 
-					sleepThreadOnPause();
+					sleepOnPause();
 				});
 
 			return list;
@@ -143,7 +143,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 				if(++ progress % progressStep == 0)
 					setProgress(++ progressIndex, 100);
 
-				sleepThreadOnPause();
+				sleepOnPause();
 			}
 
 			//release memory
@@ -159,7 +159,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 				serializer.serialize(fsa, os, percent -> {
 					setProgress(percent, 100);
 
-					sleepThreadOnPause();
+					sleepOnPause();
 				});
 
 				Files.write(outputFile.toPath(), os.toByteArray());

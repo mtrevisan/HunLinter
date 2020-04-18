@@ -107,6 +107,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION = 27;
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION = 28;
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = 29;
+	public static final Integer ACTION_COMMAND_PARSER_RELOAD_DICTIONARY = 30;
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";

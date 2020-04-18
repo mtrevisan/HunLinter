@@ -11,7 +11,10 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import unit731.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 
 
 public class DictionarySortDialog extends JDialog{
@@ -21,21 +24,27 @@ public class DictionarySortDialog extends JDialog{
 	private static final double FONT_SIZE_REDUCTION = 0.85;
 
 
+	private final ParserManager parserManager;
 	private final DictionaryParser dicParser;
 
 
-	public DictionarySortDialog(final DictionaryParser dicParser, final Frame parent){
+	public DictionarySortDialog(final ParserManager parserManager, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
-		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(parserManager);
 
-		this.dicParser = dicParser;
+		this.parserManager = parserManager;
+		this.dicParser = parserManager.getDicParser();
 
 		initComponents();
 
 		setCurrentFont();
 
+		reloadDictionaryParser(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
+
 		lblMessage.setText("Select a section from the list:");
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -109,7 +118,23 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.setEnabled(enabled);
 	}
 
-	public void loadLines(final List<String> listData, final int firstVisibleItemIndex){
+	@EventHandler
+	public void reloadDictionaryParser(final Integer actionCommand){
+		//noinspection NumberEquality
+		if(actionCommand != MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY)
+			return;
+
+		try{
+			//reload text
+			final int lastVisibleIndex = getFirstVisibleIndex();
+			loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
+		}
+		catch(final Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
 		scrollToVisibleIndex(0);
 
 		final DefaultListModel<String> model = (DefaultListModel<String>)entriesList.getModel();

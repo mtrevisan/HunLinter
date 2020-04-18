@@ -68,7 +68,7 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 
 				setProgress(processingIndex.incrementAndGet(), totalEntries);
 
-				sleepThreadOnPause();
+				sleepOnPause();
 			}
 			catch(final LinterException e){
 				throw e;
