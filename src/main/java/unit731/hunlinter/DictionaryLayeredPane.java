@@ -284,15 +284,13 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_DICTIONARY))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_DICTIONARY))
 			return;
 
 		//affix file:
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
 
-
-		clearAid(MainFrame.ACTION_COMMAND_CLEAR_AID);
 
 		clearOutputTable(table);
 
@@ -307,7 +305,7 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clearAid(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AID))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_AID))
 			return;
 
 		ruleFlagsAidComboBox.removeAllItems();

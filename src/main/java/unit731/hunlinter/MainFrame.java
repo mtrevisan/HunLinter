@@ -22,8 +22,8 @@ import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
 import unit731.hunlinter.gui.ProjectFolderFilter;
+import unit731.hunlinter.gui.events.LoadProjectEvent;
 import unit731.hunlinter.gui.events.TabbedPaneEnableEvent;
-import unit731.hunlinter.parsers.HunLintable;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -80,7 +80,7 @@ import unit731.hunlinter.services.RecentItems;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
  */
-public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener, HunLintable{
+public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -88,15 +88,25 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	public static final String ACTION_COMMAND_INITIALIZE = "initialize";
 	public static final String ACTION_COMMAND_SET_CURRENT_FONT = "set-current-font";
-	public static final String ACTION_COMMAND_CLEAR_ALL = "clear-all";
-	public static final String ACTION_COMMAND_CLEAR_AID = "clear-aid";
-	public static final String ACTION_COMMAND_CLEAR_DICTIONARY = "clear-dictionary";
-	public static final String ACTION_COMMAND_CLEAR_COMPOUNDS = "clear-compounds";
-	public static final String ACTION_COMMAND_CLEAR_THESAURUS = "clear-thesaurus";
-	public static final String ACTION_COMMAND_CLEAR_HYPHENATION = "clear-hyphenation";
-	public static final String ACTION_COMMAND_CLEAR_AUTO_CORRECT = "clear-auto-correct";
-	public static final String ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS = "clear-sentence-exceptions";
-	public static final String ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS = "clear-word-exceptions";
+	public static final String ACTION_COMMAND_GUI_CLEAR_ALL = "clear-gui-all";
+	public static final String ACTION_COMMAND_GUI_CLEAR_AID = "clear-gui-aid";
+	public static final String ACTION_COMMAND_GUI_CLEAR_DICTIONARY = "clear-gui-dictionary";
+	public static final String ACTION_COMMAND_GUI_CLEAR_COMPOUNDS = "clear-gui-compounds";
+	public static final String ACTION_COMMAND_GUI_CLEAR_THESAURUS = "clear-gui-thesaurus";
+	public static final String ACTION_COMMAND_GUI_CLEAR_HYPHENATION = "clear-gui-hyphenation";
+	public static final String ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT = "clear-gui-auto-correct";
+	public static final String ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS = "clear-gui-sentence-exceptions";
+	public static final String ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS = "clear-gui-word-exceptions";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_ALL = "clear-parser-all";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_AFFIX = "clear-parser-affix";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_DICTIONARY = "clear-parser-dictionary";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_AID = "clear-parser-aid";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_THESAURUS = "clear-parser-thesaurus";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_HYPHENATION = "clear-parser-hyphenation";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT = "clear-parser-auto-correct";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION = "clear-parser-sentence-exception";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION = "clear-parser-word-exception";
+	public static final String ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = "clear-parser-auto-text";
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
@@ -115,7 +125,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	public MainFrame(){
 		packager = new Packager();
-		parserManager = new ParserManager(packager, this);
+		parserManager = new ParserManager(packager);
 		workerManager = new WorkerManager(packager, parserManager, this);
 
 
@@ -492,19 +502,20 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		if(parserManager != null)
 			parserManager.stopFileListener();
 
-		loadFileInternal(basePath);
+		EventBusService.publish(new LoadProjectEvent(basePath));
 	}
 
-	@Override
-	public void loadFileInternal(Path projectPath){
+	@EventHandler
+	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		//clear all
 		loadFileCancelled(null);
-		clearAllParsers();
+
+		EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_ALL);
 
 		mainTabbedPane.setSelectedIndex(0);
 
 
-		projectPath = (projectPath != null? projectPath: packager.getProjectPath());
+		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
 			parsingResultTextArea.setFont(temporaryFont);
 			filOpenProjectMenuItem.setEnabled(false);
@@ -615,9 +626,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
 
-		EventBusService.publish(ACTION_COMMAND_CLEAR_ALL);
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_ALL);
 
-		clearAllParsers();
+		EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_ALL);
 
 		//dictionary file:
 		dicMenu.setEnabled(false);
@@ -630,10 +641,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 
-	@Override
-	public void clearAffixParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_DICTIONARY);
-		EventBusService.publish(ACTION_COMMAND_CLEAR_COMPOUNDS);
+	@EventHandler
+	public void clearAffixParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AFFIX))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_DICTIONARY);
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_COMPOUNDS);
 
 		EventBusService.publish(new TabbedPaneEnableEvent(dicLayeredPane, false));
 		EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, false));
@@ -642,61 +656,88 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		dicMenu.setEnabled(false);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
+
+		parserManager.getAffParser().clear();
 	}
 
-	@Override
-	public void clearDictionaryParser(){}
+	@EventHandler
+	public void clearDictionaryParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_DICTIONARY))
+			return;
 
-	@Override
-	public void clearAidParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_AID);
+		parserManager.getDicParser().clear();
 	}
 
-	@Override
-	public void clearThesaurusParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_THESAURUS);
+	@EventHandler
+	public void clearAidParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AID))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AID);
+
+		parserManager.getAidParser().clear();
+	}
+
+	@EventHandler
+	public void clearThesaurusParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_THESAURUS))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_THESAURUS);
 
 		theMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, false));
+
+		parserManager.getTheParser().clear();
 	}
 
-	@Override
-	public void clearHyphenationParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_HYPHENATION);
+	@EventHandler
+	public void clearHyphenationParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_HYPHENATION))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_HYPHENATION);
 
 		hypMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, false));
+
+		parserManager.getHypParser().clear();
 	}
 
-	@Override
-	public void clearAutoCorrectParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_AUTO_CORRECT);
+	@EventHandler
+	public void clearAutoCorrectParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT);
 
 		EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, false));
+
+		parserManager.getAcoParser().clear();
 	}
 
-	@Override
-	public void clearSentenceExceptionsParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS);
+	@EventHandler
+	public void clearSentenceExceptionsParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS);
 
 		EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane, false));
+
+		parserManager.getSexParser().clear();
 	}
 
-	@Override
-	public void clearWordExceptionsParser(){
-		EventBusService.publish(ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS);
+	@EventHandler
+	public void clearWordExceptionsParser(final String actionCommand){
+		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION))
+			return;
+
+		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS);
 
 		EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane, false));
-	}
 
-	@Override
-	public void clearAutoTextParser(){
-		//TODO
-//		final AutoTextTableModel dm = (AutoTextTableModel)atxTable.getModel();
-//		dm.setCorrections(null);
-
-//		atxMenu.setEnabled(false);
-//		EventBusService.publish(new TabbedPaneEnableEvent(atxLayeredPane, false));
+		parserManager.getWexParser().clear();
 	}
 
 

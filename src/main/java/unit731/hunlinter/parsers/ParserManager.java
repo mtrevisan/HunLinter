@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.events.LoadProjectEvent;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -34,6 +35,7 @@ import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.filelistener.FileChangeListener;
 import unit731.hunlinter.services.filelistener.FileListenerManager;
 
@@ -69,13 +71,12 @@ public class ParserManager implements FileChangeListener{
 	private final ExceptionsParser sexParser;
 	private final ExceptionsParser wexParser;
 
-	private final HunLintable hunLintable;
 	private final FileListenerManager flm;
 
 	private final Packager packager;
 
 
-	public ParserManager(final Packager packager, final HunLintable hunLintable){
+	public ParserManager(final Packager packager){
 		Objects.requireNonNull(packager);
 
 		affParser = new AffixParser();
@@ -85,7 +86,6 @@ public class ParserManager implements FileChangeListener{
 		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
 		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);
 
-		this.hunLintable = hunLintable;
 		flm = new FileListenerManager();
 
 		this.packager = packager;
@@ -168,10 +168,7 @@ public class ParserManager implements FileChangeListener{
 
 	public void openAffixFile(final File affFile) throws IOException{
 		if(!affFile.exists()){
-			affParser.clear();
-
-			if(hunLintable != null)
-				hunLintable.clearAffixParser();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);
 
 			throw new FileNotFoundException("The file '" + affFile.getCanonicalPath() + "' doesn't exists");
 		}
@@ -194,13 +191,10 @@ public class ParserManager implements FileChangeListener{
 
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
-			if(hunLintable != null)
-				hunLintable.clearHyphenationParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
 		}
 		else if(hypParser != null)
-			hypParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_HYPHENATION);
 	}
 
 	public void getCorrectnessChecker(){
@@ -215,12 +209,9 @@ public class ParserManager implements FileChangeListener{
 			final String language = affixData.getLanguage();
 			final Charset charset = affixData.getCharset();
 			dicParser = new DictionaryParser(dicFile, language, charset);
-
-			if(hunLintable != null)
-				hunLintable.clearDictionaryParser();
 		}
 		else if(dicParser != null)
-			dicParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_DICTIONARY);
 
 		wordGenerator = new WordGenerator(affixData, dicParser);
 	}
@@ -231,13 +222,10 @@ public class ParserManager implements FileChangeListener{
 
 			aidParser.parse(aidFile);
 
-			if(hunLintable != null)
-				hunLintable.clearAidParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Aid file");
 		}
 		else
-			aidParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AID);
 	}
 
 	public void openThesaurusFile(final File theDataFile) throws IOException{
@@ -246,13 +234,10 @@ public class ParserManager implements FileChangeListener{
 
 			theParser.parse(theDataFile);
 
-			if(hunLintable != null)
-				hunLintable.clearThesaurusParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
 		}
 		else
-			theParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_THESAURUS);
 	}
 
 	public void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
@@ -261,13 +246,10 @@ public class ParserManager implements FileChangeListener{
 
 			acoParser.parse(acoFile);
 
-			if(hunLintable != null)
-				hunLintable.clearAutoCorrectParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Auto–Correct file");
 		}
 		else
-			acoParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT);
 	}
 
 	public void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
@@ -277,13 +259,10 @@ public class ParserManager implements FileChangeListener{
 			final String language = affParser.getLanguage();
 			sexParser.parse(sexFile, language);
 
-			if(hunLintable != null)
-				hunLintable.clearSentenceExceptionsParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Sentence Exceptions file");
 		}
 		else
-			sexParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION);
 	}
 
 	public void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
@@ -293,13 +272,10 @@ public class ParserManager implements FileChangeListener{
 			final String language = affParser.getLanguage();
 			wexParser.parse(wexFile, language);
 
-			if(hunLintable != null)
-				hunLintable.clearWordExceptionsParser();
-
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Word Exceptions file");
 		}
 		else
-			wexParser.clear();
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION);
 	}
 
 
@@ -340,63 +316,32 @@ public class ParserManager implements FileChangeListener{
 	public void fileDeleted(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toString());
 
+		//FIXME
 		final File file = path.toFile();
-		if(file.equals(packager.getAffixFile())){
-			affParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearAffixParser);
-		}
-		else if(file.equals(packager.getDictionaryFile())){
-			dicParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearDictionaryParser);
-		}
-		else if(path.toString().endsWith(EXTENSION_AID)){
-			aidParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearAidParser);
-		}
-		else if(file.equals(packager.getAutoCorrectFile())){
-			acoParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearAutoCorrectParser);
-		}
-		else if(file.equals(packager.getSentenceExceptionsFile())){
-			sexParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearSentenceExceptionsParser);
-		}
-		else if(file.equals(packager.getWordExceptionsFile())){
-			wexParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearWordExceptionsParser);
-		}
-//		else if(filePath.equals(packager.getAutoTextFile())){
-//			atxParser.clear();
-//
-//			Optional.ofNullable(hunlintable)
-//				.ifPresent(HunLintable::clearAutoTextParser);
-//		}
+		if(file.equals(packager.getAffixFile()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);
+		else if(file.equals(packager.getDictionaryFile()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_DICTIONARY);
+		else if(path.toString().endsWith(EXTENSION_AID))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AID);
+		else if(file.equals(packager.getAutoCorrectFile()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT);
+		else if(file.equals(packager.getSentenceExceptionsFile()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION);
+		else if(file.equals(packager.getWordExceptionsFile()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION);
+//		else if(filePath.equals(packager.getAutoTextFile()))
+//			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT);
 	}
 
 	@Override
 	public void fileModified(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
-		if(path.toFile().toString().equals(packager.getDictionaryFile().toString())){
-			dicParser.clear();
-
-			Optional.ofNullable(hunLintable)
-				.ifPresent(HunLintable::clearDictionaryParser);
-		}
-		else if(hunLintable != null)
-			hunLintable.loadFileInternal(null);
+		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_DICTIONARY);
+		else
+			EventBusService.publish(new LoadProjectEvent(packager.getProjectPath()));
 	}
 
 

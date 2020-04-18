@@ -334,11 +334,13 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AUTO_CORRECT))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT))
 			return;
 
 		formerFilterIncorrectText = null;
 		formerFilterCorrectText = null;
+		incorrectTextField.setText(null);
+		correctLabel.setText(null);
 
 		openAcoButton.setEnabled(false);
 		//noinspection unchecked

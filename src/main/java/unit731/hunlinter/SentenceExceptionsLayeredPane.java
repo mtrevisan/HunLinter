@@ -219,11 +219,13 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS))
 			return;
 
-		openSexButton.setEnabled(false);
 		formerFilterSentenceException = null;
+		textField.setText(null);
+
+		openSexButton.setEnabled(false);
 		tagPanel.applyFilter(null);
 		tagPanel.initializeTags(null);
 	}

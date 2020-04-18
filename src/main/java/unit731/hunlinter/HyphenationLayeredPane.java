@@ -365,7 +365,7 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_HYPHENATION))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION))
 			return;
 
 		openHypButton.setEnabled(false);

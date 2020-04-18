@@ -365,7 +365,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_COMPOUNDS))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS))
 			return;
 
 		formerCompoundInputText = null;
@@ -377,13 +377,11 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//affix file:
 		inputComboBox.removeAllItems();
 		inputComboBox.setEnabled(true);
-
-		clearAid(MainFrame.ACTION_COMMAND_CLEAR_AID);
 	}
 
 	@EventHandler
 	public void clearAid(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AID))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_AID))
 			return;
 
 		ruleFlagsAidComboBox.removeAllItems();

@@ -221,11 +221,13 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS))
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS))
 			return;
 
-		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
+		textField.setText(null);
+
+		openWexButton.setEnabled(false);
 		tagPanel.applyFilter(null);
 		tagPanel.initializeTags(null);
 	}
