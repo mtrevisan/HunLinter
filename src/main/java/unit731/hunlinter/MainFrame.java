@@ -89,8 +89,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final Integer ACTION_COMMAND_INITIALIZE = 0;
 	public static final Integer ACTION_COMMAND_SET_CURRENT_FONT = 1;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_ALL = 10;
-	public static final Integer ACTION_COMMAND_GUI_CLEAR_AID = 11;
-	public static final Integer ACTION_COMMAND_GUI_CLEAR_DICTIONARY = 12;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_DICTIONARY = 11;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_AID = 12;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_COMPOUNDS = 13;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_THESAURUS = 14;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_HYPHENATION = 15;
@@ -526,13 +526,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		projectLoaderAction.actionPerformed(event);
 	}
 
-	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
-		parsingResultTextArea.setFont(currentFont);
-
-		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);
-	}
-
 	private void loadFileCompleted(){
 		//restore default font (changed for reporting reading errors)
 		setCurrentFont();
@@ -551,11 +544,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			EventBusService.publish(ACTION_COMMAND_INITIALIZE);
 
-
-			//dictionary file, part 1:
+			//dictionary file:
 			EventBusService.publish(new TabbedPaneEnableEvent(dicLayeredPane, true));
 
-			//dictionary file, part 2:
+			//dictionary file (compound):
 			final AffixData affixData = parserManager.getAffixData();
 			EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
 
@@ -585,6 +577,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				mainTabbedPane.setSelectedIndex(0);
 
 
+			//load font for this language
 			final String language = parserManager.getLanguage();
 			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
@@ -598,6 +591,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void setCurrentFont(){
+		final Font currentFont = GUIUtils.getCurrentFont();
+		parsingResultTextArea.setFont(currentFont);
+
+		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);
 	}
 
 	@EventHandler
@@ -750,7 +750,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt){
+	public void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case "progress":
 				final int progress = (int)evt.getNewValue();
