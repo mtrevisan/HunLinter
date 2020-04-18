@@ -86,27 +86,27 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
-	public static final String ACTION_COMMAND_INITIALIZE = "initialize";
-	public static final String ACTION_COMMAND_SET_CURRENT_FONT = "set-current-font";
-	public static final String ACTION_COMMAND_GUI_CLEAR_ALL = "clear-gui-all";
-	public static final String ACTION_COMMAND_GUI_CLEAR_AID = "clear-gui-aid";
-	public static final String ACTION_COMMAND_GUI_CLEAR_DICTIONARY = "clear-gui-dictionary";
-	public static final String ACTION_COMMAND_GUI_CLEAR_COMPOUNDS = "clear-gui-compounds";
-	public static final String ACTION_COMMAND_GUI_CLEAR_THESAURUS = "clear-gui-thesaurus";
-	public static final String ACTION_COMMAND_GUI_CLEAR_HYPHENATION = "clear-gui-hyphenation";
-	public static final String ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT = "clear-gui-auto-correct";
-	public static final String ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS = "clear-gui-sentence-exceptions";
-	public static final String ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS = "clear-gui-word-exceptions";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_ALL = "clear-parser-all";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_AFFIX = "clear-parser-affix";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_DICTIONARY = "clear-parser-dictionary";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_AID = "clear-parser-aid";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_THESAURUS = "clear-parser-thesaurus";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_HYPHENATION = "clear-parser-hyphenation";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT = "clear-parser-auto-correct";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION = "clear-parser-sentence-exception";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION = "clear-parser-word-exception";
-	public static final String ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = "clear-parser-auto-text";
+	public static final Integer ACTION_COMMAND_INITIALIZE = 0;
+	public static final Integer ACTION_COMMAND_SET_CURRENT_FONT = 1;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_ALL = 10;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_AID = 11;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_DICTIONARY = 12;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_COMPOUNDS = 13;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_THESAURUS = 14;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_HYPHENATION = 15;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT = 16;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS = 17;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS = 18;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_ALL = 20;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AFFIX = 21;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_DICTIONARY = 22;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AID = 23;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_THESAURUS = 24;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_HYPHENATION = 25;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT = 26;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION = 27;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION = 28;
+	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = 29;
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
@@ -642,8 +642,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@EventHandler
-	public void clearAffixParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AFFIX))
+	public void clearAffixParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_DICTIONARY);
@@ -661,16 +661,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearDictionaryParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_DICTIONARY))
+	public void clearDictionaryParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
 		parserManager.getDicParser().clear();
 	}
 
 	@EventHandler
-	public void clearAidParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AID))
+	public void clearAidParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AID);
@@ -679,8 +679,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearThesaurusParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_THESAURUS))
+	public void clearThesaurusParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_THESAURUS);
@@ -692,8 +692,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearHyphenationParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_HYPHENATION))
+	public void clearHyphenationParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_HYPHENATION);
@@ -705,8 +705,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearAutoCorrectParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT))
+	public void clearAutoCorrectParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT);
@@ -717,8 +717,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearSentenceExceptionsParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION))
+	public void clearSentenceExceptionsParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS);
@@ -729,8 +729,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearWordExceptionsParser(final String actionCommand){
-		if(!actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_ALL) && !actionCommand.equals(ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION))
+	public void clearWordExceptionsParser(final Integer actionCommand){
+		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS);

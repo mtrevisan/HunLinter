@@ -198,8 +198,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+	public void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
 		if(parserManager.getWexParser().getExceptionsCounter() > 0){
@@ -211,8 +211,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void setCurrentFont(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+	public void setCurrentFont(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
 		final Font currentFont = GUIUtils.getCurrentFont();
@@ -220,8 +220,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS))
+	public void clear(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;
 
 		formerFilterWordException = null;

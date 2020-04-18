@@ -314,8 +314,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void initialize(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+	public void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
 		final String language = parserManager.getLanguage();
@@ -354,8 +354,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void setCurrentFont(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+	public void setCurrentFont(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
 		final Font currentFont = GUIUtils.getCurrentFont();
@@ -364,8 +364,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS))
+	public void clear(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
 		formerCompoundInputText = null;
@@ -380,8 +380,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void clearAid(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_AID))
+	public void clearAid(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
 		ruleFlagsAidComboBox.removeAllItems();

@@ -254,8 +254,8 @@ final int iconSize = 17;
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+	public void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
 		final String language = parserManager.getLanguage();
@@ -291,8 +291,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
-	public void setCurrentFont(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+	public void setCurrentFont(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
 		final Font currentFont = GUIUtils.getCurrentFont();
@@ -301,8 +301,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
-	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS))
+	public void clear(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;
 
 		synonymsTextField.setText(null);

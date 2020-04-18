@@ -195,8 +195,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+	public void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
 		if(parserManager.getSexParser().getExceptionsCounter() > 0){
@@ -209,8 +209,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void setCurrentFont(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+	public void setCurrentFont(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
 		final Font currentFont = GUIUtils.getCurrentFont();
@@ -218,8 +218,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void clear(final String actionCommand){
-		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS))
+	public void clear(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS)
 			return;
 
 		formerFilterSentenceException = null;
