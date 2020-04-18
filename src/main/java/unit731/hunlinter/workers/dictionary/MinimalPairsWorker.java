@@ -134,7 +134,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 							if(checker.shouldBeProcessedForMinimalPair(inflection)){
 								list.add(inflection.getWord());
 
-								sleepOnPause();
+								sleepThreadOnPause();
 							}
 					}
 					catch(final LinterException e){
@@ -144,7 +144,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				setProgress(currentLine, totalLines);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 		}
 		catch(final Exception e){
@@ -201,7 +201,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 								totalPairs ++;
 							}
 
-							sleepOnPause();
+							sleepThreadOnPause();
 						}
 					}
 				}
@@ -238,7 +238,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				setProgress(index, size);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 		}
 		catch(final Exception e){

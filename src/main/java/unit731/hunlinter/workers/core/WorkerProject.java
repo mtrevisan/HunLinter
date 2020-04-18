@@ -51,7 +51,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 				//noinspection IntegerDivisionInFloatingPointContext
 				setProgress((int)Math.ceil((index + 1) * 100 / stages.size()));
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 
 			finalizeProcessing("Project loaded successfully");

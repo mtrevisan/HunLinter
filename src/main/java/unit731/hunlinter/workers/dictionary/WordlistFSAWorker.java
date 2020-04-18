@@ -82,7 +82,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				words[i] = StringHelper.getRawBytes(inflections[i].getWord());
 			encodings.addAll(words);
 
-			sleepOnPause();
+			sleepThreadOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<byte[]> fsaProcessor = builder::add;
@@ -103,7 +103,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				percent -> {
 					setProgress(percent, 100);
 
-					sleepOnPause();
+					sleepThreadOnPause();
 				});
 
 			return list;
@@ -128,7 +128,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				if(++ progress % progressStep == 0)
 					setProgress(++ progressIndex, 100);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 
 			//release memory
@@ -144,7 +144,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				serializer.serialize(fsa, os, percent -> {
 					setProgress(percent, 100);
 
-					sleepOnPause();
+					sleepThreadOnPause();
 				});
 
 				Files.write(outputFile.toPath(), os.toByteArray());

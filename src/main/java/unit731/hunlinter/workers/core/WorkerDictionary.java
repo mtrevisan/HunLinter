@@ -142,7 +142,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				if(progress.incrementAndGet() % progressStep == 0)
 					setProgress(progressIndex.incrementAndGet(), 100);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 			catch(final Exception e){
 				final LinterException le = new LinterException(e.getMessage(), e.getCause(), data);
@@ -166,7 +166,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
 					setProgress(progressIndex.incrementAndGet(), 100);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			}
 			catch(final LinterException e){
 				throw e;

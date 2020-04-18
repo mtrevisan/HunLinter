@@ -92,7 +92,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules, percent -> {
 				setProgress(percent, 100);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			});
 
 			return compactedRules;
@@ -106,7 +106,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines, percent -> {
 				setProgress(percent, 100);
 
-				sleepOnPause();
+				sleepThreadOnPause();
 			});
 
 			forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
