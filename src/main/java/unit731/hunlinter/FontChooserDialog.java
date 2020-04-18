@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.swing.*;
@@ -246,9 +247,15 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_familyNameListValueChanged
 
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
+		final List<String> fonts = (monospacedCheckBox.isSelected()?
+			GUIUtils.getFamilyNamesMonospaced():
+			GUIUtils.getFamilyNamesAll());
+
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();
-		model.addAll(monospacedCheckBox.isSelected()? GUIUtils.getFamilyNamesMonospaced(): GUIUtils.getFamilyNamesAll());
+		model.ensureCapacity(fonts.size());
+		model.addAll(fonts);
+
 		setSelectedFont();
 	}//GEN-LAST:event_monospacedCheckBoxActionPerformed
 

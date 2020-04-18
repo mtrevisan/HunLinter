@@ -135,13 +135,12 @@ public class DictionarySortDialog extends JDialog{
 	}
 
 	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
-		scrollToVisibleIndex(0);
-
 		final DefaultListModel<String> model = (DefaultListModel<String>)entriesList.getModel();
-		model.removeAllElements();
+		model.clear();
+		model.ensureCapacity(listData.size());
 		model.addAll(listData);
 
-		scrollToVisibleIndex(firstVisibleItemIndex);
+		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 	}
 
 	private void setCurrentFont(){
@@ -149,15 +148,6 @@ public class DictionarySortDialog extends JDialog{
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
-	}
-
-	private void scrollToVisibleIndex(final int index){
-		final int visibleLines = entriesList.getLastVisibleIndex();
-		final int newIndex = Math.min(index + visibleLines, entriesList.getModel().getSize() - 1);
-		entriesList.ensureIndexIsVisible(newIndex);
-
-		//correct first item
-		entriesList.ensureIndexIsVisible(index);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
