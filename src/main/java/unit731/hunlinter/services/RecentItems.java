@@ -19,7 +19,7 @@ public class RecentItems{
 		void onRecentItemChange(RecentItems src);
 	}
 
-	private final static String RECENT_ITEM_PREFIX = "recentItem.";
+	private static final String RECENT_ITEM_PREFIX = "recentItem.";
 
 	private final int maxItems;
 	private final Preferences preferenceNode;

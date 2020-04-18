@@ -15,11 +15,11 @@ import java.util.Arrays;
 public class FSABuilder{
 
 	/** A megabyte */
-	private final static int MB = 1024 * 1024;
+	private static final int MB = 1024 * 1024;
 	/** Internal serialized FSA buffer expand ratio */
-	private final static int BUFFER_GROWTH_SIZE = 5 * MB;
+	private static final int BUFFER_GROWTH_SIZE = 5 * MB;
 	/** Maximum number of labels from a single state */
-	private final static int MAX_LABELS = 256;
+	private static final int MAX_LABELS = 256;
 
 
 	/** Internal serialized FSA buffer expand ratio */

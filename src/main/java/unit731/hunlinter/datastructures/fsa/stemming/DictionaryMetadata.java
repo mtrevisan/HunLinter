@@ -76,7 +76,7 @@ public class DictionaryMetadata{
 	private EncoderType encoderType;
 
 	/** Expected metadata file extension */
-	public final static String METADATA_FILE_EXTENSION = "info";
+	public static final String METADATA_FILE_EXTENSION = "info";
 
 
 	/**

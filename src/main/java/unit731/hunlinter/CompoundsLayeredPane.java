@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.CompoundTableModel;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -36,13 +35,15 @@ import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.workers.WorkerManager;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class CompoundsLayeredPane extends JLayeredPane implements ActionListener, PanableInterface{
+public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
 
 	private static final long serialVersionUID = 4289096513559178063L;
 
@@ -81,6 +82,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		GUIUtils.addFontableProperty(inputTextArea, table);
 
 		GUIUtils.addUndoManager(inputTextArea);
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -310,8 +313,11 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		debouncer.call(this);
 	}
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		final String language = parserManager.getLanguage();
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
 			.thenComparing(BaseBuilder.getComparator(language));
@@ -347,15 +353,21 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		openAidButton.setEnabled(aidLinesPresent);
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		inputTextArea.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_COMPOUNDS))
+			return;
+
 		formerCompoundInputText = null;
 
 		inputTextArea.setText(null);
@@ -366,10 +378,14 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		inputComboBox.removeAllItems();
 		inputComboBox.setEnabled(true);
 
-		clearAid();
+		clearAid(MainFrame.ACTION_COMMAND_CLEAR_AID);
 	}
 
-	public void clearAid(){
+	@EventHandler
+	public void clearAid(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AID))
+			return;
+
 		ruleFlagsAidComboBox.removeAllItems();
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(false);

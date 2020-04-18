@@ -15,18 +15,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
 
 
-public class WordExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
+public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = -2701221843193072823L;
 
@@ -58,6 +59,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane implements PanableIn
 		GUIUtils.addFontableProperty(textField);
 
 		GUIUtils.addUndoManager(textField);
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -194,8 +197,11 @@ public class WordExceptionsLayeredPane extends JLayeredPane implements PanableIn
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		if(parserManager.getWexParser().getExceptionsCounter() > 0){
 			final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
 			tagPanel.initializeTags(wordExceptions);
@@ -204,14 +210,20 @@ public class WordExceptionsLayeredPane extends JLayeredPane implements PanableIn
 		openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		tagPanel.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS))
+			return;
+
 		openWexButton.setEnabled(false);
 		formerFilterWordException = null;
 		tagPanel.applyFilter(null);

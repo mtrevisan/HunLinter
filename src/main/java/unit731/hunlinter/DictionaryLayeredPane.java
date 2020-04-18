@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -34,6 +33,8 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
 
@@ -41,7 +42,7 @@ import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class DictionaryLayeredPane extends JLayeredPane implements PanableInterface{
+public class DictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 7030870103355904749L;
 
@@ -86,6 +87,8 @@ final int iconSize = 17;
 			GUIUtils.addPopupMenu(copyPopupMenu, table);
 		}
 		catch(final IOException ignored){}
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -225,8 +228,11 @@ final int iconSize = 17;
       );
    }// </editor-fold>//GEN-END:initComponents
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		final String language = parserManager.getLanguage();
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
@@ -266,21 +272,27 @@ final int iconSize = 17;
 		}
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		inputTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_DICTIONARY))
+			return;
+
 		//affix file:
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
 
 
-		clearAid();
+		clearAid(MainFrame.ACTION_COMMAND_CLEAR_AID);
 
 		clearOutputTable(table);
 
@@ -293,7 +305,11 @@ final int iconSize = 17;
 		openAidButton.setEnabled(false);
 	}
 
-	public void clearAid(){
+	@EventHandler
+	public void clearAid(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AID))
+			return;
+
 		ruleFlagsAidComboBox.removeAllItems();
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(false);

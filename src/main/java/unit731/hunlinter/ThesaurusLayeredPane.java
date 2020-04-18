@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.TableRenderer;
@@ -35,11 +34,13 @@ import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
-public class ThesaurusLayeredPane extends JLayeredPane implements PanableInterface{
+public class ThesaurusLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = -6844935166825095145L;
 
@@ -91,6 +92,8 @@ final int iconSize = 17;
 			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -250,8 +253,11 @@ final int iconSize = 17;
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		final String language = parserManager.getLanguage();
 
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
@@ -284,15 +290,21 @@ final int iconSize = 17;
 		}
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		synonymsTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_THESAURUS))
+			return;
+
 		synonymsTextField.setText(null);
 		popupMergeMenuItem.setEnabled(false);
 

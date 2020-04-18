@@ -16,8 +16,8 @@ public class SelectFontAction extends AbstractAction{
 
 	private static final long serialVersionUID = -4735745104118440213L;
 
-	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
-	private final static String FONT_SIZE_PREFIX = "font.size.";
+	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
+	private static final String FONT_SIZE_PREFIX = "font.size.";
 
 
 	private final ParserManager parserManager;

@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.AutoCorrectTableModel;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.TableRenderer;
@@ -37,11 +36,13 @@ import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 
-public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInterface{
+public class AutoCorrectLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = -5833945357934298046L;
 
@@ -77,6 +78,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInter
 		GUIUtils.addFontableProperty(table, incorrectTextField, correctTextField);
 
 		GUIUtils.addUndoManager(incorrectTextField, correctTextField);
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -300,8 +303,11 @@ public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInter
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		if(parserManager.getAcoParser().getCorrectionsCounter() > 0){
 			final String language = parserManager.getLanguage();
 			final Comparator<String> comparator = Comparator.comparingInt(String::length)
@@ -315,16 +321,22 @@ public class AutoCorrectLayeredPane extends JLayeredPane implements PanableInter
 		openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		incorrectTextField.setFont(currentFont);
 		correctTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_AUTO_CORRECT))
+			return;
+
 		formerFilterIncorrectText = null;
 		formerFilterCorrectText = null;
 

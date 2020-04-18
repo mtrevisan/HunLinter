@@ -71,10 +71,10 @@ import java.util.Set;
 public class FSA5 extends FSA{
 
 	/** Default filler byte */
-	public final static byte DEFAULT_FILLER = '_';
+	public static final byte DEFAULT_FILLER = '_';
 
 	/** Default annotation byte */
-	public final static byte DEFAULT_ANNOTATION = '+';
+	public static final byte DEFAULT_ANNOTATION = '+';
 
 	/** Automaton version as in the file header */
 	public static final byte VERSION = 5;
@@ -101,7 +101,7 @@ public class FSA5 extends FSA{
 	 * An offset in the arc structure, where the address and flags field begins.
 	 * In version 5 of FSA automata, this value is constant (1, skip label).
 	 */
-	public final static int ADDRESS_OFFSET = 1;
+	public static final int ADDRESS_OFFSET = 1;
 
 	/**
 	 * An array of bytes with the internal representation of the automaton. Please

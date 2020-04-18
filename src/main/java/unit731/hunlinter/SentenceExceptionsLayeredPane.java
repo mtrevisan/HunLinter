@@ -15,17 +15,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 
 
-public class SentenceExceptionsLayeredPane extends JLayeredPane implements PanableInterface{
+public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = -4277472579904204046L;
 
@@ -57,6 +58,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane implements Panab
 		GUIUtils.addFontableProperty(textField);
 
 		GUIUtils.addUndoManager(textField);
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -191,8 +194,11 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane implements Panab
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		if(parserManager.getSexParser().getExceptionsCounter() > 0){
 			updateSentenceExceptionsCounter();
 
@@ -202,14 +208,20 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane implements Panab
 		openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		tagPanel.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS))
+			return;
+
 		openSexButton.setEnabled(false);
 		formerFilterSentenceException = null;
 		tagPanel.applyFilter(null);

@@ -21,8 +21,8 @@ import unit731.hunlinter.actions.ProjectLoaderAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.ProjectFolderFilter;
+import unit731.hunlinter.gui.TabbedPaneEnableEvent;
 import unit731.hunlinter.parsers.HunLintable;
 
 import java.awt.event.ActionEvent;
@@ -39,7 +39,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Path;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
@@ -56,6 +55,8 @@ import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.RecentFilesMenu;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
@@ -85,9 +86,21 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
-	private final static String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
-	private final static String FONT_SIZE_PREFIX = "font.size.";
-	private final static String UPDATE_STARTUP_CHECK = "update.startupCheck";
+	public static final String ACTION_COMMAND_INITIALIZE = "initialize";
+	public static final String ACTION_COMMAND_SET_CURRENT_FONT = "set-current-font";
+	public static final String ACTION_COMMAND_CLEAR_ALL = "clear-all";
+	public static final String ACTION_COMMAND_CLEAR_AID = "clear-aid";
+	public static final String ACTION_COMMAND_CLEAR_DICTIONARY = "clear-dictionary";
+	public static final String ACTION_COMMAND_CLEAR_COMPOUNDS = "clear-compounds";
+	public static final String ACTION_COMMAND_CLEAR_THESAURUS = "clear-thesaurus";
+	public static final String ACTION_COMMAND_CLEAR_HYPHENATION = "clear-hyphenation";
+	public static final String ACTION_COMMAND_CLEAR_AUTO_CORRECT = "clear-auto-correct";
+	public static final String ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS = "clear-sentence-exceptions";
+	public static final String ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS = "clear-word-exceptions";
+
+	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
+	private static final String FONT_SIZE_PREFIX = "font.size.";
+	private static final String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 	private final JFileChooser openProjectPathFileChooser;
 
@@ -151,6 +164,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				catch(final Exception ignored){}
 			});
 		}
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -504,7 +519,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		final Font currentFont = GUIUtils.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
 
-		GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::setCurrentFont);
+		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);
 	}
 
 	private void loadFileCompleted(){
@@ -523,37 +538,35 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			dicMenu.setEnabled(true);
 
 
-			GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::initialize);
+			EventBusService.publish(ACTION_COMMAND_INITIALIZE);
 
-			//FIXME should be event-driven...
 
 			//dictionary file, part 1:
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			EventBusService.publish(new TabbedPaneEnableEvent(dicLayeredPane, true));
 
 			//dictionary file, part 2:
 			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
+			EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
 
 			//thesaurus file:
 			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, theMenu.isEnabled());
+			EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
 
 			//hyphenation file:
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, hypMenu.isEnabled());
+			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
 
 			//auto–correct file:
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane,
-				(parserManager.getAcoParser().getCorrectionsCounter() > 0));
+			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane,
+				(parserManager.getAcoParser().getCorrectionsCounter() > 0)));
 
 			//sentence exceptions file:
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane,
-				(parserManager.getSexParser().getExceptionsCounter() > 0));
+			EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane,
+				(parserManager.getSexParser().getExceptionsCounter() > 0)));
 
 			//word exceptions file:
-			GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane,
-				(parserManager.getWexParser().getExceptionsCounter() > 0));
+			EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane,
+				(parserManager.getWexParser().getExceptionsCounter() > 0)));
 
 
 			//enable the first tab if the current one was disabled
@@ -576,6 +589,19 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}
 
+	@EventHandler
+	public void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
+		final JLayeredPane pane = evt.getPane();
+		final boolean enable = evt.isEnable();
+		if(pane != null){
+			final int index = mainTabbedPane.indexOfComponent(pane);
+			mainTabbedPane.setEnabledAt(index, enable);
+		}
+		else
+			for(int i = 0; i < mainTabbedPane.getComponentCount(); i ++)
+				mainTabbedPane.getComponent(i).setEnabled(enable);
+	}
+
 	private void loadFileCancelled(final Exception exc){
 		//menu:
 		filOpenProjectMenuItem.setEnabled(true);
@@ -589,7 +615,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
 
-		GUIUtils.forEachTabbedPane(mainTabbedPane, PanableInterface::clear);
+		EventBusService.publish(ACTION_COMMAND_CLEAR_ALL);
 
 		clearAllParsers();
 
@@ -600,17 +626,17 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 
-		GUIUtils.disableEachTabbedPane(mainTabbedPane);
+		EventBusService.publish(new TabbedPaneEnableEvent(false));
 	}
 
 
 	@Override
 	public void clearAffixParser(){
-		((PanableInterface)dicLayeredPane).clear();
-		((PanableInterface)cmpLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_DICTIONARY);
+		EventBusService.publish(ACTION_COMMAND_CLEAR_COMPOUNDS);
 
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(dicLayeredPane, false));
+		EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, false));
 
 		//disable menu
 		dicMenu.setEnabled(false);
@@ -623,45 +649,44 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void clearAidParser(){
-		((DictionaryLayeredPane)dicLayeredPane).clearAid();
-		((CompoundsLayeredPane)cmpLayeredPane).clearAid();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_AID);
 	}
 
 	@Override
 	public void clearThesaurusParser(){
-		((PanableInterface)theLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_THESAURUS);
 
 		theMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, false));
 	}
 
 	@Override
 	public void clearHyphenationParser(){
-		((PanableInterface)hypLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_HYPHENATION);
 
 		hypMenu.setEnabled(false);
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, false));
 	}
 
 	@Override
 	public void clearAutoCorrectParser(){
-		((PanableInterface)acoLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_AUTO_CORRECT);
 
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, acoLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, false));
 	}
 
 	@Override
 	public void clearSentenceExceptionsParser(){
-		((PanableInterface)sexLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_SENTENCE_EXCEPTIONS);
 
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, sexLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane, false));
 	}
 
 	@Override
 	public void clearWordExceptionsParser(){
-		((PanableInterface)wexLayeredPane).clear();
+		EventBusService.publish(ACTION_COMMAND_CLEAR_WORD_EXCEPTIONS);
 
-		GUIUtils.setTabbedPaneEnable(mainTabbedPane, wexLayeredPane, false);
+		EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane, false));
 	}
 
 	@Override
@@ -671,7 +696,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 //		dm.setCorrections(null);
 
 //		atxMenu.setEnabled(false);
-//		setTabbedPaneEnable(mainTabbedPane, atxLayeredPane, false);
+//		EventBusService.publish(new TabbedPaneEnableEvent(atxLayeredPane, false));
 	}
 
 

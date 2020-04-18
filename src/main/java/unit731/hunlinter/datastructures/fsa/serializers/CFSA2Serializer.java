@@ -36,11 +36,11 @@ public class CFSA2Serializer implements FSASerializer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
 
 	/** Supported flags */
-	private final static EnumSet<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
+	private static final EnumSet<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
 		FSAFlags.NEXTBIT);
 
 	/** No-state id */
-	private final static int NO_STATE = -1;
+	private static final int NO_STATE = -1;
 
 	private static final Comparator<IntIntHolder> COMPARATOR = (o1, o2) -> {
 		final int countDiff = o2.b - o1.b;

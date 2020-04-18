@@ -15,27 +15,27 @@ import java.util.Set;
 public class ConstantArcSizeFSA extends FSA{
 
 	/** Size of the target address field (constant for the builder) */
-	public final static int TARGET_ADDRESS_SIZE = 4;
+	public static final int TARGET_ADDRESS_SIZE = 4;
 	/** Size of the flags field (constant for the builder) */
-	public final static int FLAGS_SIZE = 1;
+	public static final int FLAGS_SIZE = 1;
 	/** Size of the label field (constant for the builder) */
-	public final static int LABEL_SIZE = 1;
+	public static final int LABEL_SIZE = 1;
 	/** Size of a single arc structure */
-	public final static int ARC_SIZE = FLAGS_SIZE + LABEL_SIZE + TARGET_ADDRESS_SIZE;
+	public static final int ARC_SIZE = FLAGS_SIZE + LABEL_SIZE + TARGET_ADDRESS_SIZE;
 	/** Offset of the flags field inside an arc */
-	public final static int FLAGS_OFFSET = 0;
+	public static final int FLAGS_OFFSET = 0;
 	/** Offset of the label field inside an arc */
-	public final static int LABEL_OFFSET = FLAGS_SIZE;
+	public static final int LABEL_OFFSET = FLAGS_SIZE;
 	/** Offset of the address field inside an arc */
-	public final static int ADDRESS_OFFSET = LABEL_OFFSET + LABEL_SIZE;
+	public static final int ADDRESS_OFFSET = LABEL_OFFSET + LABEL_SIZE;
 
 	/** A dummy address of the terminal state */
-	final static int TERMINAL_STATE = 0;
+	static final int TERMINAL_STATE = 0;
 
 	/** An arc flag indicating the arc is last within its state */
-	public final static int BIT_ARC_LAST = 0x01;
+	public static final int BIT_ARC_LAST = 0x01;
 	/** An arc flag indicating the target node of an arc corresponds to a final state */
-	public final static int BIT_ARC_FINAL = 0x02;
+	public static final int BIT_ARC_FINAL = 0x02;
 
 	/**
 	 * An epsilon state. The first and only arc of this state points either to the

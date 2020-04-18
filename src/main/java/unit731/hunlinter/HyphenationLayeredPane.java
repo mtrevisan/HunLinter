@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.PanableInterface;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
@@ -27,10 +26,12 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 
 
-public class HyphenationLayeredPane extends JLayeredPane implements PanableInterface{
+public class HyphenationLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 67463311214897950L;
 
@@ -79,6 +80,8 @@ final int iconSize = 17;
 			GUIUtils.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 		}
 		catch(final IOException ignored){}
+
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -340,13 +343,19 @@ final int iconSize = 17;
       dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed
 
-	@Override
-	public void initialize(){
+	@EventHandler
+	public void initialize(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_INITIALIZE))
+			return;
+
 		openHypButton.setEnabled(packager.getHyphenationFile() != null);
 	}
 
-	@Override
-	public void setCurrentFont(){
+	@EventHandler
+	public void setCurrentFont(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_SET_CURRENT_FONT))
+			return;
+
 		final Font currentFont = GUIUtils.getCurrentFont();
 		wordTextField.setFont(currentFont);
 		syllabationValueLabel.setFont(currentFont);
@@ -354,8 +363,11 @@ final int iconSize = 17;
 		addRuleSyllabationValueLabel.setFont(currentFont);
 	}
 
-	@Override
-	public void clear(){
+	@EventHandler
+	public void clear(final String actionCommand){
+		if(!actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_ALL) && !actionCommand.equals(MainFrame.ACTION_COMMAND_CLEAR_HYPHENATION))
+			return;
+
 		openHypButton.setEnabled(false);
 
 		formerHyphenationText = null;
