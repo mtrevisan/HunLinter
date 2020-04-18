@@ -22,7 +22,7 @@ import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
 import unit731.hunlinter.gui.ProjectFolderFilter;
-import unit731.hunlinter.gui.TabbedPaneEnableEvent;
+import unit731.hunlinter.gui.events.TabbedPaneEnableEvent;
 import unit731.hunlinter.parsers.HunLintable;
 
 import java.awt.event.ActionEvent;

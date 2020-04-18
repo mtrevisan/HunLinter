@@ -1,4 +1,4 @@
-package unit731.hunlinter.gui;
+package unit731.hunlinter.gui.models;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -6,14 +6,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+
 import unit731.hunlinter.parsers.vos.Inflection;
 
 
-public class CompoundTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Inflection>{
+public class InflectionTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Inflection>{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Inflection", "Morphological fields"};
+	private static final String[] COLUMN_NAMES = new String[]{"Inflection", "Morphological fields", "Applied rule 1", "Applied rule 2", "Applied rule 3"};
 
 
 	private List<Inflection> inflections;
@@ -45,6 +46,9 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 		return switch(columnIndex){
 			case 0 -> inflection.getWord();
 			case 1 -> inflection.getMorphologicalFields();
+			case 2 -> inflection.getAppliedRule(0);
+			case 3 -> inflection.getAppliedRule(1);
+			case 4 -> inflection.getAppliedRule(2);
 			default -> null;
 		};
 	}
@@ -52,11 +56,6 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 	@Override
 	public String getColumnName(final int column){
 		return COLUMN_NAMES[column];
-	}
-
-	@Override
-	public void clear(){
-		setInflections(null);
 	}
 
 	@SuppressWarnings("unused")

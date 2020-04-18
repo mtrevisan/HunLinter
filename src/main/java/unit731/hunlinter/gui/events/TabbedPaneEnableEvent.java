@@ -1,4 +1,4 @@
-package unit731.hunlinter.gui;
+package unit731.hunlinter.gui.events;
 
 import javax.swing.*;
 

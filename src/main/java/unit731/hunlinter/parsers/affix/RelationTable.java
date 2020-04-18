@@ -23,7 +23,6 @@ public class RelationTable{
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': bad number of entries, it must be '<option> <substitutions>'");
 	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': bad option, it must be {1}");
 
-	//TODO
 	//aß(ss) > a, ß, ss
 	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\()(?![^\\(]*\\))");
 

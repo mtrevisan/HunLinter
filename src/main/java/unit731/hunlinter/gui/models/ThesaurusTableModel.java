@@ -1,4 +1,4 @@
-package unit731.hunlinter.gui;
+package unit731.hunlinter.gui.models;
 
 import java.io.IOException;
 import java.io.NotSerializableException;

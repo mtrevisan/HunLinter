@@ -25,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.AutoCorrectTableModel;
+import unit731.hunlinter.gui.models.AutoCorrectTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.TableRenderer;
