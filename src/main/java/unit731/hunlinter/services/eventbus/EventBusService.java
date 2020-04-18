@@ -4,26 +4,22 @@ import java.util.ServiceLoader;
 
 
 /**
- * An {@link EventBus} factory that will return a singleton implementation loaded
- * via the Java 6 {@link ServiceLoader}. By default, without changes to the jar,
- * a {@link BasicEventBus} implementation will be returned via the factory methods.
+ * An {@link EventBusInterface} factory that will return a singleton implementation loaded via the Java 6
+ * {@link ServiceLoader}. By default, without changes to the jar, a {@link BasicEventBus} implementation
+ * will be returned via the factory methods.
  * <p>
- * This static factory also includes the same methods as EventBus which will delegate
- * to the ServiceLoader loaded instance.  Thus, the class creates a convenient single
- * location for which client code can be hooked to the configured EventBus.
+ * This static factory also includes the same methods as EventBus which will delegate to the ServiceLoader
+ * loaded instance. Thus, the class creates a convenient single location for which client code can be hooked
+ * to the configured EventBus.
  *
- * @author Adam Taft
+ * @see <a href="https://github.com/taftster/simpleeventbus">Simple Event Bus</a>
  */
 public final class EventBusService{
 
-	private static final EventBus EVENT_BUS;
-	static{
-		final ServiceLoader<EventBus> ldr = ServiceLoader.load(EventBus.class);
-		EVENT_BUS = ldr.iterator().next();
-	}
+	private static final EventBusInterface EVENT_BUS = new BasicEventBus();
 
 
-	public static EventBus getInstance(){
+	public static EventBusInterface getInstance(){
 		return EVENT_BUS;
 	}
 
