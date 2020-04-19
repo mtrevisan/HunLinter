@@ -92,17 +92,6 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	public abstract Set<FSAFlags> getFlags();
 
 	/**
-	 * @param node Identifier of the node.
-	 * @return Calculates and returns the number of arcs of a given node.
-	 */
-	public int getArcCount(final int node){
-		int count = 0;
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			count ++;
-		return count;
-	}
-
-	/**
 	 * @param node	Identifier of the node.
 	 * @return	The number of sequences reachable from the given state if the automaton was compiled with {@link FSAFlags#NUMBERS}. The size
 	 * 	of the right language of the state, in other words.
