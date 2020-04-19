@@ -631,6 +631,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

@@ -63,6 +63,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		return COLUMN_NAMES[column];
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

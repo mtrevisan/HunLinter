@@ -160,6 +160,7 @@ public class CorrectionDialog extends JDialog{
       dispose();
    }//GEN-LAST:event_btnOkActionPerformed
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

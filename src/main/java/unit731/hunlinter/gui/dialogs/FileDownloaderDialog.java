@@ -273,6 +273,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			fileProgressBar.setValue((Integer)evt.getNewValue());
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

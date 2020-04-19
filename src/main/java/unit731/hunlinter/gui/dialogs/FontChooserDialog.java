@@ -308,6 +308,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		sampleTextArea.setFont(sampleFont);
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

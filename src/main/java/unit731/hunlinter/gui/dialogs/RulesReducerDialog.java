@@ -316,6 +316,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		return optimizeClosedGroupCheckBox.isSelected();
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

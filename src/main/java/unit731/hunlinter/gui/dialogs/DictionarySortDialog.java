@@ -142,6 +142,8 @@ public class DictionarySortDialog extends JDialog{
 		model.addAll(listData);
 
 		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+
+		//TODO re-render sections
 	}
 
 	private void setCurrentFont(){
@@ -184,11 +186,11 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
-	public void setCellRenderer(ListCellRenderer<String> renderer){
+	private void setCellRenderer(final ListCellRenderer<String> renderer){
 		entriesList.setCellRenderer(renderer);
 	}
 
-	public void addListSelectionListener(ListSelectionListener listener){
+	public void addListSelectionListener(final ListSelectionListener listener){
 		entriesList.addListSelectionListener(listener);
 	}
 
@@ -199,6 +201,7 @@ public class DictionarySortDialog extends JDialog{
 	public int getSelectedIndex(){
 		return entriesList.getSelectedIndex();
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
