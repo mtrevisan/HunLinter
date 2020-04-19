@@ -143,7 +143,8 @@ public class DictionarySortDialog extends JDialog{
 
 		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 
-		//TODO re-render sections
+		//re-render sections
+		entriesList.repaint();
 	}
 
 	private void setCurrentFont(){
