@@ -84,7 +84,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		GUIUtils.addUndoManager(inputTextArea);
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(CompoundsLayeredPane.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

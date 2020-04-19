@@ -45,7 +45,7 @@ public class DictionarySortDialog extends JDialog{
 
 		lblMessage.setText("Select a section from the list:");
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(DictionarySortDialog.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

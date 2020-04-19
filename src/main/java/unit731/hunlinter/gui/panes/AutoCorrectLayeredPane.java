@@ -81,7 +81,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		GUIUtils.addUndoManager(incorrectTextField, correctTextField);
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(AutoCorrectLayeredPane.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

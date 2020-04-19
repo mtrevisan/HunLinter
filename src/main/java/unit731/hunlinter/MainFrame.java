@@ -106,6 +106,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT = 16;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS = 17;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS = 18;
+	public static final Integer ACTION_COMMAND_GUI_CLEAR_POS_DICTIONARY = 19;
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_ALL = 20;
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AFFIX = 21;
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_DICTIONARY = 22;
@@ -185,7 +186,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				catch(final Exception ignored){}
 			});
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(MainFrame.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

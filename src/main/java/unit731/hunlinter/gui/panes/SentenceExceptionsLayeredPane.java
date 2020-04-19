@@ -60,7 +60,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 		GUIUtils.addUndoManager(textField);
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(SentenceExceptionsLayeredPane.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

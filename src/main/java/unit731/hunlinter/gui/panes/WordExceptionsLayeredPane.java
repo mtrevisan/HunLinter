@@ -61,7 +61,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 		GUIUtils.addUndoManager(textField);
 
-		EventBusService.subscribe(this);
+		EventBusService.subscribe(WordExceptionsLayeredPane.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
