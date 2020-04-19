@@ -85,9 +85,8 @@ public class DictionaryParser{
 		if(boundaries.isEmpty())
 			calculateDictionaryBoundaries();
 
-		return searchBoundary(lineIndex)
-			.map(e -> boundaries.headMap(lineIndex, true).size() - 1)
-			.orElse(-1);
+		final Map.Entry<Integer, Integer> entry = searchBoundary(lineIndex);
+		return (entry != null? boundaries.headMap(lineIndex, true).size() - 1: -1);
 	}
 
 	private void calculateDictionaryBoundaries(){
@@ -143,13 +142,12 @@ public class DictionaryParser{
 	}
 
 	public final boolean isInBoundary(final int lineIndex){
-		return searchBoundary(lineIndex)
-			.isPresent();
+		return (searchBoundary(lineIndex) != null);
 	}
 
-	private Optional<Map.Entry<Integer, Integer>> searchBoundary(final int lineIndex){
-		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
-			.filter(e -> lineIndex <= e.getValue());
+	private Map.Entry<Integer, Integer> searchBoundary(final int lineIndex){
+		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
+		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
 

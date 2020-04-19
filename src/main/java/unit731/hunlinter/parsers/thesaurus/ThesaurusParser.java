@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
@@ -114,14 +114,17 @@ public class ThesaurusParser{
 		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
 			.split("\\s*,\\s*");
 
-		final String[] synonyms = Arrays.stream(StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR))
-			.map(String::trim)
-			.filter(StringUtils::isNotBlank)
-			.distinct()
-			.toArray(String[]::new);
-		if(synonyms.length < 2)
+		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
+		final List<String> list = new ArrayList<>(pas.length);
+		for(final String s : pas){
+			final String trim = s.trim();
+			if(StringUtils.isNotBlank(trim) && !list.contains(trim))
+				list.add(trim);
+		}
+		if(list.size() < 2)
 			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
+		final String[] synonyms = list.toArray(new String[0]);
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
 		boolean forceInsertion = duplicates.isEmpty();
 		if(!forceInsertion){

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -192,10 +192,11 @@ public class ConversionTable{
 	}
 
 	public String extractAsList(){
-		return table.values().stream()
-			.flatMap(List::stream)
-			.map(entry -> entry.getKey() + StringUtils.SPACE + entry.getValue())
-			.collect(Collectors.joining(", "));
+		final StringJoiner sj = new StringJoiner(", ");
+		for(final List<Pair<String, String>> pairs : table.values())
+			for(final Pair<String, String> entry : pairs)
+				sj.add(entry.getKey() + StringUtils.SPACE + entry.getValue());
+		return sj.toString();
 	}
 
 	@Override

@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -114,8 +113,11 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public String toLine(final String definition){
+		final StringJoiner sj = new StringJoiner(", ", "(", ")");
+		for(final String partOfSpeech : partOfSpeeches)
+			sj.add(partOfSpeech);
 		return (new StringJoiner(ThesaurusEntry.PIPE))
-			.add(Arrays.stream(partOfSpeeches).collect(Collectors.joining(", ", "(", ")")))
+			.add(sj.toString())
 			.add(StringUtils.join(synonyms, ThesaurusEntry.PIPE))
 			.add(definition)
 			.toString();
