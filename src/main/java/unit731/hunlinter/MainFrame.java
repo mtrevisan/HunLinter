@@ -482,12 +482,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			recentProjectsMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
+			final File baseFile = openProjectPathFileChooser.getSelectedFile();
+			recentProjectsMenu.addEntry(baseFile.getAbsolutePath());
 
 			recentProjectsMenu.setEnabled(true);
 			filEmptyRecentProjectsMenuItem.setEnabled(true);
 
-			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
