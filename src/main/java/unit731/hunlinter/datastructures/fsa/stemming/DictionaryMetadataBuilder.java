@@ -130,19 +130,17 @@ public class DictionaryMetadataBuilder{
 		return this;
 	}
 
-	public DictionaryMetadataBuilder withInputConversionPairs(Map<String, String> conversionPairs){
-		final StringBuffer builder = new StringBuffer();
-		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
-			final String k = e.getKey();
-			if(builder.length() > 0)
-				builder.append(", ");
-			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
-		}
-		attrs.put(DictionaryAttribute.INPUT_CONVERSION, builder.toString());
+	public DictionaryMetadataBuilder withInputConversionPairs(final Map<String, String> conversionPairs){
+		attrs.put(DictionaryAttribute.INPUT_CONVERSION, getConversionPairs(conversionPairs));
 		return this;
 	}
 
-	public DictionaryMetadataBuilder withOutputConversionPairs(Map<String, String> conversionPairs){
+	public DictionaryMetadataBuilder withOutputConversionPairs(final Map<String, String> conversionPairs){
+		attrs.put(DictionaryAttribute.OUTPUT_CONVERSION, getConversionPairs(conversionPairs));
+		return this;
+	}
+
+	private String getConversionPairs(final Map<String, String> conversionPairs){
 		final StringBuffer builder = new StringBuffer();
 		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
 			final String k = e.getKey();
@@ -150,8 +148,7 @@ public class DictionaryMetadataBuilder{
 				builder.append(", ");
 			builder.append(k).append(StringUtils.SPACE).append(conversionPairs.get(k));
 		}
-		attrs.put(DictionaryAttribute.OUTPUT_CONVERSION, builder.toString());
-		return this;
+		return builder.toString();
 	}
 
 
