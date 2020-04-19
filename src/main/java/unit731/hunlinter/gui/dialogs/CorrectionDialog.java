@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.dialogs;
 
 import java.awt.*;
 import java.io.IOException;

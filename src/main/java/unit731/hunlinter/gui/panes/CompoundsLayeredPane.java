@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,6 +22,7 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.models.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;

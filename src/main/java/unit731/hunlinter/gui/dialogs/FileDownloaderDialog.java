@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.dialogs;
 
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -17,6 +17,7 @@ import javax.swing.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.semanticversioning.Version;
 import unit731.hunlinter.services.system.JavaHelper;

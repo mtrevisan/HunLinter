@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.dialogs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

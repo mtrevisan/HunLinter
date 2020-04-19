@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.components.JTagPanel;
@@ -24,26 +25,27 @@ import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.text.StringHelper;
 
 
-public class SentenceExceptionsLayeredPane extends JLayeredPane{
+public class WordExceptionsLayeredPane extends JLayeredPane{
 
-	private static final long serialVersionUID = -4277472579904204046L;
+	private static final long serialVersionUID = -2701221843193072823L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SentenceExceptionsLayeredPane.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordExceptionsLayeredPane.class);
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Debouncer<SentenceExceptionsLayeredPane> debouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
+	private final Debouncer<WordExceptionsLayeredPane> debouncer = new Debouncer<>(this::filterWordExceptions, DEBOUNCER_INTERVAL);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
 
-	private String formerFilterSentenceException;
+	private String formerFilterWordException;
 
 
-	public SentenceExceptionsLayeredPane(final Packager packager, final ParserManager parserManager){
+	public WordExceptionsLayeredPane(final Packager packager, final ParserManager parserManager){
 		Objects.requireNonNull(packager);
 		Objects.requireNonNull(parserManager);
 
@@ -71,10 +73,10 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
       scrollPane = new javax.swing.JScrollPane();
       scrollPane.getVerticalScrollBar().setUnitIncrement(16);
       tagPanel = new JTagPanel((changeType, tags) -> {
-         final ExceptionsParser sexParser = parserManager.getSexParser();
-         sexParser.modify(changeType, tags);
+         final ExceptionsParser wexParser = parserManager.getWexParser();
+         wexParser.modify(changeType, tags);
          try{
-            sexParser.save(packager.getSentenceExceptionsFile());
+            wexParser.save(packager.getWordExceptionsFile());
          }
          catch(final TransformerException e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
@@ -82,7 +84,9 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
       });
       correctionsRecordedLabel = new javax.swing.JLabel();
       correctionsRecordedValueLabel = new javax.swing.JLabel();
-      openSexButton = new javax.swing.JButton();
+      openWexButton = new javax.swing.JButton();
+
+      setPreferredSize(new java.awt.Dimension(929, 273));
 
       inputLabel.setText("Exception:");
 
@@ -109,9 +113,9 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
       correctionsRecordedValueLabel.setText("…");
 
-      openSexButton.setAction(new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager));
-      openSexButton.setText("Open Sentence Exceptions");
-      openSexButton.setEnabled(false);
+      openWexButton.setAction(new OpenFileAction(Packager.KEY_FILE_WORD_EXCEPTIONS, packager));
+      openWexButton.setText("Open Word Exceptions");
+      openWexButton.setEnabled(false);
 
       setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -119,7 +123,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
       setLayer(scrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(correctionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(openSexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
@@ -132,10 +136,10 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
                .addGroup(layout.createSequentialGroup()
                   .addComponent(correctionsRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(correctionsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                  .addComponent(correctionsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(openSexButton))
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                  .addComponent(openWexButton))
+               .addGroup(layout.createSequentialGroup()
                   .addComponent(inputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(textField)
@@ -148,8 +152,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(inputLabel)
+               .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(addButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
@@ -157,29 +161,29 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(correctionsRecordedLabel)
                .addComponent(correctionsRecordedValueLabel)
-               .addComponent(openSexButton))
+               .addComponent(openWexButton))
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
 
    private void textFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
-		debouncer.call(this);
+      debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          final String exception = textField.getText().trim();
-         if(!parserManager.getSexParser().contains(exception)){
-            parserManager.getSexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
+         if(!parserManager.getWexParser().contains(exception)){
+            parserManager.getWexParser().modify(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(exception));
             tagPanel.addTag(exception);
 
             //reset input
             textField.setText(StringUtils.EMPTY);
             tagPanel.applyFilter(null);
 
-            updateSentenceExceptionsCounter();
+            updateWordExceptionsCounter();
 
-            parserManager.storeSentenceExceptionFile();
+            parserManager.storeWordExceptionFile();
          }
          else{
             textField.requestFocusInWindow();
@@ -200,13 +204,12 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
-		if(parserManager.getSexParser().getExceptionsCounter() > 0){
-			updateSentenceExceptionsCounter();
-
-			final List<String> sentenceExceptions = parserManager.getSexParser().getExceptionsDictionary();
-			tagPanel.initializeTags(sentenceExceptions);
+		if(parserManager.getWexParser().getExceptionsCounter() > 0){
+			final List<String> wordExceptions = parserManager.getWexParser().getExceptionsDictionary();
+			tagPanel.initializeTags(wordExceptions);
+			updateWordExceptionsCounter();
 		}
-		openSexButton.setEnabled(packager.getSentenceExceptionsFile() != null);
+		openWexButton.setEnabled(packager.getWordExceptionsFile() != null);
 	}
 
 	@EventHandler
@@ -222,35 +225,34 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 	@EventHandler
 	public void clear(final Integer actionCommand){
 		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS)
+		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;
 
-		formerFilterSentenceException = null;
+		formerFilterWordException = null;
 		textField.setText(null);
 
-		openSexButton.setEnabled(false);
+		openWexButton.setEnabled(false);
 		tagPanel.applyFilter(null);
 		tagPanel.initializeTags(null);
 	}
 
-	private void filterSentenceExceptions(){
+	private void filterWordExceptions(){
 		final String unmodifiedException = textField.getText().trim();
-		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
+		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
 			return;
 
-		formerFilterSentenceException = unmodifiedException;
+		formerFilterWordException = unmodifiedException;
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
-		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".")
-			&& !alreadyContained);
+		final boolean alreadyContained = parserManager.getWexParser().contains(unmodifiedException);
+		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && StringHelper.countUppercases(unmodifiedException) > 1 && !alreadyContained);
 
 
 		tagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);
 	}
 
-	private void updateSentenceExceptionsCounter(){
-		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
+	private void updateWordExceptionsCounter(){
+		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getWexParser().getExceptionsCounter()));
 	}
 
 
@@ -270,9 +272,9 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
    private javax.swing.JLabel correctionsRecordedLabel;
    private javax.swing.JLabel correctionsRecordedValueLabel;
    private javax.swing.JLabel inputLabel;
-   private javax.swing.JButton openSexButton;
+   private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane scrollPane;
-   private JTagPanel tagPanel;
+   private unit731.hunlinter.gui.components.JTagPanel tagPanel;
    private javax.swing.JTextField textField;
    // End of variables declaration//GEN-END:variables
 }

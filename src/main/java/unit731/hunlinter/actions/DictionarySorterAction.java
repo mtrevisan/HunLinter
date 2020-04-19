@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.DictionarySortDialog;
+import unit731.hunlinter.gui.dialogs.DictionarySortDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.WorkerManager;

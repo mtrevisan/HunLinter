@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.RulesReducerDialog;
+import unit731.hunlinter.gui.dialogs.RulesReducerDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 

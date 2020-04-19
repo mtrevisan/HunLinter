@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.HelpDialog;
+import unit731.hunlinter.gui.dialogs.HelpDialog;
 import unit731.hunlinter.gui.GUIUtils;
 
 import javax.swing.*;

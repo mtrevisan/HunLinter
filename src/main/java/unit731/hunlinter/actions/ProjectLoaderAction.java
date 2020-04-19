@@ -2,7 +2,7 @@ package unit731.hunlinter.actions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.LanguageChooserDialog;
+import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.RegexHelper;

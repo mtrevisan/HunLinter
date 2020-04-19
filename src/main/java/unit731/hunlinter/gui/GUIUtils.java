@@ -32,7 +32,7 @@ import javax.swing.undo.UndoManager;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.FontChooserDialog;
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.RegexHelper;

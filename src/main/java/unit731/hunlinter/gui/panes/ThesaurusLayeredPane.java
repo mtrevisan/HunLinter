@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
 import java.awt.event.InputEvent;
@@ -21,6 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.renderers.TableRenderer;

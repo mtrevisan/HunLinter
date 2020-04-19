@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.FontChooserDialog;
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 

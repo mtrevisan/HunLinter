@@ -2,7 +2,7 @@ package unit731.hunlinter.actions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.FileDownloaderDialog;
+import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import unit731.hunlinter.gui.GUIUtils;
 
 import javax.swing.*;

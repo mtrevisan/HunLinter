@@ -1,5 +1,14 @@
 package unit731.hunlinter;
 
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
+import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
+import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
+import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
+import unit731.hunlinter.gui.panes.HyphenationLayeredPane;
+import unit731.hunlinter.gui.panes.ThesaurusLayeredPane;
+import unit731.hunlinter.gui.panes.CompoundsLayeredPane;
+import unit731.hunlinter.gui.panes.WordExceptionsLayeredPane;
+import unit731.hunlinter.gui.panes.DictionaryLayeredPane;
 import java.awt.*;
 
 import unit731.hunlinter.actions.AboutAction;

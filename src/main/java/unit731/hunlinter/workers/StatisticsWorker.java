@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import unit731.hunlinter.DictionaryStatisticsDialog;
+import unit731.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;

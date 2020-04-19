@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.dialogs;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -124,7 +124,7 @@ public class HelpDialog extends JDialog{
 
       managedOptionsTextArea.setEditable(false);
       managedOptionsTextArea.setColumns(20);
-      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
+      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
       managedOptionsTextArea.setLineWrap(true);
       managedOptionsTextArea.setRows(1);
       managedOptionsTextArea.setTabSize(3);

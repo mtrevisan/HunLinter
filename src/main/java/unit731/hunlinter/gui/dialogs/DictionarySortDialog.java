@@ -1,4 +1,4 @@
-package unit731.hunlinter;
+package unit731.hunlinter.gui.dialogs;
 
 import java.awt.*;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
+import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
