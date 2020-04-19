@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -122,64 +124,48 @@ public class DuplicatesWorker extends WorkerDictionary{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates(){
+		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
+
 		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
 			DuplicatesDictionaryBaseData.getInstance());
 
-		final File dicFile = dicParser.getDicFile();
-		try{
-			//read entire file in memory
-			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
-			ParserHelper.assertLinesCount(lines);
+		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
+			try{
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			long readSoFar = lines.get(0).getBytes(charset).length + 2;
-
-			int lineIndex = 1;
-			final long totalSize = dicFile.length();
-			for(; lineIndex < lines.size(); lineIndex ++){
-				final String line = lines.get(lineIndex);
-				readSoFar += line.getBytes(charset).length + 2;
-
-				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
-					try{
-						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-						for(final Inflection inflection : inflections){
-							final String str = inflection.toStringWithPartOfSpeechFields();
-							if(!bloomFilter.add(str))
-								duplicatesBloomFilter.add(str);
-						}
-					}
-					catch(final LinterException e){
-						LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
-					}
+				for(final Inflection inflection : inflections){
+					final String str = inflection.toStringWithPartOfSpeechFields();
+					if(!bloomFilter.add(str))
+						duplicatesBloomFilter.add(str);
 				}
-
-				setProgress(readSoFar, totalSize);
-
-				sleepOnPause();
 			}
+			catch(final LinterException e){
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+			}
+		};
+		final Consumer<Integer> progressCallback = lineIndex -> {
+			setProgress(lineIndex);
 
-			bloomFilter.close();
-			bloomFilter.clear();
-			duplicatesBloomFilter.close();
+			sleepOnPause();
+		};
+		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
+			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
-			setProgress(100);
+		bloomFilter.close();
+		bloomFilter.clear();
+		duplicatesBloomFilter.close();
 
-			final int totalInflections = bloomFilter.getAddedElements();
-			final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
-				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
+		final int totalInflections = bloomFilter.getAddedElements();
+		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
-			return duplicatesBloomFilter;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
+		return duplicatesBloomFilter;
 	}
 
 	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
@@ -190,45 +176,30 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
-			try{
-				//read entire file in memory
-				final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
-				ParserHelper.assertLinesCount(lines);
+			final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
+				try{
+					final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+					final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				long readSoFar = lines.get(0).getBytes(charset).length + 2;
-
-				int lineIndex = 1;
-				final long totalSize = dicFile.length();
-				for(; lineIndex < lines.size(); lineIndex ++){
-					final String line = lines.get(lineIndex);
-					readSoFar += line.getBytes(charset).length + 2;
-
-					if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
-						try{
-							final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-							final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-							final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
-							result.ensureCapacity(result.size() + inflections.length);
-							for(final Inflection inflection : inflections){
-								final String text = inflection.toStringWithPartOfSpeechFields();
-								if(duplicatesBloomFilter.contains(text))
-									result.add(new Duplicate(inflection, word, lineIndex));
-							}
-						}
-						catch(final Exception e){
-							LOGGER.warn(ParserManager.MARKER_APPLICATION, e.getMessage());
-						}
+					final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
+					result.ensureCapacity(result.size() + inflections.length);
+					for(final Inflection inflection : inflections){
+						final String text = inflection.toStringWithPartOfSpeechFields();
+						if(duplicatesBloomFilter.contains(text))
+							result.add(new Duplicate(inflection, word, lineIndex));
 					}
-
-					setProgress(readSoFar, totalSize);
-
-					sleepOnPause();
 				}
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
-			setProgress(100);
+				catch(final LinterException e){
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+				}
+			};
+			final Consumer<Integer> progressCallback = lineIndex -> {
+				setProgress(lineIndex);
+
+				sleepOnPause();
+			};
+			ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
+				ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
 			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			final double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();

@@ -3,24 +3,23 @@ package unit731.hunlinter.parsers.dictionary;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Scanner;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 
 public class DictionaryParser{
@@ -72,9 +71,8 @@ public class DictionaryParser{
 	}
 
 	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
-		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
-			.filter(e -> lineIndex <= e.getValue())
-			.orElse(null);
+		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
+		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
 	public final boolean removeBoundary(final int boundaryIndex){
@@ -90,19 +88,16 @@ public class DictionaryParser{
 	}
 
 	private void calculateDictionaryBoundaries(){
-		try{
-			//read entire file in memory
-			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
-			ParserHelper.assertLinesCount(lines);
-
-			boundaries.clear();
+		boundaries.clear();
+		try(final Scanner scanner = FileHelper.createScanner(dicFile.toPath(), charset)){
+			ParserHelper.assertLinesCount(scanner);
 
 			String prevLine = null;
 			int startSection = -1;
 			boolean needSorting = false;
 			int lineIndex = 1;
-			for(; lineIndex < lines.size(); lineIndex ++){
-				final String line = lines.get(lineIndex);
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
 				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
 					if(startSection < 0)
 						startSection = lineIndex;
@@ -115,12 +110,16 @@ public class DictionaryParser{
 					//filter out single word that doesn't need to be sorted
 					if(lineIndex - startSection > 2 && needSorting)
 						boundaries.put(startSection, lineIndex);
+
+					//reset for next section
 					prevLine = null;
 					startSection = -1;
 					needSorting = false;
 				}
+
+				lineIndex ++;
 			}
-			//filter out single word that doesn't need to be sorted
+			//add last section if needed (filter out single word that doesn't need to be sorted)
 			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
 				boundaries.put(startSection, lineIndex);
 		}
@@ -130,15 +129,13 @@ public class DictionaryParser{
 	}
 
 	public final int getNextBoundaryIndex(final int lineIndex){
-		return Optional.ofNullable(boundaries.higherEntry(lineIndex))
-			.map(Map.Entry::getKey)
-			.orElse(-1);
+		final Map.Entry<Integer, Integer> entry = boundaries.higherEntry(lineIndex);
+		return (entry != null? entry.getKey(): -1);
 	}
 
 	public final int getPreviousBoundaryIndex(final int lineIndex){
-		return Optional.ofNullable(boundaries.lowerEntry(lineIndex))
-			.map(Map.Entry::getKey)
-			.orElse(-1);
+		final Map.Entry<Integer, Integer> entry = boundaries.lowerEntry(lineIndex);
+		return (entry != null? entry.getKey(): -1);
 	}
 
 	public final boolean isInBoundary(final int lineIndex){

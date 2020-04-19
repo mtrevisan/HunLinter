@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
@@ -115,41 +117,26 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
+		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
+			try{
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-		try{
-			//read entire file in memory
-			final List<String> lines = Files.readAllLines(dicFile.toPath(), charset);
-			ParserHelper.assertLinesCount(lines);
-
-			final int totalLines = lines.size();
-			for(int currentLine = 1; currentLine < totalLines; currentLine ++){
-				final String line = lines.get(currentLine);
-
-				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
-					try{
-						final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-						final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-						for(final Inflection inflection : inflections)
-							if(checker.shouldBeProcessedForMinimalPair(inflection)){
-								list.add(inflection.getWord());
-
-								sleepOnPause();
-							}
-					}
-					catch(final LinterException e){
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), currentLine, line);
-					}
-				}
-
-				setProgress(currentLine, totalLines);
-
-				sleepOnPause();
+				LoopHelper.applyIf(inflections,
+					checker::shouldBeProcessedForMinimalPair,
+					inflection -> list.add(inflection.getWord()));
 			}
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
-		}
+			catch(final LinterException e){
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+			}
+		};
+		final Consumer<Integer> progressCallback = lineIndex -> {
+			setProgress(lineIndex);
+
+			sleepOnPause();
+		};
+		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
+			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
 		list.sort(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator));
 		return list;

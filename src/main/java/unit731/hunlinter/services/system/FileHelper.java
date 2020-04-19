@@ -7,8 +7,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
@@ -167,6 +169,19 @@ public class FileHelper{
 		final BOMInputStream bomis = new BOMInputStream(is, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
 		return new Scanner(bomis, charset);
+	}
+
+	public static int getLinesCount(final File file, final Charset charset){
+		int lines = 0;
+		try(final LineNumberReader reader = new LineNumberReader(new FileReader(file, charset))){
+			//skip to the end of file
+			reader.skip(Integer.MAX_VALUE);
+			lines = reader.getLineNumber() + 1;
+		}
+		catch(final IOException e){
+			e.printStackTrace();
+		}
+		return lines;
 	}
 
 	public static long getFileSize(final File file){
