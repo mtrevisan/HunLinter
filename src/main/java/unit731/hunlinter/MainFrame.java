@@ -316,7 +316,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new unit731.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
@@ -383,7 +383,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(dicMenu);
 
-      theMenu.setMnemonic('D');
+      theMenu.setMnemonic('T');
       theMenu.setText("Thesaurus tools");
       theMenu.setEnabled(false);
 

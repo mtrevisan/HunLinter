@@ -189,7 +189,7 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="theMenu">
           <Properties>
-            <Property name="mnemonic" type="int" value="68"/>
+            <Property name="mnemonic" type="int" value="84"/>
             <Property name="text" type="java.lang.String" value="Thesaurus tools"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
