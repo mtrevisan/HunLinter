@@ -21,9 +21,9 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="resultScrollPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="correctionsRecordedLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="posRecordedLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="correctionsRecordedValueLabel" pref="732" max="32767" attributes="0"/>
+                      <Component id="posRecordedValueLabel" pref="732" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="openPoSFSAButton" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -49,8 +49,8 @@
               <Component id="resultScrollPane" pref="191" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="correctionsRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="correctionsRecordedValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="posRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="posRecordedValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openPoSFSAButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -88,24 +88,23 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="correctionsRecordedLabel">
+    <Component class="javax.swing.JLabel" name="posRecordedLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="PoS recorded:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="correctionsRecordedValueLabel">
+    <Component class="javax.swing.JLabel" name="posRecordedValueLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x2026;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="openPoSFSAButton">
       <Properties>
-        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager)" type="code"/>
-        </Property>
         <Property name="text" type="java.lang.String" value="Load PoS FSA"/>
-        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openPoSFSAButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

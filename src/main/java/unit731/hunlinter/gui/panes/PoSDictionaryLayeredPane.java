@@ -1,16 +1,17 @@
 package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Path;
 import java.util.Objects;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -22,16 +23,17 @@ import unit731.hunlinter.services.system.Debouncer;
 
 public class PoSDictionaryLayeredPane extends JLayeredPane{
 
-	private static final long serialVersionUID = -4277472579904204046L;
+	private static final long serialVersionUID = 1011325870107687156L;
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 
-	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::filterSentenceExceptions, DEBOUNCER_INTERVAL);
+	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
 
+	private JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 
 
@@ -41,6 +43,11 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 		this.packager = packager;
 		this.parserManager = parserManager;
+
+
+		openPoSDictionaryFileChooser = new JFileChooser();
+		openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+		openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 
 		initComponents();
@@ -61,8 +68,8 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
       textField = new javax.swing.JTextField();
       resultScrollPane = new javax.swing.JScrollPane();
       resultTextArea = new javax.swing.JTextArea();
-      correctionsRecordedLabel = new javax.swing.JLabel();
-      correctionsRecordedValueLabel = new javax.swing.JLabel();
+      posRecordedLabel = new javax.swing.JLabel();
+      posRecordedValueLabel = new javax.swing.JLabel();
       openPoSFSAButton = new javax.swing.JButton();
 
       inputLabel.setText("Sentence:");
@@ -79,19 +86,22 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
       resultTextArea.setRows(5);
       resultScrollPane.setViewportView(resultTextArea);
 
-      correctionsRecordedLabel.setText("PoS recorded:");
+      posRecordedLabel.setText("PoS recorded:");
 
-      correctionsRecordedValueLabel.setText("…");
+      posRecordedValueLabel.setText("…");
 
-      openPoSFSAButton.setAction(new OpenFileAction(Packager.KEY_FILE_SENTENCE_EXCEPTIONS, packager));
       openPoSFSAButton.setText("Load PoS FSA");
-      openPoSFSAButton.setEnabled(false);
+      openPoSFSAButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            openPoSFSAButtonActionPerformed(evt);
+         }
+      });
 
       setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(resultScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(correctionsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(posRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      setLayer(posRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openPoSFSAButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -103,9 +113,9 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(resultScrollPane)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(correctionsRecordedLabel)
+                  .addComponent(posRecordedLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(correctionsRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                  .addComponent(posRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(openPoSFSAButton))
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -125,8 +135,8 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
             .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(correctionsRecordedLabel)
-               .addComponent(correctionsRecordedValueLabel)
+               .addComponent(posRecordedLabel)
+               .addComponent(posRecordedValueLabel)
                .addComponent(openPoSFSAButton))
             .addContainerGap())
       );
@@ -136,16 +146,18 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
-	@EventHandler
-	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
-			return;
-
-		if(parserManager.getSexParser().getExceptionsCounter() > 0){
-			updateSentenceExceptionsCounter();
+   private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
+		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
+		if(projectSelected == JFileChooser.APPROVE_OPTION){
+			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();
+			loadFile(baseFile.toPath());
 		}
-		openPoSFSAButton.setEnabled(packager.getSentenceExceptionsFile() != null);
+   }//GEN-LAST:event_openPoSFSAButtonActionPerformed
+
+	private void loadFile(final Path basePath){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		//TODO
 	}
 
 	@EventHandler
@@ -166,25 +178,21 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 		formerFilterInputText = null;
 		textField.setText(null);
-
-		openPoSFSAButton.setEnabled(false);
 	}
 
-	private void filterSentenceExceptions(){
+	private void processSentence(){
 		final String unmodifiedException = textField.getText().trim();
 		if(formerFilterInputText != null && formerFilterInputText.equals(unmodifiedException))
 			return;
 
 		formerFilterInputText = unmodifiedException;
 
-		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
-		openPoSFSAButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".")
-			&& !alreadyContained);
+		//TODO
 	}
 
-	private void updateSentenceExceptionsCounter(){
-		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
+	private void updatePoSCounter(){
+		//TODO
+		posRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
 	}
 
 
@@ -200,10 +208,10 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JLabel correctionsRecordedLabel;
-   private javax.swing.JLabel correctionsRecordedValueLabel;
    private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openPoSFSAButton;
+   private javax.swing.JLabel posRecordedLabel;
+   private javax.swing.JLabel posRecordedValueLabel;
    private javax.swing.JScrollPane resultScrollPane;
    private javax.swing.JTextArea resultTextArea;
    private javax.swing.JTextField textField;
