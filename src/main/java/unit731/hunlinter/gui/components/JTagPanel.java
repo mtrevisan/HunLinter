@@ -43,12 +43,25 @@ public class JTagPanel extends JPanel{
 		return UIManager.getColor("TextField.background");
 	}
 
+	@Override
+	public void setFont(final Font font){
+		//set font for each tag
+		for(final Component component : getComponents())
+			component.setFont(font);
+		invalidate();
+
+		forceRepaint();
+	}
+
 	public void initializeTags(final List<String> tags){
 		synchronized(getTreeLock()){
 			if(tags == null)
 				removeAll();
 			else
-				forEach(tags, this::createAndAddTag);
+				forEach(tags, tag -> {
+					final JTagComponent component = new JTagComponent(tag, this::removeTag);
+					add(component, BorderLayout.LINE_END);
+				});
 
 			forceRepaint();
 		}
@@ -56,18 +69,14 @@ public class JTagPanel extends JPanel{
 
 	public void addTag(final String tag){
 		synchronized(getTreeLock()){
-			createAndAddTag(tag);
+			final JTagComponent component = new JTagComponent(tag, this::removeTag);
+			add(component, BorderLayout.LINE_END);
 
 			if(tagsChanged != null)
 				tagsChanged.accept(ExceptionsParser.TagChangeType.ADD, Collections.singletonList(tag));
 
 			forceRepaint();
 		}
-	}
-
-	private void createAndAddTag(final String tag){
-		final JTagComponent component = new JTagComponent(tag, this::removeTag);
-		add(component, BorderLayout.LINE_END);
 	}
 
 	private void removeTag(final JTagComponent tag){
@@ -182,6 +191,15 @@ public class JTagPanel extends JPanel{
 			graphics.drawRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);
 			//reset strokes to default
 			graphics.setStroke(new BasicStroke());
+		}
+
+		@Override
+		public void setFont(final Font font){
+			final JLabel component = (JLabel)getComponent(0);
+			component.setFont(font);
+
+			component.invalidate();
+			validate();
 		}
 
 		public String getTag(){

@@ -1,6 +1,5 @@
 package unit731.hunlinter.gui.panes;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -354,17 +353,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 		openAidButton.setEnabled(aidLinesPresent);
-	}
-
-	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		inputTextArea.setFont(currentFont);
-		table.setFont(currentFont);
 	}
 
 	@EventHandler

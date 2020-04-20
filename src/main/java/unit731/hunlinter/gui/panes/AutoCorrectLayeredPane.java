@@ -1,6 +1,5 @@
 package unit731.hunlinter.gui.panes;
 
-import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -323,18 +322,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			updateAutoCorrectionsCounter();
 		}
 		openAcoButton.setEnabled(packager.getAutoCorrectFile() != null);
-	}
-
-	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		incorrectTextField.setFont(currentFont);
-		correctTextField.setFont(currentFont);
-		table.setFont(currentFont);
 	}
 
 	@EventHandler

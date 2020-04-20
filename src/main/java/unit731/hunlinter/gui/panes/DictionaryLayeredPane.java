@@ -75,7 +75,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		FontHelper.addFontableProperty(inputTextField);
+		FontHelper.addFontableProperty(inputTextField, table);
 
 		GUIHelper.addUndoManager(inputTextField);
 
@@ -273,17 +273,6 @@ final int iconSize = 17;
 
 			LOGGER.error("A bad error occurred", e);
 		}
-	}
-
-	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		inputTextField.setFont(currentFont);
-		table.setFont(currentFont);
 	}
 
 	@EventHandler

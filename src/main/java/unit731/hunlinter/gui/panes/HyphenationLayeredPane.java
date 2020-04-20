@@ -1,6 +1,5 @@
 package unit731.hunlinter.gui.panes;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -353,19 +352,6 @@ final int iconSize = 17;
 			return;
 
 		openHypButton.setEnabled(packager.getHyphenationFile() != null);
-	}
-
-	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		wordTextField.setFont(currentFont);
-		syllabationValueLabel.setFont(currentFont);
-		addRuleTextField.setFont(currentFont);
-		addRuleSyllabationValueLabel.setFont(currentFont);
 	}
 
 	@EventHandler

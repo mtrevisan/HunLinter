@@ -295,17 +295,6 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		synonymsTextField.setFont(currentFont);
-		table.setFont(currentFont);
-	}
-
-	@EventHandler
 	public void clear(final Integer actionCommand){
 		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)

@@ -1,6 +1,5 @@
 package unit731.hunlinter.gui.panes;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -12,6 +11,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
@@ -36,6 +37,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
+	private DictionaryLookup dictionaryLookup;
 
 
 	public PoSDictionaryLayeredPane(final Packager packager, final ParserManager parserManager){
@@ -151,24 +153,20 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();
-			loadFile(baseFile.toPath());
+			loadFSAFile(baseFile.toPath());
 		}
    }//GEN-LAST:event_openPoSFSAButtonActionPerformed
 
-	private void loadFile(final Path basePath){
+	private void loadFSAFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		//TODO
-	}
-
-	@EventHandler
-	public void setCurrentFont(final Integer actionCommand){
-		//noinspection NumberEquality
-		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
-			return;
-
-		final Font currentFont = FontHelper.getCurrentFont();
-		resultTextArea.setFont(currentFont);
+		try{
+			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
+		}
+		catch(final Exception e){
+			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA",
+				"Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	@EventHandler
