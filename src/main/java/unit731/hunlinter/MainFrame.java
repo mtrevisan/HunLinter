@@ -97,7 +97,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private static final Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);
 
 	public static final Integer ACTION_COMMAND_INITIALIZE = 0;
-	public static final Integer ACTION_COMMAND_SET_CURRENT_FONT = 1;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_ALL = 10;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_DICTIONARY = 11;
 	public static final Integer ACTION_COMMAND_GUI_CLEAR_AID = 12;
@@ -539,9 +538,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	private void loadFileCompleted(){
-		//restore default font (changed for reporting reading errors)
-		setCurrentFont();
-
 		parserManager.registerFileListener();
 		parserManager.startFileListener();
 
@@ -603,13 +599,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			LOGGER.error("A bad error occurred", e);
 		}
-	}
-
-	private void setCurrentFont(){
-		final Font currentFont = FontHelper.getCurrentFont();
-		parsingResultTextArea.setFont(currentFont);
-
-		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);
 	}
 
 	@EventHandler
