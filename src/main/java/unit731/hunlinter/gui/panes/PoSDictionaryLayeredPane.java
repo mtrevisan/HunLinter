@@ -12,7 +12,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.Packager;
@@ -54,9 +55,9 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(textField, resultTextArea);
+		FontHelper.addFontableProperty(textField, resultTextArea);
 
-		GUIUtils.addUndoManager(textField);
+		GUIHelper.addUndoManager(textField);
 
 		EventBusService.subscribe(PoSDictionaryLayeredPane.this);
 	}
@@ -166,7 +167,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		resultTextArea.setFont(currentFont);
 	}
 
