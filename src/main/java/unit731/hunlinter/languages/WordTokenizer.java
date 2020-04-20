@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  *
  * @see <a href="https://rgxdb.com/try">Regex DB</a>
  */
-public class WordTokenizer implements WordTokenizerInterface{
+public class WordTokenizer{
 
 	//@see <a href="https://www.ietf.org/rfc/rfc4648.txt">RFC-4648</a>
 	private static final String BASE64 = "(?:[a-zA-Z0-9+\\/]{4})*(?:[a-zA-Z0-9+\\/]{3}=|[a-zA-Z0-9+\\/]{2}==|[a-zA-Z0-9+\\/]{1}===)";
@@ -73,7 +73,6 @@ public class WordTokenizer implements WordTokenizerInterface{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
-	@Override
 	public List<String> tokenize(String text){
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 

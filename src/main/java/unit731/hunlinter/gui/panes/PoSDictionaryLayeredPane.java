@@ -5,18 +5,24 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import unit731.hunlinter.datastructures.fsa.lookup.WordData;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.WordTokenizer;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
@@ -31,20 +37,19 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
-	private final Packager packager;
-	private final ParserManager parserManager;
+	private final WordTokenizer wordTokenizer;
+	private final Charset charset;
 
 	private JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
 
-	public PoSDictionaryLayeredPane(final Packager packager, final ParserManager parserManager){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+	public PoSDictionaryLayeredPane(final AffixData affixData){
+		Objects.requireNonNull(affixData);
 
-		this.packager = packager;
-		this.parserManager = parserManager;
+		wordTokenizer = BaseBuilder.getWordTokenizer(affixData.getLanguage());
+		charset = affixData.getCharset();
 
 
 		openPoSDictionaryFileChooser = new JFileChooser();
@@ -165,13 +170,31 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 	}
 
 	private void processSentence(){
-		final String unmodifiedException = textField.getText().trim();
-		if(formerFilterInputText != null && formerFilterInputText.equals(unmodifiedException))
+		final String inputText = textField.getText().trim();
+		if(formerFilterInputText != null && formerFilterInputText.equals(inputText))
 			return;
 
-		formerFilterInputText = unmodifiedException;
+		formerFilterInputText = inputText;
 
-		//TODO
+
+		final StringJoiner sj = new StringJoiner(StringUtils.LF);
+		final List<String> tokens = wordTokenizer.tokenize(inputText);
+		if(dictionaryLookup != null)
+			for(final String token : tokens){
+				final StringJoiner readings = new StringJoiner("|");
+				final WordData[] datas = dictionaryLookup.lookup(token);
+				for(final WordData data : datas){
+					final String stem = new String(data.getStem(), charset);
+					final String lemma = new String(data.getWord(), charset);
+					final String pos = new String(data.getTag(), charset);
+					readings.add(stem + "/[" + lemma + "]" + pos);
+				}
+				sj.add(readings.toString());
+			}
+		else
+			for(final String token : tokens)
+				sj.add(token);
+		textField.setText(sj.toString());
 	}
 
 
