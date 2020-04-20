@@ -2,6 +2,7 @@ package unit731.hunlinter.actions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.services.Packager;
@@ -111,7 +112,7 @@ public class ProjectLoaderAction extends AbstractAction{
 		final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 			.mapToObj(Character::toString).collect(Collectors.toSet()));
-		return GUIUtils.chooseBestFont(sample);
+		return FontHelper.chooseBestFont(sample);
 	}
 
 }

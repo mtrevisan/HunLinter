@@ -1,5 +1,6 @@
 package unit731.hunlinter;
 
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
@@ -148,7 +149,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(parsingResultTextArea);
+		FontHelper.addFontableProperty(parsingResultTextArea);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -595,7 +596,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
 				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
 				FontChooserDialog.getDefaultFont());
-			GUIUtils.setCurrentFont(lastUsedFont, this);
+			FontHelper.setCurrentFont(lastUsedFont, this);
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
@@ -605,7 +606,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
 
 		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);

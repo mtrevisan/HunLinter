@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.CorrectionDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
@@ -77,7 +78,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(table, incorrectTextField, correctTextField);
+		FontHelper.addFontableProperty(table, incorrectTextField, correctTextField);
 
 		GUIUtils.addUndoManager(incorrectTextField, correctTextField);
 
@@ -330,7 +331,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		incorrectTextField.setFont(currentFont);
 		correctTextField.setFont(currentFont);
 		table.setFont(currentFont);

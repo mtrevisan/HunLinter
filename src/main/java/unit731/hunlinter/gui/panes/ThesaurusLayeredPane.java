@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.JCopyableTable;
@@ -70,7 +71,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(table, synonymsTextField);
+		FontHelper.addFontableProperty(table, synonymsTextField);
 
 		GUIUtils.addUndoManager(synonymsTextField);
 
@@ -299,7 +300,7 @@ final int iconSize = 17;
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		synonymsTextField.setFont(currentFont);
 		table.setFont(currentFont);
 	}

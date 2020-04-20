@@ -2,6 +2,7 @@ package unit731.hunlinter.gui.dialogs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.IntegerFilter;
 import unit731.hunlinter.parsers.ParserManager;
@@ -60,7 +61,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 	}
 
 	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		noHyphenationTextField.setFont(currentFont);
 		noHyphenationList.setFont(currentFont);
 	}
@@ -129,7 +130,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
          }
       });
 
-      noHyphenationList.setFont(GUIUtils.getCurrentFont());
+      noHyphenationList.setFont(FontHelper.getCurrentFont());
       //listen for row removal
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       noHyphenationList.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);

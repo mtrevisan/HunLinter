@@ -1,5 +1,6 @@
 package unit731.hunlinter.actions;
 
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
@@ -39,15 +40,14 @@ public class SelectFontAction extends AbstractAction{
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
-		Consumer<Font> onSelection = font -> {
-			GUIUtils.setCurrentFont(font, parentFrame);
+		final Consumer<Font> onSelection = font -> {
+			FontHelper.setCurrentFont(font, parentFrame);
 
 			final String language = parserManager.getLanguage();
 			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
-		FontChooserDialog dialog = new FontChooserDialog(parserManager.getAffixData(), GUIUtils.getCurrentFont(), onSelection,
-			parentFrame);
+		final FontChooserDialog dialog = new FontChooserDialog(parserManager.getAffixData(), onSelection, parentFrame);
 		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);

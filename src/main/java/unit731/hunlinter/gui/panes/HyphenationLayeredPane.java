@@ -16,6 +16,7 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
@@ -68,7 +69,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(wordTextField, addRuleTextField, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
+		FontHelper.addFontableProperty(wordTextField, addRuleTextField, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 
 		GUIUtils.addUndoManager(wordTextField, addRuleTextField);
 
@@ -360,7 +361,7 @@ final int iconSize = 17;
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		wordTextField.setFont(currentFont);
 		syllabationValueLabel.setFont(currentFont);
 		addRuleTextField.setFont(currentFont);

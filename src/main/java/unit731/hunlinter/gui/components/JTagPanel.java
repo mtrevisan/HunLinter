@@ -1,5 +1,6 @@
 package unit731.hunlinter.gui.components;
 
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.system.JavaHelper;
@@ -124,7 +125,7 @@ public class JTagPanel extends JPanel{
 			setOpaque(false);
 
 			final JLabel textLabel = new JLabel(text);
-			textLabel.setFont(GUIUtils.getCurrentFont());
+			textLabel.setFont(FontHelper.getCurrentFont());
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);

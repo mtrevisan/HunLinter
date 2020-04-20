@@ -35,6 +35,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
@@ -67,7 +68,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		initComponents();
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		mostCommonSyllabesValueLabel.setFont(currentFont);
 		longestWordCharactersValueLabel.setFont(currentFont);
 		longestWordSyllabesValueLabel.setFont(currentFont);

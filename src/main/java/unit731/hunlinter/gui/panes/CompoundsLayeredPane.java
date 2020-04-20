@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.models.CompoundTableModel;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
@@ -80,7 +81,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(inputTextArea, table);
+		FontHelper.addFontableProperty(inputTextArea, table);
 
 		GUIUtils.addUndoManager(inputTextArea);
 
@@ -361,7 +362,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		inputTextArea.setFont(currentFont);
 		table.setFont(currentFont);
 	}

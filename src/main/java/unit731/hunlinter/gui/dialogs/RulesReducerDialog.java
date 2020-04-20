@@ -20,6 +20,7 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -55,7 +56,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		initComponents();
 
-		final Font font = GUIUtils.getCurrentFont();
+		final Font font = FontHelper.getCurrentFont();
 		currentSetTextArea.setFont(font);
 		reducedSetTextArea.setFont(font);
 

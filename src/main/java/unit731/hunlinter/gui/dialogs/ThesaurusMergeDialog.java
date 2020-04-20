@@ -10,6 +10,7 @@ import java.util.Objects;
 import javax.swing.*;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 
@@ -57,7 +58,7 @@ public class ThesaurusMergeDialog extends JDialog{
       lblMessage.setLabelFor(lineComboBox);
       lblMessage.setText("Select a line from the list:");
 
-      lineComboBox.setFont(GUIUtils.getCurrentFont());
+      lineComboBox.setFont(FontHelper.getCurrentFont());
       lineComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             lineComboBoxActionPerformed(evt);
@@ -68,7 +69,7 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       mergerTextArea.setColumns(20);
-      mergerTextArea.setFont(GUIUtils.getCurrentFont());
+      mergerTextArea.setFont(FontHelper.getCurrentFont());
       mergerTextArea.setLineWrap(true);
       mergerTextArea.setRows(5);
       mergerTextArea.setWrapStyleWord(true);
