@@ -175,7 +175,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			try{
 				//verify by reading
-				DictionaryLookup s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
+				final DictionaryLookup s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
+				//noinspection StatementWithEmptyBody
 				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());

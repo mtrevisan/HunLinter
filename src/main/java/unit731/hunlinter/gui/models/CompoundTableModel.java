@@ -60,6 +60,7 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 		setInflections(null);
 	}
 
+
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());

@@ -111,7 +111,7 @@
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(model);"/>
-            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final DefaultListModel&lt;String&gt; model = new DefaultListModel&lt;&gt;();&#xd;&#xa;for(final String familyName : GUIUtils.getFamilyNamesAll())&#xd;&#xa;&#x9;model.addElement(familyName);"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final SortableListModel model = new SortableListModel();&#xd;&#xa;model.addAll(FontHelper.getFamilyNamesAll());"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>

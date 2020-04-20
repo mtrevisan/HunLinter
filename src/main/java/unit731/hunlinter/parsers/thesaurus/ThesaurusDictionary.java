@@ -114,7 +114,7 @@ public class ThesaurusDictionary{
 //		//recover definition and synonyms pairs (to be deleted)
 //		final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
 //		final List<SynonymsEntry> entries = Arrays.stream(synonymsByDefinition)
-//			.map(syns -> new SynonymsEntry(GUIUtils.removeHTMLCode(syns) + ThesaurusEntry.PIPE + definition))
+//			.map(syns -> new SynonymsEntry(GUIHelper.removeHTMLCode(syns) + ThesaurusEntry.PIPE + definition))
 //			.collect(Collectors.toList());
 //
 //		//delete each occurrence of the definition-synonyms pair

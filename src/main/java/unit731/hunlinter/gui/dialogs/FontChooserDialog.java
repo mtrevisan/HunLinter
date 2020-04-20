@@ -1,6 +1,6 @@
 package unit731.hunlinter.gui.dialogs;
 
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.system.JavaHelper;
 
@@ -81,18 +81,18 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	private final String sampleText;
 
 
-	public FontChooserDialog(final AffixData affixData, final Font initialFont, final Consumer<Font> onSelection,
-			final java.awt.Frame parent){
+	public FontChooserDialog(final AffixData affixData, final Consumer<Font> onSelection, final Frame parent){
 		super(parent, "Font chooser", true);
 
 		Objects.requireNonNull(onSelection);
 		Objects.requireNonNull(parent);
 
 		sampleText = affixData.getSampleText();
-		GUIUtils.extractFonts(sampleText);
+		FontHelper.extractFonts(sampleText);
 
 		initComponents();
 
+		final Font initialFont = FontHelper.getCurrentFont();
 		selectedFont = (initialFont == null? DEFAULT_FONT: initialFont);
 		this.onSelection = onSelection;
 		previousFont = selectedFont;
@@ -112,8 +112,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameTextField = new javax.swing.JTextField();
       familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       final DefaultListModel<String> model = new DefaultListModel<>();
-      for(final String familyName : GUIUtils.getFamilyNamesAll())
-      model.addElement(familyName);
+      model.addAll(FontHelper.getFamilyNamesAll());
       familyNameList = new javax.swing.JList<>(model);
       monospacedCheckBox = new javax.swing.JCheckBox();
       sampleLabel = new javax.swing.JLabel();
@@ -248,8 +247,8 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
 		final List<String> fonts = (monospacedCheckBox.isSelected()?
-			GUIUtils.getFamilyNamesMonospaced():
-			GUIUtils.getFamilyNamesAll());
+			FontHelper.getFamilyNamesMonospaced():
+			FontHelper.getFamilyNamesAll());
 
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();
@@ -278,7 +277,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();
-			selectedFont = GUIUtils.getDefaultHeightFont(new Font(fontFamily, Font.PLAIN, 20));
+			selectedFont = FontHelper.getDefaultHeightFont(new Font(fontFamily, Font.PLAIN, 20));
 		}
 
 		final boolean fontChanged = !selectedFont.equals(previousFont);
@@ -307,6 +306,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		final Font sampleFont = Font.decode(selectedFont.getFamily() + "-PLAIN-" + selectedFont.getSize());
 		sampleTextArea.setFont(sampleFont);
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

@@ -16,10 +16,11 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
@@ -68,9 +69,9 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(wordTextField, addRuleTextField, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
+		FontHelper.addFontableProperty(wordTextField, addRuleTextField, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 
-		GUIUtils.addUndoManager(wordTextField, addRuleTextField);
+		GUIHelper.addUndoManager(wordTextField, addRuleTextField);
 
 		try{
 			//FIXME
@@ -78,8 +79,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 //			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 		}
 		catch(final IOException ignored){}
 
@@ -340,7 +341,7 @@ final int iconSize = 17;
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
          acceptButtonAction, parentFrame);
-      GUIUtils.addCancelByEscapeKey(dialog);
+      GUIHelper.addCancelByEscapeKey(dialog);
       dialog.setLocationRelativeTo(this);
       dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed
@@ -360,7 +361,7 @@ final int iconSize = 17;
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		wordTextField.setFont(currentFont);
 		syllabationValueLabel.setFont(currentFont);
 		addRuleTextField.setFont(currentFont);

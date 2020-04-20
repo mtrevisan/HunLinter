@@ -1,5 +1,6 @@
 package unit731.hunlinter;
 
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
@@ -61,7 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryLinterAction;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
@@ -148,7 +149,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(parsingResultTextArea);
+		FontHelper.addFontableProperty(parsingResultTextArea);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -159,7 +160,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//disable the "All files" option
 		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 		try{
-			final BufferedImage projectFolderImg = ImageIO.read(GUIUtils.class.getResourceAsStream("/project_folder.png"));
+			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
 			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
@@ -179,7 +180,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
-					GUIUtils.addCancelByEscapeKey(dialog);
+					GUIHelper.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
@@ -482,12 +483,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			recentProjectsMenu.addEntry(openProjectPathFileChooser.getSelectedFile().getAbsolutePath());
+			final File baseFile = openProjectPathFileChooser.getSelectedFile();
+			recentProjectsMenu.addEntry(baseFile.getAbsolutePath());
 
 			recentProjectsMenu.setEnabled(true);
 			filEmptyRecentProjectsMenuItem.setEnabled(true);
 
-			final File baseFile = openProjectPathFileChooser.getSelectedFile();
 			loadFile(baseFile.toPath());
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
@@ -595,7 +596,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
 				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
 				FontChooserDialog.getDefaultFont());
-			GUIUtils.setCurrentFont(lastUsedFont, this);
+			FontHelper.setCurrentFont(lastUsedFont, this);
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
@@ -605,7 +606,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		parsingResultTextArea.setFont(currentFont);
 
 		EventBusService.publish(ACTION_COMMAND_SET_CURRENT_FONT);

@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,9 +37,7 @@ public class ZipManager{
 
 		//zip files one by one
 		final int startIndex = dir.toFile().getAbsolutePath().length() + 1;
-		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))){
-			zos.setLevel(compressionLevel);
-
+		try(final ZipOutputStream zos = createZIPWriter(zipFile, compressionLevel)){
 			for(final String filePath : filesListInDir){
 				//for ZipEntry we need to keep only relative file path, so we used substring on absolute path
 				zos.putNextEntry(new ZipEntry(filePath.substring(startIndex)));
@@ -54,27 +51,6 @@ public class ZipManager{
 				}
 			}
 		}
-	}
-
-	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
-		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
-		for(String folder : folders){
-			folder = Path.of(folder)
-				.toString();
-
-			boolean process = true;
-			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
-				final String[] includeFolders = Arrays.stream(excludeFolderBut)
-					.map(Path::getParent)
-					.map(Path::toString)
-					.toArray(String[]::new);
-				process = (match(includeFolders, folder::startsWith) == null);
-			}
-			if(process)
-				filteredFolders.add(folder);
-		}
-		filteredFolders.trimToSize();
-		return filteredFolders;
 	}
 
 	private List<String> extractFilesList(final Path dir){
@@ -91,27 +67,33 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	public static void zipFile(final File file, final int compressionLevel, final File zipFile) throws IOException{
-		zipStream(new FileInputStream(file), file.getName(), compressionLevel, zipFile);
+	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
+		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
+		for(String folder : folders){
+			folder = StringUtils.replaceChars(Path.of(folder)
+				.toString(), '\\', '/');
+
+			boolean process = true;
+			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
+				final String[] includeFolders = Arrays.stream(excludeFolderBut)
+					.map(Path::getParent)
+					.map(Path::toString)
+					.toArray(String[]::new);
+				process = (match(includeFolders, folder::startsWith) == null);
+			}
+			if(process)
+				filteredFolders.add(folder);
+		}
+		filteredFolders.trimToSize();
+		return filteredFolders;
 	}
 
-	public static void zipStream(final InputStream entry, final String entryName, final int compressionLevel, final File zipFile)
-			throws IOException{
-		//create ZipOutputStream to write to the zip file
-		try(final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))){
-			zos.setLevel(compressionLevel);
-
-			//add a new Zip Entry to the ZipOutputStream
-			zos.putNextEntry(new ZipEntry(entryName));
-
-			//read the file and write to ZipOutputStream
-			try(final InputStream is = new BufferedInputStream(entry)){
-				IOUtils.copy(is, zos);
-
-				//close the zip entry to write to zip file
-				zos.closeEntry();
+	private static ZipOutputStream createZIPWriter(final File file, final int compressionLevel) throws IOException{
+		return new ZipOutputStream(new FileOutputStream(file)){
+			{
+				def.setLevel(compressionLevel);
 			}
-		}
+		};
 	}
 
 }

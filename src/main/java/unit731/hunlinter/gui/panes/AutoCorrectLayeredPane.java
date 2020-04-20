@@ -24,11 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.CorrectionDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.models.AutoCorrectTableModel;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -77,9 +78,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(table, incorrectTextField, correctTextField);
+		FontHelper.addFontableProperty(table, incorrectTextField, correctTextField);
 
-		GUIUtils.addUndoManager(incorrectTextField, correctTextField);
+		GUIHelper.addUndoManager(incorrectTextField, correctTextField);
 
 		EventBusService.subscribe(AutoCorrectLayeredPane.this);
 	}
@@ -143,7 +144,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       table.addMouseListener(new MouseAdapter(){
          public void mouseClicked(final MouseEvent e){
@@ -164,7 +165,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                };
                final CorrectionEntry definition = parserManager.getAcoParser().getCorrectionsDictionary().get(row);
                final CorrectionDialog dialog = new CorrectionDialog(definition, okButtonAction, parentFrame);
-               GUIUtils.addCancelByEscapeKey(dialog);
+               GUIHelper.addCancelByEscapeKey(dialog);
                dialog.addWindowListener(new WindowAdapter(){
                   @Override
                   public void windowClosed(final WindowEvent e){
@@ -315,7 +316,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			final String language = parserManager.getLanguage();
 			final Comparator<String> comparator = Comparator.comparingInt(String::length)
 				.thenComparing(BaseBuilder.getComparator(language));
-			GUIUtils.addSorterToTable(table, comparator, null);
+			GUIHelper.addSorterToTable(table, comparator, null);
 
 			final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 			dm.setCorrections(parserManager.getAcoParser().getCorrectionsDictionary());
@@ -330,7 +331,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		incorrectTextField.setFont(currentFont);
 		correctTextField.setFont(currentFont);
 		table.setFont(currentFont);

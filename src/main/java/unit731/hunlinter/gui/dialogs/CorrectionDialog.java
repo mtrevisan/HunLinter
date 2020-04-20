@@ -11,7 +11,7 @@ import javax.swing.JDialog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 
@@ -36,8 +36,8 @@ public class CorrectionDialog extends JDialog{
 
 		initComponents();
 
-		incorrectTextField.setFont(GUIUtils.getCurrentFont());
-		correctTextField.setFont(GUIUtils.getCurrentFont());
+		incorrectTextField.setFont(FontHelper.getCurrentFont());
+		correctTextField.setFont(FontHelper.getCurrentFont());
 
 		this.correction = correction;
 		this.okButtonAction = okButtonAction;
@@ -159,6 +159,7 @@ public class CorrectionDialog extends JDialog{
 
       dispose();
    }//GEN-LAST:event_btnOkActionPerformed
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

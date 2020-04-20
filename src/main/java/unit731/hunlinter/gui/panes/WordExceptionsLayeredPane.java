@@ -16,7 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.components.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -57,9 +58,9 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		GUIUtils.addFontableProperty(textField);
+		FontHelper.addFontableProperty(textField);
 
-		GUIUtils.addUndoManager(textField);
+		GUIHelper.addUndoManager(textField);
 
 		EventBusService.subscribe(WordExceptionsLayeredPane.this);
 	}
@@ -218,7 +219,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 		if(actionCommand != MainFrame.ACTION_COMMAND_SET_CURRENT_FONT)
 			return;
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		tagPanel.setFont(currentFont);
 	}
 

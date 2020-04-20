@@ -2,8 +2,9 @@ package unit731.hunlinter.actions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
@@ -65,7 +66,7 @@ public class ProjectLoaderAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createProjectLoaderWorker(
 			worker -> {
 				try{
@@ -77,7 +78,7 @@ public class ProjectLoaderAction extends AbstractAction{
 						//choose between available languages
 						final Consumer<String> onSelection = language::set;
 						final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, parentFrame);
-						GUIUtils.addCancelByEscapeKey(dialog);
+						GUIHelper.addCancelByEscapeKey(dialog);
 						dialog.setLocationRelativeTo(parentFrame);
 						dialog.setVisible(true);
 
@@ -111,7 +112,7 @@ public class ProjectLoaderAction extends AbstractAction{
 		final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 			.mapToObj(Character::toString).collect(Collectors.toSet()));
-		return GUIUtils.chooseBestFont(sample);
+		return FontHelper.chooseBestFont(sample);
 	}
 
 }

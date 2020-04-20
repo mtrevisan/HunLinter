@@ -16,11 +16,7 @@ public enum AffixType{
 	}
 
 	public static AffixType createFromCode(final String code){
-		return match(values(), tag -> tag.option.getCode().equals(code));
-	}
-
-	public boolean is(final String code){
-		return this.option.getCode().equals(code);
+		return match(values(), tag -> tag.option.is(code));
 	}
 
 	public AffixOption getOption(){

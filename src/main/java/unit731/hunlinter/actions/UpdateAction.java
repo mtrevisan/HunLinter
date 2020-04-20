@@ -3,7 +3,7 @@ package unit731.hunlinter.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,10 +27,10 @@ public class UpdateAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		try{
 			final FileDownloaderDialog dialog = new FileDownloaderDialog(parentFrame);
-			GUIUtils.addCancelByEscapeKey(dialog, new AbstractAction(){
+			GUIHelper.addCancelByEscapeKey(dialog, new AbstractAction(){
 				private static final long serialVersionUID = -5644390861803492172L;
 
 				@Override

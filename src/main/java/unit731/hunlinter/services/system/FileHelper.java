@@ -6,13 +6,10 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -225,16 +222,6 @@ public class FileHelper{
 		return lines;
 	}
 
-
-	public static BufferedWriter createGZIPWriter(final File file, final Charset charset, final int inputBufferSize,
-		final int level) throws IOException{
-		final OutputStream out = new GZIPOutputStream(new FileOutputStream(file), inputBufferSize){
-			{
-				def.setLevel(level);
-			}
-		};
-		return new BufferedWriter(new OutputStreamWriter(out, charset));
-	}
 
 	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
 		throws IOException{

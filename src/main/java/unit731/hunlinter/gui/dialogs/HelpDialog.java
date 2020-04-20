@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
@@ -213,7 +213,7 @@ public class HelpDialog extends JDialog{
 	}//GEN-LAST:event_authorLabelValueMouseClicked
 
    private void homePageLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
-		FileHelper.browseURL(GUIUtils.removeHTMLCode(homePageLabelValue.getText()));
+		FileHelper.browseURL(GUIHelper.removeHTMLCode(homePageLabelValue.getText()));
    }//GEN-LAST:event_homePageLabelValueMouseClicked
 
 

@@ -10,8 +10,9 @@ import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.models.SortableListModel;
 import unit731.hunlinter.gui.renderers.DictionarySortCellRenderer;
-import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.eventbus.EventBusService;
@@ -63,7 +64,7 @@ public class DictionarySortDialog extends JDialog{
 
       entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
-      entriesList.setModel(new DefaultListModel<>());
+      entriesList.setModel(new SortableListModel());
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       entriesScrollPane.setViewportView(entriesList);
 
@@ -136,16 +137,18 @@ public class DictionarySortDialog extends JDialog{
 	}
 
 	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
-		final DefaultListModel<String> model = (DefaultListModel<String>)entriesList.getModel();
-		model.clear();
+		final SortableListModel model = (SortableListModel)entriesList.getModel();
 		model.ensureCapacity(listData.size());
-		model.addAll(listData);
+		model.replaceAll(listData, 0);
 
 		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+
+		//re-render sections
+		entriesList.repaint();
 	}
 
 	private void setCurrentFont(){
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
@@ -184,11 +187,11 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
-	public void setCellRenderer(ListCellRenderer<String> renderer){
+	private void setCellRenderer(final ListCellRenderer<String> renderer){
 		entriesList.setCellRenderer(renderer);
 	}
 
-	public void addListSelectionListener(ListSelectionListener listener){
+	public void addListSelectionListener(final ListSelectionListener listener){
 		entriesList.addListSelectionListener(listener);
 	}
 
@@ -199,6 +202,7 @@ public class DictionarySortDialog extends JDialog{
 	public int getSelectedIndex(){
 		return entriesList.getSelectedIndex();
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

@@ -1,7 +1,7 @@
 package unit731.hunlinter.gui.renderers;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
 
 import java.awt.*;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 			final boolean hasFocus, final int row, final int column){
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-		setFont(GUIUtils.getCurrentFont());
+		setFont(FontHelper.getCurrentFont());
 		setText(value != null? String.valueOf(value): StringUtils.SPACE);
 
 		try{

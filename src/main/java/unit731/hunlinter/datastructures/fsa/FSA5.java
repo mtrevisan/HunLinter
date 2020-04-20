@@ -72,7 +72,6 @@ public class FSA5 extends FSA{
 
 	/** Default filler byte */
 	public static final byte DEFAULT_FILLER = '_';
-
 	/** Default annotation byte */
 	public static final byte DEFAULT_ANNOTATION = '+';
 

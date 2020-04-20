@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
@@ -41,7 +41,7 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createMinimalPairsWorker(
 			() -> {
 				final int fileChosen = SAVE_RESULT_FILE_CHOOSER.showSaveDialog(parentFrame);

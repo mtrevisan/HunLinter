@@ -19,10 +19,6 @@ public final class EventBusService{
 	private static final EventBusInterface EVENT_BUS = new BasicEventBus();
 
 
-	public static EventBusInterface getInstance(){
-		return EVENT_BUS;
-	}
-
 	public static void subscribe(final Object subscriber){
 		EVENT_BUS.subscribe(subscriber);
 	}

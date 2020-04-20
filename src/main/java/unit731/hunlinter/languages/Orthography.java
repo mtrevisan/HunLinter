@@ -43,6 +43,11 @@ public class Orthography{
 			.anyMatch(error -> error);
 	}
 
+	public StringJoiner formatHyphenation(final String[] syllabes){
+		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
+		return formatHyphenation(syllabes, sj, Function.identity());
+	}
+
 	public StringJoiner formatHyphenation(final String[] syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
 		final boolean[] errors = getSyllabationErrors(syllabes);
 		for(int i = 0; i < syllabes.length; i ++){
@@ -50,11 +55,6 @@ public class Orthography{
 			sj.add(fun.apply(syllabes[i]));
 		}
 		return sj;
-	}
-
-	public StringJoiner formatHyphenation(final String[] syllabes){
-		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
-		return formatHyphenation(syllabes, sj, Function.identity());
 	}
 
 	/**

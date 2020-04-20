@@ -35,7 +35,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
@@ -67,15 +68,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		initComponents();
 
-		final Font currentFont = GUIUtils.getCurrentFont();
+		final Font currentFont = FontHelper.getCurrentFont();
 		mostCommonSyllabesValueLabel.setFont(currentFont);
 		longestWordCharactersValueLabel.setFont(currentFont);
 		longestWordSyllabesValueLabel.setFont(currentFont);
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
+			popupMenu.add(GUIHelper.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
 				longestWordCharactersValueLabel, longestWordSyllabesValueLabel, mostCommonSyllabesValueLabel,
 				syllabeLengthsModeValueLabel, totalWordsValueLabel, uniqueWordsValueLabel);
 		}
@@ -630,6 +631,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			}
 		}
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{

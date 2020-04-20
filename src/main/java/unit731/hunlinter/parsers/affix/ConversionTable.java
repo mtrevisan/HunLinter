@@ -87,7 +87,7 @@ public class ConversionTable{
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
-		if(!affixOption.getCode().equals(parts[0]))
+		if(!affixOption.is(parts[0]))
 			throw new LinterException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 

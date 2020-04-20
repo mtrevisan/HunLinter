@@ -161,8 +161,4 @@ public class DictionaryLookup implements Iterable<WordData>{
 		return new DictionaryIterator(dictionary, true);
 	}
 
-	public Dictionary getDictionary(){
-		return dictionary;
-	}
-
 }

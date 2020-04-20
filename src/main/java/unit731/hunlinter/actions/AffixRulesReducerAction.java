@@ -1,7 +1,7 @@
 package unit731.hunlinter.actions;
 
 import unit731.hunlinter.gui.dialogs.RulesReducerDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 
 import javax.swing.*;
@@ -34,7 +34,7 @@ public class AffixRulesReducerAction extends AbstractAction{
 
 		setEnabled(false);
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final RulesReducerDialog rulesReducerDialog = new RulesReducerDialog(parserManager, parentFrame);
 		rulesReducerDialog.setLocationRelativeTo(parentFrame);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){

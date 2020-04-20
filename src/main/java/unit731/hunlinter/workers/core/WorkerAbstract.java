@@ -182,21 +182,21 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			else
 				LOGGER.error("Generic error");
 
-			cancel(true);
-
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
 
 			workerData.callCancelledCallback(exception);
+
+			cancel(true);
 		}
 	}
 
 	/** User cancelled worker */
 	public void cancel(){
-		cancel(true);
-
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
 		workerData.callCancelledCallback(null);
+
+		cancel(true);
 	}
 
 

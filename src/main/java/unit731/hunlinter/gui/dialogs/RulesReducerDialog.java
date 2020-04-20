@@ -20,7 +20,8 @@ import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -55,7 +56,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		initComponents();
 
-		final Font font = GUIUtils.getCurrentFont();
+		final Font font = FontHelper.getCurrentFont();
 		currentSetTextArea.setFont(font);
 		reducedSetTextArea.setFont(font);
 
@@ -65,8 +66,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(popupMenu, reducedSetTextArea);
+			popupMenu.add(GUIHelper.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(popupMenu, reducedSetTextArea);
 		}
 		catch(final IOException ignored){}
 
@@ -202,9 +203,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
 
-		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
-			rulesReducerWorker.cancel();
-
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
 		final List<String> affixEntries = affixes.stream()
@@ -217,6 +215,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			ruleComboBox.removeAllItems();
 			forEach(affixEntries, ruleComboBox::addItem);
 		});
+
+		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
+			rulesReducerWorker.cancel();
 	}
 
    public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
@@ -263,7 +264,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				reduceButton.setEnabled(true);
 			};
 			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			GUIUtils.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask);
+			GUIHelper.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask);
 		}
 		else
 			dispose();
@@ -315,6 +316,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private boolean getKeepLongestCommonAffix(){
 		return optimizeClosedGroupCheckBox.isSelected();
 	}
+
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
