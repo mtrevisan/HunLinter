@@ -45,12 +45,27 @@ public class JTagPanel extends JPanel{
 
 	@Override
 	public void setFont(final Font font){
-		//set font for each tag
-		for(final Component component : getComponents())
-			component.setFont(font);
-//		invalidate();
+		//FIXME find a way to dynamically change the font of each tag and re-adjust container layout
+		final int size = getComponents().length;
+		if(size > 0 && getComponents()[0].getFont() != FontHelper.getCurrentFont()){
+			synchronized(getTreeLock()){
+				//remove all tags
+				final String[] tags = new String[size];
+				int i = 0;
+				for(final Component component : getComponents())
+					tags[i ++] = ((JTagComponent)component).getTag();
 
-//		forceRepaint();
+				removeAll();
+
+				//re-insert all tags
+				for(final String tag : tags){
+					final JTagComponent component = new JTagComponent(tag, this::removeTag);
+					add(component, BorderLayout.LINE_END);
+				}
+
+				forceRepaint();
+			}
+		}
 	}
 
 	public void initializeTags(final List<String> tags){
@@ -191,15 +206,6 @@ public class JTagPanel extends JPanel{
 			graphics.drawRoundRect(0, PAD, width, height, CORNER_RADIUS.width, CORNER_RADIUS.height);
 			//reset strokes to default
 			graphics.setStroke(new BasicStroke());
-		}
-
-		@Override
-		public void setFont(final Font font){
-			final JLabel component = (JLabel)getComponent(0);
-			component.setFont(font);
-
-//			component.invalidate();
-//			validate();
 		}
 
 		public String getTag(){
