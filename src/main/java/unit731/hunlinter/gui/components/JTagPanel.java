@@ -48,9 +48,9 @@ public class JTagPanel extends JPanel{
 		//set font for each tag
 		for(final Component component : getComponents())
 			component.setFont(font);
-		invalidate();
+//		invalidate();
 
-		forceRepaint();
+//		forceRepaint();
 	}
 
 	public void initializeTags(final List<String> tags){
@@ -198,8 +198,8 @@ public class JTagPanel extends JPanel{
 			final JLabel component = (JLabel)getComponent(0);
 			component.setFont(font);
 
-			component.invalidate();
-			validate();
+//			component.invalidate();
+//			validate();
 		}
 
 		public String getTag(){
