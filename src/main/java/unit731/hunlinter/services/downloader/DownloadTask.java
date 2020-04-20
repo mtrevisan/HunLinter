@@ -44,9 +44,9 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 			}
 		}
 		catch(final Exception e){
-			cancel(true);
-
 			listener.failed(e);
+
+			cancel(true);
 		}
 		return null;
 	}
@@ -66,9 +66,9 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	}
 
 	public void cancelTask(){
-		cancel(true);
-
 		listener.stopped();
+
+		cancel(true);
 	}
 
 	@Override

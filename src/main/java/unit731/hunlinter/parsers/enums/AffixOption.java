@@ -165,7 +165,7 @@ public enum AffixOption{
 	}
 
 	public boolean is(final String code){
-		return code.equals(code);
+		return this.code.equals(code);
 	}
 
 }

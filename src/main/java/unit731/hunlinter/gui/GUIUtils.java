@@ -352,12 +352,12 @@ public class GUIUtils{
 			"Do you really want to abort the " + worker.getWorkerData().getWorkerName() + " task?", "Warning!",
 			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if(answer == JOptionPane.YES_OPTION){
-			worker.cancel();
-
 			System.gc();
 
 			Optional.ofNullable(onAbort)
 				.ifPresent(Runnable::run);
+
+			worker.cancel();
 		}
 		else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 			worker.resume();

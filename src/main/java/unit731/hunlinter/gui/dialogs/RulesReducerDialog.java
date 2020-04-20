@@ -202,9 +202,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
 
-		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
-			rulesReducerWorker.cancel();
-
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
 		final List<String> affixEntries = affixes.stream()
@@ -217,6 +214,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			ruleComboBox.removeAllItems();
 			forEach(affixEntries, ruleComboBox::addItem);
 		});
+
+		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
+			rulesReducerWorker.cancel();
 	}
 
    public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed

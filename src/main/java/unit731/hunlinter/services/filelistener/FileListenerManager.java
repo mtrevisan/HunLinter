@@ -88,10 +88,10 @@ public class FileListenerManager implements FileListener, Runnable{
 	@Override
 	public void stop(){
 		if(running.get()){
+			running.set(false);
+
 			watcherTask.cancel(true);
 			watcherTask = null;
-
-			running.set(false);
 		}
 	}
 
