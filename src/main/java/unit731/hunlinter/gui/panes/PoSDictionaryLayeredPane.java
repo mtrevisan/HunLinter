@@ -32,8 +32,11 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 1011325870107687156L;
 
-	private static final int DEBOUNCER_INTERVAL = 5_000;
+	private static final String LEMMA_START = "/[";
+	private static final String LEMMA_END = "]";
+	private static final String READINGS_DELIMITER = "|";
 
+	private static final int DEBOUNCER_INTERVAL = 5_000;
 
 	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
@@ -181,13 +184,13 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		final List<String> tokens = wordTokenizer.tokenize(inputText);
 		if(dictionaryLookup != null)
 			for(final String token : tokens){
-				final StringJoiner readings = new StringJoiner("|");
+				final StringJoiner readings = new StringJoiner(READINGS_DELIMITER);
 				final WordData[] datas = dictionaryLookup.lookup(token);
 				for(final WordData data : datas){
 					final String stem = new String(data.getStem(), charset);
 					final String lemma = new String(data.getWord(), charset);
 					final String pos = new String(data.getTag(), charset);
-					readings.add(stem + "/[" + lemma + "]" + pos);
+					readings.add(stem + LEMMA_START + lemma + LEMMA_END + pos);
 				}
 				sj.add(readings.toString());
 			}
