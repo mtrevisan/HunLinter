@@ -13,7 +13,6 @@ import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.models.SortableListModel;
 import unit731.hunlinter.gui.renderers.DictionarySortCellRenderer;
-import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.eventbus.EventBusService;

@@ -36,7 +36,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
 import unit731.hunlinter.parsers.dictionary.Frequency;
@@ -75,8 +75,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
+			popupMenu.add(GUIHelper.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
 				longestWordCharactersValueLabel, longestWordSyllabesValueLabel, mostCommonSyllabesValueLabel,
 				syllabeLengthsModeValueLabel, totalWordsValueLabel, uniqueWordsValueLabel);
 		}

@@ -62,7 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryLinterAction;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
@@ -160,7 +160,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//disable the "All files" option
 		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 		try{
-			final BufferedImage projectFolderImg = ImageIO.read(GUIUtils.class.getResourceAsStream("/project_folder.png"));
+			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
 			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
@@ -180,7 +180,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
-					GUIUtils.addCancelByEscapeKey(dialog);
+					GUIHelper.addCancelByEscapeKey(dialog);
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}

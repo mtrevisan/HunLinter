@@ -1,7 +1,7 @@
 package unit731.hunlinter.workers;
 
 import org.slf4j.Logger;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
@@ -61,7 +61,7 @@ public class WorkerManager{
 			final WorkerAbstract<?> worker = workerNameWorker.getValue();
 			if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
 //				final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				GUIUtils.askUserToAbort(worker, parentFrame, null, null);
+				GUIHelper.askUserToAbort(worker, parentFrame, null, null);
 			}
 		}
 	}

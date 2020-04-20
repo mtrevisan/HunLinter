@@ -1,6 +1,6 @@
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ public class ExitAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		parentFrame.dispose();
 
 		System.exit(0);

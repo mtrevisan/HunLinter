@@ -1,7 +1,7 @@
 package unit731.hunlinter.actions;
 
 import unit731.hunlinter.gui.dialogs.DictionarySortDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.workers.WorkerManager;
 
@@ -39,10 +39,10 @@ public class DictionarySorterAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final DictionarySortDialog dialog = new DictionarySortDialog(parserManager, parentFrame);
 
-		GUIUtils.addCancelByEscapeKey(dialog);
+		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.addListSelectionListener(evt -> {
 			if(evt.getValueIsAdjusting())

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.models.InflectionTableModel;
@@ -77,7 +77,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		//add "fontable" property
 		FontHelper.addFontableProperty(inputTextField);
 
-		GUIUtils.addUndoManager(inputTextField);
+		GUIHelper.addUndoManager(inputTextField);
 
 		try{
 			//FIXME
@@ -85,8 +85,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
 //			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(copyPopupMenu, table);
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(copyPopupMenu, table);
 		}
 		catch(final IOException ignored){}
 
@@ -148,7 +148,7 @@ final int iconSize = 17;
       for(int i = 0; i < table.getColumnCount(); i ++)
       table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
       scrollPane.setViewportView(table);
 
       totalInflectionsLabel.setText("Total inflections:");
@@ -242,7 +242,7 @@ final int iconSize = 17;
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		GUIUtils.addSorterToTable(table, comparator, comparatorAffix);
+		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();

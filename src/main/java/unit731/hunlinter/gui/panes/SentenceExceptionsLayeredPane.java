@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.components.JTagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -59,7 +59,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		//add "fontable" property
 		FontHelper.addFontableProperty(textField);
 
-		GUIUtils.addUndoManager(textField);
+		GUIHelper.addUndoManager(textField);
 
 		EventBusService.subscribe(SentenceExceptionsLayeredPane.this);
 	}

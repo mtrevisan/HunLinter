@@ -29,7 +29,7 @@ import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.RegexHelper;
 
 
-public class GUIUtils{
+public class GUIHelper{
 
 	private static final Pattern PATTERN_HTML_CODE = RegexHelper.pattern("</?[^>]+>");
 
@@ -37,7 +37,7 @@ public class GUIUtils{
 	private static final String KEY_REDO = "Redo";
 
 
-	private GUIUtils(){}
+	private GUIHelper(){}
 
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.
@@ -71,7 +71,7 @@ public class GUIUtils{
 	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize,
 			final JPopupMenu popupMenu, final Consumer<Component> fnCallback) throws IOException{
 		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
-		final BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream(iconURL));
+		final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
 		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
 		menuItem.setIcon(icon);
 		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));

@@ -1,7 +1,6 @@
 package unit731.hunlinter.gui.components;
 
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
 import unit731.hunlinter.services.system.JavaHelper;
 

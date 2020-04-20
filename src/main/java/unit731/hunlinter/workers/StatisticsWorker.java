@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import unit731.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -99,7 +99,7 @@ public class StatisticsWorker extends WorkerDictionary{
 
 			//show statistics window
 			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-			GUIUtils.addCancelByEscapeKey(dialog);
+			GUIHelper.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 

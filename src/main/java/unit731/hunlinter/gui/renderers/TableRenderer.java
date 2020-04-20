@@ -2,7 +2,6 @@ package unit731.hunlinter.gui.renderers;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
 
 import java.awt.*;
 import java.util.HashSet;

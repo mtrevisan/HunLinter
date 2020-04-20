@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.gui.models.ThesaurusTableModel;
@@ -73,7 +73,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		//add "fontable" property
 		FontHelper.addFontableProperty(table, synonymsTextField);
 
-		GUIUtils.addUndoManager(synonymsTextField);
+		GUIHelper.addUndoManager(synonymsTextField);
 
 		try{
 			//FIXME
@@ -81,18 +81,18 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 //			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
-			popupMergeMenuItem = GUIUtils.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
+			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
 			popupMergeMenuItem.setEnabled(false);
 			mergeCopyRemovePopupMenu.add(popupMergeMenuItem);
-			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIUtils::copyCallback));
-			mergeCopyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIHelper::copyCallback));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
-			copyRemovePopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIUtils::copyCallback));
-			copyRemovePopupMenu.add(GUIUtils.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
-			GUIUtils.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
-			GUIUtils.addPopupMenu(mergeCopyRemovePopupMenu, table);
+			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIHelper::copyCallback));
+			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
+			GUIHelper.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
+			GUIHelper.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
 
@@ -114,7 +114,7 @@ final int iconSize = 17;
             final String synonyms = (String)model.getValueAt(row, 1);
             final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
             return Arrays.stream(synonymsByDefinition)
-            .map(GUIUtils::removeHTMLCode)
+            .map(GUIHelper::removeHTMLCode)
             .map(syns -> definition + ": " + syns)
             .collect(Collectors.joining("\r\n"));
          }
@@ -151,7 +151,7 @@ final int iconSize = 17;
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      table.registerKeyboardAction(event -> GUIUtils.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -268,7 +268,7 @@ final int iconSize = 17;
 			.thenComparing(BaseBuilder.getComparator(language));
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
-		GUIUtils.addSorterToTable(table, comparator, comparatorAffix);
+		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
 			final AffixData affixData = parserManager.getAffixData();
@@ -277,7 +277,7 @@ final int iconSize = 17;
 
 			//thesaurus file:
 			if(parserManager.getTheParser().getSynonymsCount() > 0){
-				GUIUtils.addSorterToTable(table, comparator, null);
+				GUIHelper.addSorterToTable(table, comparator, null);
 
 				final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
@@ -364,7 +364,7 @@ final int iconSize = 17;
 			//show merge dialog
 			final ThesaurusMergeDialog dialog = new ThesaurusMergeDialog(synonyms.getDefinition(), newSynonyms,
 				filteredSynonymsEntries, null);
-			GUIUtils.addCancelByEscapeKey(dialog);
+			GUIHelper.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(this);
 			dialog.setVisible(true);
 

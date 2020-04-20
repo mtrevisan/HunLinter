@@ -20,7 +20,7 @@ import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
@@ -71,7 +71,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		//add "fontable" property
 		FontHelper.addFontableProperty(wordTextField, addRuleTextField, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 
-		GUIUtils.addUndoManager(wordTextField, addRuleTextField);
+		GUIHelper.addUndoManager(wordTextField, addRuleTextField);
 
 		try{
 			//FIXME
@@ -79,8 +79,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 //			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIUtils.createPopupCopyMenu(iconSize, copyPopupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 		}
 		catch(final IOException ignored){}
 
@@ -341,7 +341,7 @@ final int iconSize = 17;
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
          acceptButtonAction, parentFrame);
-      GUIUtils.addCancelByEscapeKey(dialog);
+      GUIHelper.addCancelByEscapeKey(dialog);
       dialog.setLocationRelativeTo(this);
       dialog.setVisible(true);
    }//GEN-LAST:event_optionsButtonActionPerformed

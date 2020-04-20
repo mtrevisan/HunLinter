@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -66,8 +66,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIUtils.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIUtils::copyCallback));
-			GUIUtils.addPopupMenu(popupMenu, reducedSetTextArea);
+			popupMenu.add(GUIHelper.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(popupMenu, reducedSetTextArea);
 		}
 		catch(final IOException ignored){}
 
@@ -264,7 +264,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				reduceButton.setEnabled(true);
 			};
 			final Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			GUIUtils.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask);
+			GUIHelper.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask);
 		}
 		else
 			dispose();

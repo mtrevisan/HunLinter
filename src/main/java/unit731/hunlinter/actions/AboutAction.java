@@ -1,7 +1,7 @@
 package unit731.hunlinter.actions;
 
 import unit731.hunlinter.gui.dialogs.HelpDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,9 +21,9 @@ public class AboutAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final HelpDialog dialog = new HelpDialog(parentFrame);
-		GUIUtils.addCancelByEscapeKey(dialog);
+		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
 	}

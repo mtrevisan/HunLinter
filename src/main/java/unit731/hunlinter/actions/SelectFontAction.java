@@ -2,7 +2,7 @@ package unit731.hunlinter.actions;
 
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
-import unit731.hunlinter.gui.GUIUtils;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ public class SelectFontAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final Frame parentFrame = GUIUtils.getParentFrame((JMenuItem)event.getSource());
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final Consumer<Font> onSelection = font -> {
 			FontHelper.setCurrentFont(font, parentFrame);
 
@@ -48,7 +48,7 @@ public class SelectFontAction extends AbstractAction{
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
 		final FontChooserDialog dialog = new FontChooserDialog(parserManager.getAffixData(), onSelection, parentFrame);
-		GUIUtils.addCancelByEscapeKey(dialog);
+		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
 	}

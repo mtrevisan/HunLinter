@@ -3,7 +3,6 @@ package unit731.hunlinter.gui.dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIUtils;
 import unit731.hunlinter.gui.IntegerFilter;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptions;
