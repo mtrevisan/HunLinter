@@ -21,10 +21,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="resultScrollPane" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="posRecordedLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="posRecordedValueLabel" pref="732" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="74" pref="810" max="32767" attributes="0"/>
                       <Component id="openPoSFSAButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
@@ -48,11 +45,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="resultScrollPane" pref="191" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="posRecordedLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="posRecordedValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="openPoSFSAButton" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="openPoSFSAButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -88,16 +81,6 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="posRecordedLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="PoS recorded:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="posRecordedValueLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="&#x2026;"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="openPoSFSAButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Load PoS FSA"/>

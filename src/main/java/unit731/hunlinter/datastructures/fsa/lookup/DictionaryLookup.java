@@ -2,7 +2,9 @@ package unit731.hunlinter.datastructures.fsa.lookup;
 
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.datastructures.fsa.FSA;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
+import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 
 import java.nio.ByteBuffer;
@@ -42,14 +44,16 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
 		Objects.requireNonNull(dictionary);
-		Objects.requireNonNull(dictionary.fsa);
-		Objects.requireNonNull(dictionary.metadata);
+		final FSA fsa = dictionary.fsa;
+		final DictionaryMetadata metadata = dictionary.metadata;
+		Objects.requireNonNull(fsa);
+		Objects.requireNonNull(metadata);
 
 		this.dictionary = dictionary;
 
-		sequenceEncoder = dictionary.metadata.getSequenceEncoderType().get();
-		matcher = new FSATraversal(dictionary.fsa);
-		finalStatesIterator = new ByteSequenceIterator(dictionary.fsa, dictionary.fsa.getRootNode());
+		sequenceEncoder = metadata.getSequenceEncoderType().get();
+		matcher = new FSATraversal(fsa);
+		finalStatesIterator = new ByteSequenceIterator(fsa, fsa.getRootNode());
 	}
 
 	/**
@@ -140,7 +144,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @param replacements A map of replacements (from-&gt;to).
 	 * @return new string with all replacements applied.
 	 */
-	static String applyReplacements(final String word, final Map<String, String> replacements){
+	public static String applyReplacements(final String word, final Map<String, String> replacements){
 		//quite horrible from performance point of view; this should really be a Finite State Transducer
 		//(like https://github.com/ChrisBlom/Effestee)
 		final StringBuilder sb = new StringBuilder(word);

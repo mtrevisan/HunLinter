@@ -16,7 +16,6 @@ import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
@@ -27,7 +26,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 1011325870107687156L;
 
-	private static final int DEBOUNCER_INTERVAL = 600;
+	private static final int DEBOUNCER_INTERVAL = 5_000;
 
 
 	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
@@ -71,8 +70,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
       textField = new javax.swing.JTextField();
       resultScrollPane = new javax.swing.JScrollPane();
       resultTextArea = new javax.swing.JTextArea();
-      posRecordedLabel = new javax.swing.JLabel();
-      posRecordedValueLabel = new javax.swing.JLabel();
       openPoSFSAButton = new javax.swing.JButton();
 
       inputLabel.setText("Sentence:");
@@ -89,10 +86,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
       resultTextArea.setRows(5);
       resultScrollPane.setViewportView(resultTextArea);
 
-      posRecordedLabel.setText("PoS recorded:");
-
-      posRecordedValueLabel.setText("…");
-
       openPoSFSAButton.setText("Load PoS FSA");
       openPoSFSAButton.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -103,8 +96,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
       setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(resultScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(posRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      setLayer(posRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openPoSFSAButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -116,10 +107,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(resultScrollPane)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(posRecordedLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(posRecordedValueLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addGap(74, 810, Short.MAX_VALUE)
                   .addComponent(openPoSFSAButton))
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                   .addComponent(inputLabel)
@@ -137,10 +125,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(posRecordedLabel)
-               .addComponent(posRecordedValueLabel)
-               .addComponent(openPoSFSAButton))
+            .addComponent(openPoSFSAButton)
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
@@ -189,11 +174,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		//TODO
 	}
 
-	private void updatePoSCounter(){
-		//TODO
-		posRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getSexParser().getExceptionsCounter()));
-	}
-
 
 	@SuppressWarnings("unused")
 	private void writeObject(final ObjectOutputStream os) throws IOException{
@@ -209,8 +189,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openPoSFSAButton;
-   private javax.swing.JLabel posRecordedLabel;
-   private javax.swing.JLabel posRecordedValueLabel;
    private javax.swing.JScrollPane resultScrollPane;
    private javax.swing.JTextArea resultTextArea;
    private javax.swing.JTextField textField;
