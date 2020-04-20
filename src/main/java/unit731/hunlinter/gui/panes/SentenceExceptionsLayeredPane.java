@@ -56,7 +56,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 
 		//add "fontable" property
-		FontHelper.addFontableProperty(textField);
+		FontHelper.addFontableProperty(textField, tagPanel);
 
 		GUIHelper.addUndoManager(textField);
 
