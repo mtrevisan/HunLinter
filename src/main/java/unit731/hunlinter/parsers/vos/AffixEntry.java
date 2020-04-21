@@ -327,8 +327,8 @@ public class AffixEntry{
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(parent.getType().getOption().getCode())
 			.add(parent.getFlag())
-			.add(removing)
-			.add(appending);
+			.add(removing.isEmpty()? ZERO: removing)
+			.add(appending.isEmpty()? ZERO: appending);
 		if(continuationFlags != null && continuationFlags.length > 0)
 			sj.add(SLASH + String.join(StringUtils.EMPTY, continuationFlags));
 		sj.add(condition);
