@@ -37,7 +37,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 	private static final String LEMMA_END = "]";
 	private static final String READINGS_DELIMITER = "|";
 
-	private static final int DEBOUNCER_INTERVAL = 5_000;
+	private static final int DEBOUNCER_INTERVAL = 600;
 
 	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
@@ -190,6 +190,8 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		formerFilterInputText = inputText;
 
 
+		resultTextArea.setText(null);
+
 		final StringJoiner sj = new StringJoiner(StringUtils.LF);
 		final List<String> tokens = wordTokenizer.tokenize(inputText);
 		if(dictionaryLookup != null)
@@ -207,7 +209,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		else
 			for(final String token : tokens)
 				sj.add(token);
-		textField.setText(sj.toString());
+		resultTextArea.setText(sj.toString());
 	}
 
 
