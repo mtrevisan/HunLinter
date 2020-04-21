@@ -22,6 +22,7 @@ import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.WordTokenizer;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
@@ -40,19 +41,20 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
-	private final WordTokenizer wordTokenizer;
-	private final Charset charset;
+	private final ParserManager parserManager;
 
 	private JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
+	private WordTokenizer wordTokenizer;
+	private Charset charset;
 
-	public PoSDictionaryLayeredPane(final AffixData affixData){
-		Objects.requireNonNull(affixData);
 
-		wordTokenizer = BaseBuilder.getWordTokenizer(affixData.getLanguage());
-		charset = affixData.getCharset();
+	public PoSDictionaryLayeredPane(final ParserManager parserManager){
+		Objects.requireNonNull(parserManager);
+
+		this.parserManager = parserManager;
 
 
 		openPoSDictionaryFileChooser = new JFileChooser();
@@ -172,7 +174,15 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		textField.setText(null);
 	}
 
+	//So' drio 'ndar da mé nòna.
+	//Soʼ/[sora]AD|Soʼ/[sora]PR|Soʼ/[èser]VB -- drio/[drio]AD -- ʼndar/[ʼndar]VB -- da/[da]PR -- mé/[mé]JPW -- nòna/[nòna]NN+s+f|nòna/[nòna]NO+s+f
 	private void processSentence(){
+		if(wordTokenizer == null){
+			final AffixData affixData = parserManager.getAffixData();
+			wordTokenizer = BaseBuilder.getWordTokenizer(affixData.getLanguage());
+			charset = affixData.getCharset();
+		}
+
 		final String inputText = textField.getText().trim();
 		if(formerFilterInputText != null && formerFilterInputText.equals(inputText))
 			return;

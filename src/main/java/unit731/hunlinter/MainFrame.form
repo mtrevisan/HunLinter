@@ -22,7 +22,7 @@
                   <Image iconType="3" name="/file_open.png"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="79"/>
-                <Property name="text" type="java.lang.String" value="Open Project&#x2026;"/>
+                <Property name="text" type="java.lang.String" value="Open project&#x2026;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenProjectMenuItemActionPerformed"/>
@@ -55,7 +55,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="filEmptyRecentProjectsMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="101"/>
-                <Property name="text" type="java.lang.String" value="Empty Recent Projects list"/>
+                <Property name="text" type="java.lang.String" value="Empty recent projects list"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
@@ -254,7 +254,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new IssueReporterAction()" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Report an issue"/>
+                <Property name="text" type="java.lang.String" value="Report issue"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hlpOnlineSeparator">
@@ -264,7 +264,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new UpdateAction()" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Check for Update&#x2026;"/>
+                <Property name="text" type="java.lang.String" value="Check for update&#x2026;"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="hlpCheckUpdateOnStartupCheckBoxMenuItem">
@@ -382,6 +382,9 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
         <Container class="javax.swing.JLayeredPane" name="dicLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DictionaryLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -398,6 +401,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="cmpLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new CompoundsLayeredPane(packager, parserManager, workerManager, this)"/>
           </AuxValues>
@@ -414,6 +420,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="theLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ThesaurusLayeredPane(parserManager)"/>
           </AuxValues>
@@ -430,6 +439,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="hypLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new HyphenationLayeredPane(packager, parserManager, this)"/>
           </AuxValues>
@@ -446,6 +458,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="acoLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCorrectLayeredPane(packager, parserManager, this)"/>
           </AuxValues>
@@ -462,6 +477,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="sexLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new SentenceExceptionsLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -478,6 +496,9 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="wexLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new WordExceptionsLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -485,6 +506,25 @@
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Word Exceptions">
                 <Property name="tabTitle" type="java.lang.String" value="Word Exceptions"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+            <Property name="useNullLayout" type="boolean" value="true"/>
+          </Layout>
+        </Container>
+        <Container class="javax.swing.JLayeredPane" name="pdcLayeredPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new PoSDictionaryLayeredPane(parserManager)"/>
+          </AuxValues>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="PoS Dictionary">
+                <Property name="tabTitle" type="java.lang.String" value="PoS Dictionary"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

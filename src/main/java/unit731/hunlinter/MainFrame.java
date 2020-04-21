@@ -4,6 +4,7 @@ import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
+import unit731.hunlinter.gui.panes.PoSDictionaryLayeredPane;
 import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
 import unit731.hunlinter.gui.panes.HyphenationLayeredPane;
 import unit731.hunlinter.gui.panes.ThesaurusLayeredPane;
@@ -203,6 +204,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
       sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
       wexLayeredPane = new WordExceptionsLayeredPane(packager, parserManager);
+      pdcLayeredPane = new PoSDictionaryLayeredPane(parserManager);
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
@@ -256,13 +258,29 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
+      dicLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+
+      cmpLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
+
+      theLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
+
+      hypLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
+
+      acoLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
+
+      sexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
+
+      wexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
+
+      pdcLayeredPane.setEnabled(false);
+      mainTabbedPane.addTab("PoS Dictionary", pdcLayeredPane);
 
       addWindowListener(new WindowAdapter(){
          @Override
@@ -276,7 +294,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
-      filOpenProjectMenuItem.setText("Open Project…");
+      filOpenProjectMenuItem.setText("Open project…");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             filOpenProjectMenuItemActionPerformed(evt);
@@ -299,7 +317,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filRecentProjectsSeparator);
 
       filEmptyRecentProjectsMenuItem.setMnemonic('e');
-      filEmptyRecentProjectsMenuItem.setText("Empty Recent Projects list");
+      filEmptyRecentProjectsMenuItem.setText("Empty recent projects list");
       filEmptyRecentProjectsMenuItem.setEnabled(false);
       filEmptyRecentProjectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -421,12 +439,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hlpMenu.add(hlpOnlineHelpMenuItem);
 
       hlpIssueReporterMenuItem.setAction(new IssueReporterAction());
-      hlpIssueReporterMenuItem.setText("Report an issue");
+      hlpIssueReporterMenuItem.setText("Report issue");
       hlpMenu.add(hlpIssueReporterMenuItem);
       hlpMenu.add(hlpOnlineSeparator);
 
       hlpUpdateMenuItem.setAction(new UpdateAction());
-      hlpUpdateMenuItem.setText("Check for Update…");
+      hlpUpdateMenuItem.setText("Check for update…");
       hlpMenu.add(hlpUpdateMenuItem);
 
       hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
@@ -578,6 +596,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			//word exceptions file:
 			EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane,
 				(parserManager.getWexParser().getExceptionsCounter() > 0)));
+
+			//Part-of-Speech dictionary file:
+			EventBusService.publish(new TabbedPaneEnableEvent(pdcLayeredPane, true));
 
 
 			//enable the first tab if the current one was disabled
@@ -841,6 +862,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
