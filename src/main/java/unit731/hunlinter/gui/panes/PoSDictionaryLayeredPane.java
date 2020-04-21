@@ -7,7 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 import javax.swing.*;
@@ -84,6 +86,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
       inputLabel.setText("Sentence:");
 
+      textField.setFont(FontHelper.getCurrentFont());
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -93,6 +96,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
       resultTextArea.setEditable(false);
       resultTextArea.setColumns(20);
+      resultTextArea.setFont(FontHelper.getCurrentFont());
       resultTextArea.setRows(5);
       resultScrollPane.setViewportView(resultTextArea);
 
@@ -193,11 +197,12 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		resultTextArea.setText(null);
 
 		final StringJoiner sj = new StringJoiner(StringUtils.LF);
-		final List<String> tokens = wordTokenizer.tokenize(inputText);
+		final List<String> tokens = extractTrueWords(wordTokenizer.tokenize(inputText));
 		if(dictionaryLookup != null)
 			for(final String token : tokens){
 				final StringJoiner readings = new StringJoiner(READINGS_DELIMITER);
-				final WordData[] datas = dictionaryLookup.lookup(token);
+				final String lowercaseToken = token.toLowerCase(Locale.ROOT);
+				final WordData[] datas = dictionaryLookup.lookup(lowercaseToken);
 				for(final WordData data : datas){
 					final String stem = new String(data.getStem(), charset);
 					final String lemma = new String(data.getWord(), charset);
@@ -210,6 +215,23 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 			for(final String token : tokens)
 				sj.add(token);
 		resultTextArea.setText(sj.toString());
+	}
+
+	private List<String> extractTrueWords(final List<String> tokens){
+		final List<String> noWhitespaceTokens = new ArrayList<>();
+		for(final String token : tokens)
+			if(isWord(token))
+				noWhitespaceTokens.add(token);
+		return noWhitespaceTokens;
+	}
+
+	private boolean isWord(final String token){
+		for(int i = 0; i < token.length(); i ++){
+			final char chr = token.charAt(i);
+			if(Character.isLetter(chr) || Character.isDigit(chr))
+				return true;
+		}
+		return false;
 	}
 
 

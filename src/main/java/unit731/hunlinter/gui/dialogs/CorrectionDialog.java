@@ -63,9 +63,13 @@ public class CorrectionDialog extends JDialog{
       incorrectLabel.setText("Incorrect form:");
       incorrectLabel.setPreferredSize(new java.awt.Dimension(74, 17));
 
+      incorrectTextField.setFont(FontHelper.getCurrentFont());
+
       correctLabel.setLabelFor(correctTextField);
       correctLabel.setText("Correct form:");
       correctLabel.setPreferredSize(new java.awt.Dimension(66, 17));
+
+      correctTextField.setFont(FontHelper.getCurrentFont());
 
       buttonPanel.setPreferredSize(new java.awt.Dimension(600, 45));
 

@@ -108,7 +108,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       inputLabel.setText("Compound rule:");
 
       inputComboBox.setEditable(true);
-      inputComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      inputComboBox.setFont(FontHelper.getCurrentFont());
       inputComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter(){
          @Override
          public void keyReleased(final KeyEvent evt){
@@ -133,8 +133,9 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
-      ruleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      ruleFlagsAidComboBox.setFont(FontHelper.getCurrentFont());
 
+      table.setFont(FontHelper.getCurrentFont());
       table.setModel(new CompoundTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
@@ -146,6 +147,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
       inputTextArea.setEditable(false);
       inputTextArea.setColumns(20);
+      inputTextArea.setFont(FontHelper.getCurrentFont());
       inputScrollPane.setViewportView(inputTextArea);
 
       loadInputButton.setText("Load input from dictionary");
@@ -234,7 +236,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                .addComponent(inputScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(loadInputButton)
                .addComponent(openAffButton)

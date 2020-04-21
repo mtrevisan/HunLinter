@@ -109,6 +109,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       incorrectLabel.setText("Incorrect form:");
 
+      incorrectTextField.setFont(FontHelper.getCurrentFont());
       incorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             incorrectTextFieldKeyReleased(evt);
@@ -119,6 +120,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       correctLabel.setText("Correct form:");
 
+      correctTextField.setFont(FontHelper.getCurrentFont());
       correctTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             correctTextFieldKeyReleased(evt);
@@ -134,6 +136,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          }
       });
 
+      table.setFont(FontHelper.getCurrentFont());
       table.setModel(new AutoCorrectTableModel());
       table.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)table.getModel()));
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);

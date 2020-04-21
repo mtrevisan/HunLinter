@@ -74,6 +74,9 @@
     </Component>
     <Component class="javax.swing.JTextField" name="textField">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FontHelper.getCurrentFont()" type="code"/>
+        </Property>
         <Property name="toolTipText" type="java.lang.String" value="hit `enter` to add"/>
       </Properties>
       <Events>

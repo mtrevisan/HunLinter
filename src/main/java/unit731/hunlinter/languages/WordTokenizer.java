@@ -41,7 +41,8 @@ public class WordTokenizer{
 			.add(DATE_ISO8601)
 			.add(TIME)
 			.add(EMAIL)
-			.add(URL)
+			//FIXME consider only urls like www., or similar
+//			.add(URL)
 		;
 		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj.toString() + ")");
 	}

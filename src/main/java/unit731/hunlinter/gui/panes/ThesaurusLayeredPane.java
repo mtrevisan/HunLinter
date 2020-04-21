@@ -124,6 +124,7 @@ final int iconSize = 17;
 
       synonymsLabel.setText("New definition:");
 
+      synonymsTextField.setFont(FontHelper.getCurrentFont());
       synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             synonymsTextFieldKeyReleased(evt);
@@ -139,6 +140,7 @@ final int iconSize = 17;
          }
       });
 
+      table.setFont(FontHelper.getCurrentFont());
       table.setModel(new ThesaurusTableModel());
       table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));

@@ -110,6 +110,7 @@ final int iconSize = 17;
 
       wordLabel.setText("Word:");
 
+      wordTextField.setFont(FontHelper.getCurrentFont());
       wordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             wordTextFieldKeyReleased(evt);
@@ -119,21 +120,25 @@ final int iconSize = 17;
       syllabationLabel.setText("Syllabation:");
       syllabationLabel.setPreferredSize(new java.awt.Dimension(58, 17));
 
+      syllabationValueLabel.setFont(FontHelper.getCurrentFont());
       syllabationValueLabel.setText("…");
       syllabationValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       syllabesCountLabel.setText("Syllabes:");
 
+      syllabesCountValueLabel.setFont(FontHelper.getCurrentFont());
       syllabesCountValueLabel.setText("…");
 
       rulesLabel.setText("Rules:");
       rulesLabel.setPreferredSize(new java.awt.Dimension(31, 17));
 
+      rulesValueLabel.setFont(FontHelper.getCurrentFont());
       rulesValueLabel.setText("…");
       rulesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       addRuleLabel.setText("Add rule:");
 
+      addRuleTextField.setFont(FontHelper.getCurrentFont());
       addRuleTextField.setEnabled(false);
       addRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -161,10 +166,12 @@ final int iconSize = 17;
       addRuleSyllabationLabel.setText("New syllabation:");
       addRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
 
+      addRuleSyllabationValueLabel.setFont(FontHelper.getCurrentFont());
       addRuleSyllabationValueLabel.setText("…");
 
       addRuleSyllabesCountLabel.setText("New syllabes:");
 
+      addRuleSyllabesCountValueLabel.setFont(FontHelper.getCurrentFont());
       addRuleSyllabesCountValueLabel.setText("…");
 
       optionsButton.setText("Options");

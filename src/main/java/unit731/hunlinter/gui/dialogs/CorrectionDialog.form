@@ -75,6 +75,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="incorrectTextField">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FontHelper.getCurrentFont()" type="code"/>
+        </Property>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="correctLabel">
       <Properties>
@@ -88,6 +93,11 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="correctTextField">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FontHelper.getCurrentFont()" type="code"/>
+        </Property>
+      </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="buttonPanel">
       <Properties>

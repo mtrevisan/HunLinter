@@ -129,6 +129,7 @@ final int iconSize = 17;
 
       inputLabel.setText("Dictionary entry:");
 
+      inputTextField.setFont(FontHelper.getCurrentFont());
       inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -138,8 +139,9 @@ final int iconSize = 17;
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
-      ruleFlagsAidComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      ruleFlagsAidComboBox.setFont(FontHelper.getCurrentFont());
 
+      table.setFont(FontHelper.getCurrentFont());
       table.setModel(new InflectionTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
@@ -218,7 +220,7 @@ final int iconSize = 17;
                .addComponent(ruleFlagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(ruleFlagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+            .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(totalInflectionsLabel)

@@ -99,7 +99,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       ruleLabel.setText("Rule:");
       ruleLabel.setPreferredSize(new java.awt.Dimension(26, 17));
 
-      ruleComboBox.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+      ruleComboBox.setFont(FontHelper.getCurrentFont());
       ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             ruleComboBoxActionPerformed(evt);
@@ -127,6 +127,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetTextArea.setEditable(false);
       currentSetTextArea.setColumns(20);
+      currentSetTextArea.setFont(FontHelper.getCurrentFont());
       currentSetTextArea.setRows(1);
       currentSetTextArea.setTabSize(3);
       currentSetScrollPane.setViewportView(currentSetTextArea);
@@ -137,6 +138,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       reducedSetTextArea.setEditable(false);
       reducedSetTextArea.setColumns(20);
+      reducedSetTextArea.setFont(FontHelper.getCurrentFont());
       reducedSetTextArea.setRows(1);
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);
@@ -184,7 +186,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
             .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(statusLabel)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
             .addComponent(reducedSetLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(reducedSetScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
