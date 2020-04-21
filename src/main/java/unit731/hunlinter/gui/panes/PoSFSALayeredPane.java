@@ -121,14 +121,14 @@ public class PoSFSALayeredPane extends JLayeredPane{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(resultScrollPane)
-               .addGroup(layout.createSequentialGroup()
-                  .addGap(74, 810, Short.MAX_VALUE)
-                  .addComponent(openPoSFSAButton))
+               .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                   .addComponent(inputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(textField)))
+                  .addComponent(textField))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(openPoSFSAButton)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -151,6 +151,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
    }//GEN-LAST:event_textFieldKeyReleased
 
    private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
+		openPoSFSAButton.setEnabled(false);
+
 		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();
@@ -159,10 +161,11 @@ public class PoSFSALayeredPane extends JLayeredPane{
    }//GEN-LAST:event_openPoSFSAButtonActionPerformed
 
 	private void loadFSAFile(final Path basePath){
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
 		try{
 			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
+
+
+			textField.requestFocusInWindow();
 
 			formerFilterInputText = null;
 			if(StringUtils.isNotBlank(textField.getText()))
@@ -172,6 +175,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
 			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA\n\n"
 				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
 		}
+
+		openPoSFSAButton.setEnabled(true);
 	}
 
 	@EventHandler
