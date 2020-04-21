@@ -33,7 +33,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
 
 
-public class PoSDictionaryLayeredPane extends JLayeredPane{
+public class PoSFSALayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 1011325870107687156L;
 
@@ -43,7 +43,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
-	private final Debouncer<PoSDictionaryLayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
+	private final Debouncer<PoSFSALayeredPane> debouncer = new Debouncer<>(this::processSentence, DEBOUNCER_INTERVAL);
 
 	private final ParserManager parserManager;
 
@@ -55,7 +55,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 	private Charset charset;
 
 
-	public PoSDictionaryLayeredPane(final ParserManager parserManager){
+	public PoSFSALayeredPane(final ParserManager parserManager){
 		Objects.requireNonNull(parserManager);
 
 		this.parserManager = parserManager;
@@ -74,7 +74,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(PoSDictionaryLayeredPane.this);
+		EventBusService.subscribe(PoSFSALayeredPane.this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

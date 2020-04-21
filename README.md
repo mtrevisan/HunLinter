@@ -3,10 +3,17 @@ HunLinter
 
 ![Java-14+](https://img.shields.io/badge/java-14%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-<a href="https://codeclimate.com/github/mtrevisan/HunLinter/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
+<a href="https://codeclimate.com/github/mtrevisan/HunLinter"><img src="https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability" /></a>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ==========
+
+<br />
+
+## Forewords
+Please, be aware that this application requires Java 14+!
+
+You can download and install it for free from this [link](https://www.oracle.com/java/technologies/javase-downloads.html).
 
 <br />
 
@@ -14,7 +21,7 @@ HunLinter
 - affix file and dictionary linter
 - rules reducer
 - LibreOffice and Mozilla packager
-- Part-of-Speech FSA extractor for LanguageTools
+- Part-of-Speech and dictionary FSA extractor for LanguageTools
 - automatically choose a font to render custom language
 - manages thesaurus, hyphenation, auto-correct, sentence exceptions, and word exception files
 - minimal pairs extraction
@@ -295,7 +302,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="screenshots-pos-dictionary"></a>
 ### Part-of-Speech dictionary
-![alt text](https://i.postimg.cc/Gmg8vC15/pos-dictionary.png "PoS dictionary")
+![alt text](https://i.postimg.cc/Gmg8vC15/pos-dictionary.png "PoS FSA")
 
 <br/>
 
@@ -306,7 +313,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - made update process stoppable
 - added a linter for thesaurus
 - added a menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
-- added a section to see the PoS dictionary execution
+- added a section to see the PoS FSA execution
 - fixed a bug on hyphenation: when the same rule is being added (with different breakpoints), the old one is being lost
 - substituted charting library
 - added undo/redo capabilities on input fields

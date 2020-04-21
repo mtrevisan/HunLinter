@@ -519,12 +519,12 @@
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new PoSDictionaryLayeredPane(parserManager)"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new PoSFSALayeredPane(parserManager)"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="PoS Dictionary">
-                <Property name="tabTitle" type="java.lang.String" value="PoS Dictionary"/>
+              <JTabbedPaneConstraints tabName="PoS FSA">
+                <Property name="tabTitle" type="java.lang.String" value="PoS FSA"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

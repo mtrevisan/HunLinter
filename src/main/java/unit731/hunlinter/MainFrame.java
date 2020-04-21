@@ -4,7 +4,7 @@ import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
-import unit731.hunlinter.gui.panes.PoSDictionaryLayeredPane;
+import unit731.hunlinter.gui.panes.PoSFSALayeredPane;
 import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
 import unit731.hunlinter.gui.panes.HyphenationLayeredPane;
 import unit731.hunlinter.gui.panes.ThesaurusLayeredPane;
@@ -204,7 +204,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
       sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
       wexLayeredPane = new WordExceptionsLayeredPane(packager, parserManager);
-      pdcLayeredPane = new PoSDictionaryLayeredPane(parserManager);
+      pdcLayeredPane = new PoSFSALayeredPane(parserManager);
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
@@ -280,7 +280,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
 
       pdcLayeredPane.setEnabled(false);
-      mainTabbedPane.addTab("PoS Dictionary", pdcLayeredPane);
+      mainTabbedPane.addTab("PoS FSA", pdcLayeredPane);
 
       addWindowListener(new WindowAdapter(){
          @Override
