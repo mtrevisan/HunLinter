@@ -62,7 +62,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sort selected section (step 2/3)");
 
 			//sort the chosen section
-			lines.subList(boundary.getKey(), boundary.getValue())
+			lines.subList(boundary.getKey(), boundary.getValue() + 1)
 				.sort(comparator);
 
 			setProgress(67);

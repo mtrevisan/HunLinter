@@ -128,6 +128,8 @@ public class DictionarySortDialog extends JDialog{
 			return;
 
 		try{
+			parserManager.getDicParser().clearBoundaries();
+
 			//reload text
 			final int lastVisibleIndex = getFirstVisibleIndex();
 			loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);

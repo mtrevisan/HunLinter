@@ -109,7 +109,7 @@ public class DictionaryParser{
 				else if(startSection >= 0){
 					//filter out single word that doesn't need to be sorted
 					if(lineIndex - startSection > 2 && needSorting)
-						boundaries.put(startSection, lineIndex);
+						boundaries.put(startSection, lineIndex - 1);
 
 					//reset for next section
 					prevLine = null;
@@ -121,7 +121,7 @@ public class DictionaryParser{
 			}
 			//add last section if needed (filter out single word that doesn't need to be sorted)
 			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
-				boundaries.put(startSection, lineIndex);
+				boundaries.put(startSection, lineIndex - 1);
 		}
 		catch(final IOException e){
 			LOGGER.error(null, e);
@@ -149,6 +149,10 @@ public class DictionaryParser{
 
 
 	public final void clear(){
+		clearBoundaries();
+	}
+
+	public final void clearBoundaries(){
 		boundaries.clear();
 	}
 
