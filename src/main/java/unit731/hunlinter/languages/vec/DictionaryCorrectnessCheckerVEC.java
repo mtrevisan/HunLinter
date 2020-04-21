@@ -52,7 +52,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = RegexHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü]", Pattern.CASE_INSENSITIVE);
 	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static String PLURAL_NOUN_MASCULINE_RULE;
-	private static String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL;
 	private static String NORTHERN_PLURAL_RULE;
 	private static String NORTHERN_PLURAL_STRESSED_RULE;
 	private static String NORTHERN_PLURAL_EXCEPTION;
@@ -110,7 +109,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			Pattern.CASE_INSENSITIVE);
 
 		PLURAL_NOUN_MASCULINE_RULE = rulesLoader.readProperty("masculinePluralNoun");
-		VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = rulesLoader.readProperty("variantTransformationAtEndVanishingEl");
 		NORTHERN_PLURAL_RULE = rulesLoader.readProperty("northernPlural");
 		NORTHERN_PLURAL_STRESSED_RULE = rulesLoader.readProperty("northernPluralStressed");
 		NORTHERN_PLURAL_EXCEPTION = rulesLoader.readProperty("northernPluralException");
@@ -171,11 +169,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void incompatibilityCheck(final Inflection inflection){
-		if(inflection.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
-				&& (inflection.getContinuationFlagCount() != 2 || !inflection.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
-			throw new LinterException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
-				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
-
 		final String[] pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.length > 1)
 			throw new LinterException(SINGLE_POS_NOT_PRESENT);
