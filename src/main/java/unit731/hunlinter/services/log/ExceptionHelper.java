@@ -18,7 +18,7 @@ public class ExceptionHelper{
 		return getMessage(t, false);
 	}
 
-	public static String getMessage(final Throwable t, final boolean includeLineNumber){
+	private static String getMessage(final Throwable t, final boolean includeLineNumber){
 		final StringBuffer sb = new StringBuffer(composeExceptionMessage(t, includeLineNumber));
 		Throwable cause = t.getCause();
 		while(cause != null){

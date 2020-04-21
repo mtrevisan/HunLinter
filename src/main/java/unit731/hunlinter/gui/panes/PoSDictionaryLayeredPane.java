@@ -47,7 +47,7 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private JFileChooser openPoSDictionaryFileChooser;
+	private final JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
