@@ -161,6 +161,10 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 
 		try{
 			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
+
+			formerFilterInputText = null;
+			if(StringUtils.isNotBlank(textField.getText()))
+				processSentence();
 		}
 		catch(final Exception e){
 			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA",
