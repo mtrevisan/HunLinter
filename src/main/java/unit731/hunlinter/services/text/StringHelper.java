@@ -36,6 +36,15 @@ public class StringHelper{
 
 	private StringHelper(){}
 
+	public static boolean isWord(final String text){
+		for(int i = 0; i < text.length(); i ++){
+			final char chr = text.charAt(i);
+			if(Character.isLetter(chr) || Character.isDigit(chr))
+				return true;
+		}
+		return false;
+	}
+
 	public static long countUppercases(final String text){
 		return text.chars()
 			.filter(Character::isUpperCase)

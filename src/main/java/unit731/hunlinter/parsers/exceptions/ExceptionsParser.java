@@ -85,7 +85,7 @@ public class ExceptionsParser{
 		//check for duplications
 		final Map<String, List<String>> map = new HashMap<>();
 		forEach(dictionary, s -> map.computeIfAbsent(s, k -> new ArrayList<>(1)).add(s));
-		final List<List<String>> duplications = new ArrayList<>();
+		final List<List<String>> duplications = new ArrayList<>(map.size());
 		applyIf(map.values(),
 			s -> s.size() > 1,
 			duplications::add);

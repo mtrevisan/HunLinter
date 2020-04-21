@@ -58,7 +58,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		if(!workerData.isNoHeader())
 			ParserHelper.assertLinesCount(lines);
 
-		final List<IndexDataPair<String>> entries = new ArrayList<>();
+		final List<IndexDataPair<String>> entries = new ArrayList<>(lines.size());
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
 			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))

@@ -11,25 +11,36 @@ public class ExceptionHelper{
 	private ExceptionHelper(){}
 
 	public static String getMessage(final Throwable t){
-		final StringBuffer sb = new StringBuffer(composeExceptionMessage(t));
+		return getMessage(t, true);
+	}
+
+	public static String getMessageNoLineNumber(final Throwable t){
+		return getMessage(t, false);
+	}
+
+	public static String getMessage(final Throwable t, final boolean includeLineNumber){
+		final StringBuffer sb = new StringBuffer(composeExceptionMessage(t, includeLineNumber));
 		Throwable cause = t.getCause();
 		while(cause != null){
 			sb.append(System.lineSeparator())
-				.append(composeExceptionMessage(cause));
+				.append(composeExceptionMessage(cause, includeLineNumber));
 
 			cause = cause.getCause();
 		}
 		return sb.toString();
 	}
 
-	private static String composeExceptionMessage(final Throwable t){
+	private static String composeExceptionMessage(final Throwable t, final boolean includeLineNumber){
 		final String exceptionType = extractExceptionName(t);
-		final String codePosition = extractExceptionPosition(t);
 		final String msg = t.getMessage();
 		final StringBuffer sb = new StringBuffer();
-		sb.append(exceptionType)
-			.append(" at ")
-			.append(codePosition);
+		sb.append(exceptionType);
+		if(includeLineNumber){
+			final String codePosition = extractExceptionPosition(t);
+			sb.append(" at ").append(codePosition);
+		}
+		else
+			sb.append(':');
 		if(msg != null)
 			sb.append(StringUtils.SPACE)
 				.append(msg);

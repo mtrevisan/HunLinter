@@ -47,7 +47,7 @@ public class ThesaurusDictionary{
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		forEach(partOfSpeeches, sj::add);
 		final String wholePartOfSpeeches = sj.toString();
-		final List<String> uniqueSynonyms = new ArrayList<>();
+		final List<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
 		final Set<String> uniqueValues = new HashSet<>();
 		forEach(synonyms, synonym -> {
 			final String s = synonym.toLowerCase(Locale.ROOT);
@@ -152,7 +152,7 @@ public class ThesaurusDictionary{
 	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);
-		final List<ThesaurusEntry> list = new ArrayList<>();
+		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
 		applyIf(dictionary.values(),
 			entry -> entry.intersects(pos, syns),
 			list::add);

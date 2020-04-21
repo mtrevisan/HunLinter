@@ -167,7 +167,7 @@ public class BasicEventBus implements EventBusInterface{
 	 */
 	public void unsubscribe(final Object subscriber){
 		//remove handler from queue
-		final List<HandlerInfo> killList = new ArrayList<>();
+		final List<HandlerInfo> killList = new ArrayList<>(handlers.size());
 		for(final HandlerInfo info : handlers){
 			final Object obj = info.getSubscriber();
 			if(obj == null || obj == subscriber)
@@ -247,8 +247,8 @@ public class BasicEventBus implements EventBusInterface{
 	//called on the background thread
 	private void notifySubscribers(final Object evt){
 		//roll through the subscribers
-		final List<HandlerInfoCallable> vetoHandlers = new ArrayList<>();
-		final List<HandlerInfoCallable> regularHandlers = new ArrayList<>();
+		final List<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
+		final List<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
 		subdivideHandlers(evt, vetoHandlers, regularHandlers);
 
 		final boolean vetoCalled = dispatchToVetoableHandlers(evt, vetoHandlers);

@@ -28,7 +28,9 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.text.StringHelper;
 
 
 public class PoSDictionaryLayeredPane extends JLayeredPane{
@@ -167,8 +169,8 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 				processSentence();
 		}
 		catch(final Exception e){
-			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA",
-				"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA\n\n"
+				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -182,8 +184,6 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 		textField.setText(null);
 	}
 
-	//So' drio 'ndar da mé nòna.
-	//Soʼ/[sora]AD|Soʼ/[sora]PR|Soʼ/[èser]VB -- drio/[drio]AD -- ʼndar/[ʼndar]VB -- da/[da]PR -- mé/[mé]JPW -- nòna/[nòna]NN+s+f|nòna/[nòna]NO+s+f
 	private void processSentence(){
 		if(wordTokenizer == null){
 			final AffixData affixData = parserManager.getAffixData();
@@ -222,20 +222,11 @@ public class PoSDictionaryLayeredPane extends JLayeredPane{
 	}
 
 	private List<String> extractTrueWords(final List<String> tokens){
-		final List<String> noWhitespaceTokens = new ArrayList<>();
+		final List<String> noWhitespaceTokens = new ArrayList<>(tokens.size());
 		for(final String token : tokens)
-			if(isWord(token))
+			if(StringHelper.isWord(token))
 				noWhitespaceTokens.add(token);
 		return noWhitespaceTokens;
-	}
-
-	private boolean isWord(final String token){
-		for(int i = 0; i < token.length(); i ++){
-			final char chr = token.charAt(i);
-			if(Character.isLetter(chr) || Character.isDigit(chr))
-				return true;
-		}
-		return false;
 	}
 
 

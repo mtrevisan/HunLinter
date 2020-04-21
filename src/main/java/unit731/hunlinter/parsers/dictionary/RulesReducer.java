@@ -560,13 +560,14 @@ public class RulesReducer{
 	private boolean growNewBush(Queue<LineEntry> queue, LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 
-		final List<LineEntry> newBushes = new ArrayList<>();
+		final ArrayList<LineEntry> newBushes = new ArrayList<>();
 		final Iterator<LineEntry> itr = queue.iterator();
 		while(itr.hasNext()){
 			final LineEntry child = itr.next();
 
 			if(parent.from.containsAll(child.from)){
 				final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
+				newBushes.ensureCapacity(newBushes.size() + childGroup.size());
 				forEach(childGroup, chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
 
 				itr.remove();
@@ -672,16 +673,17 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
-		final List<LineEntry> restoredRules = new ArrayList<>();
-		forEach(entries, rule ->
+		final ArrayList<LineEntry> restoredRules = new ArrayList<>();
+		forEach(entries, rule -> {
+			restoredRules.ensureCapacity(restoredRules.size() + rule.addition.size());
 			forEach(rule.addition, addition -> {
 				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
 				final String removal = rule.removal.substring(lcp);
 				final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
 					rule.condition, rule.from);
 				restoredRules.add(type == AffixType.SUFFIX? entry: entry.createReverse());
-			})
-		);
+			});
+		});
 		final List<LineEntry> sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);
 
 		return composeAffixRules(flag, type, sortedEntries);
@@ -691,14 +693,13 @@ public class RulesReducer{
 		if(keepLongestCommonAffix)
 			forEach(entries, entry -> entry.expandConditionToMaxLength(comparator));
 
-		final List<LineEntry> list = new ArrayList<>();
-		forEach(entries, list::add);
+		final List<LineEntry> list = new ArrayList<>(entries);
 		list.sort(lineEntryComparator);
 		return list;
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
-		final List<String> list = new ArrayList<>();
+		final List<String> list = new ArrayList<>(entries.size());
 		forEach(entries, entry -> list.add(entry.toHunspellRule(type, flag)));
 		return list;
 	}
