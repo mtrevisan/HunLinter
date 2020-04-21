@@ -63,6 +63,7 @@ HunLinter
     9. [Autocorrections](#screenshots-autocorrection)
     10. [Sentence exceptions](#screenshots-sentence-exceptions)
     11. [Word exceptions](#screenshots-word-exceptions)
+    12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
 7. [Changelog](#changelog)
     1. [version 2.0.0](#changelog-2.0.0)
     2. [version 1.10.0](#changelog-1.10.0)
@@ -292,6 +293,10 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### Word exceptions
 ![alt text](https://i.postimg.cc/6qXmcTfK/word-exceptions.png "Word exceptions")
 
+<a name="screenshots-pos-dictionary"></a>
+### Part-of-Speech dictionary
+![alt text](https://i.postimg.cc/Gmg8vC15/pos-dictionary.png "PoS dictionary")
+
 <br/>
 
 <a name="changelog"></a>
@@ -301,6 +306,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - made update process stoppable
 - added a linter for thesaurus
 - added a menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
+- added a section to see the PoS dictionary execution
 - fixed a bug on hyphenation: when the same rule is being added (with different breakpoints), the old one is being lost
 - substituted charting library
 - added undo/redo capabilities on input fields
