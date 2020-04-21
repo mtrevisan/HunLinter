@@ -176,7 +176,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
             tagPanel.addTag(exception);
 
             //reset input
-            textField.setText(StringUtils.EMPTY);
+            textField.setText(null);
             tagPanel.applyFilter(null);
 
             updateSentenceExceptionsCounter();

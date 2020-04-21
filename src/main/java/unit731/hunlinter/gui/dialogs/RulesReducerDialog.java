@@ -60,7 +60,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		currentSetTextArea.setFont(font);
 		reducedSetTextArea.setFont(font);
 
-		statusLabel.setText(StringUtils.EMPTY);
+		statusLabel.setText(null);
 
 		init();
 

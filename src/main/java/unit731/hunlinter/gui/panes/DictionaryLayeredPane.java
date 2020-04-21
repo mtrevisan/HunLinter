@@ -293,7 +293,7 @@ final int iconSize = 17;
 		formerInputText = null;
 
 		//disable menu
-		totalInflectionsValueLabel.setText(StringUtils.EMPTY);
+		totalInflectionsValueLabel.setText(null);
 		inputTextField.setText(null);
 		inputTextField.requestFocusInWindow();
 		openAidButton.setEnabled(false);
@@ -366,7 +366,7 @@ final int iconSize = 17;
 			}
 		}
 		else
-			totalInflectionsValueLabel.setText(StringUtils.EMPTY);
+			totalInflectionsValueLabel.setText(null);
 	}
 
 	private void clearOutputTable(final JTable table){

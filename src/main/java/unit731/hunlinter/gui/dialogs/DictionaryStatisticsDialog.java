@@ -442,10 +442,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void cleanupSyllabeStatistics(){
-		compoundWordsValueLabel.setText(StringUtils.EMPTY);
-		syllabeLengthsModeValueLabel.setText(StringUtils.EMPTY);
-		mostCommonSyllabesValueLabel.setText(StringUtils.EMPTY);
-		longestWordSyllabesValueLabel.setText(StringUtils.EMPTY);
+		compoundWordsValueLabel.setText(null);
+		syllabeLengthsModeValueLabel.setText(null);
+		mostCommonSyllabesValueLabel.setText(null);
+		longestWordSyllabesValueLabel.setText(null);
 
 		compoundWordsLabel.setEnabled(false);
 		compoundWordsValueLabel.setEnabled(false);
