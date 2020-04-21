@@ -122,13 +122,12 @@ public class PoSFSALayeredPane extends JLayeredPane{
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 909, Short.MAX_VALUE)
-               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+               .addGroup(layout.createSequentialGroup()
                   .addComponent(inputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(textField))
-               .addGroup(layout.createSequentialGroup()
-                  .addComponent(openPoSFSAButton)
-                  .addGap(0, 0, Short.MAX_VALUE)))
+                  .addComponent(textField)
+                  .addGap(18, 18, 18)
+                  .addComponent(openPoSFSAButton)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -137,11 +136,10 @@ public class PoSFSALayeredPane extends JLayeredPane{
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(inputLabel))
+               .addComponent(inputLabel)
+               .addComponent(openPoSFSAButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(openPoSFSAButton)
+            .addComponent(resultScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
             .addContainerGap())
       );
    }// </editor-fold>//GEN-END:initComponents
