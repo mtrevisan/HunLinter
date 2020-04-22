@@ -106,8 +106,8 @@ final int iconSize = 17;
          @Override
          public String getValueAtRow(final int row){
             final TableModel model = getModel();
-            final String inflection = (String) model.getValueAt(row, 0);
-            final String morphologicalFields = (String) model.getValueAt(row, 1);
+            final String inflection = (String)model.getValueAt(row, 0);
+            final String morphologicalFields = (String)model.getValueAt(row, 1);
             final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
             .map(AffixEntry::toString)
             .orElse(null);

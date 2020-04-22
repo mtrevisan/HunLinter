@@ -17,6 +17,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -66,7 +67,11 @@ public class AffixEntry{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		final String[] lineParts = StringUtils.split(line, null, 6);
+		//remove comments at the end of the line
+		final int commentIndex = line.indexOf(ParserHelper.COMMENT_MARK_SHARP);
+		final String cleanedLine = (commentIndex >= 0? line.substring(0, commentIndex).trim(): line);
+
+		final String[] lineParts = StringUtils.split(cleanedLine, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
 			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY)}));
 

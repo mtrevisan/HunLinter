@@ -83,7 +83,7 @@ public class DownloaderHelper{
 
 			final JSONParser parser = new JSONParser();
 			final JSONArray jsonArray = (JSONArray)parser.parse(response);
-			final Version applicationVersion = new Version((String) getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
+			final Version applicationVersion = new Version((String)getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
 			final List<Pair<Version, String>> whatsNew = new ArrayList<>();
 			for(final Object elem : jsonArray){
 				final JSONObject obj = (JSONObject)elem;
