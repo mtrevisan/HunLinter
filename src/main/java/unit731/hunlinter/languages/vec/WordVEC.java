@@ -192,7 +192,8 @@ public class WordVEC{
 		//check if the word have a stress, not on the last letter, not followed by an en dash
 		final int wordLength = word.length();
 		if(stressIndex >= 0
-				&& stressIndex + 1 < wordLength
+				//filter out stress on last vowel of the word
+				&& stressIndex + 1 < wordLength && word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
 				&& word.charAt(stressIndex + 1) != HyphenationParser.EN_DASH.charAt(0)
 				&& !GraphemeVEC.isDiphtong(word)
 				&& !GraphemeVEC.isHyatus(word)

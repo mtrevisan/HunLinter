@@ -33,10 +33,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 		setFont(FontHelper.getCurrentFont());
 		setText(value != null? String.valueOf(value): StringUtils.SPACE);
 
-		try{
-			table.setRowHeight(row, getPreferredSize().height + 4);
-		}
-		catch(final IndexOutOfBoundsException ignored){}
+		table.setRowHeight(row, getPreferredSize().height + 4);
 
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)?

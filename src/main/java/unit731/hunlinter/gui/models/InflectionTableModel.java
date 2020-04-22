@@ -39,7 +39,7 @@ public class InflectionTableModel extends AbstractTableModel implements HunLinte
 
 	@Override
 	public Object getValueAt(final int rowIndex, final int columnIndex){
-		if(inflections == null || inflections.size() <= rowIndex)
+		if(inflections == null || rowIndex < 0 || inflections.size() <= rowIndex)
 			return null;
 
 		final Inflection inflection = inflections.get(rowIndex);
