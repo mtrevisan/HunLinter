@@ -219,7 +219,7 @@ final int iconSize = 17;
          final String synonyms = synonymsTextField.getText();
          final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
-               "There is some duplicates with same part–of–speech and definition(s) '" + message
+               "There is some duplicates with same part-of-speech and definition(s) '" + message
                + "'.\nForce insertion?", "Duplicate detected",
                JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);

@@ -52,7 +52,7 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoFile	The reference to the auto–correct file
+	 * @param acoFile	The reference to the auto-correct file
 	 * @throws IOException	If an I/O error occurs
 	 * @throws SAXException	If an parsing error occurs on the `xml` file
 	 */
@@ -89,7 +89,7 @@ public class AutoCorrectParser{
 			list -> list.size() > 1,
 			duplications::add);
 		for(final List<CorrectionEntry> duplication : duplications)
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in auto–correct file: incorrect form '{}', correct forms '{}'",
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in auto-correct file: incorrect form '{}', correct forms '{}'",
 				duplication.get(0).getIncorrectForm(),
 				duplication.stream().map(CorrectionEntry::getCorrectForm).collect(Collectors.toList()));
 	}
@@ -159,7 +159,7 @@ public class AutoCorrectParser{
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String incorrect, String correct){
-		//extract part–of–speech if present
+		//extract part-of-speech if present
 		final String incorrectFilter = (!incorrect.isEmpty()? incorrect: ".+");
 		final String correctFilter = (!correct.isEmpty()? correct: ".+");
 

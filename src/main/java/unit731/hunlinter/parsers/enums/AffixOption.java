@@ -88,7 +88,7 @@ public enum AffixOption{
 	/** Forbid word duplicates in compounds */
 	FORBID_DUPLICATES_IN_COMPOUND("CHECKCOMPOUNDDUP"),
 	/**
-	 * Forbid compounding if the (usually bad) compound word may be a non–compound word with a REP substitution (useful for languages with
+	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP substitution (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
 	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),

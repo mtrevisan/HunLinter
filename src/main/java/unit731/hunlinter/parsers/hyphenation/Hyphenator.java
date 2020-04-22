@@ -156,7 +156,7 @@ public class Hyphenator implements HyphenatorInterface{
 			for(final SearchResult<String> r : itr){
 				final String rule = r.getValue();
 
-				//number of non–letter characters
+				//number of non-letter characters
 				final int delta = HyphenationParser.getKeyFromData(rule).length() - HyphenationParser.getKeyFromData(rule).length();
 				final int startingIndex = r.getIndexBegin() - delta;
 
@@ -189,7 +189,7 @@ public class Hyphenator implements HyphenatorInterface{
 	public String[] splitIntoCompounds(final String word){
 		String[] response;
 		if(hypParser.isSecondLevelPresent()){
-			//apply first level hyphenation non–compound
+			//apply first level hyphenation non-compound
 			final HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND,
 				hypParser.getOptions().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);

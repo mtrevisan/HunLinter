@@ -35,11 +35,11 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
- * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non–standard hyphenation extension.
+ * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non-standard hyphenation extension.
  *
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
- * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non–standard readme</a>
+ * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non-standard readme</a>
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
@@ -209,7 +209,7 @@ public class HyphenationParser{
 					if(level == Level.COMPOUND)
 						throw new LinterException(MORE_THAN_TWO_LEVELS);
 
-					//start with non–compound level
+					//start with non-compound level
 					level = Level.COMPOUND;
 					continue;
 				}
@@ -439,7 +439,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * A standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+	 * A standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
 	 * (for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 	 */
 	private static void ensureUniqueness(final Set<String> reducedPatterns, final String cleanedRule, final String rule){

@@ -243,7 +243,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			}
 
 			// -- Simple heuristics --
-			//if the percentage of non–empty contents in check between the index `nextCheckPos` and `check` is greater than
+			//if the percentage of non-empty contents in check between the index `nextCheckPos` and `check` is greater than
 			//some constant value (e.g. 0.9), new `next_check_pos` index is written by `check`
 			if((double)nonZeroNum / (pos - nextCheckPos + 1) >= 0.95)
 				//from the position `next_check_pos` to `pos`, if the occupied space is above 95%, the next time you insert the node,

@@ -288,7 +288,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return prods;
 	}
 
-	//is word a non–compound with a REP substitution (see checkcompoundrep)?
+	//is word a non-compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
 		boolean exists = (match(compoundAsReplacement, word::contains) != null);
 		if(!exists && word.length() >= 2){

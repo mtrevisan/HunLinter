@@ -58,7 +58,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("Word {0} have unnecessary stress");
-	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
+	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non-ƚ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE = new MessageFormat("Word with ƚ cannot contain rule {0} or {1}, {2}");
 	private static final MessageFormat WORD_WITH_VAN_EL_NEAR_CONSONANT = new MessageFormat("Word with ƚ near a consonant, {0}");
 	private static final MessageFormat WORD_WITH_MIXED_VARIANTS = new MessageFormat("Word with mixed variants, {0}");

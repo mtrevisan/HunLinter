@@ -33,7 +33,7 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 public class DictionaryEntry{
 
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line ''{0}''");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non–existent rule ''{0}''{1}");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}''{1}");
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
@@ -223,8 +223,8 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * @param partOfSpeech	Part–of–Speech WITH the MorphologicalTag.PART_OF_SPEECH prefix
-	 * @return	Whether this entry has the given Part–of–Speech
+	 * @param partOfSpeech	Part-of-Speech WITH the MorphologicalTag.PART_OF_SPEECH prefix
+	 * @return	Whether this entry has the given Part-of-Speech
 	 */
 	public boolean hasPartOfSpeech(final String partOfSpeech){
 		return hasMorphologicalField(partOfSpeech);

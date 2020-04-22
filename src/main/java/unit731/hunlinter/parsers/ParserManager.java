@@ -242,11 +242,11 @@ public class ParserManager implements FileChangeListener{
 
 	public void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
 		if(acoFile != null && acoFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening Auto–Correct file: {}", acoFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Auto-Correct file: {}", acoFile.getName());
 
 			acoParser.parse(acoFile);
 
-			LOGGER.info(MARKER_APPLICATION, "Finished reading Auto–Correct file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Auto-Correct file");
 		}
 		else
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT);

@@ -585,7 +585,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
 			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
 
-			//auto–correct file:
+			//auto-correct file:
 			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane,
 				(parserManager.getAcoParser().getCorrectionsCounter() > 0)));
 

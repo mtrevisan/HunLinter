@@ -122,7 +122,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		//helps unmap a memory-mapped file before being garbage-collected.
 		if(buffer != null && buffer.isDirect()){
 			//we could use this type cast and call functions without reflection code,
-			//but static import from sun.* package is risky for non–SUN virtual machine
+			//but static import from sun.* package is risky for non-SUN virtual machine
 //			try{
 //				((sun.nio.ch.DirectBuffer)buffer).cleaner().clean();
 //			}

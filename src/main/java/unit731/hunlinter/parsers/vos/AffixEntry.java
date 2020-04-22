@@ -166,15 +166,16 @@ public class AffixEntry{
 		String[] mf = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
 		final String[] amf = (morphologicalFields != null? morphologicalFields: new String[0]);
 
-		//NOTE: part–of–speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
-			MorphologicalTag.INFLECTIONAL_PREFIX);
-		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
-			MorphologicalTag.TERMINAL_PREFIX);
+//FIXME kantaren-e	st:kantar ds:nordic is:interrogative	SFX t4 0 en/I0 [aei]r ts:conditional+present is:first+plural ds:nordic	SFX I0 0 –e . is:interrogative
+		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
+//		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
+//			MorphologicalTag.INFLECTIONAL_PREFIX);
+//		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
+//			MorphologicalTag.TERMINAL_PREFIX);
 		//remove inflectional and terminal suffixes
-		mf = removeIf(mf, field ->
-			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
+//		mf = removeIf(mf, field ->
+//			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
+//			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
 
 		//add morphological fields from the applied affix
 		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(mf, amf): ArrayUtils.addAll(amf, mf));

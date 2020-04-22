@@ -51,7 +51,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PoSFSAWorker.class);
 
-	public static final String WORKER_NAME = "Part–of–Speech FSA Extractor";
+	public static final String WORKER_NAME = "Part-of-Speech FSA Extractor";
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
