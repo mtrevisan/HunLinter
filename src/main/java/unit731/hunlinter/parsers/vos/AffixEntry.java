@@ -163,22 +163,26 @@ public class AffixEntry{
 	 * @return	The list of new morphological fields
 	 */
 	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
-		String[] mf = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
-		final String[] amf = (morphologicalFields != null? morphologicalFields: new String[0]);
+		String[] baseMorphFields = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
+		final String[] ruleMorphFields = (morphologicalFields != null? morphologicalFields: new String[0]);
 
 //FIXME kantaren-e	st:kantar ds:nordic is:interrogative	SFX t4 0 en/I0 [aei]r ts:conditional+present is:first+plural ds:nordic	SFX I0 0 –e . is:interrogative
 		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
 //		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
 //			MorphologicalTag.INFLECTIONAL_PREFIX);
-//		final boolean containsTerminalAffixes = containsAffixes(amf, MorphologicalTag.TERMINAL_SUFFIX,
+//		final boolean containsTerminalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.TERMINAL_SUFFIX,
 //			MorphologicalTag.TERMINAL_PREFIX);
+		final boolean containsDerivationalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.DERIVATIONAL_SUFFIX,
+			MorphologicalTag.DERIVATIONAL_PREFIX);
 		//remove inflectional and terminal suffixes
-//		mf = removeIf(mf, field ->
+//		baseMorphFields = removeIf(baseMorphFields, field ->
 //			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-//			|| !containsTerminalAffixes && MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field));
+//			|| !containsTerminalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
+		baseMorphFields = removeIf(baseMorphFields, field ->
+			containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
 
 		//add morphological fields from the applied affix
-		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(mf, amf): ArrayUtils.addAll(amf, mf));
+		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(baseMorphFields, ruleMorphFields): ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
 	}
 
 	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){

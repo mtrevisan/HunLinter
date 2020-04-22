@@ -807,7 +807,7 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(createInflection("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words[0]);
 		//suffix inflections
 		Assertions.assertEquals(createInflection("drinkable", "PS", "st:drink po:verb al:drank al:drunk ds:der_able"), words[1]);
-		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:verb al:drank al:drunk is:sg_3"), words[2]);
+		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[2]);
 		//prefix inflections
 		Assertions.assertEquals(createInflection("drinkables", "P", "st:drink po:verb al:drank al:drunk ds:der_able is:plur"),
 			words[3]);
