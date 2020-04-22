@@ -82,6 +82,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
+
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
 			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
 			popupMergeMenuItem.setEnabled(false);
@@ -91,7 +93,6 @@ final int iconSize = 17;
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
 			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIHelper::copyCallback));
 			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
-			GUIHelper.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
 			GUIHelper.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}

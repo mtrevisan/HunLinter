@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -24,6 +25,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.RegexHelper;
@@ -88,6 +90,11 @@ public class GUIHelper{
 		return createPopupMenu("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
 	}
 
+	public static JMenuItem createPopupExportTableMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnExport)
+			throws IOException{
+		return createPopupMenu("Export", 'E', "/popup_export.png", iconSize, popupMenu, fnExport);
+	}
+
 	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
 			throws IOException{
 		return createPopupMenu("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
@@ -106,6 +113,21 @@ public class GUIHelper{
 
 		if(textToCopy != null)
 			copyToClipboard(textToCopy);
+	}
+
+	public static void exportTableCallback(final Component invoker){
+		if(invoker instanceof JCopyableTable){
+			final StringJoiner sj = new StringJoiner(StringUtils.LF);
+			final int rows = ((JTable)invoker).getModel().getRowCount();
+			for(int row = 0; row < rows; row ++){
+				final String textToCopy = ((JCopyableTable)invoker).getValueAtRow(row);
+				sj.add(textToCopy);
+			}
+			if(sj.length() > 0)
+				copyToClipboard(sj.toString());
+		}
+		else
+			copyCallback(invoker);
 	}
 
 	public static void copyToClipboard(final JCopyableTable table){

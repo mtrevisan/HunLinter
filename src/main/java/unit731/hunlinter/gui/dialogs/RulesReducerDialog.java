@@ -65,9 +65,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		init();
 
 		try{
-			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIHelper.createPopupCopyMenu(reducedSetLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
-			GUIHelper.addPopupMenu(popupMenu, reducedSetTextArea);
+			final JPopupMenu copyPopupMenu = new JPopupMenu();
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(reducedSetLabel.getHeight(), copyPopupMenu, GUIHelper::copyCallback));
+			GUIHelper.addPopupMenu(copyPopupMenu, reducedSetTextArea);
 		}
 		catch(final IOException ignored){}
 
