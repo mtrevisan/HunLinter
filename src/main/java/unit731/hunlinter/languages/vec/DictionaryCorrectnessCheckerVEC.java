@@ -42,6 +42,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
+	private static final String WORD_SEPARATORS = HyphenationParser.MINUS_SIGN + HyphenationParser.EN_DASH;
+
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 	private static Pattern PATTERN_NON_VANISHING_EL;
@@ -146,8 +148,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void variantsCheck(final Inflection inflection){
 		final String derivedWord = inflection.getWord();
-		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT),
-			HyphenationParser.MINUS_SIGN + HyphenationParser.EN_DASH);
+		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), WORD_SEPARATORS);
 		final Set<LanguageVariant> variants = new HashSet<>();
 		for(final String subword : subwords){
 			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
