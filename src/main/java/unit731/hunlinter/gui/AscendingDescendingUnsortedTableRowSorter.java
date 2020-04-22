@@ -21,4 +21,19 @@ public class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> ext
 			super.toggleSortOrder(column);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * Overridden to cope with the annoying IOOBE
+	 */
+	@Override
+	public int convertRowIndexToModel(final int index){
+		try{
+			return super.convertRowIndexToModel(index);
+		}
+		catch(final IndexOutOfBoundsException ignored){
+			return -1;
+		}
+	}
+
 }
