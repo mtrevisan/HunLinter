@@ -146,7 +146,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void variantsCheck(final Inflection inflection){
 		final String derivedWord = inflection.getWord();
-		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), HyphenationParser.MINUS_SIGN);
+		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT),
+			HyphenationParser.MINUS_SIGN + HyphenationParser.EN_DASH);
 		final Set<LanguageVariant> variants = new HashSet<>();
 		for(final String subword : subwords){
 			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
