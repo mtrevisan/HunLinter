@@ -333,12 +333,11 @@ public class AffixEntry{
 		sj.add(parent.getType().getOption().getCode())
 			.add(parent.getFlag())
 			.add(removing.isEmpty()? ZERO: removing)
-			.add(appending.isEmpty()? ZERO: appending);
-		if(continuationFlags != null && continuationFlags.length > 0)
-			sj.add(SLASH + String.join(StringUtils.EMPTY, continuationFlags));
-		sj.add(condition);
+			.add((appending.isEmpty()? ZERO: appending)
+				+ (continuationFlags != null && continuationFlags.length > 0? SLASH + String.join(StringUtils.EMPTY, continuationFlags): StringUtils.EMPTY))
+			.add(condition);
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sj.add(String.join(StringUtils.EMPTY, morphologicalFields));
+			sj.add(String.join(StringUtils.SPACE, morphologicalFields));
 		return sj.toString();
 	}
 
