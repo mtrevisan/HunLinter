@@ -166,7 +166,6 @@ public class AffixEntry{
 		String[] baseMorphFields = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
 		final String[] ruleMorphFields = (morphologicalFields != null? morphologicalFields: new String[0]);
 
-//FIXME kantaren-e	st:kantar ds:nordic is:interrogative	SFX t4 0 en/I0 [aei]r ts:conditional+present is:first+plural ds:nordic	SFX I0 0 –e . is:interrogative
 		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
 //		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
 //			MorphologicalTag.INFLECTIONAL_PREFIX);
