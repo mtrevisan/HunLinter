@@ -114,7 +114,7 @@ public class RulesReducer{
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): ZERO);
 		final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 		if(lastAppliedRule != null)
-			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
+			addition += lastAppliedRule.toString(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}

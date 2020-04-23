@@ -318,7 +318,7 @@ public class AffixEntry{
 			removing + word.substring(appending.length()));
 	}
 
-	public String toStringWithMorphologicalFields(final FlagParsingStrategy strategy){
+	public String toString(final FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy);
 
 		final StringBuffer sb = new StringBuffer();

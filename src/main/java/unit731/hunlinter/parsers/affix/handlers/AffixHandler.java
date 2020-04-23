@@ -24,7 +24,7 @@ public class AffixHandler implements Handler{
 
 	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line ''{0}'': the third parameter is not a number");
 	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
-	private static final String DUPLICATED_LINE = "Duplicated line";
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line: {0}");
 	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
 	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
 
@@ -40,7 +40,7 @@ public class AffixHandler implements Handler{
 				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
-			final AffixEntry[] entries = readEntries(context, strategy, getData);
+			final AffixEntry[] entries = readEntries(context, strategy, parent, getData);
 			parent.setEntries(entries);
 
 			addData.accept(ruleFlag, parent);
@@ -50,7 +50,7 @@ public class AffixHandler implements Handler{
 		}
 	}
 
-	private AffixEntry[] readEntries(final ParsingContext context, final FlagParsingStrategy strategy,
+	private AffixEntry[] readEntries(final ParsingContext context, final FlagParsingStrategy strategy, final RuleEntry parent,
 			final Function<AffixOption, List<String>> getData) throws IOException{
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
@@ -72,6 +72,7 @@ public class AffixHandler implements Handler{
 
 			line = scanner.nextLine();
 			final AffixEntry entry = new AffixEntry(line, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
+			entry.setParent(parent);
 //com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
 
@@ -79,7 +80,7 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries, entry))
-				throw new LinterException(DUPLICATED_LINE);
+				throw new LinterException(DUPLICATED_LINE.format(new Object[]{entry.toString()}));
 
 			entries[offset ++] = entry;
 
