@@ -146,6 +146,7 @@ final int iconSize = 17;
       table.setModel(new InflectionTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
+      table.getTableHeader().setReorderingAllowed(false);
       table.setRowSelectionAllowed(true);
       TableRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)

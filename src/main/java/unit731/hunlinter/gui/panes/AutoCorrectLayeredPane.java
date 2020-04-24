@@ -142,6 +142,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
+      table.getTableHeader().setReorderingAllowed(false);
       //listen for row removal
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);

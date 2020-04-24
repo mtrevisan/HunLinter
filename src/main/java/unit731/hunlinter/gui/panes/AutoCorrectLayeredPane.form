@@ -134,6 +134,9 @@
             <Property name="selectionMode" type="int" value="0"/>
             <Property name="showHorizontalLines" type="boolean" value="false"/>
             <Property name="showVerticalLines" type="boolean" value="false"/>
+            <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+              <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
+            </Property>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String incorrect = (String)model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String correct = (String)model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;return incorrect + &quot; &gt; &quot; + correct;&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>

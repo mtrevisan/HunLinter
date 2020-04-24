@@ -143,11 +143,11 @@ final int iconSize = 17;
 
       table.setFont(FontHelper.getCurrentFont());
       table.setModel(new ThesaurusTableModel());
-      table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
       table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
+      table.getTableHeader().setReorderingAllowed(false);
       table.getColumnModel().getColumn(0).setMinWidth(200);
       table.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
