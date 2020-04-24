@@ -1,6 +1,7 @@
 package unit731.hunlinter.gui.events;
 
 import javax.swing.*;
+import java.util.Objects;
 
 
 public class TabbedPaneEnableEvent{
@@ -10,10 +11,13 @@ public class TabbedPaneEnableEvent{
 
 
 	public TabbedPaneEnableEvent(final boolean enable){
-		this(null, enable);
+		pane = null;
+		this.enable = enable;
 	}
 
 	public TabbedPaneEnableEvent(final JLayeredPane pane, final boolean enable){
+		Objects.requireNonNull(pane);
+
 		this.pane = pane;
 		this.enable = enable;
 	}

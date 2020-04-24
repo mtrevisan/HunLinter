@@ -148,8 +148,6 @@ final int iconSize = 17;
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
       table.getTableHeader().setReorderingAllowed(false);
-      table.getColumnModel().getColumn(0).setMinWidth(200);
-      table.getColumnModel().getColumn(0).setMaxWidth(500);
       //listen for row removal
       KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);

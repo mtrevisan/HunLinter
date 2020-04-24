@@ -153,7 +153,6 @@ public class JTagPanel extends JPanel{
 			Dimension ps = textLabel.getPreferredSize();
 			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
 			textLabel.setPreferredSize(textLabelSize);
-			textLabel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
 			final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);

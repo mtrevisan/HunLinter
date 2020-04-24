@@ -460,7 +460,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void fillLengthsFrequencies(final Frequency<Integer> frequencies, final long totalSamples, final ChartPanel panel){
 		final boolean hasData = frequencies.entrySetIterator().hasNext();
 
-		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
+		final int index = mainTabbedPane.indexOfComponent(panel);
+		mainTabbedPane.setEnabledAt(index, hasData);
 		if(hasData){
 			//extract data set
 			final XYSeries series = new XYSeries("frequencies");

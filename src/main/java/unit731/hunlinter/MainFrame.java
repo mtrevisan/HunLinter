@@ -258,29 +258,17 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
-      dicLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
-      cmpLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
-
-      theLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
-
-      hypLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
-
-      acoLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
-
-      sexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
-
-      wexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
-
-      pdcLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("PoS FSA", pdcLayeredPane);
+
+		EventBusService.publish(new TabbedPaneEnableEvent(false));
+
 
       addWindowListener(new WindowAdapter(){
          @Override
@@ -539,8 +527,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//clear all
 		loadFileCancelled(null);
 
-		EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_ALL);
-
 		mainTabbedPane.setSelectedIndex(0);
 
 
@@ -631,8 +617,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			mainTabbedPane.setEnabledAt(index, enable);
 		}
 		else
-			for(int i = 0; i < mainTabbedPane.getComponentCount(); i ++)
-				mainTabbedPane.getComponent(i).setEnabled(enable);
+			for(int index = 0; index < mainTabbedPane.getComponentCount(); index ++)
+				mainTabbedPane.setEnabledAt(index, enable);
 	}
 
 	private void loadFileCancelled(final Exception exc){
