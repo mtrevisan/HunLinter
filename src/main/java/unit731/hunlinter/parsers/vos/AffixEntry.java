@@ -167,8 +167,8 @@ public class AffixEntry{
 		final String[] ruleMorphFields = (morphologicalFields != null? morphologicalFields: new String[0]);
 
 		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-//		final boolean containsInflectionalAffix = containsAffixes(amf, MorphologicalTag.INFLECTIONAL_SUFFIX,
-//			MorphologicalTag.INFLECTIONAL_PREFIX);
+		final boolean containsInflectionalAffix = containsAffixes(ruleMorphFields, MorphologicalTag.INFLECTIONAL_SUFFIX,
+			MorphologicalTag.INFLECTIONAL_PREFIX);
 //		final boolean containsTerminalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.TERMINAL_SUFFIX,
 //			MorphologicalTag.TERMINAL_PREFIX);
 		final boolean containsDerivationalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.DERIVATIONAL_SUFFIX,
@@ -178,7 +178,8 @@ public class AffixEntry{
 //			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
 //			|| !containsTerminalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
 		baseMorphFields = removeIf(baseMorphFields, field ->
-			containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
+			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
+			|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
 
 		//add morphological fields from the applied affix
 		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(baseMorphFields, ruleMorphFields): ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
