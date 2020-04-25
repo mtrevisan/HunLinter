@@ -44,6 +44,9 @@ import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
+/*
+TODO http://www.java2s.com/Tutorial/Java/0240__Swing/ListeningforClicksonaColumnHeaderinaJTableComponent.htm
+ */
 public class DictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 7030870103355904749L;
