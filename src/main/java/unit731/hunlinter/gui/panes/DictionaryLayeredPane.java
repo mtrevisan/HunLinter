@@ -147,12 +147,13 @@ final int iconSize = 17;
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
       table.getTableHeader().setReorderingAllowed(false);
+      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
+      table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+
       table.setRowSelectionAllowed(true);
       TableRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)
       table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
-      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
-      table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
       scrollPane.setViewportView(table);
 
       totalInflectionsLabel.setText("Total inflections:");

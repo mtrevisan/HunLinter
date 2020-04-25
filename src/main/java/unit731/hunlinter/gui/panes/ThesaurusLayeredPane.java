@@ -155,6 +155,8 @@ final int iconSize = 17;
       table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
 
       TableRenderer theCellRenderer = new TableRenderer();
+      table.getColumnModel().getColumn(0).setMinWidth(150);
+      table.getColumnModel().getColumn(0).setMaxWidth(300);
       table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
       scrollPane.setViewportView(table);
 
