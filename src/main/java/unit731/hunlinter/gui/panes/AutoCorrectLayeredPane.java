@@ -148,8 +148,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       table.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       final KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
-      GUIHelper.addScrollToHome(table);
-      GUIHelper.addScrollToEnd(table);
+      GUIHelper.addScrollToFirstRow(table);
+      GUIHelper.addScrollToLastRow(table);
 
       table.addMouseListener(new MouseAdapter(){
          public void mouseClicked(final MouseEvent e){

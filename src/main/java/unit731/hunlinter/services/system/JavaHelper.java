@@ -43,6 +43,24 @@ public class JavaHelper{
 			SwingUtilities.invokeLater(runnable);
 	}
 
+	public static void delayedRun(final Runnable runnable, final long delayMillis){
+		final long requestedStartTime = System.currentTimeMillis() + delayMillis;
+		new Thread(() -> {
+			while(true){
+				try{
+					final long leftToSleep = requestedStartTime - System.currentTimeMillis();
+					if(leftToSleep > 0l)
+						Thread.sleep(leftToSleep);
+
+					break;
+				}
+				catch(final InterruptedException ignored){}
+			}
+
+			runnable.run();
+		}).start();
+	}
+
 	/* Stop current running Java application and start a new one */
 	public static void closeAndStartAnotherApplication(final String jarURL){
 		//init the command to execute, add the vm args

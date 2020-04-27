@@ -27,6 +27,7 @@ import javax.swing.undo.UndoManager;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.workers.core.WorkerAbstract;
 import unit731.hunlinter.services.RegexHelper;
 
@@ -273,32 +274,28 @@ public class GUIHelper{
 		table.setRowSorter(dicSorter);
 	}
 
-	public static void addScrollToHome(final JTable table){
+	public static void addScrollToFirstRow(final JTable table){
 		final KeyStroke homeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0, false);
 		table.registerKeyboardAction(event -> {
 			final int index = table.convertRowIndexToView(0);
-			if(table.getRowSelectionAllowed()){
-				table.clearSelection();
-
-				table.setRowSelectionInterval(index, index);
-			}
-			table.scrollRectToVisible(table.getCellRect(index, 0, true));
+			table.changeSelection(index, 0, false, false);
 		}, homeKeyStroke, JComponent.WHEN_FOCUSED);
 	}
 
-	public static void addScrollToEnd(final JTable table){
+	public static void addScrollToLastRow(final JTable table){
 		final KeyStroke endKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_END, 0, false);
 		table.registerKeyboardAction(event -> {
-			final int index = table.convertRowIndexToView(table.getRowCount() - 1);
-			if(table.getRowSelectionAllowed()){
-				table.clearSelection();
+			final int index = table.convertRowIndexToView(table.getModel().getRowCount() - 1);
+			table.changeSelection(index, 0, false, false);
 
-				table.setRowSelectionInterval(index, index);
-			}
-			table.scrollRectToVisible(table.getCellRect(index, 0, true));
+			//hack (repeat command)
+			JavaHelper.delayedRun(() -> {
+				JavaHelper.executeOnEventDispatchThread(() -> {
+					table.changeSelection(index, 0, false, false);
+				});
+			}, 10);
 		}, endKeyStroke, JComponent.WHEN_FOCUSED);
 	}
-
 
 	//Extract parent frame from menu item
 	public static Frame getParentFrame(final JMenuItem menuItem){

@@ -153,8 +153,8 @@ final int iconSize = 17;
       table.registerKeyboardAction(event -> removeSelectedRowsFromThesaurus(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
       final KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
-      GUIHelper.addScrollToHome(table);
-      GUIHelper.addScrollToEnd(table);
+      GUIHelper.addScrollToFirstRow(table);
+      GUIHelper.addScrollToLastRow(table);
 
       final TableRenderer theCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(0).setMinWidth(150);
