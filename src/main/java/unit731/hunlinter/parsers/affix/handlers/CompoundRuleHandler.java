@@ -28,7 +28,7 @@ public class CompoundRuleHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
 			final int numEntries = checkValidity(context);
@@ -56,6 +56,8 @@ public class CompoundRuleHandler implements Handler{
 			}
 
 			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
+
+			return numEntries;
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

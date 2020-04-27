@@ -165,6 +165,7 @@ public class AffixParser{
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				indexLine ++;
+System.out.println(indexLine + ": " + line);
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
@@ -177,7 +178,7 @@ public class AffixParser{
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
-						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
+						indexLine += handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(final RuntimeException e){
 						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));

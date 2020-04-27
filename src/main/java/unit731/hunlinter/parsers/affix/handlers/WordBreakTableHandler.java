@@ -31,7 +31,7 @@ public class WordBreakTableHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
 			final Scanner scanner = context.getScanner();
@@ -44,6 +44,8 @@ public class WordBreakTableHandler implements Handler{
 			final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
 
 			addData.accept(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
+
+			return numEntries;
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

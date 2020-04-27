@@ -24,7 +24,7 @@ public class AliasesHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
 			final Scanner scanner = context.getScanner();
@@ -47,6 +47,8 @@ public class AliasesHandler implements Handler{
 			}
 
 			addData.accept(context.getRuleType(), aliases);
+
+			return numEntries;
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e.getMessage());

@@ -33,12 +33,12 @@ public class RulesLoader{
 
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;
-	private final boolean wordCanHaveMultipleAccents;
+	private final boolean wordCanHaveMultipleStresses;
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
-	private final Set<String> multipleAccentedWords;
-	private final Set<String> hasToContainAccent = new HashSet<>();
-	private final Set<String> cannotContainAccent = new HashSet<>();
+	private final Set<String> multipleStressedWords;
+	private final Set<String> hasToContainStress = new HashSet<>();
+	private final Set<String> cannotContainStress = new HashSet<>();
 	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
@@ -50,7 +50,7 @@ public class RulesLoader{
 
 		morphologicalFieldsCheck = Boolean.parseBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
-		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
+		wordCanHaveMultipleStresses = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleStresses"));
 
 		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
 		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
@@ -60,15 +60,15 @@ public class RulesLoader{
 		dataFields.put(MorphologicalTag.ALLOMORPH, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
-		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');
+		multipleStressedWords = readPropertyAsSet("multipleStressedWords", ',');
 
 		if(strategy != null){
-			String[] flags = strategy.parseFlags(readProperty("hasToContainAccent"));
+			String[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
 			if(flags != null)
-				hasToContainAccent.addAll(Arrays.asList(flags));
-			flags = strategy.parseFlags(readProperty("cannotContainAccent"));
+				hasToContainStress.addAll(Arrays.asList(flags));
+			flags = strategy.parseFlags(readProperty("cannotContainStress"));
 			if(flags != null)
-				cannotContainAccent.addAll(Arrays.asList(flags));
+				cannotContainStress.addAll(Arrays.asList(flags));
 
 			Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
 			while(rules.hasNext()){
@@ -134,8 +134,8 @@ public class RulesLoader{
 		return enableVerbSyllabationCheck;
 	}
 
-	public boolean isWordCanHaveMultipleAccents(){
-		return wordCanHaveMultipleAccents;
+	public boolean isWordCanHaveMultipleStresses(){
+		return wordCanHaveMultipleStresses;
 	}
 
 	public boolean containsDataField(final MorphologicalTag key){
@@ -150,16 +150,16 @@ public class RulesLoader{
 		return unsyllabableWords.contains(word);
 	}
 
-	public boolean containsMultipleAccentedWords(final String word){
-		return multipleAccentedWords.contains(word);
+	public boolean containsMultipleStressedWords(final String word){
+		return multipleStressedWords.contains(word);
 	}
 
-	public boolean containsHasToContainAccent(final String word){
-		return hasToContainAccent.contains(word);
+	public boolean containsHasToContainStress(final String word){
+		return hasToContainStress.contains(word);
 	}
 
-	public boolean containsCannotContainAccent(final String word){
-		return cannotContainAccent.contains(word);
+	public boolean containsCannotContainStress(final String word){
+		return cannotContainStress.contains(word);
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Inflection inflection){

@@ -30,7 +30,7 @@ public class AffixHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		try{
 			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
@@ -44,6 +44,8 @@ public class AffixHandler implements Handler{
 			parent.setEntries(entries);
 
 			addData.accept(ruleFlag, parent);
+
+			return Integer.parseInt(context.getThirdParameter());
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

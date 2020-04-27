@@ -11,7 +11,7 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 
 public interface Handler{
 
-	void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 		final Function<AffixOption, List<String>> getData);
 
 }

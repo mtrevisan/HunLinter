@@ -12,9 +12,11 @@ import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 public class CopyOverHandler implements Handler{
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		addData.accept(context.getRuleType(), context.getAllButFirstParameter());
+
+		return 0;
 	}
 
 }

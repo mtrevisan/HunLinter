@@ -130,10 +130,10 @@ public class WordVEC{
 
 	//[àèéíòóú]
 	public static boolean hasStressedGrapheme(final String word){
-		return (countAccents(word) == 1);
+		return (countStresses(word) == 1);
 	}
 
-	public static int countAccents(final String word){
+	public static int countStresses(final String word){
 		return (int)IntStream.range(0, word.length())
 			.filter(i -> Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
 			.count();

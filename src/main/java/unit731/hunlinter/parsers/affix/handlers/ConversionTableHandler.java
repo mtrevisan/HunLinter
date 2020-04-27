@@ -20,12 +20,14 @@ public class ConversionTableHandler implements Handler{
 	}
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		final ConversionTable table = new ConversionTable(affixOption);
 		table.parse(context);
 
 		addData.accept(affixOption.getCode(), table);
+
+		return Integer.parseInt(context.getFirstParameter());
 	}
 
 }

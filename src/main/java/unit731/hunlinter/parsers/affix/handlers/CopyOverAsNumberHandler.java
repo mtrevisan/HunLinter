@@ -17,12 +17,14 @@ public class CopyOverAsNumberHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
 			final Function<AffixOption, List<String>> getData){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 
 		addData.accept(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
+
+		return Integer.parseInt(context.getFirstParameter());
 	}
 
 }
