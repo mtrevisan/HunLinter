@@ -289,13 +289,10 @@ public class GUIHelper{
 			table.changeSelection(index, 0, false, false);
 
 			//hack (repeat command)
-			JavaHelper.delayedRun(() -> {
-				JavaHelper.executeOnEventDispatchThread(() -> {
-					table.changeSelection(index, 0, false, false);
-				});
-			}, 10);
+			JavaHelper.delayedRun(() -> table.changeSelection(index, 0, false, false), 10);
 		}, endKeyStroke, JComponent.WHEN_FOCUSED);
 	}
+
 
 	//Extract parent frame from menu item
 	public static Frame getParentFrame(final JMenuItem menuItem){
