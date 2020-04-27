@@ -144,10 +144,14 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       table.setShowVerticalLines(false);
       table.getTableHeader().setReorderingAllowed(false);
       //listen for row removal
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+      final KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(event -> removeSelectedRowsFromAutoCorrect(), cancelKeyStroke, JComponent.WHEN_FOCUSED);
-      KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
+      final KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
+      final KeyStroke homeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0, false);
+      final KeyStroke endKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_END, 0, false);
+      table.registerKeyboardAction(event -> table.scrollRectToVisible(table.getCellRect(0, 0, true)), homeKeyStroke, JComponent.WHEN_FOCUSED);
+      table.registerKeyboardAction(event -> table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true)), endKeyStroke, JComponent.WHEN_FOCUSED);
 
       table.addMouseListener(new MouseAdapter(){
          public void mouseClicked(final MouseEvent e){
@@ -181,7 +185,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          }
       });
 
-      TableRenderer acoCellRenderer = new TableRenderer();
+      final TableRenderer acoCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
       scrollPane.setViewportView(table);
 
