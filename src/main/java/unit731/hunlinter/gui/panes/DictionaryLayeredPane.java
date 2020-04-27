@@ -152,10 +152,8 @@ final int iconSize = 17;
       table.getTableHeader().setReorderingAllowed(false);
       final KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);
       table.registerKeyboardAction(event -> GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);
-      final KeyStroke homeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0, false);
-      final KeyStroke endKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_END, 0, false);
-      table.registerKeyboardAction(event -> table.scrollRectToVisible(table.getCellRect(0, 0, true)), homeKeyStroke, JComponent.WHEN_FOCUSED);
-      table.registerKeyboardAction(event -> table.scrollRectToVisible(table.getCellRect(table.getRowCount() - 1, 0, true)), endKeyStroke, JComponent.WHEN_FOCUSED);
+      GUIHelper.addScrollToHome(table);
+      GUIHelper.addScrollToEnd(table);
 
       table.setRowSelectionAllowed(true);
       final TableRenderer dicCellRenderer = new TableRenderer();

@@ -273,6 +273,32 @@ public class GUIHelper{
 		table.setRowSorter(dicSorter);
 	}
 
+	public static void addScrollToHome(final JTable table){
+		final KeyStroke homeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0, false);
+		table.registerKeyboardAction(event -> {
+			final int index = table.convertRowIndexToView(0);
+			if(table.getRowSelectionAllowed()){
+				table.clearSelection();
+
+				table.setRowSelectionInterval(index, index);
+			}
+			table.scrollRectToVisible(table.getCellRect(index, 0, true));
+		}, homeKeyStroke, JComponent.WHEN_FOCUSED);
+	}
+
+	public static void addScrollToEnd(final JTable table){
+		final KeyStroke endKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_END, 0, false);
+		table.registerKeyboardAction(event -> {
+			final int index = table.convertRowIndexToView(table.getRowCount() - 1);
+			if(table.getRowSelectionAllowed()){
+				table.clearSelection();
+
+				table.setRowSelectionInterval(index, index);
+			}
+			table.scrollRectToVisible(table.getCellRect(index, 0, true));
+		}, endKeyStroke, JComponent.WHEN_FOCUSED);
+	}
+
 
 	//Extract parent frame from menu item
 	public static Frame getParentFrame(final JMenuItem menuItem){
