@@ -384,15 +384,12 @@
     </Component>
     <Container class="javax.swing.JTabbedPane" name="mainTabbedPane">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="for(int i = 0; i &lt; mainTabbedPane.getTabCount(); i ++)&#xa;&#x9;mainTabbedPane.setEnabledAt(i, false);&#xa;KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);&#xa;mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="tabbedPaneEnableEvent(new TabbedPaneEnableEvent(false));&#xa;&#xa;KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);&#xa;mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
         <Container class="javax.swing.JLayeredPane" name="dicLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new DictionaryLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -409,9 +406,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="cmpLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new CompoundsLayeredPane(packager, parserManager, workerManager, this)"/>
           </AuxValues>
@@ -428,9 +422,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="theLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ThesaurusLayeredPane(parserManager)"/>
           </AuxValues>
@@ -447,9 +438,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="hypLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new HyphenationLayeredPane(packager, parserManager, this)"/>
           </AuxValues>
@@ -466,9 +454,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="acoLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCorrectLayeredPane(packager, parserManager, this)"/>
           </AuxValues>
@@ -485,9 +470,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="sexLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new SentenceExceptionsLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -504,9 +486,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="wexLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new WordExceptionsLayeredPane(packager, parserManager)"/>
           </AuxValues>
@@ -523,9 +502,6 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="pdcLayeredPane">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new PoSFSALayeredPane(parserManager)"/>
           </AuxValues>

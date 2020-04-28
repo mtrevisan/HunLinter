@@ -259,28 +259,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
-      dicLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
-
-      cmpLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
-
-      theLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
-
-      hypLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
-
-      acoLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
-
-      sexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
-
-      wexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
-
-      pdcLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("PoS FSA", pdcLayeredPane);
 
       addWindowListener(new WindowAdapter(){
@@ -492,8 +477,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
             .addContainerGap())
       );
 
-      for(int i = 0; i < mainTabbedPane.getTabCount(); i ++)
-      mainTabbedPane.setEnabledAt(i, false);
+      tabbedPaneEnableEvent(new TabbedPaneEnableEvent(false));
+
       KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
