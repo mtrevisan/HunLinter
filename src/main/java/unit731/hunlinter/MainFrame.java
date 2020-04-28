@@ -236,12 +236,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
+      setMenu = new javax.swing.JMenu();
+      setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
       hlpIssueReporterMenuItem = new javax.swing.JMenuItem();
       hlpOnlineSeparator = new javax.swing.JPopupMenu.Separator();
       hlpUpdateMenuItem = new javax.swing.JMenuItem();
-      hlpCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       hlpUpdateSeparator = new javax.swing.JPopupMenu.Separator();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -258,17 +259,29 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
+      dicLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+
+      cmpLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
+
+      theLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
+
+      hypLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
+
+      acoLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("AutoCorrect", acoLayeredPane);
+
+      sexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Sentence Exceptions", sexLayeredPane);
+
+      wexLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("Word Exceptions", wexLayeredPane);
+
+      pdcLayeredPane.setEnabled(false);
       mainTabbedPane.addTab("PoS FSA", pdcLayeredPane);
-
-		EventBusService.publish(new TabbedPaneEnableEvent(false));
-
 
       addWindowListener(new WindowAdapter(){
          @Override
@@ -418,6 +431,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(hypMenu);
 
+      setMenu.setMnemonic('S');
+      setMenu.setText("Settings");
+
+      setCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
+      setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
+      setCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
+      setMenu.add(setCheckUpdateOnStartupCheckBoxMenuItem);
+
+      mainMenuBar.add(setMenu);
+
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
@@ -434,11 +457,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hlpUpdateMenuItem.setAction(new UpdateAction());
       hlpUpdateMenuItem.setText("Check for update…");
       hlpMenu.add(hlpUpdateMenuItem);
-
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
-      hlpCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
-      hlpMenu.add(hlpCheckUpdateOnStartupCheckBoxMenuItem);
       hlpMenu.add(hlpUpdateSeparator);
 
       hlpAboutMenuItem.setAction(new AboutAction());
@@ -831,7 +849,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
    private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
-   private javax.swing.JCheckBoxMenuItem hlpCheckUpdateOnStartupCheckBoxMenuItem;
    private javax.swing.JMenuItem hlpIssueReporterMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JMenuItem hlpOnlineHelpMenuItem;
@@ -849,6 +866,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane pdcLayeredPane;
+   private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
+   private javax.swing.JMenu setMenu;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;

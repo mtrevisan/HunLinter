@@ -234,6 +234,25 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="setMenu">
+          <Properties>
+            <Property name="mnemonic" type="int" value="83"/>
+            <Property name="text" type="java.lang.String" value="Settings"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="setCheckUpdateOnStartupCheckBoxMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new CheckUpdateOnStartupAction(preferences)" type="code"/>
+                </Property>
+                <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="preferences.getBoolean(UPDATE_STARTUP_CHECK, true)" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Check for updates on startup"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
         <Menu class="javax.swing.JMenu" name="hlpMenu">
           <Properties>
             <Property name="mnemonic" type="int" value="72"/>
@@ -265,17 +284,6 @@
                   <Connection code="new UpdateAction()" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Check for update&#x2026;"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="hlpCheckUpdateOnStartupCheckBoxMenuItem">
-              <Properties>
-                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="new CheckUpdateOnStartupAction(preferences)" type="code"/>
-                </Property>
-                <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="preferences.getBoolean(UPDATE_STARTUP_CHECK, true)" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Check for updates on startup"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hlpUpdateSeparator">
