@@ -165,7 +165,6 @@ public class AffixParser{
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				indexLine ++;
-System.out.println(indexLine + ": " + line);
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
