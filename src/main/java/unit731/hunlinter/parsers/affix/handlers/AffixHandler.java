@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -30,8 +29,7 @@ public class AffixHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixOption, List<String>> getData){
+	public int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
@@ -40,10 +38,10 @@ public class AffixHandler implements Handler{
 				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
-			final AffixEntry[] entries = readEntries(context, strategy, parent, getData);
+			final AffixEntry[] entries = readEntries(context, parent, affixData);
 			parent.setEntries(entries);
 
-			addData.accept(ruleFlag, parent);
+			affixData.addData(ruleFlag, parent);
 
 			return Integer.parseInt(context.getThirdParameter());
 		}
@@ -52,8 +50,10 @@ public class AffixHandler implements Handler{
 		}
 	}
 
-	private AffixEntry[] readEntries(final ParsingContext context, final FlagParsingStrategy strategy, final RuleEntry parent,
-			final Function<AffixOption, List<String>> getData) throws IOException{
+	private AffixEntry[] readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
+			throws IOException{
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
@@ -64,8 +64,8 @@ public class AffixHandler implements Handler{
 
 		//List<AffixEntry> prefixEntries = new ArrayList<>();
 		//List<AffixEntry> suffixEntries = new ArrayList<>();
-		final List<String> aliasesFlag = getData.apply(AffixOption.ALIASES_FLAG);
-		final List<String> aliasesMorphologicalField = getData.apply(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
+		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
 		int offset = 0;
 		final AffixEntry[] entries = new AffixEntry[numEntries];

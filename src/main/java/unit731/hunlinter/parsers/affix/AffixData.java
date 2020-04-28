@@ -120,11 +120,11 @@ public class AffixData{
 		return strings;
 	}
 
-	<T> void addData(final AffixOption key, final T value){
+	public <T> void addData(final AffixOption key, final T value){
 		addData(key.getCode(), value);
 	}
 
-	<T> void addData(final String key, final T value){
+	public <T> void addData(final String key, final T value){
 		if(closed)
 			throw new LinterException(CONTAINER_CLOSED);
 		if(data.containsKey(key))

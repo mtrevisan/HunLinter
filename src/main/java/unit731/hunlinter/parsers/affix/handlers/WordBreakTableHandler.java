@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -31,8 +32,7 @@ public class WordBreakTableHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixOption, List<String>> getData){
+	public int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -43,7 +43,7 @@ public class WordBreakTableHandler implements Handler{
 
 			final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
 
-			addData.accept(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
+			affixData.addData(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
 
 			return numEntries;
 		}

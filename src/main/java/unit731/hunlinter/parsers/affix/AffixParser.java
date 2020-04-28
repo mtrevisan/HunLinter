@@ -178,7 +178,7 @@ System.out.println(indexLine + ": " + line);
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
-						indexLine += handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
+						indexLine += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
 						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));

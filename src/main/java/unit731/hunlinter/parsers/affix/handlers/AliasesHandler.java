@@ -4,13 +4,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.ParsingContext;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
@@ -24,8 +21,7 @@ public class AliasesHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixOption, List<String>> getData){
+	public int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -46,7 +42,7 @@ public class AliasesHandler implements Handler{
 				aliases.add(parts[1]);
 			}
 
-			addData.accept(context.getRuleType(), aliases);
+			affixData.addData(context.getRuleType(), aliases);
 
 			return numEntries;
 		}

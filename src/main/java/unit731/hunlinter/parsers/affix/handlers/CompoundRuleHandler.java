@@ -3,13 +3,11 @@ package unit731.hunlinter.parsers.affix.handlers;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -28,9 +26,10 @@ public class CompoundRuleHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixOption, List<String>> getData){
+	public int parse(final ParsingContext context, final AffixData affixData){
 		try{
+			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+
 			final int numEntries = checkValidity(context);
 
 			final Scanner scanner = context.getScanner();
@@ -55,7 +54,7 @@ public class CompoundRuleHandler implements Handler{
 					throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
 			}
 
-			addData.accept(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
+			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
 
 			return numEntries;
 		}
