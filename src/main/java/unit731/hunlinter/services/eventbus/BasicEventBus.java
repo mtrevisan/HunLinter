@@ -51,6 +51,8 @@ import java.util.concurrent.ThreadFactory;
 public class BasicEventBus implements EventBusInterface{
 
 	private final List<HandlerInfo> handlers = new CopyOnWriteArrayList<>();
+	private final ArrayList<HandlerInfoCallable> vetoHandlers = new ArrayList<>();
+	private final ArrayList<HandlerInfoCallable> regularHandlers = new ArrayList<>();
 	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<HandlerInfo> killQueue = new LinkedBlockingQueue<>();
 
@@ -247,18 +249,19 @@ public class BasicEventBus implements EventBusInterface{
 	//called on the background thread
 	private void notifySubscribers(final Object evt){
 		//roll through the subscribers
-		final List<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
-		final List<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
-		subdivideHandlers(evt, vetoHandlers, regularHandlers);
+		subdivideHandlers(evt);
 
-		final boolean vetoCalled = dispatchToVetoableHandlers(evt, vetoHandlers);
+		final boolean vetoCalled = dispatchToVetoableHandlers(evt);
 
 		if(!vetoCalled)
-			dispatchToRegularHandlers(regularHandlers);
+			dispatchToRegularHandlers();
 	}
 
-	private void subdivideHandlers(final Object evt, final List<HandlerInfoCallable> vetoHandlers,
-		final List<HandlerInfoCallable> regularHandlers){
+	private void subdivideHandlers(final Object evt){
+		vetoHandlers.clear();
+		vetoHandlers.ensureCapacity(handlers.size());
+		regularHandlers.clear();
+		regularHandlers.ensureCapacity(handlers.size());
 		for(final HandlerInfo info : handlers){
 			if(!info.matchesEvent(evt))
 				continue;
@@ -271,7 +274,7 @@ public class BasicEventBus implements EventBusInterface{
 		}
 	}
 
-	private boolean dispatchToVetoableHandlers(final Object evt, final List<HandlerInfoCallable> vetoHandlers){
+	private boolean dispatchToVetoableHandlers(final Object evt){
 		//used to keep track if a veto was called (if so, the regular list won't be processed)
 		boolean vetoCalled = false;
 
@@ -282,8 +285,8 @@ public class BasicEventBus implements EventBusInterface{
 					vetoCalled = true;
 		}
 		catch(final Exception e){
-			//this only happens if the executorService is interrupted, and by default, that shouldn't
-			//really ever happen; or, if the callable sneaks out an exception, which again shouldn't happen
+			//this only happens if the executorService is interrupted, and by default, that shouldn't really ever happen
+			//or, if the callable sneaks out an exception, which again shouldn't happen
 			vetoCalled = true;
 
 			e.printStackTrace();
@@ -297,7 +300,7 @@ public class BasicEventBus implements EventBusInterface{
 		return vetoCalled;
 	}
 
-	private void dispatchToRegularHandlers(final List<HandlerInfoCallable> regularHandlers){
+	private void dispatchToRegularHandlers(){
 		//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
 		//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
 		//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
