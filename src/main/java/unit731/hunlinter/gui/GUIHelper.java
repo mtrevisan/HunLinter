@@ -264,11 +264,16 @@ public class GUIHelper{
 	public static void addSorterToTable(final JTable table, final Comparator<String> comparator,
 			final Comparator<AffixEntry> comparatorAffix){
 		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
+		//inflection
 		dicSorter.setComparator(0, comparator);
+		//morphological fields
 		dicSorter.setComparator(1, comparator);
 		if(table.getColumnModel().getColumnCount() > 2){
+			//applied rule 1
 			dicSorter.setComparator(2, comparatorAffix);
+			//applied rule 2
 			dicSorter.setComparator(3, comparatorAffix);
+			//applied rule 3
 			dicSorter.setComparator(4, comparatorAffix);
 		}
 		table.setRowSorter(dicSorter);

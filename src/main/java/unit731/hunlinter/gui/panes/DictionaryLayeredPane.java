@@ -248,10 +248,11 @@ final int iconSize = 17;
 
 		final String language = parserManager.getLanguage();
 
+		final Comparator<String> languageComparator = BaseBuilder.getComparator(language);
 		final Comparator<String> comparator = Comparator.comparingInt(String::length)
-			.thenComparing(BaseBuilder.getComparator(language));
+			.thenComparing(languageComparator);
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
-			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(language).compare(entry0.toString(), entry1.toString()));
+			.thenComparing((entry0, entry1) -> languageComparator.compare(entry0.toString(), entry1.toString()));
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
