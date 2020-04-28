@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -30,7 +29,6 @@ import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
@@ -134,6 +132,7 @@ final int iconSize = 17;
       inputLabel.setText("Dictionary entry:");
 
       inputTextField.setFont(FontHelper.getCurrentFont());
+      inputTextField.setEnabled(false);
       inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -147,6 +146,7 @@ final int iconSize = 17;
 
       table.setFont(FontHelper.getCurrentFont());
       table.setModel(new InflectionTableModel());
+      table.setRowHeight(24);
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
       table.getTableHeader().setReorderingAllowed(false);
@@ -256,13 +256,9 @@ final int iconSize = 17;
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
-			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-
-
 			//affix file:
-			if(!compoundRules.isEmpty())
-				inputTextField.requestFocusInWindow();
+			inputTextField.setEnabled(true);
+			inputTextField.requestFocusInWindow();
 			openAffButton.setEnabled(packager.getAffixFile() != null);
 			openDicButton.setEnabled(packager.getDictionaryFile() != null);
 
@@ -293,6 +289,7 @@ final int iconSize = 17;
 			return;
 
 		//affix file:
+		inputTextField.setEnabled(false);
 		openAffButton.setEnabled(false);
 		openDicButton.setEnabled(false);
 
