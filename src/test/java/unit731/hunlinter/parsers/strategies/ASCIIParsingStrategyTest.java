@@ -48,7 +48,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'ab'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was 'ab'", exception.getMessage());
 	}
 
 	@Test
@@ -57,7 +57,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'ŧ'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was 'ŧ'", exception.getMessage());
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was ''", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was ''", exception.getMessage());
 	}
 
 	@Test
@@ -75,7 +75,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'null'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was 'null'", exception.getMessage());
 	}
 
 	@Test
