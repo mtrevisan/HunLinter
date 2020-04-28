@@ -138,6 +138,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       table.setFont(FontHelper.getCurrentFont());
       table.setModel(new AutoCorrectTableModel());
+      table.setRowHeight(24);
       table.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)table.getModel()));
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       table.setShowHorizontalLines(false);

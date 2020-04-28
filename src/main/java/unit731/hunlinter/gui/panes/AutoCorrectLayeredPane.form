@@ -128,6 +128,7 @@
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new AutoCorrectTableModel()" type="code"/>
             </Property>
+            <Property name="rowHeight" type="int" value="24"/>
             <Property name="rowSorter" type="javax.swing.RowSorter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new TableRowSorter&lt;&gt;((AutoCorrectTableModel)table.getModel())" type="code"/>
             </Property>
