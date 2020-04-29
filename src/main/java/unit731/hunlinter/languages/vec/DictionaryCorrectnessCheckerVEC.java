@@ -168,10 +168,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 				variants.add(LanguageVariant.VENETIAN);
 			}
-			else if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
+			if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
 					|| subword.contains(GraphemeVEC.GRAPHEME_D_STROKE) || subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
 				variants.add(LanguageVariant.NORTHERN);
 		}
+		//check boundaries (ex. e-lo is northern variant)
+		for(int i = 1; i < subwords.length; i ++)
+			if(WordVEC.isVowel(subwords[i - 1].charAt(subwords[i - 1].length() - 1)) && subwords[i].startsWith(GraphemeVEC.GRAPHEME_L))
+				variants.add(LanguageVariant.NORTHERN);
+
 		if(variants.contains(LanguageVariant.VENETIAN) && variants.contains(LanguageVariant.NORTHERN))
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
 	}
