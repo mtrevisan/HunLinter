@@ -141,15 +141,18 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void stressCheck(final Inflection inflection){
 		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
-		if(!rulesLoader.containsMultipleStressedWords(derivedWord)){
-			final int stresses = WordVEC.countStresses(derivedWord);
-			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
-				throw new LinterException(MULTIPLE_STRESSES.format(new Object[]{inflection.getWord()}));
-		}
+		final String[] subwords = StringUtils.split(derivedWord, WORD_SEPARATORS);
+		for(final String subword : subwords){
+			if(!rulesLoader.containsMultipleStressedWords(subword)){
+				final int stresses = WordVEC.countStresses(subword);
+				if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
+					throw new LinterException(MULTIPLE_STRESSES.format(new Object[]{inflection.getWord()}));
+			}
 
-		final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
-		if(!derivedWord.equals(unmarkedDefaultStressWord))
-			throw new LinterException(UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
+			final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(subword);
+			if(!subword.equals(unmarkedDefaultStressWord))
+				throw new LinterException(UNNECESSARY_STRESS.format(new Object[]{inflection.getWord()}));
+		}
 	}
 
 	private void variantsCheck(final Inflection inflection){
