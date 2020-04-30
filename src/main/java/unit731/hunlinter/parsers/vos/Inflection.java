@@ -192,7 +192,7 @@ public class Inflection extends DictionaryEntry{
 			sj.add(FROM);
 			final StringJoiner subsj = new StringJoiner(LEADS_TO);
 			for(final AffixEntry appliedRule : appliedRules)
-				subsj.add(appliedRule.getFlag());
+				subsj.add(appliedRule.toString());
 			sj.add(subsj.toString());
 		}
 		return sj.toString();

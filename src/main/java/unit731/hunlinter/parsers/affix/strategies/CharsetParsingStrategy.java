@@ -27,6 +27,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		private static final CharsetParsingStrategy INSTANCE = new CharsetParsingStrategy(StandardCharsets.UTF_8);
 	}
 
+
 	public static CharsetParsingStrategy getASCIIInstance(){
 		return SingletonHelperASCII.INSTANCE;
 	}
