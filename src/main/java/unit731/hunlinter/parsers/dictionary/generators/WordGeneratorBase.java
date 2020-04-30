@@ -263,7 +263,7 @@ class WordGeneratorBase{
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 		if(applicableAffixes.length == 0)
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' via '"
-				+ (dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "'");
+				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "'");
 
 		Inflection[] inflections = new Inflection[0];
 		for(final AffixEntry entry : applicableAffixes){
