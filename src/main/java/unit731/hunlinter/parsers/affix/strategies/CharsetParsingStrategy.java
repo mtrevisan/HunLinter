@@ -11,7 +11,7 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 
 class CharsetParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: was ''{1}''");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: ''{1}''");
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule should be in {0} encoding: was ''{1}''");
 	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_ONE = new MessageFormat("Flag should be of length one and in {0} encoding: was ''{1}''");
 
@@ -65,8 +65,10 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 
 	@Override
 	public void validate(final String flag){
-		if(flag == null || flag.length() != 1 || !canEncode(flag))
+		if(flag == null || flag.length() != 1)
 			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
+		if(!canEncode(flag))
+			throw new LinterException(BAD_FORMAT.format(new Object[]{charset.displayName(), flag}));
 	}
 
 	@Override
@@ -82,7 +84,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 			throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
 	}
 
-	public boolean canEncode(final String cs){
+	private boolean canEncode(final String cs){
 		final CharsetEncoder encoder = charset.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);
