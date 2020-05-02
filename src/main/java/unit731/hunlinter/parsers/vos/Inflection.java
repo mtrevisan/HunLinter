@@ -28,11 +28,10 @@ public class Inflection extends DictionaryEntry{
 	private final DictionaryEntry[] compoundEntries;
 
 
-	public static Inflection createFromCompound(final String word, final String continuationFlags,
+	public static Inflection createFromCompound(final String word, final String[] continuationFlags,
 			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
-		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
-		return new Inflection(word, cfs, morphologicalFields, true, null, compoundEntries);
+		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry, final boolean combinable){

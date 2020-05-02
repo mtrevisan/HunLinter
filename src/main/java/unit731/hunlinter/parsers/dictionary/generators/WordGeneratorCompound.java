@@ -12,6 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -170,9 +171,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		Inflection[] inflections;
-		final StringBuffer flags = new StringBuffer();
-		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::append));
-		final Inflection p = Inflection.createFromCompound(compoundWord, flags.toString(), compoundEntries, strategy);
+		final SimpleDynamicArray<String> flags = new SimpleDynamicArray(String.class, continuationFlags.length);
+		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::add));
+		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries, strategy);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			inflections = new Inflection[]{p};
 		else{
