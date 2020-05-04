@@ -58,7 +58,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 		}
 		catch(final Exception e){
 			if(!JavaHelper.isInterruptedException(e)){
-				final String errorMessage = ExceptionHelper.getMessage(e);
+				final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
 				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}", errorMessage);
 			}
 

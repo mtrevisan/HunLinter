@@ -179,6 +179,9 @@ public class AffixParser{
 					try{
 						indexLine += handler.parse(context, data);
 					}
+					catch(final LinterException e){
+						throw e;
+					}
 					catch(final RuntimeException e){
 						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));
 					}
