@@ -3,6 +3,7 @@ package unit731.hunlinter;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
+import unit731.hunlinter.gui.events.PreLoadProjectEvent;
 import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
 import unit731.hunlinter.gui.panes.PoSFSALayeredPane;
 import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
@@ -517,11 +518,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		EventBusService.publish(new LoadProjectEvent(basePath));
+		EventBusService.publish(new PreLoadProjectEvent(basePath));
 	}
 
 	@EventHandler
-	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
+	public void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
 		parsingResultTextArea.setText(null);
 
 		if(parserManager != null)
@@ -532,7 +533,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		mainTabbedPane.setSelectedIndex(0);
 
+		//NOTE: in order to avoid concurrency problems it is necessary to transform the loader into an event for the bus
+		//so as to happen after all the clear events
+		EventBusService.publish(preLoadProjectEvent.convertToLoadEvent());
+	}
 
+	@EventHandler
+	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
 			parsingResultTextArea.setFont(temporaryFont);
@@ -649,6 +656,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		hypMenu.setEnabled(false);
 
 		EventBusService.publish(new TabbedPaneEnableEvent(false));
+
+		//NOTE: wait for clearing before proceed (this is done by instantiating the event bus with waitForHandler `true`)
 	}
 
 
