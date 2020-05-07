@@ -86,7 +86,7 @@ public class WordCountWorker extends WorkerDictionary{
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount,
-				DictionaryParser.PERCENT_FORMATTER.format((double)totalUniqueInflections / totalInflections.get()));
+				DictionaryParser.SHORT_PERCENT_FORMATTER.format((double)totalUniqueInflections / totalInflections.get()));
 
 			return null;
 		};

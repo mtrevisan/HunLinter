@@ -37,6 +37,7 @@ public class DictionaryParser{
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}
 	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.ROOT));
+	public static final DecimalFormat SHORT_PERCENT_FORMATTER = new DecimalFormat("0.#%", DecimalFormatSymbols.getInstance(Locale.ROOT));
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
 	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
