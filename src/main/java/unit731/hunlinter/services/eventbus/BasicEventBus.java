@@ -71,6 +71,16 @@ public class BasicEventBus implements EventBusInterface{
 	 * the application from shutting down).
 	 */
 	public BasicEventBus(){
+		this(false);
+	}
+
+	/**
+	 * Default constructor sets up the executorService property to use the
+	 * {@link Executors#newCachedThreadPool()} implementation. The configured ExecutorService will have
+	 * a custom ThreadFactory such that the threads returned will be daemon threads (and thus not block
+	 * the application from shutting down).
+	 */
+	public BasicEventBus(final boolean waitForHandlers){
 		this(Executors.newCachedThreadPool(new ThreadFactory(){
 
 			private final ThreadFactory delegate = Executors.defaultThreadFactory();
@@ -81,7 +91,7 @@ public class BasicEventBus implements EventBusInterface{
 				t.setDaemon(true);
 				return t;
 			}
-		}), false);
+		}), waitForHandlers);
 	}
 
 	public BasicEventBus(final ExecutorService executorService, final boolean waitForHandlers){
@@ -194,6 +204,16 @@ public class BasicEventBus implements EventBusInterface{
 		}
 	}
 
+
+	/**
+	 * Returns if the event bus has pending events.
+	 *
+	 * @param event	The event to query for.
+	 * @return	If the event bus has pending events of given type to publish.
+	 */
+	public boolean hasPendingEvents(final Object event){
+		return queue.contains(event);
+	}
 
 	/**
 	 * Returns if the event bus has pending events.

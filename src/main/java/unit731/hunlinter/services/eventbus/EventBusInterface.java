@@ -77,6 +77,17 @@ public interface EventBusInterface{
 	 * or stop certain actions based on all the events having been published.
 	 * I.e. perhaps before an application closes, etc.
 	 *
+	 * @param event	The event to query for.
+	 * @return	If events of given type are still being delivered.
+	 */
+	boolean hasPendingEvents(final Object event);
+
+	/**
+	 * Indicates whether the bus has pending events to publish.
+	 * Since message/event delivery can be asynchronous (on other threads), the method can be used to start
+	 * or stop certain actions based on all the events having been published.
+	 * I.e. perhaps before an application closes, etc.
+	 *
 	 * @return	If events are still being delivered.
 	 */
 	boolean hasPendingEvents();

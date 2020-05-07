@@ -16,7 +16,7 @@ import java.util.ServiceLoader;
  */
 public final class EventBusService{
 
-	private static final EventBusInterface EVENT_BUS = new BasicEventBus();
+	private static final EventBusInterface EVENT_BUS = new BasicEventBus(true);
 
 
 	public static void subscribe(final Object subscriber){
@@ -29,6 +29,10 @@ public final class EventBusService{
 
 	public static void publish(final Object event){
 		EVENT_BUS.publish(event);
+	}
+
+	public static boolean hasPendingEvents(final Object event){
+		return EVENT_BUS.hasPendingEvents(event);
 	}
 
 	public static boolean hasPendingEvents(){

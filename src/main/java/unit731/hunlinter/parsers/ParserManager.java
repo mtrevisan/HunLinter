@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.events.LoadProjectEvent;
+import unit731.hunlinter.gui.events.PreLoadProjectEvent;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -341,7 +341,7 @@ public class ParserManager implements FileChangeListener{
 		else{
 			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName().toString());
 
-			EventBusService.publish(new LoadProjectEvent(packager.getProjectPath()));
+			EventBusService.publish(new PreLoadProjectEvent(packager.getProjectPath()));
 		}
 	}
 

@@ -156,7 +156,7 @@ public class AffixParser{
 	 * @throws LinterException   If something is wrong while parsing the file (eg. a missing rule)
 	 */
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
-		data.clear();
+		clear();
 
 		int indexLine = 0;
 		boolean encodingRead = false;
