@@ -82,10 +82,11 @@ public class WordCountWorker extends WorkerDictionary{
 			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
 			final int falsePositiveCount = (int)Math.ceil(totalUniqueInflections * falsePositiveProbability);
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {} ± {} ({})",
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {} ± {} ({}), {}",
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
-				falsePositiveCount);
+				falsePositiveCount,
+				DictionaryParser.PERCENT_FORMATTER.format((double)totalUniqueInflections / totalInflections.get()));
 
 			return null;
 		};
