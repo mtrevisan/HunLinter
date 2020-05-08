@@ -59,7 +59,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 		catch(final Exception e){
 			if(!JavaHelper.isInterruptedException(e)){
 				final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}", errorMessage);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
 			}
 
 			cancel(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
