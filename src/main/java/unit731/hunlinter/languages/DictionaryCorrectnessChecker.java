@@ -6,6 +6,7 @@ import java.util.Set;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -13,6 +14,7 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 
 public class DictionaryCorrectnessChecker{
 
+	private static final MessageFormat INVALID_CIRCUMFIX_FLAG = new MessageFormat("{0} cannot have a circumfix flag ({1})");
 	private static final MessageFormat NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = new MessageFormat("Non-affix entry contains {0}");
 	private static final MessageFormat NO_MORPHOLOGICAL_FIELD = new MessageFormat("{0} doesn''t have any morphological fields");
 	private static final MessageFormat INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an invalid morphological field prefix: {1}");
@@ -37,7 +39,13 @@ public class DictionaryCorrectnessChecker{
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 
-	//used by the correctness worker after calling {@link #loadRules()}:
+	public void checkCircumfix(final DictionaryEntry dicEntry){
+		final String circumfixFlag = affixData.getCircumfixFlag();
+		if(circumfixFlag != null && dicEntry.hasContinuationFlag(circumfixFlag))
+			throw new LinterException(INVALID_CIRCUMFIX_FLAG.format(new Object[]{dicEntry.getWord(), circumfixFlag}));
+	}
+
+		//used by the correctness worker after calling {@link #loadRules()}:
 	public void checkInflection(final Inflection inflection){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))

@@ -41,6 +41,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+			checker.checkCircumfix(dicEntry);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Inflection inflection : inflections){
