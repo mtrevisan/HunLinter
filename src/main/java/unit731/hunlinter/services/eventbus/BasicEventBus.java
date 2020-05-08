@@ -79,6 +79,9 @@ public class BasicEventBus implements EventBusInterface{
 	 * {@link Executors#newCachedThreadPool()} implementation. The configured ExecutorService will have
 	 * a custom ThreadFactory such that the threads returned will be daemon threads (and thus not block
 	 * the application from shutting down).
+	 *
+	 * @param waitForHandlers	Should the event bus wait for the regular handlers to finish processing the event messages before
+	 * 	continuing to the next event.
 	 */
 	public BasicEventBus(final boolean waitForHandlers){
 		this(Executors.newCachedThreadPool(new ThreadFactory(){
