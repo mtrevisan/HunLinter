@@ -47,7 +47,6 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="102"/>
                 <Property name="text" type="java.lang.String" value="Select font&#x2026;"/>
-                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="filRecentProjectsSeparator">

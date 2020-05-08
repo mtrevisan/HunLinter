@@ -307,7 +307,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filFontMenuItem.setAction(new SelectFontAction(parserManager, preferences));
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font…");
-      filFontMenuItem.setEnabled(false);
       filMenu.add(filFontMenuItem);
       filMenu.add(filRecentProjectsSeparator);
 
@@ -580,7 +579,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
 			filCreatePackageMenuItem.setEnabled(true);
-			filFontMenuItem.setEnabled(true);
+//			filFontMenuItem.setEnabled(true);
 			dicLinterMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
@@ -657,7 +656,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//menu:
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
-		filFontMenuItem.setEnabled(false);
+//		filFontMenuItem.setEnabled(false);
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_ALL);
 
@@ -691,7 +690,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		//disable menu
 		dicMenu.setEnabled(false);
 		filCreatePackageMenuItem.setEnabled(false);
-		filFontMenuItem.setEnabled(false);
+//		filFontMenuItem.setEnabled(false);
 
 		final AffixParser affParser = parserManager.getAffParser();
 		if(affParser != null)
