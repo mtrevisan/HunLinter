@@ -1,13 +1,10 @@
 package unit731.hunlinter.parsers.autocorrect;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.workers.exceptions.LinterException;
@@ -18,26 +15,23 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 /** Manages pairs of mistyped words and their correct spelling */
 public class AutoCorrectParser{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectParser.class);
-
 	private static final String QUOTATION_MARK = "\"";
 
 	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: ''{1}''");
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in auto-correct file: ''{0}'' -> ''{1}''");
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
@@ -81,17 +75,10 @@ public class AutoCorrectParser{
 
 	private void validate(){
 		//check for duplications
-		final Map<String, List<CorrectionEntry>> map = new HashMap<>();
-		forEach(dictionary,
-			correctionEntry -> map.computeIfAbsent(correctionEntry.getIncorrectForm(), k -> new ArrayList<>(1)).add(correctionEntry));
-		final List<List<CorrectionEntry>> duplications = new ArrayList<>(map.size());
-		applyIf(map.values(),
-			list -> list.size() > 1,
-			duplications::add);
-		for(final List<CorrectionEntry> duplication : duplications)
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in auto-correct file: incorrect form '{}', correct forms '{}'",
-				duplication.get(0).getIncorrectForm(),
-				duplication.stream().map(CorrectionEntry::getCorrectForm).collect(Collectors.toList()));
+		final Set<String> map = new HashSet<>();
+		for(final CorrectionEntry s : dictionary)
+			if(!map.add(s.getIncorrectForm()))
+				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}));
 	}
 
 	public List<CorrectionEntry> getCorrectionsDictionary(){

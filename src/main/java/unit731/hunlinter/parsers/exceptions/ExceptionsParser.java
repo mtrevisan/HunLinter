@@ -1,12 +1,9 @@
 package unit731.hunlinter.parsers.exceptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
@@ -14,14 +11,12 @@ import unit731.hunlinter.services.XMLManager;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-
-import static unit731.hunlinter.services.system.LoopHelper.applyIf;
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import java.util.Set;
 
 
 /**
@@ -31,7 +26,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
  */
 public class ExceptionsParser{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: ''{1}''");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -83,14 +78,10 @@ public class ExceptionsParser{
 
 	private void validate(){
 		//check for duplications
-		final Map<String, List<String>> map = new HashMap<>();
-		forEach(dictionary, s -> map.computeIfAbsent(s, k -> new ArrayList<>(1)).add(s));
-		final List<List<String>> duplications = new ArrayList<>(map.size());
-		applyIf(map.values(),
-			s -> s.size() > 1,
-			duplications::add);
-		for(final List<String> duplication : duplications)
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
+		final Set<String> map = new HashSet<>();
+		for(final String s : dictionary)
+			if(!map.add(s))
+				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}));
 	}
 
 	public List<String> getExceptionsDictionary(){

@@ -180,6 +180,7 @@ public class AffixParser{
 						indexLine += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
+						//if a warning should be made, then this exception should not be thrown
 						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));
 					}
 				}
