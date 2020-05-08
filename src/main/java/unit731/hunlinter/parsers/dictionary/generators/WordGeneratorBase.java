@@ -61,7 +61,6 @@ class WordGeneratorBase{
 		//extract suffixed inflections
 		final Inflection[] suffixedInflections = getOnefoldInflections(baseInflection, isCompound, !affixData.isComplexPrefixes(),
 			overriddenRule);
-//		Arrays.sort(suffixedInflections, INFLECTION_COMPARATOR);
 		printInflections((affixData.isComplexPrefixes()? "Prefix inflections:": "Suffix inflections:"), suffixedInflections);
 
 		Inflection[] prefixedInflections = new Inflection[0];
@@ -69,7 +68,6 @@ class WordGeneratorBase{
 			//extract prefixed inflections
 			prefixedInflections = getTwofoldInflections(suffixedInflections, isCompound, !affixData.isComplexPrefixes(),
 				overriddenRule);
-//			Arrays.sort(prefixedInflections, INFLECTION_COMPARATOR);
 			printInflections((affixData.isComplexPrefixes()? "Suffix inflections:": "Prefix inflections:"), prefixedInflections);
 		}
 
@@ -77,7 +75,6 @@ class WordGeneratorBase{
 		Inflection[] twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, null);
 		twofoldInflections = getTwofoldInflections(twofoldInflections, isCompound, affixData.isComplexPrefixes(), overriddenRule);
 		checkTwofoldCorrectness(twofoldInflections);
-//		Arrays.sort(twofoldInflections, INFLECTION_COMPARATOR);
 		printInflections("Twofold inflections:", twofoldInflections);
 
 		final Inflection[] inflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, twofoldInflections);
@@ -159,7 +156,24 @@ class WordGeneratorBase{
 		return enforceNeedAffixFlag(inflections);
 	}
 
-	/** Remove rules that invalidate the circumfix rule */
+	/**
+	 * Remove rules that invalidate the circumfix rule
+	 * <p />
+	 * <code><pre>
+	 * (rule.flag is the flag associated to the rule)
+	 * (rule.type is either `PREFIX` or `AFFIX`)
+	 * (rule.flags represents the set of the continuation classes)
+	 * (rule.has(flag) returns whether the rule contains the given flag in its continuation classes)
+	 * (the operation ⋃ does NOT involve uniqueness, so it's kind of a `+`)
+	 *
+	 * def currentRule = rule | nextRule.flag ∈ dictionary-word.flags
+	 * def nextRule = rule | nextRule.flag ∈ (dictionary-word.flags ⋃ currentRule.flags) \ currentRule.flag
+	 * if ¬ currentRule.has(circumfix) ∨ ¬ nextRule.has(circumfix) ∧ currentRule.type ≠ nextRule.type then
+	 *    accept inflection
+	 * else
+	 *    discard inflection
+	 * </pre></code>
+	 */
 	private Inflection[] enforceCircumfix(Inflection[] inflections){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
