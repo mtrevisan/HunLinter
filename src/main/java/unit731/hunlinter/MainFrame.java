@@ -67,8 +67,16 @@ import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.aid.AidParser;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.eventbus.events.BusExceptionEvent;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
@@ -551,6 +559,20 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		projectLoaderAction.actionPerformed(event);
 	}
 
+	@EventHandler
+	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
+		final Throwable cause = exceptionEvent.getCause();
+		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
+
+		if(cause instanceof ProjectNotFoundException){
+			//remove the file from the recent projects menu
+			recentProjectsMenu.removeEntry(((ProjectNotFoundException)cause).getProjectPath().toString());
+
+			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
+			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
+		}
+	}
+
 	private void loadFileCompleted(){
 		parserManager.registerFileListener();
 		parserManager.startFileListener();
@@ -631,18 +653,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				mainTabbedPane.setEnabledAt(index, enable);
 	}
 
-	private void loadFileCancelled(final Exception exc){
+	private void loadFileCancelled(final Throwable exc){
 		//menu:
 		filOpenProjectMenuItem.setEnabled(true);
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
-		if(exc instanceof ProjectNotFoundException){
-			//remove the file from the recent projects menu
-			recentProjectsMenu.removeEntry(((ProjectNotFoundException)exc).getProjectPath().toString());
-
-			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
-			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
-		}
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_ALL);
 
@@ -678,7 +693,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		filCreatePackageMenuItem.setEnabled(false);
 		filFontMenuItem.setEnabled(false);
 
-		parserManager.getAffParser().clear();
+		final AffixParser affParser = parserManager.getAffParser();
+		if(affParser != null)
+			affParser.clear();
 	}
 
 	@EventHandler
@@ -687,7 +704,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
-		parserManager.getDicParser().clear();
+		final DictionaryParser dicParser = parserManager.getDicParser();
+		if(dicParser != null)
+			dicParser.clear();
 	}
 
 	@EventHandler
@@ -698,7 +717,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AID);
 
-		parserManager.getAidParser().clear();
+		final AidParser aidParser = parserManager.getAidParser();
+		if(aidParser != null)
+			aidParser.clear();
 	}
 
 	@EventHandler
@@ -712,7 +733,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		theMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, false));
 
-		parserManager.getTheParser().clear();
+		final ThesaurusParser theParser = parserManager.getTheParser();
+		if(theParser != null)
+			theParser.clear();
 	}
 
 	@EventHandler
@@ -726,7 +749,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		hypMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, false));
 
-		parserManager.getHypParser().clear();
+		final HyphenationParser hypParser = parserManager.getHypParser();
+		if(hypParser != null)
+			hypParser.clear();
 	}
 
 	@EventHandler
@@ -739,7 +764,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, false));
 
-		parserManager.getAcoParser().clear();
+		final AutoCorrectParser acoParser = parserManager.getAcoParser();
+		if(acoParser != null)
+			acoParser.clear();
 	}
 
 	@EventHandler
@@ -752,7 +779,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane, false));
 
-		parserManager.getSexParser().clear();
+		final ExceptionsParser sexParser = parserManager.getSexParser();
+		if(sexParser != null)
+			sexParser.clear();
 	}
 
 	@EventHandler
@@ -765,7 +794,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane, false));
 
-		parserManager.getWexParser().clear();
+		final ExceptionsParser wexParser = parserManager.getWexParser();
+		if(wexParser != null)
+			wexParser.clear();
 	}
 
 

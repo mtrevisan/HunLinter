@@ -109,7 +109,7 @@ public class FontHelper{
 
 	public static Font getDefaultHeightFont(final Font font){
 		final Rectangle2D bounds = getStringBounds(font, "I");
-		return font.deriveFont(Math.round(font.getSize() * 17.f / bounds.getHeight()));
+		return font.deriveFont(Math.round(font.getSize() * 18.f / bounds.getHeight()));
 	}
 
 	private static Rectangle2D getStringBounds(final Font font, final String text){

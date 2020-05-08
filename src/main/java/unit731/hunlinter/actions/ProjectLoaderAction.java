@@ -67,51 +67,56 @@ public class ProjectLoaderAction extends AbstractAction{
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
-		workerManager.createProjectLoaderWorker(
-			worker -> {
-				try{
-					packager.reload(projectPath);
+		workerManager.createProjectLoaderWorker(worker -> {
+			try{
+				packager.reload(projectPath);
 
-					final List<String> availableLanguages = packager.getAvailableLanguages();
-					final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
-					if(availableLanguages.size() > 1){
-						//choose between available languages
-						final Consumer<String> onSelection = language::set;
-						final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, parentFrame);
-						GUIHelper.addCancelByEscapeKey(dialog);
-						dialog.setLocationRelativeTo(parentFrame);
-						dialog.setVisible(true);
+				final List<String> availableLanguages = packager.getAvailableLanguages();
+				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
+				if(availableLanguages.size() > 1){
+					//choose between available languages
+					final Consumer<String> onSelection = language::set;
+					final LanguageChooserDialog dialog = new LanguageChooserDialog(availableLanguages, onSelection, parentFrame);
+					GUIHelper.addCancelByEscapeKey(dialog);
+					dialog.setLocationRelativeTo(parentFrame);
+					dialog.setVisible(true);
 
-						if(!dialog.languageChosen())
-							throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
+					if(!dialog.languageChosen()){
+						worker.cancel();
+
+						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
 					}
-					//load appropriate files based on current language
-					packager.extractConfigurationFolders(language.get());
-
-					parentFrame.setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : "
-						+ packager.getLanguage());
-
-					final Font temporaryFont = temporarilyChooseAFont();
-					if(initialize != null)
-						initialize.accept(temporaryFont);
-
-					worker.addPropertyChangeListener(propertyChangeListener);
-					worker.execute();
 				}
-				catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
-					throw new RuntimeException(e);
-				}
-			},
-			completed, cancelled);
+				//load appropriate files based on current language
+				packager.extractConfigurationFolders(language.get());
+
+				parentFrame.setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
+
+				final Font temporaryFont = temporarilyChooseAFont();
+				if(initialize != null)
+					initialize.accept(temporaryFont);
+
+				worker.addPropertyChangeListener(propertyChangeListener);
+				worker.execute();
+			}
+			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
+				worker.cancel();
+
+				throw new RuntimeException(e);
+			}
+		}, completed, cancelled);
 	}
 
-	/** Chooses one font (in case of reading errors) */
+	/**
+	 * Chooses one font (in case of reading errors)
+	 */
 	private Font temporarilyChooseAFont() throws IOException{
 		final Path affixPath = packager.getAffixFile().toPath();
 		final String content = new String(Files.readAllBytes(affixPath));
 		final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
-			.mapToObj(Character::toString).collect(Collectors.toSet()));
+			.mapToObj(Character::toString)
+			.collect(Collectors.toSet()));
 		return FontHelper.chooseBestFont(sample);
 	}
 

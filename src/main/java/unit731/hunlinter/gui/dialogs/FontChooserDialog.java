@@ -298,8 +298,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	 * @param name  the family name of the selected font.
 	 */
 	private void setSelectedFontFamily(final String name){
-		familyNameTextField.setText(name);
-		familyNameList.setSelectedValue(name, true);
+		SwingUtilities.invokeLater(() -> {
+			familyNameTextField.setText(name);
+			familyNameList.setSelectedValue(name, true);
+		});
 	}
 
 	private void setSampleFont(){

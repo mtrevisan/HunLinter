@@ -159,6 +159,8 @@ public class Packager{
 
 		this.projectPath = projectPath;
 
+		clear();
+
 		if(!existDirectory(projectPath))
 			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " doesn't exists, cannot load project");
 
@@ -173,6 +175,11 @@ public class Packager{
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
 			throw new IllegalArgumentException("No language(s) defined");
+	}
+
+	private void clear(){
+		manifestFiles.clear();
+		configurationFiles.clear();
 	}
 
 	public static boolean isProjectFolder(final File file){
