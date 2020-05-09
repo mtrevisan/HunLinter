@@ -31,19 +31,15 @@ public class ExceptionHelper{
 	}
 
 	private static String composeExceptionMessage(final Throwable t, final boolean includeLineNumber){
-		final String exceptionType = extractExceptionName(t);
-		final String msg = t.getMessage();
 		final StringBuffer sb = new StringBuffer();
-		sb.append(exceptionType);
-		if(includeLineNumber){
-			final String codePosition = extractExceptionPosition(t);
-			sb.append(" at ").append(codePosition);
-		}
-		else
-			sb.append(':');
+		if(includeLineNumber)
+			sb.append(extractExceptionName(t))
+				.append(" at ")
+				.append(extractExceptionPosition(t))
+				.append(StringUtils.SPACE);
+		final String msg = t.getMessage();
 		if(msg != null)
-			sb.append(StringUtils.SPACE)
-				.append(msg);
+			sb.append(msg);
 		return sb.toString();
 	}
 

@@ -27,6 +27,7 @@ import java.util.Set;
 public class ExceptionsParser{
 
 	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: ''{1}''");
+	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected ''{1}'', was ''{2}''");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -62,8 +63,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException("Invalid root element in file " + configurationFilename
-				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+			throw new LinterException(INVALID_ROOT.format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName()}));
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
