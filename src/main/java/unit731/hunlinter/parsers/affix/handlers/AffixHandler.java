@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -78,7 +77,7 @@ public class AffixHandler implements Handler{
 //com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
 
-			checkValidity(parentType, parentFlag, line, entry);
+			checkValidity(parentType, parentFlag, context, entry);
 
 
 			if(ArrayUtils.contains(entries, entry))
@@ -100,11 +99,11 @@ public class AffixHandler implements Handler{
 		return entries;
 	}
 
-	private void checkValidity(final AffixType ruleType, final String ruleFlag, final String line, final AffixEntry entry){
+	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
 		final String ruleTypeCode = ruleType.getOption().getCode();
-		if(!line.startsWith(ruleTypeCode))
+		if(!context.getRuleType().equals(ruleTypeCode))
 			throw new LinterException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
-		if(!line.startsWith(ruleTypeCode + StringUtils.SPACE + ruleFlag))
+		if(!context.getFirstParameter().equals(ruleFlag))
 			throw new LinterException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
 
 		entry.validate();
