@@ -2,6 +2,8 @@ package unit731.hunlinter.gui;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 
 import javax.swing.*;
@@ -19,7 +21,11 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class FontHelper{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(FontHelper.class);
+
 	private static final String CLIENT_PROPERTY_KEY_FONTABLE = "fontable";
+
+	private static final float SAME_FONT_MAX_THRESHOLD = 0.000_6f;
 
 	private static final String GRAPHEME_I = "i";
 	private static final String GRAPHEME_M = "m";
@@ -28,14 +34,21 @@ public class FontHelper{
 
 
 	private static String LANGUAGE_SAMPLE;
-	private static final Font[] ALL_FONTS;
+	private static final ArrayList<Font> ALL_FONTS;
 	static{
 		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 			.getAvailableFontFamilyNames();
-		ALL_FONTS = new Font[familyNames.length];
-		int offset = 0;
-		for(final String familyName : familyNames)
-			ALL_FONTS[offset ++] = new Font(familyName, Font.PLAIN, 20);
+		ALL_FONTS = new ArrayList<>(familyNames.length);
+		for(final String familyName : familyNames){
+			final Font font = new Font(familyName, Font.PLAIN, 20);
+			//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
+			if(!GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+					&& !GlyphComparator.allIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
+				ALL_FONTS.add(font);
+			else
+				LOGGER.trace("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
+		}
+		ALL_FONTS.trimToSize();
 	}
 	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>();
 	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
@@ -92,32 +105,28 @@ public class FontHelper{
 	private FontHelper(){}
 
 	public static Font chooseBestFont(final String languageSample){
-		Font bestFont = CURRENT_FONT;
-		if(!canCurrentFontDisplay(languageSample)){
-			//check to see if the error can be visualized, if not, change the font to one that can
-			extractFonts(languageSample);
+		extractFonts(languageSample);
 
-			final Function<Font, WidthFontPair> widthFontPair = font -> {
-				final double w = getStringBounds(font, languageSample)
-					.getWidth();
-				return WidthFontPair.of(w, font);
-			};
-			final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
+		final Function<Font, WidthFontPair> widthFontPair = font -> {
+			final double w = getStringBounds(font, languageSample)
+				.getWidth();
+			return WidthFontPair.of(w, font);
+		};
+		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 
-			WidthFontPair bestPair = null;
-			for(final Font font : fonts){
-				final WidthFontPair doubleFontPair = widthFontPair.apply(font);
-				if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
-					bestPair = doubleFontPair;
-			}
-			bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
+		WidthFontPair bestPair = null;
+		for(final Font font : fonts){
+			final WidthFontPair doubleFontPair = widthFontPair.apply(font);
+			if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
+				bestPair = doubleFontPair;
 		}
+		final Font bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
 		return getDefaultHeightFont(bestFont);
 	}
 
 	public static Font getDefaultHeightFont(final Font font){
 		final Rectangle2D bounds = getStringBounds(font, "I");
-		return font.deriveFont(Math.round(font.getSize() * 18.f / bounds.getHeight()));
+		return font.deriveFont(Math.round(font.getSize() * 17f / bounds.getHeight()));
 	}
 
 	private static Rectangle2D getStringBounds(final Font font, final String text){
