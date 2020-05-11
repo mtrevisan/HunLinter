@@ -580,10 +580,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
 		final IndexDataPair<?> data = warningEvent.getData();
-		final int index = data.getIndex();
-		final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
-		LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, data.getData());
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "{}{}: {}", warningEvent.getMessage(), lineText, data.getData());
+		if(data != null){
+			final int index = data.getIndex();
+			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, data.getData());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, data.getData());
+		}
+		else{
+			LOGGER.trace("WARN: {}", errorMessage);
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}", warningEvent.getMessage());
+		}
 	}
 
 	private void loadFileCompleted(){

@@ -12,7 +12,9 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 
 public class CompoundRuleHandler implements Handler{
@@ -51,7 +53,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
+					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line})));
 			}
 
 			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);

@@ -9,7 +9,9 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 
 public class DictionaryCorrectnessChecker{
@@ -60,7 +62,7 @@ public class DictionaryCorrectnessChecker{
 
 	private void morphologicalFieldCheck(final Inflection inflection){
 		if(!inflection.hasMorphologicalFields())
-			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}));
+			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()})));
 
 		inflection.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)

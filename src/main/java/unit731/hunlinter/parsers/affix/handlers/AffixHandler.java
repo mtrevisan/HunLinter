@@ -15,7 +15,9 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 
 public class AffixHandler implements Handler{
@@ -81,9 +83,9 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries, entry))
-				throw new LinterException(DUPLICATED_LINE.format(new Object[]{entry.toString()}));
-
-			entries[offset ++] = entry;
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()})));
+			else
+				entries[offset ++] = entry;
 
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);

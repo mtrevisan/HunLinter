@@ -18,8 +18,10 @@ import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
@@ -110,13 +112,13 @@ public class AffixEntry{
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
 			}
 		}
 	}

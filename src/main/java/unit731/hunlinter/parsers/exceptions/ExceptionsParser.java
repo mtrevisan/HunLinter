@@ -5,8 +5,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -81,7 +83,7 @@ public class ExceptionsParser{
 		final Set<String> map = new HashSet<>();
 		for(final String s : dictionary)
 			if(!map.add(s))
-				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s})));
 	}
 
 	public List<String> getExceptionsDictionary(){
