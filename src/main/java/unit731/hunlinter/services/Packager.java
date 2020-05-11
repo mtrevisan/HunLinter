@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 
@@ -40,6 +41,8 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 public class Packager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Packager.class);
+
+	private static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = RegexHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 	public static final String KEY_FILE_AFFIX = "file.affix";
 	public static final String KEY_FILE_DICTIONARY = "file.dictionary";
@@ -326,6 +329,29 @@ public class Packager{
 
 	public String getLanguage(){
 		return language;
+	}
+
+	/**
+	 * Extracts a sample from affix file
+	 *
+	 * @return	A sample text
+	 *
+	 * @see unit731.hunlinter.parsers.affix.AffixData#getSampleText()
+	 */
+	public String getSampleText(){
+		String sampleText = "The quick brown fox jumps over the lazy dog\n0123456789";
+		final File affFile = getAffixFile();
+		if(affFile != null){
+			try{
+				final String content = new String(Files.readAllBytes(affFile.toPath()));
+				final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
+				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
+					.mapToObj(Character::toString)
+					.collect(Collectors.toSet()));
+			}
+			catch(final IOException ignored){}
+		}
+		return sampleText;
 	}
 
 	public Path getProjectPath(){

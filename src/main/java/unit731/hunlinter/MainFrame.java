@@ -308,7 +308,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filCreatePackageMenuItem);
       filMenu.add(filFontSeparator);
 
-      filFontMenuItem.setAction(new SelectFontAction(parserManager, preferences));
+      filFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
       filFontMenuItem.setMnemonic('f');
       filFontMenuItem.setText("Select font…");
       filMenu.add(filFontMenuItem);
@@ -553,7 +553,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
-			parsingResultTextArea.setFont(temporaryFont);
+			FontHelper.setCurrentFont(temporaryFont, this);
+
 			filOpenProjectMenuItem.setEnabled(false);
 		};
 		final ProjectLoaderAction projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,

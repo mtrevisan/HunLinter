@@ -1,7 +1,6 @@
 package unit731.hunlinter.gui.dialogs;
 
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.system.JavaHelper;
 
 import java.awt.*;
@@ -13,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -81,13 +81,14 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	private final String sampleText;
 
 
-	public FontChooserDialog(final AffixData affixData, final Consumer<Font> onSelection, final Frame parent){
+	public FontChooserDialog(final Supplier<String> sampleExtractor, final Consumer<Font> onSelection, final Frame parent){
 		super(parent, "Font chooser", true);
 
+		Objects.requireNonNull(sampleExtractor);
 		Objects.requireNonNull(onSelection);
 		Objects.requireNonNull(parent);
 
-		sampleText = affixData.getSampleText();
+		sampleText = sampleExtractor.get();
 		FontHelper.extractFonts(sampleText);
 
 		initComponents();

@@ -273,6 +273,8 @@ public class AffixData{
 	 * Extracts all the characters from each rule
 	 *
 	 * @return	A sample text of the underlying dictionary
+	 *
+	 * @see unit731.hunlinter.services.Packager#getSampleText()
 	 */
 	public String getSampleText(){
 		final List<String> sortedSample;

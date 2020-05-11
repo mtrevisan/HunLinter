@@ -1,12 +1,10 @@
 package unit731.hunlinter.actions;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
 import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.workers.WorkerManager;
 import unit731.hunlinter.workers.exceptions.LanguageNotChosenException;
@@ -17,21 +15,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 public class ProjectLoaderAction extends AbstractAction{
 
 	private static final long serialVersionUID = 2457698626251961045L;
-
-	public static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = RegexHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
 
 	private final Path projectPath;
@@ -92,7 +85,9 @@ public class ProjectLoaderAction extends AbstractAction{
 
 				parentFrame.setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
 
-				final Font temporaryFont = temporarilyChooseAFont();
+				//choose one font (in case of reading errors)
+				final String sampleText = packager.getSampleText();
+				final Font temporaryFont = FontHelper.chooseBestFont(sampleText);
 				if(initialize != null)
 					initialize.accept(temporaryFont);
 
@@ -105,19 +100,6 @@ public class ProjectLoaderAction extends AbstractAction{
 				throw new RuntimeException(e);
 			}
 		}, completed, cancelled);
-	}
-
-	/**
-	 * Chooses one font (in case of reading errors)
-	 */
-	private Font temporarilyChooseAFont() throws IOException{
-		final Path affixPath = packager.getAffixFile().toPath();
-		final String content = new String(Files.readAllBytes(affixPath));
-		final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
-		final String sample = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
-			.mapToObj(Character::toString)
-			.collect(Collectors.toSet()));
-		return FontHelper.chooseBestFont(sample);
 	}
 
 }

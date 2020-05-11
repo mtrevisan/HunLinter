@@ -28,8 +28,17 @@ public class FontHelper{
 
 
 	private static String LANGUAGE_SAMPLE;
-	private static final List<String> FAMILY_NAMES_ALL = new ArrayList<>();
-	private static final List<String> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
+	private static final Font[] ALL_FONTS;
+	static{
+		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getAvailableFontFamilyNames();
+		ALL_FONTS = new Font[familyNames.length];
+		int offset = 0;
+		for(final String familyName : familyNames)
+			ALL_FONTS[offset ++] = new Font(familyName, Font.PLAIN, 20);
+	}
+	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>();
+	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
 	private static Font CURRENT_FONT = FontChooserDialog.getDefaultFont();
 
 	private static final class WidthFontPair{
@@ -88,17 +97,16 @@ public class FontHelper{
 			//check to see if the error can be visualized, if not, change the font to one that can
 			extractFonts(languageSample);
 
-			final Function<String, WidthFontPair> widthFontPair = fontName -> {
-				final Font currentFont = new Font(fontName, Font.PLAIN, FontHelper.CURRENT_FONT.getSize());
-				final double w = getStringBounds(currentFont, languageSample)
+			final Function<Font, WidthFontPair> widthFontPair = font -> {
+				final double w = getStringBounds(font, languageSample)
 					.getWidth();
-				return WidthFontPair.of(w, currentFont);
+				return WidthFontPair.of(w, font);
 			};
-			final List<String> fontNames = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
+			final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 
 			WidthFontPair bestPair = null;
-			for(final String fontName : fontNames){
-				final WidthFontPair doubleFontPair = widthFontPair.apply(fontName);
+			for(final Font font : fonts){
+				final WidthFontPair doubleFontPair = widthFontPair.apply(font);
 				if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
 					bestPair = doubleFontPair;
 			}
@@ -125,16 +133,12 @@ public class FontHelper{
 			FAMILY_NAMES_ALL.clear();
 			FAMILY_NAMES_MONOSPACED.clear();
 
-			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getAvailableFontFamilyNames();
-			for(final String familyName : familyNames){
-				final Font font = new Font(familyName, Font.PLAIN, 20);
+			for(final Font font : ALL_FONTS)
 				if(font.canDisplayUpTo(languageSample) < 0){
-					FAMILY_NAMES_ALL.add(familyName);
+					FAMILY_NAMES_ALL.add(font);
 					if(isMonospaced(font))
-						FAMILY_NAMES_MONOSPACED.add(familyName);
+						FAMILY_NAMES_MONOSPACED.add(font);
 				}
-			}
 		}
 	}
 
@@ -149,11 +153,17 @@ public class FontHelper{
 	}
 
 	public static List<String> getFamilyNamesAll(){
-		return FAMILY_NAMES_ALL;
+		final List<String> names = new ArrayList<>(FAMILY_NAMES_ALL.size());
+		for(final Font font : FAMILY_NAMES_ALL)
+			names.add(font.getName());
+		return names;
 	}
 
 	public static List<String> getFamilyNamesMonospaced(){
-		return FAMILY_NAMES_MONOSPACED;
+		final List<String> names = new ArrayList<>(FAMILY_NAMES_MONOSPACED.size());
+		for(final Font font : FAMILY_NAMES_MONOSPACED)
+			names.add(font.getName());
+		return names;
 	}
 
 	public static Font getCurrentFont(){
