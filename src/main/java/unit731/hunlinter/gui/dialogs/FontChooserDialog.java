@@ -161,6 +161,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       sampleTextArea.setColumns(20);
       sampleTextArea.setLineWrap(true);
       sampleTextArea.setText(sampleText);
+      sampleTextArea.setWrapStyleWord(true);
       sampleTextArea.setCaretPosition(0);
       sampleScrollPane.setViewportView(sampleTextArea);
 
@@ -187,18 +188,19 @@ public class FontChooserDialog extends javax.swing.JDialog{
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(sampleScrollPane)
-               .addComponent(familyNameLabel)
-               .addComponent(monospacedCheckBox)
-               .addGroup(layout.createSequentialGroup()
-                  .addComponent(sampleLabel)
-                  .addGap(0, 0, Short.MAX_VALUE))
                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                   .addGap(0, 0, Short.MAX_VALUE)
                   .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(cancelButton))
                .addComponent(familyNameTextField)
-               .addComponent(familyNameScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE))
+               .addComponent(familyNameScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+               .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                     .addComponent(familyNameLabel)
+                     .addComponent(monospacedCheckBox)
+                     .addComponent(sampleLabel))
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(

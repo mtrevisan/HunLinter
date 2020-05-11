@@ -28,12 +28,6 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="sampleScrollPane" max="32767" attributes="0"/>
-                  <Component id="familyNameLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="monospacedCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="sampleLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Component id="okButton" min="-2" max="-2" attributes="0"/>
@@ -42,6 +36,14 @@
                   </Group>
                   <Component id="familyNameTextField" alignment="0" max="32767" attributes="0"/>
                   <Component id="familyNameScrollPane" alignment="0" pref="320" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="familyNameLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="monospacedCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="sampleLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -111,7 +113,7 @@
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(model);"/>
-            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final SortableListModel model = new SortableListModel();&#xd;&#xa;model.addAll(FontHelper.getFamilyNamesAll());"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final DefaultListModel&lt;String&gt; model = new DefaultListModel&lt;&gt;();&#xd;&#xa;model.addAll(FontHelper.getFamilyNamesAll());"/>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>
@@ -152,6 +154,7 @@
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="sampleText" type="code"/>
             </Property>
+            <Property name="wrapStyleWord" type="boolean" value="true"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="sampleTextArea.setCaretPosition(0);"/>
