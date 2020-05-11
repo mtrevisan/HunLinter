@@ -645,19 +645,23 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 			//load font for this language
-			final String language = parserManager.getLanguage();
-			final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
-			final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-			final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-				new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-				FontChooserDialog.getDefaultFont());
-			FontHelper.setCurrentFont(lastUsedFont, this);
+			loadLanguadeDependentFont();
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void loadLanguadeDependentFont(){
+		final String language = parserManager.getLanguage();
+		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
+		final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
+		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
+			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
+			FontChooserDialog.getDefaultFont());
+		FontHelper.setCurrentFont(lastUsedFont, this);
 	}
 
 	@EventHandler
