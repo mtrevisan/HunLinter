@@ -1,5 +1,6 @@
 package unit731.hunlinter;
 
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
@@ -77,7 +78,10 @@ import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.eventbus.events.BusExceptionEvent;
+import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.workers.dictionary.WordlistWorker;
 import unit731.hunlinter.workers.core.WorkerAbstract;
@@ -570,6 +574,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
 		}
+	}
+
+	@EventHandler
+	public void parsingWarnings(final LinterWarning warningEvent){
+		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
+		final IndexDataPair<?> data = warningEvent.getData();
+		final int index = data.getIndex();
+		final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+		LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, data.getData());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "{}{}: {}", warningEvent.getMessage(), lineText, data.getData());
 	}
 
 	private void loadFileCompleted(){

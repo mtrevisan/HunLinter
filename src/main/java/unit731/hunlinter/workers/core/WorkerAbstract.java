@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import javax.swing.SwingWorker;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
@@ -100,14 +101,9 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final String errorMessage = ExceptionHelper.getMessage(e);
 			final IndexDataPair<?> data = e.getData();
 			final int index = data.getIndex();
-			if(index >= 0){
-				LOGGER.trace("{}, line {}: {}", errorMessage, index, data.getData());
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), index, data.getData());
-			}
-			else{
-				LOGGER.trace("{}: {}", errorMessage, data.getData());
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}: {}", e.getMessage(), data.getData());
-			}
+			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "{}{}: {}", e.getMessage(), lineText, data.getData());
 		}
 		else
 			e.printStackTrace();
