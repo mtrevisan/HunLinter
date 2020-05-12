@@ -120,8 +120,10 @@ public class FontHelper{
 			if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
 				bestPair = doubleFontPair;
 		}
-		final Font bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
-		return getDefaultHeightFont(bestFont);
+		Font bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
+		bestFont = getDefaultHeightFont(bestFont);
+		LOGGER.info("Best font: '{}', size {}", bestFont.getFontName(), bestFont.getSize());
+		return bestFont;
 	}
 
 	public static Font getDefaultHeightFont(final Font font){
