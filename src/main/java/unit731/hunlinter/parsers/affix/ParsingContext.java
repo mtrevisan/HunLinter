@@ -5,22 +5,36 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.ParserHelper;
 
 
 public class ParsingContext{
 
 	private final String line;
-	private final String[] definitionParts;
+	private final int index;
 	private final Scanner scanner;
 
+	private final String[] lineParts;
 
-	public ParsingContext(final String line, final Scanner scanner){
+
+	public ParsingContext(final String line, final int index, final Scanner scanner){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(scanner);
 
 		this.line = line;
-		definitionParts = StringUtils.split(line);
+		this.index = index;
 		this.scanner = scanner;
+
+		lineParts = StringUtils.split(line);
+	}
+
+	public String getLine(){
+		final int commentIndex = line.indexOf(ParserHelper.COMMENT_MARK_SHARP);
+		return (commentIndex >= 0? line.substring(0, commentIndex).trim(): line);
+	}
+
+	public int getIndex(){
+		return index;
 	}
 
 	public Scanner getScanner(){
@@ -28,23 +42,23 @@ public class ParsingContext{
 	}
 
 	public String getRuleType(){
-		return definitionParts[0];
+		return lineParts[0];
 	}
 
 	public String getFirstParameter(){
-		return definitionParts[1];
+		return lineParts[1];
 	}
 
 	public String getSecondParameter(){
-		return definitionParts[2];
+		return lineParts[2];
 	}
 
 	public String getThirdParameter(){
-		return definitionParts[3];
+		return lineParts[3];
 	}
 
 	public String getAllButFirstParameter(){
-		return StringUtils.join(Arrays.asList(definitionParts).subList(1, definitionParts.length), StringUtils.SPACE);
+		return StringUtils.join(Arrays.asList(lineParts).subList(1, lineParts.length), StringUtils.SPACE);
 	}
 
 	@Override

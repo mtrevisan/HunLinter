@@ -8,6 +8,7 @@ import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
@@ -77,12 +78,14 @@ public class AutoCorrectParser{
 
 	private void validate(){
 		//check for duplications
+		int index = 0;
 		final Set<String> map = new HashSet<>();
-		for(final CorrectionEntry s : dictionary)
+		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
-				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}));
-				//warn, but without lines
-//				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()})));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}), IndexDataPair.of(index, null)));
+
+			index ++;
+		}
 	}
 
 	public List<CorrectionEntry> getCorrectionsDictionary(){

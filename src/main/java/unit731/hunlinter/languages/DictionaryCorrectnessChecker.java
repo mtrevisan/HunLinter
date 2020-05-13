@@ -10,6 +10,7 @@ import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
@@ -48,23 +49,21 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	//used by the correctness worker after calling {@link #loadRules()}:
-	public void checkInflection(final Inflection inflection){
+	public void checkInflection(final Inflection inflection, final int index){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))
 			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{
 				AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
-			morphologicalFieldCheck(inflection);
+			morphologicalFieldCheck(inflection, index);
 
 		incompatibilityCheck(inflection);
 	}
 
-	private void morphologicalFieldCheck(final Inflection inflection){
+	private void morphologicalFieldCheck(final Inflection inflection, final int index){
 		if(!inflection.hasMorphologicalFields())
-			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}));
-			//warn, but without lines
-//			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()})));
+			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}), IndexDataPair.of(index, null)));
 
 		inflection.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)

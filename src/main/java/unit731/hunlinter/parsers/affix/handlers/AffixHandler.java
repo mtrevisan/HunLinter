@@ -16,6 +16,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
@@ -74,7 +75,7 @@ public class AffixHandler implements Handler{
 			ParserHelper.assertNotEOF(scanner);
 
 			line = scanner.nextLine();
-			final AffixEntry entry = new AffixEntry(line, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
+			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
 			entry.setParent(parent);
 //com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
@@ -83,9 +84,7 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries, entry))
-				throw new LinterException(DUPLICATED_LINE.format(new Object[]{entry.toString()}));
-				//warn, but without lines
-//				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()})));
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}), IndexDataPair.of(context.getIndex() + i, null)));
 			else
 				entries[offset ++] = entry;
 

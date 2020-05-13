@@ -720,7 +720,7 @@ public class RulesReducer{
 		final AffixEntry[] entries = new AffixEntry[reducedRules.size() - 1];
 		for(int i = 0; i < reducedRules.size() - 1; i ++){
 			final String reducedRule = reducedRules.get(i + 1);
-			entries[i] = new AffixEntry(reducedRule, type, flag, strategy, null, null);
+			entries[i] = new AffixEntry(reducedRule, i, type, flag, strategy, null, null);
 		}
 
 		int progress = 0;

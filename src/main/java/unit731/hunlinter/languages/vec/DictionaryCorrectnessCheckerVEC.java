@@ -18,6 +18,7 @@ import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
@@ -123,14 +124,14 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	public void checkInflection(final Inflection inflection){
-		super.checkInflection(inflection);
+	public void checkInflection(final Inflection inflection, final int index){
+		super.checkInflection(inflection, index);
 
 		stressCheck(inflection);
 
 		variantsCheck(inflection);
 
-		incompatibilityCheck(inflection);
+		incompatibilityCheck(inflection, index);
 
 		if(inflection.hasNonTerminalContinuationFlags(affixData::isTerminalAffix)
 				&& !inflection.hasPartOfSpeech(POS_VERB) && !inflection.hasPartOfSpeech(POS_ADVERB))
@@ -186,12 +187,10 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
 	}
 
-	private void incompatibilityCheck(final Inflection inflection){
+	private void incompatibilityCheck(final Inflection inflection, final int index){
 		final String[] pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.length > 1)
-			throw new LinterException(SINGLE_POS_NOT_PRESENT);
-			//warn, but without lines
-//			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT));
+			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT, IndexDataPair.of(index, null)));
 	}
 
 	private void northernPluralCheck(final Inflection inflection){

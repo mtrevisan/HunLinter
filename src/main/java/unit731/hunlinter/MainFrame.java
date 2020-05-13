@@ -585,7 +585,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final int index = data.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
 			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, data.getData());
+			if(data.getData() != null)
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, data.getData());
+			else
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}", warningEvent.getMessage(), lineText);
 		}
 		else{
 			LOGGER.trace("WARN: {}", errorMessage);

@@ -158,13 +158,13 @@ public class AffixParser{
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
 		clear();
 
-		int indexLine = 0;
+		int index = 0;
 		boolean encodingRead = false;
 		final Charset charset = FileHelper.determineCharset(affFile.toPath());
 		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
-				indexLine ++;
+				index ++;
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
@@ -172,16 +172,16 @@ public class AffixParser{
 					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
-				final ParsingContext context = new ParsingContext(line, scanner);
+				final ParsingContext context = new ParsingContext(line, index, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
-						indexLine += handler.parse(context, data);
+						index += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
 						//if a warning should be made, then this exception should not be thrown
-						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), indexLine}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), index}));
 					}
 				}
 			}

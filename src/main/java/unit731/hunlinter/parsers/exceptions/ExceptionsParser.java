@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
@@ -80,12 +81,14 @@ public class ExceptionsParser{
 
 	private void validate(){
 		//check for duplications
+		int index = 0;
 		final Set<String> map = new HashSet<>();
-		for(final String s : dictionary)
+		for(final String s : dictionary){
 			if(!map.add(s))
-				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}));
-				//warn, but without lines
-//				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s})));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));
+
+			index ++;
+		}
 	}
 
 	public List<String> getExceptionsDictionary(){

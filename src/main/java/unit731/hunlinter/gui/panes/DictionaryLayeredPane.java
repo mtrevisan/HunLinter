@@ -345,26 +345,26 @@ final int iconSize = 17;
 				totalInflectionsValueLabel.setText(Integer.toString(inflections.length));
 
 				//check for correctness
-				int line = 0;
+				int index = 0;
 				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
 				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
 				for(final Inflection inflection : inflections){
 					try{
-						checker.checkInflection(inflection);
+						checker.checkInflection(inflection, index);
 					}
 					catch(final Exception e){
-						dicCellRenderer.setErrorOnRow(line);
+						dicCellRenderer.setErrorOnRow(index);
 
 						final StringBuffer sb = new StringBuffer(e.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						String errorMessage = ExceptionHelper.getMessage(e);
-						LOGGER.trace("{}, line {}", errorMessage, line);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), line);
+						LOGGER.trace("{}, line {}", errorMessage, index);
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), index);
 					}
 
-					line ++;
+					index ++;
 				}
 			}
 			catch(final Exception e){

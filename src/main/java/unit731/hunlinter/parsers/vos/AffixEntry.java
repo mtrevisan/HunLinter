@@ -19,6 +19,7 @@ import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
@@ -63,7 +64,7 @@ public class AffixEntry{
 	final String[] morphologicalFields;
 
 
-	public AffixEntry(final String line, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
+	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
 			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
@@ -92,7 +93,7 @@ public class AffixEntry{
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
-		checkValidity(parentType, type, parentFlag, flag, removal, line);
+		checkValidity(parentType, type, parentFlag, flag, removal, line, index);
 	}
 
 	public void setParent(final RuleEntry parent){
@@ -102,7 +103,7 @@ public class AffixEntry{
 	}
 
 	private void checkValidity(final AffixType parentType, final AffixType type, final String parentFlag, final String flag,
-			final String removal, final String line){
+			final String removal, final String line, final int index){
 		if(parentType != type)
 			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type, line}));
 		if(!parentFlag.equals(flag))
@@ -112,17 +113,13 @@ public class AffixEntry{
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
-					//warn, but without lines
-//					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}), IndexDataPair.of(index, null)));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
-					//warn, but without lines
-//					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}), IndexDataPair.of(index, null)));
 			}
 		}
 	}
