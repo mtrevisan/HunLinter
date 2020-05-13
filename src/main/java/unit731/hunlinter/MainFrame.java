@@ -93,6 +93,8 @@ import unit731.hunlinter.services.RecentItems;
 
 
 /**
+ * Swing alternative: @see <a href="https://pivot.apache.org/"Apache Pivot</a>
+ *
  * @see <a href="http://manpages.ubuntu.com/manpages/trusty/man4/hunspell.4.html">Hunspell 4</a>
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
  * @see <a href="https://github.com/nuspell/nuspell">Nuspell on github</a>
