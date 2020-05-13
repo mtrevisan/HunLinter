@@ -580,13 +580,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@EventHandler
 	public void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
-		final IndexDataPair<?> data = warningEvent.getData();
-		if(data != null){
-			final int index = data.getIndex();
+		final IndexDataPair<?> eventData = warningEvent.getData();
+		if(eventData != null){
+			final int index = eventData.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
-			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, data.getData());
-			if(data.getData() != null)
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, data.getData());
+			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData.getData());
+			if(eventData.getData() != null)
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData.getData());
 			else
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}", warningEvent.getMessage(), lineText);
 		}
