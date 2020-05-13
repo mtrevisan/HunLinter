@@ -46,9 +46,9 @@ public class JTagPanel extends JPanel{
 	@Override
 	public void setFont(final Font font){
 		//FIXME find a way to dynamically change the font of each tag and re-adjust container layout
-		final int size = getComponents().length;
-		if(size > 0 && getComponents()[0].getFont() != FontHelper.getCurrentFont()){
-			synchronized(getTreeLock()){
+		synchronized(getTreeLock()){
+			final int size = getComponents().length;
+			if(size > 0 && getComponents()[0].getFont() != FontHelper.getCurrentFont()){
 				//remove all tags
 				final String[] tags = new String[size];
 				int i = 0;
