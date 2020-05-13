@@ -176,7 +176,7 @@ public class JTagPanel extends JPanel{
 					closeLabel.setBorder(null);
 				}
 			});
-			final JPanel closePanel = new JPanel(new GridBagLayout());
+			final JPanel closePanel = new JPanel(new GridLayout());
 			closePanel.setOpaque(false);
 			ps = closeLabel.getPreferredSize();
 			final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
