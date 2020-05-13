@@ -189,7 +189,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void incompatibilityCheck(final Inflection inflection){
 		final String[] pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.length > 1)
-			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT));
+			throw new LinterException(SINGLE_POS_NOT_PRESENT);
+			//warn, but without lines
+//			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT));
 	}
 
 	private void northernPluralCheck(final Inflection inflection){

@@ -83,7 +83,9 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries, entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()})));
+				throw new LinterException(DUPLICATED_LINE.format(new Object[]{entry.toString()}));
+				//warn, but without lines
+//				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()})));
 			else
 				entries[offset ++] = entry;
 

@@ -83,7 +83,9 @@ public class ExceptionsParser{
 		final Set<String> map = new HashSet<>();
 		for(final String s : dictionary)
 			if(!map.add(s))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s})));
+				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}));
+				//warn, but without lines
+//				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s})));
 	}
 
 	public List<String> getExceptionsDictionary(){

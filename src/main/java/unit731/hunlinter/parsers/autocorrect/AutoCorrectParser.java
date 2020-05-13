@@ -80,7 +80,9 @@ public class AutoCorrectParser{
 		final Set<String> map = new HashSet<>();
 		for(final CorrectionEntry s : dictionary)
 			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()})));
+				throw new LinterException(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}));
+				//warn, but without lines
+//				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()})));
 	}
 
 	public List<CorrectionEntry> getCorrectionsDictionary(){

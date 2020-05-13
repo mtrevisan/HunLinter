@@ -112,13 +112,17 @@ public class AffixEntry{
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
+					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					//warn, but without lines
+//					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
+					throw new LinterException(CHARACTERS_IN_COMMON.format(new Object[]{line}));
+					//warn, but without lines
+//					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line})));
 			}
 		}
 	}

@@ -53,7 +53,9 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line})));
+					throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
+					//warn, but without lines
+//					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line})));
 			}
 
 			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);

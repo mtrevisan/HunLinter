@@ -62,7 +62,9 @@ public class DictionaryCorrectnessChecker{
 
 	private void morphologicalFieldCheck(final Inflection inflection){
 		if(!inflection.hasMorphologicalFields())
-			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()})));
+			throw new LinterException(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}));
+			//warn, but without lines
+//			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()})));
 
 		inflection.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)
