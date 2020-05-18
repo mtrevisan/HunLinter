@@ -67,17 +67,17 @@ public class DictionaryCorrectnessChecker{
 
 		inflection.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)
-				throw new LinterException(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(),
-					morphologicalField}));
+				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
+					IndexDataPair.of(index, null)));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
-				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(),
-					morphologicalField}));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
+					IndexDataPair.of(index, null)));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
-				throw new LinterException(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{inflection.getWord(),
-					morphologicalField}));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{inflection.getWord(), morphologicalField}),
+					IndexDataPair.of(index, null)));
 		});
 	}
 
