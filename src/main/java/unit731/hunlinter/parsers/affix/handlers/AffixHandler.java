@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
@@ -69,8 +70,7 @@ public class AffixHandler implements Handler{
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
-		int offset = 0;
-		final AffixEntry[] entries = new AffixEntry[numEntries];
+		final FixedArray<AffixEntry> entries = new FixedArray<>(AffixEntry.class, numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			ParserHelper.assertNotEOF(scanner);
 
@@ -83,10 +83,10 @@ public class AffixHandler implements Handler{
 			checkValidity(parentType, parentFlag, context, entry);
 
 
-			if(ArrayUtils.contains(entries, entry))
+			if(ArrayUtils.contains(entries.data, entry))
 				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}), IndexDataPair.of(context.getIndex() + i, null)));
 			else
-				entries[offset ++] = entry;
+				entries.add(entry);
 
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
@@ -99,7 +99,7 @@ public class AffixHandler implements Handler{
 //else
 //	prefixEntries.put(arr, lst);
 		}
-		return entries;
+		return entries.extractCopyOrNull();
 	}
 
 	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
