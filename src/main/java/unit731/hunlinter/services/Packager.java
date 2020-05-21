@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
@@ -347,7 +348,8 @@ public class Packager{
 				final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 					.mapToObj(Character::toString)
-					.collect(Collectors.toSet()));
+					.collect(Collectors.toSet()))
+					+ DictionaryParser.COUNTER_GROUPING_SEPARATOR;
 			}
 			catch(final IOException ignored){}
 		}

@@ -28,8 +28,6 @@ public class DictionaryParser{
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
-	//figure space
-//	public static final char COUNTER_GROUPING_SEPARATOR = '\u2007';
 	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
 	static{
 		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
