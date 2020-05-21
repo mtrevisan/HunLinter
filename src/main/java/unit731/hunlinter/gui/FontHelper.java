@@ -104,6 +104,7 @@ public class FontHelper{
 
 	private FontHelper(){}
 
+	//FIXME should also consider DictionaryParser.COUNTER_GROUPING_SEPARATOR?
 	public static Font chooseBestFont(final String languageSample){
 		extractFonts(languageSample);
 
