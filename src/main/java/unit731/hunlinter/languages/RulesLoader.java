@@ -82,8 +82,8 @@ public class RulesLoader{
 			rules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
 			while(rules.hasNext()){
 				final String elem = rules.next();
-				if(elem.length() == 2 && elem.charAt(1) == ':')
-					letter = String.valueOf(elem.charAt(1));
+				if(elem.length() == 1)
+					letter = String.valueOf(elem.charAt(0));
 				else{
 					flags = strategy.parseFlags(elem);
 					final String correctRule = flags[flags.length - 1];
