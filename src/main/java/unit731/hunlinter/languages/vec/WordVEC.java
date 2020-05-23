@@ -55,11 +55,11 @@ public class WordVEC{
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
-	private static final String NO_STRESS_AVER = "^(?:r[aeiï]|ar)?g?(?:ar)?[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ESER = "^(?:r[aeiï]|ar)?(?:(?:s[ae]r)?[àé]|[sx][éí]|stà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|d[oiae])$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]))$";
-	private static final String NO_STRESS_SAVER = "^(?:pre|r[ae]|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(?:r[ae]|ar)?v[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_AVER = "^(?:r[eiï])?g?(?:ar)?[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|[bp]i)$";
+	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:(?:s[ae]r)?[àé]|[sx][éí]|stà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|d[oiae])$";
+	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]))$";
+	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_ANDAR = "^(?:re)?v[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(?:|as?|des?|es|kon|pro|re|so|sub?)?tr[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
