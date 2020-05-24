@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.apache.commons.lang3.StringUtils;
@@ -161,6 +163,11 @@ final int iconSize = 17;
       table.getColumnModel().getColumn(0).setMinWidth(150);
       table.getColumnModel().getColumn(0).setMaxWidth(300);
       table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
+      //FIXME
+		table.getModel().addTableModelListener(e -> {
+			for(int rowIndex = e.getFirstRow(); rowIndex <= e.getLastRow(); rowIndex ++)
+				theCellRenderer.adjustRowHeight(table, rowIndex);
+		});
       scrollPane.setViewportView(table);
 
       synonymsRecordedLabel.setText("Synonyms recorded:");
