@@ -12,7 +12,9 @@ public class GlyphComparator{
 	 * Perform glyph comparison, returning a list of matching codepoint tuples.
 	 * Stops prematurely (or never starts) if run == false.
 	 *
-	 * @param	chrs	Characters to be check for equality
+	 * @param font	The font to render the character in
+	 * @param maxDifferenceThreshold	Maximum allowed difference
+	 * @param chrs	Characters to be check for equality
 	 * @return	Whether all the given characters are identical in theior glyph representation.
 	 */
 	public static boolean allIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
@@ -32,7 +34,9 @@ public class GlyphComparator{
 	 * Perform glyph comparison, returning a list of matching codepoint tuples.
 	 * Stops prematurely (or never starts) if run == false.
 	 *
-	 * @param	chrs	Characters to be check for equality
+	 * @param font	The font to render the character in
+	 * @param maxDifferenceThreshold	Maximum allowed difference
+	 * @param chrs	Characters to be check for equality
 	 * @return	Whether some of the given characters are identical in their glyph representation.
 	 */
 	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
@@ -61,6 +65,7 @@ public class GlyphComparator{
 	/**
 	 * Render a BufferedImage containing the given character.
 	 *
+	 * @param font	The font to render the character in
 	 * @param chr	Character to render
 	 * @return	The image of the given character
 	 */

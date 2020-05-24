@@ -309,7 +309,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 <a name="changelog"></a>
 ## Changelog
 <a name="changelog-2.0.0"></a>
-### version 2.0.0 - 20200xxx
+### version 2.0.0 - 20200524
 - made update process stoppable
 - added a linter for thesaurus
 - added a menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
