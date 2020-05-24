@@ -32,7 +32,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 		setText(value != null? String.valueOf(value): null);
 
-//		adjustRowHeight(table, row);
+		adjustRowHeight(table, row);
 
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)? BORDER_ERROR: null);
