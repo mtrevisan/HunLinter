@@ -2,7 +2,6 @@ package unit731.hunlinter.parsers.hyphenation;
 
 import unit731.hunlinter.languages.BaseBuilder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,14 +10,14 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunlinter.services.RegexHelper;
 
 
 class HyphenationParserTest{
 
-	private static final Pattern PATTERN_CLEANER = PatternHelper.pattern("\\d|/.+$");
+	private static final Pattern PATTERN_CLEANER = RegexHelper.pattern("\\d|/.+$");
 
 
 	@Test
@@ -276,7 +275,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate("abcd", "a=bcd", HyphenationParser.Level.NON_COMPOUND);
 
-		Assertions.assertEquals(Arrays.asList("a", "bcd"), hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -690,14 +689,14 @@ class HyphenationParserTest{
 	}
 
 	private String getKeyFromData(String rule){
-		return PatternHelper.replaceAll(rule, PATTERN_CLEANER, StringUtils.EMPTY);
+		return RegexHelper.replaceAll(rule, PATTERN_CLEANER, StringUtils.EMPTY);
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
-		Assertions.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes());
 	}
 
 }

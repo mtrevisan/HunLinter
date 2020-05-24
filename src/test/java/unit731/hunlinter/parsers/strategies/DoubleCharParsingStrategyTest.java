@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class DoubleCharParsingStrategyTest{
@@ -22,7 +22,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void notOk(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> strategy.parseFlags("abc"));
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> strategy.parseFlags("abc"));
 		Assertions.assertEquals("Flag must be of length multiple of two: 'abc'", exception.getMessage());
 	}
 
@@ -50,7 +50,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
@@ -59,7 +59,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
@@ -68,7 +68,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
@@ -85,7 +85,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags(null);
+		String continuationFlags = strategy.joinFlags((String[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

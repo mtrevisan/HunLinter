@@ -10,7 +10,7 @@ public class GITFileData{
 	public Version version;
 	public final Long size;
 	public final String sha;
-	public String content;
+	public final String content;
 	public final String encoding;
 	public final String downloadUrl;
 

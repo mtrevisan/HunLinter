@@ -2,31 +2,20 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.services.system.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-class WordGeneratorCompoundRuleTest{
-
-	private AffixData affixData;
-	private WordGenerator wordGenerator;
-
+class WordGeneratorCompoundRuleTest extends TestBase{
 
 	@Test
-	void testBjörnJacke() throws IOException, SAXException{
+	void björnJacke() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw",
@@ -44,23 +33,23 @@ class WordGeneratorCompoundRuleTest{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createInflection("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
-	void simple() throws IOException, SAXException{
+	void simple() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -73,19 +62,19 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
-	void infinite() throws IOException, SAXException{
+	void infinite() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -98,54 +87,136 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("aa", null, "pa:a st:a pa:a st:a"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("bb", null, "pa:b st:b pa:b st:b"),
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cb", null, "pa:c st:c pa:b st:b"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),
-			createProduction("aab", null, "pa:a st:a pa:a st:a pa:b st:b"),
-			createProduction("aac", null, "pa:a st:a pa:a st:a pa:c st:c"),
-			createProduction("abb", null, "pa:a st:a pa:b st:b pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acb", null, "pa:a st:a pa:c st:c pa:b st:b"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("bbb", null, "pa:b st:b pa:b st:b pa:b st:b"),
-			createProduction("bbc", null, "pa:b st:b pa:b st:b pa:c st:c"),
-			createProduction("bcb", null, "pa:b st:b pa:c st:c pa:b st:b"),
-			createProduction("bcc", null, "pa:b st:b pa:c st:c pa:c st:c"),
-			createProduction("cbb", null, "pa:c st:c pa:b st:b pa:b st:b"),
-			createProduction("cbc", null, "pa:c st:c pa:b st:b pa:c st:c"),
-			createProduction("ccb", null, "pa:c st:c pa:c st:c pa:b st:b"),
-			createProduction("ccc", null, "pa:c st:c pa:c st:c pa:c st:c"),
-			createProduction("aaaa", null, "pa:a st:a pa:a st:a pa:a st:a pa:a st:a"),
-			createProduction("aaab", null, "pa:a st:a pa:a st:a pa:a st:a pa:b st:b"),
-			createProduction("aaac", null, "pa:a st:a pa:a st:a pa:a st:a pa:c st:c"),
-			createProduction("aabb", null, "pa:a st:a pa:a st:a pa:b st:b pa:b st:b"),
-			createProduction("aabc", null, "pa:a st:a pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("aacb", null, "pa:a st:a pa:a st:a pa:c st:c pa:b st:b"),
-			createProduction("aacc", null, "pa:a st:a pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("abbb", null, "pa:a st:a pa:b st:b pa:b st:b pa:b st:b"),
-			createProduction("abbc", null, "pa:a st:a pa:b st:b pa:b st:b pa:c st:c"),
-			createProduction("abcb", null, "pa:a st:a pa:b st:b pa:c st:c pa:b st:b"),
-			createProduction("abcc", null, "pa:a st:a pa:b st:b pa:c st:c pa:c st:c"),
-			createProduction("acbb", null, "pa:a st:a pa:c st:c pa:b st:b pa:b st:b"),
-			createProduction("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
-			createProduction("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
-			createProduction("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("aa", null, "pa:a st:a pa:a st:a"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("bb", null, "pa:b st:b pa:b st:b"),
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cb", null, "pa:c st:c pa:b st:b"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),
+			createInflection("aab", null, "pa:a st:a pa:a st:a pa:b st:b"),
+			createInflection("aac", null, "pa:a st:a pa:a st:a pa:c st:c"),
+			createInflection("abb", null, "pa:a st:a pa:b st:b pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acb", null, "pa:a st:a pa:c st:c pa:b st:b"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
+			createInflection("bbb", null, "pa:b st:b pa:b st:b pa:b st:b"),
+			createInflection("bbc", null, "pa:b st:b pa:b st:b pa:c st:c"),
+			createInflection("bcb", null, "pa:b st:b pa:c st:c pa:b st:b"),
+			createInflection("bcc", null, "pa:b st:b pa:c st:c pa:c st:c"),
+			createInflection("cbb", null, "pa:c st:c pa:b st:b pa:b st:b"),
+			createInflection("cbc", null, "pa:c st:c pa:b st:b pa:c st:c"),
+			createInflection("ccb", null, "pa:c st:c pa:c st:c pa:b st:b"),
+			createInflection("ccc", null, "pa:c st:c pa:c st:c pa:c st:c"),
+			createInflection("aaaa", null, "pa:a st:a pa:a st:a pa:a st:a pa:a st:a"),
+			createInflection("aaab", null, "pa:a st:a pa:a st:a pa:a st:a pa:b st:b"),
+			createInflection("aaac", null, "pa:a st:a pa:a st:a pa:a st:a pa:c st:c"),
+			createInflection("aabb", null, "pa:a st:a pa:a st:a pa:b st:b pa:b st:b"),
+			createInflection("aabc", null, "pa:a st:a pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("aacb", null, "pa:a st:a pa:a st:a pa:c st:c pa:b st:b"),
+			createInflection("aacc", null, "pa:a st:a pa:a st:a pa:c st:c pa:c st:c"),
+			createInflection("abbb", null, "pa:a st:a pa:b st:b pa:b st:b pa:b st:b"),
+			createInflection("abbc", null, "pa:a st:a pa:b st:b pa:b st:b pa:c st:c"),
+			createInflection("abcb", null, "pa:a st:a pa:b st:b pa:c st:c pa:b st:b"),
+			createInflection("abcc", null, "pa:a st:a pa:b st:b pa:c st:c pa:c st:c"),
+			createInflection("acbb", null, "pa:a st:a pa:c st:c pa:b st:b pa:b st:b"),
+			createInflection("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
+			createInflection("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
+			createInflection("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
-	void zeroOrOne() throws IOException, SAXException{
+	void onlyInCompound3() throws IOException{
+		String language = "en-GB";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"ONLYINCOMPOUND _",
+			"COMPOUNDRULE 2",
+			"COMPOUNDRULE #*0{",
+			"COMPOUNDRULE #*@}");
+		loadData(affFile, language);
+
+		String line = "#*0{";
+		String[] inputCompounds = new String[]{
+			"0/#@",
+			"0th/}{",
+			"1/#0",
+			"1st/}",
+			"1th/{_",
+			"2/#@",
+			"2nd/}",
+			"2th/{_",
+			"3/#@",
+			"3rd/}",
+			"3th/{_",
+			"4/#@",
+			"4th/}{",
+			"5/#@",
+			"5th/}{",
+			"6/#@",
+			"6th/}{",
+			"7/#@",
+			"7th/}{",
+			"8/#@",
+			"8th/}{",
+			"9/#@",
+			"9th/}{"
+		};
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+
+		Inflection[] expected = new Inflection[]{
+			createInflection("10th", null, "pa:1 st:1 pa:0th st:0th"),
+			createInflection("11th", "_", "pa:1 st:1 pa:1th st:1th"),
+			createInflection("12th", "_", "pa:1 st:1 pa:2th st:2th"),
+			createInflection("13th", "_", "pa:1 st:1 pa:3th st:3th"),
+			createInflection("14th", null, "pa:1 st:1 pa:4th st:4th"),
+			createInflection("15th", null, "pa:1 st:1 pa:5th st:5th"),
+			createInflection("16th", null, "pa:1 st:1 pa:6th st:6th"),
+			createInflection("17th", null, "pa:1 st:1 pa:7th st:7th"),
+			createInflection("18th", null, "pa:1 st:1 pa:8th st:8th"),
+			createInflection("19th", null, "pa:1 st:1 pa:9th st:9th"),
+			createInflection("010th", null, "pa:0 st:0 pa:1 st:1 pa:0th st:0th"),
+			createInflection("011th", "_", "pa:0 st:0 pa:1 st:1 pa:1th st:1th"),
+			createInflection("012th", "_", "pa:0 st:0 pa:1 st:1 pa:2th st:2th"),
+			createInflection("013th", "_", "pa:0 st:0 pa:1 st:1 pa:3th st:3th"),
+			createInflection("014th", null, "pa:0 st:0 pa:1 st:1 pa:4th st:4th"),
+			createInflection("015th", null, "pa:0 st:0 pa:1 st:1 pa:5th st:5th"),
+			createInflection("016th", null, "pa:0 st:0 pa:1 st:1 pa:6th st:6th"),
+			createInflection("017th", null, "pa:0 st:0 pa:1 st:1 pa:7th st:7th"),
+			createInflection("018th", null, "pa:0 st:0 pa:1 st:1 pa:8th st:8th"),
+			createInflection("019th", null, "pa:0 st:0 pa:1 st:1 pa:9th st:9th"),
+			createInflection("110th", null, "pa:1 st:1 pa:1 st:1 pa:0th st:0th"),
+			createInflection("111th", "_", "pa:1 st:1 pa:1 st:1 pa:1th st:1th"),
+			createInflection("112th", "_", "pa:1 st:1 pa:1 st:1 pa:2th st:2th"),
+			createInflection("113th", "_", "pa:1 st:1 pa:1 st:1 pa:3th st:3th"),
+			createInflection("114th", null, "pa:1 st:1 pa:1 st:1 pa:4th st:4th"),
+			createInflection("115th", null, "pa:1 st:1 pa:1 st:1 pa:5th st:5th"),
+			createInflection("116th", null, "pa:1 st:1 pa:1 st:1 pa:6th st:6th"),
+			createInflection("117th", null, "pa:1 st:1 pa:1 st:1 pa:7th st:7th"),
+			createInflection("118th", null, "pa:1 st:1 pa:1 st:1 pa:8th st:8th"),
+			createInflection("119th", null, "pa:1 st:1 pa:1 st:1 pa:9th st:9th"),
+			createInflection("210th", null, "pa:2 st:2 pa:1 st:1 pa:0th st:0th"),
+			createInflection("211th", "_", "pa:2 st:2 pa:1 st:1 pa:1th st:1th"),
+			createInflection("212th", "_", "pa:2 st:2 pa:1 st:1 pa:2th st:2th"),
+			createInflection("213th", "_", "pa:2 st:2 pa:1 st:1 pa:3th st:3th"),
+			createInflection("214th", null, "pa:2 st:2 pa:1 st:1 pa:4th st:4th"),
+			createInflection("215th", null, "pa:2 st:2 pa:1 st:1 pa:5th st:5th"),
+			createInflection("216th", null, "pa:2 st:2 pa:1 st:1 pa:6th st:6th")
+		};
+		Assertions.assertArrayEquals(expected, words);
+	}
+
+	@Test
+	void zeroOrOne() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -158,23 +229,23 @@ class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
-	void longFlag() throws IOException, SAXException{
+	void longFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"COMPOUNDMIN 1",
@@ -188,23 +259,23 @@ class WordGeneratorCompoundRuleTest{
 			"b/bb",
 			"c/bbcc"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 	@Test
-	void numericalFlag() throws IOException, SAXException{
+	void numericalFlag() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"COMPOUNDMIN 1",
@@ -218,25 +289,25 @@ class WordGeneratorCompoundRuleTest{
 			"b/2",
 			"c/2,3"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
-		List<Production> expected = Arrays.asList(
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
-			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
-		);
-		Assertions.assertEquals(expected, words);
+		Inflection[] expected = new Inflection[]{
+			createInflection("bc", null, "pa:b st:b pa:c st:c"),
+			createInflection("cc", null, "pa:c st:c pa:c st:c"),
+			createInflection("ac", null, "pa:a st:a pa:c st:c"),
+			createInflection("ab", null, "pa:a st:a pa:b st:b"),
+			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 
 	@Test
 	void forbiddenWordMissingRule(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String language = "xxx";
-			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 				"SET UTF-8",
 				"COMPOUNDRULE 1",
 				"COMPOUNDRULE vw");
@@ -253,9 +324,9 @@ class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	void forbiddenWord() throws IOException, SAXException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORBIDDENWORD X",
 			"COMPOUNDRULE 1",
@@ -267,16 +338,16 @@ class WordGeneratorCompoundRuleTest{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		Assertions.assertTrue(words.isEmpty());
+		Assertions.assertTrue(words.length == 0);
 	}
 
 
 	@Test
-	void forceUppercase() throws IOException, SAXException{
+	void forceUppercase() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"FORCEUCASE U",
 			"COMPOUNDRULE 1",
@@ -288,25 +359,12 @@ class WordGeneratorCompoundRuleTest{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
-//words.forEach(System.out::println);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		List<Production> expected = Collections.singletonList(
-			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
-		);
-		Assertions.assertEquals(expected, words);
-	}
-
-	private void loadData(File affFile, String language) throws IOException, SAXException{
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile, language);
-		affixData = affParser.getAffixData();
-		wordGenerator = new WordGenerator(affixData, null);
-	}
-
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
+		Inflection[] expected = new Inflection[]{
+			createInflection("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+		};
+		Assertions.assertArrayEquals(expected, words);
 	}
 
 }

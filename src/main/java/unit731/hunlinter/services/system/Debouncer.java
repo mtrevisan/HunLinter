@@ -1,11 +1,13 @@
 package unit731.hunlinter.services.system;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 
 public class Debouncer<T>{
@@ -13,19 +15,19 @@ public class Debouncer<T>{
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 	private final ConcurrentHashMap<T, TimerTask> delayedMap = new ConcurrentHashMap<>();
 
-	private final Consumer<T> callback;
+	private final Runnable callback;
 	private final int interval;
 
 
-	public Debouncer(Consumer<T> callback, int interval){
+	public Debouncer(final Runnable callback, final int interval){
 		Objects.requireNonNull(callback);
 
 		this.callback = callback;
 		this.interval = interval;
 	}
 
-	public void call(T key){
-		TimerTask task = new TimerTask(key);
+	public void call(final T key){
+		final TimerTask task = new TimerTask(key);
 
 		TimerTask prev;
 		do{
@@ -48,7 +50,7 @@ public class Debouncer<T>{
 		private final Object lock = new Object();
 
 
-		TimerTask(T key){
+		TimerTask(final T key){
 			this.key = key;
 
 			extend();
@@ -68,7 +70,7 @@ public class Debouncer<T>{
 		@Override
 		public void run(){
 			synchronized(lock){
-				long remaining = dueTime - System.currentTimeMillis();
+				final long remaining = dueTime - System.currentTimeMillis();
 				//re-schedule task
 				if(remaining > 0)
 					executorService.schedule(this, remaining, TimeUnit.MILLISECONDS);
@@ -76,13 +78,35 @@ public class Debouncer<T>{
 				else{
 					dueTime = -1;
 					try{
-						callback.accept(key);
+						callback.run();
 					}
 					finally{
 						delayedMap.remove(key);
 					}
 				}
 			}
+		}
+
+
+		@Override
+		public boolean equals(final Object obj){
+			if(obj == this)
+				return true;
+			if(obj == null || obj.getClass() != getClass())
+				return false;
+
+			@SuppressWarnings("unchecked")
+			final TimerTask rhs = (TimerTask)obj;
+			return new EqualsBuilder()
+				.append(key, rhs.key)
+				.isEquals();
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(key)
+				.toHashCode();
 		}
 	}
 

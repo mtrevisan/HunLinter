@@ -5,11 +5,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import unit731.hunlinter.collections.bloomfilter.BloomFilterInterface;
-import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.collections.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
@@ -24,7 +25,7 @@ public class DictionaryStatistics implements Closeable{
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
 
-	private int totalProductions;
+	private int totalInflections;
 	private int longestWordCountByCharacters;
 	private int longestWordCountBySyllabes;
 	private int compoundWords;
@@ -46,8 +47,8 @@ public class DictionaryStatistics implements Closeable{
 		orthography = BaseBuilder.getOrthography(language);
 	}
 
-	public int getTotalProductions(){
-		return totalProductions;
+	public int getTotalInflections(){
+		return totalInflections;
 	}
 
 	public int getLongestWordCountByCharacters(){
@@ -93,7 +94,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized boolean hasSyllabeStatistics(){
-		return (totalProductions > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
+		return (totalInflections > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 	}
 
 	public void addData(final String word){
@@ -102,12 +103,12 @@ public class DictionaryStatistics implements Closeable{
 
 	public synchronized void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
-			final List<String> syllabes = hyphenation.getSyllabes();
+			final String[] syllabes = hyphenation.getSyllabes();
 
-			final List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
-			if(!stressIndexes.isEmpty())
-				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
-			syllabeLengthsFrequencies.addValue(syllabes.size());
+			final int stressIndex = orthography.getStressedSyllabeIndexFromLast(syllabes);
+			if(stressIndex >= 0)
+				stressFromLastFrequencies.addValue(stressIndex);
+			syllabeLengthsFrequencies.addValue(syllabes.length);
 			final StringBuffer sb = new StringBuffer();
 			for(final String syllabe : syllabes){
 				sb.append(syllabe);
@@ -122,14 +123,14 @@ public class DictionaryStatistics implements Closeable{
 				compoundWords ++;
 			if(subword.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalProductions ++;
+			totalInflections++;
 		}
 		else{
 			lengthsFrequencies.addValue(word.length());
 			storeLongestWord(word);
 			if(word.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalProductions ++;
+			totalInflections++;
 		}
 	}
 
@@ -147,8 +148,8 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	private synchronized void storeHyphenation(final Hyphenation hyphenation){
-		final List<String> syllabes = hyphenation.getSyllabes();
-		final int syllabeCount = syllabes.size();
+		final String[] syllabes = hyphenation.getSyllabes();
+		final int syllabeCount = syllabes.length;
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
 			longestWordsBySyllabes.add(hyphenation);
@@ -160,7 +161,7 @@ public class DictionaryStatistics implements Closeable{
 
 	public synchronized List<String> getMostCommonSyllabes(final int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
-			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
+			.map(value -> value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.))
 			.collect(Collectors.toList());
 	}
 
@@ -170,7 +171,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized void clear(){
-		totalProductions = 0;
+		totalInflections = 0;
 		longestWordCountByCharacters = 0;
 		longestWordCountBySyllabes = 0;
 		lengthsFrequencies.clear();

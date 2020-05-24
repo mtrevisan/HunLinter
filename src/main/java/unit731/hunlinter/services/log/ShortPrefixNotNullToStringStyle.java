@@ -5,6 +5,8 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 
+	private static final long serialVersionUID = 603695866745355049L;
+
 	public static final ToStringStyle SHORT_PREFIX_NOT_NULL_STYLE = new ShortPrefixNotNullToStringStyle();
 
 
@@ -22,7 +24,7 @@ public class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 		}
 	}
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "SameReturnValue"})
 	private Object readResolve(){
 		return SHORT_PREFIX_NOT_NULL_STYLE;
 	}

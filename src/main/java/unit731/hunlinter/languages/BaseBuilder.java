@@ -2,15 +2,18 @@ package unit731.hunlinter.languages;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
-import unit731.hunlinter.collections.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import unit731.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunlinter.languages.vec.OrthographyVEC;
+import unit731.hunlinter.languages.vec.WordTokenizerVEC;
 import unit731.hunlinter.languages.vec.WordVEC;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
@@ -27,6 +30,7 @@ public class BaseBuilder{
 		private BloomFilterParameters dictionaryBaseData;
 		private BiFunction<AffixData, HyphenatorInterface, DictionaryCorrectnessChecker> checker;
 		private Orthography orthography;
+		private WordTokenizer wordTokenizer;
 	}
 
 	private static final LanguageData LANGUAGE_DATA_DEFAULT = new LanguageData();
@@ -36,6 +40,7 @@ public class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.dictionaryBaseData = DictionaryBaseData.getInstance();
 		LANGUAGE_DATA_DEFAULT.checker = DictionaryCorrectnessChecker::new;
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
+		LANGUAGE_DATA_DEFAULT.wordTokenizer = new WordTokenizer();
 	}
 	private static final Map<String, LanguageData> DATA = new HashMap<>();
 	static{
@@ -45,6 +50,7 @@ public class BaseBuilder{
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();
 		langData.checker = DictionaryCorrectnessCheckerVEC::new;
 		langData.orthography = OrthographyVEC.getInstance();
+		langData.wordTokenizer = new WordTokenizerVEC();
 		DATA.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
 	}
 
@@ -74,15 +80,22 @@ public class BaseBuilder{
 			.orthography;
 	}
 
+	public static WordTokenizer getWordTokenizer(final String language){
+		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+			.wordTokenizer;
+	}
+
 	public static Properties getRulesProperties(final String language){
 		final Properties rulesProperties = new Properties();
 		final Class<? extends DictionaryCorrectnessChecker> cl = DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
-		try(final InputStream is = cl.getResourceAsStream("rules.properties")){
-			if(is != null)
-				rulesProperties.load(is);
+		final InputStream is = cl.getResourceAsStream("rules.properties");
+		if(is != null){
+			try(final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)){
+				rulesProperties.load(isr);
+			}
+			catch(final IOException ignored){}
 		}
-		catch(final IOException ignored){}
 		return rulesProperties;
 	}
 

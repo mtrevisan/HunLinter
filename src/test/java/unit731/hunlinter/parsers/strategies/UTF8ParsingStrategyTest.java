@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class UTF8ParsingStrategyTest{
@@ -44,38 +44,38 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in UTF-8 encoding: was 'aŧ'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was 'aŧ'", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithNoUTF8(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"\\x{FFFD}"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in UTF-8 encoding: was '\\x{FFFD}'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was '\\x{FFFD}'", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in UTF-8 encoding: was ''", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was ''", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"ŧ", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in UTF-8 encoding: was 'null'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was 'null'", exception.getMessage());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags(null);
+		String continuationFlags = strategy.joinFlags((String[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

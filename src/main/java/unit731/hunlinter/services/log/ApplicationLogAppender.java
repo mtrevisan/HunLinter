@@ -9,9 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
+
 import org.slf4j.Marker;
 import unit731.hunlinter.services.system.JavaHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
@@ -19,13 +23,22 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	private Encoder<ILoggingEvent> encoder;
 
 	private static final Map<Marker, List<JTextArea>> TEXT_AREAS = new HashMap<>();
+	private static final Map<Marker, List<JLabel>> LABELS = new HashMap<>();
 
+
+	public static void addLabel(final JLabel label, final Marker... markers){
+		addComponent(LABELS, label, markers);
+	}
 
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
-		Objects.requireNonNull(textArea);
+		addComponent(TEXT_AREAS, textArea, markers);
+	}
 
-		JavaHelper.nullableToStream(markers)
-			.forEach(marker -> ApplicationLogAppender.TEXT_AREAS.computeIfAbsent(marker, k -> new ArrayList<>()).add(textArea));
+	private static <T> void addComponent(final Map<Marker, List<T>> map, final T component, final Marker... markers){
+		Objects.requireNonNull(component);
+
+		forEach(markers,
+			marker -> map.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(component));
 	}
 
 	public void setEncoder(final Encoder<ILoggingEvent> encoder){
@@ -34,14 +47,17 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 	@Override
 	protected void append(final ILoggingEvent eventObject){
-		if(!TEXT_AREAS.isEmpty() && encoder != null){
+		if((!TEXT_AREAS.isEmpty() || !LABELS.isEmpty()) && encoder != null){
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 			final Marker marker = eventObject.getMarker();
-			JavaHelper.executeOnEventDispatchThread(() ->
-				JavaHelper.nullableToStream(TEXT_AREAS.get(marker))
-					.forEach(textArea -> textArea.append(message))
-			);
+			JavaHelper.executeOnEventDispatchThread(() -> {
+				forEach(TEXT_AREAS.get(marker), textArea -> {
+					textArea.append(message);
+					textArea.setCaretPosition(textArea.getDocument().getLength());
+				});
+				forEach(LABELS.get(marker), label -> label.setText(message));
+			});
 		}
 	}
 

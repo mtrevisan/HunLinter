@@ -2,6 +2,7 @@ package unit731.hunlinter.parsers.dictionary;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,18 +12,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.RegExpSequencer;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.services.RegexSequencer;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.PatternHelper;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class LineEntry implements Serializable{
@@ -31,9 +34,9 @@ public class LineEntry implements Serializable{
 
 	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word ''{2}'' that is too short");
 
-	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
+	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
-	public static final RegExpSequencer SEQUENCER_REGEXP = new RegExpSequencer();
+	public static final RegexSequencer SEQUENCER_REGEXP = new RegexSequencer();
 
 	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
@@ -53,9 +56,9 @@ public class LineEntry implements Serializable{
 	}
 
 	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
-		final List<String> words = parentRulesFrom.stream()
-			.flatMap(rule -> rule.extractFromEndingWith(condition).stream())
-			.collect(Collectors.toList());
+		final List<String> words = new ArrayList<>();
+		for(final LineEntry rule : parentRulesFrom)
+			words.addAll(rule.extractFromEndingWith(condition));
 		return createFromWithWords(entry, condition, words);
 	}
 
@@ -80,16 +83,17 @@ public class LineEntry implements Serializable{
 		this.addition = addition;
 		this.condition = condition;
 
-		from = new HashSet<>();
-		if(words != null)
-			from.addAll(words);
+		from = (words != null? new HashSet<>(words): new HashSet<>());
 	}
 
-	public List<String> extractFromEndingWith(String suffix){
-		final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
-		return from.stream()
-			.filter(word -> PatternHelper.find(word, conditionPattern))
-			.collect(Collectors.toList());
+	public List<String> extractFromEndingWith(final String suffix){
+		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
+		final ArrayList<String> list = new ArrayList<>(from.size());
+		applyIf(from,
+			word -> RegexHelper.find(word, conditionPattern),
+			list::add);
+		list.trimToSize();
+		return list;
 	}
 
 	public boolean isProductive(){
@@ -102,14 +106,14 @@ public class LineEntry implements Serializable{
 
 	public LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
-		final Set<String> reversedAddition = addition.stream()
-			.map(add -> {
-				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
-				additions[0] = StringUtils.reverse(additions[0]);
-				return StringUtils.join(additions, StringUtils.EMPTY);
-			})
-			.collect(Collectors.toSet());
-		final String reversedCondition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
+		final Set<String> reversedAddition = new HashSet<>(addition.size());
+		forEach(addition, add -> {
+			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
+			additions[0] = StringUtils.reverse(additions[0]);
+			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
+		});
+		final String reversedCondition = LineEntry.SEQUENCER_REGEXP
+			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
@@ -120,7 +124,7 @@ public class LineEntry implements Serializable{
 	}
 
 	private Set<String> extractRuleSpine(final LineEntry rule){
-		final Set<String> parentBones = new HashSet<>();
+		final Set<String> parentBones = new HashSet<>(rule.addition.size());
 		for(final String add : rule.addition){
 			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
 				.length();
@@ -134,11 +138,11 @@ public class LineEntry implements Serializable{
 	}
 
 	public static Set<Character> extractGroup(final int indexFromLast, final Set<String> words){
-		final Set<Character> group = new HashSet<>();
+		final Set<Character> group = new HashSet<>(words.size());
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new HunLintException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
+				throw new LinterException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
 					indexFromLast, word}));
 
 			group.add(word.charAt(index));
@@ -150,9 +154,9 @@ public class LineEntry implements Serializable{
 		final String lcs = StringHelper.longestCommonSuffix(from);
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
-			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(condition));
+			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-				condition = PatternHelper.makeGroup(group, comparator) + lcs;
+				condition = RegexHelper.makeGroup(group, comparator) + lcs;
 		}
 	}
 
@@ -160,7 +164,7 @@ public class LineEntry implements Serializable{
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)
-			.add(Character.toString(combinableChar))
+			.add(String.valueOf(combinableChar))
 			.add(Integer.toString(size))
 			.toString();
 	}
@@ -189,16 +193,7 @@ public class LineEntry implements Serializable{
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(removal)
-			.append(addition)
-			.append(condition)
-			.toHashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -210,6 +205,15 @@ public class LineEntry implements Serializable{
 			.append(addition, other.addition)
 			.append(condition, other.condition)
 			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(removal)
+			.append(addition)
+			.append(condition)
+			.toHashCode();
 	}
 
 }

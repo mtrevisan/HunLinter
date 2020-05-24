@@ -1,0 +1,33 @@
+package unit731.hunlinter.actions;
+
+import unit731.hunlinter.parsers.ParserManager;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.Objects;
+
+
+public class CreatePackageAction extends AbstractAction{
+
+	private static final long serialVersionUID = 543011360433022458L;
+
+
+	private final ParserManager parserManager;
+
+
+	public CreatePackageAction(final ParserManager parserManager){
+		super("system.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
+
+		Objects.requireNonNull(parserManager);
+
+		this.parserManager = parserManager;
+	}
+
+	@Override
+	public void actionPerformed(final ActionEvent event){
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		parserManager.createPackage();
+	}
+
+}

@@ -22,14 +22,18 @@ import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.Memoizer;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class AffixData{
 
-	private static final MessageFormat REPEATED_FLAG = new MessageFormat("Same flags present in multiple options");
-	private static final MessageFormat CONTAINER_CLOSED = new MessageFormat("Cannot add data, container is closed");
+	private static final String REPEATED_FLAG = "Same flags present in multiple options";
+	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
 	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
 	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
 
@@ -65,13 +69,13 @@ public class AffixData{
 		closed = false;
 	}
 
-	/** Check that the same flag does not belongs to different tags */
+	/** Check that the same flag doesn't belongs to different tags */
 	void verify(){
 		final Map<AffixOption, Object> extractSingleFlags = extractSingleFlags();
 		final Collection<Object> flaggedData = extractSingleFlags.values();
 		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
-			throw new HunLintException(REPEATED_FLAG.format(new Object[0]));
+			throw new LinterException(REPEATED_FLAG);
 	}
 
 	private Map<AffixOption, Object> extractSingleFlags(){
@@ -111,20 +115,20 @@ public class AffixData{
 	}
 
 	private List<String> getStringData(final AffixOption... keys){
-		return Arrays.stream(keys)
-			.<String>map(this::getData)
-			.collect(Collectors.toCollection(() -> new ArrayList<>(keys.length)));
+		final List<String> strings = new ArrayList<>(keys.length);
+		forEach(keys, key -> strings.add(getData(key)));
+		return strings;
 	}
 
-	<T> void addData(final AffixOption key, final T value){
+	public <T> void addData(final AffixOption key, final T value){
 		addData(key.getCode(), value);
 	}
 
-	<T> void addData(final String key, final T value){
+	public <T> void addData(final String key, final T value){
 		if(closed)
-			throw new HunLintException(CONTAINER_CLOSED.format(new Object[0]));
+			throw new LinterException(CONTAINER_CLOSED);
 		if(data.containsKey(key))
-			throw new HunLintException(DUPLICATED_FLAG.format(new Object[]{key}));
+			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{key}));
 
 		if(value != null)
 			data.put(key, value);
@@ -157,8 +161,7 @@ public class AffixData{
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		return getCompoundRules().stream()
-			.anyMatch(rule -> isManagedByCompoundRule(rule, flag));
+		return (match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
 	}
 
 	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
@@ -200,24 +203,43 @@ public class AffixData{
 		return getData(AffixOption.FLAG);
 	}
 
-	public boolean isAffixProductive(final String word, final String affix){
+	public boolean isAffixProductive(final String affix, final String word){
 		final String convertedWord = applyInputConversionTable(word);
 
 		boolean productive;
-		final Object data = getData(affix);
-		if(data != null && RuleEntry.class.isAssignableFrom(data.getClass()))
-			productive = ((RuleEntry)data).getEntries().stream()
-				.anyMatch(entry -> entry.canApplyTo(convertedWord));
+		final Object affixData = getData(affix);
+		if(affixData != null && RuleEntry.class.isAssignableFrom(affixData.getClass()))
+			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
 		else
 			productive = isManagedByCompoundRule(affix);
 		return productive;
 	}
 
-	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
-		//extract the list of applicable affixes…
-		return entries.stream()
-			.filter(entry -> entry.canApplyTo(word))
-			.collect(Collectors.toList());
+	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
+		int limit = 0;
+		final int size = (entries != null? entries.length: 0);
+		final AffixEntry[] list = new AffixEntry[size];
+		for(int i = 0; i < size; i ++){
+			final AffixEntry entry = entries[i];
+			if(entry.canApplyTo(word))
+				list[limit ++] = entry;
+		}
+		return Arrays.copyOf(list, limit);
+	}
+
+	public String getReplacementPairs(){
+		return ((ConversionTable)getData(AffixOption.REPLACEMENT_TABLE))
+			.extractAsList();
+	}
+
+	public String getEquivalentChars(){
+		return ((RelationTable)getData(AffixOption.RELATION_TABLE))
+			.extractAsList();
+	}
+
+	public String getInputConversions(){
+		return ((ConversionTable)getData(AffixOption.INPUT_CONVERSION_TABLE))
+			.extractAsList();
 	}
 
 	public List<String> applyReplacementTable(final String word){
@@ -240,8 +262,8 @@ public class AffixData{
 			try{
 				word = table.applySingleConversionTable(word);
 			}
-			catch(final HunLintException e){
-				throw new HunLintException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
+			catch(final LinterException e){
+				throw new LinterException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
 			}
 		}
 		return word;
@@ -251,6 +273,8 @@ public class AffixData{
 	 * Extracts all the characters from each rule
 	 *
 	 * @return	A sample text of the underlying dictionary
+	 *
+	 * @see unit731.hunlinter.services.Packager#getSampleText()
 	 */
 	public String getSampleText(){
 		final List<String> sortedSample;
@@ -259,7 +283,7 @@ public class AffixData{
 			sortedSample = Arrays.asList(StringUtils.split(sample, StringUtils.EMPTY));
 		else
 			sortedSample = getRuleEntries().parallelStream()
-				.flatMap(entry -> entry.getEntries().stream())
+				.flatMap(entry -> Arrays.stream(entry.getEntries()))
 				.flatMap(entry -> Arrays.stream(StringUtils.split(entry.getAppending(), StringUtils.EMPTY)))
 				.distinct()
 				.collect(Collectors.toList());
@@ -329,10 +353,12 @@ public class AffixData{
 	}
 
 	public List<RuleEntry> getRuleEntries(){
-		return data.values().stream()
-			.filter(entry -> RuleEntry.class.isAssignableFrom(entry.getClass()))
-			.map(RuleEntry.class::cast)
-			.collect(Collectors.toList());
+		final ArrayList<RuleEntry> list = new ArrayList<>(data.size());
+		applyIf(data.values(),
+			entry -> RuleEntry.class.isAssignableFrom(entry.getClass()),
+			entry -> list.add((RuleEntry)entry));
+		list.trimToSize();
+		return list;
 	}
 
 }

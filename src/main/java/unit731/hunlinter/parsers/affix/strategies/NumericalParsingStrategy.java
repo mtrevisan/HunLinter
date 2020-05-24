@@ -1,12 +1,13 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -24,7 +25,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((\\d+)\\)|([?*])");
+	private static final Pattern COMPOUND_RULE_SPLITTER = RegexHelper.pattern("\\((\\d+)\\)|([?*])");
 
 	private static class SingletonHelper{
 		private static final NumericalParsingStrategy INSTANCE = new NumericalParsingStrategy();
@@ -46,8 +47,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 
 		checkForDuplicates(singleFlags);
 
-		Arrays.stream(singleFlags)
-			.forEach(this::validate);
+		forEach(singleFlags, this::validate);
 
 		return singleFlags;
 	}
@@ -61,27 +61,21 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new HunLintException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new LinterException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
 		}
 		catch(final NumberFormatException e){
-			throw new HunLintException(BAD_FORMAT.format(new Object[]{flag}));
+			throw new LinterException(BAD_FORMAT.format(new Object[]{flag}));
 		}
 	}
 
 	@Override
-	public String joinFlags(final String[] flags){
-		if(flags == null || flags.length == 0)
-			return StringUtils.EMPTY;
-
-		Arrays.stream(flags)
-			.forEach(this::validate);
-
-		return StringUtils.join(flags, COMMA);
+	public String joinFlags(final String[] flags, final int size){
+		return joinFlags(flags, size, COMMA);
 	}
 
 	@Override
 	public String[] extractCompoundRule(final String compoundRule){
-		final String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+		final String[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 
@@ -92,7 +86,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 		for(final String part : parts){
 			final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new HunLintException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 		}
 	}
 

@@ -1,18 +1,15 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.BufferedReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.Scanner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.ParsingContext;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class AliasesHandler implements Handler{
@@ -24,20 +21,20 @@ public class AliasesHandler implements Handler{
 
 
 	@Override
-	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
-			final Function<AffixOption, List<String>> getData){
+	public int parse(final ParsingContext context, final AffixData affixData){
 		try{
-			final BufferedReader br = context.getReader();
+			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new HunLintException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new HunLintException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			final List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = ParserHelper.extractLine(br);
+				ParserHelper.assertNotEOF(scanner);
 
+				final String line = scanner.nextLine();
 				final String[] parts = StringUtils.split(line);
 
 				checkValidity(parts, context);
@@ -45,7 +42,9 @@ public class AliasesHandler implements Handler{
 				aliases.add(parts[1]);
 			}
 
-			addData.accept(context.getRuleType(), aliases);
+			affixData.addData(context.getRuleType(), aliases);
+
+			return numEntries;
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e.getMessage());
@@ -54,9 +53,9 @@ public class AliasesHandler implements Handler{
 
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 2)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{context}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
 		if(!context.getRuleType().equals(parts[0]))
-			throw new HunLintException(BAD_OPTION.format(new Object[]{context, context.getRuleType()}));
+			throw new LinterException(BAD_OPTION.format(new Object[]{context, context.getRuleType()}));
 	}
 
 }

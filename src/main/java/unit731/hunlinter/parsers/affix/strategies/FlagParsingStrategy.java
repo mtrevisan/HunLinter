@@ -1,10 +1,10 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.SetHelper;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.datastructures.SetHelper;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Set;
 
 
@@ -26,8 +26,10 @@ public abstract class FlagParsingStrategy{
 
 	protected void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if(notDuplicatedFlags.size() < flags.length)
-			throw new HunLintException(DUPLICATED_FLAG.format(new Object[]{Arrays.toString(flags)}));
+		if(notDuplicatedFlags.size() < flags.length){
+			final Set<String> duplicates = SetHelper.getDuplicates(flags);
+			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{String.join(", ", duplicates)}));
+		}
 	}
 
 
@@ -37,7 +39,23 @@ public abstract class FlagParsingStrategy{
 	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	public abstract String joinFlags(final String[] flags);
+	public String joinFlags(final String[] flags){
+		return joinFlags(flags, (flags != null? flags.length: 0));
+	}
+
+	public String joinFlags(final String[] flags, final int size){
+		return joinFlags(flags, size, StringUtils.EMPTY);
+	}
+
+	protected String joinFlags(final String[] flags, final int size, final String flagSeparator){
+		if(flags == null || size == 0)
+			return StringUtils.EMPTY;
+
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
+
+		return StringUtils.join(flags, flagSeparator);
+	}
 
 	/**
 	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])

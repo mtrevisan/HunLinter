@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public enum AffixType{
@@ -16,14 +16,7 @@ public enum AffixType{
 	}
 
 	public static AffixType createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(t -> t.option.getCode().equals(code))
-			.findFirst()
-			.orElse(null);
-	}
-
-	public boolean is(final String code){
-		return this.option.getCode().equals(code);
+		return match(values(), tag -> tag.option.is(code));
 	}
 
 	public AffixOption getOption(){

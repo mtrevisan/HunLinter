@@ -16,8 +16,8 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.FileHelper;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.datastructures.SetHelper;
 
 
 class RulesReducerTest{
@@ -38,27 +38,27 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix1() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"SFX ʼ0 Y 11",
-			"SFX ʼ0 r ʼ r",
-			"SFX ʼ0 u ʼ u",
-			"SFX ʼ0 ra ʼ ra",
-			"SFX ʼ0 xa ʼ xa",
-			"SFX ʼ0 me ʼ me",
-			"SFX ʼ0 te ʼ te",
-			"SFX ʼ0 do ʼ do",
-			"SFX ʼ0 a ʼ [^rx]a",
-			"SFX ʼ0 e ʼ [dg]e",
-			"SFX ʼ0 o ʼ [^d]o",
-			"SFX ʼ0 ove óʼ ove"
+			"SFX '0 Y 11",
+			"SFX '0 r ʼ r",
+			"SFX '0 u ʼ u",
+			"SFX '0 ra ʼ ra",
+			"SFX '0 xa ʼ xa",
+			"SFX '0 me ʼ me",
+			"SFX '0 te ʼ te",
+			"SFX '0 do ʼ do",
+			"SFX '0 a ʼ [^rx]a",
+			"SFX '0 e ʼ [dg]e",
+			"SFX '0 o ʼ [^d]o",
+			"SFX '0 ove óʼ ove"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "ʼ0";
+		String flag = "'0";
 		AffixType affixType = AffixType.SUFFIX;
 		List<String> words = Arrays.asList("ge", "la", "na", "nu", "vu", "ge", "sto", "adove", "indove", "kome", "kuando", "tuto", "de", "so", "sora", "tèrŧo", "tèrso", "kuarto", "koarto", "kuinto", "sèsto", "par", "kaxa", "sensa", "senŧa", "komòdo", "frate", "nudo");
 		List<String> originalLines = words.stream()
@@ -67,7 +67,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -88,18 +88,18 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX ʼ0 Y 11",
-			"SFX ʼ0 r ʼ r",
-			"SFX ʼ0 u ʼ u",
-			"SFX ʼ0 ra ʼ ra",
-			"SFX ʼ0 xa ʼ xa",
-			"SFX ʼ0 me ʼ me",
-			"SFX ʼ0 te ʼ te",
-			"SFX ʼ0 do ʼ do",
-			"SFX ʼ0 a ʼ [^rx]a",
-			"SFX ʼ0 e ʼ [^mtv]e",
-			"SFX ʼ0 o ʼ [^d]o",
-			"SFX ʼ0 ove óʼ ove"
+			"SFX '0 Y 11",
+			"SFX '0 r ʼ r",
+			"SFX '0 u ʼ u",
+			"SFX '0 ra ʼ ra",
+			"SFX '0 xa ʼ xa",
+			"SFX '0 me ʼ me",
+			"SFX '0 te ʼ te",
+			"SFX '0 do ʼ do",
+			"SFX '0 a ʼ [^rx]a",
+			"SFX '0 e ʼ [^mtv]e",
+			"SFX '0 o ʼ [^d]o",
+			"SFX '0 ove óʼ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -116,21 +116,21 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix2() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"SFX §1 Y 5",
-			"SFX §1 0 ta [^ƚ]a",
-			"SFX §1 o ato [^ƚ]o",
-			"SFX §1 èƚa eƚata èƚa",
-			"SFX §1 èƚo eƚato èƚo",
-			"SFX §1 o ato [^è]ƚo"
+			"SFX &1 Y 5",
+			"SFX &1 0 ta [^ƚ]a",
+			"SFX &1 o ato [^ƚ]o",
+			"SFX &1 èƚa eƚata èƚa",
+			"SFX &1 èƚo eƚato èƚo",
+			"SFX &1 o ato [^è]ƚo"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "§1";
+		String flag = "&1";
 		AffixType affixType = AffixType.SUFFIX;
 		List<String> words = Arrays.asList("kanèƚo", "kapèƚa", "kapèƚo", "ƚibro", "vedèƚa", "vedèƚo", "moƚo", "rosiñoƚo", "roxiñoƚo", "kaƚandra", "kaƚandro", "xeƚo", "rusiñoƚo", "ruxiñoƚo");
 		List<String> originalLines = words.stream()
@@ -139,7 +139,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -154,12 +154,12 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX §1 Y 5",
-			"SFX §1 0 ta [^ƚ]a",
-			"SFX §1 o ato [^ƚ]o",
-			"SFX §1 èƚa eƚata èƚa",
-			"SFX §1 èƚo eƚato èƚo",
-			"SFX §1 o ato [^è]ƚo"
+			"SFX &1 Y 5",
+			"SFX &1 0 ta [^ƚ]a",
+			"SFX &1 o ato [^ƚ]o",
+			"SFX &1 èƚa eƚata èƚa",
+			"SFX &1 èƚo eƚato èƚo",
+			"SFX &1 o ato [^è]ƚo"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -188,34 +188,34 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix3() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
 			"FULLSTRIP",
-			"SFX §0 Y 17",
-			"SFX §0 0 ato [nr]",
-			"SFX §0 èl elato èl",
-			"SFX §0 0 ta [^bklns]a",
-			"SFX §0 0 ato [^è]l",
-			"SFX §0 o ato [^bkmv]o",
-			"SFX §0 òba obata òba",
-			"SFX §0 òka okata òka",
-			"SFX §0 èla elata èla",
-			"SFX §0 òna onata òna",
-			"SFX §0 òsa osata òsa",
-			"SFX §0 òbo obato òbo",
-			"SFX §0 òko okato òko",
-			"SFX §0 òmo omato òmo",
-			"SFX §0 òvo ovato òvo",
-			"SFX §0 0 ta [^è]la",
-			"SFX §0 o ato [^ò]ko",
-			"SFX §0 0 ta [^ò][kns]a"
+			"SFX &0 Y 17",
+			"SFX &0 0 ato [nr]",
+			"SFX &0 èl elato èl",
+			"SFX &0 0 ta [^bklns]a",
+			"SFX &0 0 ato [^è]l",
+			"SFX &0 o ato [^bkmv]o",
+			"SFX &0 òba obata òba",
+			"SFX &0 òka okata òka",
+			"SFX &0 èla elata èla",
+			"SFX &0 òna onata òna",
+			"SFX &0 òsa osata òsa",
+			"SFX &0 òbo obato òbo",
+			"SFX &0 òko okato òko",
+			"SFX &0 òmo omato òmo",
+			"SFX &0 òvo ovato òvo",
+			"SFX &0 0 ta [^è]la",
+			"SFX &0 o ato [^ò]ko",
+			"SFX &0 0 ta [^ò][kns]a"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "§0";
+		String flag = "&0";
 		AffixType affixType = AffixType.SUFFIX;
 		List<String> words = Arrays.asList("aria", "bar", "baron", "bon", "borso", "bosko", "dixnar", "dòna", "fakin", "far", "fator", "fatora", "grada", "granfo", "gòba", "gòbo", "inkuixitor", "inkuixitora", "inspetor", "inspetora", "kalandra", "kalandro", "kanèl", "kapèl", "kapèla", "kara", "kojon", "konto", "kora", "koɉon", "kuadra", "kuadro", "kòsa", "libro", "maca", "mando", "manxo", "manđo", "marenda", "merenda", "mol", "muso", "padron", "paron", "patron", "pecenin", "pesenin", "peŧenin", "porko", "pòka", "pòko", "rexon", "rosiñol", "roxiñol", "rusiñol", "ruxiñol", "ròba", "savia", "savio", "sen", "sinsin", "soko", "solfro", "sorgo", "speso", "sporko", "tabar", "toxa", "vedèl", "vedèla", "verdo", "vesin", "vexin", "vexo", "veŧin", "visio", "viŧio", "xbir", "xel", "òka", "òko", "òmo", "òvo", "đeneral", "đilio", "ŧedro", "ŧinŧin", "ŧoko");
 		List<String> originalLines = words.stream()
@@ -224,7 +224,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -249,22 +249,22 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX §0 Y 15",
-			"SFX §0 0 ato [nr]",
-			"SFX §0 èl elato èl",
-			"SFX §0 0 ta [^bklns]a",
-			"SFX §0 0 ato [^è]l",
-			"SFX §0 o ato [^bkmv]o",
-			"SFX §0 òba obata òba",
-			"SFX §0 òka okata òka",
-			"SFX §0 èla elata èla",
-			"SFX §0 òna onata òna",
-			"SFX §0 òsa osata òsa",
-			"SFX §0 òbo obato òbo",
-			"SFX §0 òko okato òko",
-			"SFX §0 òmo omato òmo",
-			"SFX §0 òvo ovato òvo",
-			"SFX §0 o ato [^ò]ko"
+			"SFX &0 Y 15",
+			"SFX &0 0 ato [nr]",
+			"SFX &0 èl elato èl",
+			"SFX &0 0 ta [^bklns]a",
+			"SFX &0 0 ato [^è]l",
+			"SFX &0 o ato [^bkmv]o",
+			"SFX &0 òba obata òba",
+			"SFX &0 òka okata òka",
+			"SFX &0 èla elata èla",
+			"SFX &0 òna onata òna",
+			"SFX &0 òsa osata òsa",
+			"SFX &0 òbo obato òbo",
+			"SFX &0 òko okato òko",
+			"SFX &0 òmo omato òmo",
+			"SFX &0 òvo ovato òvo",
+			"SFX &0 o ato [^ò]ko"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -288,7 +288,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix4() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -316,7 +316,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -374,7 +374,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix5() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -465,7 +465,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -577,7 +577,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix6() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -598,7 +598,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -624,7 +624,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix7() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -648,7 +648,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -680,7 +680,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix8() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -710,7 +710,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -743,7 +743,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix9() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -795,7 +795,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -853,7 +853,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix10() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -879,7 +879,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -910,7 +910,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix11() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -940,7 +940,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -976,7 +976,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix12() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -998,7 +998,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1039,7 +1039,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix13() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1074,7 +1074,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1125,7 +1125,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix14() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1161,7 +1161,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1213,7 +1213,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix15() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1233,7 +1233,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1257,7 +1257,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix16() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1282,7 +1282,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1316,7 +1316,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix17() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1348,7 +1348,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1398,7 +1398,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix18() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1472,7 +1472,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1602,7 +1602,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix19() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1634,7 +1634,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1674,7 +1674,7 @@ class RulesReducerTest{
 	@Test
 	void caseSuffix20() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1702,7 +1702,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1743,25 +1743,25 @@ class RulesReducerTest{
 	@Test
 	void casePrefix1() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"PFX ‘0 Y 9",
-			"PFX ‘0 a ʼ a",
-			"PFX ‘0 d ʼ d",
-			"PFX ‘0 ga ʼ ga",
-			"PFX ‘0 g ʼ go",
-			"PFX ‘0 i ʼ i",
-			"PFX ‘0 in ʼ int",
-			"PFX ‘0 kò ʼ kò",
-			"PFX ‘0 l ʼ l",
-			"PFX ‘0 v ʼ v"
+			"PFX '0 Y 9",
+			"PFX '0 a ʼ a",
+			"PFX '0 d ʼ d",
+			"PFX '0 ga ʼ ga",
+			"PFX '0 g ʼ go",
+			"PFX '0 i ʼ i",
+			"PFX '0 in ʼ int",
+			"PFX '0 kò ʼ kò",
+			"PFX '0 l ʼ l",
+			"PFX '0 v ʼ v"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "‘0";
+		String flag = "'0";
 		AffixType affixType = AffixType.PREFIX;
 		List<String> words = Arrays.asList("gonfio", "gonfieŧa", "gonfiesa", "intanto", "inté", "intʼ", "làrexe", "gaveta", "ankora", "aƚora", "alora", "al", "an", "kòsa", "indrío", "inpresta", "volsuda", "vòtu", "vòlo", "vòlvo", "vúdoe", "vosudo", "vòƚega", "vóloe", "vui", "voxaŧa", "voƚentièra", "voƚèga", "vóxoe", "varo", "vokato", "volèga", "vara", "vòlega", "varar", "vòlva", "vosuda", "vutu", "vàroe", "voƚo", "volto", "vudo", "voƚintièra", "voltadina", "vudar", "voƚar", "vòlto", "voxo", "volo", "voltada", "voxon", "voxe", "vàrdoe", "voltar", "voƚer", "vardo", "vò-tu", "vóƚoe", "vídola", "voxar", "volentièra", "vardar", "vòƚo", "voƚàdego", "voxada", "volsudo", "voler", "vòlta", "volintièra", "volar", "vòltoe", "vu-tu", "volàdego", "vòstro", "dito");
 		List<String> originalLines = words.stream()
@@ -1770,7 +1770,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1789,16 +1789,16 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX ‘0 Y 9",
-			"PFX ‘0 a ʼ a",
-			"PFX ‘0 d ʼ d",
-			"PFX ‘0 i ʼ i",
-			"PFX ‘0 l ʼ l",
-			"PFX ‘0 v ʼ v",
-			"PFX ‘0 ga ʼ ga",
-			"PFX ‘0 kò ʼ kò",
-			"PFX ‘0 g ʼ g[^a]",
-			"PFX ‘0 in ʼ int"
+			"PFX '0 Y 9",
+			"PFX '0 a ʼ a",
+			"PFX '0 d ʼ d",
+			"PFX '0 i ʼ i",
+			"PFX '0 l ʼ l",
+			"PFX '0 v ʼ v",
+			"PFX '0 ga ʼ ga",
+			"PFX '0 kò ʼ kò",
+			"PFX '0 g ʼ g[^a]",
+			"PFX '0 in ʼ int"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -1808,36 +1808,36 @@ class RulesReducerTest{
 	@Test
 	void casePrefix2() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"PFX vŧ Y 20",
-			"PFX vŧ be ba ber",
-			"PFX vŧ bè bà bèr",
-			"PFX vŧ bé bà bér",
-			"PFX vŧ fe fa fer",
-			"PFX vŧ fè fà fèr",
-			"PFX vŧ fé fà fér",
-			"PFX vŧ pe pa per",
-			"PFX vŧ pè pà pèr",
-			"PFX vŧ pé pà pér",
-			"PFX vŧ re ra re",
-			"PFX vŧ rè rà rè",
-			"PFX vŧ ré rà ré",
-			"PFX vŧ se sa se",
-			"PFX vŧ sè sà sè",
-			"PFX vŧ sé sà sé",
-			"PFX vŧ Se Sa Se",
-			"PFX vŧ te ta te",
-			"PFX vŧ tè tà tè",
-			"PFX vŧ té tà té",
-			"PFX vŧ ve va ver"
+			"PFX vs Y 20",
+			"PFX vs be ba ber",
+			"PFX vs bè bà bèr",
+			"PFX vs bé bà bér",
+			"PFX vs fe fa fer",
+			"PFX vs fè fà fèr",
+			"PFX vs fé fà fér",
+			"PFX vs pe pa per",
+			"PFX vs pè pà pèr",
+			"PFX vs pé pà pér",
+			"PFX vs re ra re",
+			"PFX vs rè rà rè",
+			"PFX vs ré rà ré",
+			"PFX vs se sa se",
+			"PFX vs sè sà sè",
+			"PFX vs sé sà sé",
+			"PFX vs Se Sa Se",
+			"PFX vs te ta te",
+			"PFX vs tè tà tè",
+			"PFX vs té tà té",
+			"PFX vs ve va ver"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "vŧ";
+		String flag = "vs";
 		AffixType affixType = AffixType.PREFIX;
 		List<String> words = Arrays.asList("Seravaƚe", "Seraval", "réngoe", "récoe", "tersaròƚoe", "tenaɉar", "tenajar", "terŧaròloe", "texin", "tersaròloe", "teràsoe", "tersariòƚo", "terŧaròlo", "tersaroƚar", "terapieno", "tersariòƚoe", "teraso", "tersariòloe", "tersarolar", "testada", "teraŧo", "teto", "tetar", "terŧariolar", "tenaɉo", "terapiénoe", "testièra", "tenajo", "terŧariòlo", "teràŧoe", "tersaròlo", "terapienar", "tenaja", "teriŧia", "terasar", "teraxina", "tersarioƚar", "tersariòlo", "tenàɉoe", "teraŧar", "tersariolar", "tenaɉa", "tersaròƚo", "terŧarolar", "terŧariòloe", "tenàjoe", "terina", "rèoe", "férmoe", "vergixar", "verífegoe", "vereno", "versor", "veròƚo", "vergíxoe", "verenar", "versurar", "veròloe", "veriòl", "veroƚar", "vergixo", "verígola", "versúroe", "verénoe", "verífego", "verifegar", "veròlo", "verolar", "veròƚoe", "versuro", "péroro", "péroroe", "pérol", "perkotar", "periodar", "perŧepiŧio", "períkolo", "perorar", "perlústroe", "perveño", "persar", "perikoƚoxo", "perintexo", "perkolo", "perifraxar", "persor", "personajo", "pervèrtoe", "permudar", "pernòto", "pernixòto", "perfòroe", "perkoƚo", "perfúmoe", "pervèñoe", "percò", "persugar", "período", "permaloxo", "perké", "perkome", "perfina", "permeto", "perfòro", "perteño", "pernòtoe", "persò", "perseguitar", "perkurador", "persuàdoe", "perukèra", "perikolar", "perkoƚar", "perukon", "pernotar", "peritar", "perúsola", "pervèrso", "personaƚixar", "personalíxoe", "perítoe", "perífraxoe", "perkoro", "peruka", "peròmo", "períkoloe", "perteñir", "persenar", "pertèñoe", "permaxo", "perkóloe", "permaƚoxo", "períkoƚoe", "persuaxion", "personaƚixo", "perpetuar", "perikoƚar", "pernixa", "permúdaroe", "perukèr", "perkóroe", "persémol", "perforar", "persona", "persèguoe", "permaner", "persénbol", "perfino", "perlustro", "pertèño", "permano", "personaxo", "persekutor", "pervéñoe", "perkòtoe", "persugo", "persekudor", "perikoloxo", "perkolar", "perkuradora", "perífraxo", "permudarar", "perseguir", "perinténdoe", "permúdaro", "permudo", "peruŧoleta", "perkóƚoe", "perveñir", "perusoleta", "perŧepir", "permeso", "perpètuo", "perŧò", "pervèño", "perfumo", "pervèrto", "persin", "pertanto", "perúŧola", "perkòto", "períkoƚo", "persepir", "perukin", "persuado", "perfumar", "perpètuoe", "perlustrato", "perminir", "persòndena", "personalixar", "pertéñoe", "períodoe", "persuaxo", "personaƚíxoe", "perpetrato", "permutar", "perlustrar", "persuto", "permúdoe", "perkorso", "pernixe", "persèguito", "permétoe", "perŧòndena", "personalixo", "persèguo", "perito", "persèguitoe", "perpetrar", "perviñir", "períkol", "però", "perintendo", "persúgoe", "feraƚe", "ferméntoe", "feràƚoe", "fermo", "fermentar", "feraƚar", "fernabuko", "feraƚo", "fersorin", "fersorar", "fermento", "feràloe", "feràxin", "fersora", "fermar", "feralo", "feralar", "fersóroe", "fersoro", "fersorada", "feral", "pèrpetroe", "pèrmutoe", "pèrmuto", "pèrpetro", "tétoe", "resente", "relojèra", "regasar", "rejòto", "reŧeđo", "reɉono", "rebaltela", "relòjo", "regaŧada", "rebégol", "rexónoe", "rekuajo", "rekòlto", "reŧédoe", "rebalta", "reŧente", "refesio", "revolton", "resteƚièra", "revendígola", "regaso", "refréskoe", "remandèl", "reŧeđar", "reɉonar", "retré", "refresko", "rebalto", "reloɉèr", "rejotar", "resteƚèra", "regasame", "relojèr", "refésioe", "restelar", "rejéstola", "rededèl", "renkuro", "rexonar", "rexentar", "reloɉèra", "recar", "remanxina", "restelada", "reco", "renkurar", "relòɉo", "reɉòto", "reɉéstola", "reŧedar", "rebàltoe", "rekuesta", "regal", "reséxoe", "remenato", "resteƚada", "redeđèl", "regàŧoe", "reɉòtoe", "regaŧar", "rendevú", "rengo", "regasa", "restèlo", "rengar", "rejono", "restelièra", "rexon", "rebàrbar", "reboba", "rejòtoe", "reɉotèl", "revoltolon", "regaŧame", "rejónoe", "rejon", "refudo", "regaŧo", "resexo", "restèƚoe", "rebufin", "rebonbo", "renkúroe", "restèloe", "reƚoɉèra", "rebaltar", "refúdoe", "remendèl", "rejotèl", "restèƚo", "refoso", "reparèla", "revendígol", "refudar", "rexéntoe", "resexar", "rexento", "redexèl", "reŧéđoe", "refreskar", "remengo", "reŧedo", "rebaltaiŧa", "reolton", "restèl", "refredo", "rejonar", "rear", "remengar", "reɉotar", "reteño", "respir", "reɉónoe", "reƚojèra", "regasada", "rejèstola", "reƚoɉèr", "rexono", "restelèra", "reƚojèr", "refesiar", "regaŧa", "resteƚar", "reɉèstola", "regàsoe", "reméngoe", "reina", "repeton", "sèra–vèrđi", "sèra–vèrxi", "sèra–vèrdi", "sèrboe", "berikòkola", "berekino", "bertoèl", "berekin", "beroèr", "bersajar", "berekinar", "bersaɉar", "bertovèla", "beretin", "bersàɉoe", "bersàjoe", "beroèra", "bereta", "bertoèla", "bertovèl", "berekínoe", "bersaɉo", "bersajo", "segretario", "sebatarò", "seravèrdi", "sebàter", "serada", "segretería", "sebàtoe", "sebaterò", "selvàrego", "serenada", "segramento", "serxente", "seravèrxi", "serbar", "seravèrđi", "segrestan", "serajo", "servisio", "seraval", "seraɉo", "sebato", "serviŧio", "segrado", "seraponto", "segreto", "serata", "segrestía", "sebàtar");
 		List<String> originalLines = words.stream()
@@ -1846,7 +1846,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1871,22 +1871,22 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX vŧ Y 15",
-			"PFX vŧ be ba be",
-			"PFX vŧ fe fa fe",
-			"PFX vŧ pe pa pe",
-			"PFX vŧ re ra re",
-			"PFX vŧ se sa se",
-			"PFX vŧ Se Sa Se",
-			"PFX vŧ te ta te",
-			"PFX vŧ ve va ve",
-			"PFX vŧ fé fà fé",
-			"PFX vŧ pé pà pé",
-			"PFX vŧ ré rà ré",
-			"PFX vŧ té tà té",
-			"PFX vŧ pè pà pè",
-			"PFX vŧ rè rà rè",
-			"PFX vŧ sè sà sè"
+			"PFX vs Y 15",
+			"PFX vs be ba be",
+			"PFX vs fe fa fe",
+			"PFX vs pe pa pe",
+			"PFX vs re ra re",
+			"PFX vs se sa se",
+			"PFX vs Se Sa Se",
+			"PFX vs te ta te",
+			"PFX vs ve va ve",
+			"PFX vs fé fà fé",
+			"PFX vs pé pà pé",
+			"PFX vs ré rà ré",
+			"PFX vs té tà té",
+			"PFX vs pè pà pè",
+			"PFX vs rè rà rè",
+			"PFX vs sè sà sè"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -1896,7 +1896,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix3() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1915,7 +1915,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1937,7 +1937,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix4() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -1958,7 +1958,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1984,7 +1984,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix5() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -2004,7 +2004,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -2028,7 +2028,7 @@ class RulesReducerTest{
 	@Test
 	void casePrefix6() throws IOException{
 		String language = "vec-IT";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
@@ -2049,7 +2049,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -2069,12 +2069,59 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
+	@Test
+	void casePrefix7() throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			"PFX +0 Y 3",
+			"PFX +0 0 in [^ƚn]",
+			"PFX +0 0 in– n",
+			"PFX +0 0 i [lƚmnñrs]"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "+0";
+		AffixType affixType = AffixType.PREFIX;
+		List<String> words = Arrays.asList("konplèto", "kòmodo", "kuranŧa", "mamada", "mamado", "nosente", "nosentin", "noŧente");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("0", "ni", "[^n]", Arrays.asList("odamam", "adamam")),
+			new LineEntry("0", "–ni", "n", Arrays.asList("etneŧon", "etneson", "nitneson")),
+			new LineEntry("0", "i", "[^k]", Arrays.asList("odamam", "etneŧon", "etneson", "nitneson", "adamam"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"PFX +0 Y 3",
+			"PFX +0 0 in– n",
+			"PFX +0 0 i [^k]",
+			"PFX +0 0 in [^n]"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);

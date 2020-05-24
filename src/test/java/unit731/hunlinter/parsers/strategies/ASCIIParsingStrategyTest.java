@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class ASCIIParsingStrategyTest{
@@ -44,38 +44,38 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinFlagsWithError(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'ab'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was 'ab'", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithNoASCII(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'ŧ'", exception.getMessage());
+		Assertions.assertEquals("Each flag should be in US-ASCII encoding: 'ŧ'", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithEmpty(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was ''", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was ''", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithNull(){
-		Throwable exception = Assertions.assertThrows(HunLintException.class, () -> {
+		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length one and in US-ASCII encoding: was 'null'", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was 'null'", exception.getMessage());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags(null);
+		String continuationFlags = strategy.joinFlags((String[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

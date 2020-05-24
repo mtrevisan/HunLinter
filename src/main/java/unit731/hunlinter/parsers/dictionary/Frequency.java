@@ -3,10 +3,14 @@ package unit731.hunlinter.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.services.system.Memoizer;
 
 
@@ -148,6 +152,10 @@ public class Frequency<T extends Comparable<?>>{
 			.sum();
 	}
 
+	public static int getDecimals(final double value){
+		return (value != 0.? Math.max((int)Math.floor(Math.log10(1. / value)) - 1, 1): 0);
+	}
+
 	/**
 	 * Return a string representation of this frequency distribution.
 	 *
@@ -161,9 +169,30 @@ public class Frequency<T extends Comparable<?>>{
 				.append('\t')
 				.append(getCount(value))
 				.append('\t')
-				.append(DictionaryParser.PERCENT_FORMATTER_1.format(getPercentOf(value)))
+				.append(String.format(Locale.ROOT, "%." + getDecimals(getPercentOf(value)) + "f%%", getPercentOf(value) * 100.))
 				.append('\n');
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(this == obj)
+			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
+
+		@SuppressWarnings("unchecked")
+		final Frequency<? super T> other = (Frequency<? super T>)obj;
+		return new EqualsBuilder()
+			.append(frequencies, other.frequencies)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(frequencies)
+			.toHashCode();
 	}
 
 }

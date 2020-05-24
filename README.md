@@ -1,13 +1,19 @@
 HunLinter
 ==========
 
-![Java-12+](https://img.shields.io/badge/java-12%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java-14+](https://img.shields.io/badge/java-14%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2a1759913c44e66bd265efc1881cbf4)](https://www.codacy.com/app/mauro-trevisan/HunLinter?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtrevisan/HunLinter&amp;utm_campaign=Badge_Grade)
-<a href="https://codeclimate.com/github/mtrevisan/HunLinter/maintainability"><img src="https://api.codeclimate.com/v1/badges/cb5a4859fb27ecaea77d/maintainability" /></a>
+<a href="https://codeclimate.com/github/mtrevisan/HunLinter"><img src="https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability" /></a>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ==========
+
+<br />
+
+## Forewords
+Please, be aware that this application requires Java 14+!
+
+You can download and install it for free from this [link](https://www.oracle.com/java/technologies/javase-downloads.html).
 
 <br />
 
@@ -15,12 +21,12 @@ HunLinter
 - affix file and dictionary linter
 - rules reducer
 - LibreOffice and Mozilla packager
-- Part-of-Speech FSA extractor for LanguageTools
-- automatically choose font to render custom language
+- Part-of-Speech and dictionary FSA extractor for LanguageTools
+- automatically choose a font to render custom language
 - manages thesaurus, hyphenation, auto-correct, sentence exceptions, and word exception files
 - minimal pairs extraction
 - statistics
-- ... and many more!
+- &hellip; and many more!
 
 <br />
 
@@ -37,22 +43,24 @@ HunLinter
 5. [How to](#how-to)
     1. [Open a project](#how-to-project)
     2. [Create an extension](#how-to-extension)
-    3. [Linter dictionary](#how-to-linter)
-    4. [Sort dictionary](#how-to-sort)
-    5. [Reduce rules](#how-to-reducer)
-    6. [Word count](#how-to-count)
-    7. [Rule flags aid](#how-to-aid)
-    8. [Dictionary statistics](#how-to-statistics)
-    9. [Dictionary duplicates](#how-to-duplicates)
-    9. [Dictionary wordlist](#how-to-wordlist)
-    10. [Create a Part-of-Speech FSA](#how-to-posfsa)
-    11. [Minimal pairs](#how-to-pairs)
-    12. [Ordering table columns](#how-to-ordering)
-    13. [Copying text](#how-to-copy)
-    14. [Rule/dictionary insertion](#how-to-insertion)
+    3. [Linter dictionary](#how-to-linter-dictionary)
+    4. [Linter thesaurus](#how-to-linter-thesaurus)
+    5. [Linter hyphenation](#how-to-linter-hyphenation)
+    6. [Sort dictionary](#how-to-sort)
+    7. [Reduce rules](#how-to-reducer)
+    8. [Word count](#how-to-count)
+    9. [Rule flags aid](#how-to-aid)
+    10. [Dictionary statistics](#how-to-statistics)
+    11. [Dictionary duplicates](#how-to-duplicates)
+    12. [Dictionary wordlist](#how-to-wordlist)
+    13. [Create a Part-of-Speech FSA](#how-to-posfsa)
+    14. [Minimal pairs](#how-to-pairs)
+    15. [Ordering table columns](#how-to-ordering)
+    16. [Copying text](#how-to-copy)
+    17. [Rule/dictionary insertion](#how-to-insertion)
 6. [Screenshots](#screenshots)
-    1. [Productions](#screenshots-productions)
-    2. [Dictionary correctness checking](#screenshots-correctness)
+    1. [Inflections](#screenshots-inflections)
+    2. [Dictionary linter](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
     4. [Hyphenation](#screenshots-hyphenation)
     5. [Dictionary sorter](#screenshots-sorter)
@@ -62,12 +70,14 @@ HunLinter
     9. [Autocorrections](#screenshots-autocorrection)
     10. [Sentence exceptions](#screenshots-sentence-exceptions)
     11. [Word exceptions](#screenshots-word-exceptions)
+    12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
 7. [Changelog](#changelog)
-    1. [version 1.10.0](#changelog-1.10.0)
-    2. [version 1.9.1](#changelog-1.9.1)
-    3. [version 1.9.0](#changelog-1.9.0)
-    4. [version 1.8.1](#changelog-1.8.1)
-    5. [version 1.8.0](#changelog-1.8.0)
+    1. [version 2.0.0](#changelog-2.0.0)
+    2. [version 1.10.0](#changelog-1.10.0)
+    3. [version 1.9.1](#changelog-1.9.1)
+    4. [version 1.9.0](#changelog-1.9.0)
+    5. [version 1.8.1](#changelog-1.8.1)
+    6. [version 1.8.0](#changelog-1.8.0)
 
 
 <br/>
@@ -126,7 +136,7 @@ CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 ## How to
 <a name="how-to-project"></a>
 ### Open a project
-Select `File|Open Project`. A dialog will appear and a blue folder (this marks a valid project) should be selected.
+Select `File|Open Project`. A dialog will appear, and a blue folder (this marks a valid project) should be selected.
 
 A `META-INF` folder containing a `manifest.xml` file is loaded, and all the information of where a particular file is are retrieved from it.
 
@@ -140,11 +150,25 @@ In order to create an extension (eg. for LibreOffice, or for Mozilla products) y
 
 Remember that the package will have the same name of the directory, but the directory itself is not included, just the content is.
 
-<a name="how-to-linter"></a>
+<a name="how-to-linter-dictionary"></a>
 ### Linter dictionary
-To linter a dictionary just select `Dictionary tools|Check correctness` or `Hyphenation tools|Check correctness.
+To linter a dictionary just select `Dictionary tools|Check correctness`.
 
 Each line is then linted following the rules of a particular language (IF the corresponding files are present in the project, e.g. for Venetan). If no such file is present a general linter is applied.
+
+<a name="how-to-linter-thesaurus"></a>
+### Linter thesaurus
+To linter the thesaurus just select `Thesaurus tools|Check correctness`.
+
+Each thesaurus entry is linted checking for the presence of each synonym as a definition (with same Part-of-Speech).
+
+In case of error it is suggested to copy _all_ the synonyms for the indicated words (and all that came out from the filtering using those two words), remove _each_ of them, and reinsert again.
+
+<a name="how-to-linter-hyphenation"></a>
+### Linter hyphenation
+To linter the hyphenation just select `Hyphenation tools|Check correctness`.
+
+Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc).
 
 <a name="how-to-sort"></a>
 ### Sort dictionary
@@ -162,7 +186,7 @@ E.g. If a dictionary file has the lines `aa/b` and `bb/b` and in the affix file 
 ### Word count
 Use `Dictionary tools|Word count` to count all the words generated by the affix files, as long as unique word (not considering part-of-speech).
 
-Note: There is an uncertainty about the uniqueness count, but it should be small. Deal with it :p
+Note: There is an uncertainty about the uniqueness count, but it should be small. Deal with it :p.
 
 <a name="how-to-statistics"></a>
 ### Dictionary statistics
@@ -191,7 +215,7 @@ To obtain a list of [minimal pairs](https://en.wikipedia.org/wiki/Minimal_pair) 
 
 <a name="how-to-aid"></a>
 ### Rule flags aid
-An external text file can be put int the directory `aids` (on the same level of the executable jar) whose content will be displayed in the drop-down element in the Dictionary tab (blank lines are ignored).
+An external text file can be put into the directory `aids` (on the same level of the executable jar) whose content will be displayed in the drop-down element in the Dictionary tab (blank lines are ignored).
 
 This file could be used as a reminder of all the flag that can be added to a word and their meaning.
 
@@ -203,7 +227,7 @@ It is possible to sort certain columns of the tables, just click on the header o
 
 <a name="how-to-copy"></a>
 ### Copying text
-Is it possible to copy content of tables and words in the statistics section. Also the graph in the statistics section can be exported into images.
+Is it possible to copy content of tables and words in the statistics section. Also, the graph in the statistics section can be exported into images.
 
 Use `Ctrl+C` after selecting the row, or use the right click of the mouse to access the popup menu.
 
@@ -218,15 +242,15 @@ This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add 
 
 <a name="screenshots"></a>
 ## Screenshots
-<a name="screenshots-productions"></a>
-### Productions
+<a name="screenshots-inflections"></a>
+### Inflections
 Entries can be a single word followed by a slash and all the flags that have to be applied, followed optionally by one or more morphological fields.
 
-![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Production")
+![alt text](https://i.postimg.cc/mkjFn6CD/production.png "Inflection")
 
 <a name="screenshots-correctness"></a>
-### Dictionary correctness checking
-![alt text](https://i.postimg.cc/9FX99CHq/dictionary-correctness-checking.png "Dictionary correctness checking")
+### Dictionary linter
+![alt text](https://i.postimg.cc/9FX99CHq/dictionary-correctness-checking.png "Dictionary linter")
 
 <a name="screenshots-thesaurus"></a>
 ### Thesaurus
@@ -276,10 +300,32 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### Word exceptions
 ![alt text](https://i.postimg.cc/6qXmcTfK/word-exceptions.png "Word exceptions")
 
+<a name="screenshots-pos-dictionary"></a>
+### Part-of-Speech dictionary
+![alt text](https://i.postimg.cc/Gmg8vC15/pos-dictionary.png "PoS FSA")
+
 <br/>
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-2.0.0"></a>
+### version 2.0.0 - 20200524
+- made update process stoppable
+- added a linter for thesaurus
+- added a menu to generate Dictionary FSA (used in [LanguageTools](https://languagetool.org/), for example)
+- added a section to see the PoS FSA execution
+- fixed a bug on hyphenation: when the same rule is being added (with different breakpoints), the old one is being lost
+- substituted charting library
+- added undo/redo capabilities on input fields
+- completely revised thread management
+- fixed a nasty memory leak
+- now the sort dialog remains open after a sort
+- categorized the errors in (true) errors and warnings, now the warning are no longer blocking
+- reduced compiled size by 52% (from 6 201 344 B to 3 002 671 B)
+- reduced memory footprint by 13% (for dictionary linter: from 728 MB to 630 MB)
+- increased speed by 53% (for dictionary linter: from 4m 44s to 2m 13s)
+- various minor bugfixes and code revisions
+
 <a name="changelog-1.10.0"></a>
 ### version 1.10.0 - 20200131
 - (finally) given a decent name to the project: HunLinter
@@ -288,7 +334,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - added update capability (the new jar will be copied in the directory of the old jar and started)
 - added buttons to open relevant files
 - added management of SentenceExceptList.xml and WordExceptList.xml
-- added menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
+- added a menu to generate Part-of-Speech FSA (used in [LanguageTools](https://languagetool.org/), for example)
 - made tables look more standard (copy and edit operations)
 - improved thesaurus merging
 

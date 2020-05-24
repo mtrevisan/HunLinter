@@ -1,27 +1,39 @@
 package unit731.hunlinter.services.system;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.workers.core.RuntimeInterruptedException;
 
 import javax.swing.SwingUtilities;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.nio.channels.ClosedChannelException;
 
 
 public class JavaHelper{
 
+	private static final char QUOTATION_MARK = '"';
 
-	public static <T> Stream<T> nullableToStream(final T[] array){
-		return Optional.ofNullable(array).stream()
-			.flatMap(Arrays::stream);
+
+	private JavaHelper(){}
+
+	/**
+	 * This method calls the garbage collector and then returns the free memory.
+	 * This avoids problems with applications where the GC hasn't reclaimed memory and reports no available memory.
+	 *
+	 * @return estimated available memory
+	 */
+	public static long estimateAvailableMemory(){
+		System.gc();
+
+		//http://stackoverflow.com/questions/12807797/java-get-available-memory
+		final Runtime r = Runtime.getRuntime();
+		final long allocatedMemory = r.totalMemory() - r.freeMemory();
+		return r.maxMemory() - allocatedMemory;
 	}
 
-	public static <T> Stream<T> nullableToStream(final Collection<T> collection){
-		return Optional.ofNullable(collection).stream()
-			.flatMap(Collection::stream);
+	public static boolean isInterruptedException(final Exception exception){
+		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
+		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
 	}
 
 	public static void executeOnEventDispatchThread(final Runnable runnable){
@@ -31,15 +43,33 @@ public class JavaHelper{
 			SwingUtilities.invokeLater(runnable);
 	}
 
+	public static void delayedRun(final Runnable runnable, final long delayMillis){
+		final long requestedStartTime = System.currentTimeMillis() + delayMillis;
+		new Thread(() -> {
+			while(true){
+				try{
+					final long leftToSleep = requestedStartTime - System.currentTimeMillis();
+					if(leftToSleep > 0l)
+						Thread.sleep(leftToSleep);
+
+					break;
+				}
+				catch(final InterruptedException ignored){}
+			}
+
+			runnable.run();
+		}).start();
+	}
+
 	/* Stop current running Java application and start a new one */
 	public static void closeAndStartAnotherApplication(final String jarURL){
 		//init the command to execute, add the vm args
 		final String fileSeparator = System.getProperty("file.separator");
 		final StringBuffer cmd = new StringBuffer()
-			.append("\"")
+			.append(QUOTATION_MARK)
 			//add java binary
 			.append(System.getProperty("java.home")).append(fileSeparator).append("bin").append(fileSeparator).append("java.exe")
-			.append("\"");
+			.append(QUOTATION_MARK);
 		for(final String arg : ManagementFactory.getRuntimeMXBean().getInputArguments())
 			//if it's the agent argument we ignore it, otherwise the address of the old application and the new one will be in conflict
 			if(!arg.startsWith("-agentlib") && !arg.startsWith("-javaagent"))

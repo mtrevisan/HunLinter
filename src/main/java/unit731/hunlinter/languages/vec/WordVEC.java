@@ -5,10 +5,7 @@ import java.text.ParseException;
 import java.text.RuleBasedCollator;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
@@ -16,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class WordVEC{
@@ -24,8 +21,10 @@ public class WordVEC{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
 	private static final String PIPE = "|";
+	private static final String TAB = "\t";
+	private static final String UNDERSCORE = "_";
 
-	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.PHONEME_I_UMLAUT;
+	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
@@ -33,7 +32,7 @@ public class WordVEC{
 	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
-	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍoOóÓòÒuUúÚ";
+	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
@@ -42,7 +41,7 @@ public class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
-	private static final String COLLATOR_RULE = ", ' ' < ʼ=''' , '-'='‒' & '-'='–' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < '/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
+	private static final String COLLATOR_RULE = ", ' ' < ʼ=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < ï,Ï < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < ü,Ü < v,V < x,X";
 	private static Collator COLLATOR;
 	static{
 		try{
@@ -54,40 +53,30 @@ public class WordVEC{
 		}
 	}
 
-//	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
-	private static final Pattern FIRST_STRESSED_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú].*$");
-	private static final Pattern LAST_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
+	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
-	private static final Pattern DEFAULT_STRESS_GROUP = PatternHelper.pattern("(fr|[ln]|st)au$");
-
-	private static final String NO_STRESS_AVER = "^(r[aei]|ar)?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ESER = "^(r[aei]|ar)?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^((dex)?d|((dex)?asue|des|kon(tra–?)?|[lƚ]iku[ei]|mal–?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|sora|stra–?|st[ou]pe|tore|tume)?f|(kon(tra)?|mal–?|move|o|re|so(ra|to))?st)([ae]rà|[àé])-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_SAVER = "^(pre|r[ae]|ar|stra–?)?(sà|sav?arà)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(r[ae]|ar)?v[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_WORDS = "^(síngui|spiràkui|títui|triàngui|vínkui)$";
+	private static final String NO_STRESS_AVER = "^(?:r[eiï])?g?(?:ar)?[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|[bp]i)$";
+	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:(?:s[ae]r)?[àé]|[sx][éí]|stà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|d[oiae])$";
+	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]))$";
+	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_ANDAR = "^(?:re)?v[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_TRAER = "^(?:|as?|des?|es|kon|pro|re|so|sub?)?tr[àé][–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
-		StringJoiner sj = (new StringJoiner(PIPE))
+		final StringJoiner sj = (new StringJoiner(PIPE))
 			.add(NO_STRESS_AVER)
 			.add(NO_STRESS_ESER)
 			.add(NO_STRESS_DAR_FAR_STAR)
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
-			.add(NO_STRESS_TRAER)
-			.add(NO_STRESS_WORDS);
-		PREVENT_UNMARK_STRESS = PatternHelper.pattern(sj.toString());
+			.add(NO_STRESS_TRAER);
+		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 
-	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
-	static{
-		ACUTE_STRESSES.put("a", "à");
-		ACUTE_STRESSES.put("e", "é");
-		ACUTE_STRESSES.put("i", "í");
-		ACUTE_STRESSES.put("o", "ó");
-		ACUTE_STRESSES.put("u", "ú");
-	}
+	//NOTE: must be sorted!
+	private static final char[] SIMPLE_VOWELS_ARRAY = "AEIOUaeiouÏÜïü".toCharArray();
+	//NOTE: must be sorted!
+	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "ÀÉÍÓÚàéíóúÍÚíú".toCharArray();
 
 
 	private WordVEC(){}
@@ -100,7 +89,7 @@ public class WordVEC{
 	}
 
 	public static boolean isApostrophe(final char chr){
-		return (chr == 'ʼ' || chr == '\'');
+		return (chr == HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE || chr == HyphenationParser.APOSTROPHE.charAt(0));
 	}
 
 	public static boolean isVowel(final char chr){
@@ -121,43 +110,30 @@ public class WordVEC{
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
 	public static boolean endsWithVowel(final String word){
-		int i = word.length();
-		while((-- i) >= 0){
-			final char chr = word.charAt(i);
-			if(!isApostrophe(chr))
-				return isVowel(chr);
-		}
-		return false;
-	}
-
-	public static int getFirstVowelIndex(final String word, final int index){
-		final Matcher m = FIRST_STRESSED_VOWEL.matcher(word.substring(index));
-		return (m.find()? m.start() + index: -1);
-	}
-
-	public static int getLastVowelIndex(final String word){
-		final Matcher m = LAST_VOWEL.matcher(word);
-		return (m.find()? m.start(): -1);
+		final int idx = word.length() - 1;
+		char chr = word.charAt(idx);
+		if(isApostrophe(chr))
+			chr = word.charAt(idx - 1);
+		return isVowel(chr);
 	}
 
 	//[aeiou][^aeiou]*$
-	private static int getLastUnstressedVowelIndex(final String word, final int idx){
-		int i = (idx >= 0? idx: word.length());
-		while((-- i) >= 0){
-			final char chr = word.charAt(i);
+	private static int getLastUnstressedVowelIndex(final String word, int lastLetterIndex){
+		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
+			final char chr = word.charAt(lastLetterIndex);
 			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
-				return i;
+				break;
 		}
-		return -1;
+		return lastLetterIndex;
 	}
 
 
 	//[àèéíòóú]
 	public static boolean hasStressedGrapheme(final String word){
-		return (countAccents(word) == 1);
+		return (countStresses(word) == 1);
 	}
 
-	public static int countAccents(final String word){
+	public static int countStresses(final String word){
 		return (int)IntStream.range(0, word.length())
 			.filter(i -> Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
 			.count();
@@ -169,7 +145,9 @@ public class WordVEC{
 
 
 	private static String setAcuteStressAtIndex(final String word, final int idx){
-		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
+		final StringBuffer sb = new StringBuffer(word);
+		sb.setCharAt(idx, addStressAcute(word.charAt(idx)));
+		return sb.toString();
 	}
 
 	//NOTE: is seems faster the current method (above)
@@ -184,53 +162,57 @@ public class WordVEC{
 //	}
 
 	private static char addStressAcute(final char chr){
-		final String c = String.valueOf(chr);
-		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
+		final int stressedIndex = Arrays.binarySearch(SIMPLE_VOWELS_ARRAY, chr);
+		return ACUTE_STRESSED_VOWELS_ARRAY[stressedIndex];
 	}
 
 	public static String markDefaultStress(String word){
-		int idx = getIndexOfStress(word);
-		if(idx < 0){
+		int stressIndex = getIndexOfStress(word);
+		if(stressIndex < 0){
 			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
-			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
+			final int lastChar = getLastUnstressedVowelIndex(phones, phones.length());
 
-			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel
-			//of a group of two (first one on a monosyllabe)
+			//last vowel if the word ends with consonant, penultimate otherwise
+			//default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
-				idx = getLastUnstressedVowelIndex(phones, lastChar);
-			if(idx >= 0 && PatternHelper.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
-				idx --;
-			if(idx < 0)
-				idx = lastChar;
+				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
+			if(stressIndex >= 0 && RegexHelper.find(phones, DEFAULT_STRESS_GROUP))
+				stressIndex --;
+			else if(stressIndex < 0)
+				stressIndex = lastChar;
 
-			if(idx >= 0)
-				word = setAcuteStressAtIndex(word, idx);
+			if(stressIndex >= 0)
+				word = setAcuteStressAtIndex(word, stressIndex);
 		}
 		return word;
 	}
 
 	public static String unmarkDefaultStress(String word){
-		final int idx = getIndexOfStress(word);
-		//check if the word have a stress and this is not on the last letter (and not followed by a minus sign)
-		final int wordSize = word.length();
-		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != HyphenationParser.MINUS_SIGN.charAt(0)){
-			final String subword = word.substring(idx, idx + 2);
-			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword)
-					&& !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
-				final String tmp = suppressStress(word);
-				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
-					word = tmp;
-			}
+		final int stressIndex = getIndexOfStress(word);
+		//check if the word have a stress, not on the last letter, not followed by an en dash
+		final int wordLength = word.length();
+		if(stressIndex >= 0
+				//filter out stress on last vowel of the word
+				&& stressIndex + 1 < wordLength && word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
+				&& word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
+				&& !GraphemeVEC.isDiphtong(word)
+				&& !GraphemeVEC.isHyatus(word)
+				&& !RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
+			final String tmp = suppressStress(word);
+			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
+				word = tmp;
 		}
 		return word;
 	}
 
-	private static int getIndexOfStress(final String word){
+	static int getIndexOfStress(final String word){
 		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
 	}
 
 	public static Comparator<String> sorterComparator(){
-		return (str1, str2) -> COLLATOR.compare(str1, str2);
+		return (str1, str2) -> COLLATOR.compare(
+			StringUtils.replace(str1, TAB, UNDERSCORE),
+			StringUtils.replace(str2, TAB, UNDERSCORE));
 	}
 
 }

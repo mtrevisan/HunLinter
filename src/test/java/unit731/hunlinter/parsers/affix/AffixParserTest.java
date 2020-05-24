@@ -2,8 +2,8 @@ package unit731.hunlinter.parsers.affix;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ class AffixParserTest{
 	@Test
 	void verifyOk() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",
@@ -27,15 +27,15 @@ class AffixParserTest{
 	}
 
 	@Test
-	void verifyKo(){
+	void verifyKo() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"CIRCUMFIX A",
 			"COMPOUNDFLAG A");
 
-		Throwable exception = Assertions.assertThrows(HunLintException.class,
+		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> affParser.parse(affFile, language));
 		Assertions.assertEquals("Same flags present in multiple options", exception.getMessage());
 	}

@@ -71,7 +71,7 @@ class VersionCoreTest{
 	@Test
 	void shouldCorrectlyCompareAllVersionsFromSpecification(){
 		String[] versions = {"1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta", "1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-rc.1", "1.0.0", "2.0.0", "2.1.0", "2.1.1"};
-		for(int i = 1; i < versions.length; i++){
+		for(int i = 1; i < versions.length; i ++){
 			Version v1 = new Version(versions[i - 1]);
 			Version v2 = new Version(versions[i]);
 

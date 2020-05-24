@@ -6,8 +6,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -25,7 +30,7 @@ import unit731.hunlinter.services.PatternHelper;
  */
 public class SmithWatermanAlignment{
 
-	private static final Pattern UNICODE_SPLITTER = PatternHelper.pattern("(\\[([^\\]]+)\\]|[^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u035B\\u035D-\\u0360\\u0362-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*(?:[\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*[\\u035C\\u0361][^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*)?)");
+	private static final Pattern UNICODE_SPLITTER = RegexHelper.pattern("(\\[([^\\]]+)\\]|[^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u035B\\u035D-\\u0360\\u0362-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*(?:[\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*[\\u035C\\u0361][^\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F][\\u0300-\\u036F\\u025A\\u02B0-\\u02FE\\u1DA3\\u207F]*)?)");
 
 	private static final double COST_GAP = -1.;
 	private static final double COST_MATCH = 2.;
@@ -45,6 +50,33 @@ public class SmithWatermanAlignment{
 		private int lastIndexA;
 		private int lastIndexB;
 		private Deque<Character> operations;
+
+
+		@Override
+		public boolean equals(final Object obj){
+			if(obj == this)
+				return true;
+			if(obj == null || obj.getClass() != getClass())
+				return false;
+
+			final Trace rhs = (Trace)obj;
+			return new EqualsBuilder()
+				.append(firstIndexA, rhs.firstIndexA)
+				.append(firstIndexB, rhs.firstIndexB)
+				.append(lastIndexA, rhs.lastIndexA)
+				.append(lastIndexB, rhs.lastIndexB)
+				.isEquals();
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(firstIndexA)
+				.append(firstIndexB)
+				.append(lastIndexA)
+				.append(lastIndexB)
+				.toHashCode();
+		}
 	}
 
 
@@ -55,9 +87,9 @@ public class SmithWatermanAlignment{
 	private final double[][] scores;
 
 
-	public SmithWatermanAlignment(String a, String b){
-		x = PatternHelper.split(a, UNICODE_SPLITTER);
-		y = PatternHelper.split(b, UNICODE_SPLITTER);
+	public SmithWatermanAlignment(final String a, final String b){
+		x = RegexHelper.split(a, UNICODE_SPLITTER);
+		y = RegexHelper.split(b, UNICODE_SPLITTER);
 
 		n = x.length;
 		m = y.length;
@@ -84,18 +116,16 @@ public class SmithWatermanAlignment{
 
 		Set<Trace> traces = new HashSet<>();
 		Stack<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
-		maxScoreIndices.forEach(score -> {
-			//extract edit operations
-			traces.add(traceback(score.getLeft(), score.getRight()));
-		});
+		//extract edit operations
+		forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
 		return traces;
 	}
 
-	private double matching(int i, int j){
+	private double matching(final int i, final int j){
 		return scores[i - 1][j - 1] + matchingCost(i, j);
 	}
 
-	private double insertion(int i, int j){
+	private double insertion(final int i, final int j){
 		int highest = 0;
 		for(int k = 1; k < j; k ++)
 			if(scores[i][k] > scores[i][highest])
@@ -103,7 +133,7 @@ public class SmithWatermanAlignment{
 		return scores[i][highest] + insertionCost(j - highest);
 	}
 
-	private double deletion(int i, int j){
+	private double deletion(final int i, final int j){
 		int highest = 0;
 		for(int k = 1; k < i; k ++)
 			if(scores[k][j] > scores[highest][j])
@@ -111,21 +141,21 @@ public class SmithWatermanAlignment{
 		return scores[highest][j] + deletionCost(i - highest);
 	}
 
-	private double matchingCost(int i, int j){
+	private double matchingCost(final int i, final int j){
 		if(i == 0 || j == 0)
 			return COST_GAP;
 		return (x[i - 1].equals(y[j - 1])? COST_MATCH: COST_MISMATCH);
 	}
 
-	private double insertionCost(double k){
+	private double insertionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private double deletionCost(double k){
+	private double deletionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(double maxScore){
+	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
 		Stack<Pair<Integer, Integer>> maxScores = new Stack<>();
 		for(int j = 1; j <= m; j ++)

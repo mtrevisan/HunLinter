@@ -1,18 +1,22 @@
 package unit731.hunlinter.parsers.affix;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.StringJoiner;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
 import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ConversionTable{
@@ -35,7 +39,7 @@ public class ConversionTable{
 	private static final String KEY_WHOLE = reduceKey("^$");
 	private static final String ZERO = "0";
 
-	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>();
+	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>(4);
 	static{
 		CONVERSION_TABLE_ADD_METHODS.put(KEY_INSIDE, ConversionTable::convertInside);
 		CONVERSION_TABLE_ADD_METHODS.put(KEY_STARTS_WITH, ConversionTable::convertStartsWith);
@@ -52,25 +56,26 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public void parseConversionTable(final ParsingContext context){
+	public void parse(final ParsingContext context){
 		try{
-			final BufferedReader br = context.getReader();
+			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new HunLintException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new HunLintException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
-				final String line = ParserHelper.extractLine(br);
+				ParserHelper.assertNotEOF(scanner);
 
+				final String line = scanner.nextLine();
 				final String[] parts = StringUtils.split(line);
 
 				checkValidity(parts, context);
 
 				final String key = reduceKey(parts[1]);
-				table.computeIfAbsent(key, k -> new ArrayList<>())
+				table.computeIfAbsent(key, k -> new ArrayList<>(1))
 					.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
 		}
@@ -81,9 +86,9 @@ public class ConversionTable{
 
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
-			throw new HunLintException(WRONG_FORMAT.format(new Object[]{context}));
-		if(!affixOption.getCode().equals(parts[0]))
-			throw new HunLintException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
+		if(!affixOption.is(parts[0]))
+			throw new LinterException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**
@@ -95,13 +100,13 @@ public class ConversionTable{
 	public String applySingleConversionTable(final String word){
 		final List<String> conversions = applyConversionTable(word);
 		if(conversions.size() > 1)
-			throw new HunLintException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
+			throw new LinterException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{word}));
 
 		return (!conversions.isEmpty()? conversions.get(0): word);
 	}
 
 	/**
-	 * NOTE: does not include the original word!
+	 * NOTE: doesn't include the original word!
 	 *
 	 * @param word	Word to be converted
 	 * @return	The list of conversions
@@ -122,7 +127,7 @@ public class ConversionTable{
 		final List<Pair<String, String>> list = table.get(key);
 		if(list != null){
 			final ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(key);
-			list.forEach(entry -> fun.convert(word, entry, conversions));
+			forEach(list, entry -> fun.convert(word, entry, conversions));
 		}
 		return conversions;
 	}
@@ -184,6 +189,14 @@ public class ConversionTable{
 		final String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))
 			conversions.add(ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
+	}
+
+	public String extractAsList(){
+		final StringJoiner sj = new StringJoiner(", ");
+		for(final List<Pair<String, String>> pairs : table.values())
+			for(final Pair<String, String> entry : pairs)
+				sj.add(entry.getKey() + StringUtils.SPACE + entry.getValue());
+		return sj.toString();
 	}
 
 	@Override

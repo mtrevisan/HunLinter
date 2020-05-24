@@ -9,7 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,8 +27,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.IntStream;
+import java.util.function.Predicate;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class XMLManager{
@@ -55,6 +56,8 @@ public class XMLManager{
 	}
 
 
+	private XMLManager(){}
+
 	public static Document parseXMLDocument(final File file) throws SAXException, IOException{
 		final Document doc = DOCUMENT_BUILDER.parse(file);
 		doc.getDocumentElement().normalize();
@@ -69,12 +72,12 @@ public class XMLManager{
 	}
 
 	/* Transform the DOM Object to an XML File */
+	@SafeVarargs
 	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		JavaHelper.nullableToStream(properties)
-			.forEach(property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
+		forEach(properties, property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
 		final DOMSource domSource = new DOMSource(doc);
 		final StreamResult streamResult = new StreamResult(xmlFile);
 		transformer.transform(domSource, streamResult);
@@ -84,14 +87,12 @@ public class XMLManager{
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
 	}
 
-	public static List<Node> extractChildren(final Node parentNode, final Function<Node, Boolean> extractionCondition){
-		final List<Node> children = new ArrayList<>();
+	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
+		final ArrayList<Node> children = new ArrayList<>();
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
-			IntStream.range(0, nodes.getLength())
-				.mapToObj(nodes::item)
-				.filter(extractionCondition::apply)
-				.forEach(children::add);
+			children.ensureCapacity(nodes.getLength());
+			LoopHelper.applyIf(nodes, extractionCondition, children::add);
 		}
 		return children;
 	}

@@ -7,7 +7,7 @@ import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +19,14 @@ class WordMuncherTest{
 	@Test
 	void simpleOriginator() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 a .",
 			"SFX b Y 1",
 			"SFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"1",
 			"a");
 		String line = "ab";
@@ -42,14 +42,14 @@ class WordMuncherTest{
 	@Test
 	void multipleOriginator() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"SFX b Y 1",
 			"SFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"1",
 			"a");
 		String line = "ab";
@@ -66,14 +66,14 @@ class WordMuncherTest{
 	@Test
 	void multipleOriginatorPrefixAndSuffix() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"PFX b Y 1",
 			"PFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"2",
 			"ab",
 			"ba");
@@ -91,13 +91,13 @@ class WordMuncherTest{
 	@Test
 	void multipleOriginators() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 2",
 			"SFX a 0 b .",
 			"SFX a 0 bb ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"0");
 		String line = "abb";
 		Pair<WordMuncher, DictionaryEntry> pair = createMuncher(affFile, dicFile, language, line);
@@ -111,14 +111,14 @@ class WordMuncherTest{
 	@Test
 	void notContainedIntoDictionary() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"SFX a Y 1",
 			"SFX a 0 b .",
 			"PFX b Y 1",
 			"PFX b 0 b ."
 		);
-		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"1",
 			"ba");
 		String line = "bab";

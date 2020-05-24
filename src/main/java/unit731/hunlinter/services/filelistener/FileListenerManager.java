@@ -10,9 +10,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,9 +23,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SetHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.applyIf;
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 /**
@@ -44,7 +47,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	private static final FileSystem FILE_SYSTEM_DEFAULT = FileSystems.getDefault();
 
 	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT
-		= new HashMap<>(3);
+		= new HashMap<>(2);
 	static{
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified);
 		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);
@@ -85,10 +88,10 @@ public class FileListenerManager implements FileListener, Runnable{
 	@Override
 	public void stop(){
 		if(running.get()){
+			running.set(false);
+
 			watcherTask.cancel(true);
 			watcherTask = null;
-
-			running.set(false);
 		}
 	}
 
@@ -99,12 +102,12 @@ public class FileListenerManager implements FileListener, Runnable{
 		for(final String pattern : patterns){
 			final Path dir = (new File(pattern)).getParentFile().toPath();
 			if(!dir.toFile().exists())
-				LOGGER.warn("File or folder '{}' does not exists", dir);
+				LOGGER.warn("File or folder '{}' doesn't exists", dir);
 			else{
 				if(!dirPathToListeners.containsKey(dir))
 					addWatchKeyToDir(dir);
 
-				dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
+				dirPathToListeners.computeIfAbsent(dir, key -> SetHelper.newConcurrentSet())
 					.add(listener);
 			}
 		}
@@ -132,24 +135,20 @@ public class FileListenerManager implements FileListener, Runnable{
 		}
 	}
 
-	private void addFilePatterns(FileChangeListener listener, String[] patterns){
-		final Set<PathMatcher> filePatterns = newConcurrentSet();
-		Arrays.stream(patterns)
-			.map(this::matcherForExpression)
-			.forEach(filePatterns::add);
+	private void addFilePatterns(final FileChangeListener listener, final String[] patterns){
+		final Set<PathMatcher> filePatterns = SetHelper.newConcurrentSet();
+		forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
 
-		listenerToFilePatterns.put(listener, filePatterns);
+		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>())
+			.addAll(filePatterns);
 	}
 
-	private <T> Set<T> newConcurrentSet(){
-		return Collections.newSetFromMap(new ConcurrentHashMap<>());
-	}
-
-	private PathMatcher matcherForExpression(String pattern){
-		return FILE_SYSTEM_DEFAULT.getPathMatcher("glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1));
+	private PathMatcher matcherForExpression(final String pattern){
+		final String syntaxAndPattern = "glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1);
+		return FILE_SYSTEM_DEFAULT.getPathMatcher(syntaxAndPattern);
 	}
 
 	@Override
@@ -176,13 +175,13 @@ public class FileListenerManager implements FileListener, Runnable{
 	 * Instead, receive one ENTRY_MODIFY event with two counts
 	 */
 	private void preventMultipleEvents(){
-		try{ Thread.sleep(50); }
+		try{ Thread.sleep(50l); }
 		catch(final InterruptedException e){
 			Thread.currentThread().interrupt();
 		}
 	}
 
-	private boolean manageKey(WatchKey key){
+	private boolean manageKey(final WatchKey key){
 		boolean stopWatching = false;
 		final Path dir = getDirPath(key);
 		if(dir == null)
@@ -196,7 +195,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	/** Reset key to allow further events for this key to be processed */
-	private boolean resetKey(WatchKey key, Path dir){
+	private boolean resetKey(final WatchKey key, final Path dir){
 		boolean stopWatching = false;
 		final boolean valid = key.reset();
 		if(!valid){
@@ -231,15 +230,18 @@ public class FileListenerManager implements FileListener, Runnable{
 				final Path dir = getDirPath(key);
 				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
-				listeners.forEach(listener -> listenerMethod.accept(listener, file));
+				final Path path = Path.of(dir.toAbsolutePath().toString(), file.toString());
+				forEach(listeners, listener -> listenerMethod.accept(listener, path));
 			}
 		}
 	}
 
 	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
-		return getListeners(dir).stream()
-			.filter(list -> matchesAny(file, getPatterns(list)))
-			.collect(Collectors.toSet());
+		final Set<FileChangeListener> set = new HashSet<>();
+		applyIf(getListeners(dir),
+			list -> matchesAny(file, getPatterns(list)),
+			set::add);
+		return set;
 	}
 
 	private Set<FileChangeListener> getListeners(final Path dir){
@@ -247,8 +249,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	public boolean matchesAny(final Path input, final Set<PathMatcher> patterns){
-		return patterns.stream()
-			.anyMatch(pattern -> matches(input, pattern));
+		return (match(patterns, pattern -> matches(input, pattern)) != null);
 	}
 
 	public boolean matches(final Path input, final PathMatcher pattern){

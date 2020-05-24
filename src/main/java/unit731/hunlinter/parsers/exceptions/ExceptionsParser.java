@@ -1,24 +1,25 @@
 package unit731.hunlinter.parsers.exceptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import unit731.hunlinter.Backbone;
 import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.XMLManager;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 
 /**
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
  */
 public class ExceptionsParser{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionsParser.class);
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: ''{1}''");
+	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected ''{1}'', was ''{2}''");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -64,8 +66,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new HunLintException("Invalid root element in file " + configurationFilename
-				+ ", expected '" + WORD_EXCEPTIONS_ROOT_ELEMENT + "', was " + rootElement.getNodeName());
+			throw new LinterException(INVALID_ROOT.format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName()}));
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
@@ -80,13 +81,14 @@ public class ExceptionsParser{
 
 	private void validate(){
 		//check for duplications
-		final List<List<String>> duplications = dictionary.stream()
-			.collect(Collectors.groupingBy(Function.identity()))
-			.values().stream()
-			.filter(list -> list.size() > 1)
-			.collect(Collectors.toList());
-		for(final List<String> duplication : duplications)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated entry in file {}: '{}'", configurationFilename, duplication);
+		int index = 0;
+		final Set<String> map = new HashSet<>();
+		for(final String s : dictionary){
+			if(!map.add(s))
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));
+
+			index ++;
+		}
 	}
 
 	public List<String> getExceptionsDictionary(){
@@ -99,18 +101,15 @@ public class ExceptionsParser{
 
 	public void modify(final TagChangeType changeType, final List<String> tags){
 		switch(changeType){
-			case ADD:
+			case ADD -> {
 				dictionary.addAll(tags);
 				dictionary.sort(comparator);
-				break;
-
-			case REMOVE:
-				dictionary.removeAll(tags);
-				break;
-
-			case SET:
+			}
+			case REMOVE -> dictionary.removeAll(tags);
+			case SET -> {
 				dictionary.clear();
 				dictionary.addAll(tags);
+			}
 		}
 	}
 

@@ -22,8 +22,8 @@ public class Version implements Comparable<Version>{
 	private final Integer major;
 	private final Integer minor;
 	private final Integer patch;
-	private String[] preRelease;
-	private String[] build;
+	private final String[] preRelease;
+	private final String[] build;
 
 
 	/**
@@ -87,8 +87,8 @@ public class Version implements Comparable<Version>{
 
 		final String[] tokens = StringUtils.split(version, DOT, 3);
 		final String patchOnly = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX)[2];
-		if(tokens[0].length() > 1 && tokens[0].charAt(0) == '0' || tokens[1].length() > 1 && tokens[1].charAt(0) == '0' || patchOnly.length() > 1 && patchOnly.charAt(0) == '0')
-			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeroes");
+		if(hasLeadingZeros(tokens[0]) || hasLeadingZeros(tokens[1]) || hasLeadingZeros(patchOnly))
+			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
 		major = Integer.parseInt(tokens[0]);
 		minor = Integer.parseInt(tokens[1]);
@@ -104,7 +104,7 @@ public class Version implements Comparable<Version>{
 			for(final String pr : preRelease){
 				final boolean numeric = StringUtils.isNumeric(pr);
 				if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
-					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeroes");
+					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 				if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
 					throw new IllegalArgumentException("Argument is not a valid version");
 			}
@@ -122,6 +122,10 @@ public class Version implements Comparable<Version>{
 			build = new String[0];
 		if(tokenizer.hasMoreElements())
 			throw new IllegalArgumentException("Argument is not a valid version");
+	}
+
+	private boolean hasLeadingZeros(final String token){
+		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 
 	private static boolean startsWithNumber(final String str){
@@ -201,7 +205,7 @@ public class Version implements Comparable<Version>{
 	/**
 	 * Compares two {@code Version} instances.
 	 * <p>
-	 * This method does not take into account the versions' build metadata. If you want to compare the versions' build metadata
+	 * This method doesn't take into account the versions' build metadata. If you want to compare the versions' build metadata
 	 * use the {@code Version.compareToWithBuilds} method.</p>
 	 *
 	 * @param other	The object to be compared.
@@ -267,7 +271,7 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public String toString(){
-		final StringBuilder sb = (new StringBuilder())
+		final StringBuffer sb = (new StringBuffer())
 			.append(major).append(DOT).append(minor).append(DOT).append(patch);
 		if(preRelease.length > 0)
 			sb.append(PRE_RELEASE_PREFIX).append(String.join(DOT, preRelease));

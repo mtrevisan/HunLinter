@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ConversionTable;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 
 class DictionaryParserTest{
@@ -21,7 +21,7 @@ class DictionaryParserTest{
 	@Test
 	void replacementTable() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"REP 4",
 			"REP ^b bb",
@@ -46,7 +46,7 @@ class DictionaryParserTest{
 	@Test
 	void applyLongest() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP b 1",
@@ -61,7 +61,7 @@ class DictionaryParserTest{
 	@Test
 	void applyLongestOnStart() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP ^b 1",
@@ -76,7 +76,7 @@ class DictionaryParserTest{
 	@Test
 	void applyLongestOnEnd() throws IOException{
 		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"REP 3",
 			"REP b$ 1",

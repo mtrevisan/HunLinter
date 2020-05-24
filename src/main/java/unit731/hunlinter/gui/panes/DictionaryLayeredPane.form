@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.9" maxVersion="1.9">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="inputLabel" alignment="0" max="32767" attributes="0"/>
+                          <Component id="ruleFlagsAidLabel" alignment="0" min="-2" pref="81" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="ruleFlagsAidComboBox" alignment="0" max="32767" attributes="0"/>
+                          <Component id="inputTextField" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="scrollPane" alignment="0" pref="909" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="totalInflectionsLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="totalInflectionsValueLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="openAidButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="openAffButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="openDicButton" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="inputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="inputTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="ruleFlagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="ruleFlagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="scrollPane" pref="161" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="totalInflectionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalInflectionsValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openAffButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openDicButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openAidButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="inputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Dictionary entry:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="inputTextField">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FontHelper.getCurrentFont()" type="code"/>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[7, 22]"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="inputTextFieldKeyReleased"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="ruleFlagsAidLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Rule flags aid:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="ruleFlagsAidComboBox">
+      <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="FontHelper.getCurrentFont()" type="code"/>
+        </Property>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="0"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleFlagsAidComboBox"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="scrollPane">
+      <AuxValues>
+        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTable" name="table">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="FontHelper.getCurrentFont()" type="code"/>
+            </Property>
+            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new InflectionTableModel()" type="code"/>
+            </Property>
+            <Property name="rowHeight" type="int" value="24"/>
+            <Property name="showHorizontalLines" type="boolean" value="false"/>
+            <Property name="showVerticalLines" type="boolean" value="false"/>
+            <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+              <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JCopyableTable(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public String getValueAtRow(final int row){&#xd;&#xa;&#x9;&#x9;final TableModel model = getModel();&#xd;&#xa;&#x9;&#x9;final String inflection = (String)model.getValueAt(row, 0);&#xd;&#xa;&#x9;&#x9;final String morphologicalFields = (String)model.getValueAt(row, 1);&#xd;&#xa;&#x9;&#x9;final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))&#xd;&#xa;&#x9;&#x9;&#x9;.map(AffixEntry::toString)&#xd;&#xa;&#x9;&#x9;&#x9;.orElse(null);&#xd;&#xa;&#x9;&#x9;final StringJoiner sj = new StringJoiner(TAB);&#xd;&#xa;&#x9;&#x9;applyIf(new String[]{inflection, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);&#xd;&#xa;&#x9;&#x9;return sj.toString();&#xd;&#xa;&#x9;}&#xd;&#xa;};"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="final KeyStroke copyKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK, false);&#xd;&#xa;table.registerKeyboardAction(event -&gt; GUIHelper.copyToClipboard((JCopyableTable)table), copyKeyStroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;GUIHelper.addScrollToFirstRow(table);&#xd;&#xa;GUIHelper.addScrollToLastRow(table);&#xd;&#xa;&#xd;&#xa;table.setRowSelectionAllowed(true);&#xd;&#xa;final TableRenderer dicCellRenderer = new TableRenderer();&#xd;&#xa;for(int i = 0; i &lt; table.getColumnCount(); i ++)&#xd;&#xa;&#x9;table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);"/>
+          </AuxValues>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JLabel" name="totalInflectionsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Total inflections:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="totalInflectionsValueLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#x2026;"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="openAidButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(parserManager::getAidFile, packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Aid"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="openAffButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(Packager.KEY_FILE_AFFIX, packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Affix"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="openDicButton">
+      <Properties>
+        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new OpenFileAction(Packager.KEY_FILE_DICTIONARY, packager)" type="code"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Open Dictionary"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

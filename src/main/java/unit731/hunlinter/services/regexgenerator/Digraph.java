@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -40,14 +42,14 @@ public final class Digraph<T>{
 	 *
 	 * @param graph	The digraph to copy
 	 */
-	public Digraph(Digraph<T> graph){
-		int vertices = graph.adjacency.size();
+	public Digraph(final Digraph<T> graph){
+		final int vertices = graph.adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			Stack<Pair<Integer, T>> reverse = new Stack<>();
-			for(Pair<Integer, T> w : graph.adjacency.get(v))
+			final Stack<Pair<Integer, T>> reverse = new Stack<>();
+			for(final Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
-			for(Pair<Integer, T> w : reverse)
+			for(final Pair<Integer, T> w : reverse)
 				addEdge(v, w.getKey(), w.getValue());
 		}
 	}
@@ -92,11 +94,11 @@ public final class Digraph<T>{
 	 * @return	the reverse of the digraph
 	 */
 	public Digraph<T> reverse(){
-		Digraph<T> reverse = new Digraph<>();
-		int vertices = adjacency.size();
+		final Digraph<T> reverse = new Digraph<>();
+		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
-			for(Pair<Integer, T> w : transitions)
+			final Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
+			for(final Pair<Integer, T> w : transitions)
 				reverse.addEdge(w.getKey(), v, w.getValue());
 		}
 		return reverse;
@@ -113,13 +115,13 @@ public final class Digraph<T>{
 		s.append(NEWLINE);
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			final String transitions = adjacency.get(v).stream()
-				.map(w -> w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")")
-				.collect(Collectors.joining(", "));
+			final StringJoiner transitions = new StringJoiner(", ");
+			forEach(adjacency.get(v),
+				w -> transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")"));
 			s.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
-				.append(transitions)
+				.append(transitions.toString())
 				.append(NEWLINE);
 		}
 		return s.toString();

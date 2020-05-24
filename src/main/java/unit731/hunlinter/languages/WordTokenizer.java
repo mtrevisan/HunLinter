@@ -1,28 +1,51 @@
 package unit731.hunlinter.languages;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.StringTokenizer;
-import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 /**
- * Tokenizes a sentence into words. Punctuation and whitespace gets their own tokens.
+ * Tokenizes a sentence into words.
+ * Punctuation and whitespace gets their own tokens.
  * The tokenizer is a quite simple character-based one, though it knows about urls and will put them in one token,
  * if fully specified including a protocol (like {@code http://foobar.org}).
  *
- * @author Daniel Naber
+ * @see <a href="https://rgxdb.com/try">Regex DB</a>
  */
 public class WordTokenizer{
 
-	private static final List<String> PROTOCOLS = List.of("http", "https", "ftp");
-	private static final Pattern URL_CHARS = Pattern.compile("[a-zA-Z0-9/%$-_.+!*'(),?#]+");
-	private static final Pattern DOMAIN_CHARS = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]+");
-	private static final Pattern PATTERN_EMAIL = Pattern.compile("(?<!:)\\b[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))\\b");
+	//@see <a href="https://www.ietf.org/rfc/rfc4648.txt">RFC-4648</a>
+	private static final String BASE64 = "(?:[a-zA-Z0-9+\\/]{4})*(?:[a-zA-Z0-9+\\/]{3}=|[a-zA-Z0-9+\\/]{2}==|[a-zA-Z0-9+\\/]{1}===)";
+//	private static final String SEMANTIC_VERSIONING = "[Vv]?(?:(?<major>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<minor>(?:0|[1-9](?:(?:0|[1-9])+)*))[.](?<patch>(?:0|[1-9](?:(?:0|[1-9])+)*))(?:-(?<prerelease>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:0|[1-9](?:(?:0|[1-9])+)*)))*))?(?:[+](?<build>(?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+))(?:[.](?:(?:(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?|(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)(?:[A-Za-z]|-)(?:(?:(?:0|[1-9])|(?:[A-Za-z]|-))+)?)|(?:(?:0|[1-9])+)))*))?)";
+//	private static final String PHONE_NUMBER = "[+]?(?=(?:[^\\dx]*\\d){7})(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?)(?:[ -]?(?:\\(\\d+(?:\\.\\d+)?\\)|\\d+(?:\\.\\d+)?))*(?:[ ]?(?:x|ext)\\.?[ ]?\\d{1,5})?";
+	private static final String DATE_ISO8601 = "(?<!\\d)(?:[+-]?\\d{4}(?!\\d{2}\\b))(?:(-?)(?:(?:00[1-9]|0[1-9]\\d|[12]\\d{2}|3[0-5]\\d|36[0-6])|(?:3[0-6]\\d)|(?:[0-2]\\d{2})|(?:0[1-9]|1[0-2])(?:\\2(?:0[1-9]|[12]\\d|3[01]))?|(?:\\d{1,2})|W(?:[0-4]\\d|5[0-2])(?:-?[1-7])?)(?!\\d)(?:[T\\s](?:(?:(?:[01]\\d|2[0-3])(?:(:?)[0-5]\\d)?|24\\:?00)(?:[.,]\\d+(?!:))?)?(?:\\3[0-5]\\d(?:[.,]\\d+)?)?(?:[zZ]|(?:[+-])(?:[01]\\d|2[0-3]):?(?:[0-5]\\d)?)?)?)?";
+	private static final String TIME = "(?<!\\d)(?:(?:0?[1-9]|1[0-2])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)? ?[aApP][mM])|(?:(?:0?\\d|1\\d|2[0-3])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)?)";
+	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
+	private static final String EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
+	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
+	private static final String URL = "(?:(?:[a-zA-Z][a-zA-Z\\d+-.]*):)(?:\\/\\/(?:(?:[^:]*)(?::(?:[^@]*))?@)?(?:(?:[a-zA-Z0-9-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(?:\\d*))?(?:(?:\\/[^\\/]*)*)|(?:\\/[^\\#\\?]+(?:\\/[^\\#\\?]*)*)?|(?:[^\\/]+(?:\\/[^\\#\\?]*)*))?(?:\\?(?:[^#]*))?(?:\\#(?:[^#]*))?";
+	private static final Pattern PATTERN_UNBREAKABLE;
+	static{
+		final StringJoiner sj = new StringJoiner("|");
+		sj
+			.add(BASE64)
+//			.add(SEMANTIC_VERSIONING)
+//			.add(PHONE_NUMBER)
+			.add(DATE_ISO8601)
+			.add(TIME)
+			.add(EMAIL)
+			//FIXME consider only urls like www., or similar
+//			.add(URL)
+		;
+		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj.toString() + ")");
+	}
 
 	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +
 		"\u1160\u1680"
@@ -32,12 +55,10 @@ public class WordTokenizer{
 		+ "\u205F\u2060\u2061\u2062\u2063\u206A\u206b\u206c\u206d"
 		+ "\u206E\u206F\u3000\u3164\ufeff\uffa0\ufff9\ufffa\ufffb"
 		+ ",.;()[]{}=*#∗×·+÷<>!?:/|\\\"'«»„”“`´‘’‛′›‹…¿¡→‼⁇⁈⁉_"
-		+ "—"  // em dash
+		//em dash
+		+ "—"
 		+ "\t\n\r";
 
-	private static final String DOT = ".";
-	private static final String COLUMN = ":";
-	private static final String SLASH = "/";
 	private static final String HORIZONTAL_EXPANDED_ELLIPSIS = "...";
 	private static final String HORIZONTAL_ELLIPSIS = "…";
 
@@ -54,149 +75,32 @@ public class WordTokenizer{
 	}
 
 	public List<String> tokenize(String text){
-		List<String> result = new ArrayList<>();
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
-		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
-		while(st.hasMoreElements())
-			result.add(st.nextToken());
 
-		result = joinEmails(result);
-		result = joinUrls(result);
-		return result;
+		final String placeholder = StringUtils.repeat("\0", StringUtils.EMPTY,
+			StringHelper.maxRepeating(text, '\0') + 1);
+
+		//find all urls and emails, substitute with placeholder
+		final List<String> unbreakableText = new ArrayList<>();
+		text = RegexHelper.matcher(text, PATTERN_UNBREAKABLE)
+			.replaceAll(m -> {
+				unbreakableText.add(m.group(1));
+				return placeholder;
+			});
+
+		return extractTokens(text, placeholder, unbreakableText);
 	}
 
-	private List<String> joinEmails(final List<String> list){
-		return join(list, PATTERN_EMAIL, "@", null);
-	}
-
-	/*
-	 * NOTE: explicit check for {@code containingChars} speeds up method by factor of ~10
-	 */
-	protected List<String> join(final List<String> list, final Pattern pattern, final String containingChars,
-			final Function<String, String> groupSubstituter){
-		final StringBuilder sb = new StringBuilder();
-		for(final String item : list)
-			sb.append(item);
-		final String text = sb.toString();
-
+	private List<String> extractTokens(final String text, final String placeholder, final List<String> unbreakableText){
 		final List<String> result = new ArrayList<>();
-		if((containingChars == null || StringUtils.containsAny(text, containingChars)) && pattern.matcher(text).find()){
-			final Matcher matcher = pattern.matcher(text);
-			int currentPosition = 0;
-			int idx = 0;
-			while(matcher.find()){
-				final int start = matcher.start();
-				final int end = matcher.end();
-				while(currentPosition < end){
-					if(currentPosition < start)
-						result.add(list.get(idx));
-					else if(currentPosition == start){
-						final String group = matcher.group();
-						result.add(groupSubstituter != null? groupSubstituter.apply(group): group);
-					}
+		int index = 0;
+		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
+		while(st.hasMoreElements()){
+			final String token = st.nextToken();
 
-					currentPosition += list.get(idx)
-						.length();
-					idx ++;
-				}
-			}
-			if(currentPosition < text.length())
-				result.addAll(list.subList(idx, list.size()));
+			//restore placeholders with original
+			result.add(token.equals(placeholder)? unbreakableText.get(index ++): token);
 		}
-		else
-			result.addAll(list);
-		return result;
-	}
-
-	/* see RFC1738 and <a href="http://stackoverflow.com/questions/1856785/characters-allowed-in-a-url">Characters allowed in a URL</a> */
-	private List<String> joinUrls(final List<String> list){
-		final List<String> newList = new ArrayList<>();
-		boolean inUrl = false;
-		final StringBuilder url = new StringBuilder();
-		String urlQuote = null;
-		for(int i = 0; i < list.size(); i ++){
-			if(urlStartsAt(i, list)){
-				inUrl = true;
-				if(i - 1 >= 0)
-					urlQuote = list.get(i - 1);
-				url.append(list.get(i));
-			}
-			else if(inUrl && urlEndsAt(i, list, urlQuote)){
-				inUrl = false;
-				urlQuote = null;
-				newList.add(url.toString());
-				url.setLength(0);
-				newList.add(list.get(i));
-			}
-			else if(inUrl)
-				url.append(list.get(i));
-			else
-				newList.add(list.get(i));
-		}
-		if(url.length() > 0)
-			newList.add(url.toString());
-		return newList;
-	}
-
-	private boolean urlStartsAt(final int index, final List<String> list){
-		final String token = list.get(index);
-		if(isProtocol(token) && list.size() > index + 3){
-			final String nToken = list.get(index + 1);
-			final String nnToken = list.get(index + 2);
-			final String nnnToken = list.get(index + 3);
-			if(nToken.equals(COLUMN) && nnToken.equals(SLASH) && nnnToken.equals(SLASH))
-				return true;
-		}
-		if(list.size() > index + 1){
-			//e.g. www.mydomain.org
-			final String nToken = list.get(index);
-			final String nnToken = list.get(index + 1);
-			if(nToken.equals("www") && nnToken.equals(DOT))
-				return true;
-		}
-		if(
-			//e.g. mydomain.org/ (require slash to avoid missing errors that can be interpreted as domains)
-			list.size() > index + 3
-				//use this order so the regex only gets matched if needed
-				&& list.get(index + 1).equals(DOT)
-				&& list.get(index + 3).equals(SLASH)
-				&& DOMAIN_CHARS.matcher(token).matches()
-				&& DOMAIN_CHARS.matcher(list.get(index + 2)).matches())
-			return true;
-
-		return (
-			//e.g. sub.mydomain.org/ (require slash to avoid missing errors that can be interpreted as domains)
-			list.size() > index + 5
-			//use this order so the regex only gets matched if needed
-			&& list.get(index + 1).equals(DOT)
-			&& list.get(index + 3).equals(DOT)
-			&& list.get(index + 5).equals(SLASH)
-			&& DOMAIN_CHARS.matcher(token).matches()
-			&& DOMAIN_CHARS.matcher(list.get(index + 2)).matches()
-			&& DOMAIN_CHARS.matcher(list.get(index + 4)).matches());
-	}
-
-	private boolean isProtocol(final String token){
-		return PROTOCOLS.contains(token);
-	}
-
-	private boolean urlEndsAt(final int index, final List<String> list, final String urlQuote){
-		boolean result = false;
-		final String token = list.get(index);
-		//this is guesswork
-		if(StringUtils.isWhitespace(token) || token.equals(")") || token.equals("]"))
-			result = true;
-		else if(list.size() > index + 1){
-			final String nextToken = list.get(index + 1);
-			if((StringUtils.isWhitespace(nextToken)
-					|| StringUtils.equalsAny(nextToken, "\"", "»", "«", "‘", "’", "“", "”", "'", DOT))
-					&& (StringUtils.equalsAny(token, DOT, ",", ";", COLUMN, "!", "?") || token.equals(urlQuote)))
-				result = true;
-			else if(!URL_CHARS.matcher(token).matches())
-				result = true;
-		}
-		else if(!URL_CHARS.matcher(token).matches() || token.equals(DOT))
-			result = true;
 		return result;
 	}
 

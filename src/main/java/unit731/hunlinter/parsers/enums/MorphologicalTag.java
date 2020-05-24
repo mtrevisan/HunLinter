@@ -1,31 +1,39 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 
+/** Default morphological fields */
 public enum MorphologicalTag{
 
-	//default morphological fields:
-	TAG_STEM("st:"),
-	TAG_ALLOMORPH("al:"),
-	TAG_PART_OF_SPEECH("po:"),
+	STEM("st:"),
+	ALLOMORPH("al:"),
+	PART_OF_SPEECH("po:"),
 
-	TAG_DERIVATIONAL_PREFIX("dp:"),
-	TAG_INFLECTIONAL_PREFIX("ip:"),
-	TAG_TERMINAL_PREFIX("tp:"),
+	DERIVATIONAL_PREFIX("dp:"),
+	INFLECTIONAL_PREFIX("ip:"),
+	TERMINAL_PREFIX("tp:"),
 
-	TAG_DERIVATIONAL_SUFFIX("ds:"),
-	TAG_INFLECTIONAL_SUFFIX("is:"),
-	TAG_TERMINAL_SUFFIX("ts:"),
+	DERIVATIONAL_SUFFIX("ds:"),
+	INFLECTIONAL_SUFFIX("is:"),
+	TERMINAL_SUFFIX("ts:"),
 
-	TAG_SURFACE_PREFIX("sp:"),
+	SURFACE_PREFIX("sp:"),
 
-	TAG_FREQUENCY("fr:"),
-	TAG_PHONETIC("ph:"),
-	TAG_HYPHENATION("hy:"),
-	TAG_PART("pa:"),
-	TAG_FLAG("fl:");
+	FREQUENCY("fr:"),
+	PHONETIC("ph:"),
+	HYPHENATION("hy:"),
+	PART("pa:"),
+	FLAG("fl:");
 
+
+	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>();
+	static{
+		for(final MorphologicalTag tag : EnumSet.allOf(MorphologicalTag.class))
+			VALUES.put(tag.getCode(), tag);
+	}
 
 	private final String code;
 
@@ -35,14 +43,15 @@ public enum MorphologicalTag{
 	}
 
 	public static MorphologicalTag createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(tag -> tag.code.equals(code))
-			.findFirst()
-			.orElse(null);
+		return VALUES.get(code.substring(0, 3));
 	}
 
 	public String getCode(){
 		return code;
+	}
+
+	public boolean isSupertypeOf(final String codeAndValue){
+		return codeAndValue.startsWith(code);
 	}
 
 	public String attachValue(final String value){

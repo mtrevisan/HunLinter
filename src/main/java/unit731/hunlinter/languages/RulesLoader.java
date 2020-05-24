@@ -1,24 +1,25 @@
 package unit731.hunlinter.languages;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.vos.Production;
-import unit731.hunlinter.services.SetHelper;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.datastructures.SetHelper;
 
 
 public class RulesLoader{
@@ -32,12 +33,12 @@ public class RulesLoader{
 
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;
-	private final boolean wordCanHaveMultipleAccents;
+	private final boolean wordCanHaveMultipleStresses;
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
-	private final Set<String> multipleAccentedWords;
-	private final Set<String> hasToContainAccent = new HashSet<>();
-	private final Set<String> cannotContainAccent = new HashSet<>();
+	private final Set<String> multipleStressedWords;
+	private final Set<String> hasToContainStress = new HashSet<>();
+	private final Set<String> cannotContainStress = new HashSet<>();
 	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
@@ -49,31 +50,31 @@ public class RulesLoader{
 
 		morphologicalFieldsCheck = Boolean.parseBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
-		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
+		wordCanHaveMultipleStresses = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleStresses"));
 
-		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
-		dataFields.put(MorphologicalTag.TAG_DERIVATIONAL_SUFFIX, readPropertyAsSet("derivationalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_STEM, null);
-		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
+		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
+		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
+		fillDataFields(MorphologicalTag.INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
+		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
+		dataFields.put(MorphologicalTag.STEM, null);
+		dataFields.put(MorphologicalTag.ALLOMORPH, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
-		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');
+		multipleStressedWords = readPropertyAsSet("multipleStressedWords", ',');
 
 		if(strategy != null){
-			String[] flags = strategy.parseFlags(readProperty("hasToContainAccent"));
+			String[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
 			if(flags != null)
-				hasToContainAccent.addAll(Arrays.asList(flags));
-			flags = strategy.parseFlags(readProperty("cannotContainAccent"));
+				hasToContainStress.addAll(Arrays.asList(flags));
+			flags = strategy.parseFlags(readProperty("cannotContainStress"));
 			if(flags != null)
-				cannotContainAccent.addAll(Arrays.asList(flags));
+				cannotContainStress.addAll(Arrays.asList(flags));
 
 			Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
 			while(rules.hasNext()){
 				final String masterFlag = rules.next();
 				final String[] wrongFlags = strategy.parseFlags(rules.next());
-				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
+				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
@@ -81,18 +82,26 @@ public class RulesLoader{
 			rules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
 			while(rules.hasNext()){
 				final String elem = rules.next();
-				if(elem.length() == 2 && elem.charAt(1) == ':')
-					letter = String.valueOf(elem.charAt(1));
+				if(elem.length() == 1)
+					letter = String.valueOf(elem.charAt(0));
 				else{
 					flags = strategy.parseFlags(elem);
 					final String correctRule = flags[flags.length - 1];
 					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
+					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
 				}
 			}
 		}
+	}
+
+	private void fillDataFields(final MorphologicalTag tag, final String property){
+		final Iterator<String> itr = readPropertyAsIterator(property, ',');
+		final Set<String> set = new HashSet<>();
+		while(itr.hasNext())
+			set.add(tag.getCode() + itr.next());
+		dataFields.put(tag, set);
 	}
 
 	public final String readProperty(final String key){
@@ -105,14 +114,15 @@ public class RulesLoader{
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		return rulesProperties.keySet().stream()
-			.map(String.class::cast)
-			.filter(k -> k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length())))
-			.map(this::readProperty)
-			.filter(StringUtils::isNotEmpty)
-			.flatMap(line -> Arrays.stream(StringUtils.split(line, separator)))
-			.collect(Collectors.toList())
-			.iterator();
+		final List<String> list = new ArrayList<>(rulesProperties.size());
+		for(final Object o : rulesProperties.keySet()){
+			final String k = (String)o;
+			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
+				final String line = readProperty(k);
+				list.addAll(Arrays.asList(StringUtils.split(line, separator)));
+			}
+		}
+		return list.iterator();
 	}
 
 
@@ -124,8 +134,8 @@ public class RulesLoader{
 		return enableVerbSyllabationCheck;
 	}
 
-	public boolean isWordCanHaveMultipleAccents(){
-		return wordCanHaveMultipleAccents;
+	public boolean isWordCanHaveMultipleStresses(){
+		return wordCanHaveMultipleStresses;
 	}
 
 	public boolean containsDataField(final MorphologicalTag key){
@@ -140,30 +150,30 @@ public class RulesLoader{
 		return unsyllabableWords.contains(word);
 	}
 
-	public boolean containsMultipleAccentedWords(final String word){
-		return multipleAccentedWords.contains(word);
+	public boolean containsMultipleStressedWords(final String word){
+		return multipleStressedWords.contains(word);
 	}
 
-	public boolean containsHasToContainAccent(final String word){
-		return hasToContainAccent.contains(word);
+	public boolean containsHasToContainStress(final String word){
+		return hasToContainStress.contains(word);
 	}
 
-	public boolean containsCannotContainAccent(final String word){
-		return cannotContainAccent.contains(word);
+	public boolean containsCannotContainStress(final String word){
+		return cannotContainStress.contains(word);
 	}
 
-	public void letterToFlagIncompatibilityCheck(final Production production){
-		letterAndRulesNotCombinable.entrySet().stream()
-			.filter(check -> StringUtils.containsAny(production.getWord(), check.getKey()))
-			.flatMap(check -> check.getValue().stream())
-			.forEach(entry -> entry.match(production));
+	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
+		for(final Map.Entry<String, Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
+			if(StringUtils.containsAny(inflection.getWord(), entry.getKey()))
+				for(final LetterMatcherEntry letterMatcherEntry : entry.getValue())
+					letterMatcherEntry.match(inflection);
 	}
 
-	public void flagToFlagIncompatibilityCheck(final Production production){
-		ruleAndRulesNotCombinable.entrySet().stream()
-			.filter(check -> production.hasContinuationFlag(check.getKey()))
-			.flatMap(check -> check.getValue().stream())
-			.forEach(entry -> entry.match(production));
+	public void flagToFlagIncompatibilityCheck(final Inflection inflection){
+		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
+			if(inflection.hasContinuationFlag(check.getKey()))
+				for(final RuleMatcherEntry entry : check.getValue())
+					entry.match(inflection);
 	}
 
 }

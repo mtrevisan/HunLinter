@@ -1,21 +1,25 @@
 package unit731.hunlinter.parsers.thesaurus;
 
 import java.io.BufferedWriter;
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.ParserHelper;
+
+import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
@@ -23,6 +27,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public static final String PIPE = "|";
 	public static final String PART_OF_SPEECH_SEPARATOR = PIPE + ":";
 	public static final String SYNONYMS_SEPARATOR = PIPE + ",";
+
+	private static final char[] NEW_LINE = {'\n'};
 
 
 	private final String definition;
@@ -43,9 +49,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		this.synonyms = synonyms;
 	}
 
-	public ThesaurusEntry(final String line, final LineNumberReader br) throws IOException{
+	public ThesaurusEntry(final String line, final Scanner scanner) throws IOException{
 		Objects.requireNonNull(line);
-		Objects.requireNonNull(br);
+		Objects.requireNonNull(scanner);
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_SEPARATOR);
@@ -54,10 +60,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		final int numEntries = Integer.parseInt(components[1]);
 		synonyms = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
-			final String definitionAndSynonyms = br.readLine();
-			if(definitionAndSynonyms == null)
-				throw new EOFException("Unexpected EOF while reading Thesaurus file");
+			ParserHelper.assertNotEOF(scanner);
 
+			final String definitionAndSynonyms = scanner.nextLine();
 			synonyms.add(new SynonymsEntry(definitionAndSynonyms));
 		}
 	}
@@ -79,31 +84,45 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public Set<String> getSynonymsSet(){
-		return synonyms.stream()
-			.map(SynonymsEntry::getSynonyms)
-			.flatMap(List::stream)
-			.collect(Collectors.toSet());
+		final Set<String> set = new HashSet<>();
+		for(final SynonymsEntry synonym : synonyms){
+			final List<String> synonymsEntrySynonyms = synonym.getSynonyms();
+			forEach(synonymsEntrySynonyms, set::add);
+		}
+		return set;
 	}
 
 	public int getSynonymsEntries(){
 		return synonyms.size();
 	}
 
+	public boolean containsPartOfSpeechesAndSynonym(final String[] partOfSpeeches, final String synonym){
+//		return synonyms.stream()
+//			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
+//			.anyMatch(entry -> entry.containsSynonym(synonym));
+		return (match(synonyms, entry -> entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym)) != null);
+//		for(final SynonymsEntry entry : synonyms)
+//			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
+//				return entry.containsSynonym(synonym);
+//		return false;
+	}
+
 	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && this.synonyms.stream().anyMatch(entry -> entry.contains(partOfSpeeches, ss)));
+		return (ss.remove(definition) && match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
 	}
 
 	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
 		final List<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) || this.synonyms.stream().anyMatch(entry -> entry.intersects(partOfSpeeches, ss)));
+		return (ss.remove(definition) && match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
+			|| match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
 	}
 
 	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
 		writer.write(definition);
 		writer.write(ThesaurusEntry.PIPE);
 		writer.write(Integer.toString(idx));
-		writer.write(StringUtils.LF);
+		writer.write(NEW_LINE);
 	}
 
 	public int saveToData(final BufferedWriter dataWriter, final Charset charset) throws IOException{
@@ -113,19 +132,18 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		for(final SynonymsEntry synonym : synonyms){
 			final String s = synonym.toString();
 			dataWriter.write(s);
-			dataWriter.write(StringUtils.LF);
+			dataWriter.write(NEW_LINE);
 
 			synonymsLength += s.getBytes(charset).length;
 		}
-		return synonymsLength + StringUtils.LF.length() * synonymsEntries;
+		return synonymsLength + NEW_LINE.length * synonymsEntries;
 	}
 
 	@Override
 	public String toString(){
-		return synonyms.stream()
-			.map(SynonymsEntry::toString)
-			.map(s -> definition + ": " + String.join(", ", s))
-			.collect(Collectors.joining("\\r\\n"));
+		final StringJoiner sj = new StringJoiner("\r\n");
+		forEach(synonyms, synonym -> sj.add(definition + ": " + String.join(", ", synonym.toString())));
+		return sj.toString();
 	}
 
 	public String toLine(final int definitionIndex){

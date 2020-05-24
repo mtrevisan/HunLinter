@@ -1,5 +1,6 @@
 package unit731.hunlinter.services.text;
 
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,29 +12,38 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.RegexHelper;
 
 
 public class StringHelper{
 
-	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = PatternHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
+	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
-		/** All lower case or neutral case, e.g. "lowercase" or "123" */
+		/** All lower case or neutral case, e.g. "hello java" */
 		LOWER_CASE,
-		/** Start upper case, rest lower case, e.g. "Initcap" */
+		/** Start upper case, rest lower case, e.g. "Hello java" */
 		TITLE_CASE,
-		/** All upper case, e.g. "UPPERCASE" or "ALL4ONE" */
+		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA" */
 		ALL_CAPS,
-		/** Camel case, start lower case, e.g. "camelCase" */
+		/** Camel case, start lower case, e.g. "helloJava" */
 		CAMEL_CASE,
-		/** Pascal case, start upper case, e.g. "PascalCase" */
+		/** Pascal case, start upper case, e.g. "HelloJava" */
 		PASCAL_CASE
 	}
 
 
 	private StringHelper(){}
+
+	public static boolean isWord(final String text){
+		for(int i = 0; i < text.length(); i ++){
+			final char chr = text.charAt(i);
+			if(Character.isLetter(chr) || Character.isDigit(chr))
+				return true;
+		}
+		return false;
+	}
 
 	public static long countUppercases(final String text){
 		return text.chars()
@@ -41,79 +51,31 @@ public class StringHelper{
 			.count();
 	}
 
+	//Classify the casing of a given string (ignoring characters for which no upper-/lowercase distinction exists)
 	public static Casing classifyCasing(final String text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
-		int lower = 0;
-		int upper = 0;
-		for(final char chr : text.toCharArray())
-			if(Character.isAlphabetic(chr)){
-				if(Character.isLowerCase(chr))
-					lower ++;
-				else if(Character.isUpperCase(chr))
-					upper ++;
-			}
-		if(upper == 0)
+		final long upper = text.chars()
+			.filter(chr -> Character.isLetter(chr) && Character.isUpperCase(chr))
+			.count();
+		if(upper == 0l)
 			return Casing.LOWER_CASE;
 
-		final boolean fistCapital = (Character.isUpperCase(text.charAt(0)));
-		if(fistCapital && upper == 1)
+		final boolean startsWithUppercase = Character.isUpperCase(text.charAt(0));
+		if(startsWithUppercase && upper == 1l)
 			return Casing.TITLE_CASE;
 
-		if(lower == 0)
+		final long lower = text.chars()
+			//Unicode modifier letter apostrophe is considered as an uppercase letter, but should be regarded as caseless,
+			//so it has to be excluded
+			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE
+				&& Character.isLowerCase(chr))
+			.count();
+		if(lower == 0l)
 			return Casing.ALL_CAPS;
 
-		return (fistCapital? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
-	}
-
-	/**
-	 * Finds the length and the index at which starts the Longest Common Substring
-	 *
-	 * @param keyA	Character sequence A
-	 * @param keyB	Character sequence B
-	 * @return	The indexes of keyA and keyB of the start of the longest common substring between <code>A</code> and <code>B</code>
-	 */
-	public static Pair<Integer, Integer> longestCommonSubstring(final String keyA, final String keyB){
-		final int m = keyA.length();
-		final int n = keyB.length();
-
-		if(m < n){
-			final Pair<Integer, Integer> indexes = longestCommonSubstring(keyB, keyA);
-			return Pair.of(indexes.getRight(), indexes.getLeft());
-		}
-
-		//matrix to store result of two consecutive rows at a time
-		final int[][] len = new int[2][n];
-		int currentRow = 0;
-
-		//for a particular value of i and j, len[currRow][j] stores length of LCS in string X[0..i] and Y[0..j]
-		int lcsMaxLength = 0;
-		int lcsIndexA = -1;
-		int lcsIndexB = -1;
-		for(int i = 0; i < m; i ++){
-			for(int j = 0; j < n; j ++){
-				final int cost;
-				if(keyA.charAt(i) != keyB.charAt(j))
-					cost = 0;
-				else if(i == 0 || j == 0)
-					cost = 1;
-				else
-					cost = len[currentRow][j - 1] + 1;
-				len[1 - currentRow][j] = cost;
-
-				if(cost > lcsMaxLength){
-					lcsMaxLength = cost;
-
-					lcsIndexA = i;
-					lcsIndexB = j;
-				}
-			}
-
-			//make current row as previous row and previous row as new current row
-			currentRow = 1 - currentRow;
-		}
-		return Pair.of(lcsIndexA, lcsIndexB);
+		return (startsWithUppercase? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
 	}
 
 	public static String longestCommonPrefix(final Collection<String> texts){
@@ -124,7 +86,8 @@ public class StringHelper{
 		return longestCommonAffix(texts, StringHelper::commonSuffix);
 	}
 
-	private static String longestCommonAffix(final Collection<String> texts, final BiFunction<String, String, String> commonAffix){
+	private static String longestCommonAffix(final Collection<String> texts,
+			final BiFunction<String, String, String> commonAffix){
 		String lcs = null;
 		if(!texts.isEmpty()){
 			final Iterator<String> itr = texts.iterator();
@@ -136,8 +99,8 @@ public class StringHelper{
 	}
 
 	/**
-	 * Returns the longest string {@code suffix} such that {@code a.toString().endsWith(suffix) &&
-	 * b.toString().endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
+	 * Returns the longest string {@code suffix} such that {@code a.endsWith(suffix) &&
+	 * b.endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common suffix, returns the empty string.
 	 */
 	private static String commonSuffix(final String a, final String b){
@@ -187,10 +150,12 @@ public class StringHelper{
 	}
 
 	public static String removeCombiningDiacriticalMarks(final String word){
-		return PatternHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS, StringUtils.EMPTY);
+		return RegexHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
+			StringUtils.EMPTY);
 	}
 
-	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit, final String ellipsis){
+	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit,
+			final String ellipsis){
 		return Collector.of(ArrayList::new,
 			(l, e) -> {
 				if(l.size() < limit)
@@ -209,6 +174,28 @@ public class StringHelper{
 	}
 
 
+	public static byte[] getRawBytes(final String text){
+		return text.getBytes(StandardCharsets.UTF_8);
+	}
+
+	public static int rawBytesLength(final CharSequence sequence){
+		int count = 0;
+		for(int i = 0; i < sequence.length(); i ++){
+			final char ch = sequence.charAt(i);
+			if(ch <= 0x7F)
+				count ++;
+			else if(ch <= 0x07FF)
+				count += 2;
+			else if(Character.isHighSurrogate(ch)){
+				count += 4;
+				i ++;
+			}
+			else
+				count += 3;
+		}
+		return count;
+	}
+
 	/**
 	 * Converts an array of bytes into a string representing the hexadecimal values of each byte in order
 	 *
@@ -216,7 +203,7 @@ public class StringHelper{
 	 * @return	The hexadecimal characters
 	 */
 	public static String byteArrayToHexString(final byte[] byteArray){
-		final StringBuilder sb = new StringBuilder(byteArray.length << 1);
+		final StringBuffer sb = new StringBuffer(byteArray.length << 1);
 		for(final byte b : byteArray){
 			sb.append(Character.forDigit((b >> 4) & 0x0F, 16));
 			sb.append(Character.forDigit((b & 0x0F), 16));
@@ -224,15 +211,45 @@ public class StringHelper{
 		return sb.toString();
 	}
 
+	//NOTE: `bytes` should be non-negative (no check is done)
 	public static String byteCountToHumanReadable(final long bytes){
-		final long b = (bytes == Long.MIN_VALUE? Long.MAX_VALUE: Math.abs(bytes));
-		return (b < 1024l? bytes + " B":
-			b <= 0xFFFCCCCCCCCCCCCl >> 40? String.format(Locale.ROOT, "%.1f KiB", bytes / 0x1p10):
-			b <= 0xFFFCCCCCCCCCCCCl >> 30? String.format(Locale.ROOT, "%.1f MiB", bytes / 0x1p20):
-			b <= 0xFFFCCCCCCCCCCCCl >> 20? String.format(Locale.ROOT, "%.1f GiB", bytes / 0x1p30):
-			b <= 0xFFFCCCCCCCCCCCCl >> 10? String.format(Locale.ROOT, "%.1f TiB", bytes / 0x1p40):
-			b <= 0xFFFCCCCCCCCCCCCl? String.format(Locale.ROOT, "%.1f PiB", (bytes >> 10) / 0x1p40):
-			String.format(Locale.ROOT, "%.1f EiB", (bytes >> 20) / 0x1p40));
+		if(bytes < 1024l)
+			return bytes + " B";
+
+		final int exponent = (int)(Math.log(bytes) / Math.log(1024.));
+		final char prefix = "KMGTPE".charAt(exponent - 1);
+		final double divisor = Math.pow(1024., exponent);
+		final double result = bytes / divisor;
+		return String.format(Locale.ROOT, (result < 100? "%.1f": "%.0f") + " %ciB", result, prefix);
+	}
+
+	//Find the maximum consecutive repeating character in given string
+	public static int maxRepeating(final String text, final char chr){
+		final int n = text.length();
+		int count = 0;
+		int currentCount = 1;
+		//traverse string except last character
+		for(int i = 0; i < n; i ++){
+			//if current character matches with next
+			if(i < n - 1 && text.charAt(i) == chr && text.charAt(i + 1) == chr)
+				currentCount ++;
+			//if doesn't match, update result (if required) and reset count
+			else{
+				if(currentCount > count)
+					count = currentCount;
+				currentCount = 1;
+			}
+		}
+		return count;
+	}
+
+	public static String removeAll(final String text, final char charToRemove){
+		final String strToRemove = Character.toString(charToRemove);
+		final StringBuffer sb = new StringBuffer(text);
+		int index = 0;
+		while((index = sb.indexOf(strToRemove, index)) >= 0)
+			sb.deleteCharAt(index --);
+		return sb.toString();
 	}
 
 }

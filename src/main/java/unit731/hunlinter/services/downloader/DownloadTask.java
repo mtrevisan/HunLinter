@@ -25,29 +25,28 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception{
+	protected Void doInBackground(){
 		try{
 			listener.startCheckUpdates();
 
-			final URL url = new URL(remoteObject.downloadUrl);
-			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
-			final int responseCode = httpConnection.getResponseCode();
-			if(responseCode != HttpURLConnection.HTTP_OK)
+			if(!DownloaderHelper.hasInternetConnectivity())
 				throw new IOException("Cannot connect to server");
 
 			listener.startDownloads(remoteObject);
 
+			final URL url = new URL(remoteObject.downloadUrl);
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
-			final FileOutputStream fos = new FileOutputStream(localPath);
-			final FileChannel fileChannel = fos.getChannel();
-			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
-			fileChannel.close();
-			fos.close();
+			try(
+					final FileOutputStream fos = new FileOutputStream(localPath);
+					final FileChannel fileChannel = fos.getChannel();
+					){
+				fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+			}
 		}
 		catch(final Exception e){
-			cancel(true);
-
 			listener.failed(e);
+
+			cancel(true);
 		}
 		return null;
 	}
@@ -66,10 +65,10 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		return contentLength;
 	}
 
-	private void cancelTask(){
-		cancel(true);
-
+	public void cancelTask(){
 		listener.stopped();
+
+		cancel(true);
 	}
 
 	@Override
@@ -79,8 +78,6 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 	@Override
 	protected void done(){
-		setProgress(100);
-
 		if(!isCancelled()){
 			try{
 				listener.validatingFile(remoteObject, localPath);

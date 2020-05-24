@@ -2,13 +2,13 @@ package unit731.hunlinter.parsers.affix;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -20,14 +20,15 @@ import unit731.hunlinter.parsers.affix.handlers.ConversionTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.CopyOverAsNumberHandler;
 import unit731.hunlinter.parsers.affix.handlers.CopyOverHandler;
 import unit731.hunlinter.parsers.affix.handlers.Handler;
+import unit731.hunlinter.parsers.affix.handlers.RelationTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
-import unit731.hunlinter.services.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.PatternHelper;
+import unit731.hunlinter.services.RegexHelper;
 
 
 /**
@@ -35,19 +36,21 @@ import unit731.hunlinter.services.PatternHelper;
  *		General:
  *			SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
  *		Suggestions:
- *			TRY (only read), NOSUGGEST (only read), REP
+ *			TRY (only read), NOSUGGEST (only read), REP, MAP (only read)
  *		Compounding:
  *			BREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG,
- *			COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE,
- *			FORCEUCASE
+ *			COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE,
+ *			SIMPLIFIEDTRIPLE, FORCEUCASE
  *		Affix creation:
  *			PFX, SFX
  *		Others:
  *			CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
+ *
+ * @see <a href="http://manpages.ubuntu.com/manpages/trusty/en/man4/hunspell.4.html">Ubuntu manuals 4</a>
  */
 public class AffixParser{
 
-	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non–comment line in the affix file must be a 'SET charset', was: ''{0}''");
+	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: ''{0}''");
 	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1,number,#}");
 
 	private static final String NO_LANGUAGE = "xxx";
@@ -55,8 +58,8 @@ public class AffixParser{
 	private static final String START = "^";
 	private static final String END = "$";
 
-	private static final Pattern PATTERN_ISO639_1 = PatternHelper.pattern("([a-z]{2})");
-	private static final Pattern PATTERN_ISO639_2 = PatternHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
+	private static final Pattern PATTERN_ISO639_1 = RegexHelper.pattern("([a-z]{2})");
+	private static final Pattern PATTERN_ISO639_2 = RegexHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
 	private static final Handler COPY_OVER = new CopyOverHandler();
 	private static final Handler COPY_OVER_AS_NUMBER = new CopyOverAsNumberHandler();
@@ -67,6 +70,7 @@ public class AffixParser{
 	private static final Handler REPLACEMENT_TABLE = new ConversionTableHandler(AffixOption.REPLACEMENT_TABLE);
 	private static final Handler INPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.INPUT_CONVERSION_TABLE);
 	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.OUTPUT_CONVERSION_TABLE);
+	private static final Handler RELATION_TABLE = new RelationTableHandler(AffixOption.RELATION_TABLE);
 
 	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new HashMap<>();
 	static{
@@ -94,7 +98,7 @@ public class AffixParser{
 //		PARSING_HANDLERS.put(AffixOption.NO_NGRAM_SUGGEST, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixOption.SUGGESTIONS_WITH_DOTS, COPY_OVER);
 		PARSING_HANDLERS.put(AffixOption.REPLACEMENT_TABLE, REPLACEMENT_TABLE);
-//		PARSING_HANDLERS.put(AffixOption.MAP_TABLE, MAP);
+		PARSING_HANDLERS.put(AffixOption.RELATION_TABLE, RELATION_TABLE);
 //		PARSING_HANDLERS.put(AffixOption.PHONE_TABLE, MAP);
 //		PARSING_HANDLERS.put(AffixOption.WARN, MAP);
 //		PARSING_HANDLERS.put(AffixOption.FORBID_WARN, MAP);
@@ -149,33 +153,34 @@ public class AffixParser{
 	 * @param affFile	The content of the affix file
 	 * @param configurationLanguage    The language implemented by the affix file
 	 * @throws IOException	If an I/O error occurs
-	 * @throws HunLintException   If something is wrong while parsing the file (eg. a missing rule)
+	 * @throws LinterException   If something is wrong while parsing the file (eg. a missing rule)
 	 */
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
-		data.clear();
+		clear();
 
+		int index = 0;
 		boolean encodingRead = false;
 		final Charset charset = FileHelper.determineCharset(affFile.toPath());
-		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
-			String line;
-			while((line = br.readLine()) != null){
-				line = ParserHelper.cleanLine(line);
-				if(line.isEmpty())
+		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+			while(scanner.hasNextLine()){
+				final String line = scanner.nextLine();
+				index ++;
+				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
 				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
-					throw new HunLintException(BAD_FIRST_LINE.format(new Object[]{line}));
+					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
-				final ParsingContext context = new ParsingContext(line, br);
+				final ParsingContext context = new ParsingContext(line, index, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
-						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
+						index += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
-						throw new HunLintException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), br.getLineNumber()}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), index}));
 					}
 				}
 			}
@@ -189,9 +194,6 @@ public class AffixParser{
 		data.close();
 
 		data.verify();
-
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
-//7 490 848 B
 	}
 
 	private void postProcessData(final File affFile){
@@ -224,9 +226,9 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.LANGUAGE)){
 			//try to infer language from filename
 			final String filename = FilenameUtils.removeExtension(affFile.getName());
-			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
+			String[] languages = RegexHelper.extract(filename, PATTERN_ISO639_2);
 			if(languages.length == 0)
-				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
+				languages = RegexHelper.extract(filename, PATTERN_ISO639_1);
 			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 			data.addData(AffixOption.LANGUAGE, language);
 		}
@@ -273,6 +275,10 @@ public class AffixParser{
 
 	public AffixData getAffixData(){
 		return data;
+	}
+
+	public String getLanguage(){
+		return data.getLanguage();
 	}
 
 	public void clear(){

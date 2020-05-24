@@ -1,6 +1,6 @@
 package unit731.hunlinter.parsers.enums;
 
-import java.util.Arrays;
+import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public enum AffixOption{
@@ -42,7 +42,7 @@ public enum AffixOption{
 //	NO_NGRAM_SUGGEST("NONGRAMSUGGEST"),
 //	SUGGESTIONS_WITH_DOTS("SUGSWITHDOTS"),
 	REPLACEMENT_TABLE("REP"),
-//	MAP_TABLE("MAP"),
+	RELATION_TABLE("MAP"),
 //	PHONE_TABLE("PHONE"),
 //	WARN("WARN"),
 //	FORBID_WARN("FORBIDWARN"),
@@ -88,7 +88,7 @@ public enum AffixOption{
 	/** Forbid word duplicates in compounds */
 	FORBID_DUPLICATES_IN_COMPOUND("CHECKCOMPOUNDDUP"),
 	/**
-	 * Forbid compounding if the (usually bad) compound word may be a non–compound word with a REP substitution (useful for languages with
+	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP substitution (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
 	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
@@ -157,14 +157,15 @@ public enum AffixOption{
 	}
 
 	public static AffixOption createFromCode(final String code){
-		return Arrays.stream(values())
-			.filter(option -> option.code.equals(code))
-			.findFirst()
-			.orElse(null);
+		return match(values(), option -> option.code.equals(code));
 	}
 
 	public String getCode(){
 		return code;
+	}
+
+	public boolean is(final String code){
+		return this.code.equals(code);
 	}
 
 }

@@ -4,17 +4,16 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.workers.exceptions.HunLintException;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag must be in {0} encoding: was ''{1}''");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be in {0} encoding: was ''{1}''");
-	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_ONE = new MessageFormat("Flag must be of length one and in {0} encoding: was ''{1}''");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: ''{1}''");
+	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule should be in {0} encoding: was ''{1}''");
+	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_ONE = new MessageFormat("Flag should be of length one and in {0} encoding: was ''{1}''");
 
 
 	private final Charset charset;
@@ -27,6 +26,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	private static class SingletonHelperUTF8{
 		private static final CharsetParsingStrategy INSTANCE = new CharsetParsingStrategy(StandardCharsets.UTF_8);
 	}
+
 
 	public static CharsetParsingStrategy getASCIIInstance(){
 		return SingletonHelperASCII.INSTANCE;
@@ -46,7 +46,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(!canEncode(flags))
-			throw new HunLintException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
+			throw new LinterException(BAD_FORMAT.format(new Object[]{charset.displayName(), flags}));
 
 		final String[] singleFlags = extractFlags(flags);
 
@@ -56,26 +56,19 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 	}
 
 	private String[] extractFlags(final String flags){
-		return IntStream.range(0, flags.length())
-			.mapToObj(i -> Character.toString(flags.charAt(i)))
-			.toArray(String[]::new);
+		final int size = flags.length();
+		final String[] list = new String[size];
+		for(int i = 0; i < size; i ++)
+			list[i] = String.valueOf(flags.charAt(i));
+		return list;
 	}
 
 	@Override
 	public void validate(final String flag){
-		if(flag == null || flag.length() != 1 || !canEncode(flag))
-			throw new HunLintException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
-	}
-
-	@Override
-	public String joinFlags(final String[] flags){
-		if(flags == null || flags.length == 0)
-			return StringUtils.EMPTY;
-
-		for(final String flag : flags)
-			validate(flag);
-
-		return StringUtils.join(flags, StringUtils.EMPTY);
+		if(flag == null || flag.length() != 1)
+			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_ONE.format(new Object[]{charset.displayName(), flag}));
+		if(!canEncode(flag))
+			throw new LinterException(BAD_FORMAT.format(new Object[]{charset.displayName(), flag}));
 	}
 
 	@Override
@@ -83,19 +76,15 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		checkCompoundValidity(compoundRule);
 
 		//NOTE: same as compoundRule.split(StringUtils.EMPTY) but faster
-		final int size = compoundRule.length();
-		final String[] result = new String[size];
-		for(int i = 0; i < size; i ++)
-			result[i] = String.valueOf(compoundRule.charAt(i));
-		return result;
+		return extractFlags(compoundRule);
 	}
 
 	private void checkCompoundValidity(final String compoundRule){
 		if(!canEncode(compoundRule))
-			throw new HunLintException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
+			throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
 	}
 
-	public boolean canEncode(final String cs){
+	private boolean canEncode(final String cs){
 		final CharsetEncoder encoder = charset.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);
