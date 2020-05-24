@@ -102,18 +102,17 @@ public class DownloaderHelper{
 
 	public static GITFileData extractVersionData(final Version version) throws Exception{
 		//find last build by filename
-		GITFileData fileData;
 		final String filename = "-" + version + DEFAULT_PACKAGING_EXTENSION;
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).openStream()){
 			final byte[] dataBytes = is.readAllBytes();
-			fileData = extractData(filename, dataBytes);
+			final GITFileData fileData = extractData(filename, dataBytes);
+
+			if(fileData == null)
+				throw new Exception(ALREADY_UPDATED);
+
+			fileData.version = version;
+			return fileData;
 		}
-
-		if(fileData == null)
-			throw new Exception(ALREADY_UPDATED);
-
-		fileData.version = version;
-		return fileData;
 	}
 
 	public static byte[] readFileContent(final String localPath) throws IOException{
