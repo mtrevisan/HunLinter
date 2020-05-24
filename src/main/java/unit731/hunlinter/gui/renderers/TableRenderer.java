@@ -32,6 +32,14 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 		setText(value != null? String.valueOf(value): null);
 
+		//FIXME
+		try{
+			table.setRowHeight(row, getPreferredSize().height + 4);
+		}
+		catch(final Exception e){
+			e.printStackTrace();
+		}
+
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)? BORDER_ERROR: null);
 
