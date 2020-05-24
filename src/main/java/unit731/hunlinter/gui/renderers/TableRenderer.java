@@ -32,18 +32,27 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 		setText(value != null? String.valueOf(value): null);
 
-		//FIXME
-		try{
-			table.setRowHeight(row, getPreferredSize().height + 4);
-		}
-		catch(final Exception e){
-			e.printStackTrace();
-		}
+		adjustRowHeight(table, row);
 
 		//draw border on error
 		setBorder(column == 0 && errors.contains(row)? BORDER_ERROR: null);
 
 		return this;
+	}
+
+	private void adjustRowHeight(final JTable table, final int rowIndex){
+		//FIXME
+		//DON'T change the state of a table in your renderer, ever. Instead, listen to changes on the tableModel - that's the only time a rowHeight might change - and update the height/s as appropriate
+		//https://www.codeproject.com/Messages/2665651/Resizing-dynamically-JTable-rows-with-setRowHeight.aspx
+		final int rowHeight = getPreferredSize().height + 4;
+		if(rowHeight != table.getRowHeight(rowIndex)){
+			try{
+				table.setRowHeight(rowIndex, rowHeight);
+			}
+			catch(final Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
