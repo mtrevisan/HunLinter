@@ -81,7 +81,7 @@ public enum AffixOption{
 	/** Allow twofold suffixes within compounds */
 	ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND("COMPOUNDMORESUFFIXES"),
 	/* Signs the compounds in the dictionary */
-	//FIXME if implemented, remember to uncomment from {@link AffixData#SINGLE_FLAG_TAGS}
+	//NOTE: if implemented, remember to uncomment from {@link AffixData#SINGLE_FLAG_TAGS}
 //	COMPOUND_ROOT("COMPOUNDROOT"),
 	/** Set maximum word count in a compound word (default is unlimited) */
 	COMPOUND_MAX_WORD_COUNT("COMPOUNDWORDMAX"),
@@ -138,7 +138,7 @@ public enum AffixOption{
 	 */
 	NEED_AFFIX_FLAG("NEEDAFFIX");
 	/* Signs affix rules and dictionary words (allomorphs) not used in morphological generation and root words removed from suggestion */
-	//FIXME if implemented, remember to uncomment from {@link AffixData#SINGLE_FLAG_TAGS}
+	//NOTE: if implemented, remember to uncomment from {@link AffixData#SINGLE_FLAG_TAGS}
 //	SUB_STANDARD_FLAG("SUBSTANDARD"),
 	/* Extends tokenizer of Hunspell command line interface with additional word character */
 //	WORD_CHARS("WORDCHARS"),
