@@ -42,14 +42,8 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	public void adjustRowHeight(final JTable table, final int rowIndex){
 		final int rowHeight = getPreferredSize().height + 4;
-		if(rowHeight != table.getRowHeight(rowIndex)){
-			try{
-				table.setRowHeight(rowIndex, rowHeight);
-			}
-			catch(final Exception e){
-				e.printStackTrace();
-			}
-		}
+		if(rowHeight > table.getRowHeight(rowIndex))
+			table.setRowHeight(rowIndex, rowHeight);
 	}
 
 }
