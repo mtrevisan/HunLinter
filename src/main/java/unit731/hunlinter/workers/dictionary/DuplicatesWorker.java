@@ -155,11 +155,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
 		bloomFilter.close();
-		bloomFilter.clear();
-		duplicatesBloomFilter.close();
-
 		final int totalInflections = bloomFilter.getAddedElements();
 		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		bloomFilter.clear();
+
+		duplicatesBloomFilter.close();
+
 		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
