@@ -74,11 +74,8 @@ public class ProjectLoaderAction extends AbstractAction{
 					dialog.setLocationRelativeTo(parentFrame);
 					dialog.setVisible(true);
 
-					if(!dialog.languageChosen()){
-						worker.cancel();
-
+					if(!dialog.languageChosen())
 						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
-					}
 				}
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
