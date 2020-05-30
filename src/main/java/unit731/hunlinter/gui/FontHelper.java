@@ -41,8 +41,10 @@ public class FontHelper{
 		ALL_FONTS = new ArrayList<>(familyNames.length);
 		for(final String familyName : familyNames){
 			final Font font = new Font(familyName, Font.PLAIN, 20);
+			//filter out non-plain fonts
 			//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
-			if(!GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+			if(font.isPlain()
+					&& !GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
 					&& !GlyphComparator.allIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
 				ALL_FONTS.add(font);
 			else
