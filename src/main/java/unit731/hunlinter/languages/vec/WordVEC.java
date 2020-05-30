@@ -193,8 +193,9 @@ public class WordVEC{
 		final int wordLength = word.length();
 		if(stressIndex >= 0
 				//filter out stress on last vowel of the word
-				&& stressIndex + 1 < wordLength && word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
+				&& stressIndex + 1 < wordLength
 				&& word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
+				&& word.charAt(stressIndex + 1) != HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE
 				&& !GraphemeVEC.isDiphtong(word)
 				&& !GraphemeVEC.isHyatus(word)
 				&& !RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
