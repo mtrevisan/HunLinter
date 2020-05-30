@@ -55,7 +55,7 @@ public class WordVEC{
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
-	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:ʼémo|g?(?:à(?:[pb]i[ae]?|be)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
+	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:[ʼg]émo|éb(?:e|ia)|g?(?:[àé](?:[pb]i[ae]?|[bd]e)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
 	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:[sx][éí]|stà|ér[aei]|(?:s[ae]r)?[àé])[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]|d[oiae])?$";
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou]))$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
