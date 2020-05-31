@@ -21,7 +21,7 @@ class NumericalParsingStrategy extends FlagParsingStrategy{
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was ''{0}''");
 
 
-	private static final int MAX_NUMERICAL_FLAG = 65_000;
+	private static final int MAX_NUMERICAL_FLAG = 65_535;
 
 	private static final String COMMA = ",";
 
