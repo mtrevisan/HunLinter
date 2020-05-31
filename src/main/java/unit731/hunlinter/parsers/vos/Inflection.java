@@ -21,6 +21,7 @@ public class Inflection extends DictionaryEntry{
 	private static final String POS_FIELD_PREFIX = ":";
 
 	public static final String POS_FSA_SEPARATOR = ",";
+	private static final String COMMA = ",";
 
 
 	private AffixEntry[] appliedRules;
@@ -29,7 +30,7 @@ public class Inflection extends DictionaryEntry{
 
 
 	public static Inflection createFromCompound(final String word, final String[] continuationFlags,
-			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
+			final DictionaryEntry[] compoundEntries){
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
 	}
@@ -165,11 +166,13 @@ public class Inflection extends DictionaryEntry{
 		return (compoundEntries != null && compoundEntries.length > 0);
 	}
 
-	public String toStringWithPartOfSpeechFields(){
+	public String toStringWithPartOfSpeechAndStem(){
 		final String[] pos = getMorphologicalFieldPartOfSpeech();
+		final String stem = getMorphologicalFieldStem();
 		if(pos.length > 0){
 			Arrays.sort(pos, Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + StringUtils.join(pos, StringUtils.SPACE);
+			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA)
+				+ StringUtils.SPACE + stem;
 		}
 		return word;
 	}

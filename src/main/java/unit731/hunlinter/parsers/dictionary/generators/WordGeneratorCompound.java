@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.Affixes;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -165,7 +164,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
 			final FixedArray<String>[] continuationFlags){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
@@ -173,7 +171,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		Inflection[] inflections;
 		final SimpleDynamicArray<String> flags = new SimpleDynamicArray(String.class, continuationFlags.length);
 		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::add));
-		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries, strategy);
+		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			inflections = new Inflection[]{p};
 		else{

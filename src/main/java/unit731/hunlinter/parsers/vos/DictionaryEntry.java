@@ -234,6 +234,16 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
+	public String getMorphologicalFieldStem(){
+		if(morphologicalFields != null){
+			final String tag = MorphologicalTag.STEM.getCode();
+			for(final String mf : morphologicalFields)
+				if(mf.startsWith(tag))
+					return mf;
+		}
+		return null;
+	}
+
 	public String[] getMorphologicalFieldPartOfSpeech(){
 		if(morphologicalFields == null)
 			return new String[0];

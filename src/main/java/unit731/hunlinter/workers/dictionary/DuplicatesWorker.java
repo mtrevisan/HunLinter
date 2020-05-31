@@ -137,7 +137,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				for(final Inflection inflection : inflections){
-					final String str = inflection.toStringWithPartOfSpeechFields();
+					final String str = inflection.toStringWithPartOfSpeechAndStem();
 					if(!bloomFilter.add(str))
 						duplicatesBloomFilter.add(str);
 				}
@@ -185,7 +185,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
 					result.ensureCapacity(result.size() + inflections.length);
 					for(final Inflection inflection : inflections){
-						final String text = inflection.toStringWithPartOfSpeechFields();
+						final String text = inflection.toStringWithPartOfSpeechAndStem();
 						if(duplicatesBloomFilter.contains(text))
 							result.add(new Duplicate(inflection, word, lineIndex));
 					}
@@ -252,7 +252,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechFields(),
+			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechAndStem(),
 				duplicate -> {
 					final List<Duplicate> list = new ArrayList<>(1);
 					list.add(duplicate);
