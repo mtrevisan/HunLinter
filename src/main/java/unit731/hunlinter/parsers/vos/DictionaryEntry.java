@@ -241,7 +241,7 @@ public class DictionaryEntry{
 				if(mf.startsWith(tag))
 					return mf;
 		}
-		return null;
+		return word;
 	}
 
 	public String[] getMorphologicalFieldPartOfSpeech(){
