@@ -568,6 +568,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@EventHandler
 	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
 		final Throwable cause = exceptionEvent.getCause();
+
+		//FIXME sometimes happens...
+		if(cause.getMessage() == null)
+			cause.printStackTrace();
+
 		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
 
 		if(cause instanceof ProjectNotFoundException){
