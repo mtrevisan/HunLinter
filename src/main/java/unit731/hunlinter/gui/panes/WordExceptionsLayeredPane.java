@@ -41,7 +41,7 @@ import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.components.JTagPanel;
+import unit731.hunlinter.gui.components.TagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
@@ -96,7 +96,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
       scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      tagPanel = new JTagPanel((changeType, tags) -> {
+      tagPanel = new TagPanel((changeType, tags) -> {
          final ExceptionsParser wexParser = parserManager.getWexParser();
          wexParser.modify(changeType, tags);
          try{
@@ -289,7 +289,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
    private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane scrollPane;
-   private unit731.hunlinter.gui.components.JTagPanel tagPanel;
+   private TagPanel tagPanel;
    private javax.swing.JTextField textField;
    // End of variables declaration//GEN-END:variables
 }

@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class JTagPanel extends JPanel{
+public class TagPanel extends JPanel{
 
 	private static final long serialVersionUID = 665517573169978352L;
 
@@ -50,11 +50,11 @@ public class JTagPanel extends JPanel{
 	private final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged;
 
 
-	public JTagPanel(){
+	public TagPanel(){
 		this(null);
 	}
 
-	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
+	public TagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
 		super();
 
 		this.tagsChanged = tagsChanged;

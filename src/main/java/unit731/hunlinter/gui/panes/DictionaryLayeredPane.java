@@ -25,7 +25,6 @@
 package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -38,8 +37,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.prefs.Preferences;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.components.LabeledPopupMenu;
 import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
 import unit731.hunlinter.gui.models.InflectionTableModel;
@@ -68,24 +70,27 @@ import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-/*
-TODO http://www.java2s.com/Tutorial/Java/0240__Swing/ListeningforClicksonaColumnHeaderinaJTableComponent.htm
- */
 public class DictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 7030870103355904749L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
 
-	private static final int HIDE_MORPHOLOGICAL_FIELDS_COLUMN = 1;
-	private static final int HIDE_APPLIED_RULES_COLUMNS = 2;
-
 	private static final String TAB = "\t";
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
+	private static final String COLUMN_MIN_WIDTH = "column.minWidth";
+	private static final String COLUMN_MAX_WIDTH = "column.maxWidth";
+	private static final String COLUMN_WIDTH = "column.width";
+	private static final String SHOW_MORPHOLOGICAL_FIELDS_COLUMN = "morphologicalFieldsColumn";
+	private static final String SHOW_APPLIED_RULE_COLUMNS = "appliedRuleColumns";
+
 
 	private final Debouncer<DictionaryLayeredPane> debouncer = new Debouncer<>(this::calculateInflections, DEBOUNCER_INTERVAL);
+
+	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
+
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -119,32 +124,69 @@ final int iconSize = 17;
 			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
 
-//			final JPopupMenu hideColumnsPopupMenu = new JPopupMenu("Show/hide columns");
-//			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Morphological fields column", 'M', hideColumnsPopupMenu,
-//				(evt, invoker) -> hideColumn(evt, invoker, HIDE_MORPHOLOGICAL_FIELDS_COLUMN)));
-//			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Applied rules columns", 'A', hideColumnsPopupMenu,
-//				(evt, invoker) -> hideColumn(evt, invoker, HIDE_APPLIED_RULES_COLUMNS)));
-//			GUIHelper.addPopupMenu(hideColumnsPopupMenu, scrollPane.getColumnHeader());
+			final JPopupMenu hideColumnsPopupMenu = new LabeledPopupMenu("Show/hide columns");
+			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Morphological fields",
+				preferences.getBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true), hideColumnsPopupMenu,
+				this::hideMorphologicalFieldsColumn));
+			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Applied rules",
+				preferences.getBoolean(SHOW_APPLIED_RULE_COLUMNS, true), hideColumnsPopupMenu,
+				this::hideAppliedRulesColumns));
+			GUIHelper.addPopupMenu(hideColumnsPopupMenu, table.getTableHeader());
 		}
 		catch(final IOException ignored){}
 
 		EventBusService.subscribe(DictionaryLayeredPane.this);
 	}
 
-//	private void hideColumn(final ActionEvent evt, final Component invoker, final int hideColumnKey){
-//		final TableColumn column = table.getColumn(hideColumnKey);
-//		final JCheckBox cb = (JCheckBox)evt.getSource();
-//		if(cb.isSelected()){
-//			column.setMinWidth(20);
-//			column.setMaxWidth(20);
-//			column.setWidth(20);
-//		}
-//		else{
-//			column.setMinWidth(0);
-//			column.setMaxWidth(0);
-//			column.setWidth(0);
-//		}
-//	}
+	private void hideMorphologicalFieldsColumn(final Component invoker){
+		final boolean showMorphologicalFieldsColumn = preferences.getBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true);
+
+		final TableColumn column = table.getColumnModel().getColumn(1);
+		storeDefaultColumnsWidth(column);
+
+		if(showMorphologicalFieldsColumn)
+			hideColumn(column);
+		else
+			setDefaultColumnsWidth(column);
+
+		preferences.putBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, !showMorphologicalFieldsColumn);
+	}
+
+	private void hideAppliedRulesColumns(final Component invoker){
+		final boolean showAppliedRuleColumns = preferences.getBoolean(SHOW_APPLIED_RULE_COLUMNS, true);
+
+		final TableColumnModel columnModel = table.getColumnModel();
+		storeDefaultColumnsWidth(columnModel.getColumn(1));
+
+		if(showAppliedRuleColumns)
+			for(int i = 2; i < 5; i ++)
+				hideColumn(columnModel.getColumn(i));
+		else
+			for(int i = 2; i < 5; i ++)
+				setDefaultColumnsWidth(columnModel.getColumn(i));
+
+		preferences.putBoolean(SHOW_APPLIED_RULE_COLUMNS, !showAppliedRuleColumns);
+	}
+
+	private void storeDefaultColumnsWidth(TableColumn column){
+		if(preferences.getInt(COLUMN_MIN_WIDTH, -1) < 0){
+			preferences.putInt(COLUMN_MIN_WIDTH, column.getMinWidth());
+			preferences.putInt(COLUMN_MAX_WIDTH, column.getMaxWidth());
+			preferences.putInt(COLUMN_WIDTH, column.getWidth());
+		}
+	}
+
+	private void setDefaultColumnsWidth(final TableColumn column){
+		column.setMinWidth(preferences.getInt(COLUMN_MIN_WIDTH, 15));
+		column.setMaxWidth(preferences.getInt(COLUMN_MAX_WIDTH, 2147483647));
+		column.setWidth(preferences.getInt(COLUMN_WIDTH, 182));
+	}
+
+	private void hideColumn(final TableColumn column){
+		column.setMinWidth(0);
+		column.setMaxWidth(0);
+		column.setWidth(0);
+	}
 
 	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
