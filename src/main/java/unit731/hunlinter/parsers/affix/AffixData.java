@@ -74,15 +74,26 @@ public class AffixData{
 
 	private final Map<String, Object> data = new HashMap<>();
 	private final Set<String> terminalAffixes = new HashSet<>();
+	private final Set<String> productableFlags = new HashSet<>();
 	private boolean closed;
 
 
 	void close(){
-		terminalAffixes.addAll(getStringData(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
-			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
-			AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
-			AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG, AffixOption.KEEP_CASE_FLAG,
-			AffixOption.NEED_AFFIX_FLAG));
+		terminalAffixes.addAll(getStringData(SINGLE_FLAG_TAGS));
+
+		productableFlags.addAll(data.keySet());
+		productableFlags.removeAll(Arrays.asList(AffixOption.CHARACTER_SET.getCode(), AffixOption.FLAG.getCode(),
+			AffixOption.COMPLEX_PREFIXES.getCode(), AffixOption.LANGUAGE.getCode(), AffixOption.ALIASES_FLAG.getCode(),
+			AffixOption.ALIASES_MORPHOLOGICAL_FIELD.getCode(), AffixOption.TRY.getCode(), AffixOption.NO_SUGGEST_FLAG.getCode(),
+			AffixOption.REPLACEMENT_TABLE.getCode(), AffixOption.RELATION_TABLE.getCode(), AffixOption.WORD_BREAK_CHARACTERS.getCode(),
+			AffixOption.COMPOUND_RULE.getCode(), AffixOption.COMPOUND_MINIMUM_LENGTH.getCode(),
+			AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND.getCode(), AffixOption.COMPOUND_MAX_WORD_COUNT.getCode(),
+			AffixOption.FORBID_DUPLICATES_IN_COMPOUND.getCode(), AffixOption.CHECK_COMPOUND_REPLACEMENT.getCode(),
+			AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND.getCode(), AffixOption.FORBID_TRIPLES_IN_COMPOUND.getCode(),
+			AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND.getCode(), AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG.getCode(),
+			AffixOption.FULLSTRIP.getCode(), AffixOption.KEEP_CASE_FLAG.getCode(), AffixOption.INPUT_CONVERSION_TABLE.getCode(),
+			AffixOption.OUTPUT_CONVERSION_TABLE.getCode()
+		));
 
 		closed = true;
 	}
@@ -138,8 +149,8 @@ public class AffixData{
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(final AffixOption... keys){
-		final List<String> strings = new ArrayList<>(keys.length);
+	private List<String> getStringData(final List<AffixOption> keys){
+		final List<String> strings = new ArrayList<>(keys.size());
 		forEach(keys, key -> strings.add(getData(key)));
 		return strings;
 	}
@@ -374,6 +385,10 @@ public class AffixData{
 
 	public String getForceCompoundUppercaseFlag(){
 		return getData(AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG);
+	}
+
+	public Set<String> getProductableFlag(){
+		return productableFlags;
 	}
 
 	public List<RuleEntry> getRuleEntries(){

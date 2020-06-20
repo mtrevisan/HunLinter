@@ -26,13 +26,19 @@ package unit731.hunlinter.workers.dictionary;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.beust.jcommander.Strings;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -47,12 +53,14 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Dictionary linter";
 
+	private static final MessageFormat UNUSED_FLAGS = new MessageFormat("Unused flags: {0}");
+
 
 	public DictionaryLinterWorker(final ParserManager parserManager){
-		this(parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator());
+		this(parserManager.getAffParser(), parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator());
 	}
 
-	public DictionaryLinterWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
+	public DictionaryLinterWorker(final AffixParser affParser, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
 			final WordGenerator wordGenerator){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
@@ -62,6 +70,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
 
+		//collectors of flags
+		final Set<String> flags = ConcurrentHashMap.newKeySet();
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
@@ -69,6 +79,9 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Inflection inflection : inflections){
+				if(inflection.getContinuationFlags() != null)
+					flags.addAll(Arrays.asList(inflection.getContinuationFlags()));
+
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());
 				}
@@ -87,6 +100,13 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			processLines(dicPath, charset, lineProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+
+			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlag();
+			unusedFlags.removeAll(flags);
+			if(!unusedFlags.isEmpty())
+				manageException(new LinterException(
+					UNUSED_FLAGS.format(new Object[]{Strings.join(", ", unusedFlags.toArray())}),
+					IndexDataPair.NULL_INDEX_DATA_PAIR));
 
 			return null;
 		};

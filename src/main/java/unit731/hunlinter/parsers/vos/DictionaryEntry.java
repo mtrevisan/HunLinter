@@ -176,6 +176,10 @@ public class DictionaryEntry{
 		return (match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
 	}
 
+	public String[] getContinuationFlags(){
+		return continuationFlags;
+	}
+
 	public int getContinuationFlagCount(){
 		return (continuationFlags != null? continuationFlags.length: 0);
 	}

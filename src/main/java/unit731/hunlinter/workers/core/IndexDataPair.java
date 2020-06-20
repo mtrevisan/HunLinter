@@ -30,6 +30,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class IndexDataPair<T>{
 
+	public static final IndexDataPair<Object> NULL_INDEX_DATA_PAIR = new IndexDataPair<>(-1, null);
+
+
 	private final int index;
 	private final T data;
 

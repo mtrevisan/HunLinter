@@ -127,7 +127,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final int index = data.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "{}{}: {}", e.getMessage(), lineText, data.getData());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), e.getMessage(),
+				lineText, data.getData());
 		}
 		else
 			e.printStackTrace();
