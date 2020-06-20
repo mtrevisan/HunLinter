@@ -25,6 +25,7 @@
 package unit731.hunlinter.gui.panes;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -74,6 +76,9 @@ public class DictionaryLayeredPane extends JLayeredPane{
 	private static final long serialVersionUID = 7030870103355904749L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);
+
+	private static final int HIDE_MORPHOLOGICAL_FIELDS_COLUMN = 1;
+	private static final int HIDE_APPLIED_RULES_COLUMNS = 2;
 
 	private static final String TAB = "\t";
 
@@ -113,13 +118,35 @@ final int iconSize = 17;
 			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
 			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
+
+//			final JPopupMenu hideColumnsPopupMenu = new JPopupMenu("Show/hide columns");
+//			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Morphological fields column", 'M', hideColumnsPopupMenu,
+//				(evt, invoker) -> hideColumn(evt, invoker, HIDE_MORPHOLOGICAL_FIELDS_COLUMN)));
+//			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Applied rules columns", 'A', hideColumnsPopupMenu,
+//				(evt, invoker) -> hideColumn(evt, invoker, HIDE_APPLIED_RULES_COLUMNS)));
+//			GUIHelper.addPopupMenu(hideColumnsPopupMenu, scrollPane.getColumnHeader());
 		}
 		catch(final IOException ignored){}
 
 		EventBusService.subscribe(DictionaryLayeredPane.this);
 	}
 
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+//	private void hideColumn(final ActionEvent evt, final Component invoker, final int hideColumnKey){
+//		final TableColumn column = table.getColumn(hideColumnKey);
+//		final JCheckBox cb = (JCheckBox)evt.getSource();
+//		if(cb.isSelected()){
+//			column.setMinWidth(20);
+//			column.setMaxWidth(20);
+//			column.setWidth(20);
+//		}
+//		else{
+//			column.setMinWidth(0);
+//			column.setMaxWidth(0);
+//			column.setWidth(0);
+//		}
+//	}
+
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       inputLabel = new javax.swing.JLabel();

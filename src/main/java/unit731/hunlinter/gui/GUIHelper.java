@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -95,12 +96,21 @@ public class GUIHelper{
 	}
 
 
+	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final JPopupMenu popupMenu,
+			final BiConsumer<ActionEvent, Component> fnCallback) throws IOException{
+		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
+		menuItem.addActionListener(e -> fnCallback.accept(e, popupMenu.getInvoker()));
+		return menuItem;
+	}
+
 	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize,
 			final JPopupMenu popupMenu, final Consumer<Component> fnCallback) throws IOException{
 		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
-		final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
-		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-		menuItem.setIcon(icon);
+		if(iconURL != null){
+			final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
+			final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+			menuItem.setIcon(icon);
+		}
 		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
 		return menuItem;
 	}
@@ -123,6 +133,11 @@ public class GUIHelper{
 	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
 			throws IOException{
 		return createPopupMenu("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
+	}
+
+	public static JMenuItem createCheckBoxMenu(final String text, final char mnemonic, final JPopupMenu popupMenu, final BiConsumer<ActionEvent, Component> fnCallback)
+			throws IOException{
+		return createPopupMenu(text, mnemonic, popupMenu, fnCallback);
 	}
 
 	public static void copyCallback(final Component invoker){
