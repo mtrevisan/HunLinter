@@ -27,7 +27,7 @@
 
 		<!-- Apache -->
 		<apache.commons-text.version>1.8</apache.commons-text.version>
-		<apache.commons-io.version>2.6</apache.commons-io.version>
+		<apache.commons-io.version>2.7</apache.commons-io.version>
 
 		<!-- FastUtil -->
 <!--		<unimi.fastutil.version>8.3.1</fastutil.version>-->
@@ -54,6 +54,7 @@
 	<build>
 		<plugins>
 			<!-- Source -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -68,12 +69,14 @@
 				</executions>
 			</plugin>
 			<!-- Deploy -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>${maven-deploy-plugin.version}</version>
 			</plugin>
 			<!-- JavaDoc -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -92,6 +95,7 @@
 				</configuration>
 			</plugin>
 			<!-- Templating -->
+			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/templating-maven-plugin -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>templating-maven-plugin</artifactId>
@@ -106,6 +110,7 @@
 				</executions>
 			</plugin>
 			<!-- Shade -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -158,6 +163,7 @@
 				</executions>
 			</plugin>
 			<!-- Compiler -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -221,11 +227,12 @@
 		</dependency>
 
 		<!-- Morfologik -->
-		<dependency>
-			<groupId>org.carrot2</groupId>
-			<artifactId>morfologik-tools</artifactId>
-			<version>${carrot2.morfologik-tools.version}</version>
-		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.carrot2/morfologik-tools -->
+<!--		<dependency>-->
+<!--			<groupId>org.carrot2</groupId>-->
+<!--			<artifactId>morfologik-tools</artifactId>-->
+<!--			<version>${carrot2.morfologik-tools.version}</version>-->
+<!--		</dependency>-->
 
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
@@ -242,6 +249,7 @@
 		</dependency>
 
 		<!-- Memory usage -->
+		<!-- https://mvnrepository.com/artifact/com.carrotsearch/java-sizeof -->
 		<dependency>
 			<groupId>com.carrotsearch</groupId>
 			<artifactId>java-sizeof</artifactId>
