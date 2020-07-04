@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.beust.jcommander.Strings;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixParser;
@@ -105,7 +105,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			unusedFlags.removeAll(flags);
 			if(!unusedFlags.isEmpty())
 				manageException(new LinterException(
-					UNUSED_FLAGS.format(new Object[]{Strings.join(", ", unusedFlags.toArray())}),
+					UNUSED_FLAGS.format(new Object[]{StringUtils.join(unusedFlags, ", ")}),
 					IndexDataPair.NULL_INDEX_DATA_PAIR));
 
 			return null;

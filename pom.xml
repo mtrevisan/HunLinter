@@ -228,11 +228,11 @@
 
 		<!-- Morfologik -->
 		<!-- https://mvnrepository.com/artifact/org.carrot2/morfologik-tools -->
-<!--		<dependency>-->
-<!--			<groupId>org.carrot2</groupId>-->
-<!--			<artifactId>morfologik-tools</artifactId>-->
-<!--			<version>${carrot2.morfologik-tools.version}</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.carrot2</groupId>
+			<artifactId>morfologik-tools</artifactId>
+			<version>${carrot2.morfologik-tools.version}</version>
+		</dependency>
 
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
