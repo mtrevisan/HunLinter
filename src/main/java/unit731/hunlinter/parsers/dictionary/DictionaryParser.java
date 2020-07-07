@@ -93,16 +93,16 @@ public class DictionaryParser{
 		return comparator;
 	}
 
-	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
+	public synchronized Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-	public final boolean removeBoundary(final int boundaryIndex){
+	public synchronized boolean removeBoundary(final int boundaryIndex){
 		return (boundaries.remove(boundaryIndex) != null);
 	}
 
-	public final int getBoundaryIndex(final int lineIndex){
+	public synchronized int getBoundaryIndex(final int lineIndex){
 		if(boundaries.isEmpty())
 			calculateDictionaryBoundaries();
 
@@ -151,17 +151,17 @@ public class DictionaryParser{
 		}
 	}
 
-	public final int getNextBoundaryIndex(final int lineIndex){
+	public synchronized int getNextBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.higherEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public final int getPreviousBoundaryIndex(final int lineIndex){
+	public synchronized int getPreviousBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.lowerEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public final boolean isInBoundary(final int lineIndex){
+	public synchronized boolean isInBoundary(final int lineIndex){
 		return (searchBoundary(lineIndex) != null);
 	}
 
@@ -171,11 +171,11 @@ public class DictionaryParser{
 	}
 
 
-	public final void clear(){
+	public void clear(){
 		clearBoundaries();
 	}
 
-	public final void clearBoundaries(){
+	public synchronized void clearBoundaries(){
 		boundaries.clear();
 	}
 
