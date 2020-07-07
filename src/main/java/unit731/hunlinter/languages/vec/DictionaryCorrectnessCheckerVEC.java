@@ -141,11 +141,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
 		final String[] subwords = StringUtils.split(derivedWord, WORD_SEPARATORS);
 		for(final String subword : subwords){
-			if(!rulesLoader.containsMultipleStressedWords(subword)){
-				final int stresses = WordVEC.countStresses(subword);
-				if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
-					throw new LinterException(MULTIPLE_STRESSES.format(new Object[]{inflection.getWord()}));
-			}
+			stressCheck(subword, inflection);
 
 			final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(subword);
 			if(!subword.equals(unmarkedDefaultStressWord))
@@ -223,25 +219,25 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
 				throw new LinterException(MULTIPLE_STRESSES.format(new Object[]{inflection.getWord()}));
 
-			final String appliedRuleFlag = getLastAppliedRule(inflection);
-			if(appliedRuleFlag != null){
+			final AffixEntry appliedRule = getLastAppliedRule(inflection);
+			if(appliedRule != null){
+				final String appliedRuleFlag = appliedRule.getFlag();
 				//retrieve last applied rule
 				if(stresses == 0 && rulesLoader.containsHasToContainStress(appliedRuleFlag))
 					throw new LinterException(MISSING_STRESS.format(new Object[]{inflection.getWord(),
 						appliedRuleFlag}));
-				if(stresses > 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
+				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
 					throw new LinterException(ALREADY_PRESENT_STRESS.format(new Object[]{inflection.getWord(),
 						appliedRuleFlag}));
 			}
 		}
 	}
 
-	private String getLastAppliedRule(final Inflection inflection){
-		String appliedRuleFlag = null;
+	private AffixEntry getLastAppliedRule(final Inflection inflection){
+		AffixEntry appliedRuleFlag = null;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
 		if(appliedRules != null)
-			appliedRuleFlag = appliedRules[appliedRules.length - 1]
-				.getFlag();
+			appliedRuleFlag = appliedRules[appliedRules.length - 1];
 		return appliedRuleFlag;
 	}
 
