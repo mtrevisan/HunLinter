@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-public class Memoizer<T, U>{
+public class Memoizer{
 
 	private static final Object DEFAULT_OBJECT = new Object();
 
