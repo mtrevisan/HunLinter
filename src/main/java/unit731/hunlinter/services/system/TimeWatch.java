@@ -26,7 +26,6 @@ package unit731.hunlinter.services.system;
 
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.StringUtils;
 
 
 public class TimeWatch{
@@ -35,6 +34,8 @@ public class TimeWatch{
 	private static final String MINUTES = "min";
 	private static final String SECONDS = "sec";
 	private static final String MILLIS = "ms";
+	private static final String MICROS = "µs";
+	private static final String SPACE = " ";
 
 	private long start;
 	private long end;
@@ -73,7 +74,7 @@ public class TimeWatch{
 
 		final long delta = time(TimeUnit.SECONDS);
 
-		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		final StringJoiner sj = new StringJoiner(SPACE);
 		final long mins = delta / 60l;
 		if(mins > 0)
 			sj.add(Long.toString(mins)).add(MINUTES);
@@ -84,7 +85,11 @@ public class TimeWatch{
 	}
 
 	public String toStringMillis(){
-		return (end > 0l? time(TimeUnit.MILLISECONDS) + StringUtils.SPACE + MILLIS: TIMER_NOT_STOPPED);
+		return (end > 0l? time(TimeUnit.MILLISECONDS) + SPACE + MILLIS: TIMER_NOT_STOPPED);
+	}
+
+	public String toStringMicros(final int runs){
+		return (end > 0l? ((end - start) / (runs * 1_000)) + SPACE + MICROS: TIMER_NOT_STOPPED);
 	}
 
 }
