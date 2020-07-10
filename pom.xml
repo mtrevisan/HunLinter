@@ -8,6 +8,24 @@
 
 	<packaging>jar</packaging>
 
+	<name>HunLinter</name>
+	<description>Application for the linting of hunspell files</description>
+	<url>https://github.com/mtrevisan/HunLinter</url>
+
+	<developers>
+		<developer>
+			<name>Mauro Trevisan</name>
+			<email>851903+mtrevisan@users.noreply.github.com</email>
+			<url>https://github.com/mtrevisan/</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/mtrevisan/HunLinter.git</connection>
+		<developerConnection>scm:git:ssh://github.com:mtrevisan/HunLinter.git</developerConnection>
+		<url>http://github.com/mtrevisan/HunLinter/tree/master</url>
+	</scm>
+
 	<properties>
 		<main.class>unit731.hunlinter.MainFrame</main.class>
 
@@ -273,4 +291,11 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
 </project>
