@@ -165,7 +165,6 @@ public class DictionarySortDialog extends JDialog{
 
 	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
 		final SortableListModel model = (SortableListModel)entriesList.getModel();
-		model.ensureCapacity(listData.size());
 		model.replaceAll(listData, 0);
 
 		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);

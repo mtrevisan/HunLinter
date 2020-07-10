@@ -279,7 +279,6 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();
-		model.ensureCapacity(fonts.size());
 		model.addAll(fonts);
 
 		setSelectedFont();
