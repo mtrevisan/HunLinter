@@ -113,6 +113,14 @@ public class Inflection extends DictionaryEntry{
 		return (appliedRules != null && index < appliedRules.length? appliedRules[index]: null);
 	}
 
+	public boolean hasAppliedRule(final String flag){
+		if(appliedRules != null)
+			for(final AffixEntry appliedRule : appliedRules)
+				if(appliedRule.getFlag().equals(flag))
+					return true;
+		return false;
+	}
+
 	@Override
 	public AffixEntry getLastAppliedRule(final AffixType type){
 		AffixEntry result = null;
@@ -148,7 +156,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 //	public boolean hasInflectionRule(final String continuationFlag){
-//		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
+//		return (appliedRules != null && Arrays.stream(appliedRules).map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
 //	}
 
 //	public boolean hasInflectionRule(final AffixEntry.Type type){
