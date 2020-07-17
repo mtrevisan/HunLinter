@@ -24,6 +24,7 @@
  */
 package unit731.hunlinter.services.system;
 
+import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
@@ -89,7 +90,12 @@ public class TimeWatch{
 	}
 
 	public String toStringMicros(final int runs){
-		return (end > 0l? ((end - start) / (runs * 1_000)) + SPACE + MICROS: TIMER_NOT_STOPPED);
+		if(end < 0l)
+			return TIMER_NOT_STOPPED;
+
+		final double micros = (double)(end - start) / (runs * 1_000);
+		final int fractionalDigits = (micros > 100? 0: (micros > 10? 1: 3));
+		return String.format(Locale.US, "%." + fractionalDigits + "f " + MICROS, micros);
 	}
 
 }
