@@ -24,20 +24,20 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.text.PermutationsWithRepetitions;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.lang3.ArrayUtils;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.text.PermutationsWithRepetitions;
 
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{

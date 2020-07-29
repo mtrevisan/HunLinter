@@ -24,6 +24,22 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.ArraySet;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.Affixes;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -31,22 +47,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.datastructures.SimpleDynamicArray;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.Affixes;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.ArraySet;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.services.text.StringHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.collectIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

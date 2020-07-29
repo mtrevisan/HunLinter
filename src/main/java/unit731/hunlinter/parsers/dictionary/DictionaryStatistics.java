@@ -24,6 +24,15 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+
 import java.io.Closeable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -31,14 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 
 
 /**

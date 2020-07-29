@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.parsers.affix;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.ParserHelper;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class ParsingContext{

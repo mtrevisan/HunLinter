@@ -24,15 +24,15 @@
  */
 package unit731.hunlinter.parsers.vos;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.StringJoiner;
-import java.util.function.Function;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.StringJoiner;
+import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

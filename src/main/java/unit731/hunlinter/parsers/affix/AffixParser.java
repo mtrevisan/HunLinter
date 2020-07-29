@@ -24,17 +24,6 @@
  */
 package unit731.hunlinter.parsers.affix;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.handlers.AffixHandler;
@@ -47,12 +36,24 @@ import unit731.hunlinter.parsers.affix.handlers.Handler;
 import unit731.hunlinter.parsers.affix.handlers.RelationTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 /**

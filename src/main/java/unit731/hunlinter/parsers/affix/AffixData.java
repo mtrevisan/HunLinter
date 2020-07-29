@@ -24,6 +24,16 @@
  */
 package unit731.hunlinter.parsers.affix;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.RuleEntry;
+import unit731.hunlinter.services.system.Memoizer;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -38,16 +48,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.Memoizer;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

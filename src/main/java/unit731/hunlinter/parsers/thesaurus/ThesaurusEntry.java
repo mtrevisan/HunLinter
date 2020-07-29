@@ -24,6 +24,12 @@
  */
 package unit731.hunlinter.parsers.thesaurus;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.ParserHelper;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,12 +41,6 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.ParserHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;

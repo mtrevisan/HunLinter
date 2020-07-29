@@ -25,9 +25,9 @@
 package unit731.hunlinter.parsers.affix.handlers;
 
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ConversionTable;
 import unit731.hunlinter.parsers.affix.ParsingContext;
+import unit731.hunlinter.parsers.enums.AffixOption;
 
 
 public class ConversionTableHandler implements Handler{

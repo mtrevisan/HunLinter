@@ -24,20 +24,21 @@
  */
 package unit731.hunlinter.parsers.affix.handlers;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.ParsingContext;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.affix.ParsingContext;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class WordBreakTableHandler implements Handler{

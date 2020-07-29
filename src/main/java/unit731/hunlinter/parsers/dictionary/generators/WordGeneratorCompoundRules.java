@@ -24,20 +24,20 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{

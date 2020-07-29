@@ -24,11 +24,12 @@
  */
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.text.MessageFormat;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.text.MessageFormat;
 
 
 public class CopyOverAsNumberHandler implements Handler{

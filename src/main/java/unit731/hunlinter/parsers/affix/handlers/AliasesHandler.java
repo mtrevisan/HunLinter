@@ -24,16 +24,17 @@
  */
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 
 public class AliasesHandler implements Handler{

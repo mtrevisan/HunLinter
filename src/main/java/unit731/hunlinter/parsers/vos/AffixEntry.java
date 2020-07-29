@@ -24,6 +24,22 @@
  */
 package unit731.hunlinter.parsers.vos;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -31,22 +47,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.workers.core.IndexDataPair;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;

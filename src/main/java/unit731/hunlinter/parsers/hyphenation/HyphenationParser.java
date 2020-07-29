@@ -24,6 +24,15 @@
  */
 package unit731.hunlinter.parsers.hyphenation;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -46,14 +55,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

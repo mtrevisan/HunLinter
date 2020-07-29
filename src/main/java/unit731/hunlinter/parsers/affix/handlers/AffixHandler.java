@@ -24,26 +24,26 @@
  */
 package unit731.hunlinter.parsers.affix.handlers;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Scanner;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Scanner;
 
 
 public class AffixHandler implements Handler{

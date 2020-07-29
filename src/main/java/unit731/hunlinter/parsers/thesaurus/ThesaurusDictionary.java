@@ -24,6 +24,10 @@
  */
 package unit731.hunlinter.parsers.thesaurus;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.RegexHelper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -35,10 +39,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

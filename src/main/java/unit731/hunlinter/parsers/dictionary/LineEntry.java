@@ -24,6 +24,18 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.RegexSequencer;
+import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -36,17 +48,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexSequencer;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;

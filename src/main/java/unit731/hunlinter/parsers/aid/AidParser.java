@@ -24,6 +24,8 @@
  */
 package unit731.hunlinter.parsers.aid;
 
+import unit731.hunlinter.services.system.FileHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,8 +33,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import unit731.hunlinter.services.system.FileHelper;
 
 
 public class AidParser{

@@ -29,10 +29,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import javax.xml.transform.TransformerException;

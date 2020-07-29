@@ -24,9 +24,10 @@
  */
 package unit731.hunlinter.parsers.hyphenation;
 
-import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.Objects;
 
 
 public class Hyphenation{

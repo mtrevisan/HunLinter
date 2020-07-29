@@ -24,6 +24,21 @@
  */
 package unit731.hunlinter.parsers.vos;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -34,21 +49,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;

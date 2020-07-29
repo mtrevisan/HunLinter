@@ -24,13 +24,13 @@
  */
 package unit731.hunlinter.parsers.affix.strategies;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 class CharsetParsingStrategy extends FlagParsingStrategy{

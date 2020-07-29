@@ -24,18 +24,18 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
 
 
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{

@@ -27,14 +27,14 @@ package unit731.hunlinter.parsers.dictionary.generators;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 
 import java.util.ArrayList;
 import java.util.Arrays;

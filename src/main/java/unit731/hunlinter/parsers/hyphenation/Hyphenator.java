@@ -24,6 +24,14 @@
  */
 package unit731.hunlinter.parsers.hyphenation;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.LoopHelper;
+
 import java.text.Normalizer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,14 +40,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class Hyphenator implements HyphenatorInterface{

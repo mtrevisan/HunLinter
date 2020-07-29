@@ -24,12 +24,13 @@
  */
 package unit731.hunlinter.parsers.affix.strategies;
 
-import java.text.MessageFormat;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.text.MessageFormat;
+import java.util.regex.Pattern;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

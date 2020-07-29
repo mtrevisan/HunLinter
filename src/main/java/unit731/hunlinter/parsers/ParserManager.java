@@ -25,8 +25,33 @@
 package unit731.hunlinter.parsers;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.events.PreLoadProjectEvent;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.aid.AidParser;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.parsers.hyphenation.Hyphenator;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.filelistener.FileChangeListener;
+import unit731.hunlinter.services.filelistener.FileListenerManager;
 
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,33 +62,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.events.PreLoadProjectEvent;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.aid.AidParser;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.hyphenation.Hyphenator;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.filelistener.FileChangeListener;
-import unit731.hunlinter.services.filelistener.FileListenerManager;
-
-import javax.xml.transform.TransformerException;
 
 
 public class ParserManager implements FileChangeListener{

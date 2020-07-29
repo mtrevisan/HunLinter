@@ -24,10 +24,11 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
-import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.vos.Inflection;
+
+import java.util.Objects;
 
 
 public class Duplicate{

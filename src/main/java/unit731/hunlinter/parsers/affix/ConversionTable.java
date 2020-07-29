@@ -24,6 +24,13 @@
  */
 package unit731.hunlinter.parsers.affix;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -32,13 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringJoiner;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

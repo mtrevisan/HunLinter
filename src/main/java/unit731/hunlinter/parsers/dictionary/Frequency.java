@@ -24,6 +24,10 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunlinter.services.system.Memoizer;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,10 +36,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunlinter.services.system.Memoizer;
 
 
 /**

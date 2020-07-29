@@ -24,6 +24,13 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.FileHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,12 +45,6 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.TreeMap;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.system.FileHelper;
 
 
 public class DictionaryParser{

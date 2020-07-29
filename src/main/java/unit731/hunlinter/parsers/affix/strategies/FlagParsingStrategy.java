@@ -25,8 +25,8 @@
 package unit731.hunlinter.parsers.affix.strategies;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.Set;
