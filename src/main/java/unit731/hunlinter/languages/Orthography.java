@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.languages;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+
 import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 
 
 public class Orthography{

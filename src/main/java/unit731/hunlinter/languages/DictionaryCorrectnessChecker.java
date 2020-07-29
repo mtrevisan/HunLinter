@@ -24,19 +24,20 @@
  */
 package unit731.hunlinter.languages;
 
-import java.text.MessageFormat;
-import java.util.Objects;
-import java.util.Set;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
+
+import java.text.MessageFormat;
+import java.util.Objects;
+import java.util.Set;
 
 
 public class DictionaryCorrectnessChecker{

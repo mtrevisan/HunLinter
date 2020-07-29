@@ -24,12 +24,6 @@
  */
 package unit731.hunlinter.languages.vec;
 
-import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.languages.Orthography;
@@ -37,14 +31,21 @@ import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
+
+import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{

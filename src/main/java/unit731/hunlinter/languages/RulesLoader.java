@@ -24,6 +24,13 @@
  */
 package unit731.hunlinter.languages;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.vos.Inflection;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,13 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.SetHelper;
 
 
 public class RulesLoader{

@@ -24,6 +24,12 @@
  */
 package unit731.hunlinter.languages.vec;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.RegexHelper;
+
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
@@ -32,12 +38,6 @@ import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.RegexHelper;
 
 
 public class WordVEC{

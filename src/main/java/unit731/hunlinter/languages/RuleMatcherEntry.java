@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.languages;
 
-import java.text.MessageFormat;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.text.MessageFormat;
 
 
 public class RuleMatcherEntry{

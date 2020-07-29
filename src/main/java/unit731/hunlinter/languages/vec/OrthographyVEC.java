@@ -24,15 +24,15 @@
  */
 package unit731.hunlinter.languages.vec;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.RegexHelper;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 
 public class OrthographyVEC extends Orthography{

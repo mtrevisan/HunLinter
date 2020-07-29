@@ -24,6 +24,15 @@
  */
 package unit731.hunlinter.languages;
 
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.languages.vec.DictionaryBaseDataVEC;
+import unit731.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
+import unit731.hunlinter.languages.vec.OrthographyVEC;
+import unit731.hunlinter.languages.vec.WordTokenizerVEC;
+import unit731.hunlinter.languages.vec.WordVEC;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,14 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.languages.vec.DictionaryBaseDataVEC;
-import unit731.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
-import unit731.hunlinter.languages.vec.OrthographyVEC;
-import unit731.hunlinter.languages.vec.WordTokenizerVEC;
-import unit731.hunlinter.languages.vec.WordVEC;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 
 public class BaseBuilder{

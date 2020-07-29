@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.languages.vec;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.services.RegexHelper;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.services.RegexHelper;
 
 
 class GraphemeVEC{
