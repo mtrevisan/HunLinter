@@ -26,8 +26,8 @@ package unit731.hunlinter.actions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -26,8 +26,8 @@ package unit731.hunlinter.actions;
 
 import org.xml.sax.SAXException;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.LanguageChooserDialog;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.workers.WorkerManager;

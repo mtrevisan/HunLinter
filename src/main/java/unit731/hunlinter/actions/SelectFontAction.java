@@ -26,8 +26,8 @@ package unit731.hunlinter.actions;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.Packager;

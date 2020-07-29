@@ -24,8 +24,8 @@
  */
 package unit731.hunlinter.actions;
 
-import unit731.hunlinter.gui.dialogs.HelpDialog;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.HelpDialog;
 
 import javax.swing.*;
 import java.awt.*;
