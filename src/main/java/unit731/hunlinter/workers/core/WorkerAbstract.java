@@ -24,13 +24,6 @@
  */
 package unit731.hunlinter.workers.core;
 
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import javax.swing.SwingWorker;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -41,6 +34,13 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import javax.swing.SwingWorker;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 
 public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<Void, Void>{
