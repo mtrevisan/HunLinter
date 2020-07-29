@@ -24,11 +24,11 @@
  */
 package unit731.hunlinter.services.text;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 
 /**

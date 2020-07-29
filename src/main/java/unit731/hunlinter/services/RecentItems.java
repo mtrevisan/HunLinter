@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.services;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
-
-import org.apache.commons.lang3.StringUtils;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

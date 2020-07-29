@@ -24,6 +24,10 @@
  */
 package unit731.hunlinter.services.text;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.RegexHelper;
+
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -34,10 +38,6 @@ import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.RegexHelper;
 
 
 public class StringHelper{

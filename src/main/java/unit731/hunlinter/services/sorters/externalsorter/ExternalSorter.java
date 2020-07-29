@@ -24,6 +24,9 @@
  */
 package unit731.hunlinter.services.sorters.externalsorter;
 
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,9 +41,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

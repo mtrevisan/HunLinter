@@ -24,9 +24,10 @@
  */
 package unit731.hunlinter.services.sorters.externalsorter;
 
+import org.apache.commons.lang3.builder.Builder;
+
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import org.apache.commons.lang3.builder.Builder;
 
 
 /**

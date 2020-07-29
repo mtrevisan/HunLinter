@@ -32,8 +32,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import unit731.hunlinter.gui.dialogs.HelpDialog;
-import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.services.semanticversioning.Version;
+import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -24,14 +24,14 @@
  */
 package unit731.hunlinter.services.regexgenerator;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.StringJoiner;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

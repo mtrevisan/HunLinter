@@ -24,6 +24,10 @@
  */
 package unit731.hunlinter.services.filelistener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SetHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -47,9 +51,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.datastructures.SetHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
