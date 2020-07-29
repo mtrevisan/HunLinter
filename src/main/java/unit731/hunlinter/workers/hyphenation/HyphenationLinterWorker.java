@@ -24,31 +24,30 @@
  */
 package unit731.hunlinter.workers.hyphenation;
 
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.text.MessageFormat;
-
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.languages.RulesLoader;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import unit731.hunlinter.languages.RulesLoader;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class HyphenationLinterWorker extends WorkerDictionary{

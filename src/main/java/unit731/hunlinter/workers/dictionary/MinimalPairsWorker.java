@@ -24,6 +24,25 @@
  */
 package unit731.hunlinter.workers.dictionary;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.LoopHelper;
+import unit731.hunlinter.services.text.HammingDistance;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,34 +52,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.system.LoopHelper;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.text.HammingDistance;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class MinimalPairsWorker extends WorkerDictionary{

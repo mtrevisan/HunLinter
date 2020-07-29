@@ -24,11 +24,12 @@
  */
 package unit731.hunlinter.workers;
 
-import unit731.hunlinter.workers.core.WorkerDataProject;
-import unit731.hunlinter.workers.core.WorkerProject;
-import java.util.function.Consumer;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.workers.core.WorkerDataProject;
+import unit731.hunlinter.workers.core.WorkerProject;
+
+import java.util.function.Consumer;
 
 
 public class ProjectLoaderWorker extends WorkerProject{

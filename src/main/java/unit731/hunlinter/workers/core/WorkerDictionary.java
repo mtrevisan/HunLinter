@@ -24,6 +24,13 @@
  */
 package unit731.hunlinter.workers.core;
 
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -38,13 +45,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{

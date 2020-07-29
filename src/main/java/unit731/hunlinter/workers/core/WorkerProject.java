@@ -28,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 import unit731.hunlinter.services.Packager;
 import unit731.hunlinter.services.log.ExceptionHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

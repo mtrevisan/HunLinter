@@ -24,15 +24,6 @@
  */
 package unit731.hunlinter.workers.affix;
 
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.parsers.ParserManager;
@@ -49,6 +40,15 @@ import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
 import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

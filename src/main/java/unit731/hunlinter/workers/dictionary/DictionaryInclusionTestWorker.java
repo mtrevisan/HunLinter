@@ -24,19 +24,13 @@
  */
 package unit731.hunlinter.workers.dictionary;
 
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -44,6 +38,12 @@ import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

@@ -24,6 +24,25 @@
  */
 package unit731.hunlinter.workers.dictionary;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.Duplicate;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -39,25 +58,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.dictionary.Duplicate;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

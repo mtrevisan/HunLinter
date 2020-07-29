@@ -24,21 +24,21 @@
  */
 package unit731.hunlinter.workers.dictionary;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
 
 
 public class SorterWorker extends WorkerDictionary{
