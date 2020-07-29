@@ -24,6 +24,20 @@
  */
 package unit731.hunlinter.gui;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.core.WorkerAbstract;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -40,20 +54,6 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.JTextComponent;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.RegexHelper;
 
 
 public class GUIHelper{

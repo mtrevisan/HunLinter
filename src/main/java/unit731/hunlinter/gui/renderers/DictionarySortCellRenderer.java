@@ -26,6 +26,9 @@ package unit731.hunlinter.gui.renderers;
 
 import unit731.hunlinter.gui.Watercolors;
 
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import java.awt.Component;
 import java.awt.Font;
 import java.io.IOException;
@@ -34,9 +37,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 
 
 public class DictionarySortCellRenderer extends JLabel implements ListCellRenderer<String>{

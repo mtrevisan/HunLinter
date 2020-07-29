@@ -24,6 +24,13 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
+
+import javax.swing.JDialog;
 import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -31,13 +38,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.JDialog;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 
 
 public class CorrectionDialog extends JDialog{

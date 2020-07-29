@@ -24,19 +24,19 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.system.FileHelper;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
 /**
