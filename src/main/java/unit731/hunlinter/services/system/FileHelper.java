@@ -24,6 +24,16 @@
  */
 package unit731.hunlinter.services.system;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -50,16 +60,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.apache.commons.io.ByteOrderMark;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.BOMInputStream;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

@@ -27,17 +27,17 @@ package unit731.hunlinter.services.log;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
+import org.slf4j.Marker;
+import unit731.hunlinter.services.system.JavaHelper;
+
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
-
-import org.slf4j.Marker;
-import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
