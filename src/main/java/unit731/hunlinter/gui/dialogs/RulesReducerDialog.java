@@ -24,6 +24,22 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.RuleEntry;
+import unit731.hunlinter.services.log.ApplicationLogAppender;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.affix.RulesReducerWorker;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,22 +55,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import javax.swing.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.workers.affix.RulesReducerWorker;
-import unit731.hunlinter.services.log.ApplicationLogAppender;
-import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

@@ -24,19 +24,19 @@
  */
 package unit731.hunlinter.parsers.hyphenation;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunlinter.services.RegexHelper;
 
 
 class HyphenationParserTest{

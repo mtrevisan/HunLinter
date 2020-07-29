@@ -26,8 +26,8 @@ package unit731.hunlinter.parsers.affix;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.File;
 import java.io.IOException;

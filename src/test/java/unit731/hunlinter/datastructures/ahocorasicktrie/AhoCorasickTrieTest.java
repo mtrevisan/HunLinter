@@ -24,14 +24,15 @@
  */
 package unit731.hunlinter.datastructures.ahocorasicktrie;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 
 class AhoCorasickTrieTest{

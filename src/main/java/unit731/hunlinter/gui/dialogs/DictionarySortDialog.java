@@ -24,15 +24,6 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
-import java.awt.*;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Objects;
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.models.SortableListModel;
@@ -41,6 +32,16 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.List;
+import java.util.Objects;
 
 
 public class DictionarySortDialog extends JDialog{

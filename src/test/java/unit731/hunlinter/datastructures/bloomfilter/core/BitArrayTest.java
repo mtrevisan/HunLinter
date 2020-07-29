@@ -24,11 +24,12 @@
  */
 package unit731.hunlinter.datastructures.bloomfilter.core;
 
-import java.io.File;
-import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
+
+import java.io.File;
+import java.io.IOException;
 
 
 class BitArrayTest{

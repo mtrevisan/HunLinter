@@ -24,14 +24,14 @@
  */
 package unit731.hunlinter.gui.models;
 
+import unit731.hunlinter.parsers.vos.Inflection;
+
+import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
-import javax.swing.table.AbstractTableModel;
-
-import unit731.hunlinter.parsers.vos.Inflection;
 
 
 public class InflectionTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Inflection>{

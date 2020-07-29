@@ -24,6 +24,9 @@
  */
 package unit731.hunlinter.gui.components;
 
+import unit731.hunlinter.services.RecentItems;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -32,9 +35,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.*;
-
-import unit731.hunlinter.services.RecentItems;
 
 
 /** A menu used to store and display recently used files. */

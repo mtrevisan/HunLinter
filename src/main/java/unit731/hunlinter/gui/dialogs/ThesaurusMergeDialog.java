@@ -24,6 +24,12 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
+
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -31,12 +37,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.*;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 

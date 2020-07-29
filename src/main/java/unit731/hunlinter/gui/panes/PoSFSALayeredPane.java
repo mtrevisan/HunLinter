@@ -24,21 +24,6 @@
  */
 package unit731.hunlinter.gui.panes;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.StringJoiner;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
@@ -55,6 +40,21 @@ import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 
 public class PoSFSALayeredPane extends JLayeredPane{

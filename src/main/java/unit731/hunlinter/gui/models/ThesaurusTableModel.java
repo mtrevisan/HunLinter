@@ -24,14 +24,15 @@
  */
 package unit731.hunlinter.gui.models;
 
+import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
+
+import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.MessageFormat;
 import java.util.List;
-import javax.swing.table.AbstractTableModel;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 
 
 public class ThesaurusTableModel extends AbstractTableModel{

@@ -24,6 +24,33 @@
  */
 package unit731.hunlinter.gui.panes;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.JCopyableTable;
+import unit731.hunlinter.gui.dialogs.CorrectionDialog;
+import unit731.hunlinter.gui.models.AutoCorrectTableModel;
+import unit731.hunlinter.gui.renderers.TableRenderer;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.JavaHelper;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -40,32 +67,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.CorrectionDialog;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.models.AutoCorrectTableModel;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.renderers.TableRenderer;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class AutoCorrectLayeredPane extends JLayeredPane{

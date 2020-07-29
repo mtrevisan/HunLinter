@@ -24,16 +24,6 @@
  */
 package unit731.hunlinter.gui.panes;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import javax.swing.*;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +40,16 @@ import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
+
+import javax.swing.*;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 public class WordExceptionsLayeredPane extends JLayeredPane{

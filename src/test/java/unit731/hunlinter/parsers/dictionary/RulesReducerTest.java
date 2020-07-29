@@ -24,6 +24,17 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.system.FileHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -32,16 +43,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.datastructures.SetHelper;
 
 
 class RulesReducerTest{

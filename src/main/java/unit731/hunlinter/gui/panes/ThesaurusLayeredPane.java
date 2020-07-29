@@ -24,6 +24,34 @@
  */
 package unit731.hunlinter.gui.panes;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.JCopyableTable;
+import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
+import unit731.hunlinter.gui.models.ThesaurusTableModel;
+import unit731.hunlinter.gui.renderers.TableRenderer;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
+import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.JavaHelper;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,35 +66,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.renderers.TableRenderer;
-import unit731.hunlinter.gui.models.ThesaurusTableModel;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{

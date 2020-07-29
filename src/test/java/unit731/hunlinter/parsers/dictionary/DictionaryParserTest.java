@@ -24,17 +24,18 @@
  */
 package unit731.hunlinter.parsers.dictionary;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.affix.ConversionTable;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.services.system.FileHelper;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.affix.ConversionTable;
-import unit731.hunlinter.services.system.FileHelper;
 
 
 class DictionaryParserTest{

@@ -27,6 +27,12 @@ package unit731.hunlinter.gui.dialogs;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.services.system.JavaHelper;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -37,12 +43,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Position;
 
 
 /**

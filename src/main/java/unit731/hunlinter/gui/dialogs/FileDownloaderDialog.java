@@ -24,6 +24,20 @@
  */
 package unit731.hunlinter.gui.dialogs;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.services.downloader.DownloadListenerInterface;
+import unit731.hunlinter.services.downloader.DownloadTask;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.downloader.GITFileData;
+import unit731.hunlinter.services.semanticversioning.Version;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
+
+import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,20 +50,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.swing.*;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.semanticversioning.Version;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.services.downloader.DownloadListenerInterface;
-import unit731.hunlinter.services.downloader.DownloadTask;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
-import unit731.hunlinter.services.downloader.GITFileData;
 
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{

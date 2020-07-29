@@ -24,12 +24,13 @@
  */
 package unit731.hunlinter.parsers.vos;
 
-import java.io.File;
-import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.affix.AffixParser;
 import unit731.hunlinter.services.system.FileHelper;
+
+import java.io.File;
+import java.io.IOException;
 
 
 class DictionaryEntryTest{

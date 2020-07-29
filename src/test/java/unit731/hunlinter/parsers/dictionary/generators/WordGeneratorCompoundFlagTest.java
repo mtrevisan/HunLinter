@@ -24,14 +24,15 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import java.io.File;
-import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.services.system.FileHelper;
 import unit731.hunlinter.services.text.PermutationsWithRepetitions;
+
+import java.io.File;
+import java.io.IOException;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */

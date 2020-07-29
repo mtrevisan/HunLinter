@@ -24,12 +24,12 @@
  */
 package unit731.hunlinter.gui.renderers;
 
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class TableRenderer extends DefaultTableCellRenderer{
