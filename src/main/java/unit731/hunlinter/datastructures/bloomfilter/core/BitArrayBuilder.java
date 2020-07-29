@@ -24,12 +24,13 @@
  */
 package unit731.hunlinter.datastructures.bloomfilter.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.services.downloader.DownloaderHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 
 
 public class BitArrayBuilder{

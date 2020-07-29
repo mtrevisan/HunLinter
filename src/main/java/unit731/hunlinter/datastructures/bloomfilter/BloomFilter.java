@@ -24,9 +24,6 @@
  */
 package unit731.hunlinter.datastructures.bloomfilter;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Objects;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +34,10 @@ import unit731.hunlinter.datastructures.bloomfilter.decompose.Decomposer;
 import unit731.hunlinter.datastructures.bloomfilter.decompose.DefaultDecomposer;
 import unit731.hunlinter.datastructures.bloomfilter.hash.HashFunction;
 import unit731.hunlinter.datastructures.bloomfilter.hash.Murmur3HashFunction;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Objects;
 
 
 /**

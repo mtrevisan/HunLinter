@@ -25,9 +25,9 @@
 package unit731.hunlinter.datastructures.fsa.builders;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.BufferedInputStream;
