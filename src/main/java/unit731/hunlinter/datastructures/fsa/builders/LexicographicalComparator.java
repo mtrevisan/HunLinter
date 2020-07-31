@@ -41,6 +41,8 @@ import java.util.Comparator;
  * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
  * support only identity equality), but it is consistent with {@link
  * java.util.Arrays#equals(byte[], byte[])}.
+ *
+ * @see <a href="https://dzone.com/articles/understanding-sunmiscunsafe">Understanding sun.misc.Unsafe</a>
  */
 public class LexicographicalComparator{
 
