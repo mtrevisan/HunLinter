@@ -44,7 +44,7 @@
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 
 		<!-- Apache -->
-		<apache.commons-text.version>1.8</apache.commons-text.version>
+		<apache.commons-text.version>1.9</apache.commons-text.version>
 		<apache.commons-io.version>2.7</apache.commons-io.version>
 
 		<!-- FastUtil -->
