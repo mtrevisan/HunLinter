@@ -56,7 +56,7 @@ public class ZipManager{
 		Files.deleteIfExists(zipFile.toPath());
 
 		final List<String> folders = extractFilesList(dir);
-		excludeFolderBut = ArrayUtils.removeAllOccurences(excludeFolderBut, null);
+		excludeFolderBut = ArrayUtils.removeAllOccurrences(excludeFolderBut, null);
 		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
 
 		//zip files one by one
