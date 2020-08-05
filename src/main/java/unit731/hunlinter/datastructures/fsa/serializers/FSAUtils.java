@@ -24,7 +24,8 @@
  */
 package unit731.hunlinter.datastructures.fsa.serializers;
 
-import com.carrotsearch.hppc.IntIntHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import unit731.hunlinter.datastructures.fsa.FSA;
 
 
@@ -44,8 +45,8 @@ public class FSAUtils{
 	 * @param fsa	The automaton to calculate right language for
 	 * @return	A map with node identifiers as keys and their right language counts as associated values
 	 */
-	public static IntIntHashMap rightLanguageForAllStates(final FSA fsa){
-		final IntIntHashMap numbers = new IntIntHashMap();
+	public static Int2IntMap rightLanguageForAllStates(final FSA fsa){
+		final Int2IntMap numbers = new Int2IntArrayMap();
 		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
 			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))

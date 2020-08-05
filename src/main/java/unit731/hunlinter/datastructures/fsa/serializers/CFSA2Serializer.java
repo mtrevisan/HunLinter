@@ -24,8 +24,9 @@
  */
 package unit731.hunlinter.datastructures.fsa.serializers;
 
-import com.carrotsearch.hppc.IntIntHashMap;
-import com.carrotsearch.hppc.cursors.IntIntCursor;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.dynamicarray.DynamicIntArray;
@@ -80,9 +81,9 @@ public class CFSA2Serializer implements FSASerializer{
 	private boolean serializeWithNumbers;
 
 	/** A hash map of [state, offset] pairs */
-	private final IntIntHashMap offsets = new IntIntHashMap();
+	private final Int2IntMap offsets = new Int2IntArrayMap();
 	/** A hash map of [state, right-language-count] pairs */
-	private IntIntHashMap numbers;
+	private Int2IntMap numbers;
 	/** The most frequent labels for integrating with the flags field */
 	private byte[] labelsIndex;
 	/**
@@ -119,7 +120,7 @@ public class CFSA2Serializer implements FSASerializer{
 			progressCallback.accept(20);
 
 		//calculate the number of bytes required for the node data, if serializing with numbers
-		numbers = (serializeWithNumbers? FSAUtils.rightLanguageForAllStates(fsa): new IntIntHashMap());
+		numbers = (serializeWithNumbers? FSAUtils.rightLanguageForAllStates(fsa): new Int2IntArrayMap());
 
 		//linearize all the states, optimizing their layout
 		final DynamicIntArray linearized = linearize(fsa);
@@ -192,7 +193,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private DynamicIntArray linearize(final FSA fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
-		final IntIntHashMap inLinkCount = computeInLinkCount(fsa);
+		final Int2IntMap inLinkCount = computeInLinkCount(fsa);
 
 		//ordered states for serialization
 		final DynamicIntArray linearized = new DynamicIntArray();
@@ -233,7 +234,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-			final IntIntHashMap offsets) throws IOException{
+			final Int2IntMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
@@ -278,20 +279,23 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length */
-	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInLinkCount){
+	private int[] computeFirstStates(final Int2IntMap inLinkCount, final int maxStates, final int minInLinkCount){
 		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
-		for(final IntIntCursor c : inLinkCount)
-			if(c.value > minInLinkCount){
-				scratch.a = c.value;
-				scratch.b = c.key;
+		final ObjectIterator<Int2IntMap.Entry> itr = inLinkCount.int2IntEntrySet().iterator();
+		while(itr.hasNext()){
+			final Int2IntMap.Entry c = itr.next();
+			if(c.getIntValue() > minInLinkCount){
+				scratch.a = c.getIntValue();
+				scratch.b = c.getIntKey();
 
 				if(stateInLink.size() < maxStates || COMPARATOR.compare(scratch, stateInLink.peek()) > 0){
-					stateInLink.add(new IntIntHolder(c.value, c.key));
+					stateInLink.add(new IntIntHolder(c.getIntValue(), c.getIntKey()));
 					if(stateInLink.size() > maxStates)
 						stateInLink.remove();
 				}
 			}
+		}
 
 		final int[] states = new int[stateInLink.size()];
 		for(int position = states.length; !stateInLink.isEmpty(); ){
@@ -302,8 +306,8 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute in-link count for each state */
-	private IntIntHashMap computeInLinkCount(final FSA fsa){
-		final IntIntHashMap inLinkCount = new IntIntHashMap();
+	private Int2IntMap computeInLinkCount(final FSA fsa){
+		final Int2IntMap inLinkCount = new Int2IntArrayMap();
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
