@@ -322,13 +322,23 @@ public class CFSA2Serializer implements FSASerializer{
 			for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
 				if(!fsa.isArcTerminal(arc)){
 					final int target = fsa.getEndNode(arc);
-					inLinkCount.putOrAdd(target, 1, 1);
+					putOrAdd(inLinkCount, target, 1, 1);
 					if(!visited.get(target))
 						nodes.push(target);
 				}
 		}
 
 		return inLinkCount;
+	}
+
+	private int putOrAdd(final Int2IntMap map, final int key, int putValue, int incrementValue){
+		if(map.containsKey(key)){
+			putValue = map.get(key);
+			putValue += incrementValue;
+		}
+
+		map.put(key, putValue);
+		return putValue;
 	}
 
 	/** Update arc offsets assuming the given goto length */
