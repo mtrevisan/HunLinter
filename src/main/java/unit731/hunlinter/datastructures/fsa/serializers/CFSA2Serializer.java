@@ -322,7 +322,7 @@ public class CFSA2Serializer implements FSASerializer{
 			for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
 				if(!fsa.isArcTerminal(arc)){
 					final int target = fsa.getEndNode(arc);
-					putOrAdd(inLinkCount, target, 1, 1);
+					putOrAdd(inLinkCount, target);
 					if(!visited.get(target))
 						nodes.push(target);
 				}
@@ -331,12 +331,8 @@ public class CFSA2Serializer implements FSASerializer{
 		return inLinkCount;
 	}
 
-	private int putOrAdd(final Int2IntMap map, final int key, int putValue, int incrementValue){
-		if(map.containsKey(key)){
-			putValue = map.get(key);
-			putValue += incrementValue;
-		}
-
+	private int putOrAdd(final Int2IntMap map, final int key){
+		final int putValue = map.getOrDefault(key, 0) + 1;
 		map.put(key, putValue);
 		return putValue;
 	}
