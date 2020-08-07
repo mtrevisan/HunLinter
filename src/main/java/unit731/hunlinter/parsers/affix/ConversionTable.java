@@ -178,7 +178,7 @@ public class ConversionTable{
 
 			//search every occurrence of the pattern in the word
 			int idx = -valueLength;
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			while((idx = word.indexOf(key, idx + valueLength)) >= 0){
 				sb.append(word);
 				sb.replace(idx, idx + keyLength, value);

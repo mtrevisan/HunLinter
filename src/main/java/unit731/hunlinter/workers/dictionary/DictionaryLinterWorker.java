@@ -125,10 +125,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 	}
 
 	private Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final List<Inflection> inflections){
-		final Iterator<Inflection> itr = inflections.iterator();
-		while(itr.hasNext())
-			if(itr.next().hasAppliedRule(lastAppliedRuleFlag))
-				itr.remove();
+		inflections.removeIf(inflection -> inflection.hasAppliedRule(lastAppliedRuleFlag));
 		return inflections.iterator();
 	}
 

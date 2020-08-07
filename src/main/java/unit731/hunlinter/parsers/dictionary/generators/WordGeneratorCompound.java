@@ -193,7 +193,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		Inflection[] inflections;
-		final SimpleDynamicArray<String> flags = new SimpleDynamicArray(String.class, continuationFlags.length);
+		final SimpleDynamicArray<String> flags = new SimpleDynamicArray<>(String.class, continuationFlags.length);
 		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::add));
 		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)

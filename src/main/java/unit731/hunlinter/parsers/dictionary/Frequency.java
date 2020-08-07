@@ -187,7 +187,7 @@ public class Frequency<T extends Comparable<?>>{
 	 */
 	@Override
 	public String toString(){
-		final StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
+		final StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
 		for(final T value : frequencies.keySet())
 			sb.append(value)
 				.append('\t')

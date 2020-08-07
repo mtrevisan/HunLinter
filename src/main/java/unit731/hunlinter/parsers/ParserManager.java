@@ -174,7 +174,7 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
+		final File[] files = ArrayUtils.removeAllOccurrences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
 			null);
 		for(final File file : files)
 			flm.register(this, file.getAbsolutePath());

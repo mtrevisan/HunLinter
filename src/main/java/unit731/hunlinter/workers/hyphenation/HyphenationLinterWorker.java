@@ -94,7 +94,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 					if(orthography.hasSyllabationErrors(syllabes)){
 						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
-						final StringBuffer sb = new StringBuffer(message);
+						final StringBuilder sb = new StringBuilder(message);
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						throw new LinterException(sb.toString());

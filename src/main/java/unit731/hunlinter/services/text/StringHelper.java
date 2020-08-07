@@ -227,7 +227,7 @@ public class StringHelper{
 	 * @return	The hexadecimal characters
 	 */
 	public static String byteArrayToHexString(final byte[] byteArray){
-		final StringBuffer sb = new StringBuffer(byteArray.length << 1);
+		final StringBuilder sb = new StringBuilder(byteArray.length << 1);
 		for(final byte b : byteArray){
 			sb.append(Character.forDigit((b >> 4) & 0x0F, 16));
 			sb.append(Character.forDigit((b & 0x0F), 16));
@@ -269,7 +269,7 @@ public class StringHelper{
 
 	public static String removeAll(final String text, final char charToRemove){
 		final String strToRemove = Character.toString(charToRemove);
-		final StringBuffer sb = new StringBuffer(text);
+		final StringBuilder sb = new StringBuilder(text);
 		int index = 0;
 		while((index = sb.indexOf(strToRemove, index)) >= 0)
 			sb.deleteCharAt(index --);

@@ -169,7 +169,7 @@ public class WordVEC{
 
 
 	private static String setAcuteStressAtIndex(final String word, final int idx){
-		final StringBuffer sb = new StringBuffer(word);
+		final StringBuilder sb = new StringBuilder(word);
 		sb.setCharAt(idx, addStressAcute(word.charAt(idx)));
 		return sb.toString();
 	}

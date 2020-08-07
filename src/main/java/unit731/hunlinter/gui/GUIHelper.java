@@ -135,7 +135,7 @@ public class GUIHelper{
 	}
 
 	public static JMenuItem createCheckBoxMenu(final String text, final boolean selected, final JPopupMenu popupMenu,
-			final Consumer<Component> fnCallback) throws IOException{
+			final Consumer<Component> fnCallback){
 		return createPopupMenuItem(text, selected, popupMenu, fnCallback);
 	}
 

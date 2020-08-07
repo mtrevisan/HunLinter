@@ -127,7 +127,7 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withReplacementPairs(Map<String, List<String>> replacementPairs){
-		final StringBuffer builder = new StringBuffer();
+		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<String, List<String>> e : replacementPairs.entrySet()){
 			final String k = e.getKey();
 			for(final String v : e.getValue()){
@@ -141,7 +141,7 @@ public class DictionaryMetadataBuilder{
 	}
 
 	public DictionaryMetadataBuilder withEquivalentChars(Map<Character, List<Character>> equivalentChars){
-		final StringBuffer builder = new StringBuffer();
+		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<Character, List<Character>> e : equivalentChars.entrySet()){
 			final Character k = e.getKey();
 			for(final Character v : e.getValue()){
@@ -165,7 +165,7 @@ public class DictionaryMetadataBuilder{
 	}
 
 	private String getConversionPairs(final Map<String, String> conversionPairs){
-		final StringBuffer builder = new StringBuffer();
+		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
 			final String k = e.getKey();
 			if(builder.length() > 0)

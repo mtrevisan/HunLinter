@@ -348,7 +348,7 @@ public class AffixEntry{
 	public String toString(final FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy);
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));

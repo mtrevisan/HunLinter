@@ -353,7 +353,7 @@ public class DictionaryEntry{
 	}
 
 	public String toString(final FlagParsingStrategy strategy){
-		final StringBuffer sb = new StringBuffer(word);
+		final StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));

@@ -450,7 +450,7 @@ final int iconSize = 17;
 					catch(final Exception e){
 						dicCellRenderer.setErrorOnRow(index);
 
-						final StringBuffer sb = new StringBuffer(e.getMessage());
+						final StringBuilder sb = new StringBuilder(e.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						String errorMessage = ExceptionHelper.getMessage(e);
