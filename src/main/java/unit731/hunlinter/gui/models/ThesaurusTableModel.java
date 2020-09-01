@@ -39,7 +39,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = -2584004821296780108L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Definition", "Synonyms"};
+	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
 
 	public static final String TAG_NEW_LINE = "<br>";
 	private static final MessageFormat TAG = new MessageFormat("<html><body style=\"'white-space:nowrap'\">{0}</body></html>");

@@ -317,7 +317,6 @@ public class RulesReducer{
 				final Set<String> overallFrom = new HashSet<>();
 				for(final LineEntry entry : plainRules)
 					forEach(entry.from, overallFrom::add);
-				//noinspection InfiniteLoopStatement
 				for(int index = 0; ; index ++){
 					final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
 					overallLastGroups.put(index, overallLastGroup);

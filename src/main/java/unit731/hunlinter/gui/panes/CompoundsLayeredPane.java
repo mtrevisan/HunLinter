@@ -109,7 +109,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		GUIHelper.addUndoManager(inputTextArea);
 
-		EventBusService.subscribe(CompoundsLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -343,7 +343,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -384,7 +383,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
@@ -401,7 +399,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clearAid(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 

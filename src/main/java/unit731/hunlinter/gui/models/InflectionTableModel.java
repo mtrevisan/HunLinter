@@ -38,7 +38,7 @@ public class InflectionTableModel extends AbstractTableModel implements HunLinte
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Inflection", "Morphological fields", "Applied rule 1", "Applied rule 2", "Applied rule 3"};
+	private static final String[] COLUMN_NAMES = {"Inflection", "Morphological fields", "Applied rule 1", "Applied rule 2", "Applied rule 3"};
 
 
 	private List<Inflection> inflections;

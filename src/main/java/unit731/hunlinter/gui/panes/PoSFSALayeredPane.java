@@ -39,6 +39,7 @@ import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.text.ArrayHelper;
 import unit731.hunlinter.services.text.StringHelper;
 
 import javax.swing.*;
@@ -51,6 +52,7 @@ import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -98,7 +100,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(PoSFSALayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -203,7 +205,6 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_POS_DICTIONARY)
 			return;
 
@@ -248,7 +249,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		resultTextArea.setText(sj.toString());
 	}
 
-	private List<String> extractTrueWords(final List<String> tokens){
+	private List<String> extractTrueWords(final Collection<String> tokens){
 		final List<String> noWhitespaceTokens = new ArrayList<>(tokens.size());
 		for(final String token : tokens)
 			if(StringHelper.isWord(token))

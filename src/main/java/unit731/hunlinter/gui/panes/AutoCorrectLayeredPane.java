@@ -49,6 +49,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.InputEvent;
@@ -106,7 +107,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(incorrectTextField, correctTextField);
 
-		EventBusService.subscribe(AutoCorrectLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -209,7 +210,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          }
       });
 
-      final TableRenderer acoCellRenderer = new TableRenderer();
+      final TableCellRenderer acoCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
       scrollPane.setViewportView(table);
 
@@ -339,7 +340,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -357,8 +357,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
+	@SuppressWarnings("unchecked")
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -368,8 +368,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		correctLabel.setText(null);
 
 		openAcoButton.setEnabled(false);
-		//noinspection unchecked
-		((TableRowSorter<AutoCorrectTableModel>)table.getRowSorter()).setRowFilter(null);
+		((DefaultRowSorter<AutoCorrectTableModel, Integer>)table.getRowSorter()).setRowFilter(null);
 		final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 		dm.setCorrections(null);
 	}
