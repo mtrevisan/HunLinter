@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +80,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
-			final List<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry)));
+			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry)));
 
 			Iterator<Inflection> itr = inflections.iterator();
 			while(itr.hasNext()){
@@ -124,7 +125,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		setProcessor(step1);
 	}
 
-	private Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final List<Inflection> inflections){
+	private Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Collection<Inflection> inflections){
 		inflections.removeIf(inflection -> inflection.hasAppliedRule(lastAppliedRuleFlag));
 		return inflections.iterator();
 	}

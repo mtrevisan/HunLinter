@@ -33,7 +33,9 @@ import unit731.hunlinter.datastructures.fsa.builders.FSABuilder;
 import unit731.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import unit731.hunlinter.datastructures.fsa.builders.MetadataBuilder;
 import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import unit731.hunlinter.datastructures.fsa.lookup.WordData;
 import unit731.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
+import unit731.hunlinter.datastructures.fsa.serializers.FSASerializer;
 import unit731.hunlinter.datastructures.fsa.stemming.BufferUtils;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
@@ -178,7 +180,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<FSA, File> step4 = fsa -> {
 			resetProcessing("Compressing FSA (step 4/5)");
 
-			final CFSA2Serializer serializer = new CFSA2Serializer();
+			final FSASerializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
 					setProgress(percent, 100);
@@ -199,8 +201,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			try{
 				//verify by reading
-				final DictionaryLookup s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
-				//noinspection StatementWithEmptyBody
+				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
 				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
@@ -279,7 +280,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return out;
 	}
 
-	private void extractInflection(final List<String> suffixInflection, final ByteBuffer output){
+	private void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
 			for(final String code : suffixInflection){
 				final String[] tags = InflectionTag.createFromCodeAndValue(code).getTags();

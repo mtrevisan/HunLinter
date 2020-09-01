@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -85,8 +86,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final AffixType type = ruleToBeReduced.getType();
 
-		final List<String> originalLines = new ArrayList<>();
-		final List<LineEntry> originalRules = new ArrayList<>();
+		final Collection<String> originalLines = new ArrayList<>();
+		final Collection<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);

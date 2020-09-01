@@ -178,7 +178,7 @@ public class RulesReducer{
 		return reduceRules(plainRules, null);
 	}
 
-	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final Consumer<Integer> progressCallback){
+	public List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final Consumer<Integer> progressCallback){
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
 		if(progressCallback != null)
@@ -206,7 +206,7 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
+	private List<LineEntry> redistributeAdditions(final Collection<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
 		forEach(plainRules, entry -> redistributeAddition(entry, map));
 		return SetHelper.collect(map.values(),
@@ -310,7 +310,7 @@ public class RulesReducer{
 		}
 	}
 
-	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
+	private Map<Integer, Set<Character>> collectOverallLastGroups(Collection<LineEntry> plainRules){
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
 		if(!plainRules.isEmpty()){
 			try{
@@ -732,7 +732,7 @@ public class RulesReducer{
 		checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines,
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines,
 			final Consumer<Integer> progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)

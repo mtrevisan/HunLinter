@@ -70,7 +70,7 @@ public class SorterWorker extends WorkerDictionary{
 		final Function<Void, List<String>> step1 = ignored -> {
 			prepareProcessing("Load dictionary file (step 1/3)");
 
-			List<String> lines;
+			final List<String> lines;
 			try{
 				lines = FileHelper.readAllLines(dicParser.getDicFile().toPath(), dicParser.getCharset());
 			}
