@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded as two ASCII characters whose codes
  * must be combined into a single character.
  */
-class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
+final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: ''{1}''");
 	private static final MessageFormat FLAG_MUST_BE_EVEN_IN_LENGTH = new MessageFormat("Flag must be of length multiple of two: ''{0}''");
@@ -78,7 +78,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private String[] extractFlags(final String flags){
+	private String[] extractFlags(final CharSequence flags){
 		return RegexHelper.split(flags, PATTERN);
 	}
 
@@ -99,7 +99,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final String compoundRule){
+	private void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
 			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
@@ -108,7 +108,7 @@ class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		}
 	}
 
-	private boolean canEncode(final String cs){
+	private boolean canEncode(final CharSequence cs){
 		final CharsetEncoder encoder = StandardCharsets.US_ASCII.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);

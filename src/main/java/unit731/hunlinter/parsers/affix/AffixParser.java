@@ -48,7 +48,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
@@ -97,7 +97,7 @@ public class AffixParser{
 	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.OUTPUT_CONVERSION_TABLE);
 	private static final Handler RELATION_TABLE = new RelationTableHandler(AffixOption.RELATION_TABLE);
 
-	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new HashMap<>();
+	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new EnumMap<>(AffixOption.class);
 	static{
 		//General options
 //		PARSING_HANDLERS.put("NAME", COPY_OVER);
@@ -187,13 +187,14 @@ public class AffixParser{
 		boolean encodingRead = false;
 		final Charset charset = FileHelper.determineCharset(affFile.toPath());
 		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				index ++;
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
-				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
+				if(!encodingRead && !line.startsWith(prefix))
 					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
@@ -288,7 +289,7 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
-			int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
+			final int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
 			if(compoundMin < 1)
 				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
 		}

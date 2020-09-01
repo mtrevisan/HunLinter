@@ -73,7 +73,7 @@ public class AffixData{
 
 
 	private final Map<String, Object> data = new HashMap<>();
-	private final Set<String> terminalAffixes = new HashSet<>();
+	private final Collection<String> terminalAffixes = new HashSet<>();
 	private final Set<String> productableFlags = new HashSet<>();
 	private boolean closed;
 
@@ -108,7 +108,7 @@ public class AffixData{
 	void verify(){
 		final Map<AffixOption, Object> extractSingleFlags = extractSingleFlags();
 		final Collection<Object> flaggedData = extractSingleFlags.values();
-		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
+		final Collection<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
 			throw new LinterException(REPEATED_FLAG);
 	}
@@ -149,7 +149,7 @@ public class AffixData{
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(final List<AffixOption> keys){
+	private List<String> getStringData(final Collection<AffixOption> keys){
 		final List<String> strings = new ArrayList<>(keys.size());
 		forEach(keys, key -> strings.add(getData(key)));
 		return strings;
@@ -241,7 +241,7 @@ public class AffixData{
 	public boolean isAffixProductive(final String affix, final String word){
 		final String convertedWord = applyInputConversionTable(word);
 
-		boolean productive;
+		final boolean productive;
 		final Object affixData = getData(affix);
 		if(affixData != null && RuleEntry.class.isAssignableFrom(affixData.getClass()))
 			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
@@ -313,7 +313,7 @@ public class AffixData{
 	 */
 	public String getSampleText(){
 		final List<String> sortedSample;
-		String sample = getData(AffixOption.TRY);
+		final String sample = getData(AffixOption.TRY);
 		if(sample != null)
 			sortedSample = Arrays.asList(StringUtils.split(sample, StringUtils.EMPTY));
 		else

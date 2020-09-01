@@ -42,9 +42,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
@@ -103,7 +103,7 @@ public class AutoCorrectParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Set<String> map = new HashSet<>();
+		final Collection<String> map = new HashSet<>();
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}), IndexDataPair.of(index, null)));
@@ -176,7 +176,7 @@ public class AutoCorrectParser{
 		return Matcher.quoteReplacement(text.trim());
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final String incorrect, String correct){
+	public static Pair<String, String> prepareTextForFilter(final String incorrect, final String correct){
 		//extract part-of-speech if present
 		final String incorrectFilter = (!incorrect.isEmpty()? incorrect: ".+");
 		final String correctFilter = (!correct.isEmpty()? correct: ".+");

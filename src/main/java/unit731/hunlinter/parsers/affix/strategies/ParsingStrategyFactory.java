@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ParsingStrategyFactory{
+public final class ParsingStrategyFactory{
 
 	private static final MessageFormat UNKNOWN_TYPE = new MessageFormat("Unknown strategy type: {0}");
 

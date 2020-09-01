@@ -41,12 +41,14 @@ import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.collectIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -75,7 +77,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	protected final WordGenerator wordGenerator;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
-	private final Set<String> compoundAsReplacement = new HashSet<>();
+	private final Collection<String> compoundAsReplacement = new HashSet<>();
 
 
 	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
@@ -85,7 +87,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		this.wordGenerator = wordGenerator;
 	}
 
-	protected List<List<Inflection[]>> generateCompounds(final List<List<String>> permutations,
+	protected List<List<Inflection[]>> generateCompounds(final Iterable<List<String>> permutations,
 			final Map<String, DictionaryEntry[]> inputs){
 		final List<List<Inflection[]>> entries = new ArrayList<>();
 		final Map<String, Inflection[]> dicEntries = new HashMap<>();
@@ -121,7 +123,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Inflection[] applyCompound(final List<List<Inflection[]>> entries, final int limit){
+	protected Inflection[] applyCompound(final Iterable<List<Inflection[]>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -142,7 +144,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					@SuppressWarnings("rawtypes")
 					final FixedArray[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
-					//noinspection unchecked
 					if(forbiddenWordFlag == null
 							|| !continuationFlags[Affixes.INDEX_PREFIXES].contains(forbiddenWordFlag)
 							&& !continuationFlags[Affixes.INDEX_SUFFIXES].contains(forbiddenWordFlag)
@@ -171,10 +172,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return limitResponse(inflections, limit);
 	}
 
-	private void applyOutputConversions(final Set<Inflection> inflections, final String forceCompoundUppercaseFlag){
+	private void applyOutputConversions(final Iterable<Inflection> inflections, final String forceCompoundUppercaseFlag){
+		final Function<String, String> applyOutputConversionTable = affixData::applyOutputConversionTable;
 		//convert using output table
 		for(final Inflection inflection : inflections){
-			inflection.applyOutputConversionTable(affixData::applyOutputConversionTable);
+			inflection.applyOutputConversionTable(applyOutputConversionTable);
 			inflection.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			inflection.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
@@ -343,7 +345,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** Merge the distribution with the others */
 	protected Map<String, DictionaryEntry[]> mergeDistributions(final Map<String, DictionaryEntry[]> compoundRules,
 			final Map<String, DictionaryEntry[]> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		final List<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
+		final Collection<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
 		final Map<String, DictionaryEntry[]> map = new HashMap<>();
