@@ -280,7 +280,6 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j ++;
-					//noinspection IfStatementMissingBreakInLoop
 					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j < cond.length - 1 && cond[j] != ']');
@@ -307,7 +306,6 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j --;
-					//noinspection IfStatementMissingBreakInLoop
 					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j > 0 && cond[j] != '[');
