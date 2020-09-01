@@ -44,7 +44,7 @@ import java.util.Properties;
 import java.util.function.BiFunction;
 
 
-public class BaseBuilder{
+public final class BaseBuilder{
 
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
@@ -69,7 +69,7 @@ public class BaseBuilder{
 	}
 	private static final Map<String, LanguageData> DATA = new HashMap<>();
 	static{
-		LanguageData langData = new LanguageData();
+		final LanguageData langData = new LanguageData();
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
 		langData.comparator = WordVEC.sorterComparator();
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();

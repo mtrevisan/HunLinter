@@ -42,6 +42,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -56,7 +57,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 
-public class GUIHelper{
+public final class GUIHelper{
 
 	private static final Pattern PATTERN_HTML_CODE = RegexHelper.pattern("</?[^>]+>");
 
@@ -76,7 +77,7 @@ public class GUIHelper{
 			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(final ActionEvent e){
 				dialog.dispose();
 			}
 		});
@@ -88,7 +89,7 @@ public class GUIHelper{
 	 * @param dialog	Dialog to attach the escape key to
 	 * @param cancelAction	Action to be performed on cancel
 	 */
-	public static void addCancelByEscapeKey(final JDialog dialog, final AbstractAction cancelAction){
+	public static void addCancelByEscapeKey(final JDialog dialog, final ActionListener cancelAction){
 		final KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		dialog.getRootPane()
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -100,7 +101,7 @@ public class GUIHelper{
 		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
 		if(iconURL != null){
 			final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
-			final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+			final Icon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
 			menuItem.setIcon(icon);
 		}
 		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
@@ -146,7 +147,7 @@ public class GUIHelper{
 		else if(invoker instanceof JLabel)
 			textToCopy = ((JLabel)invoker).getText();
 		else if(invoker instanceof JCopyableTable){
-			final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
+			final int selectedRow = ((JTable)invoker).convertRowIndexToModel(((JTable)invoker).getSelectedRow());
 			textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
 		}
 
@@ -183,7 +184,7 @@ public class GUIHelper{
 	}
 
 
-	public static String removeHTMLCode(final String text){
+	public static String removeHTMLCode(final CharSequence text){
 		return RegexHelper.clear(text, PATTERN_HTML_CODE);
 	}
 
@@ -211,8 +212,8 @@ public class GUIHelper{
 					if(e.isPopupTrigger()){
 						//select row
 						if(field instanceof JCopyableTable){
-							final int selectedRow = ((JCopyableTable)field).rowAtPoint(e.getPoint());
-							((JCopyableTable)field).setRowSelectionInterval(selectedRow, selectedRow);
+							final int selectedRow = ((JTable)field).rowAtPoint(e.getPoint());
+							((JTable)field).setRowSelectionInterval(selectedRow, selectedRow);
 						}
 
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());

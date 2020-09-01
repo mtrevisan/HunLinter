@@ -28,7 +28,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
-public class GlyphComparator{
+public final class GlyphComparator{
 
 	private GlyphComparator(){}
 

@@ -27,15 +27,14 @@ package unit731.hunlinter.languages.vec;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.RegexHelper;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-class GraphemeVEC{
+final class GraphemeVEC{
 
 	public static final String PHONEME_JJH = "ʝ";
-	public static final String PHONEME_FH = "\uA799";
+	public static final String PHONEME_FH = "ꞙ";
 	public static final String PHONEME_I_CIRCUMFLEX = "î";
 	private static final String PHONEME_U_CIRCUMFLEX = "û";
 
@@ -64,7 +63,7 @@ class GraphemeVEC{
 
 	private GraphemeVEC(){}
 
-	public static boolean isDiphtong(final String word){
+	public static boolean isDiphtong(final CharSequence word){
 		if(RegexHelper.find(word, DIPHTONG1))
 			return true;
 
@@ -72,11 +71,11 @@ class GraphemeVEC{
 		return (m.find() && m.start() != WordVEC.getIndexOfStress(word));
 	}
 
-	public static boolean isHyatus(final String word){
+	public static boolean isHyatus(final CharSequence word){
 		return RegexHelper.find(word, HYATUS);
 	}
 
-	public static boolean isEterophonicSequence(final String group){
+	public static boolean isEterophonicSequence(final CharSequence group){
 		return RegexHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
@@ -109,7 +108,7 @@ class GraphemeVEC{
 		return word;
 	}
 
-	private static String correctGrapheme(String word, final String grapheme, final List<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
+	private static String correctGrapheme(String word, final CharSequence grapheme, final Iterable<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
 		if(word.contains(grapheme))
 			for(final Pattern p : eterophonicSequenceFalsePositives)
 				word = RegexHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
