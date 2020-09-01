@@ -320,7 +320,7 @@ public enum DictionaryAttribute{
 
 	static{
 		attrsByPropertyName = new HashMap<>();
-		for(final DictionaryAttribute attr : DictionaryAttribute.values())
+		for(final DictionaryAttribute attr : values())
 			if(attrsByPropertyName.put(attr.propertyName, attr) != null)
 				throw new RuntimeException("Duplicate property key for: " + attr);
 	}

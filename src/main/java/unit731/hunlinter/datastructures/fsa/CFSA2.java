@@ -328,7 +328,6 @@ public class CFSA2 extends FSA{
 	/** Skip a v-int */
 	private int skipVInt(int offset){
 		//do nothing
-		//noinspection StatementWithEmptyBody
 		while(arcs[offset ++] < 0){}
 		return offset;
 	}

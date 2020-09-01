@@ -42,91 +42,91 @@ public class DictionaryMetadataBuilder{
 
 	private final EnumMap<DictionaryAttribute, String> attrs = new EnumMap<>(DictionaryAttribute.class);
 
-	public DictionaryMetadataBuilder separator(char c){
+	public DictionaryMetadataBuilder separator(final char c){
 		attrs.put(DictionaryAttribute.SEPARATOR, Character.toString(c));
 		return this;
 	}
 
-	public DictionaryMetadataBuilder encoding(Charset charset){
+	public DictionaryMetadataBuilder encoding(final Charset charset){
 		return encoding(charset.name());
 	}
 
-	public DictionaryMetadataBuilder encoding(String charsetName){
+	public DictionaryMetadataBuilder encoding(final String charsetName){
 		attrs.put(DictionaryAttribute.ENCODING, charsetName);
 		return this;
 	}
 
 	public DictionaryMetadataBuilder frequencyIncluded(){ return frequencyIncluded(true); }
 
-	public DictionaryMetadataBuilder frequencyIncluded(boolean v){
+	public DictionaryMetadataBuilder frequencyIncluded(final boolean v){
 		attrs.put(DictionaryAttribute.FREQUENCY_INCLUDED, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignorePunctuation(){ return ignorePunctuation(true); }
 
-	public DictionaryMetadataBuilder ignorePunctuation(boolean v){
+	public DictionaryMetadataBuilder ignorePunctuation(final boolean v){
 		attrs.put(DictionaryAttribute.IGNORE_PUNCTUATION, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreNumbers(){ return ignoreNumbers(true); }
 
-	public DictionaryMetadataBuilder ignoreNumbers(boolean v){
+	public DictionaryMetadataBuilder ignoreNumbers(final boolean v){
 		attrs.put(DictionaryAttribute.IGNORE_NUMBERS, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreCamelCase(){ return ignoreCamelCase(true); }
 
-	public DictionaryMetadataBuilder ignoreCamelCase(boolean v){
+	public DictionaryMetadataBuilder ignoreCamelCase(final boolean v){
 		attrs.put(DictionaryAttribute.IGNORE_CAMEL_CASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreAllUppercase(){ return ignoreAllUppercase(true); }
 
-	public DictionaryMetadataBuilder ignoreAllUppercase(boolean v){
+	public DictionaryMetadataBuilder ignoreAllUppercase(final boolean v){
 		attrs.put(DictionaryAttribute.IGNORE_ALL_UPPERCASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder ignoreDiacritics(){ return ignoreDiacritics(true); }
 
-	public DictionaryMetadataBuilder ignoreDiacritics(boolean v){
+	public DictionaryMetadataBuilder ignoreDiacritics(final boolean v){
 		attrs.put(DictionaryAttribute.IGNORE_DIACRITICS, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder convertCase(){ return convertCase(true); }
 
-	public DictionaryMetadataBuilder convertCase(boolean v){
+	public DictionaryMetadataBuilder convertCase(final boolean v){
 		attrs.put(DictionaryAttribute.CONVERT_CASE, Boolean.toString(v));
 		return this;
 	}
 
 	public DictionaryMetadataBuilder supportRunOnWords(){ return supportRunOnWords(true); }
 
-	public DictionaryMetadataBuilder supportRunOnWords(boolean v){
+	public DictionaryMetadataBuilder supportRunOnWords(final boolean v){
 		attrs.put(DictionaryAttribute.RUN_ON_WORDS, Boolean.toString(v));
 		return this;
 	}
 
-	public DictionaryMetadataBuilder encoder(EncoderType type){
+	public DictionaryMetadataBuilder encoder(final EncoderType type){
 		attrs.put(DictionaryAttribute.ENCODER, type.name());
 		return this;
 	}
 
-	public DictionaryMetadataBuilder locale(Locale locale){
+	public DictionaryMetadataBuilder locale(final Locale locale){
 		return locale(locale.toString());
 	}
 
-	public DictionaryMetadataBuilder locale(String localeName){
+	public DictionaryMetadataBuilder locale(final String localeName){
 		attrs.put(DictionaryAttribute.LOCALE, localeName);
 		return this;
 	}
 
-	public DictionaryMetadataBuilder withReplacementPairs(Map<String, List<String>> replacementPairs){
+	public DictionaryMetadataBuilder withReplacementPairs(final Map<String, List<String>> replacementPairs){
 		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<String, List<String>> e : replacementPairs.entrySet()){
 			final String k = e.getKey();
@@ -140,7 +140,7 @@ public class DictionaryMetadataBuilder{
 		return this;
 	}
 
-	public DictionaryMetadataBuilder withEquivalentChars(Map<Character, List<Character>> equivalentChars){
+	public DictionaryMetadataBuilder withEquivalentChars(final Map<Character, List<Character>> equivalentChars){
 		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<Character, List<Character>> e : equivalentChars.entrySet()){
 			final Character k = e.getKey();
@@ -176,17 +176,17 @@ public class DictionaryMetadataBuilder{
 	}
 
 
-	public DictionaryMetadataBuilder author(String author){
+	public DictionaryMetadataBuilder author(final String author){
 		attrs.put(DictionaryAttribute.AUTHOR, author);
 		return this;
 	}
 
-	public DictionaryMetadataBuilder creationDate(String creationDate){
+	public DictionaryMetadataBuilder creationDate(final String creationDate){
 		attrs.put(DictionaryAttribute.CREATION_DATE, creationDate);
 		return this;
 	}
 
-	public DictionaryMetadataBuilder license(String license){
+	public DictionaryMetadataBuilder license(final String license){
 		attrs.put(DictionaryAttribute.LICENSE, license);
 		return this;
 	}

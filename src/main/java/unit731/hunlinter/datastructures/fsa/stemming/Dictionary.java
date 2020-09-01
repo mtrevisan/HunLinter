@@ -80,10 +80,10 @@ public class Dictionary{
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static Dictionary read(Path location) throws IOException{
+	public static Dictionary read(final Path location) throws IOException{
 		final Path metadata = DictionaryMetadata.getExpectedMetadataLocation(location);
 
-		try(InputStream fsaStream = Files.newInputStream(location); InputStream metadataStream = Files.newInputStream(metadata)){
+		try(final InputStream fsaStream = Files.newInputStream(location); final InputStream metadataStream = Files.newInputStream(metadata)){
 			return read(fsaStream, metadataStream);
 		}
 	}
@@ -96,17 +96,17 @@ public class Dictionary{
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public static Dictionary read(URL dictURL) throws IOException{
+	public static Dictionary read(final URL dictURL) throws IOException{
 		final URL expectedMetadataURL;
 		try{
-			String external = dictURL.toExternalForm();
+			final String external = dictURL.toExternalForm();
 			expectedMetadataURL = new URL(DictionaryMetadata.getExpectedMetadataFileName(external));
 		}
-		catch(MalformedURLException e){
+		catch(final MalformedURLException e){
 			throw new IOException("Couldn't construct relative feature map URL for: " + dictURL, e);
 		}
 
-		try(InputStream fsaStream = dictURL.openStream(); InputStream metadataStream = expectedMetadataURL.openStream()){
+		try(final InputStream fsaStream = dictURL.openStream(); final InputStream metadataStream = expectedMetadataURL.openStream()){
 			return read(fsaStream, metadataStream);
 		}
 	}
@@ -120,7 +120,7 @@ public class Dictionary{
 	 * @return	An instantiated {@link Dictionary}.
 	 * @throws IOException	If an I/O error occurs.
 	 */
-	public static Dictionary read(InputStream fsaStream, InputStream metadataStream) throws IOException{
+	public static Dictionary read(final InputStream fsaStream, final InputStream metadataStream) throws IOException{
 		return new Dictionary(FSA.read(fsaStream), DictionaryMetadata.read(metadataStream));
 	}
 
