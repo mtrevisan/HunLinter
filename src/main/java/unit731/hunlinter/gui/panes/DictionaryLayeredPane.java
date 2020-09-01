@@ -49,6 +49,7 @@ import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -136,7 +137,7 @@ final int iconSize = 17;
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(DictionaryLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
 	private void hideMorphologicalFieldsColumn(final Component invoker){
@@ -169,7 +170,7 @@ final int iconSize = 17;
 		preferences.putBoolean(SHOW_APPLIED_RULE_COLUMNS, !showAppliedRuleColumns);
 	}
 
-	private void storeDefaultColumnsWidth(TableColumn column){
+	private void storeDefaultColumnsWidth(final TableColumn column){
 		if(preferences.getInt(COLUMN_MIN_WIDTH, -1) < 0){
 			preferences.putInt(COLUMN_MIN_WIDTH, column.getMinWidth());
 			preferences.putInt(COLUMN_MAX_WIDTH, column.getMaxWidth());
@@ -250,7 +251,7 @@ final int iconSize = 17;
       GUIHelper.addScrollToLastRow(table);
 
       table.setRowSelectionAllowed(true);
-      final TableRenderer dicCellRenderer = new TableRenderer();
+      final TableCellRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)
       table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       scrollPane.setViewportView(table);
@@ -336,7 +337,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -378,7 +378,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_DICTIONARY)
 			return;
 
@@ -401,7 +400,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clearAid(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
@@ -443,6 +441,7 @@ final int iconSize = 17;
 				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
 				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
+				final StringBuilder sb = new StringBuilder();
 				for(final Inflection inflection : inflections){
 					try{
 						checker.checkInflection(inflection, index);
@@ -450,12 +449,13 @@ final int iconSize = 17;
 					catch(final Exception e){
 						dicCellRenderer.setErrorOnRow(index);
 
-						final StringBuffer sb = new StringBuffer(e.getMessage());
+						sb.setLength(0);
+						sb.append(e.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
-						String errorMessage = ExceptionHelper.getMessage(e);
+						final String errorMessage = ExceptionHelper.getMessage(e);
 						LOGGER.trace("{}, line {}", errorMessage, index);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), index);
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
 					}
 
 					index ++;

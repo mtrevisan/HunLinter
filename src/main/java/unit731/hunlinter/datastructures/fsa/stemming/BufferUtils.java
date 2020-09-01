@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
 /**
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class BufferUtils{
+public final class BufferUtils{
 
 	private BufferUtils(){}
 

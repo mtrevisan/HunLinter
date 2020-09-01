@@ -27,7 +27,7 @@ package unit731.hunlinter.languages.vec;
 import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 
 
-public class DictionaryBaseDataVEC extends BloomFilterParameters{
+public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 50_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;

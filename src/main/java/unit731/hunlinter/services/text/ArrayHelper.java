@@ -25,9 +25,21 @@
 package unit731.hunlinter.services.text;
 
 
-public class ArrayHelper{
+public final class ArrayHelper{
 
 	private ArrayHelper(){}
+
+	public static byte[] concatenate(final byte[]... arrays){
+		int size = 0;
+		for(int i = 0; i < arrays.length; i ++)
+			size += arrays[i].length;
+
+		size = 0;
+		final byte[] joinedArray = new byte[size];
+		for(int i = 0; i < arrays.length; i ++, size += arrays[i].length)
+			System.arraycopy(arrays[i], 0, joinedArray, size, arrays[i].length);
+		return joinedArray;
+	}
 
 	/**
 	 * Compute the length of the shared prefix between two byte sequences

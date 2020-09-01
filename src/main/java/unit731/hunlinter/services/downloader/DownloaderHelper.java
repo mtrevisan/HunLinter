@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class DownloaderHelper{
+public final class DownloaderHelper{
 
 	private static final String ALREADY_UPDATED = "You already have the latest version installed";
 
@@ -63,8 +63,9 @@ public class DownloaderHelper{
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
 
 	@SuppressWarnings("CanBeFinal")
-	private static Comparator<Pair<Version, String>> VERSION_COMPARATOR = Comparator.comparing(Pair::getKey);
+	private static Comparator<Pair<Version, String>> VERSION_COMPARATOR;
 	static{
+		VERSION_COMPARATOR = Comparator.comparing(Pair::getKey);
 		VERSION_COMPARATOR = VERSION_COMPARATOR.reversed();
 	}
 
@@ -78,7 +79,19 @@ public class DownloaderHelper{
 
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
 
-	private static Map<String, Object> APPLICATION_PROPERTIES;
+	public static final Map<String, Object> APPLICATION_PROPERTIES;
+	static{
+		APPLICATION_PROPERTIES = new HashMap<>();
+		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
+			final Properties prop = new Properties();
+			prop.load(is);
+
+			APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
+			APPLICATION_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
+			APPLICATION_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
+		}
+		catch(final IOException ignored){}
+	}
 
 
 	private DownloaderHelper(){}
@@ -107,7 +120,7 @@ public class DownloaderHelper{
 
 			final JSONParser parser = new JSONParser();
 			final JSONArray jsonArray = (JSONArray)parser.parse(response);
-			final Version applicationVersion = new Version((String)getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_VERSION));
+			final Version applicationVersion = new Version((String)APPLICATION_PROPERTIES.get(PROPERTY_KEY_VERSION));
 			final List<Pair<Version, String>> whatsNew = new ArrayList<>();
 			for(final Object elem : jsonArray){
 				final JSONObject obj = (JSONObject)elem;
@@ -152,22 +165,6 @@ public class DownloaderHelper{
 		final String downloadedSha = calculateGitSha1(content);
 		if(!downloadedSha.equals(object.sha))
 			throw new Exception("SHA mismatch while downloading " + object.name);
-	}
-
-	public static Map<String, Object> getApplicationProperties(){
-		if(APPLICATION_PROPERTIES == null){
-			APPLICATION_PROPERTIES = new HashMap<>();
-			try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
-				final Properties prop = new Properties();
-				prop.load(is);
-
-				APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
-				APPLICATION_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
-				APPLICATION_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
-			}
-			catch(final IOException ignored){}
-		}
-		return APPLICATION_PROPERTIES;
 	}
 
 	private static GITFileData extractData(final String filename, final byte[] directoryContent) throws ParseException{

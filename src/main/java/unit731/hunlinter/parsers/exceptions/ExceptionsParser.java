@@ -40,10 +40,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -106,7 +106,7 @@ public class ExceptionsParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Set<String> map = new HashSet<>();
+		final Collection<String> map = new HashSet<>();
 		for(final String s : dictionary){
 			if(!map.add(s))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));
@@ -123,7 +123,7 @@ public class ExceptionsParser{
 		return dictionary.size();
 	}
 
-	public void modify(final TagChangeType changeType, final List<String> tags){
+	public void modify(final TagChangeType changeType, final Collection<String> tags){
 		switch(changeType){
 			case ADD -> {
 				dictionary.addAll(tags);

@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -91,7 +92,7 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
+	private List<String> filterFolders(final Collection<String> folders, final Path[] excludeFolderBut){
 		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
 		for(String folder : folders){
 			folder = StringUtils.replaceChars(Path.of(folder)

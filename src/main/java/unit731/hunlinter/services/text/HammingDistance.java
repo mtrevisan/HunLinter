@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Hamming_distance">Hamming distance</a>
  */
-public class HammingDistance{
+public final class HammingDistance{
 
 	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings ''{0}'' and ''{1}'' must have the same length");
 
@@ -65,7 +65,7 @@ public class HammingDistance{
 	 * @return	the hamming distance between the given strings
 	 * @throws IllegalArgumentException	if either input is <code>null</code> or if they do not have the same length
 	 */
-	public static int getDistance(CharSequence left, CharSequence right){
+	public static int getDistance(final CharSequence left, final CharSequence right){
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);
 		if(left.length() != right.length())
@@ -76,11 +76,11 @@ public class HammingDistance{
 			.count();
 	}
 
-	public static Pair<Character, Character> findFirstDifference(CharSequence left, CharSequence right){
+	public static Pair<Character, Character> findFirstDifference(final CharSequence left, final CharSequence right){
 		return findFirstDifference(left, right, 0);
 	}
 
-	public static Pair<Character, Character> findFirstDifference(CharSequence left, CharSequence right, int offset){
+	public static Pair<Character, Character> findFirstDifference(final CharSequence left, final CharSequence right, final int offset){
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);
 		if(left.length() != right.length())

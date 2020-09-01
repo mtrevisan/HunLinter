@@ -30,6 +30,7 @@ import unit731.hunlinter.services.RegexHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -71,8 +72,8 @@ public class ThesaurusDictionary{
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		forEach(partOfSpeeches, sj::add);
 		final String wholePartOfSpeeches = sj.toString();
-		final List<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Set<String> uniqueValues = new HashSet<>();
+		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
+		final Collection<String> uniqueValues = new HashSet<>();
 		forEach(synonyms, synonym -> {
 			final String s = synonym.toLowerCase(Locale.ROOT);
 			if(uniqueValues.add(s))
@@ -101,7 +102,7 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private SynonymsEntry extractPartOfSpeechAndSynonyms(final String partOfSpeeches, final List<String> synonyms,
+	private SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
@@ -183,7 +184,7 @@ public class ThesaurusDictionary{
 		return list;
 	}
 
-	public static String removeSynonymUse(final String synonym){
+	public static String removeSynonymUse(final CharSequence synonym){
 		return RegexHelper.replaceAll(synonym, PATTERN_SYNONYM_USE, StringUtils.EMPTY);
 	}
 

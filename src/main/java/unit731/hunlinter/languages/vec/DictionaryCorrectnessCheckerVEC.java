@@ -41,10 +41,10 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import java.text.MessageFormat;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -153,7 +153,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void variantsCheck(final Inflection inflection){
 		final String derivedWord = inflection.getWord();
 		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), WORD_SEPARATORS);
-		final Set<LanguageVariant> variants = new HashSet<>();
+		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
 		for(final String subword : subwords){
 			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 				if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL))

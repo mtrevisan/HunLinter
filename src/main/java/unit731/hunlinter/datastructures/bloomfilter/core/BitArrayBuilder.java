@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 
-public class BitArrayBuilder{
+public final class BitArrayBuilder{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BitArrayBuilder.class);
 
@@ -54,7 +54,7 @@ public class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					final File file = File.createTempFile(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
+					final File file = File.createTempFile(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}

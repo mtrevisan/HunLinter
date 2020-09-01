@@ -39,7 +39,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded in its numerical form. In the case
  * of multiple flags, each number is separated by a comma.
  */
-class NumericalParsingStrategy extends FlagParsingStrategy{
+final class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was ''{1}''");
 	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was ''{0}''");

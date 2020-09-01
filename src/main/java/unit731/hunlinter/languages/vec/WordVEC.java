@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 
-public class WordVEC{
+public final class WordVEC{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
@@ -125,7 +125,7 @@ public class WordVEC{
 	}
 
 	//^[ʼ']?[aeiouàèéíòóú]
-	public static boolean startsWithVowel(final String word){
+	public static boolean startsWithVowel(final CharSequence word){
 		char chr = word.charAt(0);
 		if(isApostrophe(chr))
 			chr = word.charAt(1);
@@ -133,7 +133,7 @@ public class WordVEC{
 	}
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
-	public static boolean endsWithVowel(final String word){
+	public static boolean endsWithVowel(final CharSequence word){
 		final int idx = word.length() - 1;
 		char chr = word.charAt(idx);
 		if(isApostrophe(chr))
@@ -142,7 +142,7 @@ public class WordVEC{
 	}
 
 	//[aeiou][^aeiou]*$
-	private static int getLastUnstressedVowelIndex(final String word, int lastLetterIndex){
+	private static int getLastUnstressedVowelIndex(final CharSequence word, int lastLetterIndex){
 		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
 			final char chr = word.charAt(lastLetterIndex);
 			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
@@ -153,11 +153,11 @@ public class WordVEC{
 
 
 	//[àèéíòóú]
-	public static boolean hasStressedGrapheme(final String word){
+	public static boolean hasStressedGrapheme(final CharSequence word){
 		return (countStresses(word) == 1);
 	}
 
-	public static int countStresses(final String word){
+	public static int countStresses(final CharSequence word){
 		return (int)IntStream.range(0, word.length())
 			.filter(i -> Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
 			.count();
@@ -169,7 +169,7 @@ public class WordVEC{
 
 
 	private static String setAcuteStressAtIndex(final String word, final int idx){
-		final StringBuffer sb = new StringBuffer(word);
+		final StringBuilder sb = new StringBuilder(word);
 		sb.setCharAt(idx, addStressAcute(word.charAt(idx)));
 		return sb.toString();
 	}
@@ -230,7 +230,7 @@ public class WordVEC{
 		return word;
 	}
 
-	static int getIndexOfStress(final String word){
+	static int getIndexOfStress(final CharSequence word){
 		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
 	}
 

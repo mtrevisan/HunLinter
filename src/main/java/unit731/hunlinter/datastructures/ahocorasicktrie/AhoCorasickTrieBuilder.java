@@ -117,7 +117,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 *
 	 * @param keywordSet the collection holding keywords
 	 */
-	private void addAllKeywords(final Collection<String> keywordSet){
+	private void addAllKeywords(final Iterable<String> keywordSet){
 		int i = 0;
 		for(final String keyword : keywordSet)
 			addKeyword(keyword, i ++);

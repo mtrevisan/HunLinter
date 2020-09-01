@@ -46,7 +46,7 @@ public class DictionaryIterator implements Iterator<WordData>{
 
 
 	public DictionaryIterator(final Dictionary dictionary, final boolean decodeStems){
-		this.separator = dictionary.metadata.getSeparator();
+		separator = dictionary.metadata.getSeparator();
 
 		entriesItr = dictionary.fsa.iterator();
 		sequenceEncoder = (decodeStems? dictionary.metadata.getSequenceEncoderType().get(): new NoEncoder());

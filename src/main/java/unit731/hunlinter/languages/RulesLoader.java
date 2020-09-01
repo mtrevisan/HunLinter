@@ -34,12 +34,12 @@ import unit731.hunlinter.parsers.vos.Inflection;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -61,8 +61,8 @@ public class RulesLoader{
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
 	private final Set<String> multipleStressedWords;
-	private final Set<String> hasToContainStress = new HashSet<>();
-	private final Set<String> cannotContainStress = new HashSet<>();
+	private final Collection<String> hasToContainStress = new HashSet<>();
+	private final Collection<String> cannotContainStress = new HashSet<>();
 	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
@@ -138,7 +138,7 @@ public class RulesLoader{
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		final List<String> list = new ArrayList<>(rulesProperties.size());
+		final Collection<String> list = new ArrayList<>(rulesProperties.size());
 		for(final Object o : rulesProperties.keySet()){
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){

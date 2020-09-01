@@ -34,16 +34,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class FontHelper{
+public final class FontHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FontHelper.class);
 
@@ -165,8 +167,8 @@ public class FontHelper{
 	public static void extractFonts(final String languageSample){
 		Objects.requireNonNull(languageSample);
 
-		if(!languageSample.equals(FontHelper.LANGUAGE_SAMPLE)){
-			FontHelper.LANGUAGE_SAMPLE = languageSample;
+		if(!languageSample.equals(LANGUAGE_SAMPLE)){
+			LANGUAGE_SAMPLE = languageSample;
 
 			FAMILY_NAMES_ALL.clear();
 			FAMILY_NAMES_MONOSPACED.clear();
@@ -221,18 +223,19 @@ public class FontHelper{
 	}
 
 	private static void updateComponent(final Component component, final Font font){
-		final Stack<Component> stack = new Stack<>();
+		final Deque<Component> stack = new ArrayDeque<>();
 		stack.push(component);
+		final Consumer<Component> push = stack::push;
 		while(!stack.isEmpty()){
 			final Component comp = stack.pop();
 
 			if(comp instanceof JEditorPane)
-				((JEditorPane)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+				((JComponent)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 			if((comp instanceof JComponent) && ((JComponent)comp).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 				comp.setFont(font);
 
 			if(comp instanceof Container)
-				forEach(((Container)comp).getComponents(), stack::push);
+				forEach(((Container)comp).getComponents(), push);
 		}
 	}
 

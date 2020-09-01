@@ -74,7 +74,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-		final String[] compoundRule = new String[]{compoundBeginFlag, "?", compoundMiddleFlag, "?", compoundEndFlag, "?"};
+		final String[] compoundRule = {compoundBeginFlag, "?", compoundMiddleFlag, "?", compoundEndFlag, "?"};
 		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);

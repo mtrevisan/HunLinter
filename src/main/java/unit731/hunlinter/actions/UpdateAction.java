@@ -58,7 +58,7 @@ public class UpdateAction extends AbstractAction{
 				private static final long serialVersionUID = -5644390861803492172L;
 
 				@Override
-				public void actionPerformed(ActionEvent e){
+				public void actionPerformed(final ActionEvent e){
 					dialog.interrupt();
 
 					dialog.dispose();

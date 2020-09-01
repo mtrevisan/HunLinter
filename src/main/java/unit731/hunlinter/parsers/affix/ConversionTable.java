@@ -34,6 +34,7 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,29 +157,29 @@ public class ConversionTable{
 		return conversions;
 	}
 
-	private static String reduceKey(final String key){
+	private static String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private static boolean isStarting(final String key){
+	private static boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private static boolean isEnding(final String key){
+	private static boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
-	private static void convertInside(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertInside(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 
 		if(word.contains(key)){
 			final String value = (ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
-			int keyLength = key.length();
-			int valueLength = value.length();
+			final int keyLength = key.length();
+			final int valueLength = value.length();
 
 			//search every occurrence of the pattern in the word
 			int idx = -valueLength;
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			while((idx = word.indexOf(key, idx + valueLength)) >= 0){
 				sb.append(word);
 				sb.replace(idx, idx + keyLength, value);
@@ -189,7 +190,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertStartsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertStartsWith(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1);
 		if(word.startsWith(strippedKey)){
@@ -198,7 +199,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertEndsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertEndsWith(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final int keyLength = key.length() - 1;
 		final String strippedKey = key.substring(0, keyLength);
@@ -208,7 +209,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertWhole(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertWhole(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))

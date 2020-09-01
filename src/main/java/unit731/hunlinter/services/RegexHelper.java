@@ -28,6 +28,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class RegexHelper{
+public final class RegexHelper{
 
 	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
 
@@ -62,23 +63,23 @@ public class RegexHelper{
 	 * @param delimitersRegex	regex stating the delimiters
 	 * @return	The pattern to be used to split a string
 	 */
-	public static Pattern splitterWithDelimiters(String delimitersRegex){
+	public static Pattern splitterWithDelimiters(final String delimitersRegex){
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
 	}
 
-	public static String[] split(String text, Pattern pattern){
+	public static String[] split(final CharSequence text, final Pattern pattern){
 		return split(text, pattern, 0);
 	}
 
-	public static String[] split(String text, Pattern pattern, int limit){
+	public static String[] split(final CharSequence text, final Pattern pattern, final int limit){
 		return pattern.split(text, limit);
 	}
 
-	public static String[] extract(final String text, final Pattern pattern){
+	public static String[] extract(final CharSequence text, final Pattern pattern){
 		return extract(text, pattern, -1);
 	}
 
-	public static String[] extract(final String text, final Pattern pattern, final int limit){
+	public static String[] extract(final CharSequence text, final Pattern pattern, final int limit){
 		final Matcher matcher = matcher(text, pattern);
 		return (limit >= 0? extractWithLimit(matcher, limit): extractUnlimited(matcher));
 	}
@@ -112,26 +113,26 @@ public class RegexHelper{
 	}
 
 
-	public static Matcher matcher(final String text, final Pattern pattern){
+	public static Matcher matcher(final CharSequence text, final Pattern pattern){
 		return pattern.matcher(text);
 	}
 
-	public static boolean find(final String text, final Pattern pattern){
+	public static boolean find(final CharSequence text, final Pattern pattern){
 		return matcher(text, pattern)
 			.find();
 	}
 
-	public static boolean matches(final String text, final Pattern pattern){
+	public static boolean matches(final CharSequence text, final Pattern pattern){
 		return matcher(text, pattern)
 			.matches();
 	}
 
-	public static String replaceAll(final String text, final Pattern pattern, final String replacement){
+	public static String replaceAll(final CharSequence text, final Pattern pattern, final String replacement){
 		return matcher(text, pattern)
 			.replaceAll(replacement);
 	}
 
-	public static String clear(final String text, final Pattern pattern){
+	public static String clear(final CharSequence text, final Pattern pattern){
 		return replaceAll(text, pattern, StringUtils.EMPTY);
 	}
 
@@ -145,7 +146,7 @@ public class RegexHelper{
 		return NOT_GROUP_START + merge + GROUP_END;
 	}
 
-	public static <V> String mergeSet(final Set<V> set, final Comparator<String> comparator){
+	public static <V> String mergeSet(final Collection<V> set, final Comparator<String> comparator){
 		final List<String> list = new ArrayList<>(set.size());
 		forEach(set, v -> list.add(String.valueOf(v)));
 		list.sort(comparator);

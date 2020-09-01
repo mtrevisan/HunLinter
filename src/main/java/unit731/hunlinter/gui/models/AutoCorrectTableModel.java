@@ -38,7 +38,7 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = -5235919012141465022L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Incorrect form", "Correct form"};
+	private static final String[] COLUMN_NAMES = {"Incorrect form", "Correct form"};
 
 
 	private List<CorrectionEntry> corrections;

@@ -30,14 +30,13 @@ import org.w3c.dom.NodeList;
 import unit731.hunlinter.datastructures.FixedArray;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 
-public class LoopHelper{
+public final class LoopHelper{
 
 	private LoopHelper(){}
 
@@ -71,7 +70,7 @@ public class LoopHelper{
 		return null;
 	}
 
-	public static <T> T match(final Collection<T> collection, final Predicate<T> condition){
+	public static <T> T match(final Iterable<T> collection, final Predicate<T> condition){
 		if(collection != null)
 			for(final T elem : collection)
 				if(condition.test(elem))
@@ -80,7 +79,7 @@ public class LoopHelper{
 	}
 
 
-	public static <T> boolean allMatch(final Collection<T> collection, final Predicate<T> condition){
+	public static <T> boolean allMatch(final Iterable<T> collection, final Predicate<T> condition){
 		boolean result = true;
 		if(collection != null)
 			for(final T elem : collection)
@@ -101,7 +100,7 @@ public class LoopHelper{
 		}
 	}
 
-	public static <T> void applyIf(final Collection<T> collection, final Predicate<T> condition, final Consumer<T> fun){
+	public static <T> void applyIf(final Iterable<T> collection, final Predicate<T> condition, final Consumer<T> fun){
 		if(collection != null)
 			for(final T elem : collection)
 				if(condition.test(elem))
@@ -130,7 +129,7 @@ public class LoopHelper{
 	}
 
 
-	public static <T> T max(final Collection<T> collection, final Comparator<T> comparator){
+	public static <T> T max(final Iterable<T> collection, final Comparator<T> comparator){
 		T best = null;
 		for(final T elem : collection)
 			if(best == null || comparator.compare(elem, best) > 0)
@@ -148,13 +147,12 @@ public class LoopHelper{
 		indices[0] = index;
 
 		int count;
-		//noinspection StatementWithEmptyBody
 		for(count = 1; (index = indexOf(array, filter, indices[count - 1] + 1)) != -1; indices[count ++] = index){}
 
 		return ArrayUtils.removeAll(array, Arrays.copyOf(indices, count));
 	}
 
-	private static <T> int indexOf(final T[] array, final Predicate<T> filter, int startIndex){
+	private static <T> int indexOf(final T[] array, final Predicate<T> filter, final int startIndex){
 		for(int i = startIndex; i < array.length; i ++)
 			if(filter.test(array[i]))
 				return i;

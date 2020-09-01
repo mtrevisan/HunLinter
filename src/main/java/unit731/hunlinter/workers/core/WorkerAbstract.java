@@ -39,6 +39,7 @@ import javax.swing.SwingWorker;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
@@ -51,7 +52,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	protected final WD workerData;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
-	private static final ReentrantLock PAUSE_LOCK = new ReentrantLock();
+	private static final Lock PAUSE_LOCK = new ReentrantLock();
 	private static final Condition UNPAUSE = PAUSE_LOCK.newCondition();
 
 	private final TimeWatch watch = TimeWatch.start();
@@ -110,7 +111,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		System.gc();
 
 		setProgress(100);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
 	public void executeSynchronously(){

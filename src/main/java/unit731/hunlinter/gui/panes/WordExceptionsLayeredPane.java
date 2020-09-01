@@ -85,7 +85,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(WordExceptionsLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -225,7 +225,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -239,7 +238,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;
 

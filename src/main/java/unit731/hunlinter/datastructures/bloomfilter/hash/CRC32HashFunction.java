@@ -25,6 +25,7 @@
 package unit731.hunlinter.datastructures.bloomfilter.hash;
 
 import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 
 /**
@@ -39,7 +40,7 @@ public class CRC32HashFunction implements HashFunction{
 
 	@Override
 	public long hash(final byte[] bytes){
-		final CRC32 crc32 = new CRC32();
+		final Checksum crc32 = new CRC32();
 		crc32.update(bytes);
 		return crc32.getValue();
 	}

@@ -35,7 +35,7 @@ import java.util.function.Consumer;
  *
  * @see <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a>
  */
-public class HeapSort{
+public final class HeapSort{
 
 	private HeapSort(){}
 
@@ -48,12 +48,12 @@ public class HeapSort{
 		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
-	public static <T> void sort(final T[] data, int low, final int high,
+	public static <T> void sort(final T[] data, final int low, final int high,
 			final Comparator<? super T> comparator){
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T> void sort(final T[] data, int low, final int high, final Comparator<? super T> comparator,
+	public static synchronized <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);

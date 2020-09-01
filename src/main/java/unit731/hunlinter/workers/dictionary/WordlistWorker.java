@@ -80,7 +80,7 @@ public class WordlistWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 
-		BufferedWriter writer;
+		final BufferedWriter writer;
 		try{
 			writer = Files.newBufferedWriter(outputFile.toPath(), charset);
 		}

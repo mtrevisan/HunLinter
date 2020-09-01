@@ -26,7 +26,6 @@ package unit731.hunlinter.gui.dialogs;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -39,7 +38,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
 	private boolean languageChosen;
 
 
-	public LanguageChooserDialog(final List<String> availableLanguages, final Consumer<String> onSelection, Frame parent){
+	public LanguageChooserDialog(final Iterable<String> availableLanguages, final Consumer<String> onSelection, final Frame parent){
 		super(parent, "Language chooser", true);
 
 		Objects.requireNonNull(onSelection);

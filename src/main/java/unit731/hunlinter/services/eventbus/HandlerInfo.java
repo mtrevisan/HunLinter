@@ -37,7 +37,7 @@ class HandlerInfo{
 	private final boolean vetoHandler;
 
 
-	public HandlerInfo(final Class<?> eventClass, final Method method, final Object subscriber, final boolean vetoHandler){
+	HandlerInfo(final Class<?> eventClass, final Method method, final Object subscriber, final boolean vetoHandler){
 		this.eventClass = eventClass;
 		this.method = method;
 		this.subscriber = new WeakReference<>(subscriber);

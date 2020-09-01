@@ -166,7 +166,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return list;
 	}
 
-	private void writeSupportFile(final File file, final List<String> list){
+	private void writeSupportFile(final File file, final Iterable<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
 			LoopHelper.forEach(list, line -> writeLine(writer, line, NEW_LINE));
@@ -198,7 +198,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 						final String line2Lowercase = line2.toLowerCase(Locale.ROOT);
 
 						//calculate distance
-						int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
+						final int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
 						if(distance == 1){
 							final Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 							final char left = difference.getLeft();
@@ -247,7 +247,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setProgress(index, size);
+				setProgress(index ++, size);
 
 				sleepOnPause();
 			}

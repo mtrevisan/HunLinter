@@ -31,6 +31,9 @@ import java.util.Collection;
 
 public class SortableListModel extends AbstractListModel<String>{
 
+	private static final long serialVersionUID = -2766941679426379241L;
+
+
 	private final ArrayList<String> delegate = new ArrayList<>();
 
 
@@ -59,7 +62,7 @@ public class SortableListModel extends AbstractListModel<String>{
 		return delegate.get(index);
 	}
 
-	public void replaceAll(final Collection<? extends String> c, int startIndex){
+	public void replaceAll(final Collection<? extends String> c, final int startIndex){
 		if(!c.isEmpty()){
 			final int size = getSize();
 			if(startIndex >= size)

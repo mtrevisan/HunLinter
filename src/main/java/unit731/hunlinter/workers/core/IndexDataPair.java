@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
-public class IndexDataPair<T>{
+public final class IndexDataPair<T>{
 
 	public static final IndexDataPair<Object> NULL_INDEX_DATA_PAIR = new IndexDataPair<>(-1, null);
 

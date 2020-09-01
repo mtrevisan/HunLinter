@@ -35,16 +35,16 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 
-public class OrthographyVEC extends Orthography{
+public final class OrthographyVEC extends Orthography{
 
-	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
-	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
+	private static final String[] STRESS_CODES = {"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
+	private static final String[] TRUE_STRESS = {"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
 
-	private static final String[] EXTENDED_CHARS = new String[]{"dh", "jh", "lh", "nh", "th"};
-	private static final String[] TRUE_CHARS = new String[]{"đ", "ɉ", "ƚ", "ñ", "ŧ"};
+	private static final String[] EXTENDED_CHARS = {"dh", "jh", "lh", "nh", "th"};
+	private static final String[] TRUE_CHARS = {"đ", "ɉ", "ƚ", "ñ", "ŧ"};
 
-	private static final String[] MB_MP = new String[]{"mb", "mp"};
-	private static final String[] NB_NP = new String[]{"nb", "np"};
+	private static final String[] MB_MP = {"mb", "mp"};
+	private static final String[] NB_NP = {"nb", "np"};
 
 	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàéèíóòú])");
 	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàéèíóòú])");

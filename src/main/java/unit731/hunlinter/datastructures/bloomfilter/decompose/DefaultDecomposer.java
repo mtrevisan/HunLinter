@@ -43,7 +43,7 @@ public class DefaultDecomposer<T> implements Decomposer<T>{
 	@Override
 	public void decompose(final T object, final ByteSink sink, final Charset charset){
 		if(object != null){
-			byte[] bytes;
+			final byte[] bytes;
 			if(String.class.isAssignableFrom(object.getClass()))
 				bytes = ((String)object).getBytes(charset);
 			else

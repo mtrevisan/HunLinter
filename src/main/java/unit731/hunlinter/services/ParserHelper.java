@@ -40,7 +40,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
-public class ParserHelper{
+public final class ParserHelper{
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was ''{0}''");
 
@@ -51,7 +51,7 @@ public class ParserHelper{
 
 	private ParserHelper(){}
 
-	public static boolean isComment(final String line, final char... comment){
+	public static boolean isComment(final CharSequence line, final char... comment){
 		return (StringUtils.isBlank(line) || StringUtils.indexOfAny(line, comment) == 0);
 	}
 
@@ -90,7 +90,7 @@ public class ParserHelper{
 	public static void assertLinesCount(final List<String> lines) throws IOException{
 		if(lines.isEmpty())
 			throw new EOFException("Unexpected EOF while reading file");
-		String line = lines.get(0);
+		final String line = lines.get(0);
 		if(!NumberUtils.isCreatable(line))
 			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
 	}

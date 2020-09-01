@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -93,7 +94,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		return entries;
 	}
 
-	private void processLinesParallel(final List<IndexDataPair<String>> entries,
+	private void processLinesParallel(final Collection<IndexDataPair<String>> entries,
 			final Consumer<IndexDataPair<String>> dataProcessor){
 		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, entries.size());
 		entries.parallelStream()

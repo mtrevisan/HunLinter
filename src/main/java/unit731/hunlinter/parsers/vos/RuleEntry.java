@@ -87,7 +87,7 @@ public class RuleEntry{
 	}
 
 	public char combinableChar(){
-		return (isCombinable()? COMBINABLE: NOT_COMBINABLE);
+		return (combinable? COMBINABLE: NOT_COMBINABLE);
 	}
 
 	public AffixEntry[] getEntries(){

@@ -34,6 +34,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +42,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
@@ -99,7 +101,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return StringUtils.join(synonyms, separator);
 	}
 
-	public void addSynonym(SynonymsEntry synonymsEntry){
+	public void addSynonym(final SynonymsEntry synonymsEntry){
 		synonyms.add(synonymsEntry);
 	}
 
@@ -109,10 +111,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public Set<String> getSynonymsSet(){
 		final Set<String> set = new HashSet<>();
-		for(final SynonymsEntry synonym : synonyms){
-			final List<String> synonymsEntrySynonyms = synonym.getSynonyms();
-			forEach(synonymsEntrySynonyms, set::add);
-		}
+		final Consumer<String> add = set::add;
+		for(final SynonymsEntry synonym : synonyms)
+			forEach(synonym.getSynonyms(), add);
 		return set;
 	}
 
@@ -131,20 +132,20 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return false;
 	}
 
-	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
-		final List<String> ss = new ArrayList<>(synonyms);
+	public boolean contains(final Collection<String> partOfSpeeches, final List<String> synonyms){
+		final Collection<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
 	}
 
-	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
-		final List<String> ss = new ArrayList<>(synonyms);
+	public boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
+		final Collection<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
 			|| match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
 	}
 
-	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
+	public void saveToIndex(final BufferedWriter writer, final int idx) throws IOException{
 		writer.write(definition);
-		writer.write(ThesaurusEntry.PIPE);
+		writer.write(PIPE);
 		writer.write(Integer.toString(idx));
 		writer.write(NEW_LINE);
 	}

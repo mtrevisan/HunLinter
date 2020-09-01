@@ -55,8 +55,6 @@ public class TagPanel extends JPanel{
 	}
 
 	public TagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
-		super();
-
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
@@ -82,8 +80,9 @@ public class TagPanel extends JPanel{
 				removeAll();
 
 				//re-insert all tags
+				final Consumer<JTagComponent> removeTag = this::removeTag;
 				for(final String tag : tags){
-					final JTagComponent component = new JTagComponent(tag, this::removeTag);
+					final JTagComponent component = new JTagComponent(tag, removeTag);
 					add(component, BorderLayout.LINE_END);
 				}
 
@@ -92,7 +91,7 @@ public class TagPanel extends JPanel{
 		}
 	}
 
-	public void initializeTags(final List<String> tags){
+	public void initializeTags(final Iterable<String> tags){
 		synchronized(getTreeLock()){
 			if(tags == null)
 				removeAll();
@@ -151,7 +150,7 @@ public class TagPanel extends JPanel{
 	private static final Color COLOR_TEXT = new Color(85, 85, 85);
 	private static final Color COLOR_CLOSE = new Color(119, 119, 119);
 
-	private static final String TEXT_CROSS_MARK = "\u274C";
+	private static final String TEXT_CROSS_MARK = "❌";
 
 	//values for horizontal and vertical radius of corner arcs
 	private static final Dimension CORNER_RADIUS = new Dimension(5, 5);

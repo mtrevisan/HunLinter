@@ -108,7 +108,7 @@ public class RadixTrieNode{
 	 *
 	 * @param childrenIds	Id of the children to add
 	 */
-	public void addChildrenIds(final Collection<Integer> childrenIds){
+	public void addChildrenIds(final Iterable<Integer> childrenIds){
 		forEach(childrenIds, this::addChildrenId);
 	}
 

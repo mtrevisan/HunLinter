@@ -108,7 +108,7 @@ final int iconSize = 17;
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(HyphenationLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -366,8 +366,8 @@ final int iconSize = 17;
 
             parserManager.storeHyphenationFile();
          }
-         catch(Exception ex){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
+         catch(final Exception e){
+            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
@@ -379,7 +379,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -388,7 +387,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION)
 			return;
 

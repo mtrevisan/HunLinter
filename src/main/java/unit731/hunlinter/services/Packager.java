@@ -242,7 +242,7 @@ public class Packager{
 		}
 	}
 
-	private List<String> extractLanguages(final List<File> configurationFiles) throws IOException, SAXException{
+	private List<String> extractLanguages(final Iterable<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final Node parentNode = pair.getRight();
 		final List<Node> children = extractChildren(parentNode);
@@ -319,7 +319,7 @@ public class Packager{
 		}
 	}
 
-	private Path packageAutoCorrectFiles(String language) throws IOException{
+	private Path packageAutoCorrectFiles(final String language) throws IOException{
 		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
 		if(autoCorrectFile == null)
 			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
@@ -342,7 +342,7 @@ public class Packager{
 		return outputPath;
 	}
 
-	private void packageExtension(Path projectPath, Path autoCorrectOutputPath, Path autoTextOutputPath) throws IOException{
+	private void packageExtension(final Path projectPath, final Path autoCorrectOutputPath, final Path autoTextOutputPath) throws IOException{
 		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
 			+ EXTENSION_ZIP)
 			.toFile();
@@ -367,7 +367,7 @@ public class Packager{
 		final File affFile = getAffixFile();
 		if(affFile != null){
 			try{
-				final String content = new String(Files.readAllBytes(affFile.toPath()));
+				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
 				final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 					.mapToObj(Character::toString)
@@ -462,7 +462,7 @@ public class Packager{
 		return configurationPaths;
 	}
 
-	private Pair<File, Node> findConfiguration(final String configurationName, final List<File> configurationFiles)
+	private Pair<File, Node> findConfiguration(final String configurationName, final Iterable<File> configurationFiles)
 			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
 			final Document doc = XMLManager.parseXMLDocument(configurationFile);

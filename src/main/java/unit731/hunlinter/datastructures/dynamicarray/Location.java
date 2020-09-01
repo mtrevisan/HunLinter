@@ -63,7 +63,7 @@ class Location{
 		//floor(log2 r) is the total number of bits immediately after the leading 1 bit in `r`,
 		//and k = floor(log2 r)
 		//k - numOfBitsToCapture gives us how many places we need to shift the bits to the right in `r`
-		r = r >> (k - numOfBitsToCapture);
+		r >>= (k - numOfBitsToCapture);
 		//mask depends on how many bits we want to capture
 		final int mask = mask(numOfBitsToCapture);
 		return r & mask;

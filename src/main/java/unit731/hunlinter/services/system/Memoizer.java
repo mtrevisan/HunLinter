@@ -27,12 +27,13 @@ package unit731.hunlinter.services.system;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-public class Memoizer{
+public final class Memoizer{
 
 	private static final Object DEFAULT_OBJECT = new Object();
 
@@ -59,7 +60,7 @@ public class Memoizer{
 	 */
 	public static <T> Supplier<T> memoizeThreadAndRecursionSafe(final Supplier<T> supplier){
 		final Map<Object, T> cache = new HashMap<>();
-		final ReentrantLock lock = new ReentrantLock();
+		final Lock lock = new ReentrantLock();
 		return () -> {
 			lock.lock();
 			try{
@@ -82,7 +83,7 @@ public class Memoizer{
 	 */
 	public static <T, U> Function<T, U> memoizeThreadAndRecursionSafe(final Function<T, U> function){
 		final Map<T, U> cache = new HashMap<>();
-		final ReentrantLock lock = new ReentrantLock();
+		final Lock lock = new ReentrantLock();
 		return input -> {
 			lock.lock();
 			try{

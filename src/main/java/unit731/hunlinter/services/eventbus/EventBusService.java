@@ -43,6 +43,8 @@ public final class EventBusService{
 	private static final EventBusInterface EVENT_BUS = new BasicEventBus(true);
 
 
+	private EventBusService(){}
+
 	public static void subscribe(final Object subscriber){
 		EVENT_BUS.subscribe(subscriber);
 	}

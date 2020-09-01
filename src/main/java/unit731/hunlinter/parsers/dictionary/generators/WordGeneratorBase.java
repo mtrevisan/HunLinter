@@ -251,7 +251,7 @@ class WordGeneratorBase{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		final FixedArray<String> appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
-		FixedArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
+		final FixedArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
 		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS].data, circumfixFlag))
 			postponedAffixes.add(circumfixFlag);
 

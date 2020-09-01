@@ -56,7 +56,7 @@ public enum MorphologicalTag{
 	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>();
 	static{
 		for(final MorphologicalTag tag : EnumSet.allOf(MorphologicalTag.class))
-			VALUES.put(tag.getCode(), tag);
+			VALUES.put(tag.code, tag);
 	}
 
 	private final String code;

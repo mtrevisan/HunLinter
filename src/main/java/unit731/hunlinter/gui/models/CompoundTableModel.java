@@ -38,7 +38,7 @@ public class CompoundTableModel extends AbstractTableModel implements HunLinterT
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Inflection", "Morphological fields"};
+	private static final String[] COLUMN_NAMES = {"Inflection", "Morphological fields"};
 
 
 	private List<Inflection> inflections;

@@ -39,7 +39,7 @@ public class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> ext
 	@Override
 	public void toggleSortOrder(final int column){
 		final List<? extends SortKey> sortKeys = getSortKeys();
-		if(sortKeys.size() > 0 && sortKeys.get(0).getSortOrder() == SortOrder.DESCENDING)
+		if(!sortKeys.isEmpty() && sortKeys.get(0).getSortOrder() == SortOrder.DESCENDING)
 			setSortKeys(null);
 		else
 			super.toggleSortOrder(column);

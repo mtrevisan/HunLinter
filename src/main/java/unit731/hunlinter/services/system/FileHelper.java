@@ -64,7 +64,7 @@ import java.util.zip.GZIPOutputStream;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class FileHelper{
+public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
@@ -247,7 +247,7 @@ public class FileHelper{
 	}
 
 
-	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final List<String> content)
+	public static void saveFile(final Path path, final String lineTerminator, final Charset charset, final Iterable<String> content)
 		throws IOException{
 		try(final BufferedWriter writer = Files.newBufferedWriter(path, charset)){
 			for(final String line : content){
@@ -317,14 +317,12 @@ public class FileHelper{
 		try{
 			switch(action){
 				case OPEN:
-					//noinspection ConstantConditions
 					desktop.open((File)parameter);
 					done = true;
 					break;
 
 				case BROWSE:
 					if(DownloaderHelper.hasInternetConnectivity()){
-						//noinspection ConstantConditions
 						desktop.browse(new URI((String)parameter));
 						done = true;
 					}
@@ -332,7 +330,6 @@ public class FileHelper{
 
 				case MAIL:
 					if(DownloaderHelper.hasInternetConnectivity()){
-						//noinspection ConstantConditions
 						desktop.mail(new URI((String)parameter));
 						done = true;
 					}

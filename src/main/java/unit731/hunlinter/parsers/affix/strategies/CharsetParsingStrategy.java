@@ -33,7 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
 
-class CharsetParsingStrategy extends FlagParsingStrategy{
+final class CharsetParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: ''{1}''");
 	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule should be in {0} encoding: was ''{1}''");
@@ -79,7 +79,7 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private String[] extractFlags(final String flags){
+	private String[] extractFlags(final CharSequence flags){
 		final int size = flags.length();
 		final String[] list = new String[size];
 		for(int i = 0; i < size; i ++)
@@ -103,12 +103,12 @@ class CharsetParsingStrategy extends FlagParsingStrategy{
 		return extractFlags(compoundRule);
 	}
 
-	private void checkCompoundValidity(final String compoundRule){
+	private void checkCompoundValidity(final CharSequence compoundRule){
 		if(!canEncode(compoundRule))
 			throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{charset.displayName(), compoundRule}));
 	}
 
-	private boolean canEncode(final String cs){
+	private boolean canEncode(final CharSequence cs){
 		final CharsetEncoder encoder = charset.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);

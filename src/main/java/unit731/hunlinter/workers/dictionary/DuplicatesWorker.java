@@ -49,6 +49,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +243,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result;
 	}
 
-	private void writeDuplicates(final File duplicatesFile, final List<Duplicate> duplicates){
+	private void writeDuplicates(final File duplicatesFile, final Collection<Duplicate> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
@@ -274,7 +275,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		}
 	}
 
-	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
+	private List<List<Duplicate>> mergeDuplicates(final Collection<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
 			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechAndStem(),
 				duplicate -> {

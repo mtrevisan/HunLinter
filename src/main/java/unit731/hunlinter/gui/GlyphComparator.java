@@ -28,7 +28,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 
-public class GlyphComparator{
+public final class GlyphComparator{
 
 	private GlyphComparator(){}
 
@@ -81,8 +81,8 @@ public class GlyphComparator{
 	}
 
 	private static void validateCharacters(final char[] chrs){
-		for(int i = 0; i < chrs.length; i++)
-			if(! Character.isLetterOrDigit(chrs[i]))
+		for(final char chr : chrs)
+			if(!Character.isLetterOrDigit(chr))
 				throw new IllegalArgumentException("Only letters or numbers chan be compared");
 	}
 

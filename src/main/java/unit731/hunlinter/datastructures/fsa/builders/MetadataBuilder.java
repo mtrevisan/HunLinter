@@ -41,14 +41,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 
 /**
  * @see <a href="http://wiki.languagetool.org/hunspell-support">LanguageTool - Spell check</a>
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
  */
-public class MetadataBuilder{
+public final class MetadataBuilder{
 
 	private MetadataBuilder(){}
 
@@ -66,7 +66,7 @@ public class MetadataBuilder{
 
 	public static void create(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
 			throws IOException{
-		final List<String> content = new ArrayList<>(Arrays.asList(
+		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 			"fsa.dict.encoding=" + charset.name().toLowerCase(),

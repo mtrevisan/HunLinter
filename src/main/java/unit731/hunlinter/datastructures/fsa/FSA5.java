@@ -242,7 +242,7 @@ public class FSA5 extends FSA{
 	 */
 	@Override
 	public int getRightLanguageCount(final int node){
-		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
+		assert flags.contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
 
 		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
 	}

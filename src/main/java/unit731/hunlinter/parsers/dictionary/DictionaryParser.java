@@ -55,7 +55,7 @@ public class DictionaryParser{
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
 	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
 	static{
-		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
+		final DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
 		symbols.setGroupingSeparator(COUNTER_GROUPING_SEPARATOR);
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}

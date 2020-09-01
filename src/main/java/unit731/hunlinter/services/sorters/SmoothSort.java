@@ -36,7 +36,7 @@ import java.util.function.Consumer;
  * @see <a href="https://www.keithschwarz.com/interesting/code/?dir=smoothsort">Smoothsort Demystified - source code</a>
  * https://code.google.com/archive/p/combsortcs2p-and-other-sorting-algorithms/wikis/SmoothSort.wiki
  */
-public class SmoothSort{
+public final class SmoothSort{
 
 	//by keeping these constants, we can avoid the tiresome business of keeping track of Dijkstra's b and c. Instead of keeping
 	//b and c, I will keep an index into this array (the number past the last one is > 63 bits)
@@ -79,7 +79,7 @@ public class SmoothSort{
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T> void sort(final T[] data, int low, int high,
+	public static synchronized <T> void sort(final T[] data, final int low, int high,
 			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(comparator);

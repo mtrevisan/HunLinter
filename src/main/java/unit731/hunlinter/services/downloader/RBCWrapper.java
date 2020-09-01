@@ -52,7 +52,7 @@ class RBCWrapper implements ReadableByteChannel{
 
 	@Override
 	public int read(final ByteBuffer bb) throws IOException{
-		int readBytes;
+		final int readBytes;
 		if((readBytes = rbc.read(bb)) > 0){
 			readSoFar += readBytes;
 

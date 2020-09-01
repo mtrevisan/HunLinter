@@ -50,7 +50,7 @@ public class CheckUpdateOnStartupAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		preferences.putBoolean(UPDATE_STARTUP_CHECK, ((JCheckBoxMenuItem)event.getSource()).isSelected());
+		preferences.putBoolean(UPDATE_STARTUP_CHECK, ((AbstractButton)event.getSource()).isSelected());
 	}
 
 }

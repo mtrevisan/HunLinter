@@ -256,11 +256,11 @@ public class Hyphenator implements HyphenatorInterface{
 		return LoopHelper.removeIf(response, nohyp::equals);
 	}
 
-	private boolean isStarting(final String key){
+	private boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final String key){
+	private boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
@@ -322,11 +322,11 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	private String removeNonStandardPart(final String rule){
+	private String removeNonStandardPart(final CharSequence rule){
 		return RegexHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
-	private int getNormalizedLength(final String word){
+	private int getNormalizedLength(final CharSequence word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 

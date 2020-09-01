@@ -29,6 +29,9 @@ import unit731.hunlinter.workers.core.IndexDataPair;
 
 public class LinterWarning extends Exception{
 
+	private static final long serialVersionUID = 3853411643385148097L;
+
+
 	private final IndexDataPair<?> data;
 
 

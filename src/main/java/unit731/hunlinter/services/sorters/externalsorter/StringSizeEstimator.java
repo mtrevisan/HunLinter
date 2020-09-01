@@ -28,7 +28,7 @@ package unit731.hunlinter.services.sorters.externalsorter;
 /**
  * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</a>, version 0.4.4, 11/3/2020
  */
-class StringSizeEstimator{
+final class StringSizeEstimator{
 
 	private static final int OBJ_OVERHEAD;
 	static{
@@ -68,8 +68,8 @@ class StringSizeEstimator{
 	 * @param text The string to estimate memory footprint
 	 * @return The <strong>estimated</strong> size [B]
 	 */
-	public static long estimatedSizeOf(final String text){
-		return text.length() * 2 + OBJ_OVERHEAD;
+	public static long estimatedSizeOf(final CharSequence text){
+		return (text.length() << 1) + OBJ_OVERHEAD;
 	}
 
 }

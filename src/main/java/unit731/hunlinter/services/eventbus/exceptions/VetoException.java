@@ -38,4 +38,6 @@ import unit731.hunlinter.services.eventbus.EventHandler;
  */
 public class VetoException extends RuntimeException{
 
+	private static final long serialVersionUID = -9216228586704212839L;
+
 }

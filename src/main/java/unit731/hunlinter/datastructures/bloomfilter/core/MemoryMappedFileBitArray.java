@@ -75,7 +75,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		extendFile(numberOfBytes);
 
 		//initialize the rest
-		this.maxElements = bits;
+		maxElements = bits;
 		buffer = this.backingFile.getChannel().map(MapMode.READ_WRITE, 0, this.backingFile.length());
 	}
 

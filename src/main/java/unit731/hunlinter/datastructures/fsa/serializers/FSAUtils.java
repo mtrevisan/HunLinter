@@ -33,7 +33,7 @@ import unit731.hunlinter.datastructures.fsa.FSA;
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class FSAUtils{
+public final class FSAUtils{
 
 	private FSAUtils(){}
 

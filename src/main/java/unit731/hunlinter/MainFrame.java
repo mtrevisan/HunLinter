@@ -198,7 +198,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 		try{
 			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
-			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
+			final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
 				@Override
@@ -224,7 +224,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				catch(final Exception ignored){}
 			});
 
-		EventBusService.subscribe(MainFrame.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -284,7 +284,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle((String)DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
+      setTitle((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
@@ -292,7 +292,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       parsingResultTextArea.setColumns(20);
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
-      DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
+      final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
@@ -355,7 +355,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
-      RecentItems recentItems = new RecentItems(5, preferences);
+      final RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new unit731.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
@@ -514,7 +514,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       tabbedPaneEnableEvent(new TabbedPaneEnableEvent(false));
 
-      KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+      final KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
       pack();
@@ -545,7 +545,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void actionPerformed(ActionEvent event){
+	public void actionPerformed(final ActionEvent event){
 		workerManager.checkForAbortion();
 	}
 
@@ -580,7 +580,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			filOpenProjectMenuItem.setEnabled(false);
 		};
-		final ProjectLoaderAction projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
+		final ActionListener projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
 			initialize, this::loadFileCompleted, this::loadFileCancelled, this);
 		final ActionEvent event = new ActionEvent(filEmptyRecentProjectsMenuItem, -1, "openProject");
 		projectLoaderAction.actionPerformed(event);
@@ -716,7 +716,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_ALL);
 
-		EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_ALL);
+		EventBusService.publish(ACTION_COMMAND_PARSER_CLEAR_ALL);
 
 		//dictionary file:
 		dicMenu.setEnabled(false);
@@ -733,7 +733,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAffixParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
@@ -755,7 +754,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearDictionaryParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
@@ -766,7 +764,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAidParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
@@ -779,7 +776,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearThesaurusParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
@@ -795,7 +791,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearHyphenationParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
@@ -811,7 +806,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAutoCorrectParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -826,7 +820,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearSentenceExceptionsParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
@@ -841,7 +834,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearWordExceptionsParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 

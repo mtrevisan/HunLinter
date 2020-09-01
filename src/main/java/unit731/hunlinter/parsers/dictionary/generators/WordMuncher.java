@@ -38,6 +38,7 @@ import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -131,7 +132,7 @@ public class WordMuncher{
 		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, affixData);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
-			final List<Inflection> originatingRulesFromEntry = new ArrayList<>();
+			final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
