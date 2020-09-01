@@ -13,14 +13,10 @@ public class LabeledPopupMenu extends JPopupMenu{
 
 
 	public LabeledPopupMenu(){
-		super();
-
-		this.label = null;
+		label = null;
 	}
 
 	public LabeledPopupMenu(final String label){
-		super();
-
 		this.label = new JLabel(composeTitle(label));
 		final Font font = this.label.getFont();
 		this.label.setFont(font.deriveFont(font.getSize() + 1.f));

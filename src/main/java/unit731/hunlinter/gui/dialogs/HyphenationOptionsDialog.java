@@ -33,8 +33,8 @@ import unit731.hunlinter.parsers.hyphenation.HyphenationOptions;
 import unit731.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
-import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,7 +59,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 	private final Consumer<HyphenationOptionsParser> acceptButtonAction;
 
 
-	public HyphenationOptionsDialog(HyphenationOptionsParser options, final Consumer<HyphenationOptionsParser> acceptButtonAction, java.awt.Frame parent){
+	public HyphenationOptionsDialog(final HyphenationOptionsParser options, final Consumer<HyphenationOptionsParser> acceptButtonAction, final java.awt.Frame parent){
 		super(parent, true);
 
 		Objects.requireNonNull(options);
@@ -119,22 +119,22 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       minLeftNonCompoundLabel.setText("Minimal left distance:");
 
       final DocumentFilter integerFilter = new IntegerFilter();
-      ((PlainDocument)minLeftNonCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
+      ((AbstractDocument)minLeftNonCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 
       minRightNonCompoundLabel.setLabelFor(minRightNonCompoundTextField);
       minRightNonCompoundLabel.setText("Minimal right distance:");
 
-      ((PlainDocument)minRightNonCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
+      ((AbstractDocument)minRightNonCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 
       minLeftCompoundLabel.setLabelFor(minLeftCompoundTextField);
       minLeftCompoundLabel.setText("Minimal left compound distance:");
 
-      ((PlainDocument)minLeftCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
+      ((AbstractDocument)minLeftCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 
       minRightCompoundLabel.setLabelFor(minRightCompoundTextField);
       minRightCompoundLabel.setText("Minimal right compound distance:");
 
-      ((PlainDocument)minRightCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
+      ((AbstractDocument)minRightCompoundTextField.getDocument()).setDocumentFilter(integerFilter);
 
       noHyphenationLabel.setLabelFor(noHyphenationTextField);
       noHyphenationLabel.setText("No hyph character:");
@@ -155,7 +155,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 
       noHyphenationList.setFont(FontHelper.getCurrentFont());
       //listen for row removal
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+      final KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       noHyphenationList.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       noHyphenationScrollPane.setViewportView(noHyphenationList);
 
@@ -236,7 +236,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void actionPerformed(ActionEvent event){
+	public void actionPerformed(final ActionEvent event){
 		if(event.getSource() == noHyphenationList)
 			removeSelectedRows();
 	}

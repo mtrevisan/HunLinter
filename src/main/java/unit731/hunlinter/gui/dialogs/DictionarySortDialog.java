@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
 
 
@@ -71,7 +71,7 @@ public class DictionarySortDialog extends JDialog{
 
 		lblMessage.setText("Select a section from the list:");
 
-		EventBusService.subscribe(DictionarySortDialog.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -148,7 +148,6 @@ public class DictionarySortDialog extends JDialog{
 
 	@EventHandler
 	public void reloadDictionaryParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY)
 			return;
 
@@ -164,7 +163,7 @@ public class DictionarySortDialog extends JDialog{
 		}
 	}
 
-	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
+	private void loadLines(final Collection<String> listData, final int firstVisibleItemIndex){
 		final SortableListModel model = (SortableListModel)entriesList.getModel();
 		model.replaceAll(listData, 0);
 

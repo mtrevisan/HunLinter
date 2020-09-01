@@ -27,6 +27,7 @@ package unit731.hunlinter.gui.components;
 import unit731.hunlinter.services.RecentItems;
 
 import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -48,8 +49,6 @@ public class RecentFilesMenu extends JMenu{
 
 
 	public RecentFilesMenu(final RecentItems recentItems, final Consumer<Path> onSelectFile){
-		super();
-
 		Objects.requireNonNull(recentItems);
 		Objects.requireNonNull(onSelectFile);
 
@@ -86,19 +85,20 @@ public class RecentFilesMenu extends JMenu{
 		//clear the existing items
 		removeAll();
 
+		final ActionListener actionListener = actionEvent -> {
+			final String path = actionEvent.getActionCommand();
+			recentItems.push(path);
+
+			addEntriesToMenu();
+
+			onSelectFile.accept(Path.of(path));
+		};
 		final List<String> items = recentItems.getItems();
 		int index = 0;
 		for(final String item : items){
 			final JMenuItem newMenuItem = new JMenuItem(item);
 			newMenuItem.setActionCommand(item);
-			newMenuItem.addActionListener(actionEvent -> {
-				final String path = actionEvent.getActionCommand();
-				recentItems.push(path);
-
-				addEntriesToMenu();
-
-				onSelectFile.accept(Path.of(path));
-			});
+			newMenuItem.addActionListener(actionListener);
 			add(newMenuItem, index ++);
 		}
 	}

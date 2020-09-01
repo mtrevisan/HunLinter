@@ -55,9 +55,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 
 
 	/** Constructs a new <code>WrapLayout</code> with a left alignment and a default 5-unit horizontal and vertical gap. */
-	public HorizontalFlowLayout(){
-		super();
-	}
+	public HorizontalFlowLayout(){}
 
 	/**
 	 * Constructs a new <code>FlowLayout</code> with the specified alignment and a default 5-unit horizontal and vertical gap.

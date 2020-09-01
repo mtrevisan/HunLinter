@@ -437,7 +437,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		final int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
-		double x = (double)compoundWords / uniqueWords;
+		final double x = (double)compoundWords / uniqueWords;
 		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ formatFrequencyVariableDecimals(x);
 		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
@@ -495,7 +495,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				final Map.Entry<Integer, Long> elem = itr.next();
 				series.add(elem.getKey().doubleValue(), elem.getValue().doubleValue() / totalSamples);
 			}
-			final XYSeriesCollection dataset = new XYSeriesCollection(series);
+			final XYDataset dataset = new XYSeriesCollection(series);
 
 			panel.getChart().getXYPlot().setDataset(dataset);
 		}
