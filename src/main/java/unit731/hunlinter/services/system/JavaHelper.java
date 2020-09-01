@@ -33,7 +33,7 @@ import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
 
 
-public class JavaHelper{
+public final class JavaHelper{
 
 	private static final char QUOTATION_MARK = '"';
 

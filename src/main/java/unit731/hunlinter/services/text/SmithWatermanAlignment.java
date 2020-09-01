@@ -33,7 +33,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -111,7 +110,7 @@ public class SmithWatermanAlignment{
 	private final double[][] scores;
 
 
-	public SmithWatermanAlignment(final String a, final String b){
+	public SmithWatermanAlignment(final CharSequence a, final CharSequence b){
 		x = RegexHelper.split(a, UNICODE_SPLITTER);
 		y = RegexHelper.split(b, UNICODE_SPLITTER);
 
@@ -131,15 +130,15 @@ public class SmithWatermanAlignment{
 		double maxScore = 0.;
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++){
-				double m1 = Math.max(0, matching(i, j));
-				double m2 = Math.max(insertion(i, j), deletion(i, j));
+				final double m1 = Math.max(0, matching(i, j));
+				final double m2 = Math.max(insertion(i, j), deletion(i, j));
 				scores[i][j] = Math.max(m1, m2);
 
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		Set<Trace> traces = new HashSet<>();
-		Stack<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Set<Trace> traces = new HashSet<>();
+		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
 		//extract edit operations
 		forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
 		return traces;
@@ -179,9 +178,9 @@ public class SmithWatermanAlignment{
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
+	private Deque<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		Stack<Pair<Integer, Integer>> maxScores = new Stack<>();
+		final Deque<Pair<Integer, Integer>> maxScores = new ArrayDeque<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
@@ -190,14 +189,14 @@ public class SmithWatermanAlignment{
 	}
 
 	private Trace traceback(int lastIndexA, int lastIndexB){
-		Trace trace = new Trace();
+		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
 		trace.operations = new ArrayDeque<>();
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){
-			double tmp = scores[lastIndexA][lastIndexB];
+			final double tmp = scores[lastIndexA][lastIndexB];
 			if(tmp == 0.)
 				break;
 

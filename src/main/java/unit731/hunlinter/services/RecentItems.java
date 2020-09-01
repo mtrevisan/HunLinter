@@ -27,6 +27,7 @@ package unit731.hunlinter.services;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
@@ -49,7 +50,7 @@ public class RecentItems{
 	private final Preferences preferenceNode;
 
 	private final List<String> items;
-	private final List<RecentItemsObserver> observers = new ArrayList<>();
+	private final Collection<RecentItemsObserver> observers = new ArrayList<>();
 
 
 	public RecentItems(final int maxItems, final Preferences preferenceNode){

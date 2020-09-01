@@ -29,7 +29,7 @@ import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 
-public class TimeWatch{
+public final class TimeWatch{
 
 	private static final String TIMER_NOT_STOPPED = "timer not stopped";
 	private static final String MINUTES = "min";
@@ -50,7 +50,7 @@ public class TimeWatch{
 		return new TimeWatch();
 	}
 
-	public final TimeWatch reset(){
+	public TimeWatch reset(){
 		start = System.nanoTime();
 		end = 0l;
 		return this;

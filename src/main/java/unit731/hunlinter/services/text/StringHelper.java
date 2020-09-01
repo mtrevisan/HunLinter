@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
 
-public class StringHelper{
+public final class StringHelper{
 
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
@@ -60,7 +60,7 @@ public class StringHelper{
 
 	private StringHelper(){}
 
-	public static boolean isWord(final String text){
+	public static boolean isWord(final CharSequence text){
 		for(int i = 0; i < text.length(); i ++){
 			final char chr = text.charAt(i);
 			if(Character.isLetter(chr) || Character.isDigit(chr))
@@ -69,14 +69,14 @@ public class StringHelper{
 		return false;
 	}
 
-	public static long countUppercases(final String text){
+	public static long countUppercases(final CharSequence text){
 		return text.chars()
 			.filter(Character::isUpperCase)
 			.count();
 	}
 
 	//Classify the casing of a given string (ignoring characters for which no upper-/lowercase distinction exists)
-	public static Casing classifyCasing(final String text){
+	public static Casing classifyCasing(final CharSequence text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
@@ -127,7 +127,7 @@ public class StringHelper{
 	 * b.endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common suffix, returns the empty string.
 	 */
-	private static String commonSuffix(final String a, final String b){
+	private static String commonSuffix(final CharSequence a, final CharSequence b){
 		int s = 0;
 		final int aLength = a.length();
 		final int bLength = b.length();
@@ -144,7 +144,7 @@ public class StringHelper{
 	 * b.toString().startsWith(prefix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common prefix, returns the empty string.
 	 */
-	private static String commonPrefix(final String a, final String b){
+	private static String commonPrefix(final CharSequence a, final CharSequence b){
 		int p = 0;
 		final int maxPrefixLength = Math.min(a.length(), b.length());
 		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
@@ -164,7 +164,7 @@ public class StringHelper{
 			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
-	public static int getLastCommonLetterIndex(final String word1, final String word2){
+	public static int getLastCommonLetterIndex(final CharSequence word1, final CharSequence word2){
 		int lastCommonLetter;
 		final int minWordLength = Math.min(word1.length(), word2.length());
 		for(lastCommonLetter = 0; lastCommonLetter < minWordLength; lastCommonLetter ++)
@@ -173,12 +173,12 @@ public class StringHelper{
 		return lastCommonLetter;
 	}
 
-	public static String removeCombiningDiacriticalMarks(final String word){
+	public static String removeCombiningDiacriticalMarks(final CharSequence word){
 		return RegexHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
 			StringUtils.EMPTY);
 	}
 
-	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit,
+	public static Collector<String, List<String>, String> limitingJoin(final CharSequence delimiter, final int limit,
 			final String ellipsis){
 		return Collector.of(ArrayList::new,
 			(l, e) -> {
@@ -248,7 +248,7 @@ public class StringHelper{
 	}
 
 	//Find the maximum consecutive repeating character in given string
-	public static int maxRepeating(final String text, final char chr){
+	public static int maxRepeating(final CharSequence text, final char chr){
 		final int n = text.length();
 		int count = 0;
 		int currentCount = 1;
