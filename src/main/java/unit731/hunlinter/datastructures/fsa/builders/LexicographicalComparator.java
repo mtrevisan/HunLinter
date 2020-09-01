@@ -44,7 +44,7 @@ import java.util.Comparator;
  *
  * @see <a href="https://dzone.com/articles/understanding-sunmiscunsafe">Understanding sun.misc.Unsafe</a>
  */
-public class LexicographicalComparator{
+public final class LexicographicalComparator{
 
 	private static final int UNSIGNED_MASK = 0xFF;
 
@@ -53,8 +53,10 @@ public class LexicographicalComparator{
 	private static final Comparator<byte[]> BEST_COMPARATOR = getBestComparator();
 
 
+	private LexicographicalComparator(){}
+
 	public static Comparator<byte[]> lexicographicalComparator(){
-		return LexicographicalComparator.BEST_COMPARATOR;
+		return BEST_COMPARATOR;
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -131,7 +133,7 @@ public class LexicographicalComparator{
 		public int compare(final byte[] left, final byte[] right){
 			final int stride = 8;
 			final int minLength = Math.min(left.length, right.length);
-			final int strideLimit = minLength & ~(stride - 1);
+			final int strideLimit = minLength & -stride;
 			int i;
 
 			/*

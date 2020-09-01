@@ -25,6 +25,7 @@
 package unit731.hunlinter.datastructures.fsa.serializers;
 
 import com.carrotsearch.hppc.IntIntHashMap;
+import com.carrotsearch.hppc.IntIntMap;
 import com.carrotsearch.hppc.cursors.IntIntCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +177,6 @@ public class CFSA2Serializer implements FSASerializer{
 		invertedLabelsIndex = new int[256];
 		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); --i){
 			final IntIntHolder p = labelAndCount.pollFirst();
-			//noinspection ConstantConditions
 			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte)p.a;
 		}
@@ -233,7 +233,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-														  final IntIntHashMap offsets) throws IOException{
+			final IntIntMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
@@ -278,7 +278,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length */
-	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInLinkCount){
+	private int[] computeFirstStates(final Iterable<IntIntCursor> inLinkCount, final int maxStates, final int minInLinkCount){
 		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
 		for(final IntIntCursor c : inLinkCount)

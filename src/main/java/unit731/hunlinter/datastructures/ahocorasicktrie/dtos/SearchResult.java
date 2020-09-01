@@ -36,7 +36,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class SearchResult<V>{
 
 	/** the beginning index, inclusive */
-	private final int start;
+	private final int begin;
 	/** the ending index, exclusive */
 	private final int end;
 	/** the value assigned to the keyword */
@@ -44,13 +44,13 @@ public class SearchResult<V>{
 
 
 	public SearchResult(final int begin, final int end, final V value){
-		this.start = begin;
+		this.begin = begin;
 		this.end = end;
 		this.value = value;
 	}
 
 	public int getIndexBegin(){
-		return start;
+		return begin;
 	}
 
 	public int getIndexEnd(){
@@ -58,7 +58,7 @@ public class SearchResult<V>{
 	}
 
 	public int getMatchLength(){
-		return end - start;
+		return end - begin;
 	}
 
 	public V getValue(){
@@ -67,7 +67,7 @@ public class SearchResult<V>{
 
 	@Override
 	public String toString(){
-		return "[" + start + ":" + end + "] = " + value;
+		return "[" + begin + ":" + end + "] = " + value;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class SearchResult<V>{
 
 		final SearchResult<?> rhs = (SearchResult<?>)obj;
 		return new EqualsBuilder()
-			.append(start, rhs.start)
+			.append(begin, rhs.begin)
 			.append(end, rhs.end)
 			.append(value, rhs.value)
 			.isEquals();
@@ -88,7 +88,7 @@ public class SearchResult<V>{
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(start)
+			.append(begin)
 			.append(end)
 			.append(value)
 			.toHashCode();

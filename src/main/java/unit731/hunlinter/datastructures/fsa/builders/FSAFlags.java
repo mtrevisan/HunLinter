@@ -26,8 +26,6 @@ package unit731.hunlinter.datastructures.fsa.builders;
 
 import unit731.hunlinter.datastructures.fsa.FSA;
 
-import java.util.Set;
-
 
 /**
  * FSA automaton flags. Where applicable, flags follow Daciuk's <code>fsa</code> package.
@@ -84,7 +82,7 @@ public enum FSAFlags{
 	 * @param flags A set of flags to encode.
 	 * @return Returns the set of flags encoded as packed <code>short</code>.
 	 */
-	public static short getMask(final Set<FSAFlags> flags){
+	public static short getMask(final Iterable<FSAFlags> flags){
 		short value = 0;
 		for(final FSAFlags f : flags)
 			value |= f.bits;
