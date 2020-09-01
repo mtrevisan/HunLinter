@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>unit731</groupId>
@@ -17,21 +18,34 @@
 			<name>Mauro Trevisan</name>
 			<email>851903+mtrevisan@users.noreply.github.com</email>
 			<url>https://github.com/mtrevisan/</url>
+			<roles>
+				<role>Developer</role>
+			</roles>
 		</developer>
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/mtrevisan/HunLinter.git</connection>
-		<developerConnection>scm:git:ssh://github.com:mtrevisan/HunLinter.git</developerConnection>
-		<url>http://github.com/mtrevisan/HunLinter/tree/master</url>
+		<connection>scm:git:git@github.com:mtrevisan/HunLinter.git</connection>
+		<developerConnection>scm:git:git@github.com:mtrevisan/HunLinter.git</developerConnection>
+		<url>https://github.com/mtrevisan/HunLinter</url>
 	</scm>
+
+	<issueManagement>
+		<url>https://github.com/mtrevisan/HunLinter/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
 
 	<properties>
 		<main.class>unit731.hunlinter.MainFrame</main.class>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<java.version>1.14</java.version>
 		<maven.compiler.source>14</maven.compiler.source>
 		<maven.compiler.target>14</maven.compiler.target>
+
+		<javadoc.html.version>-html5</javadoc.html.version>
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
@@ -105,11 +119,25 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<additionalOptions>${javadoc.html.version}</additionalOptions>
+							<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+							<detectJavaApiLink>false</detectJavaApiLink>
+						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- Compiler -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<additionalOptions>-html5</additionalOptions>
-					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
 			<!-- Templating -->
@@ -179,18 +207,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<!-- Compiler -->
-			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler-plugin.version}</version>
-				<configuration>
-					<showDeprecation>true</showDeprecation>
-					<source>14</source>
-					<target>14</target>
-				</configuration>
 			</plugin>
 		</plugins>
 
@@ -296,6 +312,7 @@
 		<license>
 			<name>MIT License</name>
 			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>manual</distribution>
 		</license>
 	</licenses>
 </project>
