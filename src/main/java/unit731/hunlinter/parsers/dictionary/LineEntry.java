@@ -80,7 +80,7 @@ public class LineEntry implements Serializable{
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
+	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final Iterable<LineEntry> parentRulesFrom){
 		final List<String> words = new ArrayList<>();
 		for(final LineEntry rule : parentRulesFrom)
 			words.addAll(rule.extractFromEndingWith(condition));
@@ -137,8 +137,8 @@ public class LineEntry implements Serializable{
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
 		});
-		final String reversedCondition = LineEntry.SEQUENCER_REGEXP
-			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
+		final String reversedCondition = SEQUENCER_REGEXP
+			.toString(SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
@@ -162,7 +162,7 @@ public class LineEntry implements Serializable{
 		return extractGroup(indexFromLast, from);
 	}
 
-	public static Set<Character> extractGroup(final int indexFromLast, final Set<String> words){
+	public static Set<Character> extractGroup(final int indexFromLast, final Collection<String> words){
 		final Set<Character> group = new HashSet<>(words.size());
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
@@ -185,7 +185,7 @@ public class LineEntry implements Serializable{
 		}
 	}
 
-	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
+	public static String toHunspellHeader(final AffixType type, final CharSequence flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)

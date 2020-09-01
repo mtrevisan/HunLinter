@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
@@ -100,7 +101,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result;
 	}
 
-	private List<List<Inflection[]>> generateCompounds(final List<int[]> permutations, final DictionaryEntry[] inputs){
+	private List<List<Inflection[]>> generateCompounds(final Iterable<int[]> permutations, final DictionaryEntry[] inputs){
 		final Map<Integer, Inflection[]> dicEntries = new HashMap<>();
 		final List<List<Inflection[]>> list = new ArrayList<>();
 		for(final int[] permutation : permutations){
@@ -114,8 +115,9 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	private List<Inflection[]> generateCompound(final int[] permutation, final Map<Integer, Inflection[]> dicEntries,
 			final DictionaryEntry[] inputs){
 		final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
+		final Function<Integer, Inflection[]> integerFunction = idx -> applyAffixRules(inputs[idx], true, null);
 		for(final int index : permutation){
-			final Inflection[] list = dicEntries.computeIfAbsent(index, idx -> applyAffixRules(inputs[idx], true, null));
+			final Inflection[] list = dicEntries.computeIfAbsent(index, integerFunction);
 			if(list.length > 0)
 				expandedPermutationEntries.add(list);
 		}

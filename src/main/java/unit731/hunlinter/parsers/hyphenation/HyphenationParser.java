@@ -85,20 +85,20 @@ public class HyphenationParser{
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
-//	private static final String HYPHEN = "\u2010";
-//	private static final String HYPHEN_MINUS = "\u002D";
+//	private static final String HYPHEN = "‐";
+//	private static final String HYPHEN_MINUS = "-";
 	public static final String MINUS_SIGN = "-";
 	public static final char EQUALS_SIGN = '=';
 	public static final String SOFT_HYPHEN = "\u00AD";
-	public static final String EN_DASH = "\u2013";
-//	private static final char EM_DASH = '\u2014';
+	public static final String EN_DASH = "–";
+//	private static final char EM_DASH = '—';
 	public static final String APOSTROPHE = "'";
-	public static final char RIGHT_MODIFIER_LETTER_APOSTROPHE = '\u02BC';
+	public static final char RIGHT_MODIFIER_LETTER_APOSTROPHE = 'ʼ';
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
 	 */
-//	private static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
+//	private static final String MODIFIER_LETTER_APOSTROPHE = "ʼ";
 
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 
@@ -124,9 +124,9 @@ public class HyphenationParser{
 	public static final int PARAM_CUT = 6;
 	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	public static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
-	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
 
-	public static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
@@ -174,7 +174,7 @@ public class HyphenationParser{
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		forEach(Level.values(), level -> this.patterns.put(level, patterns.get(level)));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new HashMap<>(0));
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new EnumMap<>(Level.class));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
@@ -215,7 +215,7 @@ public class HyphenationParser{
 	public void parse(final File hypFile){
 		final Path path = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
-		Charset charset = FileHelper.determineCharset(path);
+		final Charset charset = FileHelper.determineCharset(path);
 		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
 			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
@@ -268,7 +268,7 @@ public class HyphenationParser{
 	}
 
 	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
-	private String convertUnicode(final String line){
+	private String convertUnicode(final CharSequence line){
 		final String[] components = RegexHelper.extract(line, PATTERN_ESCAPED_UNICODE);
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
@@ -322,7 +322,7 @@ public class HyphenationParser{
 		return (!isAugmentedRule(line) && StringUtils.contains(line, EQUALS_SIGN));
 	}
 
-	private boolean isRuleDuplicated(final String key, final String line, final Level level){
+	private boolean isRuleDuplicated(final String key, final CharSequence line, final Level level){
 		boolean duplicatedRule = false;
 		final String foundNodeValue = rules.get(level)
 			.get(key);
@@ -424,7 +424,7 @@ public class HyphenationParser{
 		ensureUniqueness(reducedPatterns, cleanedRule, rule);
 	}
 
-	private static void validateBasicRules(final String rule){
+	private static void validateBasicRules(final CharSequence rule){
 		if(!RegexHelper.find(rule, PATTERN_VALID_RULE))
 			throw new LinterException(INVALID_RULE.format(new Object[]{rule}));
 		if(!StringUtils.contains(rule, EQUALS_SIGN)){
@@ -435,7 +435,7 @@ public class HyphenationParser{
 		}
 	}
 
-	private static void validateAugmentedRule(final String cleanedRule, final String rule){
+	private static void validateAugmentedRule(final CharSequence cleanedRule, final String rule){
 		final int count = RegexHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
 			throw new LinterException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
@@ -467,7 +467,7 @@ public class HyphenationParser{
 	 * A standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
 	 * (for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 	 */
-	private static void ensureUniqueness(final Set<String> reducedPatterns, final String cleanedRule, final String rule){
+	private static void ensureUniqueness(final Iterable<String> reducedPatterns, final String cleanedRule, final String rule){
 		String alreadyPresentRule = null;
 		for(final String pattern : reducedPatterns)
 			if(pattern.contains(cleanedRule) || cleanedRule.contains(pattern)){
@@ -478,7 +478,7 @@ public class HyphenationParser{
 			throw new LinterException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
 	}
 
-	public static int getIndexOfBreakpoint(final String rule){
+	public static int getIndexOfBreakpoint(final CharSequence rule){
 		final Matcher m = RegexHelper.matcher(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
 		m.find();
 		return m.start();
@@ -534,7 +534,7 @@ public class HyphenationParser{
 			rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
-	public static String getKeyFromData(final String rule){
+	public static String getKeyFromData(final CharSequence rule){
 		return RegexHelper.clear(rule, PATTERN_KEY);
 	}
 

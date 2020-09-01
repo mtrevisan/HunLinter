@@ -32,7 +32,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 public class HyphenationBreak{
@@ -80,7 +79,7 @@ public class HyphenationBreak{
 		return list;
 	}
 
-	public String[] enforceNoHyphens(String[] syllabes, final Set<String> noHyphen){
+	public String[] enforceNoHyphens(String[] syllabes, final Iterable<String> noHyphen){
 		if(syllabes.length > 1){
 			int wordLength = 0;
 			for(final String syllabe : syllabes)
@@ -97,14 +96,14 @@ public class HyphenationBreak{
 	}
 
 	private static String[] manageInside(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
-			final String nohyp, final int wordLength){
+			final CharSequence nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
 
 		int index = 0;
 		for(int i = 0; syllabes.length > 1 && i < syllabes.length; i ++){
 			final String syllabe = syllabes[i];
 
-			if(syllabe.equals(nohyp)){
+			if(syllabe.contentEquals(nohyp)){
 				indexesAndRules.remove(index);
 				indexesAndRules.remove(index + nohypLength);
 
@@ -139,7 +138,7 @@ public class HyphenationBreak{
 
 	private static String[] manageEndsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
 			final String nohyp, final int wordLength){
-		int nohypLength = nohyp.length();
+		final int nohypLength = nohyp.length();
 		if(syllabes[syllabes.length - 1].equals(nohyp.substring(0, nohypLength - 1))){
 			indexesAndRules.remove(wordLength - nohypLength - 1);
 			indexesAndRules.remove(wordLength - 1);
@@ -163,7 +162,7 @@ public class HyphenationBreak{
 	}
 
 	private static String[] mergeIndexWithPrevious(final String[] array, final int index){
-		array[index - 1] = array[index - 1] + array[index];
+		array[index - 1] += array[index];
 		return ArrayUtils.remove(array, index);
 	}
 
@@ -172,15 +171,15 @@ public class HyphenationBreak{
 		return ArrayUtils.removeAll(array, index, index + 1);
 	}
 
-	private String reduceKey(final String key){
+	private String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private boolean isStarting(final String key){
+	private boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final String key){
+	private boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
