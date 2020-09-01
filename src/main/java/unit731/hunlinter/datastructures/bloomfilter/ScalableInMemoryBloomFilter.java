@@ -25,8 +25,9 @@
 package unit731.hunlinter.datastructures.bloomfilter;
 
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.stream.IntStream;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -48,7 +49,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 
-	private final Stack<BloomFilterInterface<T>> filters = new Stack<>();
+	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>();
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
@@ -123,7 +124,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public synchronized double getTrueFalsePositiveProbability(){
 		final int size = filters.size();
-		final double p0 = filters.lastElement().getFalsePositiveProbability();
+		final double p0 = filters.getLast().getFalsePositiveProbability();
 		final double probability = IntStream.range(0, size)
 			.mapToDouble(i -> 1. - p0 * Math.pow(parameters.getTighteningRatio(), i))
 			.reduce(1., (a, b) -> a * b);

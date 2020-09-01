@@ -48,7 +48,7 @@
 		<apache.commons-io.version>2.7</apache.commons-io.version>
 
 		<!-- FastUtil -->
-		<unimi.fastutil.version>8.4.0</unimi.fastutil.version>
+<!--		<unimi.fastutil.version>8.4.1</unimi.fastutil.version>-->
 
 		<!-- jFreeChart -->
 		<jfree.jfreechart.version>1.5.0</jfree.jfreechart.version>

@@ -152,8 +152,8 @@ public class Murmur3HashFunction implements HashFunction{
 		final ByteBuffer buffer = ByteBuffer.wrap(data);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		while(buffer.remaining() >= 16){
-			long k1 = buffer.getLong();
-			long k2 = buffer.getLong();
+			final long k1 = buffer.getLong();
+			final long k2 = buffer.getLong();
 
 			h1 ^= mixK1(k1);
 

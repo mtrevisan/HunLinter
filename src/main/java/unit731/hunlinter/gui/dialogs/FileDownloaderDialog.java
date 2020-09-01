@@ -48,7 +48,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -77,8 +76,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		//copy to default download folder
 		localPath = System.getProperty("user.home") + "/Downloads/" + remoteObject.name;
 
-		final Map<String, Object> pomProperties = DownloaderHelper.getApplicationProperties();
-		currentVersionLabel.setText((String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION));
+		currentVersionLabel.setText((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION));
 		newVersionLabel.setText(remoteObject.version.toString());
 		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(remoteObject.size));
 	}
@@ -100,7 +98,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      versionAvailableLabel.setText("A new version of " + DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " is available.");
+      versionAvailableLabel.setText("A new version of " + DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " is available.");
 
       currentVersionPreLabel.setText("Current version:");
 
@@ -293,7 +291,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt){
-		if(evt.getPropertyName().equals("progress"))
+		if("progress".equals(evt.getPropertyName()))
 			fileProgressBar.setValue((Integer)evt.getNewValue());
 	}
 

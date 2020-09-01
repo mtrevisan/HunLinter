@@ -104,7 +104,7 @@ public class ProjectLoaderAction extends AbstractAction{
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				parentFrame.setTitle(DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
+				parentFrame.setTitle(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
 
 				//choose one font (in case of reading errors)
 				final String sampleText = packager.getSampleText();

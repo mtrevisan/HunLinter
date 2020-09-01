@@ -30,13 +30,13 @@ import unit731.hunlinter.services.downloader.DownloaderHelper;
 import unit731.hunlinter.services.system.FileHelper;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Map;
 
 
 /**
@@ -56,15 +56,14 @@ public class HelpDialog extends JDialog{
 
 		try{
 			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
-			final ImageIcon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
+			final Icon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
 			logo.setIcon(icon);
 		}
 		catch(final IOException ignored){}
 
-		final Map<String, Object> pomProperties = DownloaderHelper.getApplicationProperties();
-		final String artifactID = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
-		final String version = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION);
-		final LocalDate buildTimestamp = (LocalDate)pomProperties.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
+		final String artifactID = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
+		final String version = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION);
+		final LocalDate buildTimestamp = (LocalDate)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
 
 		productNameValue.setText(artifactID);
 		productVersionValue.setText(version);
