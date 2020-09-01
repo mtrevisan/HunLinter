@@ -84,7 +84,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(SentenceExceptionsLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -222,7 +222,6 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -237,7 +236,6 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS)
 			return;
 

@@ -236,10 +236,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
 				final String lowercaseToken = token.toLowerCase(Locale.ROOT);
 				final WordData[] datas = dictionaryLookup.lookup(lowercaseToken);
 				for(final WordData data : datas){
-					final String stem = new String(data.getStem(), charset);
-					final String lemma = new String(data.getWord(), charset);
-					final String pos = new String(data.getTag(), charset);
-					readings.add(stem + LEMMA_START + lemma + LEMMA_END + pos);
+					final byte[] wholeArray = ArrayHelper.concatenate(data.getStem(), LEMMA_START.getBytes(), data.getWord(), LEMMA_END.getBytes(), data.getTag());
+					readings.add(new String(wholeArray, charset));
 				}
 				sj.add(readings.toString());
 			}

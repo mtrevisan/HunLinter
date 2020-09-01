@@ -28,8 +28,8 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 
 public class TableRenderer extends DefaultTableCellRenderer{
@@ -38,7 +38,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	private static final MatteBorder BORDER_ERROR = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED);
 
-	private final Set<Integer> errors = new HashSet<>();
+	private final Collection<Integer> errors = new HashSet<>();
 
 
 	public void setErrorOnRow(final int line){

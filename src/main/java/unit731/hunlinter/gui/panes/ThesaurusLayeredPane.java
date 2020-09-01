@@ -50,6 +50,7 @@ import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -122,7 +123,7 @@ final int iconSize = 17;
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(ThesaurusLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -182,7 +183,7 @@ final int iconSize = 17;
       GUIHelper.addScrollToFirstRow(table);
       GUIHelper.addScrollToLastRow(table);
 
-      final TableRenderer theCellRenderer = new TableRenderer();
+      final TableCellRenderer theCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(0).setMinWidth(150);
       table.getColumnModel().getColumn(0).setMaxWidth(300);
       table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -289,7 +290,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -326,8 +326,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
+	@SuppressWarnings("unchecked")
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;
 
@@ -335,8 +335,7 @@ final int iconSize = 17;
 		popupMergeMenuItem.setEnabled(false);
 
 		formerFilterThesaurusText = null;
-		//noinspection unchecked
-		((TableRowSorter<ThesaurusTableModel>)table.getRowSorter()).setRowFilter(null);
+		((DefaultRowSorter<ThesaurusTableModel, Integer>)table.getRowSorter()).setRowFilter(null);
 		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		dm.setSynonyms(null);
 	}
