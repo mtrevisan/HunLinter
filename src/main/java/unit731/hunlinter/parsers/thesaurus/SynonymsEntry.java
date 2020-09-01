@@ -34,12 +34,12 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.StringJoiner;
 
 import static unit731.hunlinter.services.system.LoopHelper.match;
@@ -76,7 +76,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		for(int i = 0; i < partOfSpeeches.length; i ++)
 			partOfSpeeches[i] = partOfSpeeches[i].trim();
 
-		final Set<String> uniqueValues = new HashSet<>();
+		final Collection<String> uniqueValues = new HashSet<>();
 		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR)){
 			final String trim = synonym.trim();
 			if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
@@ -86,7 +86,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
-	public SynonymsEntry merge(final String definition, final SynonymsEntry entry){
+	public SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 
 		//remove intersection
@@ -110,7 +110,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return synonyms;
 	}
 
-	public boolean containsPartOfSpeech(final List<String> partOfSpeeches){
+	public boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
 		return !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches);
 	}
 
@@ -118,12 +118,12 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return (match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
 	}
 
-	public boolean contains(final List<String> partOfSpeeches, final List<String> synonyms){
+	public boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
 		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches))
 			&& this.synonyms.containsAll(synonyms));
 	}
 
-	public boolean intersects(final List<String> partOfSpeeches, final List<String> synonyms){
+	public boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
 		return ((partOfSpeeches == null || !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches))
 			&& !Collections.disjoint(this.synonyms, synonyms));
 	}
@@ -136,7 +136,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			.toString();
 	}
 
-	public String toLine(final String definition){
+	public String toLine(final CharSequence definition){
 		final StringJoiner sj = new StringJoiner(", ", "(", ")");
 		for(final String partOfSpeech : partOfSpeeches)
 			sj.add(partOfSpeech);

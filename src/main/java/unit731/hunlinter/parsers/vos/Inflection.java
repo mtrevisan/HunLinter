@@ -68,7 +68,7 @@ public class Inflection extends DictionaryEntry{
 			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
-		final AffixEntry[] appliedRules = new AffixEntry[]{appliedEntry};
+		final AffixEntry[] appliedRules = {appliedEntry};
 		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
 		return new Inflection(word, continuationFlags, morphologicalFields, combinable, appliedRules, compoundEntries);
 	}

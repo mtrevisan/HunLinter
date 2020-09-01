@@ -336,7 +336,7 @@ public class ParserManager implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(final Path path){
-		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName().toString());
+		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName());
 
 		//FIXME
 		final File file = path.toFile();
@@ -361,7 +361,7 @@ public class ParserManager implements FileChangeListener{
 		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 		else{
-			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName().toString());
+			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName());
 
 			EventBusService.publish(new PreLoadProjectEvent(packager.getProjectPath()));
 		}

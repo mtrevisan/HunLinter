@@ -216,7 +216,7 @@ public class ThesaurusParser{
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms){
+	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, final String[] synonyms){
 		//extract Part-of-Speech if present
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
