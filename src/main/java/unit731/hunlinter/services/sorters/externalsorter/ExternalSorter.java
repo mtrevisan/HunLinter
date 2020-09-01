@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -151,7 +152,7 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final StringList sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private void saveChunk(final Iterable<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
@@ -175,7 +176,7 @@ public class ExternalSorter{
 	 * @param outputFile The output {@link File} to merge the results to
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
+	private void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
 		final Comparator<String> comparator = options.getComparator();
 		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),

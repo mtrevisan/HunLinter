@@ -148,7 +148,7 @@ public class Version implements Comparable<Version>{
 			throw new IllegalArgumentException("Argument is not a valid version");
 	}
 
-	private boolean hasLeadingZeros(final String token){
+	private boolean hasLeadingZeros(final CharSequence token){
 		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 

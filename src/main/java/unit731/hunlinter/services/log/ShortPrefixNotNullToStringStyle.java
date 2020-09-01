@@ -27,7 +27,7 @@ package unit731.hunlinter.services.log;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 
-public class ShortPrefixNotNullToStringStyle extends ToStringStyle{
+public final class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 
 	private static final long serialVersionUID = 603695866745355049L;
 
@@ -35,10 +35,9 @@ public class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 
 
 	private ShortPrefixNotNullToStringStyle(){
-		super();
 
-		this.setUseShortClassName(true);
-		this.setUseIdentityHashCode(false);
+		setUseShortClassName(true);
+		setUseIdentityHashCode(false);
 	}
 
 	@Override

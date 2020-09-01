@@ -88,7 +88,7 @@ public class StringList implements Iterable<String>{
 	}
 
 	public StringList(){
-		this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+		elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class StringList implements Iterable<String>{
 	 */
 	private void grow(final int minCapacity){
 		final int oldCapacity = elementData.length;
-		if(oldCapacity > 0 || elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA){
+		if(oldCapacity > 0 || !Arrays.equals(elementData, DEFAULTCAPACITY_EMPTY_ELEMENTDATA)){
 			final int newCapacity = newLength(oldCapacity, minCapacity - oldCapacity,
 				oldCapacity >> 1);
 			elementData = Arrays.copyOf(elementData, newCapacity);
@@ -256,32 +256,36 @@ public class StringList implements Iterable<String>{
 	 */
 	@Override
 	public Iterator<String> iterator(){
-		return new Itr();
+		return new StringIterator(this);
 	}
 
 	/** An optimized version of AbstractList.Itr */
-	private class Itr implements Iterator<String>{
+	public static class StringIterator implements Iterator<String>{
+
+		private final StringList self;
 		//index of next element to return
 		int cursor;
 		//index of last element returned; -1 if no such
 		int lastReturnedIndex = -1;
 
 		// prevent creating a synthetic constructor
-		Itr(){}
+		StringIterator(final StringList self){
+			this.self = self;
+		}
 
 		@Override
 		public boolean hasNext(){
-			return cursor != size;
+			return (cursor != self.size);
 		}
 
 		@Override
 		public String next(){
-			if(cursor >= size)
+			if(cursor >= self.size)
 				throw new NoSuchElementException();
 
 			lastReturnedIndex = cursor;
 			cursor ++;
-			return StringList.this.elementData[lastReturnedIndex];
+			return self.elementData[lastReturnedIndex];
 		}
 
 		@Override
@@ -290,7 +294,7 @@ public class StringList implements Iterable<String>{
 				throw new IllegalStateException();
 
 			try{
-				StringList.this.remove(lastReturnedIndex);
+				self.remove(lastReturnedIndex);
 
 				cursor = lastReturnedIndex;
 				lastReturnedIndex = -1;

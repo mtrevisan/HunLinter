@@ -273,7 +273,7 @@ public class FileListenerManager implements FileListener, Runnable{
 		return dirPathToListeners.get(dir);
 	}
 
-	public boolean matchesAny(final Path input, final Set<PathMatcher> patterns){
+	public boolean matchesAny(final Path input, final Iterable<PathMatcher> patterns){
 		return (match(patterns, pattern -> matches(input, pattern)) != null);
 	}
 

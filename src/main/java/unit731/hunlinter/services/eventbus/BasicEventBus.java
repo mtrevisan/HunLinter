@@ -31,7 +31,7 @@ import unit731.hunlinter.services.eventbus.exceptions.VetoException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -74,7 +74,7 @@ import java.util.concurrent.ThreadFactory;
  */
 public class BasicEventBus implements EventBusInterface{
 
-	private final List<HandlerInfo> handlers = new CopyOnWriteArrayList<>();
+	private final Collection<HandlerInfo> handlers = new CopyOnWriteArrayList<>();
 	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<HandlerInfo> killQueue = new LinkedBlockingQueue<>();
 
@@ -204,7 +204,7 @@ public class BasicEventBus implements EventBusInterface{
 	 */
 	public void unsubscribe(final Object subscriber){
 		//remove handler from queue
-		final List<HandlerInfo> killList = new ArrayList<>(handlers.size());
+		final Collection<HandlerInfo> killList = new ArrayList<>(handlers.size());
 		for(final HandlerInfo info : handlers){
 			final Object obj = info.getSubscriber();
 			if(obj == null || obj == subscriber)
@@ -248,16 +248,16 @@ public class BasicEventBus implements EventBusInterface{
 	 * @return	Returns true if the event bus has pending events to publish.
 	 */
 	public boolean hasPendingEvents(){
-		return (queue.size() > 0);
+		return !queue.isEmpty();
 	}
 
 
 	//the background thread consumer, simply extracts any events from the queue and publishes them
 	private class EventQueueRunner implements Runnable{
+		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
 		public void run(){
 			try{
-				//noinspection InfiniteLoopStatement
 				while(true)
 					notifySubscribers(queue.take());
 			}
@@ -272,10 +272,10 @@ public class BasicEventBus implements EventBusInterface{
 	//consumer runnable to remove handler infos from the subscription list if they are null (this is
 	//if the GC has collected them)
 	private class KillQueueRunner implements Runnable{
+		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
 		public void run(){
 			try{
-				//noinspection InfiniteLoopStatement
 				while(true){
 					final HandlerInfo info = killQueue.take();
 					if(info.getSubscriber() == null)
@@ -294,8 +294,8 @@ public class BasicEventBus implements EventBusInterface{
 	//called on the background thread
 	private void notifySubscribers(final Object evt){
 		//roll through the subscribers
-		final List<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
-		final List<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
+		final Collection<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
+		final Collection<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
 		subdivideHandlers(evt, vetoHandlers, regularHandlers);
 
 		final boolean vetoCalled = dispatchToVetoableHandlers(evt, vetoHandlers);
@@ -304,8 +304,8 @@ public class BasicEventBus implements EventBusInterface{
 			dispatchToRegularHandlers(regularHandlers);
 	}
 
-	private void subdivideHandlers(final Object evt, final List<HandlerInfoCallable> vetoHandlers,
-		final List<HandlerInfoCallable> regularHandlers){
+	private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
+		final Collection<HandlerInfoCallable> regularHandlers){
 		for(final HandlerInfo info : handlers){
 			if(!info.matchesEvent(evt))
 				continue;
@@ -318,7 +318,7 @@ public class BasicEventBus implements EventBusInterface{
 		}
 	}
 
-	private boolean dispatchToVetoableHandlers(final Object evt, final List<HandlerInfoCallable> vetoHandlers){
+	private boolean dispatchToVetoableHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers){
 		//used to keep track if a veto was called (if so, the regular list won't be processed)
 		boolean vetoCalled = false;
 
@@ -344,7 +344,7 @@ public class BasicEventBus implements EventBusInterface{
 		return vetoCalled;
 	}
 
-	private void dispatchToRegularHandlers(final List<HandlerInfoCallable> regularHandlers){
+	private void dispatchToRegularHandlers(final Collection<HandlerInfoCallable> regularHandlers){
 		//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
 		//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
 		//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
@@ -371,13 +371,13 @@ public class BasicEventBus implements EventBusInterface{
 
 	//callable used to actually invoke the task
 	//it eats any exception thrown and publishes an event back onto the bus
-	private class HandlerInfoCallable implements Callable<Boolean>{
+	private final class HandlerInfoCallable implements Callable<Boolean>{
 
 		private final HandlerInfo handlerInfo;
 		private final Object event;
 
 
-		public HandlerInfoCallable(final HandlerInfo handlerInfo, final Object event){
+		private HandlerInfoCallable(final HandlerInfo handlerInfo, final Object event){
 			this.handlerInfo = handlerInfo;
 			this.event = event;
 		}

@@ -27,10 +27,11 @@ package unit731.hunlinter.services.regexgenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 import java.util.StringJoiner;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -70,7 +71,7 @@ public final class Digraph<T>{
 		final int vertices = graph.adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			final Stack<Pair<Integer, T>> reverse = new Stack<>();
+			final Deque<Pair<Integer, T>> reverse = new ArrayDeque<>();
 			for(final Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
 			for(final Pair<Integer, T> w : reverse)
@@ -84,7 +85,7 @@ public final class Digraph<T>{
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
 	 */
-	public void addEdge(int v, int w){
+	public void addEdge(final int v, final int w){
 		addEdge(v, w, null);
 	}
 
@@ -95,7 +96,7 @@ public final class Digraph<T>{
 	 * @param w	The head vertex
 	 * @param value	The value associated with this transition
 	 */
-	public void addEdge(int v, int w, T value){
+	public void addEdge(final int v, final int w, final T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
 		adjacency.get(v).add(0, Pair.of(w, value));
@@ -108,7 +109,7 @@ public final class Digraph<T>{
 	 * @return the vertices adjacent from vertex {@code vertex}
 	 * @throws IndexOutOfBoundsException unless {@code 0 <= vertex < vertices}
 	 */
-	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
+	public Iterable<Pair<Integer, T>> adjacentVertices(final int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());
 	}
 
@@ -145,7 +146,7 @@ public final class Digraph<T>{
 			s.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
-				.append(transitions.toString())
+				.append(transitions)
 				.append(NEWLINE);
 		}
 		return s.toString();

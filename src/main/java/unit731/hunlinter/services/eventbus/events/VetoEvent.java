@@ -38,6 +38,9 @@ import java.util.EventObject;
  */
 public class VetoEvent extends EventObject{
 
+	private static final long serialVersionUID = -6990813610487588182L;
+
+
 	public VetoEvent(final Object event){
 		super(event);
 	}

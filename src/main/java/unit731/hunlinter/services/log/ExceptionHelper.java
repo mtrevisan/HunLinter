@@ -30,7 +30,7 @@ import unit731.hunlinter.services.system.LoopHelper;
 import java.util.Optional;
 
 
-public class ExceptionHelper{
+public final class ExceptionHelper{
 
 	private ExceptionHelper(){}
 

@@ -33,7 +33,7 @@ import java.util.Comparator;
 /**
  * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</a>, version 0.4.4, 11/3/2020
  */
-public class ExternalSorterOptions{
+public final class ExternalSorterOptions{
 
 	/** Default maximal number of temporary files allowed */
 	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
