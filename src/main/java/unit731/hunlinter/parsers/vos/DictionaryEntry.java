@@ -108,7 +108,7 @@ public class DictionaryEntry{
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
-	protected DictionaryEntry(final DictionaryEntry dicEntry){
+	DictionaryEntry(final DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry);
 
 		word = dicEntry.word;
@@ -117,8 +117,7 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-			final boolean combinable){
+	DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
 		Objects.requireNonNull(word);
 
 		this.word = word;

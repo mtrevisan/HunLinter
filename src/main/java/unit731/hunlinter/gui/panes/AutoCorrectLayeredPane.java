@@ -373,7 +373,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		dm.setCorrections(null);
 	}
 
-	public void removeSelectedRowsFromAutoCorrect(){
+	private void removeSelectedRowsFromAutoCorrect(){
 		try{
 			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 			parserManager.getAcoParser().deleteCorrection(selectedRow);

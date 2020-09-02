@@ -28,7 +28,7 @@ package unit731.hunlinter.datastructures.dynamicarray;
 class Block<T>{
 
 	final T[] data;
-	int limit;
+	private int limit;
 
 
 	@SuppressWarnings("unchecked")

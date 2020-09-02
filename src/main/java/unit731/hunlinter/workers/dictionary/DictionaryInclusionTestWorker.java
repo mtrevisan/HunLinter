@@ -52,7 +52,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryInclusionTestWorker.class);
 
-	public static final String WORKER_NAME = "Dictionary inclusion test";
+	private static final String WORKER_NAME = "Dictionary inclusion test";
 
 	private final BloomFilterInterface<String> dictionary;
 

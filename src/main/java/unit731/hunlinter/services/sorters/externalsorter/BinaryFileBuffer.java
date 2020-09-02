@@ -36,7 +36,7 @@ import java.util.Scanner;
  */
 class BinaryFileBuffer implements Closeable{
 
-	protected final Scanner scanner;
+	private final Scanner scanner;
 	private String cache;
 
 

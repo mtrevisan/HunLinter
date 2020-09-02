@@ -47,7 +47,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Cloneable, Serializab
 		//position of next item to return
 		int offset;
 
-		public ArrayIterator(final Object[] values){
+		ArrayIterator(final Object[] values){
 			this.values = values;
 		}
 

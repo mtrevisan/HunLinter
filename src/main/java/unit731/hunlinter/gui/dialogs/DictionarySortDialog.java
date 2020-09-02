@@ -61,7 +61,7 @@ public class DictionarySortDialog extends JDialog{
 		Objects.requireNonNull(parserManager);
 
 		this.parserManager = parserManager;
-		this.dicParser = parserManager.getDicParser();
+		dicParser = parserManager.getDicParser();
 
 		initComponents();
 

@@ -30,7 +30,7 @@ import javax.swing.table.TableRowSorter;
 import java.util.List;
 
 
-public class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends TableRowSorter<M>{
+class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends TableRowSorter<M>{
 
 	public AscendingDescendingUnsortedTableRowSorter(final M model){
 		super(model);

@@ -54,7 +54,7 @@ public class ConversionTable{
 
 
 	@FunctionalInterface
-	public interface ConversionFunction{
+	interface ConversionFunction{
 		void convert(String word, Pair<String, String> entry, List<String> conversions);
 	}
 

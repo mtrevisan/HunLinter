@@ -70,7 +70,7 @@ public class DictionaryMetadata{
 	 * A separator character between fields (stem, lemma, form).
 	 * The character must be within byte range (FSA uses bytes internally).
 	 */
-	protected byte separator;
+	private byte separator;
 
 	private Locale locale = Locale.ROOT;
 
@@ -100,7 +100,7 @@ public class DictionaryMetadata{
 	private EncoderType encoderType;
 
 	/** Expected metadata file extension */
-	public static final String METADATA_FILE_EXTENSION = "info";
+	private static final String METADATA_FILE_EXTENSION = "info";
 
 
 	/**

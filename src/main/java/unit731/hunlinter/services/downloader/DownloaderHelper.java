@@ -70,9 +70,9 @@ public final class DownloaderHelper{
 	}
 
 
-	public static final String PROPERTY_KEY_TAG_NAME = "tag_name";
-	public static final String PROPERTY_KEY_WHATS_NEW = "body";
-	public static final String PROPERTY_KEY_FILENAME = "name";
+	private static final String PROPERTY_KEY_TAG_NAME = "tag_name";
+	private static final String PROPERTY_KEY_WHATS_NEW = "body";
+	private static final String PROPERTY_KEY_FILENAME = "name";
 	public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
 	public static final String PROPERTY_KEY_VERSION = "version";
 	public static final String PROPERTY_KEY_BUILD_TIMESTAMP = "buildTimestamp";

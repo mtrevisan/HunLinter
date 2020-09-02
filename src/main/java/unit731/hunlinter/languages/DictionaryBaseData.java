@@ -43,7 +43,7 @@ public class DictionaryBaseData extends BloomFilterParameters{
 		return SingletonHelper.INSTANCE;
 	}
 
-	protected DictionaryBaseData(){}
+	private DictionaryBaseData(){}
 
 	@Override
 	public int getExpectedNumberOfElements(){

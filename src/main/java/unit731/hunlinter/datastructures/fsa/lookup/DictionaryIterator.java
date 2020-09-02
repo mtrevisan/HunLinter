@@ -37,7 +37,7 @@ import java.util.Iterator;
  * An iterator over {@link WordData} entries of a {@link Dictionary}.
  * The stems can be decoded from compressed format or preserved as compressed format.
  */
-public class DictionaryIterator implements Iterator<WordData>{
+class DictionaryIterator implements Iterator<WordData>{
 
 	private final byte separator;
 

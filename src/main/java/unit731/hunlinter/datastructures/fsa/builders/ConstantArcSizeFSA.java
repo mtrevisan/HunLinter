@@ -41,9 +41,9 @@ public class ConstantArcSizeFSA extends FSA{
 	/** Size of the target address field (constant for the builder) */
 	public static final int TARGET_ADDRESS_SIZE = 4;
 	/** Size of the flags field (constant for the builder) */
-	public static final int FLAGS_SIZE = 1;
+	private static final int FLAGS_SIZE = 1;
 	/** Size of the label field (constant for the builder) */
-	public static final int LABEL_SIZE = 1;
+	private static final int LABEL_SIZE = 1;
 	/** Size of a single arc structure */
 	public static final int ARC_SIZE = FLAGS_SIZE + LABEL_SIZE + TARGET_ADDRESS_SIZE;
 	/** Offset of the flags field inside an arc */
