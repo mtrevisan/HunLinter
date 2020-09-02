@@ -146,7 +146,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 
 	private boolean secondLevelPresent;
-	public Pattern patternNoHyphen;
+	private Pattern patternNoHyphen;
 	private final Map<Level, Map<String, String>> rules = new EnumMap<>(Level.class);
 	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);

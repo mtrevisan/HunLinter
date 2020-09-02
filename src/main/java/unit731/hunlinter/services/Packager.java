@@ -123,7 +123,7 @@ public class Packager{
 	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 	private static final String FOLDER_ORIGIN = "%origin%";
-	private static final String FOLDER_SPLITTER = "[/\\\\]";
+	private static final Pattern FOLDER_SPLITTER = RegexHelper.pattern("[/\\\\]");
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
@@ -197,7 +197,7 @@ public class Packager{
 				+ ", cannot load project");
 
 		forEach(extractFileEntries(mainManifestPath.toFile()),
-			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile()));
+			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile()));
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
@@ -547,7 +547,7 @@ public class Packager{
 			folder = folder.substring(FOLDER_ORIGIN.length());
 			currentParentPath = originPath;
 		}
-		final Path truePath = Path.of(currentParentPath.toString(), folder.split(FOLDER_SPLITTER));
+		final Path truePath = Path.of(currentParentPath.toString(), RegexHelper.split(folder, FOLDER_SPLITTER));
 		return Path.of(truePath.toFile().getCanonicalPath())
 			.toFile();
 	}

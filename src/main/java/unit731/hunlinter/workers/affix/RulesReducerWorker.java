@@ -60,7 +60,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
 
-	public static final String WORKER_NAME = "Rules reducer";
+	private static final String WORKER_NAME = "Rules reducer";
 
 
 	private final RulesReducer rulesReducer;

@@ -48,7 +48,7 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class ThesaurusDictionary{
 
-	public static final Pattern PATTERN_SYNONYM_USE = RegexHelper.pattern("\\s*\\([^)]+\\)");
+	private static final Pattern PATTERN_SYNONYM_USE = RegexHelper.pattern("\\s*\\([^)]+\\)");
 
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String PART_OF_SPEECH_START = "(";

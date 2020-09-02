@@ -54,7 +54,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 public class RadixTrieNode{
 
 	/** The length of the pattern string is also the depth of this node */
-	protected final int depth;
+	private final int depth;
 
 	/** The fail function, if there is no match, jumps to this node. */
 	private RadixTrieNode failure;

@@ -66,6 +66,9 @@ public class ThesaurusParser{
 	private static final String PART_OF_SPEECH_START = "(";
 	private static final String PART_OF_SPEECH_END = ")";
 
+	private static final Pattern PART_OF_SPEECH_SPLITTER = RegexHelper.pattern("\\s*,\\s*");
+	private static final Pattern FILTER_SPLITTER = RegexHelper.pattern(", *");
+
 	private static final Pattern PATTERN_PARENTHESIS = RegexHelper.pattern("\\([^)]+\\)");
 
 	private static final Pattern PATTERN_CLEAR_SEARCH = RegexHelper.pattern("\\s+\\([^)]+\\)");
@@ -135,8 +138,7 @@ public class ThesaurusParser{
 		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
 		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
-		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
-			.split("\\s*,\\s*");
+		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix), PART_OF_SPEECH_SPLITTER);
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
@@ -210,9 +212,9 @@ public class ThesaurusParser{
 			idx = text.indexOf(")|");
 			start = 1;
 		}
-		if(idx >= 0)
-			pos = text.substring(start, idx)
-				.split(", *");
+		if(idx >= 0){
+			pos = RegexHelper.split(text.substring(start, idx), FILTER_SPLITTER);
+		}
 		return pos;
 	}
 

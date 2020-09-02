@@ -66,7 +66,7 @@ public class StringList implements Iterable<String>{
 	 * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
 	 * will be expanded to DEFAULT_CAPACITY when the first element is added.
 	 */
-	transient String[] elementData;
+	private transient String[] elementData;
 
 	/** The size of the ArrayList (the number of elements it contains) */
 	private int size;

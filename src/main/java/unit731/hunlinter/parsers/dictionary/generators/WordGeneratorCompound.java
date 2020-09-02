@@ -73,8 +73,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 
-	protected final DictionaryParser dicParser;
-	protected final WordGenerator wordGenerator;
+	private final DictionaryParser dicParser;
+	private final WordGenerator wordGenerator;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
 	private final Collection<String> compoundAsReplacement = new HashSet<>();

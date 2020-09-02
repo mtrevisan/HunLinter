@@ -26,6 +26,7 @@ package unit731.hunlinter.datastructures.fsa.stemming;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -189,7 +191,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, String> conversionPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -214,7 +216,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, String> conversionPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -239,7 +241,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, List<String>> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, List<String>> replacementPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -267,7 +269,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<Character, List<Character>> fromString(final String value) throws IllegalArgumentException{
 			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
-			final String[] eqChars = value.split(",\\s*");
+			final String[] eqChars = RegexHelper.split(value, SPLITTER);
 			for(final String characterPair : eqChars){
 				final String[] twoChars = characterPair.trim().split(StringUtils.SPACE);
 				if(twoChars.length != 2 || twoChars[0].length() != 1 || twoChars[1].length() != 1)
@@ -288,6 +290,10 @@ public enum DictionaryAttribute{
 	AUTHOR("fsa.dict.author"),
 	/** Dictionary creation date */
 	CREATION_DATE("fsa.dict.created");
+
+
+	private static final Pattern SPLITTER = RegexHelper.pattern(",\\s*");
+
 
 	/** Property name for this attribute */
 	public final String propertyName;

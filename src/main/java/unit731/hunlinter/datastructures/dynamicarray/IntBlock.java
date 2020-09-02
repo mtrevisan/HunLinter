@@ -28,7 +28,7 @@ package unit731.hunlinter.datastructures.dynamicarray;
 class IntBlock{
 
 	final int[] data;
-	int limit;
+	private int limit;
 
 
 	IntBlock(final int capacity){
