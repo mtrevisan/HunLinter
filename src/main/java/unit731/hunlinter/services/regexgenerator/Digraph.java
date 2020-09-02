@@ -69,9 +69,10 @@ public final class Digraph<T>{
 	 */
 	public Digraph(final Digraph<T> graph){
 		final int vertices = graph.adjacency.size();
+		final Deque<Pair<Integer, T>> reverse = new ArrayDeque<>();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			final Deque<Pair<Integer, T>> reverse = new ArrayDeque<>();
+			reverse.clear();
 			for(final Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
 			for(final Pair<Integer, T> w : reverse)
