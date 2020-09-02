@@ -267,6 +267,19 @@ public class BasicEventBus implements EventBusInterface{
 				throw new RuntimeException(e);
 			}
 		}
+
+		//called on the background thread
+		private void notifySubscribers(final Object evt){
+			//roll through the subscribers
+			final Collection<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
+			final Collection<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
+			subdivideHandlers(evt, vetoHandlers, regularHandlers);
+
+			final boolean vetoCalled = dispatchToVetoableHandlers(evt, vetoHandlers);
+
+			if(!vetoCalled)
+				dispatchToRegularHandlers(regularHandlers);
+		}
 	}
 
 	//consumer runnable to remove handler infos from the subscription list if they are null (this is
@@ -290,19 +303,6 @@ public class BasicEventBus implements EventBusInterface{
 		}
 	}
 
-
-	//called on the background thread
-	private void notifySubscribers(final Object evt){
-		//roll through the subscribers
-		final Collection<HandlerInfoCallable> vetoHandlers = new ArrayList<>(handlers.size());
-		final Collection<HandlerInfoCallable> regularHandlers = new ArrayList<>(handlers.size());
-		subdivideHandlers(evt, vetoHandlers, regularHandlers);
-
-		final boolean vetoCalled = dispatchToVetoableHandlers(evt, vetoHandlers);
-
-		if(!vetoCalled)
-			dispatchToRegularHandlers(regularHandlers);
-	}
 
 	private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
 		final Collection<HandlerInfoCallable> regularHandlers){

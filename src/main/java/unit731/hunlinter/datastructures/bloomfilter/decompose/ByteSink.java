@@ -25,7 +25,6 @@
 package unit731.hunlinter.datastructures.bloomfilter.decompose;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -38,7 +37,7 @@ public class ByteSink{
 	/** The actual storage stream */
 	private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 	/** Wrapper over the byte stream */
-	private final DataOutput dataStream = new DataOutputStream(stream);
+	private final DataOutputStream dataStream = new DataOutputStream(stream);
 
 
 	/**
@@ -49,6 +48,10 @@ public class ByteSink{
 	public byte[] getByteArray(){
 		try{
 			stream.close();
+		}
+		catch(final IOException ignored){}
+		try{
+			dataStream.close();
 		}
 		catch(final IOException ignored){}
 		return stream.toByteArray();
