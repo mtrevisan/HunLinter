@@ -78,6 +78,7 @@ public class RulesLoader{
 
 		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
 		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
+		fillDataFields(MorphologicalTag.DERIVATIONAL_PREFIX, "derivationalPrefixes");
 		fillDataFields(MorphologicalTag.INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
 		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
 		dataFields.put(MorphologicalTag.STEM, null);
