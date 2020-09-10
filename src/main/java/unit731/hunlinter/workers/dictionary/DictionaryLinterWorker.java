@@ -81,6 +81,21 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
 			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry)));
+//prefixes after suffixes
+//boolean prefix = false;
+//unit731.hunlinter.parsers.affix.AffixData affixData = affParser.getAffixData();
+//if(dicEntry.getContinuationFlags() != null)
+//	for(String flag : dicEntry.getContinuationFlags()){
+//		unit731.hunlinter.parsers.vos.RuleEntry rule = affixData.getData(flag);
+//		if(rule == null)
+//			continue;;
+//		if(rule.getType() == unit731.hunlinter.parsers.enums.AffixType.PREFIX)
+//			prefix = true;
+//		else if(prefix){
+//			System.out.println("Suffix " + flag + " after prefix for " + indexData.getData());
+//			break;
+//		}
+//	}
 
 			Iterator<Inflection> itr = inflections.iterator();
 			while(itr.hasNext()){
