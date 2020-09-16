@@ -109,9 +109,11 @@ final class GraphemeVEC{
 	}
 
 	private static String correctGrapheme(String word, final CharSequence grapheme, final Iterable<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
-		if(word.contains(grapheme))
+		if(word.contains(grapheme)){
+			final String newPhonemePattern = "$1" + newPhoneme + "$2";
 			for(final Pattern p : eterophonicSequenceFalsePositives)
-				word = RegexHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
+				word = RegexHelper.replaceAll(word, p, newPhonemePattern);
+		}
 		return word;
 	}
 

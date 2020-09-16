@@ -24,7 +24,7 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
-import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -90,15 +90,15 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		DictionaryEntry[] result = new DictionaryEntry[0];
+		final SimpleDynamicArray<DictionaryEntry> result = new SimpleDynamicArray<>(DictionaryEntry.class, inputCompounds.length);
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
 			//filter input set by minimum length and forbidden flag
 			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
-				result = ArrayUtils.add(result, dicEntry);
+				result.add(dicEntry);
 		}
-		return result;
+		return result.extractCopy();
 	}
 
 	private List<List<Inflection[]>> generateCompounds(final Iterable<int[]> permutations, final DictionaryEntry[] inputs){

@@ -31,6 +31,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixOption;
@@ -221,11 +222,16 @@ public class DictionaryEntry{
 	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, DictionaryEntry[]> result = new HashMap<>();
 		final int size = (continuationFlags != null? continuationFlags.length: 0);
+		final SimpleDynamicArray<DictionaryEntry> vv = new SimpleDynamicArray<>(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
 			final String cf = continuationFlags[i];
 			if(affixData.isManagedByCompoundRule(cf)){
+				vv.reset();
 				final DictionaryEntry[] v = result.get(cf);
-				result.put(cf, (v != null? ArrayUtils.add(v, this): new DictionaryEntry[]{this}));
+				if(v != null)
+					vv.addAll(v);
+				vv.add(this);
+				result.put(cf, vv.extractCopy());
 			}
 		}
 		return result;
@@ -276,11 +282,11 @@ public class DictionaryEntry{
 			return new String[0];
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		String[] list = new String[0];
+		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, morphologicalFields.length);
 		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
-				list = ArrayUtils.add(list, mf);
-		return list;
+				list.add(mf);
+		return list.extractCopy();
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

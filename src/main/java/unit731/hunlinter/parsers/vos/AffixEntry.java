@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
@@ -246,15 +247,16 @@ public class AffixEntry{
 	}
 
 	private String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		String[] collector = new String[0];
+		final SimpleDynamicArray<String> collector = new SimpleDynamicArray<>(String.class,
+			(morphologicalFields != null? morphologicalFields.length: 0));
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();
 			final int purgeTag = tag.length();
 			for(final String mf : morphologicalFields)
 				if(mf.startsWith(tag))
-					collector = ArrayUtils.add(collector, mf.substring(purgeTag));
+					collector.add(mf.substring(purgeTag));
 		}
-		return collector;
+		return collector.extractCopy();
 	}
 
 	public boolean canApplyTo(final String word){

@@ -101,7 +101,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					for(final DictionaryEntry entry : inputs.get(flag)){
 						final Inflection[] inflections = applyAffixRules(entry, true, null);
 						final Inflection[] collect = collectIf(inflections,
-							inflection -> inflection.hasContinuationFlag(flag), () -> new Inflection[0]);
+							inflection -> inflection.hasContinuationFlag(flag));
 						dicEntriesPerFlag = ArrayUtils.addAll(dicEntriesPerFlag, collect);
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);

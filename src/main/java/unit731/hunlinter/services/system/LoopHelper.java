@@ -28,12 +28,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 
 public final class LoopHelper{
@@ -117,15 +117,15 @@ public final class LoopHelper{
 	}
 
 
-	public static <T> T[] collectIf(final T[] array, final Predicate<T> condition, final Supplier<T[]> creator){
-		T[] collect = creator.get();
+	public static <T> T[] collectIf(final T[] array, final Predicate<T> condition){
 		final int size = (array != null? array.length: 0);
+		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<T>((Class<T>)array.getClass().getComponentType(), size);
 		for(int i = 0; i < size; i ++){
 			final T elem = array[i];
 			if(condition.test(elem))
-				collect = ArrayUtils.add(collect, elem);
+				collect.add(elem);
 		}
-		return collect;
+		return collect.extractCopy();
 	}
 
 

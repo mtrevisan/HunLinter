@@ -24,8 +24,8 @@
  */
 package unit731.hunlinter.services;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,12 +95,12 @@ public final class RegexHelper{
 	}
 
 	private static String[] extractUnlimited(final Matcher matcher){
-		String[] result = new String[0];
+		final SimpleDynamicArray<String> result = new SimpleDynamicArray<>(String.class);
 		while(matcher.find()){
 			final String component = getNextGroup(matcher);
-			result = ArrayUtils.add(result, (component != null? component: matcher.group()));
+			result.add((component != null? component: matcher.group()));
 		}
-		return result;
+		return result.extractCopy();
 	}
 
 	private static String getNextGroup(final Matcher matcher){

@@ -146,7 +146,7 @@ public class CFSA2 extends FSA{
 	 * Please see the documentation of this class for more information on how
 	 * this structure is organized.
 	 */
-	private byte[] arcs;
+	private final byte[] arcs;
 
 	/** Flags for this automaton version */
 	private final EnumSet<FSAFlags> flags;

@@ -268,7 +268,7 @@ public final class GUIHelper{
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override
-			public void actionPerformed(ActionEvent evt){
+			public void actionPerformed(final ActionEvent evt){
 				if(undo.canUndo()){
 					try{
 						undo.undo();
@@ -282,7 +282,7 @@ public final class GUIHelper{
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override
-			public void actionPerformed(ActionEvent evt){
+			public void actionPerformed(final ActionEvent evt){
 				if(undo.canRedo()){
 					try{
 						undo.redo();

@@ -43,8 +43,6 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static unit731.hunlinter.services.system.LoopHelper.match;
-
 
 public class ZipManager{
 
@@ -104,13 +102,23 @@ public class ZipManager{
 					.map(Path::getParent)
 					.map(Path::toString)
 					.toArray(String[]::new);
-				process = (match(includeFolders, folder::startsWith) == null);
+				process = (match(includeFolders, folder) == null);
 			}
 			if(process)
 				filteredFolders.add(folder);
 		}
 		filteredFolders.trimToSize();
 		return filteredFolders;
+	}
+
+	private static String match(final String[] array, final String folder){
+		final int size = (array != null? array.length: 0);
+		for(int i = 0; i < size; i ++){
+			final String elem = array[i];
+			if(folder.startsWith(elem))
+				return elem;
+		}
+		return null;
 	}
 
 	private static ZipOutputStream createZIPWriter(final File file, final int compressionLevel) throws IOException{
