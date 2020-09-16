@@ -34,8 +34,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * The {@code Digraph} class represents a directed graph of vertices.
@@ -142,8 +140,7 @@ public final class Digraph<T>{
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			final StringJoiner transitions = new StringJoiner(", ");
-			forEach(adjacency.get(v),
-				w -> transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")"));
+			forEach(adjacency.get(v), transitions);
 			s.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
@@ -151,6 +148,11 @@ public final class Digraph<T>{
 				.append(NEWLINE);
 		}
 		return s.toString();
+	}
+
+	public static <T> void forEach(final Iterable<Pair<Integer, T>> adjacency, final StringJoiner transitions){
+		for(final Pair<Integer, T> w : adjacency)
+			transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")");
 	}
 
 }

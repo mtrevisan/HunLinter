@@ -126,10 +126,11 @@ public class RecentItems{
 	private void storeToPreferences(){
 		final int size = items.size();
 		for(int i = 0; i < maxItems; i ++){
+			final String key = RECENT_ITEM_PREFIX + i;
 			if(i < size)
-				preferenceNode.put(RECENT_ITEM_PREFIX + i, items.get(i));
+				preferenceNode.put(key, items.get(i));
 			else
-				preferenceNode.remove(RECENT_ITEM_PREFIX + i);
+				preferenceNode.remove(key);
 		}
 	}
 

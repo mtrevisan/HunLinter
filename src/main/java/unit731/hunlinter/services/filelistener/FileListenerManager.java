@@ -256,7 +256,8 @@ public class FileListenerManager implements FileListener, Runnable{
 				final Set<FileChangeListener> listeners = matchedListeners(dir, file);
 
 				final Path path = Path.of(dir.toAbsolutePath().toString(), file.toString());
-				forEach(listeners, listener -> listenerMethod.accept(listener, path));
+				for(final FileChangeListener listener : listeners)
+					listenerMethod.accept(listener, path);
 			}
 		}
 	}

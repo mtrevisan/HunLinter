@@ -27,19 +27,18 @@ package unit731.hunlinter.languages;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.Inflection;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -95,18 +94,18 @@ public class RulesLoader{
 			if(flags != null)
 				cannotContainStress.addAll(Arrays.asList(flags));
 
-			Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
-			while(rules.hasNext()){
-				final String masterFlag = rules.next();
-				final String[] wrongFlags = strategy.parseFlags(rules.next());
+			String[] rules = readPropertyAsArray("notCombinableRules", '/');
+			for(int i = 0; i < rules.length; i ++){
+				final String masterFlag = rules[i ++];
+				final String[] wrongFlags = strategy.parseFlags(rules[i]);
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
 			String letter = null;
-			rules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
-			while(rules.hasNext()){
-				final String elem = rules.next();
+			rules = readPropertyAsArray("letterAndRulesNotCombinable", '/');
+			for(int i = 0; i < rules.length; i ++){
+				final String elem = rules[i];
 				if(elem.length() == 1)
 					letter = String.valueOf(elem.charAt(0));
 				else{
@@ -122,10 +121,10 @@ public class RulesLoader{
 	}
 
 	private void fillDataFields(final MorphologicalTag tag, final String property){
-		final Iterator<String> itr = readPropertyAsIterator(property, ',');
+		final String[] itr = readPropertyAsArray(property, ',');
 		final Set<String> set = new HashSet<>();
-		while(itr.hasNext())
-			set.add(tag.getCode() + itr.next());
+		for(int i = 0; i < itr.length; i ++)
+			set.add(tag.getCode() + itr[i]);
 		dataFields.put(tag, set);
 	}
 
@@ -138,16 +137,16 @@ public class RulesLoader{
 		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.emptySet());
 	}
 
-	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
-		final Collection<String> list = new ArrayList<>(rulesProperties.size());
+	public final String[] readPropertyAsArray(final String key, final char separator){
+		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, rulesProperties.size());
 		for(final Object o : rulesProperties.keySet()){
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
 				final String line = readProperty(k);
-				list.addAll(Arrays.asList(StringUtils.split(line, separator)));
+				list.addAll(StringUtils.split(line, separator));
 			}
 		}
-		return list.iterator();
+		return list.extractCopy();
 	}
 
 

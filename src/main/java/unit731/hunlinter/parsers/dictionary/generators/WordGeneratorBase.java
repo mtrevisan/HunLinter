@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.AffixEntry;
@@ -41,7 +42,6 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import java.text.MessageFormat;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
-import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
@@ -303,15 +303,14 @@ class WordGeneratorBase{
 			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' via '"
 				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "'");
 
-		Inflection[] inflections = new Inflection[0];
+		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class, applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = (match(appliedRules,
-						appliedRule -> (entry.getType() == AffixType.SUFFIX ^ appliedRule.getType() == AffixType.SUFFIX) && appliedRule.hasContinuationFlag(circumfixFlag)) != null);
+					final boolean appliedRuleContainsCircumfix = match(appliedRules, entry, circumfixFlag);
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.getType() == AffixType.SUFFIX ^ appliedRuleContainsCircumfix));
 				}
 
@@ -322,10 +321,21 @@ class WordGeneratorBase{
 				if(removeCircumfixFlag)
 					inflection.removeContinuationFlag(circumfixFlag);
 				if(!inflection.hasContinuationFlag(forbiddenWordFlag))
-					inflections = ArrayUtils.add(inflections, inflection);
+					inflections.add(inflection);
 			}
 		}
-		return inflections;
+		return inflections.extractCopy();
+	}
+
+	private static boolean match(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){
+		final AffixType entryType = entry.getType();
+		final int size = (appliedRules != null? appliedRules.length: 0);
+		for(int i = 0; i < size; i ++){
+			final AffixEntry appliedRule = appliedRules[i];
+			if((entryType == AffixType.SUFFIX ^ appliedRule.getType() == AffixType.SUFFIX) && appliedRule.hasContinuationFlag(circumfixFlag))
+				return true;
+		}
+		return false;
 	}
 
 	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final FixedArray<String> appliedAffixes,
