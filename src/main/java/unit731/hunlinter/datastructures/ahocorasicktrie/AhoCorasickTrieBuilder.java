@@ -278,8 +278,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings)
 				trie.check[begin + sibling.getKey()] = begin;
 
+			final ArrayList<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(0);
 			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings){
-				final List<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
+				newSiblings.clear();
+				newSiblings.ensureCapacity(sibling.getValue().getSuccess().entrySet().size() + 1);
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){

@@ -99,7 +99,8 @@ public class AffixHandler implements Handler{
 			ParserHelper.assertNotEOF(scanner);
 
 			line = scanner.nextLine();
-			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
+			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
+				aliasesMorphologicalField);
 			entry.setParent(parent);
 //com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
@@ -108,7 +109,8 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries.data, entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}), IndexDataPair.of(context.getIndex() + i, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}),
+					IndexDataPair.of(context.getIndex() + i, null)));
 			else
 				entries.add(entry);
 

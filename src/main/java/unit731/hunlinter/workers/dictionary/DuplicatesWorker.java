@@ -60,8 +60,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class DuplicatesWorker extends WorkerDictionary{
 
@@ -257,8 +255,11 @@ public class DuplicatesWorker extends WorkerDictionary{
 						+ "): ";
 					writer.write(origin);
 					final StringJoiner sj = new StringJoiner(", ");
-					forEach(entries,
-						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getInflection().hasInflectionRules()? " via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
+					if(entries != null)
+						for(final Duplicate duplicate : entries)
+							sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+								(duplicate.getInflection().hasInflectionRules()?
+								" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
 					writer.write(sj.toString());
 					writer.newLine();
 

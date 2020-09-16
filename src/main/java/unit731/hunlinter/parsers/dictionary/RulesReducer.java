@@ -168,7 +168,8 @@ public class RulesReducer{
 				final int delta = longestConditionLength - rule.condition.length();
 				final String deltaAddition = from.substring(startIndex, startIndex + delta);
 				//add addition
-				forEach(rule.addition, addition -> compactedRule.addition.add(deltaAddition + addition));
+				for(final String addition : rule.addition)
+					compactedRule.addition.add(deltaAddition + addition);
 			}
 		}
 	}
@@ -214,8 +215,10 @@ public class RulesReducer{
 	}
 
 	private void redistributeAddition(final LineEntry entry, final Map<String, LineEntry> map){
+		final String removalTab = entry.removal + TAB;
+		final String tabCondition = TAB + entry.condition;
 		for(final String addition : entry.addition){
-			final String key = entry.removal + TAB + addition + TAB + entry.condition;
+			final String key = removalTab + addition + tabCondition;
 			final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
 			final LineEntry rule = map.putIfAbsent(key, newEntry);
 			if(rule != null)
@@ -246,14 +249,17 @@ public class RulesReducer{
 		final List<LineEntry> disjointedRules = new ArrayList<>();
 
 		final Consumer<LineEntry> lineEntryConsumer = temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule);
+		final Collection<LineEntry> temporaryRules = new ArrayList<>();
+		final List<String> keys = new ArrayList<>(0);
 		for(final LineEntry rule : rules){
-			final Collection<LineEntry> temporaryRules = new ArrayList<>();
+			temporaryRules.clear();
 
 			final Map<String, List<String>> lcss = SetHelper.bucket(rule.addition,
 				add -> StringHelper.longestCommonPrefix(add, rule.removal));
 			if(lcss.size() > 1){
 				//order keys from longer to shorter
-				final List<String> keys = new ArrayList<>(lcss.keySet());
+				keys.clear();
+				keys.addAll(lcss.keySet());
 				keys.sort(Comparator.comparingInt(String::length).reversed());
 				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
@@ -284,7 +290,8 @@ public class RulesReducer{
 			final String removal = (conditionLength <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
 			final Set<String> addition = new HashSet<>(list.size());
-			forEach(list, add -> addition.add(add.substring(keyLength)));
+			for(final String add : list)
+				addition.add(add.substring(keyLength));
 			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
 			if(rules.contains(newEntry)){
 				temporaryRules.add(newEntry);
@@ -371,6 +378,8 @@ public class RulesReducer{
 		rules.removeAll(sameCondition);
 
 		//separate conditions:
+		final Set<Character> childrenGroup = new HashSet<>();
+		final Set<Character> notPresentConditions = new HashSet<>();
 		//for each rule with same condition
 		for(final LineEntry parent : sameCondition){
 			//extract ratifying group
@@ -381,7 +390,7 @@ public class RulesReducer{
 			applyIf(children,
 				child -> child != parent,
 				childrenNotParent::add);
-			final Set<Character> childrenGroup = new HashSet<>();
+			childrenGroup.clear();
 			for(final LineEntry lineEntry : childrenNotParent)
 				forEach(groups.get(lineEntry), childrenGroup::add);
 
@@ -395,7 +404,7 @@ public class RulesReducer{
 			}
 
 			//extract and add new condition only if there are rules that ends with the new condition
-			final Set<Character> notPresentConditions = new HashSet<>();
+			notPresentConditions.clear();
 			final Iterator<Character> itr = groupsIntersection.iterator();
 			while(itr.hasNext()){
 				final Character chr = itr.next();
@@ -510,6 +519,7 @@ public class RulesReducer{
 
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
 		queue.addAll(bush);
+		final Set<Character> childrenGroup = new HashSet<>();
 		while(!queue.isEmpty()){
 			final LineEntry parent = queue.remove();
 
@@ -524,9 +534,9 @@ public class RulesReducer{
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 			//extract negated group
-			final Set<Character> childrenGroup = new HashSet<>(bubbles.size());
-			forEach(bubbles,
-				child -> childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1)));
+			childrenGroup.clear();
+			for(final LineEntry child : bubbles)
+				childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1));
 
 			//if intersection(parent-group, children-group) is empty
 			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
@@ -556,11 +566,11 @@ public class RulesReducer{
 				finalRules.addAll(bubbles);
 			}
 			else if(allMatch(queue, rule -> rule.condition.length() > parentConditionLength + 1))
-				forEach(childrenGroup, chr -> {
+				for(final Character chr : childrenGroup){
 					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
 					if(!queue.contains(entry))
 						queue.add(entry);
-				});
+				}
 			else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
 				//expand intersection
 				for(final Character chr : groupsIntersection){
@@ -592,7 +602,8 @@ public class RulesReducer{
 			if(parent.from.containsAll(child.from)){
 				final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
 				newBushes.ensureCapacity(newBushes.size() + childGroup.size());
-				forEach(childGroup, chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
+				for(final Character chr : childGroup)
+					newBushes.add(LineEntry.createFrom(child, chr + child.condition));
 
 				itr.remove();
 			}
@@ -665,6 +676,7 @@ public class RulesReducer{
 			entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegexSequencer.splitSequence(entry.condition).length:
 			null));
+		final Set<Character> group = new HashSet<>();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
@@ -672,13 +684,15 @@ public class RulesReducer{
 				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				final Set<Character> group = new HashSet<>(similarities.size());
-				forEach(similarities, entry -> group.add(RegexSequencer.splitSequence(entry.condition)[1].charAt(0)));
+				group.clear();
+				for(final LineEntry similarity : similarities)
+					group.add(RegexSequencer.splitSequence(similarity.condition)[1].charAt(0));
 				final String condition = StringUtils.join(commonPreCondition) + RegexHelper.makeGroup(group, comparator)
 					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
-				forEach(similarities, entries::remove);
+				for(final LineEntry similarity : similarities)
+					entries.remove(similarity);
 			}
 	}
 

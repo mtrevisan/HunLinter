@@ -106,7 +106,8 @@ public class AutoCorrectParser{
 		final Collection<String> map = new HashSet<>();
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}), IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),
+					IndexDataPair.of(index, null)));
 
 			index ++;
 		}
