@@ -39,7 +39,6 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -151,7 +150,7 @@ public class LineEntry implements Serializable{
 	private Set<String> extractRuleSpine(final LineEntry rule){
 		final Set<String> parentBones = new HashSet<>(rule.addition.size());
 		for(final String add : rule.addition){
-			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
+			final int lcsLength = StringHelper.longestCommonPrefix(add, rule.removal)
 				.length();
 			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
 		}
@@ -176,7 +175,7 @@ public class LineEntry implements Serializable{
 	}
 
 	public void expandConditionToMaxLength(final Comparator<String> comparator){
-		final String lcs = StringHelper.longestCommonSuffix(from);
+		final String lcs = StringHelper.longestCommonSuffix(from.toArray(String[]::new));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));

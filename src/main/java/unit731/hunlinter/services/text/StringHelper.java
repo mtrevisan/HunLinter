@@ -31,8 +31,6 @@ import unit731.hunlinter.services.RegexHelper;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
@@ -102,22 +100,21 @@ public final class StringHelper{
 		return (startsWithUppercase? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
 	}
 
-	public static String longestCommonPrefix(final Collection<String> texts){
-		return longestCommonAffix(texts, StringHelper::commonPrefix);
+	public static String longestCommonPrefix(final String... texts){
+		return longestCommonAffix(StringHelper::commonPrefix, texts);
 	}
 
-	public static String longestCommonSuffix(final Collection<String> texts){
-		return longestCommonAffix(texts, StringHelper::commonSuffix);
+	public static String longestCommonSuffix(final String... texts){
+		return longestCommonAffix(StringHelper::commonSuffix, texts);
 	}
 
-	private static String longestCommonAffix(final Collection<String> texts,
-			final BiFunction<String, String, String> commonAffix){
+	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String... texts){
 		String lcs = null;
-		if(!texts.isEmpty()){
-			final Iterator<String> itr = texts.iterator();
-			lcs = itr.next();
-			while(!lcs.isEmpty() && itr.hasNext())
-				lcs = commonAffix.apply(lcs, itr.next());
+		if(texts.length > 0){
+			int offset = 0;
+			lcs = texts[offset ++];
+			while(!lcs.isEmpty() && offset < texts.length)
+				lcs = commonAffix.apply(lcs, texts[offset ++]);
 		}
 		return lcs;
 	}

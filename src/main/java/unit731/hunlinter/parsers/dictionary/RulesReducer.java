@@ -45,7 +45,6 @@ import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -251,7 +250,7 @@ public class RulesReducer{
 			final Collection<LineEntry> temporaryRules = new ArrayList<>();
 
 			final Map<String, List<String>> lcss = SetHelper.bucket(rule.addition,
-				add -> StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal)));
+				add -> StringHelper.longestCommonPrefix(add, rule.removal));
 			if(lcss.size() > 1){
 				//order keys from longer to shorter
 				final List<String> keys = new ArrayList<>(lcss.keySet());
@@ -702,7 +701,7 @@ public class RulesReducer{
 		forEach(entries, rule -> {
 			restoredRules.ensureCapacity(restoredRules.size() + rule.addition.size());
 			forEach(rule.addition, addition -> {
-				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
+				final int lcp = StringHelper.longestCommonPrefix(rule.removal, addition).length();
 				final String removal = rule.removal.substring(lcp);
 				final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
 					rule.condition, rule.from);

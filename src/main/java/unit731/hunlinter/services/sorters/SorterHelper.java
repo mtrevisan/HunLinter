@@ -49,11 +49,14 @@ public final class SorterHelper{
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array, final int low, final int high){
 		//fetch all the duplicates
 		final Collection<T> set = new HashSet<>();
-		int[] indexes = new int[0];
+		int[] indexes = new int[high - low];
+		int offset = 0;
 		for(int i = low; i < high; i ++)
 			if(!set.add(array[i]))
-				indexes = ArrayUtils.add(indexes, i);
-		return ArrayUtils.removeAll(array, indexes);
+				indexes[offset ++] = i;
+		int[] tmp = new int[offset];
+		System.arraycopy(indexes, 0, tmp, 0, offset);
+		return ArrayUtils.removeAll(array, tmp);
 	}
 
 }
