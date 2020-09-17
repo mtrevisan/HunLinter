@@ -82,6 +82,7 @@ public class RulesLoader{
 		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
 		dataFields.put(MorphologicalTag.STEM, null);
 		dataFields.put(MorphologicalTag.ALLOMORPH, null);
+		dataFields.put(MorphologicalTag.PART, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
 		multipleStressedWords = readPropertyAsSet("multipleStressedWords", ',');
