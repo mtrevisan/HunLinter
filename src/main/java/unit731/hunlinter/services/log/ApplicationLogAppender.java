@@ -28,6 +28,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import org.slf4j.Marker;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
+import unit731.hunlinter.actions.ReportWarningsAction;
 import unit731.hunlinter.services.system.JavaHelper;
 
 import javax.swing.JLabel;
@@ -38,11 +41,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.prefs.Preferences;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
+
+	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 
 	private Encoder<ILoggingEvent> encoder;
 
@@ -74,6 +80,11 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 		if((!TEXT_AREAS.isEmpty() || !LABELS.isEmpty()) && encoder != null){
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
+
+			//FIXME
+			if(!preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true) && message.contains("WARN:"))
+				return;
+
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				forEach(TEXT_AREAS.get(marker), textArea -> {

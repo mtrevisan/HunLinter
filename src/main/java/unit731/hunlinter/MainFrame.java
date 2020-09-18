@@ -164,7 +164,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private final JFileChooser openProjectPathFileChooser;
 
-	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
+	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 	private final ParserManager parserManager;
 	private final Packager packager;
 
