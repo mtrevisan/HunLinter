@@ -45,6 +45,7 @@ import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.IssueReporterAction;
 import unit731.hunlinter.actions.OnlineHelpAction;
 import unit731.hunlinter.actions.ProjectLoaderAction;
+import unit731.hunlinter.actions.ReportWarningsAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
@@ -159,7 +160,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
-	private static final String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 
 	private final JFileChooser openProjectPathFileChooser;
@@ -213,7 +213,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 		//check for updates
-		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true))
+		if(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true))
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
@@ -275,6 +275,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+      setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
       hlpIssueReporterMenuItem = new javax.swing.JMenuItem();
@@ -355,6 +356,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
+      final Preferences preferences = Preferences.userNodeForPackage(getClass());
       final RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new unit731.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
@@ -455,9 +457,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setMenu.setText("Settings");
 
       setCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
-      setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
+      setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true));
       setCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       setMenu.add(setCheckUpdateOnStartupCheckBoxMenuItem);
+
+      setReportWarningsCheckBoxMenuItem.setAction(new ReportWarningsAction(preferences));
+      setReportWarningsCheckBoxMenuItem.setSelected(preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true));
+      setReportWarningsCheckBoxMenuItem.setText("Report warnings");
+      setMenu.add(setReportWarningsCheckBoxMenuItem);
 
       mainMenuBar.add(setMenu);
 
@@ -939,6 +946,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
+   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;

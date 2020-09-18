@@ -30,18 +30,18 @@ import java.util.Objects;
 import java.util.prefs.Preferences;
 
 
-public class CheckUpdateOnStartupAction extends AbstractAction{
+public class ReportWarningsAction extends AbstractAction{
 
-	private static final long serialVersionUID = 2319044845856106299L;
+	private static final long serialVersionUID = -3894315443438154651L;
 
-	public static final String UPDATE_STARTUP_CHECK = "update.startupCheck";
+	public static final String REPORT_WARNINGS = "report.warnings";
 
 
 	private final Preferences preferences;
 
 
-	public CheckUpdateOnStartupAction(final Preferences preferences){
-		super("system.checkUpdateOnStartup");
+	public ReportWarningsAction(final Preferences preferences){
+		super("system.reportWarnings");
 
 		Objects.requireNonNull(preferences);
 
@@ -50,7 +50,7 @@ public class CheckUpdateOnStartupAction extends AbstractAction{
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		preferences.putBoolean(UPDATE_STARTUP_CHECK, ((AbstractButton)event.getSource()).isSelected());
+		preferences.putBoolean(REPORT_WARNINGS, ((AbstractButton)event.getSource()).isSelected());
 	}
 
 }
