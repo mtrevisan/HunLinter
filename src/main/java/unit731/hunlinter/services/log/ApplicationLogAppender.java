@@ -81,8 +81,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 
-			//FIXME
-			if(!preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true) && message.contains("WARN:"))
+			//FIXME?
+			if(!preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true) && message.contains(" WARN: "))
 				return;
 
 			final Marker marker = eventObject.getMarker();
