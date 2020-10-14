@@ -74,8 +74,8 @@ public class StatisticsWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(affParser, "Affix parser cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
 		final AffixData affixData = affParser.getAffixData();

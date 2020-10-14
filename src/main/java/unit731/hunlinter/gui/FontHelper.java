@@ -165,7 +165,7 @@ public final class FontHelper{
 	}
 
 	public static void extractFonts(final String languageSample){
-		Objects.requireNonNull(languageSample);
+		Objects.requireNonNull(languageSample, "Language sample cannot be null");
 
 		if(!languageSample.equals(LANGUAGE_SAMPLE)){
 			LANGUAGE_SAMPLE = languageSample;

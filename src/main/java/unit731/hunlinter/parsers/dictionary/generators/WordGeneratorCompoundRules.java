@@ -60,8 +60,8 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
 	Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
-		Objects.requireNonNull(inputCompounds);
-		Objects.requireNonNull(compoundRule);
+		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
+		Objects.requireNonNull(compoundRule, "Compound rule cannot be null");
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 

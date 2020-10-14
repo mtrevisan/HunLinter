@@ -90,10 +90,10 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

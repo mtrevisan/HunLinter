@@ -41,7 +41,7 @@ class BinaryFileBuffer implements Closeable{
 
 
 	BinaryFileBuffer(final Scanner scanner){
-		Objects.requireNonNull(scanner);
+		Objects.requireNonNull(scanner, "Scanner cannot be null");
 
 		this.scanner = scanner;
 

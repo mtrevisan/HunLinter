@@ -55,7 +55,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		try{
 			if(workerData.isParallelProcessing()){

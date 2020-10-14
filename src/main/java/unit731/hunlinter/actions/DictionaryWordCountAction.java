@@ -45,8 +45,8 @@ public class DictionaryWordCountAction extends AbstractAction{
 		super("dictionary.wordCount",
 			new ImageIcon(DictionaryWordCountAction.class.getResource("/dictionary_count.png")));
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;

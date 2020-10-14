@@ -58,7 +58,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
 	Inflection[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
-		Objects.requireNonNull(inputCompounds);
+		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 

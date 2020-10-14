@@ -227,7 +227,7 @@ public final class GUIHelper{
 
 	public static void askUserToAbort(final WorkerAbstract<?> worker, final Component parentComponent, final Runnable onAbort,
 			final Runnable resumeTask){
-		Objects.requireNonNull(parentComponent);
+		Objects.requireNonNull(parentComponent, "Parent component cannot be null");
 
 		worker.pause();
 

@@ -63,8 +63,8 @@ public class WordMuncher{
 
 
 	public WordMuncher(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		Objects.requireNonNull(affixData);
-//		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+//		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 
 		this.affixData = affixData;
 //		this.dicParser = dicParser;

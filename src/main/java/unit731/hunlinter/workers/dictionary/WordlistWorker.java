@@ -73,8 +73,8 @@ public class WordlistWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		final Charset charset = dicParser.getCharset();

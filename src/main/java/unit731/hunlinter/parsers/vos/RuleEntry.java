@@ -49,8 +49,8 @@ public class RuleEntry{
 
 
 	public RuleEntry(final AffixType type, final String flag, final char combinable){
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(flag);
+		Objects.requireNonNull(type, "Type cannot be null");
+		Objects.requireNonNull(flag, "Flag cannot be null");
 
 		this.type = type;
 		this.flag = flag;
@@ -63,9 +63,9 @@ public class RuleEntry{
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
-//	Objects.requireNonNull(combinable);
-//	Objects.requireNonNull(prefixEntries);
-//	Objects.requireNonNull(suffixEntries);
+//	Objects.requireNonNull(combinable, "Combinable cannot be null");
+//	Objects.requireNonNull(prefixEntries, "Prefix entries cannot be null");
+//	Objects.requireNonNull(suffixEntries, "Suffix entries cannot be null");
 //
 //	this.isSuffix = isSuffix;
 //	this.combinable = (combinable == YES);

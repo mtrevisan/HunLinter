@@ -65,7 +65,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	}
 
 	private static <T> void addComponent(final Map<Marker, List<T>> map, final T component, final Marker... markers){
-		Objects.requireNonNull(component);
+		Objects.requireNonNull(component, "Component cannot be null");
 
 		forEach(markers,
 			marker -> map.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(component));

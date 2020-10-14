@@ -41,7 +41,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
 	public LanguageChooserDialog(final Iterable<String> availableLanguages, final Consumer<String> onSelection, final Frame parent){
 		super(parent, "Language chooser", true);
 
-		Objects.requireNonNull(onSelection);
+		Objects.requireNonNull(onSelection, "On selection cannot be null");
 
 		initComponents();
 

@@ -52,8 +52,8 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 
 
 	public DictionarySortCellRenderer(final Function<Integer, Integer> boundaryIndex, final Font font){
-		Objects.requireNonNull(boundaryIndex);
-		Objects.requireNonNull(font);
+		Objects.requireNonNull(boundaryIndex, "Boundary index cannot be null");
+		Objects.requireNonNull(font, "Font cannot be null");
 
 		this.boundaryIndex = boundaryIndex;
 		this.font = font;

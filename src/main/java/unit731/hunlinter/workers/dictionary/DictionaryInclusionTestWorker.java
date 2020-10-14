@@ -64,8 +64,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(language);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(language, "Language cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);

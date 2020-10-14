@@ -60,7 +60,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 
 	public SynonymsEntry(final String partOfSpeechAndSynonyms){
-		Objects.requireNonNull(partOfSpeechAndSynonyms);
+		Objects.requireNonNull(partOfSpeechAndSynonyms, "Part-of-speech and synonyms cannot be null");
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT),

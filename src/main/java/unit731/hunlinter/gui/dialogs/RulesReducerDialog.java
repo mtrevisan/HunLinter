@@ -74,7 +74,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	public RulesReducerDialog(final ParserManager parserManager, final Frame parent){
 		super(parent, "Rules Reducer", true);
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 

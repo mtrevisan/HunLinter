@@ -61,13 +61,13 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 
 	WorkerAbstract(final WD workerData){
-		Objects.requireNonNull(workerData);
+		Objects.requireNonNull(workerData, "Worker data cannot be null");
 
 		this.workerData = workerData;
 	}
 
 	public final void setProcessor(final Function<?, ?> processor){
-		Objects.requireNonNull(processor);
+		Objects.requireNonNull(processor, "Processor cannot be null");
 
 		this.processor = processor;
 	}

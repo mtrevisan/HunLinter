@@ -61,7 +61,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
 	Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
-		Objects.requireNonNull(inputCompounds);
+		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
 		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)

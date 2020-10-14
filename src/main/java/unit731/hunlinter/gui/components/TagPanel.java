@@ -165,7 +165,7 @@ public class TagPanel extends JPanel{
 
 
 		JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
-			Objects.requireNonNull(tagRemover);
+			Objects.requireNonNull(tagRemover, "Tag remover cannot be null");
 
 			setLayout(new BorderLayout());
 			setOpaque(false);

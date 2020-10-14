@@ -55,8 +55,8 @@ public final class HeapSort{
 
 	public static synchronized <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
 			final Consumer<Integer> progressCallback){
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(data, "Data cannot be null");
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 		assert low < high && low < data.length && high <= data.length;
 
 		final int progressStep = (int)Math.ceil((data.length << 1) / 100.f);

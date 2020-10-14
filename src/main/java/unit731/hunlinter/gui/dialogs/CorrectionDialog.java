@@ -54,9 +54,9 @@ public class CorrectionDialog extends JDialog{
 	public CorrectionDialog(final CorrectionEntry correction, final BiConsumer<String, String> okButtonAction, final Frame parent){
 		super(parent, "Change auto correction for " + correction, true);
 
-		Objects.requireNonNull(parent);
-		Objects.requireNonNull(correction);
-		Objects.requireNonNull(okButtonAction);
+		Objects.requireNonNull(parent, "Parent cannot be null");
+		Objects.requireNonNull(correction, "Correction cannot be null");
+		Objects.requireNonNull(okButtonAction, "Ok button action cannot be null");
 
 		initComponents();
 

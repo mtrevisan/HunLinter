@@ -122,7 +122,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	@Override
 	public void register(final FileChangeListener listener, final String... patterns){
-		Objects.requireNonNull(listener);
+		Objects.requireNonNull(listener, "Listener cannot be null");
 
 		for(final String pattern : patterns){
 			final Path dir = (new File(pattern)).getParentFile().toPath();

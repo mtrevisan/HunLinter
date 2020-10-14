@@ -69,8 +69,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 
 	public SentenceExceptionsLayeredPane(final Packager packager, final ParserManager parserManager){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

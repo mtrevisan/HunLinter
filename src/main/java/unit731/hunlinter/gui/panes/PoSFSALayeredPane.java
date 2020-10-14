@@ -82,7 +82,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 
 	public PoSFSALayeredPane(final ParserManager parserManager){
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 

@@ -118,9 +118,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(language);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(language, "Language cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		this.dicParser = dicParser;

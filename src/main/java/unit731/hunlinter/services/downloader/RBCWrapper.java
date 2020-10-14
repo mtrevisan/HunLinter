@@ -40,7 +40,7 @@ class RBCWrapper implements ReadableByteChannel{
 
 
 	RBCWrapper(final ReadableByteChannel rbc, final long expectedSize, final RBCWrapperDelegate delegate){
-		Objects.requireNonNull(delegate);
+		Objects.requireNonNull(delegate, "Delegate cannot be null");
 
 		this.delegate = delegate;
 		this.expectedSize = expectedSize;

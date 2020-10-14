@@ -103,7 +103,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public DictionaryCorrectnessCheckerVEC(final AffixData affixData, final HyphenatorInterface hyphenator){
 		super(affixData, hyphenator);
 
-		Objects.requireNonNull(hyphenator);
+		Objects.requireNonNull(hyphenator, "Hyphenator cannot be null");
 
 		orthography = OrthographyVEC.getInstance();
 	}

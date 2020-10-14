@@ -88,7 +88,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 	public ThesaurusLayeredPane(final ParserManager parserManager){
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 

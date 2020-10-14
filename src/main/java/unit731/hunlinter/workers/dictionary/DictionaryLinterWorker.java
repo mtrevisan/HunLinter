@@ -71,8 +71,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		getWorkerData()
 			.withParallelProcessing();
 
-		Objects.requireNonNull(checker);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(checker, "Checker cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		//collectors of flags
 		final Set<String> flags = ConcurrentHashMap.newKeySet();

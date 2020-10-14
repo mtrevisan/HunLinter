@@ -65,10 +65,10 @@ public class ProjectLoaderAction extends AbstractAction{
 			final PropertyChangeListener propertyChangeListener){
 		super("project.load");
 
-		Objects.requireNonNull(projectPath);
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(projectPath, "Project path cannot be null");
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.projectPath = projectPath;
 		this.packager = packager;

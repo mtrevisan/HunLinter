@@ -90,8 +90,8 @@ public class RulesReducer{
 
 
 	public RulesReducer(final AffixData affixData, final WordGenerator wordGenerator){
-		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		this.affixData = affixData;
 		strategy = affixData.getFlagParsingStrategy();

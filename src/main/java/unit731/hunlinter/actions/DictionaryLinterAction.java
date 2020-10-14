@@ -45,8 +45,8 @@ public class DictionaryLinterAction extends AbstractAction{
 		super("dictionary.linter",
 			new ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;

@@ -57,9 +57,9 @@ public class SelectFontAction extends AbstractAction{
 	public SelectFontAction(final Packager packager, final ParserManager parserManager, final Preferences preferences){
 		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(preferences);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(preferences, "Preferences cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

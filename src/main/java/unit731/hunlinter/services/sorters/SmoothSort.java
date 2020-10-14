@@ -81,8 +81,8 @@ public final class SmoothSort{
 
 	public static synchronized <T> void sort(final T[] data, final int low, int high,
 			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(data, "Data cannot be null");
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 
 		if(high - low > LEONARDO_NUMBER[LEONARDO_NUMBER.length - 1] + 1){
 			//array too big to sort using this method, switch to heapsort

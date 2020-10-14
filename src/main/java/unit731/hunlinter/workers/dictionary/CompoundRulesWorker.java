@@ -36,8 +36,8 @@ public class CompoundRulesWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(inflectionReader);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(inflectionReader, "Inflection reader cannot be null");
 
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {

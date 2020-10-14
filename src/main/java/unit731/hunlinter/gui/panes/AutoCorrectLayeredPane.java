@@ -90,9 +90,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
 	public AutoCorrectLayeredPane(final Packager packager, final ParserManager parserManager, final JFrame parentFrame){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(parentFrame);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

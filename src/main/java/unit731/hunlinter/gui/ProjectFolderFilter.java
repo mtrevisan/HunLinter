@@ -52,7 +52,7 @@ public class ProjectFolderFilter extends FileFilter{
 	 * @see #accept
 	 */
 	public ProjectFolderFilter(final String description){
-		Objects.requireNonNull(description);
+		Objects.requireNonNull(description, "Description cannot be null");
 
 		this.description = description;
 	}

@@ -38,7 +38,7 @@ public class DuplicationResult<T>{
 
 
 	public DuplicationResult(final List<T> duplicates, final boolean forceInsertion){
-		Objects.requireNonNull(duplicates);
+		Objects.requireNonNull(duplicates, "Duplicates cannot be null");
 
 		this.duplicates = duplicates;
 		this.forceInsertion = forceInsertion;

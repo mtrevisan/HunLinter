@@ -80,10 +80,10 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		final Charset charset = dicParser.getCharset();

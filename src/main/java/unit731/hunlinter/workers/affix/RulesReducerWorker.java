@@ -74,9 +74,9 @@ public class RulesReducerWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(flag);
-		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(flag, "Flag cannot be null");
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		rulesReducer = new RulesReducer(affixData, wordGenerator);
 

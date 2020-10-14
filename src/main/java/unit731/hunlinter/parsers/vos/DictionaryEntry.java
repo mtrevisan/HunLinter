@@ -91,8 +91,8 @@ public class DictionaryEntry{
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(line, "Line cannot be null");
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 		if(!m.find())
@@ -110,7 +110,7 @@ public class DictionaryEntry{
 	}
 
 	DictionaryEntry(final DictionaryEntry dicEntry){
-		Objects.requireNonNull(dicEntry);
+		Objects.requireNonNull(dicEntry, "Dictionary entry cannot be null");
 
 		word = dicEntry.word;
 		continuationFlags = dicEntry.continuationFlags;
@@ -119,7 +119,7 @@ public class DictionaryEntry{
 	}
 
 	DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
-		Objects.requireNonNull(word);
+		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.word = word;
 		this.continuationFlags = continuationFlags;
@@ -137,7 +137,7 @@ public class DictionaryEntry{
 	}
 
 //	public static String extractWord(final String line){
-//		Objects.requireNonNull(line);
+//		Objects.requireNonNull(line, "Line cannot be null");
 //
 //		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 //		if(!m.find())

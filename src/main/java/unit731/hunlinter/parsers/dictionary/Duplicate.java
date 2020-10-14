@@ -39,8 +39,8 @@ public class Duplicate{
 
 
 	public Duplicate(final Inflection inflection, final String word, final int lineIndex){
-		Objects.requireNonNull(inflection);
-		Objects.requireNonNull(word);
+		Objects.requireNonNull(inflection, "Inflection cannot be null");
+		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.inflection = inflection;
 		this.word = word;

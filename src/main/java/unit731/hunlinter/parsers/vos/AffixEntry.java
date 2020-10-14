@@ -91,8 +91,8 @@ public class AffixEntry{
 
 	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
 			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(line, "Line cannot be null");
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		//remove comments at the end of the line
 		final int commentIndex = line.indexOf(ParserHelper.COMMENT_MARK_SHARP);
@@ -122,7 +122,7 @@ public class AffixEntry{
 	}
 
 	public void setParent(final RuleEntry parent){
-		Objects.requireNonNull(parent);
+		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		this.parent = parent;
 	}
@@ -346,7 +346,7 @@ public class AffixEntry{
 	}
 
 	public String toString(final FlagParsingStrategy strategy){
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final StringBuilder sb = new StringBuilder();
 		if(continuationFlags != null && continuationFlags.length > 0){
