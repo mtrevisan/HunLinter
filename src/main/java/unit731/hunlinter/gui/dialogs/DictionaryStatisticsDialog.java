@@ -508,21 +508,21 @@ public class DictionaryStatisticsDialog extends JDialog{
 			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save,
 					final boolean print, final boolean zoom){
 				final JPopupMenu result = new JPopupMenu("Chart:");
-				final JMenuItem propertiesItem = new JMenuItem("Properties...");
+				final JMenuItem propertiesItem = new JMenuItem("Properties…");
 				propertiesItem.setActionCommand("PROPERTIES");
 				propertiesItem.addActionListener(this);
 				result.add(propertiesItem);
 
 				result.addSeparator();
 
-				final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG...");
+				final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG…");
 				saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
 				saveAsPNGItem.addActionListener(this);
 				result.add(saveAsPNGItem);
 
 				result.addSeparator();
 
-				final JMenuItem printItem = new JMenuItem("Print...");
+				final JMenuItem printItem = new JMenuItem("Print…");
 				printItem.setActionCommand("PRINT");
 				printItem.addActionListener(this);
 				result.add(printItem);
