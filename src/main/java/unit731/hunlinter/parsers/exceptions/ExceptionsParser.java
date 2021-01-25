@@ -53,8 +53,8 @@ import java.util.List;
  */
 public class ExceptionsParser{
 
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: ''{1}''");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected ''{1}'', was ''{2}''");
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: `{1}`");
+	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected `{1}`, was `{2}`");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 

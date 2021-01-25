@@ -55,16 +55,16 @@ import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 public class AffixEntry{
 
-	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0} in parent flag ''{1}''");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
-	private static final MessageFormat WRONG_REMOVING_APPENDING_FORMAT = new MessageFormat("Same removal and addition parts: ''{0}''");
-	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected ''{0}'', got ''{1}'': {2}");
-	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected ''{0}'', got ''{1}'': {2}");
-	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: ''{0}''");
-	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: ''{0}''");
-	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: ''{0}''");
-	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");
-	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word ''{0}'' without the FULLSTRIP option");
+	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0} in parent flag `{1}`");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line `{0}`");
+	private static final MessageFormat WRONG_REMOVING_APPENDING_FORMAT = new MessageFormat("Same removal and addition parts: `{0}`");
+	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected `{0}`, got `{1}`: {2}");
+	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected `{0}`, got `{1}`: {2}");
+	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: `{0}`");
+	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: `{0}`");
+	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: `{0}`");
+	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: `{0}`");
+	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word `{0}` without the FULLSTRIP option");
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
@@ -101,7 +101,7 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(cleanedLine, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY), parentFlag}));
+			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY), parentFlag}));
 
 		final AffixType type = AffixType.createFromCode(lineParts[0]);
 		final String flag = lineParts[1];

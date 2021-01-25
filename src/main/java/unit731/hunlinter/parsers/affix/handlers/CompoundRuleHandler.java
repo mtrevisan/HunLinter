@@ -45,12 +45,12 @@ import java.util.Set;
 
 public class CompoundRuleHandler implements Handler{
 
-	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': mismatched compound rule type (expected {1})");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line ''{0}'': duplicated line");
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
-	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line ''{0}'': compound rule type cannot be empty");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line ''{0}'': compound rule is bad formatted");
+	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: mismatched compound rule type (expected {1})");
+	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line `{0}`: duplicated line");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
+	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: compound rule type cannot be empty");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line `{0}`: compound rule is bad formatted");
 
 
 	@Override

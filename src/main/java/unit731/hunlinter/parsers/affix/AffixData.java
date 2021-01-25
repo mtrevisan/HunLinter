@@ -58,8 +58,8 @@ public class AffixData{
 
 	private static final String REPEATED_FLAG = "Same flags present in multiple options";
 	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
-	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: `{0}`");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word `{1}`, too many applicable rules");
 
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY

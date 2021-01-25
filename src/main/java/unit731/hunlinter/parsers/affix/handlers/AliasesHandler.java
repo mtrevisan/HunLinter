@@ -39,10 +39,10 @@ import java.util.Scanner;
 
 public class AliasesHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': bad number of entries, it must be '<option> <flag/morphological field>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': bad option, it must be {1}");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <flag/morphological field>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line `{0}`: bad option, it must be {1}");
 
 
 	@Override

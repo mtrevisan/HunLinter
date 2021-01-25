@@ -48,11 +48,11 @@ import java.util.Scanner;
 
 public class AffixHandler implements Handler{
 
-	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line ''{0}'': the third parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line `{0}`: the third parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
 	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line: {0}");
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
+	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected `{0}`)");
+	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected `{0}`)");
 
 
 	@Override

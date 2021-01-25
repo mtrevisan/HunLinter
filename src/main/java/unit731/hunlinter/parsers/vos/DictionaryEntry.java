@@ -57,8 +57,8 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class DictionaryEntry{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line ''{0}''");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}''{1}");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line `{0}`");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
@@ -141,7 +141,7 @@ public class DictionaryEntry{
 //
 //		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 //		if(!m.find())
-//			throw new HunLintException("Cannot parse dictionary line '" + line + "'");
+//			throw new HunLintException("Cannot parse dictionary line `" + line + "`");
 //
 //		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 //	}

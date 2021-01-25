@@ -41,7 +41,7 @@ import java.util.Objects;
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
-	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule ''{0}'' in compound begin-middle-end");
+	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule `{0}` in compound begin-middle-end");
 
 
 	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){

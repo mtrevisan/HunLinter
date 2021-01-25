@@ -49,8 +49,8 @@ class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
-	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}''{1}");
+	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for `{0} from {1}` ({2} still has rules {3})");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
 
 	protected final AffixData affixData;
@@ -300,8 +300,8 @@ class WordGeneratorBase{
 		final String word = dicEntry.getWord();
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 		if(applicableAffixes.length == 0)
-			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' via '"
-				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "'");
+			throw new NoApplicableRuleException("No applicable rules found for flag `" + affix + "` via `"
+				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
 
 		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class, applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){

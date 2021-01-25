@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
  */
 public final class HammingDistance{
 
-	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings ''{0}'' and ''{1}'' must have the same length");
+	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings `{0}` and `{1}` must have the same length");
 
 
 	private HammingDistance(){}

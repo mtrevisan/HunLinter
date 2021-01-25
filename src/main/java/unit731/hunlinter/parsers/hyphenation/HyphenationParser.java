@@ -71,16 +71,16 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 public class HyphenationParser{
 
 	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
-	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation ''{0}'' is already present");
-	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: ''{0}''");
-	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule ''{0}'' has an invalid format");
-	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule ''{0}'' has no hyphenation point(s)");
-	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule ''{0}'' is invalid, the hyphenation point should not be adjacent to a dot");
-	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule ''{0}'' has not exactly one hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule ''{0}'' has the index number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule ''{0}'' has the length number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule ''{0}'' has the length number that exceeds the length of the rule");
-	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern ''{0}'' already present as ''{1}''");
+	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation `{0}` is already present");
+	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: `{0}`");
+	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule `{0}` has an invalid format");
+	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule `{0}` has no hyphenation point(s)");
+	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule `{0}` is invalid, the hyphenation point should not be adjacent to a dot");
+	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule `{0}` has not exactly one hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the index number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the length number not less than the hyphenation point");
+	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule `{0}` has the length number that exceeds the length of the rule");
+	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern `{0}` already present as `{1}`");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 

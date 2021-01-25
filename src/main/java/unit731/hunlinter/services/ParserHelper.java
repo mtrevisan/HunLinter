@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 
 public final class ParserHelper{
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was ''{0}''");
+	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was `{0}`");
 
 	public static final char COMMENT_MARK_SHARP = '#';
 	public static final char COMMENT_MARK_SLASH = '/';

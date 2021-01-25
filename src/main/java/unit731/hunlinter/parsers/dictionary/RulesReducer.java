@@ -70,8 +70,8 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
-	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from ''{0}'', expected {1}, obtained {1}");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`, cannot reduce");
+	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from `{0}`, expected {1}, obtained {1}");
 
 	private static final String PIPE = "|";
 

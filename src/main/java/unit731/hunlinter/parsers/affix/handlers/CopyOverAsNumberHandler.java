@@ -34,7 +34,7 @@ import java.text.MessageFormat;
 
 public class CopyOverAsNumberHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': The first parameter is not a number");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: The first parameter is not a number");
 
 
 	@Override

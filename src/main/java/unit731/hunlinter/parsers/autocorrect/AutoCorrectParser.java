@@ -57,9 +57,9 @@ public class AutoCorrectParser{
 
 	private static final String QUOTATION_MARK = "\"";
 
-	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: ''{1}''");
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in auto-correct file: ''{0}'' -> ''{1}''");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element, expected ''{0}'', was ''{1}''");
+	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: `{1}`");
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in auto-correct file: `{0}` -> `{1}`");
+	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element, expected `{0}`, was `{1}`");
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";

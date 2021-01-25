@@ -56,7 +56,7 @@ public class LineEntry implements Serializable{
 
 	private static final long serialVersionUID = 8374397415767767436L;
 
-	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word ''{2}'' that is too short");
+	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word `{2}` that is too short");
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
