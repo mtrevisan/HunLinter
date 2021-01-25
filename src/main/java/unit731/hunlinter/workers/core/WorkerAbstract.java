@@ -35,7 +35,7 @@ import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -199,8 +199,14 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 */
 	protected void cancel(final Exception exception){
 		if(!JavaHelper.isInterruptedException(exception)){
-			if(exception != null)
-				LOGGER.error(ExceptionHelper.getMessage(exception), exception);
+			if(exception != null){
+				final String errorMessage = ExceptionHelper.getMessage(exception);
+				LOGGER.error(errorMessage, exception);
+
+				JOptionPane.showOptionDialog(null,
+					"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE, null, null, null);
+			}
 			else
 				LOGGER.error("Generic error");
 
