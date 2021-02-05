@@ -126,12 +126,15 @@ final int iconSize = 17;
 			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
 
+			//reset columns visibility
+			preferences.putBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true);
+			preferences.putBoolean(SHOW_APPLIED_RULE_COLUMNS, true);
 			final JPopupMenu hideColumnsPopupMenu = new LabeledPopupMenu("Show/hide columns");
 			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Morphological fields",
-				preferences.getBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true), hideColumnsPopupMenu,
+				true, hideColumnsPopupMenu,
 				this::hideMorphologicalFieldsColumn));
 			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Applied rules",
-				preferences.getBoolean(SHOW_APPLIED_RULE_COLUMNS, true), hideColumnsPopupMenu,
+				true, hideColumnsPopupMenu,
 				this::hideAppliedRulesColumns));
 			GUIHelper.addPopupMenu(hideColumnsPopupMenu, table.getTableHeader());
 		}
