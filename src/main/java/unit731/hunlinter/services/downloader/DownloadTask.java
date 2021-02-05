@@ -97,7 +97,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 	@Override
 	public void rbcProgressCallback(final RBCWrapper rbc, final double progress){
-		setProgress((int)Math.round(progress));
+		setProgress(Math.min((int)Math.round(progress), 100));
 	}
 
 	@Override

@@ -138,7 +138,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	protected void setProgress(final long index, final long total){
 		final int progress = calculateProgress(index, total);
-		setProgress(progress);
+		setProgress(Math.min(progress, 100));
 	}
 
 	private int calculateProgress(final long index, final long total){

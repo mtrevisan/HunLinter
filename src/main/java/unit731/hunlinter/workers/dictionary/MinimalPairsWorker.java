@@ -155,7 +155,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		};
 		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(lineIndex);
+			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();
 		};
