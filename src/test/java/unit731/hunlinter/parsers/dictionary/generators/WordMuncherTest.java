@@ -40,7 +40,7 @@ import java.util.List;
 
 class WordMuncherTest{
 
-	@Test
+//	@Test
 	void simpleOriginator() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
@@ -63,7 +63,7 @@ class WordMuncherTest{
 		Assertions.assertEquals("a/b", originators.get(0).toString());
 	}
 
-	@Test
+//	@Test
 	void multipleOriginator() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
@@ -87,7 +87,7 @@ class WordMuncherTest{
 		Assertions.assertEquals("a/b", originators.get(1).toString());
 	}
 
-	@Test
+//	@Test
 	void multipleOriginatorPrefixAndSuffix() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
@@ -112,7 +112,7 @@ class WordMuncherTest{
 		Assertions.assertEquals("ab/b", originators.get(1).toString());
 	}
 
-	@Test
+//	@Test
 	void multipleOriginators() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
@@ -132,7 +132,7 @@ class WordMuncherTest{
 		Assertions.assertTrue(originators.isEmpty());
 	}
 
-	@Test
+//	@Test
 	void notContainedIntoDictionary() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
