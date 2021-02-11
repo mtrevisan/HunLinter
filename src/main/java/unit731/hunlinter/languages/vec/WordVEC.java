@@ -65,7 +65,7 @@ public final class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
-	private static final String COLLATOR_RULE = ", ' ' < ʼ=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < ï,Ï < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < ü,Ü < v,V < x,X";
+	private static final String COLLATOR_RULE = ", ' ' < ‘=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < ï,Ï < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < ü,Ü < v,V < x,X";
 	private static Collator COLLATOR;
 	static{
 		try{
@@ -79,7 +79,7 @@ public final class WordVEC{
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
-	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:[ʼg]émo|éb(?:e|ia)|g?(?:[àé](?:[pb]i[ae]?|[bd]e)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
+	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:[‘g]émo|éb(?:e|ia)|g?(?:[àé](?:[pb]i[ae]?|[bd]e)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
 	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:[sx][éí]|stà|ér[aei]|(?:s[ae]r)?[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|d[oiae])?$";
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]))$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
@@ -113,7 +113,7 @@ public final class WordVEC{
 	}
 
 	public static boolean isApostrophe(final char chr){
-		return (chr == HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE || chr == HyphenationParser.APOSTROPHE.charAt(0));
+		return (chr == HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK || chr == HyphenationParser.APOSTROPHE.charAt(0));
 	}
 
 	public static boolean isVowel(final char chr){
@@ -124,7 +124,7 @@ public final class WordVEC{
 		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
 	}
 
-	//^[ʼ']?[aeiouàèéíòóú]
+	//^[‘']?[aeiouàèéíòóú]
 	public static boolean startsWithVowel(final CharSequence word){
 		char chr = word.charAt(0);
 		if(isApostrophe(chr))
@@ -132,7 +132,7 @@ public final class WordVEC{
 		return isVowel(chr);
 	}
 
-	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
+	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*‘?$
 	public static boolean endsWithVowel(final CharSequence word){
 		final int idx = word.length() - 1;
 		char chr = word.charAt(idx);
@@ -219,7 +219,7 @@ public final class WordVEC{
 				//filter out stress on last vowel of the word
 				&& stressIndex + 1 < wordLength
 				&& word.charAt(stressIndex + 1) != HyphenationParser.MINUS_SIGN.charAt(0)
-				&& word.charAt(stressIndex + 1) != HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE
+				&& word.charAt(stressIndex + 1) != HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK
 				&& !GraphemeVEC.isDiphtong(word)
 				&& !GraphemeVEC.isHyatus(word)
 				&& !RegexHelper.find(word, PREVENT_UNMARK_STRESS)){

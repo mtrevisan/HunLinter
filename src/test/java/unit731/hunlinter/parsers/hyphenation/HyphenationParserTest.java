@@ -589,7 +589,7 @@ class HyphenationParserTest{
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
-		addRule(hyphenations, "1" + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE + "1");
+		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK + "1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
@@ -602,7 +602,7 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
@@ -615,7 +615,7 @@ class HyphenationParserTest{
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
-		addRule(hyphenations, "1" + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE + "1");
+		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK + "1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
@@ -628,7 +628,7 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 

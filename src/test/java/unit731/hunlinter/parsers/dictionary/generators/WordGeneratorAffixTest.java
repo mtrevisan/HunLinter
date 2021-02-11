@@ -408,7 +408,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Cannot strip full word 'a' without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word `a` without the FULLSTRIP option", exception.getMessage());
 	}
 
 	@Test
@@ -456,7 +456,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'p1aas1/S2,P2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `p1aas1/S2,P2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1` (S1 > P1 still has rules P2)", exception.getMessage());
 	}
 
 	@Test
@@ -487,7 +487,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'ga/A,B,C,D,E\tst:a\tfrom\tPFX G 0 g/E . from G' (G still has rules E)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `ga/A,B,C,D,E\tst:a\tfrom\tPFX G 0 g/E . from G` (G still has rules E)", exception.getMessage());
 	}
 
 
@@ -615,7 +615,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'ag/A,B,C,D,E\tst:a\tfrom\tSFX G 0 g/E . from G' (G still has rules E)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `ag/A,B,C,D,E\tst:a\tfrom\tSFX G 0 g/E . from G` (G still has rules E)", exception.getMessage());
 	}
 
 

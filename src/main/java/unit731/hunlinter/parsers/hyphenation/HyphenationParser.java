@@ -93,7 +93,7 @@ public class HyphenationParser{
 	public static final String EN_DASH = "–";
 //	private static final char EM_DASH = '—';
 	public static final String APOSTROPHE = "'";
-	public static final char RIGHT_MODIFIER_LETTER_APOSTROPHE = 'ʼ';
+	public static final char RIGHT_SINGLE_QUOTATION_MASK = '‘';
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
@@ -298,7 +298,7 @@ public class HyphenationParser{
 	private void addDefaults(final Level level, final Charset charset){
 		//dash and apostrophe are added by default (retro-compatibility)
 		final List<String> retroCompatibilityNoHyphen = (charset == StandardCharsets.UTF_8?
-			Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(RIGHT_MODIFIER_LETTER_APOSTROPHE), EN_DASH):
+			Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(RIGHT_SINGLE_QUOTATION_MASK), EN_DASH):
 			Arrays.asList(APOSTROPHE, MINUS_SIGN));
 
 		patternNoHyphen = RegexHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");

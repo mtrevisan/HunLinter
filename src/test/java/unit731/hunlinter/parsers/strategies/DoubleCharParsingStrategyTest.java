@@ -48,7 +48,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void notOk(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> strategy.parseFlags("abc"));
-		Assertions.assertEquals("Flag must be of length multiple of two: 'abc'", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length multiple of two: `abc`", exception.getMessage());
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length two: 'c'", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two: `c`", exception.getMessage());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length two: ''", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two: ``", exception.getMessage());
 	}
 
 	@Test
@@ -97,7 +97,7 @@ class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag must be of length two: 'null'", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two: `null`", exception.getMessage());
 	}
 
 	@Test

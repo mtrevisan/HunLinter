@@ -41,7 +41,7 @@ class AffixEntryTest{
 		String line = "SFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
-		Assertions.assertEquals("Condition part doesn't ends with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't ends with removal part: `" + line + "`", exception.getMessage());
 	}
 
 	//FIXME an event is sent to the event bus
@@ -52,7 +52,7 @@ class AffixEntryTest{
 //		String line = "SFX M0 a ai a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
-//		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
+//		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
 //	}
 
 	@Test
@@ -62,7 +62,7 @@ class AffixEntryTest{
 		String line = "PFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
-		Assertions.assertEquals("Condition part doesn't starts with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't starts with removal part: `" + line + "`", exception.getMessage());
 	}
 
 	//FIXME an event is sent to the event bus
@@ -73,7 +73,7 @@ class AffixEntryTest{
 //		String line = "PFX M0 a ia a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
-//		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
+//		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
 //	}
 
 	@Test
@@ -177,7 +177,7 @@ class AffixEntryTest{
 
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> entry.applyRule("man", false));
-		Assertions.assertEquals("Cannot strip full word 'man' without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word `man` without the FULLSTRIP option", exception.getMessage());
 }
 
 	@Test

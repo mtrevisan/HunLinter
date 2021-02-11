@@ -35,7 +35,7 @@ import java.util.stream.IntStream;
 public class Orthography{
 
 	private static final String WRONG_APOSTROPHES = HyphenationParser.APOSTROPHE + "‘";
-	private static final String CORRECT_APOSTROPHES = StringUtils.repeat(HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE, WRONG_APOSTROPHES.length());
+	private static final String CORRECT_APOSTROPHES = StringUtils.repeat(HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK, WRONG_APOSTROPHES.length());
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
