@@ -57,6 +57,7 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = RegexHelper.pattern("([aeiouàèéíïòóúü])i(?=[aeiouàèéíïòóúü])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
+		RegexHelper.pattern("[nv][ou]ialtri"),
 		RegexHelper.pattern("b[ae]ro[iï][aeèi]r"),
 		RegexHelper.pattern("re[sŧ]e[iï][ouü]r[aeio]?")
 	);
