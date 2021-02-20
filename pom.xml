@@ -63,10 +63,10 @@
 		<apache.commons-io.version>2.8.0</apache.commons-io.version>
 
 		<!-- FastUtil -->
-<!--		<unimi.fastutil.version>8.4.4</unimi.fastutil.version>-->
+<!--		<unimi.fastutil.version>8.5.2</unimi.fastutil.version>-->
 
 		<!-- jFreeChart -->
-		<jfree.jfreechart.version>1.5.1</jfree.jfreechart.version>
+		<jfree.jfreechart.version>1.5.2</jfree.jfreechart.version>
 
 		<!-- Morfologik -->
 		<carrot2.morfologik-tools.version>2.1.7</carrot2.morfologik-tools.version>
@@ -81,7 +81,7 @@
 		<logback.logback-classic.version>1.2.3</logback.logback-classic.version>
 
 		<!-- JUnit -->
-		<junit.junit-jupiter-engine.version>5.7.0</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.7.1</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
