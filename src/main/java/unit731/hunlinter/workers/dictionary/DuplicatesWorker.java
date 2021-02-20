@@ -1,4 +1,47 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.dictionary;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.Duplicate;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,6 +49,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -15,27 +59,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.dictionary.Duplicate;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
-
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DuplicatesWorker extends WorkerDictionary{
@@ -95,9 +118,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(language);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(language, "Language cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		this.dicParser = dicParser;
@@ -137,7 +160,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				for(final Inflection inflection : inflections){
-					final String str = inflection.toStringWithPartOfSpeechFields();
+					final String str = inflection.toStringWithPartOfSpeechAndStem();
 					if(!bloomFilter.add(str))
 						duplicatesBloomFilter.add(str);
 				}
@@ -147,7 +170,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 		};
 		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(lineIndex);
+			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();
 		};
@@ -155,11 +178,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
 		bloomFilter.close();
-		bloomFilter.clear();
-		duplicatesBloomFilter.close();
-
 		final int totalInflections = bloomFilter.getAddedElements();
 		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		bloomFilter.clear();
+
+		duplicatesBloomFilter.close();
+
 		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
@@ -184,7 +208,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
 					result.ensureCapacity(result.size() + inflections.length);
 					for(final Inflection inflection : inflections){
-						final String text = inflection.toStringWithPartOfSpeechFields();
+						final String text = inflection.toStringWithPartOfSpeechAndStem();
 						if(duplicatesBloomFilter.contains(text))
 							result.add(new Duplicate(inflection, word, lineIndex));
 					}
@@ -194,7 +218,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 			};
 			final Consumer<Integer> progressCallback = lineIndex -> {
-				setProgress(lineIndex);
+				setProgress(Math.min(lineIndex, 100));
 
 				sleepOnPause();
 			};
@@ -217,7 +241,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result;
 	}
 
-	private void writeDuplicates(final File duplicatesFile, final List<Duplicate> duplicates){
+	private void writeDuplicates(final File duplicatesFile, final Collection<Duplicate> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
@@ -231,8 +255,11 @@ public class DuplicatesWorker extends WorkerDictionary{
 						+ "): ";
 					writer.write(origin);
 					final StringJoiner sj = new StringJoiner(", ");
-					forEach(entries,
-						duplicate -> sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()), (duplicate.getInflection().hasInflectionRules()? " via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY)));
+					if(entries != null)
+						for(final Duplicate duplicate : entries)
+							sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+								(duplicate.getInflection().hasInflectionRules()?
+								" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
 					writer.write(sj.toString());
 					writer.newLine();
 
@@ -249,9 +276,9 @@ public class DuplicatesWorker extends WorkerDictionary{
 		}
 	}
 
-	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
+	private List<List<Duplicate>> mergeDuplicates(final Collection<Duplicate> duplicates){
 		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechFields(),
+			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechAndStem(),
 				duplicate -> {
 					final List<Duplicate> list = new ArrayList<>(1);
 					list.add(duplicate);

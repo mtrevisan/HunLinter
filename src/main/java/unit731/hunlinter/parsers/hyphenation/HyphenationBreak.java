@@ -1,14 +1,37 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.hyphenation;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class HyphenationBreak{
@@ -56,7 +79,7 @@ public class HyphenationBreak{
 		return list;
 	}
 
-	public String[] enforceNoHyphens(String[] syllabes, final Set<String> noHyphen){
+	public String[] enforceNoHyphens(String[] syllabes, final Iterable<String> noHyphen){
 		if(syllabes.length > 1){
 			int wordLength = 0;
 			for(final String syllabe : syllabes)
@@ -73,14 +96,14 @@ public class HyphenationBreak{
 	}
 
 	private static String[] manageInside(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
-			final String nohyp, final int wordLength){
+			final CharSequence nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
 
 		int index = 0;
 		for(int i = 0; syllabes.length > 1 && i < syllabes.length; i ++){
 			final String syllabe = syllabes[i];
 
-			if(syllabe.equals(nohyp)){
+			if(syllabe.contentEquals(nohyp)){
 				indexesAndRules.remove(index);
 				indexesAndRules.remove(index + nohypLength);
 
@@ -115,7 +138,7 @@ public class HyphenationBreak{
 
 	private static String[] manageEndsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
 			final String nohyp, final int wordLength){
-		int nohypLength = nohyp.length();
+		final int nohypLength = nohyp.length();
 		if(syllabes[syllabes.length - 1].equals(nohyp.substring(0, nohypLength - 1))){
 			indexesAndRules.remove(wordLength - nohypLength - 1);
 			indexesAndRules.remove(wordLength - 1);
@@ -139,7 +162,7 @@ public class HyphenationBreak{
 	}
 
 	private static String[] mergeIndexWithPrevious(final String[] array, final int index){
-		array[index - 1] = array[index - 1] + array[index];
+		array[index - 1] += array[index];
 		return ArrayUtils.remove(array, index);
 	}
 
@@ -148,15 +171,15 @@ public class HyphenationBreak{
 		return ArrayUtils.removeAll(array, index, index + 1);
 	}
 
-	private String reduceKey(final String key){
+	private String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private boolean isStarting(final String key){
+	private boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final String key){
+	private boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 

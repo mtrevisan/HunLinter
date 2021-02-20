@@ -1,8 +1,33 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.bloomfilter;
 
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.stream.IntStream;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -24,12 +49,12 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 
-	private final Stack<BloomFilterInterface<T>> filters = new Stack<>();
+	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>();
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
-		Objects.requireNonNull(charset);
-		Objects.requireNonNull(parameters);
+		Objects.requireNonNull(charset, "Charset cannot be null");
+		Objects.requireNonNull(parameters, "Parameters cannot be null");
 
 		parameters.validate();
 
@@ -99,7 +124,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public synchronized double getTrueFalsePositiveProbability(){
 		final int size = filters.size();
-		final double p0 = filters.lastElement().getFalsePositiveProbability();
+		final double p0 = filters.getLast().getFalsePositiveProbability();
 		final double probability = IntStream.range(0, size)
 			.mapToDouble(i -> 1. - p0 * Math.pow(parameters.getTighteningRatio(), i))
 			.reduce(1., (a, b) -> a * b);

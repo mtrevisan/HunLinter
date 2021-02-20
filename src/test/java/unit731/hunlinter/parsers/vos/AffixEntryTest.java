@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.vos;
 
 import org.junit.jupiter.api.Assertions;
@@ -17,7 +41,7 @@ class AffixEntryTest{
 		String line = "SFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
-		Assertions.assertEquals("Condition part doesn't ends with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't ends with removal part: `" + line + "`", exception.getMessage());
 	}
 
 	//FIXME an event is sent to the event bus
@@ -28,7 +52,7 @@ class AffixEntryTest{
 //		String line = "SFX M0 a ai a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
-//		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
+//		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
 //	}
 
 	@Test
@@ -38,7 +62,7 @@ class AffixEntryTest{
 		String line = "PFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
-		Assertions.assertEquals("Condition part doesn't starts with removal part: '" + line + "'", exception.getMessage());
+		Assertions.assertEquals("Condition part doesn't starts with removal part: `" + line + "`", exception.getMessage());
 	}
 
 	//FIXME an event is sent to the event bus
@@ -49,7 +73,7 @@ class AffixEntryTest{
 //		String line = "PFX M0 a ia a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
-//		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
+//		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
 //	}
 
 	@Test
@@ -153,7 +177,7 @@ class AffixEntryTest{
 
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> entry.applyRule("man", false));
-		Assertions.assertEquals("Cannot strip full word 'man' without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word `man` without the FULLSTRIP option", exception.getMessage());
 }
 
 	@Test

@@ -1,4 +1,45 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.vos;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.exceptions.LinterException;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -8,37 +49,22 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.workers.core.IndexDataPair;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.workers.exceptions.LinterWarning;
-
 import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
 public class AffixEntry{
 
-	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0} in parent flag ''{1}''");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line ''{0}''");
-	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected ''{0}'', got ''{1}'': {2}");
-	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected ''{0}'', got ''{1}'': {2}");
-	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: ''{0}''");
-	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: ''{0}''");
-	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: ''{0}''");
-	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: ''{0}''");
-	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word ''{0}'' without the FULLSTRIP option");
+	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0} in parent flag `{1}`");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line `{0}`");
+	private static final MessageFormat WRONG_REMOVING_APPENDING_FORMAT = new MessageFormat("Same removal and addition parts: `{0}`");
+	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected `{0}`, got `{1}`: {2}");
+	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected `{0}`, got `{1}`: {2}");
+	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: `{0}`");
+	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: `{0}`");
+	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: `{0}`");
+	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: `{0}`");
+	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word `{0}` without the FULLSTRIP option");
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
@@ -66,8 +92,8 @@ public class AffixEntry{
 
 	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
 			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(line, "Line cannot be null");
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		//remove comments at the end of the line
 		final int commentIndex = line.indexOf(ParserHelper.COMMENT_MARK_SHARP);
@@ -75,7 +101,7 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(cleanedLine, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY), parentFlag}));
+			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY), parentFlag}));
 
 		final AffixType type = AffixType.createFromCode(lineParts[0]);
 		final String flag = lineParts[1];
@@ -97,7 +123,7 @@ public class AffixEntry{
 	}
 
 	public void setParent(final RuleEntry parent){
-		Objects.requireNonNull(parent);
+		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		this.parent = parent;
 	}
@@ -108,6 +134,8 @@ public class AffixEntry{
 			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type, line}));
 		if(!parentFlag.equals(flag))
 			throw new LinterException(WRONG_FLAG.format(new Object[]{parentFlag, flag, line}));
+		if(removing.equals(appending))
+			throw new LinterException(WRONG_REMOVING_APPENDING_FORMAT.format(new Object[]{line}));
 		if(!removing.isEmpty()){
 			if(parentType == AffixType.SUFFIX){
 				if(!condition.endsWith(removal))
@@ -222,15 +250,16 @@ public class AffixEntry{
 	}
 
 	private String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		String[] collector = new String[0];
+		final SimpleDynamicArray<String> collector = new SimpleDynamicArray<>(String.class,
+			(morphologicalFields != null? morphologicalFields.length: 0));
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();
 			final int purgeTag = tag.length();
 			for(final String mf : morphologicalFields)
 				if(mf.startsWith(tag))
-					collector = ArrayUtils.add(collector, mf.substring(purgeTag));
+					collector.add(mf.substring(purgeTag));
 		}
-		return collector;
+		return collector.extractCopy();
 	}
 
 	public boolean canApplyTo(final String word){
@@ -256,7 +285,6 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j ++;
-					//noinspection IfStatementMissingBreakInLoop
 					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j < cond.length - 1 && cond[j] != ']');
@@ -283,7 +311,6 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j --;
-					//noinspection IfStatementMissingBreakInLoop
 					if(!in && wrd[i] == cond[j])
 						in = true;
 				}while(j > 0 && cond[j] != '[');
@@ -322,9 +349,9 @@ public class AffixEntry{
 	}
 
 	public String toString(final FlagParsingStrategy strategy){
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));

@@ -1,9 +1,44 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.RegexSequencer;
+import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,17 +47,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexSequencer;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -32,7 +56,7 @@ public class LineEntry implements Serializable{
 
 	private static final long serialVersionUID = 8374397415767767436L;
 
-	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word ''{2}'' that is too short");
+	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word `{2}` that is too short");
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
@@ -55,7 +79,7 @@ public class LineEntry implements Serializable{
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
+	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final Iterable<LineEntry> parentRulesFrom){
 		final List<String> words = new ArrayList<>();
 		for(final LineEntry rule : parentRulesFrom)
 			words.addAll(rule.extractFromEndingWith(condition));
@@ -112,8 +136,8 @@ public class LineEntry implements Serializable{
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
 		});
-		final String reversedCondition = LineEntry.SEQUENCER_REGEXP
-			.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
+		final String reversedCondition = SEQUENCER_REGEXP
+			.toString(SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
@@ -126,7 +150,7 @@ public class LineEntry implements Serializable{
 	private Set<String> extractRuleSpine(final LineEntry rule){
 		final Set<String> parentBones = new HashSet<>(rule.addition.size());
 		for(final String add : rule.addition){
-			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
+			final int lcsLength = StringHelper.longestCommonPrefix(add, rule.removal)
 				.length();
 			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
 		}
@@ -137,7 +161,7 @@ public class LineEntry implements Serializable{
 		return extractGroup(indexFromLast, from);
 	}
 
-	public static Set<Character> extractGroup(final int indexFromLast, final Set<String> words){
+	public static Set<Character> extractGroup(final int indexFromLast, final Collection<String> words){
 		final Set<Character> group = new HashSet<>(words.size());
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
@@ -151,7 +175,7 @@ public class LineEntry implements Serializable{
 	}
 
 	public void expandConditionToMaxLength(final Comparator<String> comparator){
-		final String lcs = StringHelper.longestCommonSuffix(from);
+		final String lcs = StringHelper.longestCommonSuffix(from.toArray(String[]::new));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
@@ -160,7 +184,7 @@ public class LineEntry implements Serializable{
 		}
 	}
 
-	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
+	public static String toHunspellHeader(final AffixType type, final CharSequence flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)

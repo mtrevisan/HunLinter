@@ -1,34 +1,58 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.affix.handlers;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Scanner;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.affix.ParsingContext;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Scanner;
+
 
 public class AffixHandler implements Handler{
 
-	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line ''{0}'': the third parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
+	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line `{0}`: the third parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
 	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line: {0}");
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected ''{0}'')");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected ''{0}'')");
+	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected `{0}`)");
+	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected `{0}`)");
 
 
 	@Override
@@ -75,7 +99,8 @@ public class AffixHandler implements Handler{
 			ParserHelper.assertNotEOF(scanner);
 
 			line = scanner.nextLine();
-			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag, aliasesMorphologicalField);
+			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
+				aliasesMorphologicalField);
 			entry.setParent(parent);
 //com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
@@ -84,7 +109,8 @@ public class AffixHandler implements Handler{
 
 
 			if(ArrayUtils.contains(entries.data, entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}), IndexDataPair.of(context.getIndex() + i, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}),
+					IndexDataPair.of(context.getIndex() + i, null)));
 			else
 				entries.add(entry);
 

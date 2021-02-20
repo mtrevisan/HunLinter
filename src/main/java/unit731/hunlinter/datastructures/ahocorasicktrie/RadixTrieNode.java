@@ -1,4 +1,33 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.ahocorasicktrie;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -6,10 +35,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import unit731.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -29,7 +54,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 public class RadixTrieNode{
 
 	/** The length of the pattern string is also the depth of this node */
-	protected final int depth;
+	private final int depth;
 
 	/** The fail function, if there is no match, jumps to this node. */
 	private RadixTrieNode failure;
@@ -83,7 +108,7 @@ public class RadixTrieNode{
 	 *
 	 * @param childrenIds	Id of the children to add
 	 */
-	public void addChildrenIds(final Collection<Integer> childrenIds){
+	public void addChildrenIds(final Iterable<Integer> childrenIds){
 		forEach(childrenIds, this::addChildrenId);
 	}
 

@@ -1,4 +1,47 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.dictionary;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.LoopHelper;
+import unit731.hunlinter.services.text.HammingDistance;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,34 +52,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.system.LoopHelper;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.text.HammingDistance;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class MinimalPairsWorker extends WorkerDictionary{
@@ -131,7 +155,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		};
 		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(lineIndex);
+			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();
 		};
@@ -142,7 +166,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return list;
 	}
 
-	private void writeSupportFile(final File file, final List<String> list){
+	private void writeSupportFile(final File file, final Iterable<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
 			LoopHelper.forEach(list, line -> writeLine(writer, line, NEW_LINE));
@@ -174,7 +198,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 						final String line2Lowercase = line2.toLowerCase(Locale.ROOT);
 
 						//calculate distance
-						int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
+						final int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
 						if(distance == 1){
 							final Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 							final char left = difference.getLeft();
@@ -223,7 +247,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setProgress(index, size);
+				setProgress(index ++, size);
 
 				sleepOnPause();
 			}

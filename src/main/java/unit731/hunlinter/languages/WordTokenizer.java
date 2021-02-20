@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.languages;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,17 +68,17 @@ public class WordTokenizer{
 			//FIXME consider only urls like www., or similar
 //			.add(URL)
 		;
-		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj.toString() + ")");
+		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj + ")");
 	}
 
-	public static final String DEFAULT_TOKENIZING_CHARACTERS = "\u0020\u00A0\u115f" +
-		"\u1160\u1680"
+	public static final String DEFAULT_TOKENIZING_CHARACTERS = " \u00A0ᅟ" +
+		"ᅠ\u1680"
 		+ "\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007"
 		+ "\u2008\u2009\u200A\u200B\u200c\u200d\u200e\u200f"
 		+ "\u2028\u2029\u202a\u202b\u202c\u202d\u202e\u202f"
 		+ "\u205F\u2060\u2061\u2062\u2063\u206A\u206b\u206c\u206d"
-		+ "\u206E\u206F\u3000\u3164\ufeff\uffa0\ufff9\ufffa\ufffb"
-		+ ",.;()[]{}=*#∗×·+÷<>!?:/|\\\"'«»„”“`´‘’‛′›‹…¿¡→‼⁇⁈⁉_"
+		+ "\u206E\u206F\u3000ㅤ\ufeffﾠ\ufff9\ufffa\ufffb"
+		+ ",.;()[]{}=*#∗×·+÷<>!?:/|\\\"'«»„”“`´’‛′›‹…¿¡→‼⁇⁈⁉_"
 		//em dash
 		+ "—"
 		+ "\t\n\r";

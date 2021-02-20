@@ -1,19 +1,28 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.StringJoiner;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.MainFrame;
@@ -30,7 +39,24 @@ import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.text.ArrayHelper;
 import unit731.hunlinter.services.text.StringHelper;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 
 public class PoSFSALayeredPane extends JLayeredPane{
@@ -56,7 +82,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 
 	public PoSFSALayeredPane(final ParserManager parserManager){
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 
@@ -74,7 +100,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(PoSFSALayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -179,7 +205,6 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_POS_DICTIONARY)
 			return;
 
@@ -211,10 +236,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
 				final String lowercaseToken = token.toLowerCase(Locale.ROOT);
 				final WordData[] datas = dictionaryLookup.lookup(lowercaseToken);
 				for(final WordData data : datas){
-					final String stem = new String(data.getStem(), charset);
-					final String lemma = new String(data.getWord(), charset);
-					final String pos = new String(data.getTag(), charset);
-					readings.add(stem + LEMMA_START + lemma + LEMMA_END + pos);
+					final byte[] wholeArray = ArrayHelper.concatenate(data.getStem(), LEMMA_START.getBytes(), data.getWord(), LEMMA_END.getBytes(), data.getTag());
+					readings.add(new String(wholeArray, charset));
 				}
 				sj.add(readings.toString());
 			}
@@ -224,7 +247,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		resultTextArea.setText(sj.toString());
 	}
 
-	private List<String> extractTrueWords(final List<String> tokens){
+	private List<String> extractTrueWords(final Collection<String> tokens){
 		final List<String> noWhitespaceTokens = new ArrayList<>(tokens.size());
 		for(final String token : tokens)
 			if(StringHelper.isWord(token))

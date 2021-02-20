@@ -1,5 +1,58 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.JCopyableTable;
+import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
+import unit731.hunlinter.gui.models.ThesaurusTableModel;
+import unit731.hunlinter.gui.renderers.TableRenderer;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
+import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.JavaHelper;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -14,33 +67,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.ThesaurusMergeDialog;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.renderers.TableRenderer;
-import unit731.hunlinter.gui.models.ThesaurusTableModel;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{
@@ -62,7 +88,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 	public ThesaurusLayeredPane(final ParserManager parserManager){
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 
@@ -97,7 +123,7 @@ final int iconSize = 17;
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(ThesaurusLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -157,7 +183,7 @@ final int iconSize = 17;
       GUIHelper.addScrollToFirstRow(table);
       GUIHelper.addScrollToLastRow(table);
 
-      final TableRenderer theCellRenderer = new TableRenderer();
+      final TableCellRenderer theCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(0).setMinWidth(150);
       table.getColumnModel().getColumn(0).setMaxWidth(300);
       table.getColumnModel().getColumn(1).setCellRenderer(theCellRenderer);
@@ -264,7 +290,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -301,8 +326,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
+	@SuppressWarnings("unchecked")
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;
 
@@ -310,8 +335,7 @@ final int iconSize = 17;
 		popupMergeMenuItem.setEnabled(false);
 
 		formerFilterThesaurusText = null;
-		//noinspection unchecked
-		((TableRowSorter<ThesaurusTableModel>)table.getRowSorter()).setRowFilter(null);
+		((DefaultRowSorter<ThesaurusTableModel, Integer>)table.getRowSorter()).setRowFilter(null);
 		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		dm.setSynonyms(null);
 	}

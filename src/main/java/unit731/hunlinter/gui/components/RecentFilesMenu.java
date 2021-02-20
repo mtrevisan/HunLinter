@@ -1,5 +1,33 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.components;
 
+import unit731.hunlinter.services.RecentItems;
+
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -8,9 +36,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.*;
-
-import unit731.hunlinter.services.RecentItems;
 
 
 /** A menu used to store and display recently used files. */
@@ -24,8 +49,6 @@ public class RecentFilesMenu extends JMenu{
 
 
 	public RecentFilesMenu(final RecentItems recentItems, final Consumer<Path> onSelectFile){
-		super();
-
 		Objects.requireNonNull(recentItems);
 		Objects.requireNonNull(onSelectFile);
 
@@ -62,19 +85,20 @@ public class RecentFilesMenu extends JMenu{
 		//clear the existing items
 		removeAll();
 
+		final ActionListener actionListener = actionEvent -> {
+			final String path = actionEvent.getActionCommand();
+			recentItems.push(path);
+
+			addEntriesToMenu();
+
+			onSelectFile.accept(Path.of(path));
+		};
 		final List<String> items = recentItems.getItems();
 		int index = 0;
 		for(final String item : items){
 			final JMenuItem newMenuItem = new JMenuItem(item);
 			newMenuItem.setActionCommand(item);
-			newMenuItem.addActionListener(actionEvent -> {
-				final String path = actionEvent.getActionCommand();
-				recentItems.push(path);
-
-				addEntriesToMenu();
-
-				onSelectFile.accept(Path.of(path));
-			});
+			newMenuItem.addActionListener(actionListener);
 			add(newMenuItem, index ++);
 		}
 	}

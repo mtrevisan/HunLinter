@@ -1,4 +1,31 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services.sorters.externalsorter;
+
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -14,9 +42,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.system.JavaHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -127,7 +152,7 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final StringList sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private void saveChunk(final Iterable<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
@@ -151,7 +176,7 @@ public class ExternalSorter{
 	 * @param outputFile The output {@link File} to merge the results to
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final List<File> files, final ExternalSorterOptions options, final File outputFile)
+	private void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
 		final Comparator<String> comparator = options.getComparator();
 		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),

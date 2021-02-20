@@ -1,30 +1,53 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.hyphenation;
+
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.languages.RulesLoader;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.core.WorkerDataParser;
+import unit731.hunlinter.workers.core.WorkerDictionary;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.workers.core.IndexDataPair;
-import unit731.hunlinter.workers.core.WorkerDataParser;
-import unit731.hunlinter.workers.core.WorkerDictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import unit731.hunlinter.languages.RulesLoader;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.workers.exceptions.LinterException;
 
 
 public class HyphenationLinterWorker extends WorkerDictionary{
@@ -49,8 +72,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
-			.withParallelProcessing()
-			.withCancelOnException();
+			.withParallelProcessing();
 
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
@@ -72,7 +94,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 					if(orthography.hasSyllabationErrors(syllabes)){
 						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
-						final StringBuffer sb = new StringBuffer(message);
+						final StringBuilder sb = new StringBuilder(message);
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						throw new LinterException(sb.toString());

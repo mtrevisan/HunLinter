@@ -1,18 +1,42 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.dialogs;
 
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.system.FileHelper;
+
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Map;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
 
 
 /**
@@ -32,15 +56,14 @@ public class HelpDialog extends JDialog{
 
 		try{
 			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
-			final ImageIcon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
+			final Icon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
 			logo.setIcon(icon);
 		}
 		catch(final IOException ignored){}
 
-		final Map<String, Object> pomProperties = DownloaderHelper.getApplicationProperties();
-		final String artifactID = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
-		final String version = (String)pomProperties.get(DownloaderHelper.PROPERTY_KEY_VERSION);
-		final LocalDate buildTimestamp = (LocalDate)pomProperties.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
+		final String artifactID = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
+		final String version = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION);
+		final LocalDate buildTimestamp = (LocalDate)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
 
 		productNameValue.setText(artifactID);
 		productVersionValue.setText(version);

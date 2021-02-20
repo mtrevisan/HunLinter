@@ -1,25 +1,37 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import javax.swing.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
@@ -31,6 +43,19 @@ import unit731.hunlinter.services.RegexHelper;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 
 public class HyphenationLayeredPane extends JLayeredPane{
@@ -55,9 +80,9 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 
 	public HyphenationLayeredPane(final Packager packager, final ParserManager parserManager, final JFrame parentFrame){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(parentFrame);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
@@ -83,7 +108,7 @@ final int iconSize = 17;
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(HyphenationLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -341,8 +366,8 @@ final int iconSize = 17;
 
             parserManager.storeHyphenationFile();
          }
-         catch(Exception ex){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
+         catch(final Exception e){
+            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
@@ -354,7 +379,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -363,7 +387,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION)
 			return;
 

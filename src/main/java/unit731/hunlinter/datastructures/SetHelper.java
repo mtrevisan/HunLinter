@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures;
 
 import java.util.ArrayList;
@@ -21,12 +45,12 @@ import java.util.stream.Collectors;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class SetHelper{
+public final class SetHelper{
 
 	private SetHelper(){}
 
 
-	public static Set<Character> makeCharacterSetFrom(final String text){
+	public static Set<Character> makeCharacterSetFrom(final CharSequence text){
 		return text.codePoints()
 			.mapToObj(chr -> (char)chr)
 			.collect(Collectors.toSet());
@@ -87,7 +111,7 @@ public class SetHelper{
 	 * @param sets	List of sets
 	 * @return	The union of {@code sets}
 	 */
-	public static <T> Set<T> union(final Collection<Set<T>> sets){
+	public static <T> Set<T> union(final Iterable<Set<T>> sets){
 		final Set<T> union = new HashSet<>();
 		forEach(sets, union::addAll);
 		return union;
@@ -120,7 +144,7 @@ public class SetHelper{
 	 * @param sets	List of sets
 	 * @return	The intersection of {@code sets}
 	 */
-	public static <T> Set<T> intersection(final Collection<Set<T>> sets){
+	public static <T> Set<T> intersection(final Iterable<Set<T>> sets){
 		final Iterator<Set<T>> itr = sets.iterator();
 		final Set<T> intersection = new HashSet<>(itr.next());
 		while(itr.hasNext())
@@ -210,7 +234,7 @@ public class SetHelper{
 		final Set<T> union = new HashSet<>(set1);
 		union.addAll(set2);
 
-		final Set<T> intersection = new HashSet<>(set1);
+		final Collection<T> intersection = new HashSet<>(set1);
 		intersection.retainAll(set2);
 
 		union.removeAll(intersection);
@@ -226,7 +250,7 @@ public class SetHelper{
 		return bucket;
 	}
 
-	public static <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
+	public static <K, V> Map<K, List<V>> bucket(final Iterable<V> entries, final Function<V, K> keyMapper){
 		final Map<K, List<V>> bucket = new HashMap<>();
 		for(final V entry : entries)
 			processBucketEntry(bucket, keyMapper, entry);
@@ -240,8 +264,8 @@ public class SetHelper{
 				.add(entry);
 	}
 
-	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper,
-		final BiConsumer<V, V> mergeFunction){
+	public static <K, V> List<V> collect(final Iterable<V> entries, final Function<V, K> keyMapper,
+			final BiConsumer<V, V> mergeFunction){
 		final Map<K, V> compaction = new HashMap<>();
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
@@ -254,7 +278,7 @@ public class SetHelper{
 
 	@SafeVarargs
 	public static <V> Set<V> getDuplicates(final V... list){
-		final Set<V> uniques = new HashSet<>();
+		final Collection<V> uniques = new HashSet<>();
 		final Set<V> duplicates = new HashSet<>();
 		for(final V elem : list)
 			if(!uniques.add(elem))

@@ -1,14 +1,28 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
-
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import javax.swing.*;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,7 +31,7 @@ import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.components.JTagPanel;
+import unit731.hunlinter.gui.components.TagPanel;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
@@ -26,6 +40,16 @@ import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.system.Debouncer;
 import unit731.hunlinter.services.text.StringHelper;
+
+import javax.swing.*;
+import javax.xml.transform.TransformerException;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 
 public class WordExceptionsLayeredPane extends JLayeredPane{
@@ -46,8 +70,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 
 	public WordExceptionsLayeredPane(final Packager packager, final ParserManager parserManager){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
@@ -61,7 +85,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(textField);
 
-		EventBusService.subscribe(WordExceptionsLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -72,7 +96,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
       scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      tagPanel = new JTagPanel((changeType, tags) -> {
+      tagPanel = new TagPanel((changeType, tags) -> {
          final ExceptionsParser wexParser = parserManager.getWexParser();
          wexParser.modify(changeType, tags);
          try{
@@ -201,7 +225,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -215,7 +238,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;
 
@@ -265,7 +287,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
    private javax.swing.JLabel inputLabel;
    private javax.swing.JButton openWexButton;
    private javax.swing.JScrollPane scrollPane;
-   private unit731.hunlinter.gui.components.JTagPanel tagPanel;
+   private TagPanel tagPanel;
    private javax.swing.JTextField textField;
    // End of variables declaration//GEN-END:variables
 }

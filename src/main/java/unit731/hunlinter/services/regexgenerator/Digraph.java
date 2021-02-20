@@ -1,15 +1,38 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services.regexgenerator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Stack;
-import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import static unit731.hunlinter.services.system.LoopHelper.forEach;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.StringJoiner;
 
 
 /**
@@ -44,9 +67,10 @@ public final class Digraph<T>{
 	 */
 	public Digraph(final Digraph<T> graph){
 		final int vertices = graph.adjacency.size();
+		final Deque<Pair<Integer, T>> reverse = new ArrayDeque<>();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			final Stack<Pair<Integer, T>> reverse = new Stack<>();
+			reverse.clear();
 			for(final Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
 			for(final Pair<Integer, T> w : reverse)
@@ -60,7 +84,7 @@ public final class Digraph<T>{
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
 	 */
-	public void addEdge(int v, int w){
+	public void addEdge(final int v, final int w){
 		addEdge(v, w, null);
 	}
 
@@ -71,7 +95,7 @@ public final class Digraph<T>{
 	 * @param w	The head vertex
 	 * @param value	The value associated with this transition
 	 */
-	public void addEdge(int v, int w, T value){
+	public void addEdge(final int v, final int w, final T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
 		adjacency.get(v).add(0, Pair.of(w, value));
@@ -84,7 +108,7 @@ public final class Digraph<T>{
 	 * @return the vertices adjacent from vertex {@code vertex}
 	 * @throws IndexOutOfBoundsException unless {@code 0 <= vertex < vertices}
 	 */
-	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
+	public Iterable<Pair<Integer, T>> adjacentVertices(final int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());
 	}
 
@@ -111,20 +135,24 @@ public final class Digraph<T>{
 	 */
 	@Override
 	public String toString(){
-		final StringBuffer s = new StringBuffer();
+		final StringBuilder s = new StringBuilder();
 		s.append(NEWLINE);
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			final StringJoiner transitions = new StringJoiner(", ");
-			forEach(adjacency.get(v),
-				w -> transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")"));
+			forEach(adjacency.get(v), transitions);
 			s.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
-				.append(transitions.toString())
+				.append(transitions)
 				.append(NEWLINE);
 		}
 		return s.toString();
+	}
+
+	public static <T> void forEach(final Iterable<Pair<Integer, T>> adjacency, final StringJoiner transitions){
+		for(final Pair<Integer, T> w : adjacency)
+			transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")");
 	}
 
 }

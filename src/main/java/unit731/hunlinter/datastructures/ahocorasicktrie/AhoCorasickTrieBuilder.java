@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.ahocorasicktrie;
 
 import java.io.Serializable;
@@ -93,7 +117,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 *
 	 * @param keywordSet the collection holding keywords
 	 */
-	private void addAllKeywords(final Collection<String> keywordSet){
+	private void addAllKeywords(final Iterable<String> keywordSet){
 		int i = 0;
 		for(final String keyword : keywordSet)
 			addKeyword(keyword, i ++);
@@ -254,8 +278,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings)
 				trie.check[begin + sibling.getKey()] = begin;
 
+			final ArrayList<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(0);
 			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings){
-				final List<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
+				newSiblings.clear();
+				newSiblings.ensureCapacity(sibling.getValue().getSuccess().entrySet().size() + 1);
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){

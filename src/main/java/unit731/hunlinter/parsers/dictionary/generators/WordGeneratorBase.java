@@ -1,23 +1,47 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary.generators;
-
-import java.text.MessageFormat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.Affixes;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
+import java.text.MessageFormat;
+
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
-import static unit731.hunlinter.services.system.LoopHelper.match;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
 
 
@@ -25,8 +49,8 @@ class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
-	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for ''{0} from {1}'' ({2} still has rules {3})");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}''{1}");
+	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for `{0} from {1}` ({2} still has rules {3})");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
 
 	protected final AffixData affixData;
@@ -227,7 +251,7 @@ class WordGeneratorBase{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		final FixedArray<String> appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
-		FixedArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
+		final FixedArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
 		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS].data, circumfixFlag))
 			postponedAffixes.add(circumfixFlag);
 
@@ -276,18 +300,17 @@ class WordGeneratorBase{
 		final String word = dicEntry.getWord();
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 		if(applicableAffixes.length == 0)
-			throw new NoApplicableRuleException("No applicable rules found for flag '" + affix + "' via '"
-				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "'");
+			throw new NoApplicableRuleException("No applicable rules found for flag `" + affix + "` via `"
+				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
 
-		Inflection[] inflections = new Inflection[0];
+		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class, applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = (match(appliedRules,
-						appliedRule -> (entry.getType() == AffixType.SUFFIX ^ appliedRule.getType() == AffixType.SUFFIX) && appliedRule.hasContinuationFlag(circumfixFlag)) != null);
+					final boolean appliedRuleContainsCircumfix = match(appliedRules, entry, circumfixFlag);
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.getType() == AffixType.SUFFIX ^ appliedRuleContainsCircumfix));
 				}
 
@@ -298,10 +321,21 @@ class WordGeneratorBase{
 				if(removeCircumfixFlag)
 					inflection.removeContinuationFlag(circumfixFlag);
 				if(!inflection.hasContinuationFlag(forbiddenWordFlag))
-					inflections = ArrayUtils.add(inflections, inflection);
+					inflections.add(inflection);
 			}
 		}
-		return inflections;
+		return inflections.extractCopy();
+	}
+
+	private static boolean match(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){
+		final AffixType entryType = entry.getType();
+		final int size = (appliedRules != null? appliedRules.length: 0);
+		for(int i = 0; i < size; i ++){
+			final AffixEntry appliedRule = appliedRules[i];
+			if((entryType == AffixType.SUFFIX ^ appliedRule.getType() == AffixType.SUFFIX) && appliedRule.hasContinuationFlag(circumfixFlag))
+				return true;
+		}
+		return false;
 	}
 
 	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final FixedArray<String> appliedAffixes,

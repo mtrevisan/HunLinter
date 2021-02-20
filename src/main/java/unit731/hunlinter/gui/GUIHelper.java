@@ -1,9 +1,48 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui;
 
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.core.WorkerAbstract;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -16,23 +55,9 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import javax.swing.text.JTextComponent;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
-
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.RegexHelper;
 
 
-public class GUIHelper{
+public final class GUIHelper{
 
 	private static final Pattern PATTERN_HTML_CODE = RegexHelper.pattern("</?[^>]+>");
 
@@ -52,7 +77,7 @@ public class GUIHelper{
 			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(final ActionEvent e){
 				dialog.dispose();
 			}
 		});
@@ -64,41 +89,55 @@ public class GUIHelper{
 	 * @param dialog	Dialog to attach the escape key to
 	 * @param cancelAction	Action to be performed on cancel
 	 */
-	public static void addCancelByEscapeKey(final JDialog dialog, final AbstractAction cancelAction){
+	public static void addCancelByEscapeKey(final JDialog dialog, final ActionListener cancelAction){
 		final KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		dialog.getRootPane()
 			.registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
 
-	public static JMenuItem createPopupMenu(final String text, final char mnemonic, final String iconURL, final int iconSize,
+	public static JMenuItem createPopupMenuItem(final String text, final char mnemonic, final String iconURL, final int iconSize,
 			final JPopupMenu popupMenu, final Consumer<Component> fnCallback) throws IOException{
 		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
-		final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
-		final ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-		menuItem.setIcon(icon);
+		if(iconURL != null){
+			final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
+			final Icon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+			menuItem.setIcon(icon);
+		}
+		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
+		return menuItem;
+	}
+
+	public static JMenuItem createPopupMenuItem(final String text, final boolean selected, final JPopupMenu popupMenu,
+			final Consumer<Component> fnCallback){
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(text, selected);
 		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
 		return menuItem;
 	}
 
 	public static JMenuItem createPopupMergeMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnMerge)
 			throws IOException{
-		return createPopupMenu("Merge", 'M', "/popup_add.png", iconSize, popupMenu, fnMerge);
+		return createPopupMenuItem("Merge", 'M', "/popup_add.png", iconSize, popupMenu, fnMerge);
 	}
 
 	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnCopy)
 			throws IOException{
-		return createPopupMenu("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
+		return createPopupMenuItem("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
 	}
 
 	public static JMenuItem createPopupExportTableMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnExport)
 			throws IOException{
-		return createPopupMenu("Export", 'E', "/popup_export.png", iconSize, popupMenu, fnExport);
+		return createPopupMenuItem("Export", 'E', "/popup_export.png", iconSize, popupMenu, fnExport);
 	}
 
 	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
 			throws IOException{
-		return createPopupMenu("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
+		return createPopupMenuItem("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
+	}
+
+	public static JMenuItem createCheckBoxMenu(final String text, final boolean selected, final JPopupMenu popupMenu,
+			final Consumer<Component> fnCallback){
+		return createPopupMenuItem(text, selected, popupMenu, fnCallback);
 	}
 
 	public static void copyCallback(final Component invoker){
@@ -108,7 +147,7 @@ public class GUIHelper{
 		else if(invoker instanceof JLabel)
 			textToCopy = ((JLabel)invoker).getText();
 		else if(invoker instanceof JCopyableTable){
-			final int selectedRow = ((JCopyableTable)invoker).convertRowIndexToModel(((JCopyableTable)invoker).getSelectedRow());
+			final int selectedRow = ((JTable)invoker).convertRowIndexToModel(((JTable)invoker).getSelectedRow());
 			textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
 		}
 
@@ -145,7 +184,7 @@ public class GUIHelper{
 	}
 
 
-	public static String removeHTMLCode(final String text){
+	public static String removeHTMLCode(final CharSequence text){
 		return RegexHelper.clear(text, PATTERN_HTML_CODE);
 	}
 
@@ -173,8 +212,8 @@ public class GUIHelper{
 					if(e.isPopupTrigger()){
 						//select row
 						if(field instanceof JCopyableTable){
-							final int selectedRow = ((JCopyableTable)field).rowAtPoint(e.getPoint());
-							((JCopyableTable)field).setRowSelectionInterval(selectedRow, selectedRow);
+							final int selectedRow = ((JTable)field).rowAtPoint(e.getPoint());
+							((JTable)field).setRowSelectionInterval(selectedRow, selectedRow);
 						}
 
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -188,7 +227,7 @@ public class GUIHelper{
 
 	public static void askUserToAbort(final WorkerAbstract<?> worker, final Component parentComponent, final Runnable onAbort,
 			final Runnable resumeTask){
-		Objects.requireNonNull(parentComponent);
+		Objects.requireNonNull(parentComponent, "Parent component cannot be null");
 
 		worker.pause();
 
@@ -229,7 +268,7 @@ public class GUIHelper{
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override
-			public void actionPerformed(ActionEvent evt){
+			public void actionPerformed(final ActionEvent evt){
 				if(undo.canUndo()){
 					try{
 						undo.undo();
@@ -243,7 +282,7 @@ public class GUIHelper{
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override
-			public void actionPerformed(ActionEvent evt){
+			public void actionPerformed(final ActionEvent evt){
 				if(undo.canRedo()){
 					try{
 						undo.redo();

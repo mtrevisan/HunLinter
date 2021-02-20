@@ -1,9 +1,33 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.actions;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.services.Packager;
@@ -33,9 +57,9 @@ public class SelectFontAction extends AbstractAction{
 	public SelectFontAction(final Packager packager, final ParserManager parserManager, final Preferences preferences){
 		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(preferences);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(preferences, "Preferences cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

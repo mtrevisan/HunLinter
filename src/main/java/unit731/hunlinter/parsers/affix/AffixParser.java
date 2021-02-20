@@ -1,16 +1,29 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.affix;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.parsers.affix.handlers.AffixHandler;
@@ -23,12 +36,24 @@ import unit731.hunlinter.parsers.affix.handlers.Handler;
 import unit731.hunlinter.parsers.affix.handlers.RelationTableHandler;
 import unit731.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 
 /**
@@ -50,7 +75,7 @@ import unit731.hunlinter.services.RegexHelper;
  */
 public class AffixParser{
 
-	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: ''{0}''");
+	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: `{0}`");
 	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1,number,#}");
 
 	private static final String NO_LANGUAGE = "xxx";
@@ -72,7 +97,7 @@ public class AffixParser{
 	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixOption.OUTPUT_CONVERSION_TABLE);
 	private static final Handler RELATION_TABLE = new RelationTableHandler(AffixOption.RELATION_TABLE);
 
-	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new HashMap<>();
+	private static final Map<AffixOption, Handler> PARSING_HANDLERS = new EnumMap<>(AffixOption.class);
 	static{
 		//General options
 //		PARSING_HANDLERS.put("NAME", COPY_OVER);
@@ -162,13 +187,14 @@ public class AffixParser{
 		boolean encodingRead = false;
 		final Charset charset = FileHelper.determineCharset(affFile.toPath());
 		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				index ++;
 				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
 					continue;
 
-				if(!encodingRead && !line.startsWith(AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE))
+				if(!encodingRead && !line.startsWith(prefix))
 					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
@@ -263,7 +289,7 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
-			int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
+			final int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
 			if(compoundMin < 1)
 				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
 		}

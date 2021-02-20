@@ -1,4 +1,44 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.vos;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -11,29 +51,14 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.enums.MorphologicalTag;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
-
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class DictionaryEntry{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line ''{0}''");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}''{1}");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line `{0}`");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
@@ -66,8 +91,8 @@ public class DictionaryEntry{
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(strategy);
+		Objects.requireNonNull(line, "Line cannot be null");
+		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 		if(!m.find())
@@ -84,8 +109,8 @@ public class DictionaryEntry{
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
-	protected DictionaryEntry(final DictionaryEntry dicEntry){
-		Objects.requireNonNull(dicEntry);
+	DictionaryEntry(final DictionaryEntry dicEntry){
+		Objects.requireNonNull(dicEntry, "Dictionary entry cannot be null");
 
 		word = dicEntry.word;
 		continuationFlags = dicEntry.continuationFlags;
@@ -93,9 +118,8 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-			final boolean combinable){
-		Objects.requireNonNull(word);
+	DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
+		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.word = word;
 		this.continuationFlags = continuationFlags;
@@ -113,11 +137,11 @@ public class DictionaryEntry{
 	}
 
 //	public static String extractWord(final String line){
-//		Objects.requireNonNull(line);
+//		Objects.requireNonNull(line, "Line cannot be null");
 //
 //		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 //		if(!m.find())
-//			throw new HunLintException("Cannot parse dictionary line '" + line + "'");
+//			throw new HunLintException("Cannot parse dictionary line `" + line + "`");
 //
 //		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 //	}
@@ -150,6 +174,10 @@ public class DictionaryEntry{
 	 */
 	public boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
 		return (match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
+	}
+
+	public String[] getContinuationFlags(){
+		return continuationFlags;
 	}
 
 	public int getContinuationFlagCount(){
@@ -194,11 +222,16 @@ public class DictionaryEntry{
 	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, DictionaryEntry[]> result = new HashMap<>();
 		final int size = (continuationFlags != null? continuationFlags.length: 0);
+		final SimpleDynamicArray<DictionaryEntry> vv = new SimpleDynamicArray<>(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
 			final String cf = continuationFlags[i];
 			if(affixData.isManagedByCompoundRule(cf)){
+				vv.reset();
 				final DictionaryEntry[] v = result.get(cf);
-				result.put(cf, (v != null? ArrayUtils.add(v, this): new DictionaryEntry[]{this}));
+				if(v != null)
+					vv.addAll(v);
+				vv.add(this);
+				result.put(cf, vv.extractCopy());
 			}
 		}
 		return result;
@@ -234,16 +267,26 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
+	public String getMorphologicalFieldStem(){
+		if(morphologicalFields != null){
+			final String tag = MorphologicalTag.STEM.getCode();
+			for(final String mf : morphologicalFields)
+				if(mf.startsWith(tag))
+					return mf;
+		}
+		return word;
+	}
+
 	public String[] getMorphologicalFieldPartOfSpeech(){
 		if(morphologicalFields == null)
 			return new String[0];
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		String[] list = new String[0];
+		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, morphologicalFields.length);
 		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
-				list = ArrayUtils.add(list, mf);
-		return list;
+				list.add(mf);
+		return list.extractCopy();
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
@@ -315,7 +358,7 @@ public class DictionaryEntry{
 	}
 
 	public String toString(final FlagParsingStrategy strategy){
-		final StringBuffer sb = new StringBuffer(word);
+		final StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));

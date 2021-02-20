@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa.stemming;
 
 import java.io.IOException;
@@ -46,7 +70,7 @@ public class DictionaryMetadata{
 	 * A separator character between fields (stem, lemma, form).
 	 * The character must be within byte range (FSA uses bytes internally).
 	 */
-	protected byte separator;
+	private byte separator;
 
 	private Locale locale = Locale.ROOT;
 
@@ -76,7 +100,7 @@ public class DictionaryMetadata{
 	private EncoderType encoderType;
 
 	/** Expected metadata file extension */
-	public static final String METADATA_FILE_EXTENSION = "info";
+	private static final String METADATA_FILE_EXTENSION = "info";
 
 
 	/**
@@ -127,6 +151,7 @@ public class DictionaryMetadata{
 	 * @param attributes	A set of {@link DictionaryAttribute} keys and their associated values.
 	 * @see DictionaryMetadataBuilder
 	 */
+	@SuppressWarnings("unchecked")
 	public DictionaryMetadata(final Map<DictionaryAttribute, String> attributes){
 		this.attributes = attributes;
 
@@ -147,14 +172,10 @@ public class DictionaryMetadata{
 				case LOCALE -> locale = (Locale)value;
 				case ENCODING -> charset = (Charset)value;
 				case ENCODER -> encoderType = (EncoderType)value;
-				case INPUT_CONVERSION -> //noinspection unchecked
-					inputConversion = (Map<String, String>)value;
-				case OUTPUT_CONVERSION -> //noinspection unchecked
-					outputConversion = (Map<String, String>)value;
-				case REPLACEMENT_PAIRS -> //noinspection unchecked
-					replacementPairs = (Map<String, List<String>>)value;
-				case EQUIVALENT_CHARS -> //noinspection unchecked
-					equivalentChars = (Map<Character, List<Character>>)value;
+				case INPUT_CONVERSION -> inputConversion = (Map<String, String>)value;
+				case OUTPUT_CONVERSION -> outputConversion = (Map<String, String>)value;
+				case REPLACEMENT_PAIRS -> replacementPairs = (Map<String, List<String>>)value;
+				case EQUIVALENT_CHARS -> equivalentChars = (Map<Character, List<Character>>)value;
 				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> boolAttributes.put(e.getKey(), (Boolean)value);
 				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
 				default -> throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());

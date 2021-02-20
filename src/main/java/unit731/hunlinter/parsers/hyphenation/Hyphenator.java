@@ -1,4 +1,36 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.hyphenation;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.LoopHelper;
 
 import java.text.Normalizer;
 import java.util.Collections;
@@ -8,14 +40,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.system.LoopHelper;
 
 
 public class Hyphenator implements HyphenatorInterface{
@@ -232,11 +256,11 @@ public class Hyphenator implements HyphenatorInterface{
 		return LoopHelper.removeIf(response, nohyp::equals);
 	}
 
-	private boolean isStarting(final String key){
+	private boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final String key){
+	private boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
@@ -298,11 +322,11 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	private String removeNonStandardPart(final String rule){
+	private String removeNonStandardPart(final CharSequence rule){
 		return RegexHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
-	private int getNormalizedLength(final String word){
+	private int getNormalizedLength(final CharSequence word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 

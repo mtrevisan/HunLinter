@@ -1,7 +1,32 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa.stemming;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -10,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -165,7 +191,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, String> conversionPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -190,7 +216,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, String> conversionPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -215,7 +241,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<String, List<String>> fromString(final String value) throws IllegalArgumentException{
 			final Map<String, List<String>> replacementPairs = new HashMap<>();
-			final String[] replacements = value.split(",\\s*");
+			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -243,7 +269,7 @@ public enum DictionaryAttribute{
 		@Override
 		public Map<Character, List<Character>> fromString(final String value) throws IllegalArgumentException{
 			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
-			final String[] eqChars = value.split(",\\s*");
+			final String[] eqChars = RegexHelper.split(value, SPLITTER);
 			for(final String characterPair : eqChars){
 				final String[] twoChars = characterPair.trim().split(StringUtils.SPACE);
 				if(twoChars.length != 2 || twoChars[0].length() != 1 || twoChars[1].length() != 1)
@@ -264,6 +290,10 @@ public enum DictionaryAttribute{
 	AUTHOR("fsa.dict.author"),
 	/** Dictionary creation date */
 	CREATION_DATE("fsa.dict.created");
+
+
+	private static final Pattern SPLITTER = RegexHelper.pattern(",\\s*");
+
 
 	/** Property name for this attribute */
 	public final String propertyName;
@@ -296,7 +326,7 @@ public enum DictionaryAttribute{
 
 	static{
 		attrsByPropertyName = new HashMap<>();
-		for(final DictionaryAttribute attr : DictionaryAttribute.values())
+		for(final DictionaryAttribute attr : values())
 			if(attrsByPropertyName.put(attr.propertyName, attr) != null)
 				throw new RuntimeException("Duplicate property key for: " + attr);
 	}

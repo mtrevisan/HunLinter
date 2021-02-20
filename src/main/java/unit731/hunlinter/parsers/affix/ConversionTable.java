@@ -1,13 +1,28 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.affix;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -16,20 +31,30 @@ import unit731.hunlinter.parsers.enums.AffixOption;
 import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.StringJoiner;
+
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ConversionTable{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line ''{0}'': the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line ''{0}'': bad number of entries, ''{1}'' must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line ''{0}'': bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line ''{0}'': bad option, it must be {1}");
-	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word ''{0}'', too many applicable rules");
+	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
+	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line `{0}`: bad option, it must be {1}");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot convert word `{0}`, too many applicable rules");
 
 
 	@FunctionalInterface
-	public interface ConversionFunction{
+	interface ConversionFunction{
 		void convert(String word, Pair<String, String> entry, List<String> conversions);
 	}
 
@@ -132,29 +157,29 @@ public class ConversionTable{
 		return conversions;
 	}
 
-	private static String reduceKey(final String key){
+	private static String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private static boolean isStarting(final String key){
+	private static boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private static boolean isEnding(final String key){
+	private static boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
-	private static void convertInside(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertInside(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 
 		if(word.contains(key)){
 			final String value = (ZERO.equals(entry.getValue())? StringUtils.EMPTY: entry.getValue());
-			int keyLength = key.length();
-			int valueLength = value.length();
+			final int keyLength = key.length();
+			final int valueLength = value.length();
 
 			//search every occurrence of the pattern in the word
 			int idx = -valueLength;
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			while((idx = word.indexOf(key, idx + valueLength)) >= 0){
 				sb.append(word);
 				sb.replace(idx, idx + keyLength, value);
@@ -165,7 +190,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertStartsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertStartsWith(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1);
 		if(word.startsWith(strippedKey)){
@@ -174,7 +199,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertEndsWith(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertEndsWith(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final int keyLength = key.length() - 1;
 		final String strippedKey = key.substring(0, keyLength);
@@ -184,7 +209,7 @@ public class ConversionTable{
 		}
 	}
 
-	private static void convertWhole(final String word, final Pair<String, String> entry, final List<String> conversions){
+	private static void convertWhole(final String word, final Pair<String, String> entry, final Collection<String> conversions){
 		final String key = entry.getKey();
 		final String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))

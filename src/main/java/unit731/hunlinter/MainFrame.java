@@ -1,29 +1,43 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter;
 
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.FontChooserDialog;
-import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
-import unit731.hunlinter.gui.events.PreLoadProjectEvent;
-import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
-import unit731.hunlinter.gui.panes.PoSFSALayeredPane;
-import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
-import unit731.hunlinter.gui.panes.HyphenationLayeredPane;
-import unit731.hunlinter.gui.panes.ThesaurusLayeredPane;
-import unit731.hunlinter.gui.panes.CompoundsLayeredPane;
-import unit731.hunlinter.gui.panes.WordExceptionsLayeredPane;
-import unit731.hunlinter.gui.panes.DictionaryLayeredPane;
-import java.awt.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunlinter.actions.AboutAction;
 import unit731.hunlinter.actions.AffixRulesReducerAction;
 import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
 import unit731.hunlinter.actions.CreatePackageAction;
-import unit731.hunlinter.actions.DictionaryExtractWordlistFSAAction;
 import unit731.hunlinter.actions.DictionaryExtractDuplicatesAction;
 import unit731.hunlinter.actions.DictionaryExtractMinimalPairsAction;
+import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
 import unit731.hunlinter.actions.DictionaryExtractWordlistAction;
+import unit731.hunlinter.actions.DictionaryExtractWordlistFSAAction;
 import unit731.hunlinter.actions.DictionaryHyphenationStatisticsAction;
+import unit731.hunlinter.actions.DictionaryLinterAction;
 import unit731.hunlinter.actions.DictionarySorterAction;
 import unit731.hunlinter.actions.DictionaryWordCountAction;
 import unit731.hunlinter.actions.ExitAction;
@@ -31,14 +45,58 @@ import unit731.hunlinter.actions.HyphenationLinterAction;
 import unit731.hunlinter.actions.IssueReporterAction;
 import unit731.hunlinter.actions.OnlineHelpAction;
 import unit731.hunlinter.actions.ProjectLoaderAction;
+import unit731.hunlinter.actions.ReportWarningsAction;
 import unit731.hunlinter.actions.SelectFontAction;
 import unit731.hunlinter.actions.ThesaurusLinterAction;
 import unit731.hunlinter.actions.UpdateAction;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
 import unit731.hunlinter.gui.ProjectFolderFilter;
 import unit731.hunlinter.gui.components.RecentFilesMenu;
+import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
+import unit731.hunlinter.gui.dialogs.FontChooserDialog;
 import unit731.hunlinter.gui.events.LoadProjectEvent;
+import unit731.hunlinter.gui.events.PreLoadProjectEvent;
 import unit731.hunlinter.gui.events.TabbedPaneEnableEvent;
+import unit731.hunlinter.gui.panes.AutoCorrectLayeredPane;
+import unit731.hunlinter.gui.panes.CompoundsLayeredPane;
+import unit731.hunlinter.gui.panes.DictionaryLayeredPane;
+import unit731.hunlinter.gui.panes.HyphenationLayeredPane;
+import unit731.hunlinter.gui.panes.PoSFSALayeredPane;
+import unit731.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
+import unit731.hunlinter.gui.panes.ThesaurusLayeredPane;
+import unit731.hunlinter.gui.panes.WordExceptionsLayeredPane;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.aid.AidParser;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.RecentItems;
+import unit731.hunlinter.services.downloader.DownloaderHelper;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.eventbus.events.BusExceptionEvent;
+import unit731.hunlinter.services.log.ApplicationLogAppender;
+import unit731.hunlinter.services.log.ExceptionHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.workers.WorkerManager;
+import unit731.hunlinter.workers.core.IndexDataPair;
+import unit731.hunlinter.workers.core.WorkerAbstract;
+import unit731.hunlinter.workers.dictionary.WordlistWorker;
+import unit731.hunlinter.workers.exceptions.LinterWarning;
+import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.filechooser.FileView;
+import javax.swing.text.DefaultCaret;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -55,41 +113,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.filechooser.FileView;
-import javax.swing.text.DefaultCaret;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.actions.DictionaryExtractPoSFSAAction;
-import unit731.hunlinter.actions.DictionaryLinterAction;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.aid.AidParser;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.eventbus.events.BusExceptionEvent;
-import unit731.hunlinter.services.log.ExceptionHelper;
-import unit731.hunlinter.workers.WorkerManager;
-import unit731.hunlinter.workers.core.IndexDataPair;
-import unit731.hunlinter.workers.exceptions.LinterWarning;
-import unit731.hunlinter.workers.exceptions.ProjectNotFoundException;
-import unit731.hunlinter.workers.dictionary.WordlistWorker;
-import unit731.hunlinter.workers.core.WorkerAbstract;
-import unit731.hunlinter.services.downloader.DownloaderHelper;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.log.ApplicationLogAppender;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.RecentItems;
 
 
 /**
@@ -137,12 +160,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
-	private static final String UPDATE_STARTUP_CHECK = "update.startupCheck";
 
 
 	private final JFileChooser openProjectPathFileChooser;
 
-	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
+	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 	private final ParserManager parserManager;
 	private final Packager packager;
 
@@ -176,7 +198,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 		try{
 			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
-			final ImageIcon projectFolderIcon = new ImageIcon(projectFolderImg);
+			final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
 			openProjectPathFileChooser.setFileView(new FileView(){
 				//choose the right icon for the folder
 				@Override
@@ -191,7 +213,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 		//check for updates
-		if(preferences.getBoolean(UPDATE_STARTUP_CHECK, true))
+		if(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true))
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				try{
 					final FileDownloaderDialog dialog = new FileDownloaderDialog(this);
@@ -202,7 +224,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				catch(final Exception ignored){}
 			});
 
-		EventBusService.subscribe(MainFrame.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -253,6 +275,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+      setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpOnlineHelpMenuItem = new javax.swing.JMenuItem();
       hlpIssueReporterMenuItem = new javax.swing.JMenuItem();
@@ -262,7 +285,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle((String)DownloaderHelper.getApplicationProperties().get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
+      setTitle((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
@@ -270,7 +293,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       parsingResultTextArea.setColumns(20);
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
-      DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
+      final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
@@ -333,8 +356,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
-      Preferences preferences = Preferences.userNodeForPackage(getClass());
-      RecentItems recentItems = new RecentItems(5, preferences);
+      final Preferences preferences = Preferences.userNodeForPackage(getClass());
+      final RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new unit731.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
@@ -434,9 +457,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setMenu.setText("Settings");
 
       setCheckUpdateOnStartupCheckBoxMenuItem.setAction(new CheckUpdateOnStartupAction(preferences));
-      setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(UPDATE_STARTUP_CHECK, true));
+      setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true));
       setCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       setMenu.add(setCheckUpdateOnStartupCheckBoxMenuItem);
+
+      setReportWarningsCheckBoxMenuItem.setAction(new ReportWarningsAction(preferences));
+      setReportWarningsCheckBoxMenuItem.setSelected(preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true));
+      setReportWarningsCheckBoxMenuItem.setText("Report warnings");
+      setMenu.add(setReportWarningsCheckBoxMenuItem);
 
       mainMenuBar.add(setMenu);
 
@@ -493,7 +521,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       tabbedPaneEnableEvent(new TabbedPaneEnableEvent(false));
 
-      KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+      final KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
       pack();
@@ -524,7 +552,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void actionPerformed(ActionEvent event){
+	public void actionPerformed(final ActionEvent event){
 		workerManager.checkForAbortion();
 	}
 
@@ -559,7 +587,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			filOpenProjectMenuItem.setEnabled(false);
 		};
-		final ProjectLoaderAction projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
+		final ActionListener projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
 			initialize, this::loadFileCompleted, this::loadFileCancelled, this);
 		final ActionEvent event = new ActionEvent(filEmptyRecentProjectsMenuItem, -1, "openProject");
 		projectLoaderAction.actionPerformed(event);
@@ -568,6 +596,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@EventHandler
 	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
 		final Throwable cause = exceptionEvent.getCause();
+
+		//FIXME sometimes happens...
+		if(cause.getMessage() == null)
+			cause.printStackTrace();
+
 		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
 
 		if(cause instanceof ProjectNotFoundException){
@@ -690,7 +723,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_ALL);
 
-		EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_ALL);
+		EventBusService.publish(ACTION_COMMAND_PARSER_CLEAR_ALL);
 
 		//dictionary file:
 		dicMenu.setEnabled(false);
@@ -707,7 +740,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAffixParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
@@ -729,7 +761,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearDictionaryParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
@@ -740,7 +771,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAidParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
@@ -753,7 +783,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearThesaurusParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
@@ -769,7 +798,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearHyphenationParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
@@ -785,7 +813,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearAutoCorrectParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -800,7 +827,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearSentenceExceptionsParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
@@ -815,7 +841,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	public void clearWordExceptionsParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 
@@ -921,6 +946,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
+   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;

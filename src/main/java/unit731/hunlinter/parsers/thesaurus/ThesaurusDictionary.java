@@ -1,7 +1,36 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.thesaurus;
+
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -12,10 +41,6 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.RegexHelper;
-
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
@@ -23,7 +48,7 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class ThesaurusDictionary{
 
-	public static final Pattern PATTERN_SYNONYM_USE = RegexHelper.pattern("\\s*\\([^)]+\\)");
+	private static final Pattern PATTERN_SYNONYM_USE = RegexHelper.pattern("\\s*\\([^)]+\\)");
 
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String PART_OF_SPEECH_START = "(";
@@ -47,8 +72,8 @@ public class ThesaurusDictionary{
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		forEach(partOfSpeeches, sj::add);
 		final String wholePartOfSpeeches = sj.toString();
-		final List<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Set<String> uniqueValues = new HashSet<>();
+		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
+		final Collection<String> uniqueValues = new HashSet<>();
 		forEach(synonyms, synonym -> {
 			final String s = synonym.toLowerCase(Locale.ROOT);
 			if(uniqueValues.add(s))
@@ -77,7 +102,7 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private SynonymsEntry extractPartOfSpeechAndSynonyms(final String partOfSpeeches, final List<String> synonyms,
+	private SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
@@ -159,7 +184,7 @@ public class ThesaurusDictionary{
 		return list;
 	}
 
-	public static String removeSynonymUse(final String synonym){
+	public static String removeSynonymUse(final CharSequence synonym){
 		return RegexHelper.replaceAll(synonym, PATTERN_SYNONYM_USE, StringUtils.EMPTY);
 	}
 

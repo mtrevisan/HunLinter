@@ -1,15 +1,40 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary.generators;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.parsers.affix.ConversionTable;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.File;
 import java.io.IOException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.affix.ConversionTable;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
@@ -383,7 +408,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Cannot strip full word 'a' without the FULLSTRIP option", exception.getMessage());
+		Assertions.assertEquals("Cannot strip full word `a` without the FULLSTRIP option", exception.getMessage());
 	}
 
 	@Test
@@ -431,7 +456,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'p1aas1/S2,P2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `p1aas1/S2,P2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1` (S1 > P1 still has rules P2)", exception.getMessage());
 	}
 
 	@Test
@@ -462,7 +487,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'ga/A,B,C,D,E\tst:a\tfrom\tPFX G 0 g/E . from G' (G still has rules E)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `ga/A,B,C,D,E\tst:a\tfrom\tPFX G 0 g/E . from G` (G still has rules E)", exception.getMessage());
 	}
 
 
@@ -590,7 +615,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for 'ag/A,B,C,D,E\tst:a\tfrom\tSFX G 0 g/E . from G' (G still has rules E)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `ag/A,B,C,D,E\tst:a\tfrom\tSFX G 0 g/E . from G` (G still has rules E)", exception.getMessage());
 	}
 
 

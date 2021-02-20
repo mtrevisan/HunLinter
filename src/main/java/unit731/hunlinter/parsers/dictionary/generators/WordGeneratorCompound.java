@@ -1,29 +1,54 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.ArraySet;
+import unit731.hunlinter.datastructures.FixedArray;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.vos.Affixes;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.datastructures.SimpleDynamicArray;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.vos.Affixes;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.ArraySet;
-import unit731.hunlinter.datastructures.FixedArray;
-import unit731.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.services.text.StringHelper;
+import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.collectIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -48,11 +73,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 
-	protected final DictionaryParser dicParser;
-	protected final WordGenerator wordGenerator;
+	private final DictionaryParser dicParser;
+	private final WordGenerator wordGenerator;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
-	private final Set<String> compoundAsReplacement = new HashSet<>();
+	private final Collection<String> compoundAsReplacement = new HashSet<>();
 
 
 	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
@@ -62,7 +87,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		this.wordGenerator = wordGenerator;
 	}
 
-	protected List<List<Inflection[]>> generateCompounds(final List<List<String>> permutations,
+	protected List<List<Inflection[]>> generateCompounds(final Iterable<List<String>> permutations,
 			final Map<String, DictionaryEntry[]> inputs){
 		final List<List<Inflection[]>> entries = new ArrayList<>();
 		final Map<String, Inflection[]> dicEntries = new HashMap<>();
@@ -76,7 +101,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					for(final DictionaryEntry entry : inputs.get(flag)){
 						final Inflection[] inflections = applyAffixRules(entry, true, null);
 						final Inflection[] collect = collectIf(inflections,
-							inflection -> inflection.hasContinuationFlag(flag), () -> new Inflection[0]);
+							inflection -> inflection.hasContinuationFlag(flag));
 						dicEntriesPerFlag = ArrayUtils.addAll(dicEntriesPerFlag, collect);
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
@@ -98,7 +123,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Inflection[] applyCompound(final List<List<Inflection[]>> entries, final int limit){
+	protected Inflection[] applyCompound(final Iterable<List<Inflection[]>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -119,7 +144,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					@SuppressWarnings("rawtypes")
 					final FixedArray[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
-					//noinspection unchecked
 					if(forbiddenWordFlag == null
 							|| !continuationFlags[Affixes.INDEX_PREFIXES].contains(forbiddenWordFlag)
 							&& !continuationFlags[Affixes.INDEX_SUFFIXES].contains(forbiddenWordFlag)
@@ -148,10 +172,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return limitResponse(inflections, limit);
 	}
 
-	private void applyOutputConversions(final Set<Inflection> inflections, final String forceCompoundUppercaseFlag){
+	private void applyOutputConversions(final Iterable<Inflection> inflections, final String forceCompoundUppercaseFlag){
+		final Function<String, String> applyOutputConversionTable = affixData::applyOutputConversionTable;
 		//convert using output table
 		for(final Inflection inflection : inflections){
-			inflection.applyOutputConversionTable(affixData::applyOutputConversionTable);
+			inflection.applyOutputConversionTable(applyOutputConversionTable);
 			inflection.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			inflection.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
@@ -165,15 +190,14 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
 			final FixedArray<String>[] continuationFlags){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		Inflection[] inflections;
-		final SimpleDynamicArray<String> flags = new SimpleDynamicArray(String.class, continuationFlags.length);
+		final SimpleDynamicArray<String> flags = new SimpleDynamicArray<>(String.class, continuationFlags.length);
 		forEach(continuationFlags, continuationFlag -> forEach(continuationFlag, flags::add));
-		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries, strategy);
+		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			inflections = new Inflection[]{p};
 		else{
@@ -321,7 +345,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** Merge the distribution with the others */
 	protected Map<String, DictionaryEntry[]> mergeDistributions(final Map<String, DictionaryEntry[]> compoundRules,
 			final Map<String, DictionaryEntry[]> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		final List<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
+		final Collection<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
 		final Map<String, DictionaryEntry[]> map = new HashMap<>();

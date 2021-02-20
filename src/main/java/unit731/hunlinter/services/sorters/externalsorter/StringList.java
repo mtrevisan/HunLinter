@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services.sorters.externalsorter;
 
 import unit731.hunlinter.services.sorters.SmoothSort;
@@ -42,7 +66,7 @@ public class StringList implements Iterable<String>{
 	 * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
 	 * will be expanded to DEFAULT_CAPACITY when the first element is added.
 	 */
-	transient String[] elementData;
+	private transient String[] elementData;
 
 	/** The size of the ArrayList (the number of elements it contains) */
 	private int size;
@@ -64,7 +88,7 @@ public class StringList implements Iterable<String>{
 	}
 
 	public StringList(){
-		this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+		elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
 	}
 
 	/**
@@ -102,7 +126,7 @@ public class StringList implements Iterable<String>{
 	 */
 	private void grow(final int minCapacity){
 		final int oldCapacity = elementData.length;
-		if(oldCapacity > 0 || elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA){
+		if(oldCapacity > 0 || !Arrays.equals(elementData, DEFAULTCAPACITY_EMPTY_ELEMENTDATA)){
 			final int newCapacity = newLength(oldCapacity, minCapacity - oldCapacity,
 				oldCapacity >> 1);
 			elementData = Arrays.copyOf(elementData, newCapacity);
@@ -232,32 +256,36 @@ public class StringList implements Iterable<String>{
 	 */
 	@Override
 	public Iterator<String> iterator(){
-		return new Itr();
+		return new StringIterator(this);
 	}
 
 	/** An optimized version of AbstractList.Itr */
-	private class Itr implements Iterator<String>{
+	public static class StringIterator implements Iterator<String>{
+
+		private final StringList self;
 		//index of next element to return
 		int cursor;
 		//index of last element returned; -1 if no such
 		int lastReturnedIndex = -1;
 
 		// prevent creating a synthetic constructor
-		Itr(){}
+		StringIterator(final StringList self){
+			this.self = self;
+		}
 
 		@Override
 		public boolean hasNext(){
-			return cursor != size;
+			return (cursor != self.size);
 		}
 
 		@Override
 		public String next(){
-			if(cursor >= size)
+			if(cursor >= self.size)
 				throw new NoSuchElementException();
 
 			lastReturnedIndex = cursor;
 			cursor ++;
-			return StringList.this.elementData[lastReturnedIndex];
+			return self.elementData[lastReturnedIndex];
 		}
 
 		@Override
@@ -266,7 +294,7 @@ public class StringList implements Iterable<String>{
 				throw new IllegalStateException();
 
 			try{
-				StringList.this.remove(lastReturnedIndex);
+				self.remove(lastReturnedIndex);
 
 				cursor = lastReturnedIndex;
 				lastReturnedIndex = -1;

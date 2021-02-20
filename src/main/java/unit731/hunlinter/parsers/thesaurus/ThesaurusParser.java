@@ -1,4 +1,35 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.thesaurus;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,13 +47,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.services.text.StringHelper;
-
 
 /**
  * for storing mementos:
@@ -34,13 +58,16 @@ import unit731.hunlinter.services.text.StringHelper;
  */
 public class ThesaurusParser{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': was ''{0}''");
-	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): was ''{0}''");
+	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': was `{0}`");
+	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): was `{0}`");
 
 	private static final String PIPE = "|";
 
 	private static final String PART_OF_SPEECH_START = "(";
 	private static final String PART_OF_SPEECH_END = ")";
+
+	private static final Pattern PART_OF_SPEECH_SPLITTER = RegexHelper.pattern("\\s*,\\s*");
+	private static final Pattern FILTER_SPLITTER = RegexHelper.pattern(", *");
 
 	private static final Pattern PATTERN_PARENTHESIS = RegexHelper.pattern("\\([^)]+\\)");
 
@@ -111,8 +138,7 @@ public class ThesaurusParser{
 		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
 		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
-		final String[] partOfSpeeches = partOfSpeech.substring(prefix, partOfSpeech.length() - suffix)
-			.split("\\s*,\\s*");
+		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix), PART_OF_SPEECH_SPLITTER);
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
@@ -186,13 +212,13 @@ public class ThesaurusParser{
 			idx = text.indexOf(")|");
 			start = 1;
 		}
-		if(idx >= 0)
-			pos = text.substring(start, idx)
-				.split(", *");
+		if(idx >= 0){
+			pos = RegexHelper.split(text.substring(start, idx), FILTER_SPLITTER);
+		}
 		return pos;
 	}
 
-	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, String[] synonyms){
+	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, final String[] synonyms){
 		//extract Part-of-Speech if present
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
 			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":

@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.exceptions;
 
 import org.w3c.dom.Document;
@@ -5,10 +29,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.XMLManager;
 import unit731.hunlinter.workers.exceptions.LinterWarning;
 
 import javax.xml.transform.TransformerException;
@@ -16,10 +40,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -29,8 +53,8 @@ import java.util.Set;
  */
 public class ExceptionsParser{
 
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: ''{1}''");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected ''{1}'', was ''{2}''");
+	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: `{1}`");
+	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected `{1}`, was `{2}`");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -82,7 +106,7 @@ public class ExceptionsParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Set<String> map = new HashSet<>();
+		final Collection<String> map = new HashSet<>();
 		for(final String s : dictionary){
 			if(!map.add(s))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));
@@ -99,7 +123,7 @@ public class ExceptionsParser{
 		return dictionary.size();
 	}
 
-	public void modify(final TagChangeType changeType, final List<String> tags){
+	public void modify(final TagChangeType changeType, final Collection<String> tags){
 		switch(changeType){
 			case ADD -> {
 				dictionary.addAll(tags);

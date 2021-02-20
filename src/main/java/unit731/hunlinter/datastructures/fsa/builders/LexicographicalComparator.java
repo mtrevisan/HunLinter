@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa.builders;
 
 import sun.misc.Unsafe;
@@ -17,8 +41,10 @@ import java.util.Comparator;
  * <p>The returned comparator is inconsistent with {@link Object#equals(Object)} (since arrays
  * support only identity equality), but it is consistent with {@link
  * java.util.Arrays#equals(byte[], byte[])}.
+ *
+ * @see <a href="https://dzone.com/articles/understanding-sunmiscunsafe">Understanding sun.misc.Unsafe</a>
  */
-public class LexicographicalComparator{
+public final class LexicographicalComparator{
 
 	private static final int UNSIGNED_MASK = 0xFF;
 
@@ -27,8 +53,10 @@ public class LexicographicalComparator{
 	private static final Comparator<byte[]> BEST_COMPARATOR = getBestComparator();
 
 
+	private LexicographicalComparator(){}
+
 	public static Comparator<byte[]> lexicographicalComparator(){
-		return LexicographicalComparator.BEST_COMPARATOR;
+		return BEST_COMPARATOR;
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -105,7 +133,7 @@ public class LexicographicalComparator{
 		public int compare(final byte[] left, final byte[] right){
 			final int stride = 8;
 			final int minLength = Math.min(left.length, right.length);
-			final int strideLimit = minLength & ~(stride - 1);
+			final int strideLimit = minLength & -stride;
 			int i;
 
 			/*

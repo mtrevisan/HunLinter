@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -10,16 +34,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class FontHelper{
+public final class FontHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FontHelper.class);
 
@@ -41,8 +67,10 @@ public class FontHelper{
 		ALL_FONTS = new ArrayList<>(familyNames.length);
 		for(final String familyName : familyNames){
 			final Font font = new Font(familyName, Font.PLAIN, 20);
+			//filter out non-plain fonts
 			//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
-			if(!GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+			if(font.isPlain()
+					&& !GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
 					&& !GlyphComparator.allIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
 				ALL_FONTS.add(font);
 			else
@@ -137,10 +165,10 @@ public class FontHelper{
 	}
 
 	public static void extractFonts(final String languageSample){
-		Objects.requireNonNull(languageSample);
+		Objects.requireNonNull(languageSample, "Language sample cannot be null");
 
-		if(!languageSample.equals(FontHelper.LANGUAGE_SAMPLE)){
-			FontHelper.LANGUAGE_SAMPLE = languageSample;
+		if(!languageSample.equals(LANGUAGE_SAMPLE)){
+			LANGUAGE_SAMPLE = languageSample;
 
 			FAMILY_NAMES_ALL.clear();
 			FAMILY_NAMES_MONOSPACED.clear();
@@ -195,18 +223,19 @@ public class FontHelper{
 	}
 
 	private static void updateComponent(final Component component, final Font font){
-		final Stack<Component> stack = new Stack<>();
+		final Deque<Component> stack = new ArrayDeque<>();
 		stack.push(component);
+		final Consumer<Component> push = stack::push;
 		while(!stack.isEmpty()){
 			final Component comp = stack.pop();
 
 			if(comp instanceof JEditorPane)
-				((JEditorPane)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+				((JComponent)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 			if((comp instanceof JComponent) && ((JComponent)comp).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 				comp.setFont(font);
 
 			if(comp instanceof Container)
-				forEach(((Container)comp).getComponents(), stack::push);
+				forEach(((Container)comp).getComponents(), push);
 		}
 	}
 

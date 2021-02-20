@@ -1,4 +1,38 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.affix;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunlinter.parsers.enums.AffixOption;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.RuleEntry;
+import unit731.hunlinter.services.system.Memoizer;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
@@ -15,16 +49,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
-import unit731.hunlinter.parsers.enums.AffixOption;
-import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.system.Memoizer;
-
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.match;
@@ -34,8 +58,8 @@ public class AffixData{
 
 	private static final String REPEATED_FLAG = "Same flags present in multiple options";
 	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: ''{0}''");
-	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word ''{1}'', too many applicable rules");
+	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: `{0}`");
+	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0} convert word `{1}`, too many applicable rules");
 
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
@@ -44,21 +68,32 @@ public class AffixData{
 	private static final List<AffixOption> SINGLE_FLAG_TAGS = Arrays.asList(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG,
 		AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
 		AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
-		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG,
-		AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
+		/*AffixOption.COMPOUND_ROOT,*/ AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
+		AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
 
 
 	private final Map<String, Object> data = new HashMap<>();
-	private final Set<String> terminalAffixes = new HashSet<>();
+	private final Collection<String> terminalAffixes = new HashSet<>();
+	private final Set<String> productableFlags = new HashSet<>();
 	private boolean closed;
 
 
 	void close(){
-		terminalAffixes.addAll(getStringData(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.FORBIDDEN_WORD_FLAG,
-			AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG,
-			AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG,
-			AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG, AffixOption.KEEP_CASE_FLAG,
-			AffixOption.NEED_AFFIX_FLAG));
+		terminalAffixes.addAll(getStringData(SINGLE_FLAG_TAGS));
+
+		productableFlags.addAll(data.keySet());
+		productableFlags.removeAll(Arrays.asList(AffixOption.CHARACTER_SET.getCode(), AffixOption.FLAG.getCode(),
+			AffixOption.COMPLEX_PREFIXES.getCode(), AffixOption.LANGUAGE.getCode(), AffixOption.ALIASES_FLAG.getCode(),
+			AffixOption.ALIASES_MORPHOLOGICAL_FIELD.getCode(), AffixOption.TRY.getCode(), AffixOption.NO_SUGGEST_FLAG.getCode(),
+			AffixOption.REPLACEMENT_TABLE.getCode(), AffixOption.RELATION_TABLE.getCode(), AffixOption.WORD_BREAK_CHARACTERS.getCode(),
+			AffixOption.COMPOUND_RULE.getCode(), AffixOption.COMPOUND_MINIMUM_LENGTH.getCode(),
+			AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND.getCode(), AffixOption.COMPOUND_MAX_WORD_COUNT.getCode(),
+			AffixOption.FORBID_DUPLICATES_IN_COMPOUND.getCode(), AffixOption.CHECK_COMPOUND_REPLACEMENT.getCode(),
+			AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND.getCode(), AffixOption.FORBID_TRIPLES_IN_COMPOUND.getCode(),
+			AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND.getCode(), AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG.getCode(),
+			AffixOption.FULLSTRIP.getCode(), AffixOption.KEEP_CASE_FLAG.getCode(), AffixOption.NEED_AFFIX_FLAG.getCode(),
+			AffixOption.INPUT_CONVERSION_TABLE.getCode(), AffixOption.OUTPUT_CONVERSION_TABLE.getCode()
+		));
 
 		closed = true;
 	}
@@ -73,7 +108,7 @@ public class AffixData{
 	void verify(){
 		final Map<AffixOption, Object> extractSingleFlags = extractSingleFlags();
 		final Collection<Object> flaggedData = extractSingleFlags.values();
-		final Set<Object> uniqueValues = new HashSet<>(flaggedData);
+		final Collection<Object> uniqueValues = new HashSet<>(flaggedData);
 		if(uniqueValues.size() != flaggedData.size())
 			throw new LinterException(REPEATED_FLAG);
 	}
@@ -114,8 +149,8 @@ public class AffixData{
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(final AffixOption... keys){
-		final List<String> strings = new ArrayList<>(keys.length);
+	private List<String> getStringData(final Collection<AffixOption> keys){
+		final List<String> strings = new ArrayList<>(keys.size());
 		forEach(keys, key -> strings.add(getData(key)));
 		return strings;
 	}
@@ -206,7 +241,7 @@ public class AffixData{
 	public boolean isAffixProductive(final String affix, final String word){
 		final String convertedWord = applyInputConversionTable(word);
 
-		boolean productive;
+		final boolean productive;
 		final Object affixData = getData(affix);
 		if(affixData != null && RuleEntry.class.isAssignableFrom(affixData.getClass()))
 			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
@@ -278,7 +313,7 @@ public class AffixData{
 	 */
 	public String getSampleText(){
 		final List<String> sortedSample;
-		String sample = getData(AffixOption.TRY);
+		final String sample = getData(AffixOption.TRY);
 		if(sample != null)
 			sortedSample = Arrays.asList(StringUtils.split(sample, StringUtils.EMPTY));
 		else
@@ -350,6 +385,10 @@ public class AffixData{
 
 	public String getForceCompoundUppercaseFlag(){
 		return getData(AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG);
+	}
+
+	public Set<String> getProductableFlag(){
+		return productableFlags;
 	}
 
 	public List<RuleEntry> getRuleEntries(){

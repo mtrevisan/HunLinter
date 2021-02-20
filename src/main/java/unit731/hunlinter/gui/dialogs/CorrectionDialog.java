@@ -1,5 +1,36 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.dialogs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
+
+import javax.swing.JDialog;
 import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -7,13 +38,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.JDialog;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
 
 
 public class CorrectionDialog extends JDialog{
@@ -27,12 +51,12 @@ public class CorrectionDialog extends JDialog{
 	private final BiConsumer<String, String> okButtonAction;
 
 
-	public CorrectionDialog(CorrectionEntry correction, BiConsumer<String, String> okButtonAction, Frame parent){
+	public CorrectionDialog(final CorrectionEntry correction, final BiConsumer<String, String> okButtonAction, final Frame parent){
 		super(parent, "Change auto correction for " + correction, true);
 
-		Objects.requireNonNull(parent);
-		Objects.requireNonNull(correction);
-		Objects.requireNonNull(okButtonAction);
+		Objects.requireNonNull(parent, "Parent cannot be null");
+		Objects.requireNonNull(correction, "Correction cannot be null");
+		Objects.requireNonNull(okButtonAction, "Ok button action cannot be null");
 
 		initComponents();
 

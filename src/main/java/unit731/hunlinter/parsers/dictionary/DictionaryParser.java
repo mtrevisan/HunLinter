@@ -1,4 +1,35 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,12 +45,6 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.TreeMap;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.services.ParserHelper;
-import unit731.hunlinter.services.system.FileHelper;
 
 
 public class DictionaryParser{
@@ -30,7 +55,7 @@ public class DictionaryParser{
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
 	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.ROOT);
 	static{
-		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
+		final DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
 		symbols.setGroupingSeparator(COUNTER_GROUPING_SEPARATOR);
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}
@@ -48,8 +73,8 @@ public class DictionaryParser{
 
 
 	public DictionaryParser(final File dicFile, final String language, final Charset charset){
-		Objects.requireNonNull(dicFile);
-		Objects.requireNonNull(charset);
+		Objects.requireNonNull(dicFile, "Dictionary file cannot be null");
+		Objects.requireNonNull(charset, "Charser cannot be null");
 
 		this.dicFile = dicFile;
 		this.charset = charset;
@@ -69,16 +94,16 @@ public class DictionaryParser{
 		return comparator;
 	}
 
-	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
+	public synchronized Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-	public final boolean removeBoundary(final int boundaryIndex){
+	public synchronized boolean removeBoundary(final int boundaryIndex){
 		return (boundaries.remove(boundaryIndex) != null);
 	}
 
-	public final int getBoundaryIndex(final int lineIndex){
+	public synchronized int getBoundaryIndex(final int lineIndex){
 		if(boundaries.isEmpty())
 			calculateDictionaryBoundaries();
 
@@ -127,17 +152,17 @@ public class DictionaryParser{
 		}
 	}
 
-	public final int getNextBoundaryIndex(final int lineIndex){
+	public synchronized int getNextBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.higherEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public final int getPreviousBoundaryIndex(final int lineIndex){
+	public synchronized int getPreviousBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.lowerEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public final boolean isInBoundary(final int lineIndex){
+	public synchronized boolean isInBoundary(final int lineIndex){
 		return (searchBoundary(lineIndex) != null);
 	}
 
@@ -147,11 +172,11 @@ public class DictionaryParser{
 	}
 
 
-	public final void clear(){
+	public void clear(){
 		clearBoundaries();
 	}
 
-	public final void clearBoundaries(){
+	public synchronized void clearBoundaries(){
 		boundaries.clear();
 	}
 

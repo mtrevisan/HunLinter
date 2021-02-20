@@ -1,4 +1,35 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.core;
+
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.services.ParserHelper;
+import unit731.hunlinter.services.system.FileHelper;
+import unit731.hunlinter.services.system.JavaHelper;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,6 +38,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -14,13 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.services.system.JavaHelper;
-import unit731.hunlinter.services.text.StringHelper;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.ParserHelper;
 
 
 public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{
@@ -30,7 +55,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		try{
 			if(workerData.isParallelProcessing()){
@@ -69,7 +94,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		return entries;
 	}
 
-	private void processLinesParallel(final List<IndexDataPair<String>> entries,
+	private void processLinesParallel(final Collection<IndexDataPair<String>> entries,
 			final Consumer<IndexDataPair<String>> dataProcessor){
 		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, entries.size());
 		entries.parallelStream()

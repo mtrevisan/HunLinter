@@ -1,30 +1,54 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers;
 
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
+import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerDictionary;
+
 import java.awt.Frame;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import unit731.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.dictionary.DictionaryStatistics;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
 
 
 public class StatisticsWorker extends WorkerDictionary{
@@ -50,8 +74,8 @@ public class StatisticsWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(affParser, "Affix parser cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
 		final AffixData affixData = affParser.getAffixData();
@@ -67,8 +91,8 @@ public class StatisticsWorker extends WorkerDictionary{
 				for(final Inflection inflection : inflections){
 					//collect statistics
 					final String word = inflection.getWord();
-					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): new String[0]);
-					if(subwords.length == 0)
+					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
+					if(subwords == null || subwords.length == 0)
 						dicStatistics.addData(word);
 					else
 						for(final String subword : subwords){

@@ -1,9 +1,33 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa.builders;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.BufferedInputStream;
@@ -17,14 +41,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 
 /**
  * @see <a href="http://wiki.languagetool.org/hunspell-support">LanguageTool - Spell check</a>
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
  */
-public class MetadataBuilder{
+public final class MetadataBuilder{
 
 	private MetadataBuilder(){}
 
@@ -42,7 +66,7 @@ public class MetadataBuilder{
 
 	public static void create(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
 			throws IOException{
-		final List<String> content = new ArrayList<>(Arrays.asList(
+		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
 			"fsa.dict.encoding=" + charset.name().toLowerCase(),

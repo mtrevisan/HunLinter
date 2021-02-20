@@ -1,8 +1,50 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.parsers.vos.RuleEntry;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.services.RegexSequencer;
+import unit731.hunlinter.services.text.StringHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,25 +59,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexSequencer;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.parsers.vos.DictionaryEntry;
-import unit731.hunlinter.parsers.vos.RuleEntry;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.services.RegexHelper;
-import unit731.hunlinter.datastructures.SetHelper;
-import unit731.hunlinter.services.text.StringHelper;
-
 import static unit731.hunlinter.services.system.LoopHelper.allMatch;
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
@@ -47,8 +70,8 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule ''{0}'', cannot reduce");
-	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from ''{0}'', expected {1}, obtained {1}");
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`, cannot reduce");
+	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from `{0}`, expected {1}, obtained {1}");
 
 	private static final String PIPE = "|";
 
@@ -67,8 +90,8 @@ public class RulesReducer{
 
 
 	public RulesReducer(final AffixData affixData, final WordGenerator wordGenerator){
-		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		this.affixData = affixData;
 		strategy = affixData.getFlagParsingStrategy();
@@ -145,16 +168,17 @@ public class RulesReducer{
 				final int delta = longestConditionLength - rule.condition.length();
 				final String deltaAddition = from.substring(startIndex, startIndex + delta);
 				//add addition
-				forEach(rule.addition, addition -> compactedRule.addition.add(deltaAddition + addition));
+				for(final String addition : rule.addition)
+					compactedRule.addition.add(deltaAddition + addition);
 			}
 		}
 	}
 
-	List<LineEntry> reduceRules(final List<LineEntry> plainRules){
+	List<LineEntry> reduceRules(final Collection<LineEntry> plainRules){
 		return reduceRules(plainRules, null);
 	}
 
-	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final Consumer<Integer> progressCallback){
+	public List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final Consumer<Integer> progressCallback){
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
 		if(progressCallback != null)
@@ -182,7 +206,7 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
+	private List<LineEntry> redistributeAdditions(final Iterable<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
 		forEach(plainRules, entry -> redistributeAddition(entry, map));
 		return SetHelper.collect(map.values(),
@@ -191,8 +215,10 @@ public class RulesReducer{
 	}
 
 	private void redistributeAddition(final LineEntry entry, final Map<String, LineEntry> map){
+		final String removalTab = entry.removal + TAB;
+		final String tabCondition = TAB + entry.condition;
 		for(final String addition : entry.addition){
-			final String key = entry.removal + TAB + addition + TAB + entry.condition;
+			final String key = removalTab + addition + tabCondition;
 			final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
 			final LineEntry rule = map.putIfAbsent(key, newEntry);
 			if(rule != null)
@@ -200,14 +226,14 @@ public class RulesReducer{
 		}
 	}
 
-	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
+	private List<LineEntry> compactRules(final Iterable<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return SetHelper.collect(rules,
 			entry -> entry.removal + TAB + RegexHelper.mergeSet(entry.addition, comparator) + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules){
+	private List<LineEntry> makeAdditionsDisjoint(final Collection<LineEntry> rules){
 		//transform
 		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=…]
 		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=…]
@@ -222,18 +248,22 @@ public class RulesReducer{
 		//	[rem=ièr,add=[ar, areto, ereto, èr, er],cond=ièr,from=…]
 		final List<LineEntry> disjointedRules = new ArrayList<>();
 
+		final Consumer<LineEntry> lineEntryConsumer = temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule);
+		final Collection<LineEntry> temporaryRules = new ArrayList<>();
+		final List<String> keys = new ArrayList<>(0);
 		for(final LineEntry rule : rules){
-			final List<LineEntry> temporaryRules = new ArrayList<>();
+			temporaryRules.clear();
 
 			final Map<String, List<String>> lcss = SetHelper.bucket(rule.addition,
-				add -> StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal)));
+				add -> StringHelper.longestCommonPrefix(add, rule.removal));
 			if(lcss.size() > 1){
 				//order keys from longer to shorter
-				final List<String> keys = new ArrayList<>(lcss.keySet());
+				keys.clear();
+				keys.addAll(lcss.keySet());
 				keys.sort(Comparator.comparingInt(String::length).reversed());
 				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
-				forEach(temporaryRules, temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule));
+				forEach(temporaryRules, lineEntryConsumer);
 				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
@@ -247,8 +277,8 @@ public class RulesReducer{
 	}
 
 	//add each key, remove the list from the addition
-	private List<String> retrieveAdditionsToBeRemoved(final List<LineEntry> rules, final LineEntry rule,
-			final List<LineEntry> temporaryRules, final Map<String, List<String>> lcss, final List<String> keys){
+	private List<String> retrieveAdditionsToBeRemoved(final Collection<LineEntry> rules, final LineEntry rule,
+			final Collection<LineEntry> temporaryRules, final Map<String, List<String>> lcss, final Iterable<String> keys){
 		final List<String> additionsToBeRemoved = new ArrayList<>();
 		for(final String key : keys){
 			final int keyLength = key.length();
@@ -260,7 +290,8 @@ public class RulesReducer{
 			final String removal = (conditionLength <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
 			final Set<String> addition = new HashSet<>(list.size());
-			forEach(list, add -> addition.add(add.substring(keyLength)));
+			for(final String add : list)
+				addition.add(add.substring(keyLength));
 			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
 			if(rules.contains(newEntry)){
 				temporaryRules.add(newEntry);
@@ -286,14 +317,14 @@ public class RulesReducer{
 		}
 	}
 
-	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
+	private Map<Integer, Set<Character>> collectOverallLastGroups(final Collection<LineEntry> plainRules){
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
 		if(!plainRules.isEmpty()){
 			try{
 				final Set<String> overallFrom = new HashSet<>();
+				final Consumer<String> add = overallFrom::add;
 				for(final LineEntry entry : plainRules)
-					forEach(entry.from, overallFrom::add);
-				//noinspection InfiniteLoopStatement
+					forEach(entry.from, add);
 				for(int index = 0; ; index ++){
 					final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
 					overallLastGroups.put(index, overallLastGroup);
@@ -333,7 +364,7 @@ public class RulesReducer{
 	}
 
 	private void disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
-			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
+			final String condition, final Collection<LineEntry> sameCondition, final Collection<LineEntry> finalRules){
 		//extract children
 		final List<LineEntry> children = new ArrayList<>(rules.size());
 		applyIf(rules,
@@ -347,6 +378,8 @@ public class RulesReducer{
 		rules.removeAll(sameCondition);
 
 		//separate conditions:
+		final Set<Character> childrenGroup = new HashSet<>();
+		final Set<Character> notPresentConditions = new HashSet<>();
 		//for each rule with same condition
 		for(final LineEntry parent : sameCondition){
 			//extract ratifying group
@@ -357,7 +390,7 @@ public class RulesReducer{
 			applyIf(children,
 				child -> child != parent,
 				childrenNotParent::add);
-			final Set<Character> childrenGroup = new HashSet<>();
+			childrenGroup.clear();
 			for(final LineEntry lineEntry : childrenNotParent)
 				forEach(groups.get(lineEntry), childrenGroup::add);
 
@@ -371,7 +404,7 @@ public class RulesReducer{
 			}
 
 			//extract and add new condition only if there are rules that ends with the new condition
-			final Set<Character> notPresentConditions = new HashSet<>();
+			notPresentConditions.clear();
 			final Iterator<Character> itr = groupsIntersection.iterator();
 			while(itr.hasNext()){
 				final Character chr = itr.next();
@@ -452,8 +485,8 @@ public class RulesReducer{
 		return preCondition + parentCondition;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
-			final Set<Character> childrenGroup, final Set<Character> intersectionGroup){
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
+			final Collection<Character> childrenGroup, final Collection<Character> intersectionGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
 		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
@@ -480,12 +513,13 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush,
+	private List<LineEntry> disjoinSameEndingConditionsBush(final Collection<LineEntry> bush,
 			final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
 		queue.addAll(bush);
+		final Set<Character> childrenGroup = new HashSet<>();
 		while(!queue.isEmpty()){
 			final LineEntry parent = queue.remove();
 
@@ -500,9 +534,9 @@ public class RulesReducer{
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 			//extract negated group
-			final Set<Character> childrenGroup = new HashSet<>(bubbles.size());
-			forEach(bubbles,
-				child -> childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1)));
+			childrenGroup.clear();
+			for(final LineEntry child : bubbles)
+				childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1));
 
 			//if intersection(parent-group, children-group) is empty
 			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
@@ -532,11 +566,11 @@ public class RulesReducer{
 				finalRules.addAll(bubbles);
 			}
 			else if(allMatch(queue, rule -> rule.condition.length() > parentConditionLength + 1))
-				forEach(childrenGroup, chr -> {
+				for(final Character chr : childrenGroup){
 					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
 					if(!queue.contains(entry))
 						queue.add(entry);
-				});
+				}
 			else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
 				//expand intersection
 				for(final Character chr : groupsIntersection){
@@ -557,7 +591,7 @@ public class RulesReducer{
 	 * @param parent	The parent rule
 	 * @return	<code>true</code> if a bush was created and added to the queue
 	 */
-	private boolean growNewBush(Queue<LineEntry> queue, LineEntry parent){
+	private boolean growNewBush(final Collection<LineEntry> queue, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 
 		final ArrayList<LineEntry> newBushes = new ArrayList<>();
@@ -568,7 +602,8 @@ public class RulesReducer{
 			if(parent.from.containsAll(child.from)){
 				final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
 				newBushes.ensureCapacity(newBushes.size() + childGroup.size());
-				forEach(childGroup, chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
+				for(final Character chr : childGroup)
+					newBushes.add(LineEntry.createFrom(child, chr + child.condition));
 
 				itr.remove();
 			}
@@ -584,7 +619,7 @@ public class RulesReducer{
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
 		rules.sort(shortestConditionComparator);
 
-		ArrayList<List<LineEntry>> forest = new ArrayList<>(rules.size());
+		final List<List<LineEntry>> forest = new ArrayList<>(rules.size());
 		while(!rules.isEmpty()){
 			//extract base condition
 			final String parentCondition = rules.get(0).condition;
@@ -596,7 +631,7 @@ public class RulesReducer{
 		return forest;
 	}
 
-	private List<LineEntry> extractSimilarRules(final List<LineEntry> rules, final String parentCondition){
+	private List<LineEntry> extractSimilarRules(final Iterable<LineEntry> rules, final String parentCondition){
 		final List<LineEntry> children = new ArrayList<>();
 		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
@@ -611,7 +646,7 @@ public class RulesReducer{
 		return children;
 	}
 
-	private List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
+	private List<LineEntry> extractBubbles(final Iterable<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = new ArrayList<>();
 		applyIf(bush,
@@ -625,8 +660,8 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
-			final Set<Character> childrenGroup){
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
+			final Collection<Character> childrenGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
 		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1)
@@ -641,6 +676,7 @@ public class RulesReducer{
 			entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegexSequencer.splitSequence(entry.condition).length:
 			null));
+		final Set<Character> group = new HashSet<>();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
@@ -648,17 +684,19 @@ public class RulesReducer{
 				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				final Set<Character> group = new HashSet<>(similarities.size());
-				forEach(similarities, entry -> group.add(RegexSequencer.splitSequence(entry.condition)[1].charAt(0)));
+				group.clear();
+				for(final LineEntry similarity : similarities)
+					group.add(RegexSequencer.splitSequence(similarity.condition)[1].charAt(0));
 				final String condition = StringUtils.join(commonPreCondition) + RegexHelper.makeGroup(group, comparator)
 					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
-				forEach(similarities, entries::remove);
+				for(final LineEntry similarity : similarities)
+					entries.remove(similarity);
 			}
 	}
 
-	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
+	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final Iterable<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
@@ -671,13 +709,13 @@ public class RulesReducer{
 	}
 
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
-			final Collection<LineEntry> entries){
+			final Iterable<LineEntry> entries){
 		//restore original rules
 		final ArrayList<LineEntry> restoredRules = new ArrayList<>();
 		forEach(entries, rule -> {
 			restoredRules.ensureCapacity(restoredRules.size() + rule.addition.size());
 			forEach(rule.addition, addition -> {
-				final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
+				final int lcp = StringHelper.longestCommonPrefix(rule.removal, addition).length();
 				final String removal = rule.removal.substring(lcp);
 				final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
 					rule.condition, rule.from);
@@ -698,17 +736,17 @@ public class RulesReducer{
 		return list;
 	}
 
-	private List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
+	private List<String> composeAffixRules(final String flag, final AffixType type, final Collection<LineEntry> entries){
 		final List<String> list = new ArrayList<>(entries.size());
 		forEach(entries, entry -> list.add(entry.toHunspellRule(type, flag)));
 		return list;
 	}
 
-	void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
+	void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines){
 		checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines,
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines,
 			final Consumer<Integer> progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)

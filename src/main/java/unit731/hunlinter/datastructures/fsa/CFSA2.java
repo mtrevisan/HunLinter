@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa;
 
 import unit731.hunlinter.datastructures.fsa.builders.FSAFlags;
@@ -106,10 +130,10 @@ public class CFSA2 extends FSA{
 	public static final int BIT_FINAL_ARC = 0x20;
 
 	/** The count of bits assigned to storing an indexed label */
-	static final int LABEL_INDEX_BITS = 5;
+	private static final int LABEL_INDEX_BITS = 5;
 
 	/** Masks only the M bits of a flag byte */
-	static final int LABEL_INDEX_MASK = (1 << LABEL_INDEX_BITS) - 1;
+	private static final int LABEL_INDEX_MASK = (1 << LABEL_INDEX_BITS) - 1;
 
 	/** Maximum size of the labels index */
 	public static final int LABEL_INDEX_SIZE = (1 << LABEL_INDEX_BITS) - 1;
@@ -122,13 +146,13 @@ public class CFSA2 extends FSA{
 	 * Please see the documentation of this class for more information on how
 	 * this structure is organized.
 	 */
-	public byte[] arcs;
+	private final byte[] arcs;
 
 	/** Flags for this automaton version */
 	private final EnumSet<FSAFlags> flags;
 
 	/** Label mapping for M-indexed labels */
-	public final byte[] labelMapping;
+	private final byte[] labelMapping;
 
 	/** If <code>true</code> states are prepended with numbers */
 	private final boolean hasNumbers;
@@ -258,7 +282,7 @@ public class CFSA2 extends FSA{
 	/**
 	 * Returns the address of the node pointed to by this arc.
 	 */
-	final int getDestinationNodeOffset(int arc){
+	private int getDestinationNodeOffset(int arc){
 		if(isNextSet(arc)){
 			//follow until the last arc of this state
 			while(!isArcLast(arc))
@@ -291,7 +315,7 @@ public class CFSA2 extends FSA{
 	}
 
 	/** Read a v-int */
-	static int readVInt(final byte[] array, int offset){
+	private static int readVInt(final byte[] array, int offset){
 		byte b = array[offset];
 		int value = b & 0x7F;
 		for(int shift = 7; b < 0; shift += 7){
@@ -304,7 +328,6 @@ public class CFSA2 extends FSA{
 	/** Skip a v-int */
 	private int skipVInt(int offset){
 		//do nothing
-		//noinspection StatementWithEmptyBody
 		while(arcs[offset ++] < 0){}
 		return offset;
 	}

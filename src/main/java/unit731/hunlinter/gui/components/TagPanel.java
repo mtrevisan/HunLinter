@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.components;
 
 import unit731.hunlinter.gui.FontHelper;
@@ -18,7 +42,7 @@ import java.util.function.Consumer;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class JTagPanel extends JPanel{
+public class TagPanel extends JPanel{
 
 	private static final long serialVersionUID = 665517573169978352L;
 
@@ -26,13 +50,11 @@ public class JTagPanel extends JPanel{
 	private final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged;
 
 
-	public JTagPanel(){
+	public TagPanel(){
 		this(null);
 	}
 
-	public JTagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
-		super();
-
+	public TagPanel(final BiConsumer<ExceptionsParser.TagChangeType, List<String>> tagsChanged){
 		this.tagsChanged = tagsChanged;
 
 		setLayout(new HorizontalFlowLayout(FlowLayout.LEFT, 2, 0));
@@ -58,8 +80,9 @@ public class JTagPanel extends JPanel{
 				removeAll();
 
 				//re-insert all tags
+				final Consumer<JTagComponent> removeTag = this::removeTag;
 				for(final String tag : tags){
-					final JTagComponent component = new JTagComponent(tag, this::removeTag);
+					final JTagComponent component = new JTagComponent(tag, removeTag);
 					add(component, BorderLayout.LINE_END);
 				}
 
@@ -68,7 +91,7 @@ public class JTagPanel extends JPanel{
 		}
 	}
 
-	public void initializeTags(final List<String> tags){
+	public void initializeTags(final Iterable<String> tags){
 		synchronized(getTreeLock()){
 			if(tags == null)
 				removeAll();
@@ -127,7 +150,7 @@ public class JTagPanel extends JPanel{
 	private static final Color COLOR_TEXT = new Color(85, 85, 85);
 	private static final Color COLOR_CLOSE = new Color(119, 119, 119);
 
-	private static final String TEXT_CROSS_MARK = "\u274C";
+	private static final String TEXT_CROSS_MARK = "❌";
 
 	//values for horizontal and vertical radius of corner arcs
 	private static final Dimension CORNER_RADIUS = new Dimension(5, 5);
@@ -142,7 +165,7 @@ public class JTagPanel extends JPanel{
 
 
 		JTagComponent(final String text, final Consumer<JTagComponent> tagRemover){
-			Objects.requireNonNull(tagRemover);
+			Objects.requireNonNull(tagRemover, "Tag remover cannot be null");
 
 			setLayout(new BorderLayout());
 			setOpaque(false);

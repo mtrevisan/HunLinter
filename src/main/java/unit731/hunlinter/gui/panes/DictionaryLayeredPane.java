@@ -1,20 +1,29 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
 
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
-import javax.swing.*;
-import javax.swing.table.TableModel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +31,9 @@ import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.actions.OpenFileAction;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.JCopyableTable;
+import unit731.hunlinter.gui.components.LabeledPopupMenu;
+import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
 import unit731.hunlinter.gui.models.InflectionTableModel;
 import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
@@ -38,13 +48,30 @@ import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.log.ExceptionHelper;
 import unit731.hunlinter.services.system.Debouncer;
 
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.prefs.Preferences;
+
 import static unit731.hunlinter.services.system.LoopHelper.applyIf;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-/*
-TODO http://www.java2s.com/Tutorial/Java/0240__Swing/ListeningforClicksonaColumnHeaderinaJTableComponent.htm
- */
 public class DictionaryLayeredPane extends JLayeredPane{
 
 	private static final long serialVersionUID = 7030870103355904749L;
@@ -55,8 +82,17 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
+	private static final String COLUMN_MIN_WIDTH = "column.minWidth";
+	private static final String COLUMN_MAX_WIDTH = "column.maxWidth";
+	private static final String COLUMN_WIDTH = "column.width";
+	private static final String SHOW_MORPHOLOGICAL_FIELDS_COLUMN = "morphologicalFieldsColumn";
+	private static final String SHOW_APPLIED_RULE_COLUMNS = "appliedRuleColumns";
+
 
 	private final Debouncer<DictionaryLayeredPane> debouncer = new Debouncer<>(this::calculateInflections, DEBOUNCER_INTERVAL);
+
+	private final Preferences preferences = Preferences.userNodeForPackage(getClass());
+
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -65,8 +101,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 
 	public DictionaryLayeredPane(final Packager packager, final ParserManager parserManager){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
@@ -89,13 +125,75 @@ final int iconSize = 17;
 			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
 			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
+
+			//reset columns visibility
+			preferences.putBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true);
+			preferences.putBoolean(SHOW_APPLIED_RULE_COLUMNS, true);
+			final JPopupMenu hideColumnsPopupMenu = new LabeledPopupMenu("Show/hide columns");
+			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Morphological fields",
+				true, hideColumnsPopupMenu,
+				this::hideMorphologicalFieldsColumn));
+			hideColumnsPopupMenu.add(GUIHelper.createCheckBoxMenu("Applied rules",
+				true, hideColumnsPopupMenu,
+				this::hideAppliedRulesColumns));
+			GUIHelper.addPopupMenu(hideColumnsPopupMenu, table.getTableHeader());
 		}
 		catch(final IOException ignored){}
 
-		EventBusService.subscribe(DictionaryLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+	private void hideMorphologicalFieldsColumn(final Component invoker){
+		final boolean showMorphologicalFieldsColumn = preferences.getBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, true);
+
+		final TableColumn column = table.getColumnModel().getColumn(1);
+		storeDefaultColumnsWidth(column);
+
+		if(showMorphologicalFieldsColumn)
+			hideColumn(column);
+		else
+			setDefaultColumnsWidth(column);
+
+		preferences.putBoolean(SHOW_MORPHOLOGICAL_FIELDS_COLUMN, !showMorphologicalFieldsColumn);
+	}
+
+	private void hideAppliedRulesColumns(final Component invoker){
+		final boolean showAppliedRuleColumns = preferences.getBoolean(SHOW_APPLIED_RULE_COLUMNS, true);
+
+		final TableColumnModel columnModel = table.getColumnModel();
+		storeDefaultColumnsWidth(columnModel.getColumn(1));
+
+		if(showAppliedRuleColumns)
+			for(int i = 2; i < 5; i ++)
+				hideColumn(columnModel.getColumn(i));
+		else
+			for(int i = 2; i < 5; i ++)
+				setDefaultColumnsWidth(columnModel.getColumn(i));
+
+		preferences.putBoolean(SHOW_APPLIED_RULE_COLUMNS, !showAppliedRuleColumns);
+	}
+
+	private void storeDefaultColumnsWidth(final TableColumn column){
+		if(preferences.getInt(COLUMN_MIN_WIDTH, -1) < 0){
+			preferences.putInt(COLUMN_MIN_WIDTH, column.getMinWidth());
+			preferences.putInt(COLUMN_MAX_WIDTH, column.getMaxWidth());
+			preferences.putInt(COLUMN_WIDTH, column.getWidth());
+		}
+	}
+
+	private void setDefaultColumnsWidth(final TableColumn column){
+		column.setMinWidth(preferences.getInt(COLUMN_MIN_WIDTH, 15));
+		column.setMaxWidth(preferences.getInt(COLUMN_MAX_WIDTH, 2147483647));
+		column.setWidth(preferences.getInt(COLUMN_WIDTH, 182));
+	}
+
+	private void hideColumn(final TableColumn column){
+		column.setMinWidth(0);
+		column.setMaxWidth(0);
+		column.setWidth(0);
+	}
+
+	// <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
       inputLabel = new javax.swing.JLabel();
@@ -156,7 +254,7 @@ final int iconSize = 17;
       GUIHelper.addScrollToLastRow(table);
 
       table.setRowSelectionAllowed(true);
-      final TableRenderer dicCellRenderer = new TableRenderer();
+      final TableCellRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)
       table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       scrollPane.setViewportView(table);
@@ -242,7 +340,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -284,7 +381,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_DICTIONARY)
 			return;
 
@@ -307,7 +403,6 @@ final int iconSize = 17;
 
 	@EventHandler
 	public void clearAid(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
@@ -349,6 +444,7 @@ final int iconSize = 17;
 				final DictionaryCorrectnessChecker checker = parserManager.getChecker();
 				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
+				final StringBuilder sb = new StringBuilder();
 				for(final Inflection inflection : inflections){
 					try{
 						checker.checkInflection(inflection, index);
@@ -356,12 +452,13 @@ final int iconSize = 17;
 					catch(final Exception e){
 						dicCellRenderer.setErrorOnRow(index);
 
-						final StringBuffer sb = new StringBuffer(e.getMessage());
+						sb.setLength(0);
+						sb.append(e.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
-						String errorMessage = ExceptionHelper.getMessage(e);
+						final String errorMessage = ExceptionHelper.getMessage(e);
 						LOGGER.trace("{}, line {}", errorMessage, index);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb.toString(), index);
+						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
 					}
 
 					index ++;

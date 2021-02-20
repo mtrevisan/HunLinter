@@ -1,18 +1,42 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.hyphenation;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import unit731.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunlinter.services.RegexHelper;
 
 
 class HyphenationParserTest{
@@ -565,7 +589,7 @@ class HyphenationParserTest{
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
-		addRule(hyphenations, "1" + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE + "1");
+		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK + "1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
@@ -578,7 +602,7 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
@@ -591,7 +615,7 @@ class HyphenationParserTest{
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
-		addRule(hyphenations, "1" + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE + "1");
+		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK + "1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
@@ -604,7 +628,7 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 

@@ -1,14 +1,29 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.dialogs;
 
-import java.awt.*;
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Objects;
-import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import unit731.hunlinter.MainFrame;
 import unit731.hunlinter.gui.FontHelper;
 import unit731.hunlinter.gui.models.SortableListModel;
@@ -17,6 +32,16 @@ import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.services.eventbus.EventBusService;
 import unit731.hunlinter.services.eventbus.EventHandler;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+import java.util.Objects;
 
 
 public class DictionarySortDialog extends JDialog{
@@ -36,7 +61,7 @@ public class DictionarySortDialog extends JDialog{
 		Objects.requireNonNull(parserManager);
 
 		this.parserManager = parserManager;
-		this.dicParser = parserManager.getDicParser();
+		dicParser = parserManager.getDicParser();
 
 		initComponents();
 
@@ -46,7 +71,7 @@ public class DictionarySortDialog extends JDialog{
 
 		lblMessage.setText("Select a section from the list:");
 
-		EventBusService.subscribe(DictionarySortDialog.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -123,7 +148,6 @@ public class DictionarySortDialog extends JDialog{
 
 	@EventHandler
 	public void reloadDictionaryParser(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY)
 			return;
 
@@ -139,9 +163,8 @@ public class DictionarySortDialog extends JDialog{
 		}
 	}
 
-	private void loadLines(final List<String> listData, final int firstVisibleItemIndex){
+	private void loadLines(final Collection<String> listData, final int firstVisibleItemIndex){
 		final SortableListModel model = (SortableListModel)entriesList.getModel();
-		model.ensureCapacity(listData.size());
 		model.replaceAll(listData, 0);
 
 		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);

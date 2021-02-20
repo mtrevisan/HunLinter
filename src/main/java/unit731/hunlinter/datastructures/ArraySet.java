@@ -1,25 +1,55 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Serializable;
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
-public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Serializable{
+public class ArraySet<E> extends AbstractSet<E> implements Cloneable, Serializable{
 
 	private static final long serialVersionUID = -5730118321825456724L;
 
 
-	private class ArrayIterator implements Iterator<E>{
+	public static class ArrayIterator<T> implements Iterator<T>{
+
+		private Object[] values;
 		//position of next item to return
-		int offset = 0;
+		int offset;
+
+		ArrayIterator(final Object[] values){
+			this.values = values;
+		}
 
 		@Override
 		public boolean hasNext(){
@@ -28,12 +58,11 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public E next(){
+		public T next(){
 			if(offset == values.length)
 				throw new NoSuchElementException();
 
-			//noinspection unchecked
-			return (E)values[offset ++];
+			return (T)values[offset ++];
 		}
 
 		@Override
@@ -49,8 +78,6 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 	private Object[] values = EMPTY_ARRAY;
 
 
-	public ArraySet(){}
-
 	@Override
 	public Object[] toArray(){
 		return values;
@@ -60,7 +87,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 	@SuppressWarnings("MethodDoesntCallSuperMethod")
 	public ArraySet<E> clone(){
 		final ArraySet<E> ret = new ArraySet<>();
-		ret.values = (values == EMPTY_ARRAY? EMPTY_ARRAY: values.clone());
+		ret.values = (Arrays.equals(values, EMPTY_ARRAY)? EMPTY_ARRAY: values.clone());
 		return ret;
 	}
 
@@ -76,7 +103,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 
 	@Override
 	public Iterator<E> iterator(){
-		return new ArrayIterator();
+		return new ArrayIterator<>(values);
 	}
 
 	@Override
@@ -86,7 +113,7 @@ public class ArraySet<E> extends AbstractSet<E> implements Set<E>, Cloneable, Se
 
 	@Override
 	public boolean add(final E value){
-		int n = values.length;
+		final int n = values.length;
 		for(final Object o : values)
 			if(o.equals(value))
 				return false;

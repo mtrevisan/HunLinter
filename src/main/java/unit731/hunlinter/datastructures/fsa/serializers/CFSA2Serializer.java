@@ -1,6 +1,31 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.datastructures.fsa.serializers;
 
 import com.carrotsearch.hppc.IntIntHashMap;
+import com.carrotsearch.hppc.IntIntMap;
 import com.carrotsearch.hppc.cursors.IntIntCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +177,6 @@ public class CFSA2Serializer implements FSASerializer{
 		invertedLabelsIndex = new int[256];
 		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); --i){
 			final IntIntHolder p = labelAndCount.pollFirst();
-			//noinspection ConstantConditions
 			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte)p.a;
 		}
@@ -209,7 +233,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-			final IntIntHashMap offsets) throws IOException{
+			final IntIntMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
@@ -242,7 +266,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Add a state to linearized list */
 	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
-			final BitSet visited, final int node){
+										 final BitSet visited, final int node){
 		linearized.add(node);
 		visited.set(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
@@ -254,7 +278,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length */
-	private int[] computeFirstStates(final IntIntHashMap inLinkCount, final int maxStates, final int minInLinkCount){
+	private int[] computeFirstStates(final Iterable<IntIntCursor> inLinkCount, final int maxStates, final int minInLinkCount){
 		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
 		for(final IntIntCursor c : inLinkCount)

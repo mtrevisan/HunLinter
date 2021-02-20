@@ -1,5 +1,57 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.JCopyableTable;
+import unit731.hunlinter.gui.dialogs.CorrectionDialog;
+import unit731.hunlinter.gui.models.AutoCorrectTableModel;
+import unit731.hunlinter.gui.renderers.TableRenderer;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.services.system.JavaHelper;
+
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -16,32 +68,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.dialogs.CorrectionDialog;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.models.AutoCorrectTableModel;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.JCopyableTable;
-import unit731.hunlinter.gui.renderers.TableRenderer;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.autocorrect.CorrectionEntry;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.thesaurus.DuplicationResult;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.services.system.JavaHelper;
 
 
 public class AutoCorrectLayeredPane extends JLayeredPane{
@@ -64,9 +90,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 
 	public AutoCorrectLayeredPane(final Packager packager, final ParserManager parserManager, final JFrame parentFrame){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(parentFrame);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
@@ -81,7 +107,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		GUIHelper.addUndoManager(incorrectTextField, correctTextField);
 
-		EventBusService.subscribe(AutoCorrectLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -184,7 +210,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          }
       });
 
-      final TableRenderer acoCellRenderer = new TableRenderer();
+      final TableCellRenderer acoCellRenderer = new TableRenderer();
       table.getColumnModel().getColumn(1).setCellRenderer(acoCellRenderer);
       scrollPane.setViewportView(table);
 
@@ -314,7 +340,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -332,8 +357,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
+	@SuppressWarnings("unchecked")
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -343,13 +368,12 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		correctLabel.setText(null);
 
 		openAcoButton.setEnabled(false);
-		//noinspection unchecked
-		((TableRowSorter<AutoCorrectTableModel>)table.getRowSorter()).setRowFilter(null);
+		((DefaultRowSorter<AutoCorrectTableModel, Integer>)table.getRowSorter()).setRowFilter(null);
 		final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
 		dm.setCorrections(null);
 	}
 
-	public void removeSelectedRowsFromAutoCorrect(){
+	private void removeSelectedRowsFromAutoCorrect(){
 		try{
 			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 			parserManager.getAcoParser().deleteCorrection(selectedRow);

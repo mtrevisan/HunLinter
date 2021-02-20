@@ -1,17 +1,40 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.languages.vec;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.RegexHelper;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-class GraphemeVEC{
+
+final class GraphemeVEC{
 
 	public static final String PHONEME_JJH = "ʝ";
-	public static final String PHONEME_FH = "\uA799";
+	public static final String PHONEME_FH = "ꞙ";
 	public static final String PHONEME_I_CIRCUMFLEX = "î";
 	private static final String PHONEME_U_CIRCUMFLEX = "û";
 
@@ -40,7 +63,7 @@ class GraphemeVEC{
 
 	private GraphemeVEC(){}
 
-	public static boolean isDiphtong(final String word){
+	public static boolean isDiphtong(final CharSequence word){
 		if(RegexHelper.find(word, DIPHTONG1))
 			return true;
 
@@ -48,11 +71,11 @@ class GraphemeVEC{
 		return (m.find() && m.start() != WordVEC.getIndexOfStress(word));
 	}
 
-	public static boolean isHyatus(final String word){
+	public static boolean isHyatus(final CharSequence word){
 		return RegexHelper.find(word, HYATUS);
 	}
 
-	public static boolean isEterophonicSequence(final String group){
+	public static boolean isEterophonicSequence(final CharSequence group){
 		return RegexHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
@@ -85,10 +108,12 @@ class GraphemeVEC{
 		return word;
 	}
 
-	private static String correctGrapheme(String word, final String grapheme, final List<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
-		if(word.contains(grapheme))
+	private static String correctGrapheme(String word, final CharSequence grapheme, final Iterable<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
+		if(word.contains(grapheme)){
+			final String newPhonemePattern = "$1" + newPhoneme + "$2";
 			for(final Pattern p : eterophonicSequenceFalsePositives)
-				word = RegexHelper.replaceAll(word, p, "$1" + newPhoneme + "$2");
+				word = RegexHelper.replaceAll(word, p, newPhonemePattern);
+		}
 		return word;
 	}
 

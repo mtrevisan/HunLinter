@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -21,7 +45,6 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -99,7 +122,7 @@ public class Packager{
 	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 	private static final String FOLDER_ORIGIN = "%origin%";
-	private static final String FOLDER_SPLITTER = "[/\\\\]";
+	private static final Pattern FOLDER_SPLITTER = RegexHelper.pattern("[/\\\\]");
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
@@ -173,7 +196,7 @@ public class Packager{
 				+ ", cannot load project");
 
 		forEach(extractFileEntries(mainManifestPath.toFile()),
-			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), configurationFile.split(FOLDER_SPLITTER)).toFile()));
+			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile()));
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
@@ -218,7 +241,7 @@ public class Packager{
 		}
 	}
 
-	private List<String> extractLanguages(final List<File> configurationFiles) throws IOException, SAXException{
+	private List<String> extractLanguages(final Iterable<File> configurationFiles) throws IOException, SAXException{
 		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final Node parentNode = pair.getRight();
 		final List<Node> children = extractChildren(parentNode);
@@ -236,7 +259,8 @@ public class Packager{
 		for(final Node child : children)
 			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
-				languageSets.addAll(Arrays.asList(locales));
+				for(final String locale : locales)
+					languageSets.add(locale);
 			}
 		final List<String> langs = new ArrayList<>(languageSets);
 		Collections.sort(langs);
@@ -295,7 +319,7 @@ public class Packager{
 		}
 	}
 
-	private Path packageAutoCorrectFiles(String language) throws IOException{
+	private Path packageAutoCorrectFiles(final String language) throws IOException{
 		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
 		if(autoCorrectFile == null)
 			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
@@ -318,7 +342,7 @@ public class Packager{
 		return outputPath;
 	}
 
-	private void packageExtension(Path projectPath, Path autoCorrectOutputPath, Path autoTextOutputPath) throws IOException{
+	private void packageExtension(final Path projectPath, final Path autoCorrectOutputPath, final Path autoTextOutputPath) throws IOException{
 		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
 			+ EXTENSION_ZIP)
 			.toFile();
@@ -343,7 +367,7 @@ public class Packager{
 		final File affFile = getAffixFile();
 		if(affFile != null){
 			try{
-				final String content = new String(Files.readAllBytes(affFile.toPath()));
+				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
 				final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 					.mapToObj(Character::toString)
@@ -438,7 +462,7 @@ public class Packager{
 		return configurationPaths;
 	}
 
-	private Pair<File, Node> findConfiguration(final String configurationName, final List<File> configurationFiles)
+	private Pair<File, Node> findConfiguration(final String configurationName, final Iterable<File> configurationFiles)
 			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
 			final Document doc = XMLManager.parseXMLDocument(configurationFile);
@@ -523,7 +547,7 @@ public class Packager{
 			folder = folder.substring(FOLDER_ORIGIN.length());
 			currentParentPath = originPath;
 		}
-		final Path truePath = Path.of(currentParentPath.toString(), folder.split(FOLDER_SPLITTER));
+		final Path truePath = Path.of(currentParentPath.toString(), RegexHelper.split(folder, FOLDER_SPLITTER));
 		return Path.of(truePath.toFile().getCanonicalPath())
 			.toFile();
 	}

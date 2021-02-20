@@ -1,11 +1,28 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.core;
-
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Function;
-import javax.swing.SwingWorker;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,6 +35,14 @@ import unit731.hunlinter.services.system.JavaHelper;
 import unit731.hunlinter.services.system.TimeWatch;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
+import javax.swing.*;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+
 
 public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<Void, Void>{
 
@@ -27,7 +52,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	protected final WD workerData;
 
 	private final AtomicBoolean paused = new AtomicBoolean(false);
-	private static final ReentrantLock PAUSE_LOCK = new ReentrantLock();
+	private static final Lock PAUSE_LOCK = new ReentrantLock();
 	private static final Condition UNPAUSE = PAUSE_LOCK.newCondition();
 
 	private final TimeWatch watch = TimeWatch.start();
@@ -36,13 +61,13 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 
 	WorkerAbstract(final WD workerData){
-		Objects.requireNonNull(workerData);
+		Objects.requireNonNull(workerData, "Worker data cannot be null");
 
 		this.workerData = workerData;
 	}
 
 	public final void setProcessor(final Function<?, ?> processor){
-		Objects.requireNonNull(processor);
+		Objects.requireNonNull(processor, "Processor cannot be null");
 
 		this.processor = processor;
 	}
@@ -86,7 +111,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		System.gc();
 
 		setProgress(100);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, message + " (in {})", watch.toStringMinuteSeconds());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
 	public void executeSynchronously(){
@@ -103,7 +128,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final int index = data.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "{}{}: {}", e.getMessage(), lineText, data.getData());
+			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), e.getMessage(),
+				lineText, data.getData());
 		}
 		else
 			e.printStackTrace();
@@ -112,7 +138,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	protected void setProgress(final long index, final long total){
 		final int progress = calculateProgress(index, total);
-		setProgress(progress);
+		setProgress(Math.min(progress, 100));
 	}
 
 	private int calculateProgress(final long index, final long total){
@@ -173,8 +199,14 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 */
 	protected void cancel(final Exception exception){
 		if(!JavaHelper.isInterruptedException(exception)){
-			if(exception != null)
-				LOGGER.error(ExceptionHelper.getMessage(exception), exception);
+			if(exception != null){
+				final String errorMessage = ExceptionHelper.getMessage(exception);
+				LOGGER.error(errorMessage, exception);
+
+				JOptionPane.showOptionDialog(null,
+					"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.ERROR_MESSAGE, null, null, null);
+			}
 			else
 				LOGGER.error("Generic error");
 

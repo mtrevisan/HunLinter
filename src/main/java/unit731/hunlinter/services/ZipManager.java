@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services;
 
 import org.apache.commons.io.IOUtils;
@@ -13,12 +37,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static unit731.hunlinter.services.system.LoopHelper.match;
 
 
 public class ZipManager{
@@ -32,7 +55,7 @@ public class ZipManager{
 		Files.deleteIfExists(zipFile.toPath());
 
 		final List<String> folders = extractFilesList(dir);
-		excludeFolderBut = ArrayUtils.removeAllOccurences(excludeFolderBut, null);
+		excludeFolderBut = ArrayUtils.removeAllOccurrences(excludeFolderBut, null);
 		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
 
 		//zip files one by one
@@ -67,7 +90,7 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	private List<String> filterFolders(final List<String> folders, final Path[] excludeFolderBut){
+	private List<String> filterFolders(final Collection<String> folders, final Path[] excludeFolderBut){
 		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
 		for(String folder : folders){
 			folder = StringUtils.replaceChars(Path.of(folder)
@@ -79,13 +102,23 @@ public class ZipManager{
 					.map(Path::getParent)
 					.map(Path::toString)
 					.toArray(String[]::new);
-				process = (match(includeFolders, folder::startsWith) == null);
+				process = (match(includeFolders, folder) == null);
 			}
 			if(process)
 				filteredFolders.add(folder);
 		}
 		filteredFolders.trimToSize();
 		return filteredFolders;
+	}
+
+	private static String match(final String[] array, final String folder){
+		final int size = (array != null? array.length: 0);
+		for(int i = 0; i < size; i ++){
+			final String elem = array[i];
+			if(folder.startsWith(elem))
+				return elem;
+		}
+		return null;
 	}
 
 	private static ZipOutputStream createZIPWriter(final File file, final int compressionLevel) throws IOException{

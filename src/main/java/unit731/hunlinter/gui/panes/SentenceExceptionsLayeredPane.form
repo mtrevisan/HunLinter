@@ -98,7 +98,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="unit731.hunlinter.gui.components.JTagPanel" name="tagPanel">
+        <Component class="unit731.hunlinter.gui.components.TagPanel" name="tagPanel">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTagPanel((changeType, tags) -&gt; {&#xd;&#xa;&#x9;final ExceptionsParser sexParser = parserManager.getSexParser();&#xd;&#xa;&#x9;sexParser.modify(changeType, tags);&#xd;&#xa;&#x9;try{&#xd;&#xa;&#x9;&#x9;sexParser.save(packager.getSentenceExceptionsFile());&#xd;&#xa;&#x9;}&#xd;&#xa;&#x9;catch(final TransformerException e){&#xd;&#xa;&#x9;&#x9;LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());&#xd;&#xa;&#x9;}&#xd;&#xa;})"/>
           </AuxValues>

@@ -1,5 +1,53 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.gui.panes;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.actions.OpenFileAction;
+import unit731.hunlinter.gui.FontHelper;
+import unit731.hunlinter.gui.GUIHelper;
+import unit731.hunlinter.gui.models.CompoundTableModel;
+import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.vos.AffixEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.eventbus.EventHandler;
+import unit731.hunlinter.services.system.Debouncer;
+import unit731.hunlinter.workers.WorkerManager;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -17,29 +65,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-import javax.swing.*;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.actions.OpenFileAction;
-import unit731.hunlinter.gui.FontHelper;
-import unit731.hunlinter.gui.models.CompoundTableModel;
-import unit731.hunlinter.gui.GUIHelper;
-import unit731.hunlinter.gui.models.HunLinterTableModelInterface;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.ParserManager;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.vos.AffixEntry;
-import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.eventbus.EventHandler;
-import unit731.hunlinter.services.system.Debouncer;
-import unit731.hunlinter.workers.WorkerManager;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -65,10 +90,10 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
@@ -84,7 +109,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		GUIHelper.addUndoManager(inputTextArea);
 
-		EventBusService.subscribe(CompoundsLayeredPane.this);
+		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -318,7 +343,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void initialize(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -359,7 +383,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clear(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
@@ -376,7 +399,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	public void clearAid(final Integer actionCommand){
-		//noinspection NumberEquality
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 

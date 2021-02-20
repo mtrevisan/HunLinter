@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.vos;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -25,8 +49,8 @@ public class RuleEntry{
 
 
 	public RuleEntry(final AffixType type, final String flag, final char combinable){
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(flag);
+		Objects.requireNonNull(type, "Type cannot be null");
+		Objects.requireNonNull(flag, "Flag cannot be null");
 
 		this.type = type;
 		this.flag = flag;
@@ -39,9 +63,9 @@ public class RuleEntry{
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
-//	Objects.requireNonNull(combinable);
-//	Objects.requireNonNull(prefixEntries);
-//	Objects.requireNonNull(suffixEntries);
+//	Objects.requireNonNull(combinable, "Combinable cannot be null");
+//	Objects.requireNonNull(prefixEntries, "Prefix entries cannot be null");
+//	Objects.requireNonNull(suffixEntries, "Suffix entries cannot be null");
 //
 //	this.isSuffix = isSuffix;
 //	this.combinable = (combinable == YES);
@@ -63,7 +87,7 @@ public class RuleEntry{
 	}
 
 	public char combinableChar(){
-		return (isCombinable()? COMBINABLE: NOT_COMBINABLE);
+		return (combinable? COMBINABLE: NOT_COMBINABLE);
 	}
 
 	public AffixEntry[] getEntries(){

@@ -1,16 +1,39 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services.text;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunlinter.services.RegexHelper;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -87,7 +110,7 @@ public class SmithWatermanAlignment{
 	private final double[][] scores;
 
 
-	public SmithWatermanAlignment(final String a, final String b){
+	public SmithWatermanAlignment(final CharSequence a, final CharSequence b){
 		x = RegexHelper.split(a, UNICODE_SPLITTER);
 		y = RegexHelper.split(b, UNICODE_SPLITTER);
 
@@ -107,15 +130,15 @@ public class SmithWatermanAlignment{
 		double maxScore = 0.;
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++){
-				double m1 = Math.max(0, matching(i, j));
-				double m2 = Math.max(insertion(i, j), deletion(i, j));
+				final double m1 = Math.max(0, matching(i, j));
+				final double m2 = Math.max(insertion(i, j), deletion(i, j));
 				scores[i][j] = Math.max(m1, m2);
 
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		Set<Trace> traces = new HashSet<>();
-		Stack<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Set<Trace> traces = new HashSet<>();
+		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
 		//extract edit operations
 		forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
 		return traces;
@@ -155,9 +178,9 @@ public class SmithWatermanAlignment{
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Stack<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
+	private Deque<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		Stack<Pair<Integer, Integer>> maxScores = new Stack<>();
+		final Deque<Pair<Integer, Integer>> maxScores = new ArrayDeque<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
@@ -166,14 +189,14 @@ public class SmithWatermanAlignment{
 	}
 
 	private Trace traceback(int lastIndexA, int lastIndexB){
-		Trace trace = new Trace();
+		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
 		trace.operations = new ArrayDeque<>();
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){
-			double tmp = scores[lastIndexA][lastIndexB];
+			final double tmp = scores[lastIndexA][lastIndexB];
 			if(tmp == 0.)
 				break;
 

@@ -1,8 +1,57 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.xml.sax.SAXException;
+import unit731.hunlinter.MainFrame;
+import unit731.hunlinter.gui.events.PreLoadProjectEvent;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.aid.AidParser;
+import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.parsers.hyphenation.Hyphenator;
+import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.services.Packager;
+import unit731.hunlinter.services.eventbus.EventBusService;
+import unit731.hunlinter.services.filelistener.FileChangeListener;
+import unit731.hunlinter.services.filelistener.FileListenerManager;
 
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,33 +62,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.gui.events.PreLoadProjectEvent;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.aid.AidParser;
-import unit731.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import unit731.hunlinter.parsers.dictionary.DictionaryParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.hyphenation.Hyphenator;
-import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
-import unit731.hunlinter.parsers.exceptions.ExceptionsParser;
-import unit731.hunlinter.services.Packager;
-import unit731.hunlinter.services.eventbus.EventBusService;
-import unit731.hunlinter.services.filelistener.FileChangeListener;
-import unit731.hunlinter.services.filelistener.FileListenerManager;
-
-import javax.xml.transform.TransformerException;
 
 
 public class ParserManager implements FileChangeListener{
@@ -152,7 +174,7 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = ArrayUtils.removeAllOccurences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
+		final File[] files = ArrayUtils.removeAllOccurrences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
 			null);
 		for(final File file : files)
 			flm.register(this, file.getAbsolutePath());
@@ -314,7 +336,7 @@ public class ParserManager implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(final Path path){
-		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName().toString());
+		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName());
 
 		//FIXME
 		final File file = path.toFile();
@@ -339,7 +361,7 @@ public class ParserManager implements FileChangeListener{
 		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 		else{
-			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName().toString());
+			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName());
 
 			EventBusService.publish(new PreLoadProjectEvent(packager.getProjectPath()));
 		}

@@ -1,0 +1,100 @@
+t0/l0/70: theme 2, 4, 5, 6, 7 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
+n0: theme 2, 4, 7, 11, 12 (-àr, -ér, '-er, -ír, -ír/is: northern variant)
+t1/l1/71/p1/n1: theme 1 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant/central variant/northern variant)
+p4/l4/74: theme 4 (base central variant/no vanishing el variant central variant/vanishing el variant central variant)
+t8/n8: theme 8 (base/northern variant)
+T8/N8: theme 8 for stressed word (base/northern variant)
+tA/lA/7A: theme 9, 10 (-àr: base/no vanishing el variant/vanishing el variant)
+tE/lE/7E: theme 9, 10 (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
+tB/lB/7B: theme 9, 10 for stressed words (-àr: base/no vanishing el variant/vanishing el variant)
+tC/lC/7C: theme 9, 10 for stressed words (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
+
+xA: irregular verb (re-?)andar
+xB/xC: irregular verb (re-?)av?er, (re-?)g(av)er, ‘(v)er
+xD : irregular verb (a(s)|apar|de|(in)kon|intra|man|(re)o|re|sos|tra)[ct][èé]ñer, (a(r)|ben|de(x)|(des|re)kon|in|inter|intr[ae]|kontra|mal|per|pre|(re)so|pro|rin|sko(n)|sora|x)v[èéí]ñer/‘ñer
+xE : irregular verb (des|re)(c|ti?)oler, (ben|mal|re)(vu?|‘)oler
+xF : irregular verb (dex)dar, ((dex)asue|des|kon(tra)|[lƚ]iku[ei]|putre|(ra)?re|sastu|sat[iu]s|sodis|sora|stra|stupe|tore|tume)far, (kon(tra)|mal|move|o|re|so(ra|to))star
+xG : irregular verb liku[ei]far senŧa èle vanesente
+xH : irregular verb ƚiku[ei]far ko èle vanesente
+xI : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|pre|re)díxer
+xJ : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|male|pre|re)díxer senŧa èle vanesente
+xK : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|maƚe|pre|re)díxer ko èle vanesente
+xL : irregular verb déver
+xM : irregular verb (r[eï])èser
+xN : irregular verb poder
+xO : irregular verb (pre|re|stra)sav?er
+xP : irregular verb (a|as|de|des|es|kon|pro|re|so)tràer
+xQ : irregular verb vardar
+
+P0/Pl/P7: pronomenal verbs, detached (-[gmnstv]e(ne) / -([gmstv]e)l[oaie] / -([gmstv]e)ƚ[oaie])
+Q0/Ql/Q7: pronomenal verbs, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
+R0/Rl/R7: pronomenal verbs for '-er, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
+S0/Sl/S7: pronomenal verbs for the imperative, detached (-[gmnstv]e(ne) / -([gmstv]e)l[oaie] / -([gmstv]e)ƚ[oaie])
+D0/Dl/D7: pronomenal verbs for the imperative, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
+FS: (public) sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>n|ñ[oei], ñ.>ñ|ñ[oei], b.>p|b[oei], p.>p|p[oei], ...)
+J1/I1: interrogatives for first singular, detached (-(m)i, -n(t)[ei], -[ei]) / attached ((m)i, n(t)[ei], [ei])
+J2/I2: interrogatives for first plural, detached (-i, -n(t)[ei], -[ei]) / attached (i, n(t)[ei], [ei])
+J3/I3: interrogatives for second singular, detached (-(s)tu, -to) / attached ((s)tu, to)
+J4/I4: interrogatives for second plural, detached (-[uo]) / attached ([uo])
+J5/j5: interrogatives for third, detached (-l[oaie] / -ƚ[oaie])
+I5/i5: interrogatives for third, attached (l[oaie] / ƚ[oaie])
+J6/I6: interrogatives for conditional present first singular, detached (-ïo) / attached (ïo)
+J7/j7: interrogatives for conditional present third, detached (-ave > -ise-l[oaie] / -ave > -ise-ƚ[oaie])
+I7/i7: interrogatives for conditional present third, attached (-ave > -ísel[oaie], -ave > -íseƚ[oaie])
+
+A1: (public) all declinations, adjectives of first class (a>[oaie]|[^oaie], o>i|[^ij]o, .o>i|[ij]o, o>[ae])
+A2: (public) adjectives of second class (a>[aie]|[^oaie], a>[ie])
+F0: (public) feminine plural substantives, adjectives of third class (a>[ei]|[^oaie], a>e, e>i)
+M0: (public) masculine plural substantives (a>[oi]|[^oaie], o>i|[^i]o, .o>i|io, [ae]>i)
+M1: (public) adding of -io/a to the words in -o/a ([lnr]>.io, [oe]>io, a>ia)
+
+B1: (public) suffix for feltrin-belumat transformation, plural with transformation '[aeou][ln] > 'Vi (.>i|[èò][ln], a.>ài|a[ln], e.>éi|e[ln], o.>ói|o[ln], u.>úi|u[ln])
+B2: (public) suffix for feltrin-belumat transformation, plural with transformation '[aeou][^-]+[aeou][ln] > 'V[^-]+Vi (l>i|[aeouàèéòóú]l, n>i|[aeouàèéòóú]n)
+V3/V7: (public) suffix for venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
+Vf: (public) suffix for venetian transformation for femenine words (l>ƚe)
+Vp: (public) prefix for venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
+Pd: (public) suffix for paduan transformation: metaphonesis (oxo>uxi)
+Vs: (public) prefix for vicentine transformation (re->ra-/ar-, se->sa-, per- > par-)
+Vr/VR: (public) suffix for veronexe transformation (-ente > -ènte/M0FS, -en[pstŧ]o > -èn[pstŧ]o/M0FSPd, -en[dstŧ]a > -èn[dstŧ]a/F0, -osto > -òsto/M0FS, -ongo > -òngo/M0FS)
+
+v0/v7: (public) plants and crafts ((i)èr>ar(o/a/i/e), dor>(t)or(a/i/e)|[aeiou]dor, ol>i[oò]l(o/a/i/e)|[rs]ol, ol>òl(o/a/i/e)|[rs]ol, ...)
+m0/m7: (public) deverbal nominals (-ment(o/i))
+z0/s0/s7: (public) deverbal nominals (r>ŧion, r>sion)
+d0/d7: (public) deverbal nominals ([ai]r>(d)ura, [ai]dur>ur, [ai]dur>ureto, [ai]dura>ura, [ai]dura>ureta)
+x0/x7: (public) deaverbial nominals (a>ixm[oi]|[nr], a>ixm[oi])
+r0: (public) denominal nominals (-[ae]ría)
+i0: (public) denominal nominals (a>ist[aei]|l, [ae]>ist[aei], o>ist[aei]|[^i]o, o>st[aei]|io)
+w0: (public) adverbs in -mente
+y0/y1: (public) collective substantives (duro>ur[oi], ada>à[ae], ida>í[ae], uda>ú[ae])
+Z0: (public) ignore upper/lower case
+
+aT: (public) altered substantives (-ato/a)
+aZ/aS: (public) altered substantives (-aŧo/a, -aso/a)
+eL/e7: (public) altered substantives (-èl/èla, -èƚo/a)
+eT/e8: (public) altered substantives (-eto/a)
+eZ/eS: (public) deajectival nominals (-eŧa/e, -esa/e)
+iN: (public) altered substantives (-in/-ina)
+iZ/iS: (public) deajectival nominals (-iŧia/e, -isia/e)
+o0/o7: (public) altered substantives (-on)
+o1: (public) altered substantives (-ona)
+o2/o3: (public) altered substantives (-one masc., -one fem.)
+o4: (public) altered substantives (-oni masc.)
+oT: (public) altered substantives (-òto/a)
+uZ/uS: (public) altered substantives (-uŧo/a)
+
+p2/p3: (public) prefix for bi-/tr[ie]-
+^0/^1/^2/^3/^4/^5/^6/^7/^8: (public) prefix for altered substantives (anti-/tra-/pre-/kapo-/kontra-/kontro-/stra-/mal-/ben-)
+-0/-1: (public) prefix for removal or lowering, and euphonic of de- (de-/de[sx]-)
++0: (public) prefix for deajectival verbs (i(n)-)
+*0: (public) prefix for contrary or privative-pejorative action, removal, exit, separation ([sx]-)
+.0: (public) prefix for repeated action (re-)
+@0: (public) prefix for direction, approach, addition, intensive value (a-)
+:0: (public) prefix for union, participation, connection (kon-)
+gv: (public) prefix for initial lenition gua>va
+%0: (public) numerals (collectives) (-exèna)
+%1: (public) altered numerals (collectives) (-ando)
+%a/%7: (public) altered numerals (collectives) (-èximo)
+%2/%3: (public) latin numerals (I, II, III, ...)
+$0/$1/$2/$3: (public) unit of measures (k/M/G/..., h/da, d/c/m/..., ki/Mi/Gi/...)
+'0: (public) truncated words at the begin (adds an apostrophe at the begin)
+'9: (public) truncated words at the end (adds an apostrophe at the end)

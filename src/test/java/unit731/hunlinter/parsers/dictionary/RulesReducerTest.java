@@ -1,4 +1,39 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import unit731.hunlinter.datastructures.SetHelper;
+import unit731.hunlinter.parsers.affix.AffixData;
+import unit731.hunlinter.parsers.affix.AffixParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
+import unit731.hunlinter.parsers.enums.AffixType;
+import unit731.hunlinter.services.system.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,32 +43,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import unit731.hunlinter.parsers.affix.AffixData;
-import unit731.hunlinter.parsers.affix.AffixParser;
-import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
-import unit731.hunlinter.parsers.enums.AffixType;
-import unit731.hunlinter.services.system.FileHelper;
-import unit731.hunlinter.datastructures.SetHelper;
 
 
 class RulesReducerTest{
 
 	/**
-	[rem= o,add=[ʼ],cond= o,from=[koarto, kuinto, kuarto, sèsto, tèrso, tuto, tèrŧo, so, sto]]	=> [s, t, ŧ]
-	[rem=do,add=[ʼ],cond=do,from=[nudo, komòdo, kuando]]														=> [d]
+	[rem= o,add=[‘],cond= o,from=[koarto, kuinto, kuarto, sèsto, tèrso, tuto, tèrŧo, so, sto]]	=> [s, t, ŧ]
+	[rem=do,add=[‘],cond=do,from=[nudo, komòdo, kuando]]														=> [d]
 
-	[rem=  e,add=[ ʼ],cond=  e,from=[de, ge]]				=> [d, g]
-	[rem= te,add=[ ʼ],cond= te,from=[frate]]				=> [t]
-	[rem= me,add=[ ʼ],cond= me,from=[kome]]				=> [m]
-	[rem=ove,add=[óʼ],cond=ove,from=[indove, adove]]	=> [v]
+	[rem=  e,add=[ ‘],cond=  e,from=[de, ge]]				=> [d, g]
+	[rem= te,add=[ ‘],cond= te,from=[frate]]				=> [t]
+	[rem= me,add=[ ‘],cond= me,from=[kome]]				=> [m]
+	[rem=ove,add=[ó‘],cond=ove,from=[indove, adove]]	=> [v]
 
-	[rem= a,add=[ʼ],cond= a,from=[senŧa, na, la, sensa]]	=> [s, ŧ, l, n]
-	[rem=ra,add=[ʼ],cond=ra,from=[sora]]						=> [r]
-	[rem=xa,add=[ʼ],cond=xa,from=[kaxa]]						=> [x]
+	[rem= a,add=[‘],cond= a,from=[senŧa, na, la, sensa]]	=> [s, ŧ, l, n]
+	[rem=ra,add=[‘],cond=ra,from=[sora]]						=> [r]
+	[rem=xa,add=[‘],cond=xa,from=[kaxa]]						=> [x]
 	*/
 	@Test
 	void caseSuffix1() throws IOException{
@@ -43,17 +68,17 @@ class RulesReducerTest{
 			"LANG " + language,
 			"FLAG long",
 			"SFX '0 Y 11",
-			"SFX '0 r ʼ r",
-			"SFX '0 u ʼ u",
-			"SFX '0 ra ʼ ra",
-			"SFX '0 xa ʼ xa",
-			"SFX '0 me ʼ me",
-			"SFX '0 te ʼ te",
-			"SFX '0 do ʼ do",
-			"SFX '0 a ʼ [^rx]a",
-			"SFX '0 e ʼ [dg]e",
-			"SFX '0 o ʼ [^d]o",
-			"SFX '0 ove óʼ ove"
+			"SFX '0 r ‘ r",
+			"SFX '0 u ‘ u",
+			"SFX '0 ra ‘ ra",
+			"SFX '0 xa ‘ xa",
+			"SFX '0 me ‘ me",
+			"SFX '0 te ‘ te",
+			"SFX '0 do ‘ do",
+			"SFX '0 a ‘ [^rx]a",
+			"SFX '0 e ‘ [dg]e",
+			"SFX '0 o ‘ [^d]o",
+			"SFX '0 ove ó‘ ove"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
@@ -72,34 +97,34 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("r", "ʼ", "r", "par"),
-			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
-			new LineEntry("ra", "ʼ", "ra", "sora"),
-			new LineEntry("xa", "ʼ", "xa", "kaxa"),
-			new LineEntry("me", "ʼ", "me", "kome"),
-			new LineEntry("te", "ʼ", "te", "frate"),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
-			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
-			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
-			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove"))
+			new LineEntry("r", "‘", "r", "par"),
+			new LineEntry("u", "‘", "u", Arrays.asList("nu", "vu")),
+			new LineEntry("ra", "‘", "ra", "sora"),
+			new LineEntry("xa", "‘", "xa", "kaxa"),
+			new LineEntry("me", "‘", "me", "kome"),
+			new LineEntry("te", "‘", "te", "frate"),
+			new LineEntry("do", "‘", "do", Arrays.asList("nudo", "komòdo", "kuando")),
+			new LineEntry("a", "‘", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
+			new LineEntry("e", "‘", "[^mtv]e", Arrays.asList("de", "ge")),
+			new LineEntry("o", "‘", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("ove", "ó‘", "ove", Arrays.asList("indove", "adove"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX '0 Y 11",
-			"SFX '0 r ʼ r",
-			"SFX '0 u ʼ u",
-			"SFX '0 ra ʼ ra",
-			"SFX '0 xa ʼ xa",
-			"SFX '0 me ʼ me",
-			"SFX '0 te ʼ te",
-			"SFX '0 do ʼ do",
-			"SFX '0 a ʼ [^rx]a",
-			"SFX '0 e ʼ [^mtv]e",
-			"SFX '0 o ʼ [^d]o",
-			"SFX '0 ove óʼ ove"
+			"SFX '0 r ‘ r",
+			"SFX '0 u ‘ u",
+			"SFX '0 ra ‘ ra",
+			"SFX '0 xa ‘ xa",
+			"SFX '0 me ‘ me",
+			"SFX '0 te ‘ te",
+			"SFX '0 do ‘ do",
+			"SFX '0 a ‘ [^rx]a",
+			"SFX '0 e ‘ [^mtv]e",
+			"SFX '0 o ‘ [^d]o",
+			"SFX '0 ove ó‘ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
@@ -1748,22 +1773,22 @@ class RulesReducerTest{
 			"LANG " + language,
 			"FLAG long",
 			"PFX '0 Y 9",
-			"PFX '0 a ʼ a",
-			"PFX '0 d ʼ d",
-			"PFX '0 ga ʼ ga",
-			"PFX '0 g ʼ go",
-			"PFX '0 i ʼ i",
-			"PFX '0 in ʼ int",
-			"PFX '0 kò ʼ kò",
-			"PFX '0 l ʼ l",
-			"PFX '0 v ʼ v"
+			"PFX '0 a ‘ a",
+			"PFX '0 d ‘ d",
+			"PFX '0 ga ‘ ga",
+			"PFX '0 g ‘ go",
+			"PFX '0 i ‘ i",
+			"PFX '0 in ‘ int",
+			"PFX '0 kò ‘ kò",
+			"PFX '0 l ‘ l",
+			"PFX '0 v ‘ v"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
 		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("gonfio", "gonfieŧa", "gonfiesa", "intanto", "inté", "intʼ", "làrexe", "gaveta", "ankora", "aƚora", "alora", "al", "an", "kòsa", "indrío", "inpresta", "volsuda", "vòtu", "vòlo", "vòlvo", "vúdoe", "vosudo", "vòƚega", "vóloe", "vui", "voxaŧa", "voƚentièra", "voƚèga", "vóxoe", "varo", "vokato", "volèga", "vara", "vòlega", "varar", "vòlva", "vosuda", "vutu", "vàroe", "voƚo", "volto", "vudo", "voƚintièra", "voltadina", "vudar", "voƚar", "vòlto", "voxo", "volo", "voltada", "voxon", "voxe", "vàrdoe", "voltar", "voƚer", "vardo", "vò-tu", "vóƚoe", "vídola", "voxar", "volentièra", "vardar", "vòƚo", "voƚàdego", "voxada", "volsudo", "voler", "vòlta", "volintièra", "volar", "vòltoe", "vu-tu", "volàdego", "vòstro", "dito");
+		List<String> words = Arrays.asList("gonfio", "gonfieŧa", "gonfiesa", "intanto", "inté", "int‘", "làrexe", "gaveta", "ankora", "aƚora", "alora", "al", "an", "kòsa", "indrío", "inpresta", "volsuda", "vòtu", "vòlo", "vòlvo", "vúdoe", "vosudo", "vòƚega", "vóloe", "vui", "voxaŧa", "voƚentièra", "voƚèga", "vóxoe", "varo", "vokato", "volèga", "vara", "vòlega", "varar", "vòlva", "vosuda", "vutu", "vàroe", "voƚo", "volto", "vudo", "voƚintièra", "voltadina", "vudar", "voƚar", "vòlto", "voxo", "volo", "voltada", "voxon", "voxe", "vàrdoe", "voltar", "voƚer", "vardo", "vò-tu", "vóƚoe", "vídola", "voxar", "volentièra", "vardar", "vòƚo", "voƚàdego", "voxada", "volsudo", "voler", "vòlta", "volintièra", "volar", "vòltoe", "vu-tu", "volàdego", "vòstro", "dito");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
@@ -1775,30 +1800,30 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("g", "ʼ", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
-			new LineEntry("ag", "ʼ", "ag", "atevag"),
-			new LineEntry("l", "ʼ", "l", "exeràl"),
-			new LineEntry("a", "ʼ", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
-			new LineEntry("i", "ʼ", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "ʼtni", "étni")),
-			new LineEntry("ni", "ʼ", "tni", Arrays.asList("otnatni", "ʼtni", "étni")),
-			new LineEntry("v", "ʼ", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
-			new LineEntry("d", "ʼ", "d", "otid"),
-			new LineEntry("òk", "ʼ", "òk", "asòk")
+			new LineEntry("g", "‘", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
+			new LineEntry("ag", "‘", "ag", "atevag"),
+			new LineEntry("l", "‘", "l", "exeràl"),
+			new LineEntry("a", "‘", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
+			new LineEntry("i", "‘", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "‘tni", "étni")),
+			new LineEntry("ni", "‘", "tni", Arrays.asList("otnatni", "‘tni", "étni")),
+			new LineEntry("v", "‘", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
+			new LineEntry("d", "‘", "d", "otid"),
+			new LineEntry("òk", "‘", "òk", "asòk")
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"PFX '0 Y 9",
-			"PFX '0 a ʼ a",
-			"PFX '0 d ʼ d",
-			"PFX '0 i ʼ i",
-			"PFX '0 l ʼ l",
-			"PFX '0 v ʼ v",
-			"PFX '0 ga ʼ ga",
-			"PFX '0 kò ʼ kò",
-			"PFX '0 g ʼ g[^a]",
-			"PFX '0 in ʼ int"
+			"PFX '0 a ‘ a",
+			"PFX '0 d ‘ d",
+			"PFX '0 i ‘ i",
+			"PFX '0 l ‘ l",
+			"PFX '0 v ‘ v",
+			"PFX '0 ga ‘ ga",
+			"PFX '0 kò ‘ kò",
+			"PFX '0 g ‘ g[^a]",
+			"PFX '0 in ‘ int"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 

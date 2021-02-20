@@ -1,22 +1,44 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services.text;
+
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
+import unit731.hunlinter.services.RegexHelper;
 
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.services.RegexHelper;
 
-
-public class StringHelper{
+public final class StringHelper{
 
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
@@ -36,7 +58,7 @@ public class StringHelper{
 
 	private StringHelper(){}
 
-	public static boolean isWord(final String text){
+	public static boolean isWord(final CharSequence text){
 		for(int i = 0; i < text.length(); i ++){
 			final char chr = text.charAt(i);
 			if(Character.isLetter(chr) || Character.isDigit(chr))
@@ -45,14 +67,14 @@ public class StringHelper{
 		return false;
 	}
 
-	public static long countUppercases(final String text){
+	public static long countUppercases(final CharSequence text){
 		return text.chars()
 			.filter(Character::isUpperCase)
 			.count();
 	}
 
 	//Classify the casing of a given string (ignoring characters for which no upper-/lowercase distinction exists)
-	public static Casing classifyCasing(final String text){
+	public static Casing classifyCasing(final CharSequence text){
 		if(StringUtils.isBlank(text))
 			return Casing.LOWER_CASE;
 
@@ -69,7 +91,7 @@ public class StringHelper{
 		final long lower = text.chars()
 			//Unicode modifier letter apostrophe is considered as an uppercase letter, but should be regarded as caseless,
 			//so it has to be excluded
-			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE
+			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK
 				&& Character.isLowerCase(chr))
 			.count();
 		if(lower == 0l)
@@ -78,22 +100,21 @@ public class StringHelper{
 		return (startsWithUppercase? Casing.PASCAL_CASE: Casing.CAMEL_CASE);
 	}
 
-	public static String longestCommonPrefix(final Collection<String> texts){
-		return longestCommonAffix(texts, StringHelper::commonPrefix);
+	public static String longestCommonPrefix(final String... texts){
+		return longestCommonAffix(StringHelper::commonPrefix, texts);
 	}
 
-	public static String longestCommonSuffix(final Collection<String> texts){
-		return longestCommonAffix(texts, StringHelper::commonSuffix);
+	public static String longestCommonSuffix(final String... texts){
+		return longestCommonAffix(StringHelper::commonSuffix, texts);
 	}
 
-	private static String longestCommonAffix(final Collection<String> texts,
-			final BiFunction<String, String, String> commonAffix){
+	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String... texts){
 		String lcs = null;
-		if(!texts.isEmpty()){
-			final Iterator<String> itr = texts.iterator();
-			lcs = itr.next();
-			while(!lcs.isEmpty() && itr.hasNext())
-				lcs = commonAffix.apply(lcs, itr.next());
+		if(texts.length > 0){
+			int offset = 0;
+			lcs = texts[offset ++];
+			while(!lcs.isEmpty() && offset < texts.length)
+				lcs = commonAffix.apply(lcs, texts[offset ++]);
 		}
 		return lcs;
 	}
@@ -103,7 +124,7 @@ public class StringHelper{
 	 * b.endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common suffix, returns the empty string.
 	 */
-	private static String commonSuffix(final String a, final String b){
+	private static String commonSuffix(final CharSequence a, final CharSequence b){
 		int s = 0;
 		final int aLength = a.length();
 		final int bLength = b.length();
@@ -120,7 +141,7 @@ public class StringHelper{
 	 * b.toString().startsWith(prefix)}, taking care not to split surrogate pairs. If {@code a} and
 	 * {@code b} have no common prefix, returns the empty string.
 	 */
-	private static String commonPrefix(final String a, final String b){
+	private static String commonPrefix(final CharSequence a, final CharSequence b){
 		int p = 0;
 		final int maxPrefixLength = Math.min(a.length(), b.length());
 		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
@@ -140,7 +161,7 @@ public class StringHelper{
 			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
-	public static int getLastCommonLetterIndex(final String word1, final String word2){
+	public static int getLastCommonLetterIndex(final CharSequence word1, final CharSequence word2){
 		int lastCommonLetter;
 		final int minWordLength = Math.min(word1.length(), word2.length());
 		for(lastCommonLetter = 0; lastCommonLetter < minWordLength; lastCommonLetter ++)
@@ -149,12 +170,12 @@ public class StringHelper{
 		return lastCommonLetter;
 	}
 
-	public static String removeCombiningDiacriticalMarks(final String word){
+	public static String removeCombiningDiacriticalMarks(final CharSequence word){
 		return RegexHelper.replaceAll(Normalizer.normalize(word, Normalizer.Form.NFKD), PATTERN_COMBINING_DIACRITICAL_MARKS,
 			StringUtils.EMPTY);
 	}
 
-	public static Collector<String, List<String>, String> limitingJoin(final String delimiter, final int limit,
+	public static Collector<String, List<String>, String> limitingJoin(final CharSequence delimiter, final int limit,
 			final String ellipsis){
 		return Collector.of(ArrayList::new,
 			(l, e) -> {
@@ -203,7 +224,7 @@ public class StringHelper{
 	 * @return	The hexadecimal characters
 	 */
 	public static String byteArrayToHexString(final byte[] byteArray){
-		final StringBuffer sb = new StringBuffer(byteArray.length << 1);
+		final StringBuilder sb = new StringBuilder(byteArray.length << 1);
 		for(final byte b : byteArray){
 			sb.append(Character.forDigit((b >> 4) & 0x0F, 16));
 			sb.append(Character.forDigit((b & 0x0F), 16));
@@ -224,7 +245,7 @@ public class StringHelper{
 	}
 
 	//Find the maximum consecutive repeating character in given string
-	public static int maxRepeating(final String text, final char chr){
+	public static int maxRepeating(final CharSequence text, final char chr){
 		final int n = text.length();
 		int count = 0;
 		int currentCount = 1;
@@ -245,7 +266,7 @@ public class StringHelper{
 
 	public static String removeAll(final String text, final char charToRemove){
 		final String strToRemove = Character.toString(charToRemove);
-		final StringBuffer sb = new StringBuffer(text);
+		final StringBuilder sb = new StringBuilder(text);
 		int index = 0;
 		while((index = sb.indexOf(strToRemove, index)) >= 0)
 			sb.deleteCharAt(index --);

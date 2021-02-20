@@ -1,4 +1,37 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.dictionary;
+
+import org.apache.commons.text.similarity.LevenshteinDistance;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.languages.BaseBuilder;
+import unit731.hunlinter.languages.Orthography;
+import unit731.hunlinter.parsers.hyphenation.Hyphenation;
+import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 
 import java.io.Closeable;
 import java.nio.charset.Charset;
@@ -7,14 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunlinter.languages.Orthography;
-import unit731.hunlinter.languages.BaseBuilder;
-import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
-import unit731.hunlinter.parsers.hyphenation.Hyphenation;
 
 
 /**
@@ -109,7 +134,7 @@ public class DictionaryStatistics implements Closeable{
 			if(stressIndex >= 0)
 				stressFromLastFrequencies.addValue(stressIndex);
 			syllabeLengthsFrequencies.addValue(syllabes.length);
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			for(final String syllabe : syllabes){
 				sb.append(syllabe);
 				if(orthography.countGraphemes(syllabe) == syllabe.length())

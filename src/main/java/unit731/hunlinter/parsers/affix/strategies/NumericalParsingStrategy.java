@@ -1,11 +1,36 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.parsers.affix.strategies;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunlinter.services.RegexHelper;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunlinter.workers.exceptions.LinterException;
-import unit731.hunlinter.services.RegexHelper;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
@@ -14,14 +39,14 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded in its numerical form. In the case
  * of multiple flags, each number is separated by a comma.
  */
-class NumericalParsingStrategy extends FlagParsingStrategy{
+final class NumericalParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was ''{1}''");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was ''{0}''");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was ''{0}''");
+	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was `{1}`");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was `{0}`");
+	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was `{0}`");
 
 
-	private static final int MAX_NUMERICAL_FLAG = 65_000;
+	private static final int MAX_NUMERICAL_FLAG = 65_535;
 
 	private static final String COMMA = ",";
 

@@ -1,3 +1,27 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.services;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +39,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -32,7 +58,7 @@ import java.util.function.Predicate;
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 
-public class XMLManager{
+public final class XMLManager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLManager.class);
 
@@ -50,7 +76,7 @@ public class XMLManager{
 			DOCUMENT_BUILDER = factory.newDocumentBuilder();
 			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
 		}
-		catch(ParserConfigurationException e){
+		catch(final ParserConfigurationException e){
 			LOGGER.error("Bad error while creating the XML parser", e);
 		}
 	}
@@ -78,8 +104,8 @@ public class XMLManager{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
 		forEach(properties, property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
-		final DOMSource domSource = new DOMSource(doc);
-		final StreamResult streamResult = new StreamResult(xmlFile);
+		final Source domSource = new DOMSource(doc);
+		final Result streamResult = new StreamResult(xmlFile);
 		transformer.transform(domSource, streamResult);
 	}
 

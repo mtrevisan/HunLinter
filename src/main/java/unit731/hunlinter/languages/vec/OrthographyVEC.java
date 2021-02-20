@@ -1,29 +1,54 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.languages.vec;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.hyphenation.HyphenationParser;
 import unit731.hunlinter.services.RegexHelper;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
-public class OrthographyVEC extends Orthography{
 
-	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
-	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
+public final class OrthographyVEC extends Orthography{
 
-	private static final String[] EXTENDED_CHARS = new String[]{"dh", "jh", "lh", "nh", "th"};
-	private static final String[] TRUE_CHARS = new String[]{"đ", "ɉ", "ƚ", "ñ", "ŧ"};
+	private static final String[] STRESS_CODES = {"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
+	private static final String[] TRUE_STRESS = {"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
 
-	private static final String[] MB_MP = new String[]{"mb", "mp"};
-	private static final String[] NB_NP = new String[]{"nb", "np"};
+	private static final String[] EXTENDED_CHARS = {"dh", "jh", "lh", "nh", "th"};
+	private static final String[] TRUE_CHARS = {"đ", "ɉ", "ƚ", "ñ", "ŧ"};
 
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàéèíóòú])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàéèíóòú])");
+	private static final String[] MB_MP = {"mb", "mp"};
+	private static final String[] NB_NP = {"nb", "np"};
+
+	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüïo` to be valid
+	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiïouàéèíóòúü])");
+	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiïouàéèíóòúü])");
 
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
 
@@ -32,15 +57,17 @@ public class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = RegexHelper.pattern("([aeiouàèéíïòóúü])i(?=[aeiouàèéíïòóúü])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
-		RegexHelper.pattern("b[ae]roi[aeèi]r"),
-		RegexHelper.pattern("re[sŧ]ei[ou]r[aeio]?")
+		RegexHelper.pattern("[nv][ou]ialtri"),
+		RegexHelper.pattern("b[ae]ro[iï][aeèi]r"),
+		RegexHelper.pattern("re[sŧ]e[iï][ouü]r[aeio]?")
 	);
 	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = RegexHelper.pattern("[aeiouàèéíïòóúü]i(?:o|(?:[oó]n|on-)(?:[gmnstv].{1,3}|[ei])?(?:[lƚ][oiae])?|é(?:-?[ou])?|e[dg]e(?:-[ou])?|omi|ent[eoi]?-?(?:[gmnstv].{1,3})?(?:[lƚ][oiae])?|inti)$");
-	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^ʼ'aeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^‘'aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^‘'aeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
 		+ "ɉsvrlŧ]))");
+	private static final String FALSE_S_INTO_X = "èsre";
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = RegexHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
@@ -87,7 +114,8 @@ public class OrthographyVEC extends Orthography{
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
+		if(!correctedWord.endsWith(FALSE_S_INTO_X))
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//correct morphological errors
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");
@@ -122,7 +150,7 @@ public class OrthographyVEC extends Orthography{
 		for(int i = 0; i < syllabes.length; i ++){
 			final String syllabe = syllabes[i];
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
-				&& !StringUtils.contains(syllabe, HyphenationParser.RIGHT_MODIFIER_LETTER_APOSTROPHE)
+				&& !StringUtils.contains(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK)
 				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
 		return errors;

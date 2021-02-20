@@ -1,8 +1,40 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 package unit731.hunlinter.workers.dictionary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.datastructures.fsa.FSA;
+import unit731.hunlinter.datastructures.fsa.builders.FSABuilder;
+import unit731.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
+import unit731.hunlinter.datastructures.fsa.builders.MetadataBuilder;
 import unit731.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import unit731.hunlinter.datastructures.fsa.lookup.WordData;
+import unit731.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
+import unit731.hunlinter.datastructures.fsa.serializers.FSASerializer;
 import unit731.hunlinter.datastructures.fsa.stemming.Dictionary;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.affix.AffixData;
@@ -10,12 +42,6 @@ import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
 import unit731.hunlinter.parsers.vos.Inflection;
-import unit731.hunlinter.datastructures.SimpleDynamicArray;
-import unit731.hunlinter.datastructures.fsa.FSA;
-import unit731.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
-import unit731.hunlinter.datastructures.fsa.builders.MetadataBuilder;
-import unit731.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
-import unit731.hunlinter.datastructures.fsa.builders.FSABuilder;
 import unit731.hunlinter.services.sorters.SmoothSort;
 import unit731.hunlinter.services.text.StringHelper;
 import unit731.hunlinter.workers.WorkerManager;
@@ -54,10 +80,10 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		final Charset charset = dicParser.getCharset();
@@ -139,7 +165,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Function<FSA, File> step4 = fsa -> {
 			resetProcessing("Compress FSA (step 4/5)");
 
-			final CFSA2Serializer serializer = new CFSA2Serializer();
+			final FSASerializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
 					setProgress(percent, 100);
@@ -160,8 +186,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			try{
 				//verify by reading
-				final DictionaryLookup s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
-				//noinspection StatementWithEmptyBody
+				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
 				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());

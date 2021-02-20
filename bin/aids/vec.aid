@@ -76,5 +76,5 @@ gv: (public) prefix for initial lenition gua>va
 %a/%ⱥ: (public) altered numerals (collectives) (-èximo)
 %2/%3: (public) latin numerals (I, II, III, …)
 $0/$1/$2/$3: (public) unit of measures (k/M/G/…, h/da, d/c/m/…, ki/Mi/Gi/…)
-‘0: (public) truncated words at the begin (adds a ʼ at the begin)
-’0: (public) truncated words at the end (adds a ʼ at the end)
+‘0: (public) truncated words at the begin (adds a ‘ at the begin)
+’0: (public) truncated words at the end (adds a ‘ at the end)
