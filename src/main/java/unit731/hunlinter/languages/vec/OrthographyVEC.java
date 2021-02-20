@@ -67,6 +67,7 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
 		+ "ɉsvrlŧ]))");
+	private static final String FALSE_S_INTO_X = "èsre";
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = RegexHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
@@ -113,7 +114,8 @@ public final class OrthographyVEC extends Orthography{
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
+		if(!correctedWord.endsWith(FALSE_S_INTO_X))
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//correct morphological errors
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");

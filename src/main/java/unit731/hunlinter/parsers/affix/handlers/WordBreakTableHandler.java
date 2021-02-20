@@ -90,7 +90,7 @@ public class WordBreakTableHandler implements Handler{
 				throw new LinterException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
 
 			final boolean inserted = wordBreakCharacters.add(breakCharacter);
-			if(!inserted)
+			if(!inserted && !HyphenationParser.EN_DASH.equals(breakCharacter))
 				throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
 		}
 		return wordBreakCharacters;
