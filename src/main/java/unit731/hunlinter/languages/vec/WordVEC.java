@@ -65,7 +65,7 @@ public final class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
-	private static final String COLLATOR_RULE = ", ' ' < ‘=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < ï,Ï < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < ü,Ü < v,V < x,X";
+	private static final String COLLATOR_RULE = ", ' ' < ‘=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	private static Collator COLLATOR;
 	static{
 		try{
