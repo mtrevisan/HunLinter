@@ -108,8 +108,9 @@ public class RulesReducer{
 
 
 	public List<LineEntry> collectInflectionsByFlag(Inflection[] inflections, final String flag, final AffixType type){
-		//remove base inflection
-		inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+		if(inflections.length > 0)
+			//remove base inflection
+			inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
 		//collect all inflections that generates from the given flag
 		final List<LineEntry> filteredRules = new ArrayList<>(inflections.length);
 		for(final Inflection inflection : inflections){
