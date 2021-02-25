@@ -62,8 +62,8 @@ public final class OrthographyVEC extends Orthography{
 		RegexHelper.pattern("re[sŧ]e[iï][ouü]r[aeio]?")
 	);
 	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = RegexHelper.pattern("[aeiouàèéíïòóúü]i(?:o|(?:[oó]n|on-)(?:[gmnstv].{1,3}|[ei])?(?:[lƚ][oiae])?|é(?:-?[ou])?|e[dg]e(?:-[ou])?|omi|ent[eoi]?-?(?:[gmnstv].{1,3})?(?:[lƚ][oiae])?|inti)$");
-	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^‘’'aeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^‘’'aeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
 		+ "ɉsvrlŧ]))");
