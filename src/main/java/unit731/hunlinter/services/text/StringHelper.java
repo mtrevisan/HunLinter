@@ -91,7 +91,7 @@ public final class StringHelper{
 		final long lower = text.chars()
 			//Unicode modifier letter apostrophe is considered as an uppercase letter, but should be regarded as caseless,
 			//so it has to be excluded
-			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK
+			.filter(chr -> Character.isLetter(chr) && chr != HyphenationParser.MODIFIER_LETTER_APOSTROPHE
 				&& Character.isLowerCase(chr))
 			.count();
 		if(lower == 0l)

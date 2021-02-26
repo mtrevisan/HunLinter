@@ -261,7 +261,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //				entry.match(inflection);
 //	}
 //
-//	//(^[‘']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
+//	//(^[‘’']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
 //	private static boolean canContainVanishingEl(final String word){
 //		boolean result = false;
 //		final int size = word.length();

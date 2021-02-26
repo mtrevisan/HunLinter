@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 public class WordTokenizerVEC extends WordTokenizer{
 
-	private static final String APOSTROPHES = HyphenationParser.APOSTROPHE + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK;
+	private static final String APOSTROPHES = HyphenationParser.APOSTROPHE + HyphenationParser.MODIFIER_LETTER_APOSTROPHE;
 
 	private static final Pattern TOKENIZING_CHARACTERS;
 	static{
@@ -49,7 +49,7 @@ public class WordTokenizerVEC extends WordTokenizer{
 
 	@Override
 	public List<String> tokenize(String text){
-		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MASK + "$2");
+		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");
 		return super.tokenize(text);
 	}
 
