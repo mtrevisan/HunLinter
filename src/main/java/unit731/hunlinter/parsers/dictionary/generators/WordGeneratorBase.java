@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.enums.AffixType;
 import unit731.hunlinter.parsers.vos.AffixEntry;
@@ -40,6 +41,7 @@ import unit731.hunlinter.parsers.vos.RuleEntry;
 import unit731.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 
 import static unit731.hunlinter.services.system.LoopHelper.forEach;
 import static unit731.hunlinter.services.system.LoopHelper.removeIf;
@@ -54,10 +56,14 @@ class WordGeneratorBase{
 
 
 	protected final AffixData affixData;
+	private final DictionaryCorrectnessChecker checker;
 
 
-	protected WordGeneratorBase(final AffixData affixData){
+	protected WordGeneratorBase(final AffixData affixData, final DictionaryCorrectnessChecker checker){
+		Objects.requireNonNull(affixData);
+
 		this.affixData = affixData;
+		this.checker = checker;
 	}
 
 	/**
@@ -299,7 +305,7 @@ class WordGeneratorBase{
 
 		final String word = dicEntry.getWord();
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
-		if(applicableAffixes.length == 0)
+		if(applicableAffixes.length == 0 && (checker == null || !checker.shouldNotCheckProductiveness(affix)))
 			throw new NoApplicableRuleException("No applicable rules found for flag `" + affix + "` via `"
 				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
 

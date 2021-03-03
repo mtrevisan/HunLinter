@@ -45,7 +45,7 @@ class TestBase{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
 		affixData = affParser.getAffixData();
-		wordGenerator = new WordGenerator(affixData, null);
+		wordGenerator = new WordGenerator(affixData, null, null);
 	}
 
 	protected void loadData(File affFile, File dicFile, String language) throws IOException{
@@ -54,7 +54,7 @@ class TestBase{
 		affixData = affParser.getAffixData();
 		Charset charset = affixData.getCharset();
 		DictionaryParser dicParser = new DictionaryParser(dicFile, language, charset);
-		wordGenerator = new WordGenerator(affixData, dicParser);
+		wordGenerator = new WordGenerator(affixData, dicParser, null);
 	}
 
 	protected Inflection createInflection(String word, String continuationFlags, String morphologicalFields){

@@ -25,6 +25,7 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -47,8 +48,9 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	private static final MessageFormat NON_POSITIVE_MAX_COMPOUNDS = new MessageFormat("Max compounds cannot be non-positive: was {0}");
 
 
-	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(affixData, dicParser, wordGenerator);
+	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, wordGenerator, checker);
 	}
 
 	/**

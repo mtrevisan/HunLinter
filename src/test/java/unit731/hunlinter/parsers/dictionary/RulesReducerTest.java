@@ -2149,7 +2149,7 @@ class RulesReducerTest{
 		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);
+		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser, null);
 		RulesReducer reducer = new RulesReducer(affixData, wordGenerator);
 		return Pair.of(reducer, wordGenerator);
 	}

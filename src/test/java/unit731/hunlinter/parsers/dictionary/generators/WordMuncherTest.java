@@ -161,7 +161,7 @@ class WordMuncherTest{
 		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);
+		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser, null);
 		WordMuncher muncher = new WordMuncher(affixData, dicParser, wordGenerator);
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
 		return Pair.of(muncher, dicEntry);

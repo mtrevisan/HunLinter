@@ -24,6 +24,7 @@
  */
 package unit731.hunlinter.parsers.dictionary.generators;
 
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -41,11 +42,11 @@ public class WordGenerator{
 	private final WordGeneratorCompoundBeginMiddleEnd wordGeneratorCompoundBeginMiddleEnd;
 
 
-	public WordGenerator(final AffixData affixData, final DictionaryParser dicParser){
-		wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData);
-		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, this);
-		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, this);
-		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, this);
+	public WordGenerator(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData, checker);
+		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, this, checker);
+		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, this, checker);
+		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, this, checker);
 	}
 
 	public DictionaryEntry createFromDictionaryLine(final String line){

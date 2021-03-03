@@ -26,6 +26,7 @@ package unit731.hunlinter.parsers.dictionary.generators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -42,8 +43,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	WordGeneratorAffixRules(final AffixData affixData){
-		super(affixData);
+	WordGeneratorAffixRules(final AffixData affixData, final DictionaryCorrectnessChecker checker){
+		super(affixData, checker);
 	}
 
 	Inflection[] applyAffixRules(final DictionaryEntry dicEntry){

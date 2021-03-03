@@ -235,7 +235,7 @@ public class ParserManager implements FileChangeListener{
 		else if(dicParser != null)
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_DICTIONARY);
 
-		wordGenerator = new WordGenerator(affixData, dicParser);
+		wordGenerator = new WordGenerator(affixData, dicParser, checker);
 	}
 
 	public void openAidFile(final File aidFile) throws IOException{

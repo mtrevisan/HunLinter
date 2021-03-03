@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -81,6 +82,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = RegexHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü]", Pattern.CASE_INSENSITIVE);
 	private static String NORTHERN_PLURAL_RULE;
 	private static String NORTHERN_PLURAL_STRESSED_RULE;
+	private static Set<String> DONT_CHECK_PRODUCTIVENESS_RULES;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("Word {0} have unnecessary stress");
@@ -123,6 +125,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		NORTHERN_PLURAL_RULE = rulesLoader.readProperty("northernPlural");
 		NORTHERN_PLURAL_STRESSED_RULE = rulesLoader.readProperty("northernPluralStressed");
+
+		DONT_CHECK_PRODUCTIVENESS_RULES = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
 	}
 
 	@Override
@@ -285,6 +289,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //		return result;
 //	}
 
+
+	@Override
+	public boolean shouldNotCheckProductiveness(final String flag){
+		return DONT_CHECK_PRODUCTIVENESS_RULES.contains(flag);
+	}
 
 	@Override
 	public boolean isConsonant(final char chr){

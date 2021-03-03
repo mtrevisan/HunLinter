@@ -25,6 +25,7 @@
 package unit731.hunlinter.parsers.dictionary.generators;
 
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
@@ -46,8 +47,9 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule {0} in compound rule {1}");
 
 
-	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(affixData, dicParser, wordGenerator);
+	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, wordGenerator, checker);
 	}
 
 	/**

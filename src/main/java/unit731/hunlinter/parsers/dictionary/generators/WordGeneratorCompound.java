@@ -32,6 +32,7 @@ import unit731.hunlinter.datastructures.ArraySet;
 import unit731.hunlinter.datastructures.FixedArray;
 import unit731.hunlinter.datastructures.SetHelper;
 import unit731.hunlinter.datastructures.SimpleDynamicArray;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.dictionary.DictionaryParser;
 import unit731.hunlinter.parsers.vos.Affixes;
@@ -80,8 +81,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private final Collection<String> compoundAsReplacement = new HashSet<>();
 
 
-	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
-		super(affixData);
+	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final DictionaryCorrectnessChecker checker){
+		super(affixData, checker);
 
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;

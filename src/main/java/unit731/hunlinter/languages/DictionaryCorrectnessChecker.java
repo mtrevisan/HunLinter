@@ -115,6 +115,10 @@ public class DictionaryCorrectnessChecker{
 	//used by the correctness worker:
 	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
+	public boolean shouldNotCheckProductiveness(final String flag){
+		return false;
+	}
+
 	//used by the minimal pairs worker:
 	public boolean isConsonant(final char chr){
 		return true;
