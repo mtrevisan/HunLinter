@@ -420,9 +420,10 @@ public class RulesReducer{
 				}
 			}
 
-			if(!notPresentConditions.isEmpty()){
+			final Set<Character> characters = overallLastGroups.get(parent.condition.length());
+			if(!notPresentConditions.isEmpty() && characters != null){
 				final String notCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
-				final Set<Character> overallLastGroup = new HashSet<>(overallLastGroups.get(parent.condition.length()));
+				final Set<Character> overallLastGroup = new HashSet<>(characters);
 				overallLastGroup.removeAll(notPresentConditions);
 				final String yesCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 				final LineEntry notRule = match(finalRules,
