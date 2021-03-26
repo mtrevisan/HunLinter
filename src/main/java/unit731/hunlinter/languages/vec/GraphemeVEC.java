@@ -35,8 +35,6 @@ final class GraphemeVEC{
 
 	public static final String PHONEME_JJH = "ʝ";
 	public static final String PHONEME_FH = "ꞙ";
-	public static final String PHONEME_I_CIRCUMFLEX = "î";
-	private static final String PHONEME_U_CIRCUMFLEX = "û";
 
 	public static final String GRAPHEME_D_STROKE = "đ";
 	private static final String GRAPHEME_F = "f";
@@ -59,6 +57,11 @@ final class GraphemeVEC{
 	private static final Pattern ETEROPHONIC_SEQUENCE = RegexHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = RegexHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Pattern ETEROPHONIC_SEQUENCE_J = RegexHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
+
+	private static final Pattern SINGLE_SYLLABE_I = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+i[aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_U = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+u[aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_I_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+ï[aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_U_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+ü[aeiou]$");
 
 
 	private GraphemeVEC(){}
@@ -101,6 +104,12 @@ final class GraphemeVEC{
 	}
 
 	private static String correctUIJGraphemes(String word){
+		final int stressIndex = WordVEC.getIndexOfStress(word);
+		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_I))
+			word = WordVEC.replaceCharAt(word, word.length() - 2, 'ï');
+		else if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_U))
+			word = WordVEC.replaceCharAt(word, word.length() - 2, 'ü');
+
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
@@ -127,10 +136,15 @@ final class GraphemeVEC{
 		word = StringUtils.replace(word, PHONEME_FH, GRAPHEME_FH);
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, GRAPHEME_J, GRAPHEME_I);
-		word = StringUtils.replace(word, PHONEME_I_CIRCUMFLEX, GRAPHEME_I);
 		word = StringUtils.replace(word, GRAPHEME_W, GRAPHEME_U);
-		word = StringUtils.replace(word, PHONEME_U_CIRCUMFLEX, GRAPHEME_U);
 		word = StringUtils.replace(word, PHONEME_JJH, GRAPHEME_J);
+
+		final int stressIndex = WordVEC.getIndexOfStress(word);
+		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_I_UMLAUT))
+			word = WordVEC.replaceCharAt(word, word.length() - 2, 'i');
+		else if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_U_UMLAUT))
+			word = WordVEC.replaceCharAt(word, word.length() - 2, 'u');
+
 		return word;
 	}
 

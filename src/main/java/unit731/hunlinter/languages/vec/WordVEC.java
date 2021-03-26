@@ -48,7 +48,7 @@ public final class WordVEC{
 	private static final String TAB = "\t";
 	private static final String UNDERSCORE = "_";
 
-	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ" + GraphemeVEC.PHONEME_I_CIRCUMFLEX;
+	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ";
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
@@ -178,12 +178,12 @@ public final class WordVEC{
 //	private static String setAcuteStressAtIndex(final String word, final int idx){
 //		return replaceCharAt(word, idx, addStressAcute(word.charAt(idx)));
 //	}
-//
-//	private static String replaceCharAt(final String text, final int idx, final char chr){
-//		final StringBuffer sb = new StringBuffer(text);
-//		sb.setCharAt(idx, chr);
-//		return sb.toString();
-//	}
+
+	static String replaceCharAt(final String text, final int idx, final char chr){
+		final StringBuffer sb = new StringBuffer(text);
+		sb.setCharAt(idx, chr);
+		return sb.toString();
+	}
 
 	private static char addStressAcute(final char chr){
 		final int stressedIndex = Arrays.binarySearch(SIMPLE_VOWELS_ARRAY, chr);

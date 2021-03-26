@@ -38,6 +38,7 @@ import unit731.hunlinter.gui.models.InflectionTableModel;
 import unit731.hunlinter.gui.renderers.TableRenderer;
 import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.languages.Orthography;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.vos.AffixEntry;
 import unit731.hunlinter.parsers.vos.DictionaryEntry;
@@ -416,17 +417,19 @@ final int iconSize = 17;
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 
 	private void calculateInflections(){
-		final String inputText = inputTextField.getText().trim();
+		final String language = parserManager.getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
+		final String text = orthography.correctOrthography(inputTextField.getText().trim());
 
-		if(formerInputText != null && formerInputText.equals(inputText))
+		if(formerInputText != null && formerInputText.equals(text))
 			return;
-		formerInputText = inputText;
+		formerInputText = text;
 
 		clearOutputTable(table);
 
-		if(StringUtils.isNotBlank(inputText)){
+		if(StringUtils.isNotBlank(text)){
 			try{
-				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputText,
+				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(text,
 					parserManager.getAffixData());
 				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
@@ -465,7 +468,7 @@ final int iconSize = 17;
 				}
 			}
 			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), text);
 			}
 		}
 		else

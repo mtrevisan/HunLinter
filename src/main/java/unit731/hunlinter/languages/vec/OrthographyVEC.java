@@ -52,8 +52,7 @@ public final class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
 
-	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéíï"
-		+ GraphemeVEC.PHONEME_I_CIRCUMFLEX + "òóúüh])");
+	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéíïòóúüh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = RegexHelper.pattern("([aeiouàèéíïòóúü])i(?=[aeiouàèéíïòóúü])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
@@ -86,7 +85,9 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public String correctOrthography(final String word){
+	public String correctOrthography(String word){
+		word = WordVEC.unmarkDefaultStress(word);
+
 		//correct stress
 		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
 

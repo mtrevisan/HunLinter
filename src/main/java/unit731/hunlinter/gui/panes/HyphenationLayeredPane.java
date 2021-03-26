@@ -408,7 +408,7 @@ final int iconSize = 17;
 	private void hyphenate(){
 		final String language = parserManager.getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
-		String text = orthography.correctOrthography(wordTextField.getText());
+		String text = orthography.correctOrthography(wordTextField.getText().trim());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
