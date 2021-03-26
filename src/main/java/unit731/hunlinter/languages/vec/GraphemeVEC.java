@@ -27,6 +27,8 @@ package unit731.hunlinter.languages.vec;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunlinter.services.RegexHelper;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,10 +60,15 @@ final class GraphemeVEC{
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = RegexHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Pattern ETEROPHONIC_SEQUENCE_J = RegexHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 
-	private static final Pattern SINGLE_SYLLABE_I = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+i[aeiou]$");
-	private static final Pattern SINGLE_SYLLABE_U = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+u[aeiou]$");
-	private static final Pattern SINGLE_SYLLABE_I_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+ï[aeiou]$");
-	private static final Pattern SINGLE_SYLLABE_U_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+ü[aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_IU = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+[iu][aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_IU_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+[ïü][aeiou]$");
+	private static final Map<Character, Character> IU_UMLAUT = new HashMap<>();
+	static{
+		IU_UMLAUT.put('i', 'ï');
+		IU_UMLAUT.put('u', 'ü');
+		IU_UMLAUT.put('ï', 'i');
+		IU_UMLAUT.put('ü', 'u');
+	}
 
 
 	private GraphemeVEC(){}
@@ -105,10 +112,10 @@ final class GraphemeVEC{
 
 	private static String correctUIJGraphemes(String word){
 		final int stressIndex = WordVEC.getIndexOfStress(word);
-		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_I))
-			word = WordVEC.replaceCharAt(word, word.length() - 2, 'ï');
-		else if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_U))
-			word = WordVEC.replaceCharAt(word, word.length() - 2, 'ü');
+		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_IU)){
+			final int index = word.length() - 2;
+			word = WordVEC.replaceCharAt(word, index, IU_UMLAUT.get(word.charAt(index)));
+		}
 
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
@@ -140,10 +147,10 @@ final class GraphemeVEC{
 		word = StringUtils.replace(word, PHONEME_JJH, GRAPHEME_J);
 
 		final int stressIndex = WordVEC.getIndexOfStress(word);
-		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_I_UMLAUT))
-			word = WordVEC.replaceCharAt(word, word.length() - 2, 'i');
-		else if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_U_UMLAUT))
-			word = WordVEC.replaceCharAt(word, word.length() - 2, 'u');
+		if(stressIndex < 0 && RegexHelper.find(word, SINGLE_SYLLABE_IU_UMLAUT)){
+			final int index = word.length() - 2;
+			word = WordVEC.replaceCharAt(word, index, IU_UMLAUT.get(word.charAt(index)));
+		}
 
 		return word;
 	}
