@@ -60,7 +60,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			.withCancelOnException();
 
 		//TODO orthography check (DictionaryCorrectnessChecker.checkInflection)
-//		final DictionaryCorrectnessChecker checker = parserManager.getChecker();
+//		final ParserManager parserManager = workerData.getParserManager();
+//		final DictionaryCorrectnessChecker correctnessChecker = parserManager.getCorrectnessChecker();
 //		checker.checkInflection(inflection, index);
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
