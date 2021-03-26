@@ -26,6 +26,7 @@ package unit731.hunlinter.workers.thesaurus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
 import unit731.hunlinter.parsers.ParserManager;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
@@ -57,6 +58,10 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		getWorkerData()
 			.withParallelProcessing()
 			.withCancelOnException();
+
+		//TODO orthography check (DictionaryCorrectnessChecker.checkInflection)
+//		final DictionaryCorrectnessChecker checker = parserManager.getChecker();
+//		checker.checkInflection(inflection, index);
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
