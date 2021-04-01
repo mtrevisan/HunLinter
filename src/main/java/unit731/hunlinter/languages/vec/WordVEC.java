@@ -81,7 +81,7 @@ public final class WordVEC{
 
 	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:[‘’g]émo|éb(?:e|ia)|g?(?:[àé](?:[pb]i[ae]?|[bd]e)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
 	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:[sx][éí]|só([jɉ]o|n[ie])|sén[ie]|si?ón(m?i|[jɉ]o|nt?[ei]|t[ei]|e)|stà|ér[aei]|(?:s[ae]r)?[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|d[oiae])?|erísi[ou]$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]))|(d|f|st)àg$";
+	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|sodis|sosti|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:àg?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]))|(d|f|st)àg$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(?:re)?v[àé][–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(?:|as?|des?|es|kon|pro|re|so|sub?)?tr[àé][–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
