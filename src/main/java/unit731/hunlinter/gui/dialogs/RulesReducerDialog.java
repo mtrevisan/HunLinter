@@ -347,11 +347,13 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 
 	@SuppressWarnings("unused")
+	@Serial
 	private void writeObject(final ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
+	@Serial
 	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
