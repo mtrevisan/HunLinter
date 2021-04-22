@@ -60,10 +60,10 @@ public final class HammingDistance{
 	 * distance.apply("karolin", "kerstin"  = 3
 	 * </pre>
 	 *
-	 * @param left	the first CharSequence, must not be <code>null</code>
-	 * @param right	the second CharSequence, must not be <code>null</code>
+	 * @param left	the first CharSequence, must not be {@code null}
+	 * @param right	the second CharSequence, must not be {@code null}
 	 * @return	the hamming distance between the given strings
-	 * @throws IllegalArgumentException	if either input is <code>null</code> or if they do not have the same length
+	 * @throws IllegalArgumentException	if either input is {@code null} or if they do not have the same length
 	 */
 	public static int getDistance(final CharSequence left, final CharSequence right){
 		Objects.requireNonNull(left);

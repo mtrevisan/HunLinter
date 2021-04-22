@@ -194,11 +194,7 @@ public class ExternalSorter{
 
 		OutputStream out = new FileOutputStream(outputFile);
 		if(options.isWriteOutputAsZip())
-			out = new GZIPOutputStream(out, options.getZipBufferSize()){
-				{
-					def.setLevel(Deflater.BEST_SPEED);
-				}
-			};
+			out = new MyGZIPOutputStream(out, options);
 		mergeSortedFiles(out, options, queue);
 		forEach(files, File::delete);
 	}
@@ -244,4 +240,10 @@ public class ExternalSorter{
 		}
 	}
 
+	private static class MyGZIPOutputStream extends GZIPOutputStream{
+		public MyGZIPOutputStream(OutputStream out, ExternalSorterOptions options) throws IOException{
+			super(out, options.getZipBufferSize());
+			def.setLevel(Deflater.BEST_SPEED);
+		}
+	}
 }

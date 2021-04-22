@@ -79,7 +79,7 @@ public final class Digraph<T>{
 	}
 
 	/**
-	 * Adds the directed edge <code>v→w</code> upon ε-transition to this digraph.
+	 * Adds the directed edge {@code v→w} upon ε-transition to this digraph.
 	 *
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
@@ -89,7 +89,7 @@ public final class Digraph<T>{
 	}
 
 	/**
-	 * Adds the directed edge <code>v→w</code> upon input <code>value</code> to this digraph.
+	 * Adds the directed edge {@code v→w} upon input <code>value</code> to this digraph.
 	 *
 	 * @param v	The tail vertex
 	 * @param w	The head vertex

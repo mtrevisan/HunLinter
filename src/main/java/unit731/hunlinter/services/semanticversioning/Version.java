@@ -152,7 +152,7 @@ public class Version implements Comparable<Version>{
 		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 
-	private static boolean startsWithNumber(final String str){
+	private static boolean startsWithNumber(final CharSequence str){
 		return (!str.isEmpty() && Character.isDigit(str.charAt(0)));
 	}
 
@@ -295,7 +295,7 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public String toString(){
-		final StringBuffer sb = (new StringBuffer())
+		final StringBuilder sb = (new StringBuilder())
 			.append(major).append(DOT).append(minor).append(DOT).append(patch);
 		if(preRelease.length > 0)
 			sb.append(PRE_RELEASE_PREFIX).append(String.join(DOT, preRelease));

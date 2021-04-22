@@ -280,6 +280,70 @@ public class BasicEventBus implements EventBusInterface{
 			if(!vetoCalled)
 				dispatchToRegularHandlers(regularHandlers);
 		}
+
+		private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
+												 final Collection<HandlerInfoCallable> regularHandlers){
+			for(final HandlerInfo info : handlers){
+				if(!info.matchesEvent(evt))
+					continue;
+
+				final HandlerInfoCallable hc = new HandlerInfoCallable(info, evt);
+				if(info.isVetoHandler())
+					vetoHandlers.add(hc);
+				else
+					regularHandlers.add(hc);
+			}
+		}
+
+		private boolean dispatchToVetoableHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers){
+			//used to keep track if a veto was called (if so, the regular list won't be processed)
+			boolean vetoCalled = false;
+
+			//submit the veto calls to the executor service
+			try{
+				for(final Future<Boolean> f : executorService.invokeAll(vetoHandlers))
+					if(f.get())
+						vetoCalled = true;
+			}
+			catch(final Exception e){
+				//this only happens if the executorService is interrupted, and by default, that shouldn't
+				//really ever happen; or, if the callable sneaks out an exception, which again shouldn't happen
+				vetoCalled = true;
+
+				e.printStackTrace();
+			}
+
+			//VetoEvents cannot be vetoed
+			if(vetoCalled && evt instanceof VetoEvent)
+				vetoCalled = false;
+
+			//simply return if a veto has occurred
+			return vetoCalled;
+		}
+
+		private void dispatchToRegularHandlers(final Collection<HandlerInfoCallable> regularHandlers){
+			//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
+			//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
+			//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
+			//are accounted for here and exceptions really shouldn't be thrown.
+			if(waitForHandlers){
+				try{
+					executorService.invokeAll(regularHandlers);
+				}
+				catch(final Exception e){
+					e.printStackTrace();
+				}
+			}
+			else
+				executorService.submit(() -> {
+					try{
+						executorService.invokeAll(regularHandlers);
+					}
+					catch(final Exception e){
+						e.printStackTrace();
+					}
+				});
+		}
 	}
 
 	//consumer runnable to remove handler infos from the subscription list if they are null (this is
@@ -301,71 +365,6 @@ public class BasicEventBus implements EventBusInterface{
 				throw new RuntimeException(e);
 			}
 		}
-	}
-
-
-	private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
-		final Collection<HandlerInfoCallable> regularHandlers){
-		for(final HandlerInfo info : handlers){
-			if(!info.matchesEvent(evt))
-				continue;
-
-			final HandlerInfoCallable hc = new HandlerInfoCallable(info, evt);
-			if(info.isVetoHandler())
-				vetoHandlers.add(hc);
-			else
-				regularHandlers.add(hc);
-		}
-	}
-
-	private boolean dispatchToVetoableHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers){
-		//used to keep track if a veto was called (if so, the regular list won't be processed)
-		boolean vetoCalled = false;
-
-		//submit the veto calls to the executor service
-		try{
-			for(final Future<Boolean> f : executorService.invokeAll(vetoHandlers))
-				if(f.get())
-					vetoCalled = true;
-		}
-		catch(final Exception e){
-			//this only happens if the executorService is interrupted, and by default, that shouldn't
-			//really ever happen; or, if the callable sneaks out an exception, which again shouldn't happen
-			vetoCalled = true;
-
-			e.printStackTrace();
-		}
-
-		//VetoEvents cannot be vetoed
-		if(vetoCalled && evt instanceof VetoEvent)
-			vetoCalled = false;
-
-		//simply return if a veto has occurred
-		return vetoCalled;
-	}
-
-	private void dispatchToRegularHandlers(final Collection<HandlerInfoCallable> regularHandlers){
-		//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
-		//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
-		//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
-		//are accounted for here and exceptions really shouldn't be thrown.
-		if(waitForHandlers){
-			try{
-				executorService.invokeAll(regularHandlers);
-			}
-			catch(final Exception e){
-				e.printStackTrace();
-			}
-		}
-		else
-			executorService.submit(() -> {
-				try{
-					executorService.invokeAll(regularHandlers);
-				}
-				catch(final Exception e){
-					e.printStackTrace();
-				}
-			});
 	}
 
 

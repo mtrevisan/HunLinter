@@ -90,7 +90,7 @@ public class HunSpellRegexWordGenerator{
 	/**
 	 * Initializes the NFA from the specified regular expression.
 	 * <p>
-	 * NOTE: each element should be enclosed in parentheses (eg. <code>(as)(ert)?(b)*</code>), the managed operations are <code>*</code> and <code>?</code>
+	 * NOTE: each element should be enclosed in parentheses (eg. {@code (as)(ert)?(b)*}), the managed operations are <code>*</code> and <code>?</code>
 	 *
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
 	 */
@@ -125,7 +125,7 @@ public class HunSpellRegexWordGenerator{
 	}
 
 	/**
-	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
+	 * Generate a subList with a maximum size of {@code limit} of words that matches the given regex.
 	 * <p>
 	 * The Strings are ordered in lexicographical order.
 	 *

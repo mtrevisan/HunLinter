@@ -72,7 +72,6 @@ public class PropertiesUTF8 extends Properties{
 	 * @param inStream	The input stream.
 	 * @throws IOException	If an error occurred when reading from the input stream.
 	 * @throws IllegalArgumentException	If the input stream contains a malformed Unicode escape sequence.
-	 * @see Properties#load(InputStream)
 	 */
 	@Override
 	public synchronized void load(final InputStream inStream) throws IOException{
@@ -93,19 +92,15 @@ public class PropertiesUTF8 extends Properties{
 					if(!property.isEmpty()){
 						int endOfKey = 0;
 						//calculates the ending index of the key
-						int l = property.length();
+						final int l = property.length();
 						while(endOfKey < l && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
 							endOfKey ++;
 						String key = property.substring(0, endOfKey);
 						String value = property.substring(endOfKey + 1);
-						if(value.startsWith("Selhání"))
-							System.out.println();
 
 						key = loadConversion(key);
 						value = loadConversion(removeWhiteSpaces(value));
 
-						if(value.startsWith("Selhání"))
-							System.out.println();
 						put(key, value);
 					}
 				}
@@ -132,7 +127,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The beginning of the property that might be continued on the next line.
 	 * @return	Whether the property continues on the following line.
 	 */
-	private boolean continueLine(final String line){
+	private boolean continueLine(final CharSequence line){
 		return (line != null && !line.isEmpty() && line.charAt(line.length() - 1) == '\\');
 	}
 
@@ -191,11 +186,6 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 
-	/**
-	 * @param out	An output stream.
-	 * @param header	A description of the property list.
-	 * @see Properties#store(OutputStream, String)
-	 */
 	@Override
 	public void store(final OutputStream out, final String header) throws IOException{
 		try(final BufferedWriter output = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8))){
@@ -256,6 +246,11 @@ public class PropertiesUTF8 extends Properties{
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public PropertiesUTF8 clone(){
+		return (PropertiesUTF8)super.clone();
 	}
 
 }

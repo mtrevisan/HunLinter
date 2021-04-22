@@ -29,7 +29,6 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import org.slf4j.Marker;
 import unit731.hunlinter.MainFrame;
-import unit731.hunlinter.actions.CheckUpdateOnStartupAction;
 import unit731.hunlinter.actions.ReportWarningsAction;
 import unit731.hunlinter.services.system.JavaHelper;
 

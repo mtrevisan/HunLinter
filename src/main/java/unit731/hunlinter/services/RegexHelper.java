@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,12 +135,12 @@ public final class RegexHelper{
 		return replaceAll(text, pattern, StringUtils.EMPTY);
 	}
 
-	public static String makeGroup(final Set<Character> group, final Comparator<String> comparator){
+	public static String makeGroup(final Collection<Character> group, final Comparator<String> comparator){
 		final String merge = mergeSet(group, comparator);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
 	}
 
-	public static String makeNotGroup(final Set<Character> group, final Comparator<String> comparator){
+	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
 		final String merge = mergeSet(group, comparator);
 		return NOT_GROUP_START + merge + GROUP_END;
 	}

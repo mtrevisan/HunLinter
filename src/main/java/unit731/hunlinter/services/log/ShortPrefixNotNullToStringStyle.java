@@ -51,6 +51,7 @@ public final class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 	}
 
 	@SuppressWarnings({"unused", "SameReturnValue"})
+	@Serial
 	private Object readResolve(){
 		return SHORT_PREFIX_NOT_NULL_STYLE;
 	}
