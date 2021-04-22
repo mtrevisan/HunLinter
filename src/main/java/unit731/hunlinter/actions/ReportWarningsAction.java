@@ -26,12 +26,14 @@ package unit731.hunlinter.actions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
 
 public class ReportWarningsAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -3894315443438154651L;
 
 	public static final String REPORT_WARNINGS = "report.warnings";

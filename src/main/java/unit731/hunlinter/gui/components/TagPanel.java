@@ -33,6 +33,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +45,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class TagPanel extends JPanel{
 
+	@Serial
 	private static final long serialVersionUID = 665517573169978352L;
 
 
@@ -161,6 +163,7 @@ public class TagPanel extends JPanel{
 
 	private static class JTagComponent extends JComponent{
 
+		@Serial
 		private static final long serialVersionUID = -7410352884175789897L;
 
 

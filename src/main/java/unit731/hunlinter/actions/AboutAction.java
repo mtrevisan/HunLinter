@@ -30,10 +30,12 @@ import unit731.hunlinter.gui.dialogs.HelpDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 
 public class AboutAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 4363575204925273954L;
 
 

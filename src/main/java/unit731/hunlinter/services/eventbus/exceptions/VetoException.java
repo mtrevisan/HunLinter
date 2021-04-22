@@ -26,6 +26,8 @@ package unit731.hunlinter.services.eventbus.exceptions;
 
 import unit731.hunlinter.services.eventbus.EventHandler;
 
+import java.io.Serial;
+
 
 /**
  * Thrown by subscribers in their {@link EventHandler} annotated methods to indicate that a "veto" of the event has occurred.
@@ -38,6 +40,7 @@ import unit731.hunlinter.services.eventbus.EventHandler;
  */
 public class VetoException extends RuntimeException{
 
+	@Serial
 	private static final long serialVersionUID = -9216228586704212839L;
 
 }

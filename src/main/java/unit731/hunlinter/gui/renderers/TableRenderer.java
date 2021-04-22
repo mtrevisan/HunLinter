@@ -28,12 +28,14 @@ import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.HashSet;
 
 
 public class TableRenderer extends DefaultTableCellRenderer{
 
+	@Serial
 	private static final long serialVersionUID = -7581282504915833642L;
 
 	private static final MatteBorder BORDER_ERROR = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED);

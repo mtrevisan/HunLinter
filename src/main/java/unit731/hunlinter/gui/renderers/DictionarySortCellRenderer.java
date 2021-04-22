@@ -35,12 +35,14 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Function;
 
 
 public class DictionarySortCellRenderer extends JLabel implements ListCellRenderer<String>{
 
+	@Serial
 	private static final long serialVersionUID = -6904206237491328151L;
 
 	private static final Watercolors[] COLORS = Watercolors.values();

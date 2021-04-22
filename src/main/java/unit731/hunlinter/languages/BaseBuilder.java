@@ -32,6 +32,7 @@ import unit731.hunlinter.languages.vec.WordTokenizerVEC;
 import unit731.hunlinter.languages.vec.WordVEC;
 import unit731.hunlinter.parsers.affix.AffixData;
 import unit731.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunlinter.services.system.PropertiesUTF8;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,8 +111,8 @@ public final class BaseBuilder{
 			.wordTokenizer;
 	}
 
-	public static Properties getRulesProperties(final String language){
-		final Properties rulesProperties = new Properties();
+	public static PropertiesUTF8 getRulesProperties(final String language){
+		final PropertiesUTF8 rulesProperties = new PropertiesUTF8();
 		final Class<? extends DictionaryCorrectnessChecker> cl = DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
 		final InputStream is = cl.getResourceAsStream("rules.properties");

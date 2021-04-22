@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -71,6 +72,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
 
+	@Serial
 	private static final long serialVersionUID = 4289096513559178063L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompoundsLayeredPane.class);

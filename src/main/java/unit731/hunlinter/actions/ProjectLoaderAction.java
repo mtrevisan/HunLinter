@@ -39,6 +39,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +49,7 @@ import java.util.function.Consumer;
 
 public class ProjectLoaderAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 2457698626251961045L;
 
 

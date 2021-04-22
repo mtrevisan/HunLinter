@@ -28,11 +28,13 @@ import unit731.hunlinter.parsers.ParserManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.Objects;
 
 
 public class CreatePackageAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 543011360433022458L;
 
 

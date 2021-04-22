@@ -26,9 +26,12 @@ package unit731.hunlinter.services.log;
 
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.io.Serial;
+
 
 public final class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 
+	@Serial
 	private static final long serialVersionUID = 603695866745355049L;
 
 	public static final ToStringStyle SHORT_PREFIX_NOT_NULL_STYLE = new ShortPrefixNotNullToStringStyle();

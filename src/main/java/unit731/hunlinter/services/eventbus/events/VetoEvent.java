@@ -27,6 +27,7 @@ package unit731.hunlinter.services.eventbus.events;
 import unit731.hunlinter.services.eventbus.EventHandler;
 import unit731.hunlinter.services.eventbus.exceptions.VetoException;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 
@@ -38,6 +39,7 @@ import java.util.EventObject;
  */
 public class VetoEvent extends EventObject{
 
+	@Serial
 	private static final long serialVersionUID = -6990813610487588182L;
 
 

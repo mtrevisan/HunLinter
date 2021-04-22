@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ import java.util.StringJoiner;
 
 public class PoSFSALayeredPane extends JLayeredPane{
 
+	@Serial
 	private static final long serialVersionUID = 1011325870107687156L;
 
 	private static final String LEMMA_START = "/[";

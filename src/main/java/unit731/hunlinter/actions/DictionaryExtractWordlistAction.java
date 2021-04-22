@@ -33,11 +33,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.Objects;
 
 
 public class DictionaryExtractWordlistAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 7870582176463311807L;
 
 

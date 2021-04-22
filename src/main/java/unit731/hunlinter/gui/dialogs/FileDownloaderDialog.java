@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
 
 public class FileDownloaderDialog extends JDialog implements PropertyChangeListener, DownloadListenerInterface{
 
+	@Serial
 	private static final long serialVersionUID = 5026264244292731091L;
 
 	private final String localPath;

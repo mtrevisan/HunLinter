@@ -31,11 +31,13 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.List;
 
 
 public class CompoundTableModel extends AbstractTableModel implements HunLinterTableModelInterface<Inflection>{
 
+	@Serial
 	private static final long serialVersionUID = -7276635232728680738L;
 
 	private static final String[] COLUMN_NAMES = {"Inflection", "Morphological fields"};

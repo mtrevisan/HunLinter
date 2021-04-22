@@ -36,6 +36,7 @@ import javax.swing.JDialog;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serial;
 import java.time.LocalDate;
 
 
@@ -45,6 +46,7 @@ import java.time.LocalDate;
  */
 public class HelpDialog extends JDialog{
 
+	@Serial
 	private static final long serialVersionUID = -9151942201399886892L;
 
 

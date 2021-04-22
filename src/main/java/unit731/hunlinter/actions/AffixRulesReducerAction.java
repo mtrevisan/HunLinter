@@ -33,11 +33,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.Serial;
 import java.util.Objects;
 
 
 public class AffixRulesReducerAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 2384472624481589969L;
 
 

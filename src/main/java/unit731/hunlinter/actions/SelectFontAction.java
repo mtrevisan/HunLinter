@@ -35,6 +35,7 @@ import unit731.hunlinter.services.Packager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -43,6 +44,7 @@ import java.util.prefs.Preferences;
 
 public class SelectFontAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -4735745104118440213L;
 
 	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";

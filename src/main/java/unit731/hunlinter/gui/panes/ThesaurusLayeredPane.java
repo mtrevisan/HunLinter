@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -71,6 +72,7 @@ import java.util.stream.Collectors;
 
 public class ThesaurusLayeredPane extends JLayeredPane{
 
+	@Serial
 	private static final long serialVersionUID = -6844935166825095145L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusLayeredPane.class);

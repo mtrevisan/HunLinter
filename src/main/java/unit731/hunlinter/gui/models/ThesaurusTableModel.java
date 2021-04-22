@@ -31,12 +31,14 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.text.MessageFormat;
 import java.util.List;
 
 
 public class ThesaurusTableModel extends AbstractTableModel{
 
+	@Serial
 	private static final long serialVersionUID = -2584004821296780108L;
 
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};

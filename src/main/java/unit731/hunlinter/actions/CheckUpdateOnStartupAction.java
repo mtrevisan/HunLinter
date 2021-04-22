@@ -26,12 +26,14 @@ package unit731.hunlinter.actions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
 
 public class CheckUpdateOnStartupAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 2319044845856106299L;
 
 	public static final String UPDATE_STARTUP_CHECK = "update.startupCheck";

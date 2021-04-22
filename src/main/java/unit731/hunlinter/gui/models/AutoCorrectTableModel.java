@@ -31,11 +31,13 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.List;
 
 
 public class AutoCorrectTableModel extends AbstractTableModel{
 
+	@Serial
 	private static final long serialVersionUID = -5235919012141465022L;
 
 	private static final String[] COLUMN_NAMES = {"Incorrect form", "Correct form"};

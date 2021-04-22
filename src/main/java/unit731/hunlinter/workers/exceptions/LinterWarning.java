@@ -26,9 +26,12 @@ package unit731.hunlinter.workers.exceptions;
 
 import unit731.hunlinter.workers.core.IndexDataPair;
 
+import java.io.Serial;
+
 
 public class LinterWarning extends Exception{
 
+	@Serial
 	private static final long serialVersionUID = 3853411643385148097L;
 
 

@@ -26,9 +26,12 @@ package unit731.hunlinter.workers.exceptions;
 
 import unit731.hunlinter.workers.core.IndexDataPair;
 
+import java.io.Serial;
+
 
 public class LinterException extends RuntimeException{
 
+	@Serial
 	private static final long serialVersionUID = 2097260898128903703L;
 
 	public enum FixActionType{ADD, REPLACE, REMOVE}

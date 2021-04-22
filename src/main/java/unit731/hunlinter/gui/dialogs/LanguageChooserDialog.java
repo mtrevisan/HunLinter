@@ -26,12 +26,14 @@ package unit731.hunlinter.gui.dialogs;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 
 public class LanguageChooserDialog extends javax.swing.JDialog{
 
+	@Serial
 	private static final long serialVersionUID = 1343230759230486883L;
 
 	private final Consumer<String> onSelection;

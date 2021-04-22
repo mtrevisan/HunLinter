@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
@@ -72,6 +73,7 @@ import java.util.stream.Collectors;
 
 public class AutoCorrectLayeredPane extends JLayeredPane{
 
+	@Serial
 	private static final long serialVersionUID = -5833945357934298046L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AutoCorrectLayeredPane.class);

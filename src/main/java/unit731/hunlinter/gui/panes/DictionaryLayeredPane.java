@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -75,6 +76,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class DictionaryLayeredPane extends JLayeredPane{
 
+	@Serial
 	private static final long serialVersionUID = 7030870103355904749L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryLayeredPane.class);

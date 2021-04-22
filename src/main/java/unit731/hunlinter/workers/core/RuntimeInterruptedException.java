@@ -25,8 +25,12 @@
 package unit731.hunlinter.workers.core;
 
 
+import java.io.Serial;
+
+
 public class RuntimeInterruptedException extends RuntimeException{
 
+	@Serial
 	private static final long serialVersionUID = -4900866992135800875L;
 
 }

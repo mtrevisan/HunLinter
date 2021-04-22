@@ -36,12 +36,14 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
 
 public class CorrectionDialog extends JDialog{
 
+	@Serial
 	private static final long serialVersionUID = 7630665680331864500L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CorrectionDialog.class);

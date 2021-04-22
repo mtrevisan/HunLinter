@@ -31,6 +31,7 @@ import unit731.hunlinter.datastructures.SimpleDynamicArray;
 import unit731.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunlinter.parsers.enums.MorphologicalTag;
 import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.system.PropertiesUTF8;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class RulesLoader{
 	private static final MessageFormat WORD_WITH_LETTER_CANNOT_HAVE_USE = new MessageFormat("Word with letter `{0}` cannot have rule {1}, use {2}");
 
 
-	private final Properties rulesProperties;
+	private final PropertiesUTF8 rulesProperties;
 
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;

@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
@@ -72,6 +73,7 @@ import java.util.stream.Collectors;
 
 public class DictionaryStatisticsDialog extends JDialog{
 
+	@Serial
 	private static final long serialVersionUID = 5762751368059394067l;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);

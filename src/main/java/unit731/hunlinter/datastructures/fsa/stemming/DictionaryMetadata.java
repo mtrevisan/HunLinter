@@ -24,6 +24,8 @@
  */
 package unit731.hunlinter.datastructures.fsa.stemming;
 
+import unit731.hunlinter.services.system.PropertiesUTF8;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -112,7 +114,7 @@ public class DictionaryMetadata{
 	 */
 	public static DictionaryMetadata read(final InputStream metadataStream) throws IOException{
 		final Map<DictionaryAttribute, String> map = new EnumMap<>(DictionaryAttribute.class);
-		final Properties properties = new Properties();
+		final PropertiesUTF8 properties = new PropertiesUTF8();
 		properties.load(new InputStreamReader(metadataStream, StandardCharsets.UTF_8));
 
 		//handle back-compatibility for encoder specification
@@ -258,7 +260,7 @@ public class DictionaryMetadata{
 	 * @throws IOException	Thrown when an I/O error occurs.
 	 */
 	public void write(final Writer writer) throws IOException{
-		final Properties properties = new Properties();
+		final PropertiesUTF8 properties = new PropertiesUTF8();
 		for(final Map.Entry<DictionaryAttribute, String> e : getAttributes().entrySet())
 			properties.setProperty(e.getKey().propertyName, e.getValue());
 		properties.store(writer, "# " + getClass().getName());

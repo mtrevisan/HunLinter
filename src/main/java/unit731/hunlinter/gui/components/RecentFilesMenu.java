@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +42,7 @@ import java.util.function.Consumer;
 /** A menu used to store and display recently used files. */
 public class RecentFilesMenu extends JMenu{
 
+	@Serial
 	private static final long serialVersionUID = 5949478291911784729L;
 
 

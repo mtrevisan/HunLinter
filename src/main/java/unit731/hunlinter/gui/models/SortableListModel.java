@@ -25,12 +25,14 @@
 package unit731.hunlinter.gui.models;
 
 import javax.swing.*;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 
 
 public class SortableListModel extends AbstractListModel<String>{
 
+	@Serial
 	private static final long serialVersionUID = -2766941679426379241L;
 
 

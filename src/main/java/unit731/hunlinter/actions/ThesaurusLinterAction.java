@@ -29,11 +29,13 @@ import unit731.hunlinter.workers.WorkerManager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.Objects;
 
 
 public class ThesaurusLinterAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -8807355872370651224L;
 
 	private final WorkerManager workerManager;

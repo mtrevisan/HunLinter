@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,6 +44,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class ThesaurusMergeDialog extends JDialog{
 
+	@Serial
 	private static final long serialVersionUID = 8375487773986703688L;
 
 	private final SynonymsEntry baseSynonyms;

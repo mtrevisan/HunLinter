@@ -33,12 +33,14 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Supplier;
 
 
 public class OpenFileAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 5234230587473648899L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OpenFileAction.class);

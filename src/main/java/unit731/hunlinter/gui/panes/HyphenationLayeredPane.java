@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -60,6 +61,7 @@ import java.util.regex.Pattern;
 
 public class HyphenationLayeredPane extends JLayeredPane{
 
+	@Serial
 	private static final long serialVersionUID = 67463311214897950L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationLayeredPane.class);

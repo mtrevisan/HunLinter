@@ -26,6 +26,7 @@ package unit731.hunlinter.datastructures;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.AbstractSet;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import static unit731.hunlinter.services.system.LoopHelper.match;
 
 public class ArraySet<E> extends AbstractSet<E> implements Cloneable, Serializable{
 
+	@Serial
 	private static final long serialVersionUID = -5730118321825456724L;
 
 

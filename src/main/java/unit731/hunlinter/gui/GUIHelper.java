@@ -49,6 +49,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,6 +75,7 @@ public final class GUIHelper{
 	 */
 	public static void addCancelByEscapeKey(final JDialog dialog){
 		addCancelByEscapeKey(dialog, new AbstractAction(){
+			@Serial
 			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
@@ -265,6 +267,7 @@ public final class GUIHelper{
 		final ActionMap actionMap = field.getActionMap();
 		//create an undo action and add it to the text component
 		actionMap.put(KEY_UNDO, new AbstractAction(KEY_UNDO){
+			@Serial
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override
@@ -279,6 +282,7 @@ public final class GUIHelper{
 		});
 		//create a redo action and add it to the text component
 		actionMap.put(KEY_REDO, new AbstractAction(KEY_REDO){
+			@Serial
 			private static final long serialVersionUID = -6536021676834946105L;
 
 			@Override

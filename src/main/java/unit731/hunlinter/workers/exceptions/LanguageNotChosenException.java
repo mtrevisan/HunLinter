@@ -25,8 +25,12 @@
 package unit731.hunlinter.workers.exceptions;
 
 
+import java.io.Serial;
+
+
 public class LanguageNotChosenException extends Exception{
 
+	@Serial
 	private static final long serialVersionUID = 7746149848221945649L;
 
 

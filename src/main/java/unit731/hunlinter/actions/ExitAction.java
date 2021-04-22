@@ -29,10 +29,12 @@ import unit731.hunlinter.gui.GUIHelper;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 
 public class ExitAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -3856496810694201902L;
 
 

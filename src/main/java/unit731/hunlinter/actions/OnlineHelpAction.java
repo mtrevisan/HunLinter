@@ -28,10 +28,12 @@ import unit731.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 
 public class OnlineHelpAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = 4095028068562974115L;
 
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";

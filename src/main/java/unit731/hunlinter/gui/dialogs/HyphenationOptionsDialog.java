@@ -39,6 +39,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -52,6 +53,7 @@ import static unit731.hunlinter.services.system.LoopHelper.forEach;
 
 public class HyphenationOptionsDialog extends javax.swing.JDialog implements ActionListener{
 
+	@Serial
 	private static final long serialVersionUID = 2441720505407258235L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationOptionsDialog.class);

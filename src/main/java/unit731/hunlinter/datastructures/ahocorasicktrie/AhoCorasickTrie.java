@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.HitProcessor;
 import unit731.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ import java.util.function.BiFunction;
  */
 public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
+	@Serial
 	private static final long serialVersionUID = 5044611770728521000L;
 
 	private static final int ROOT_NODE_ID = 0;

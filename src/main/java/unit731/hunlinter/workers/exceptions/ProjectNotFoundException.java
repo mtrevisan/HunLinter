@@ -24,11 +24,13 @@
  */
 package unit731.hunlinter.workers.exceptions;
 
+import java.io.Serial;
 import java.nio.file.Path;
 
 
 public class ProjectNotFoundException extends Exception{
 
+	@Serial
 	private static final long serialVersionUID = 3943841591851856914L;
 
 

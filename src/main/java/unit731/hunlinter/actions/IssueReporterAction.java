@@ -28,10 +28,12 @@ import unit731.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 
 
 public class IssueReporterAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -115598226718687073L;
 
 	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";

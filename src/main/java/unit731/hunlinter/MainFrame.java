@@ -110,6 +110,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
@@ -131,6 +132,7 @@ import java.util.prefs.Preferences;
  */
 public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener{
 
+	@Serial
 	private static final long serialVersionUID = 6772959670167531135L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MainFrame.class);

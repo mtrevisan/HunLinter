@@ -27,6 +27,7 @@ package unit731.hunlinter.gui.components;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import java.awt.*;
+import java.io.Serial;
 import java.util.function.Function;
 
 
@@ -51,6 +52,7 @@ import java.util.function.Function;
  */
 public class HorizontalFlowLayout extends FlowLayout{
 
+	@Serial
 	private static final long serialVersionUID = -9089126297688841865L;
 
 

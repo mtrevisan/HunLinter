@@ -32,12 +32,14 @@ import unit731.hunlinter.gui.dialogs.FileDownloaderDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.Serial;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
 
 
 public class UpdateAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -624514803595503205L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UpdateAction.class);
@@ -55,6 +57,7 @@ public class UpdateAction extends AbstractAction{
 		try{
 			final FileDownloaderDialog dialog = new FileDownloaderDialog(parentFrame);
 			GUIHelper.addCancelByEscapeKey(dialog, new AbstractAction(){
+				@Serial
 				private static final long serialVersionUID = -5644390861803492172L;
 
 				@Override

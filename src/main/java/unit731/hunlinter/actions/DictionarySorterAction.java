@@ -33,11 +33,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serial;
 import java.util.Objects;
 
 
 public class DictionarySorterAction extends AbstractAction{
 
+	@Serial
 	private static final long serialVersionUID = -3875908108517717837L;
 
 

@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -51,6 +52,7 @@ import java.util.function.Supplier;
  */
 public class FontChooserDialog extends javax.swing.JDialog{
 
+	@Serial
 	private static final long serialVersionUID = -4686780467476615109L;
 
 	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);

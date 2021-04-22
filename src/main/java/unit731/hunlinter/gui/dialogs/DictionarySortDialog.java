@@ -40,12 +40,14 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Objects;
 
 
 public class DictionarySortDialog extends JDialog{
 
+	@Serial
 	private static final long serialVersionUID = -4815599935456195094L;
 
 	private static final double FONT_SIZE_REDUCTION = 0.85;

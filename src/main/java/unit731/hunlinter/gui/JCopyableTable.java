@@ -25,10 +25,12 @@
 package unit731.hunlinter.gui;
 
 import javax.swing.*;
+import java.io.Serial;
 
 
 public class JCopyableTable extends JTable{
 
+	@Serial
 	private static final long serialVersionUID = -5693323480525777411L;
 
 

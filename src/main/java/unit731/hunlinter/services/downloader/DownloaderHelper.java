@@ -33,6 +33,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import unit731.hunlinter.gui.dialogs.HelpDialog;
 import unit731.hunlinter.services.semanticversioning.Version;
+import unit731.hunlinter.services.system.PropertiesUTF8;
 import unit731.hunlinter.services.text.StringHelper;
 
 import java.io.FileInputStream;
@@ -83,7 +84,7 @@ public final class DownloaderHelper{
 	static{
 		APPLICATION_PROPERTIES = new HashMap<>();
 		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
-			final Properties prop = new Properties();
+			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);
 
 			APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));

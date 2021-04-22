@@ -24,6 +24,7 @@
  */
 package unit731.hunlinter.services.eventbus.events;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 
@@ -34,6 +35,7 @@ import java.util.EventObject;
  */
 public class BusExceptionEvent extends EventObject{
 
+	@Serial
 	private static final long serialVersionUID = -6138624437653011774L;
 
 
