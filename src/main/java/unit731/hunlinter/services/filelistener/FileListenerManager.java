@@ -90,9 +90,9 @@ public class FileListenerManager implements FileListener, Runnable{
 	public FileListenerManager(){
 		watcher = createWatcher();
 		running = new AtomicBoolean(false);
-		watchKeyToDirPath = new ConcurrentHashMap<>();
-		dirPathToListeners = new ConcurrentHashMap<>();
-		listenerToFilePatterns = new ConcurrentHashMap<>();
+		watchKeyToDirPath = new ConcurrentHashMap<>(0);
+		dirPathToListeners = new ConcurrentHashMap<>(0);
+		listenerToFilePatterns = new ConcurrentHashMap<>(0);
 	}
 
 	private WatchService createWatcher() throws RuntimeException{
@@ -167,7 +167,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
 
-		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>())
+		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>(filePatterns.size()))
 			.addAll(filePatterns);
 	}
 

@@ -51,8 +51,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 	private Encoder<ILoggingEvent> encoder;
 
-	private static final Map<Marker, List<JTextArea>> TEXT_AREAS = new HashMap<>();
-	private static final Map<Marker, List<JLabel>> LABELS = new HashMap<>();
+	private static final Map<Marker, List<JTextArea>> TEXT_AREAS = new HashMap<>(0);
+	private static final Map<Marker, List<JLabel>> LABELS = new HashMap<>(0);
 
 
 	public static void addLabel(final JLabel label, final Marker... markers){
