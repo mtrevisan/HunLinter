@@ -74,7 +74,7 @@ public class DictionaryParser{
 
 	public DictionaryParser(final File dicFile, final String language, final Charset charset){
 		Objects.requireNonNull(dicFile, "Dictionary file cannot be null");
-		Objects.requireNonNull(charset, "Charser cannot be null");
+		Objects.requireNonNull(charset, "Charset cannot be null");
 
 		this.dicFile = dicFile;
 		this.charset = charset;

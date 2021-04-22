@@ -349,7 +349,7 @@ public class HyphenationParser{
 	 *
 	 * @param rule   The rule to add
 	 * @param level   Level to add the rule to
-	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
+	 * @return The value of a rule if already in place, {@code null} if the insertion has completed successfully
 	 */
 	public String addRule(final String rule, final Level level){
 		validateRule(rule, level);
@@ -378,7 +378,7 @@ public class HyphenationParser{
 	 *
 	 * @param rule	The rule to remove
 	 * @param level	Level to remove the rule from
-	 * @return <code>true</code> if the removal has completed successfully
+	 * @return {@code true} if the removal has completed successfully
 	 */
 	public boolean removeRule(final String rule, final Level level){
 		final String oldRule;
