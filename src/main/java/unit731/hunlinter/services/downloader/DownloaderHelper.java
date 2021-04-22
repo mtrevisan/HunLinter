@@ -81,7 +81,7 @@ public final class DownloaderHelper{
 
 	public static final Map<String, Object> APPLICATION_PROPERTIES;
 	static{
-		APPLICATION_PROPERTIES = new HashMap<>();
+		APPLICATION_PROPERTIES = new HashMap<>(3);
 		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
 			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);

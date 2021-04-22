@@ -126,7 +126,7 @@ public class Packager{
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
-	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>();
+	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>(9);
 	static{
 		KEY_FILE_MAPPER.put(KEY_FILE_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX);
 		KEY_FILE_MAPPER.put(KEY_FILE_DICTIONARY, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY);
@@ -151,7 +151,7 @@ public class Packager{
 		}
 
 		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath) throws IOException{
-			final Map<String, File> folders = new HashMap<>();
+			final Map<String, File> folders = new HashMap<>(2);
 			final int splitIndex = childFolders.indexOf(foldersSeparator);
 			final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
 			final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
@@ -162,7 +162,7 @@ public class Packager{
 			return folders;
 		}
 	}
-	private static final Map<String, ConfigurationData> CONFIG_DATA = new HashMap<>();
+	private static final Map<String, ConfigurationData> CONFIG_DATA = new HashMap<>(2);
 	static{
 		CONFIG_DATA.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, new ConfigurationData(".aff ",
 			CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY));
@@ -259,8 +259,7 @@ public class Packager{
 		for(final Node child : children)
 			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
-				for(final String locale : locales)
-					languageSets.add(locale);
+				Collections.addAll(languageSets, locales);
 			}
 		final List<String> langs = new ArrayList<>(languageSets);
 		Collections.sort(langs);
@@ -284,7 +283,7 @@ public class Packager{
 		final Node node = pair.getRight();
 		if(node != null){
 			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-			final Set<String> uniqueFolders = new HashSet<>();
+			final Set<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
 			forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
@@ -528,7 +527,7 @@ public class Packager{
 		Objects.requireNonNull(folder);
 
 		final File file = absolutizeFolder(folder, basePath, originPath);
-		final Map<String, File> children = new HashMap<>();
+		final Map<String, File> children = new HashMap<>(4);
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
 			children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
 			children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
