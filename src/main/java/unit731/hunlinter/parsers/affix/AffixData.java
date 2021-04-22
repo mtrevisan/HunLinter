@@ -82,7 +82,7 @@ public class AffixData{
 		terminalAffixes.addAll(getStringData(SINGLE_FLAG_TAGS));
 
 		productableFlags.addAll(data.keySet());
-		Arrays.asList(AffixOption.CHARACTER_SET.getCode(), AffixOption.FLAG.getCode(),
+		productableFlags.removeAll(Arrays.asList(AffixOption.CHARACTER_SET.getCode(), AffixOption.FLAG.getCode(),
 			AffixOption.COMPLEX_PREFIXES.getCode(), AffixOption.LANGUAGE.getCode(), AffixOption.ALIASES_FLAG.getCode(),
 			AffixOption.ALIASES_MORPHOLOGICAL_FIELD.getCode(), AffixOption.TRY.getCode(), AffixOption.NO_SUGGEST_FLAG.getCode(),
 			AffixOption.REPLACEMENT_TABLE.getCode(), AffixOption.RELATION_TABLE.getCode(), AffixOption.WORD_BREAK_CHARACTERS.getCode(),
@@ -93,7 +93,7 @@ public class AffixData{
 			AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND.getCode(), AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG.getCode(),
 			AffixOption.FULLSTRIP.getCode(), AffixOption.KEEP_CASE_FLAG.getCode(), AffixOption.NEED_AFFIX_FLAG.getCode(),
 			AffixOption.INPUT_CONVERSION_TABLE.getCode(), AffixOption.OUTPUT_CONVERSION_TABLE.getCode()
-		).forEach(productableFlags::remove);
+		));
 
 		closed = true;
 	}

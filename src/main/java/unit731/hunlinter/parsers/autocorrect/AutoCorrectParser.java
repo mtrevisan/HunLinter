@@ -129,7 +129,7 @@ public class AutoCorrectParser{
 	 * @param incorrect	The incorrect form
 	 * @param correct	The correct form
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
-	 * 	(return {@code true} to force insertion)
+	 * 	(return <code>true</code> to force insertion)
 	 * @return The duplication result
 	 */
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
@@ -162,7 +162,7 @@ public class AutoCorrectParser{
 	}
 
 	/* Find if there is a duplicate with the same incorrect and correct forms */
-	public boolean contains(final CharSequence incorrect, final CharSequence correct){
+	public boolean contains(final String incorrect, final String correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);

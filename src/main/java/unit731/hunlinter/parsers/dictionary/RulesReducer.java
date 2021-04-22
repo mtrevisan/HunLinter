@@ -265,7 +265,7 @@ public class RulesReducer{
 				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
 				forEach(temporaryRules, lineEntryConsumer);
-				additionsToBeRemoved.forEach(rule.addition::remove);
+				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
 			}
@@ -380,7 +380,7 @@ public class RulesReducer{
 
 		//separate conditions:
 		final Set<Character> childrenGroup = new HashSet<>();
-		final Collection<Character> notPresentConditions = new HashSet<>();
+		final Set<Character> notPresentConditions = new HashSet<>();
 		//for each rule with same condition
 		for(final LineEntry parent : sameCondition){
 			//extract ratifying group
@@ -423,7 +423,7 @@ public class RulesReducer{
 			final Set<Character> characters = overallLastGroups.get(parent.condition.length());
 			if(!notPresentConditions.isEmpty() && characters != null){
 				final String notCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
-				final Collection<Character> overallLastGroup = new HashSet<>(characters);
+				final Set<Character> overallLastGroup = new HashSet<>(characters);
 				overallLastGroup.removeAll(notPresentConditions);
 				final String yesCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 				final LineEntry notRule = match(finalRules,
@@ -458,7 +458,7 @@ public class RulesReducer{
 	}
 
 	private String chooseCondition(final String parentCondition, final Set<Character> parentGroup,
-			final Set<Character> childrenGroup, final Collection<Character> groupsIntersection,
+			final Set<Character> childrenGroup, final Set<Character> groupsIntersection,
 			final Map<Integer, Set<Character>> overallLastGroups){
 		final int parentConditionLength = parentCondition.length();
 		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup,
@@ -591,7 +591,7 @@ public class RulesReducer{
 	/**
 	 * @param queue	The queue to add the new rules to
 	 * @param parent	The parent rule
-	 * @return	{@code true} if a bush was created and added to the queue
+	 * @return	<code>true</code> if a bush was created and added to the queue
 	 */
 	private boolean growNewBush(final Collection<LineEntry> queue, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
@@ -672,13 +672,13 @@ public class RulesReducer{
 	}
 
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
-	private void mergeSimilarRules(final Collection<LineEntry> entries){
+	private void mergeSimilarRules(final List<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
 			entry -> (entry.condition.contains(RegexHelper.GROUP_END)?
 			entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegexSequencer.splitSequence(entry.condition).length:
 			null));
-		final Collection<Character> group = new HashSet<>();
+		final Set<Character> group = new HashSet<>();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();

@@ -143,7 +143,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			while(!completed){
 				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
 
-				if(!sb.isEmpty() && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
+				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					@SuppressWarnings("rawtypes")
 					final FixedArray[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
 					if(forbiddenWordFlag == null
@@ -245,7 +245,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				break;
 			}
 			//enforce forbidden case if CHECKCOMPOUNDCASE is set
-			if(!sb.isEmpty() && forbidDifferentCasesInCompound){
+			if(sb.length() > 0 && forbidDifferentCasesInCompound){
 				if(lastWordCasing == null)
 					lastWordCasing = StringHelper.classifyCasing(sb.toString());
 				final StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
