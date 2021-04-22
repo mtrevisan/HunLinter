@@ -50,7 +50,7 @@ public class RecentItems{
 	private final Preferences preferenceNode;
 
 	private final List<String> items;
-	private final Collection<RecentItemsObserver> observers = new ArrayList<>();
+	private final Collection<RecentItemsObserver> observers = new ArrayList<>(0);
 
 
 	public RecentItems(final int maxItems, final Preferences preferenceNode){

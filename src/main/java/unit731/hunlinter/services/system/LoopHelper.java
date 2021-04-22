@@ -120,7 +120,7 @@ public final class LoopHelper{
 	public static <T> T[] collectIf(final T[] array, final Predicate<T> condition){
 		final int size = (array != null? array.length: 0);
 		@SuppressWarnings("unchecked")
-		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<T>((Class<T>)array.getClass().getComponentType(), size);
+		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<>((Class<T>)array.getClass().getComponentType(), size);
 		for(int i = 0; i < size; i ++){
 			final T elem = array[i];
 			if(condition.test(elem))
