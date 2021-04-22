@@ -126,7 +126,7 @@ public class ThesaurusParser{
 	/**
 	 * @param partOfSpeechAndSynonyms	The object representing all the synonyms of a word along with their Part-of-Speech
 	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found
-	 * 	(return <code>true</code> to force insertion)
+	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
 	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,

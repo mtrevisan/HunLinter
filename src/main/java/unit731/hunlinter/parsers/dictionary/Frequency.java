@@ -150,7 +150,7 @@ public class Frequency<T extends Comparable<?>>{
 	/**
 	 * Returns the percentage of values that are equal to the given value (as a proportion between 0 and 1).
 	 * <p>
-	 * Returns <code>Double.NaN</code> if no values have been added.
+	 * Returns {@code Double.NaN} if no values have been added.
 	 * Returns 0 if at least one value has been added, but the value is not comparable to the values set.</p>
 	 *
 	 * @param value	the value to lookup

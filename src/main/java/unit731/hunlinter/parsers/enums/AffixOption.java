@@ -97,7 +97,7 @@ public enum AffixOption{
 	/**
 	 * Affixes with this flag may be present inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
 	 * at the end of compounds only).
-	 * <code>(prefix)?(root)+(affix)?</code>
+	 * {@code (prefix)?(root)+(affix)?}
 	 */
 	PERMIT_COMPOUND_FLAG("COMPOUNDPERMITFLAG"),
 	/** Affixes with this flag forbid compounding of the affixed word */
