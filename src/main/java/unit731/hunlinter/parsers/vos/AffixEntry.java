@@ -285,10 +285,8 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j ++;
-					if(!in && wrd[i] == cond[j]){
+					if(!in && wrd[i] == cond[j])
 						in = true;
-						break;
-					}
 				}while(j < cond.length - 1 && cond[j] != ']');
 				//cope with negation inside group
 				if(neg == in || j == cond.length - 1 && cond[j] != ']')
@@ -313,10 +311,8 @@ public class AffixEntry{
 				boolean in = false;
 				do{
 					j --;
-					if(!in && wrd[i] == cond[j]){
+					if(!in && wrd[i] == cond[j])
 						in = true;
-						break;
-					}
 				}while(j > 0 && cond[j] != '[');
 				if(j == 0 && cond[j] != '[')
 					break;
