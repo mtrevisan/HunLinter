@@ -81,12 +81,12 @@ public class PropertiesUTF8 extends Properties{
 				line = removeWhiteSpaces(line);
 				if(!line.isEmpty() && COMMENT.indexOf(line.charAt(0)) < 0){
 					//removes the beginning separators
-					final StringBuilder property = new StringBuilder(line);
+					String property = line;
 					//reads the whole property if it is on multiple lines
 					while(continueLine(line)){
-						property.setLength(property.length() - 1);
+						property = property.substring(0, property.length() - 1);
 						line = in.readLine();
-						property.append(line);
+						property += line;
 					}
 
 					if(!property.isEmpty()){
