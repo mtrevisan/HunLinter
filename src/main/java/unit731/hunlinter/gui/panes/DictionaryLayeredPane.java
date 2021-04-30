@@ -419,9 +419,7 @@ final int iconSize = 17;
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 
 	private void calculateInflections(){
-		final String language = parserManager.getLanguage();
-		final Orthography orthography = BaseBuilder.getOrthography(language);
-		final String text = orthography.correctOrthography(inputTextField.getText().trim());
+		final String text = inputTextField.getText().trim();
 
 		if(formerInputText != null && formerInputText.equals(text))
 			return;
