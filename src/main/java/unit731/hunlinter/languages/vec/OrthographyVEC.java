@@ -70,8 +70,27 @@ public final class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = RegexHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
-	private static final Pattern PATTERN_CONSONANT_GEMINATES = RegexHelper.pattern("([^aeiou])\\1+|(?<!\\S)(inn)");
-	private static final Function<String, String> GEMINATES_REDUCER = word -> RegexHelper.replaceAll(word, PATTERN_CONSONANT_GEMINATES, "$1$2");
+	//a double consonant, not ^inn, not [eo]nne$
+	private static final Pattern PATTERN_CONSONANT_GEMINATES = RegexHelper.pattern("([^aeiou])\\1+");
+	private static final Function<String, String> GEMINATES_REDUCER = word -> {
+		String strippedWord = word;
+		String starting = "";
+		if(strippedWord.startsWith("inn")){
+			strippedWord = strippedWord.substring(3);
+			starting = "inn";
+		}
+		String ending = "";
+		if(strippedWord.endsWith("onne")){
+			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
+			ending = "onne";
+		}
+		else if(strippedWord.endsWith("enne")){
+			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
+			ending = "enne";
+		}
+		strippedWord = RegexHelper.replaceAll(strippedWord, PATTERN_CONSONANT_GEMINATES, "$1");
+		return starting + strippedWord + ending;
+	};
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
