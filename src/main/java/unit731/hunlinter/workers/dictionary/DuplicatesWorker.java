@@ -205,12 +205,14 @@ public class DuplicatesWorker extends WorkerDictionary{
 					final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 					final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
-					final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
-					result.ensureCapacity(result.size() + inflections.length);
-					for(final Inflection inflection : inflections){
-						final String text = inflection.toStringWithPartOfSpeechAndStem();
-						if(duplicatesBloomFilter.contains(text))
-							result.add(new Duplicate(inflection, word, lineIndex));
+					if(inflections.length > 0){
+						final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
+						result.ensureCapacity(result.size() + inflections.length);
+						for(final Inflection inflection : inflections){
+							final String text = inflection.toStringWithPartOfSpeechAndStem();
+							if(duplicatesBloomFilter.contains(text))
+								result.add(new Duplicate(inflection, word, lineIndex));
+						}
 					}
 				}
 				catch(final LinterException e){
@@ -251,9 +253,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Inflection prod = entries.get(0).getInflection();
-					final String origin = prod.getWord() + "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech())
-						+ "): ";
-					writer.write(origin);
+					String origin = prod.getWord();
+					if(prod.getMorphologicalFieldPartOfSpeech().length > 0)
+						origin += "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech()) + ")";
+					writer.write(origin + ": ");
 					final StringJoiner sj = new StringJoiner(", ");
 					if(entries != null)
 						for(final Duplicate duplicate : entries)
