@@ -26,19 +26,32 @@ package unit731.hunlinter.workers.thesaurus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunlinter.languages.DictionaryCorrectnessChecker;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
+import unit731.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import unit731.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunlinter.languages.BaseBuilder;
 import unit731.hunlinter.parsers.ParserManager;
+import unit731.hunlinter.parsers.dictionary.DictionaryParser;
+import unit731.hunlinter.parsers.dictionary.generators.WordGenerator;
 import unit731.hunlinter.parsers.thesaurus.SynonymsEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunlinter.parsers.thesaurus.ThesaurusParser;
+import unit731.hunlinter.parsers.vos.DictionaryEntry;
+import unit731.hunlinter.parsers.vos.Inflection;
+import unit731.hunlinter.services.ParserHelper;
 import unit731.hunlinter.workers.core.IndexDataPair;
 import unit731.hunlinter.workers.core.WorkerDataParser;
 import unit731.hunlinter.workers.core.WorkerThesaurus;
+import unit731.hunlinter.workers.exceptions.LinterException;
 
+import java.io.File;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -50,19 +63,31 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 	public static final String WORKER_NAME = "Thesaurus linter";
 
 	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
+	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain definition {0} (from entry {1})");
 
 
-	public ThesaurusLinterWorker(final ThesaurusParser theParser){
+	private final BloomFilterInterface<String> bloomFilter;
+
+
+	public ThesaurusLinterWorker(final ThesaurusParser theParser, final String language, final DictionaryParser dicParser,
+			final WordGenerator wordGenerator){
 		super(new WorkerDataParser<>(WORKER_NAME, theParser));
 
 		getWorkerData()
 			.withParallelProcessing()
 			.withCancelOnException();
 
+		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+
 		//TODO orthography check (DictionaryCorrectnessChecker.checkInflection)
 //		final ParserManager parserManager = workerData.getParserManager();
 //		final DictionaryCorrectnessChecker correctnessChecker = parserManager.getCorrectnessChecker();
 //		checker.checkInflection(inflection, index);
+
+		final Charset charset = dicParser.getCharset();
+		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
@@ -73,6 +98,14 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
 				for(String definition : definitions){
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
+
+					//check if the word is present in the dictionary
+					if(definition.equals("rúkoƚa"))
+						System.out.println();
+					if(!bloomFilter.contains(definition))
+						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+							new Object[]{definition, originalDefinition}));
+
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(
@@ -81,8 +114,15 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			}
 		};
 
-		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+		final Function<Void, Void> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/2)");
+
+			collectWords(dicParser, wordGenerator);
+
+			return null;
+		};
+		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step2 = ignored -> {
+			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
@@ -90,7 +130,48 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			return null;
 		};
-		setProcessor(step1);
+		setProcessor(step1.andThen(step2));
+	}
+
+	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
+		final File dicFile = dicParser.getDicFile();
+		final Charset charset = dicParser.getCharset();
+
+		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
+			try{
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+
+				for(final Inflection inflection : inflections){
+					final String str = inflection.getWord();
+					if(str.equals("rúkoƚa"))
+						System.out.println();
+					bloomFilter.add(str);
+				}
+			}
+			catch(final LinterException e){
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+			}
+		};
+		final Consumer<Integer> progressCallback = lineIndex -> {
+			setProgress(Math.min(lineIndex, 100));
+
+			sleepOnPause();
+		};
+		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
+			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+
+		bloomFilter.close();
+		final int totalInflections = bloomFilter.getAddedElements();
+		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		bloomFilter.clear();
+
+		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
+
+		return bloomFilter;
 	}
 
 }
