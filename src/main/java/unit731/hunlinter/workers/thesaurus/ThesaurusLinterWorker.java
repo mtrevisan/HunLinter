@@ -100,8 +100,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
 
 					//check if the word is present in the dictionary
-					if(definition.equals("rúkoƚa"))
-						System.out.println();
 					if(!bloomFilter.contains(definition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
 							new Object[]{definition, originalDefinition}));
@@ -144,8 +142,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 				for(final Inflection inflection : inflections){
 					final String str = inflection.getWord();
-					if(str.equals("rúkoƚa"))
-						System.out.println();
 					bloomFilter.add(str);
 				}
 			}
@@ -162,14 +158,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
 
 		bloomFilter.close();
-		final int totalInflections = bloomFilter.getAddedElements();
-		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-		bloomFilter.clear();
-
-		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
-			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		return bloomFilter;
 	}
