@@ -24,6 +24,7 @@
  */
 package unit731.hunlinter.workers.thesaurus;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
@@ -100,9 +101,11 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
 
 					//check if the word is present in the dictionary
-					if(!bloomFilter.contains(definition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
-							new Object[]{definition, originalDefinition}));
+					final String[] words = StringUtils.split(definition, " -");
+					for(final String word : words)
+						if(!bloomFilter.contains(word))
+							LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+								new Object[]{definition, originalDefinition}));
 
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
