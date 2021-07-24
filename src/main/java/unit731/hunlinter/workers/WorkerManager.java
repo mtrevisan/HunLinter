@@ -131,7 +131,8 @@ public class WorkerManager{
 
 	public void createThesaurusLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterWorker(parserManager.getTheParser());
+		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterWorker(parserManager.getTheParser(), parserManager.getLanguage(),
+			parserManager.getDicParser(), parserManager.getWordGenerator());
 		createWorker(ThesaurusLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
