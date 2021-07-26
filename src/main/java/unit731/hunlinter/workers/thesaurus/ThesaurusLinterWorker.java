@@ -51,6 +51,7 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -92,6 +93,14 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
+
+			//check if the word is present in the dictionary
+			final String[] words = StringUtils.split(originalDefinition, " -");
+			for(final String word : words)
+				if(!bloomFilter.contains(word))
+					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+						new Object[]{word, originalDefinition}));
+
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
 			for(final SynonymsEntry syn : syns){
@@ -99,14 +108,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
 				for(String definition : definitions){
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
-
-					//check if the word is present in the dictionary
-					final String[] words = StringUtils.split(definition, " -");
-					for(final String word : words)
-						if(!bloomFilter.contains(word))
-							LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
-								new Object[]{definition, originalDefinition}));
-
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(
@@ -144,7 +145,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				for(final Inflection inflection : inflections){
-					final String str = inflection.getWord();
+					final String str = inflection.getWord().toLowerCase(Locale.ROOT);
 					bloomFilter.add(str);
 				}
 			}
