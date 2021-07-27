@@ -40,6 +40,9 @@ public class CompoundRulesWorker extends WorkerDictionary{
 		Objects.requireNonNull(inflectionReader, "Inflection reader cannot be null");
 
 
+		//TODO instead of generating each inflection, try only the flag tree that would generate the compound words (that is the path able to generate a compound flag)
+		//TODO scan the affix file and for each SFX/PFX, collect all the flags that can be generated
+
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
