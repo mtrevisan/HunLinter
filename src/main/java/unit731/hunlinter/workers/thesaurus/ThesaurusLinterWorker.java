@@ -82,11 +82,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
-		//TODO orthography check (DictionaryCorrectnessChecker.checkInflection)
-//		final ParserManager parserManager = workerData.getParserManager();
-//		final DictionaryCorrectnessChecker correctnessChecker = parserManager.getCorrectnessChecker();
-//		checker.checkInflection(inflection, index);
-
 		final Charset charset = dicParser.getCharset();
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
