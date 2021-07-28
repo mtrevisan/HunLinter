@@ -95,7 +95,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			final String originalDefinition = data.getDefinition();
 
 			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(originalDefinition, " -–");
+			final String[] words = StringUtils.split(originalDefinition, " –");
 			for(final String word : words)
 				if(!bloomFilter.contains(word))
 					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(

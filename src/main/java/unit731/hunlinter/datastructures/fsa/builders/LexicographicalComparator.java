@@ -28,13 +28,15 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Comparator;
 
 
 /**
  * Provides a <a href="http://en.wikipedia.org/wiki/Lexicographical_order">lexicographical comparator</a> implementation;
- * either a Java implementation or a faster implementation based on {@link sun.misc.Unsafe}.
+ * either a Java implementation or a faster implementation based on {@link Unsafe}.
  *
  * <p>Uses reflection to gracefully fall back to the Java implementation if {@code Unsafe} isn't available.
  *
@@ -85,7 +87,7 @@ public final class LexicographicalComparator{
 		 * them while (final or not) local variables are run time values.
 		 */
 
-		static final sun.misc.Unsafe theUnsafe = getUnsafe();
+		static final Unsafe theUnsafe = getUnsafe();
 
 		/** The offset to the first element in a byte array */
 		static final int BYTE_ARRAY_BASE_OFFSET = theUnsafe.arrayBaseOffset(byte[].class);
@@ -100,20 +102,20 @@ public final class LexicographicalComparator{
 		}
 
 		/**
-		 * Returns a sun.misc.Unsafe. Suitable for use in a 3rd party package. Replace with a simple
-		 * call to Unsafe.getUnsafe when integrating into a jdk.
+		 * A {@link sun.misc.Unsafe Unsafe} object suitable for use in a 3rd party package.
+		 * Replace with a simple call to Unsafe.getUnsafe when integrating into a jdk.
 		 *
-		 * @return a sun.misc.Unsafe
+		 * @return	A {@link sun.misc.Unsafe Unsafe}.
 		 */
-		private static sun.misc.Unsafe getUnsafe(){
+		private static Unsafe getUnsafe(){
 			try{
-				return sun.misc.Unsafe.getUnsafe();
+				return Unsafe.getUnsafe();
 			}
 			catch(final SecurityException ignored){
 				//that's okay; try reflection instead
 			}
 			try{
-				return java.security.AccessController.doPrivileged((PrivilegedExceptionAction<Unsafe>)() -> {
+				return AccessController.doPrivileged((PrivilegedExceptionAction<Unsafe>)() -> {
 					final Class<Unsafe> k = Unsafe.class;
 					for(final Field f : k.getDeclaredFields()){
 						f.setAccessible(true);
@@ -124,7 +126,7 @@ public final class LexicographicalComparator{
 					throw new NoSuchFieldError("the Unsafe");
 				});
 			}
-			catch(final java.security.PrivilegedActionException e){
+			catch(final PrivilegedActionException e){
 				throw new RuntimeException("Could not initialize intrinsics", e.getCause());
 			}
 		}
