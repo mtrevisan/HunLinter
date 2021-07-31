@@ -421,7 +421,7 @@
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>
-					<include>io.github.mtrevisan/hunlinter/languages/*/rules.properties</include>
+					<include>io/github/mtrevisan/hunlinter/languages/*/rules.properties</include>
 				</includes>
 			</resource>
 			<resource>
