@@ -35,7 +35,7 @@
 	</issueManagement>
 
 	<properties>
-		<main.class>unit731.hunlinter.MainFrame</main.class>
+		<main.class>io.github.mtrevisan.hunlinter.MainFrame</main.class>
 		<app.name>HunLinter</app.name>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -421,7 +421,7 @@
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>
-					<include>unit731/hunlinter/languages/*/rules.properties</include>
+					<include>io.github.mtrevisan/hunlinter/languages/*/rules.properties</include>
 				</includes>
 			</resource>
 			<resource>

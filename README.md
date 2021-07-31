@@ -101,11 +101,11 @@ This application can also sort the dictionary, counting words (unique and total 
 
 <a name="enhancements"></a>
 ## How to enhance its capabilities
-You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) or [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunlinter/languages/DictionaryCorrectnessChecker.java), [Orthography](src/main/java/unit731/hunlinter/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunlinter/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
+You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) or [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code, and extending the [DictionaryCorrectnessChecker](src/main/java/io/github/mtrevisan/hunlinter/languages/DictionaryCorrectnessChecker.java), [Orthography](src/main/java/io/github/mtrevisan/hunlinter/languages/Orthography.java), and [DictionaryBaseData](src/main/java/io/github/mtrevisan/hunlinter/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
 
 Along with these classes you can insert your `rules.properties`, a file that describes various constraints about the rules in the `.dic` file.
 
-After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunlinter/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
+After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/io/github/mtrevisan/hunlinter/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
 
