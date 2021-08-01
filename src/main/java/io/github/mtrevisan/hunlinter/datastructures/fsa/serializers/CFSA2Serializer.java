@@ -24,9 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
-import com.carrotsearch.hppc.IntIntHashMap;
-import com.carrotsearch.hppc.IntIntMap;
-import com.carrotsearch.hppc.cursors.IntIntCursor;
+import com.carrotsearch.hppcrt.maps.IntIntHashMap;
+import com.carrotsearch.hppcrt.cursors.IntIntCursor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
@@ -233,7 +232,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-			final IntIntMap offsets) throws IOException{
+			final IntIntHashMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();

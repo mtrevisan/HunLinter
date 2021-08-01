@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Queue;
 
 
 /**
@@ -49,6 +50,8 @@ import java.util.Collection;
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
  */
 public final class MetadataBuilder{
+
+	private static final String EQUALS = "=";
 
 	private MetadataBuilder(){}
 
@@ -64,24 +67,50 @@ public final class MetadataBuilder{
 		}
 	}
 
-	public static void create(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
+	//https://www.posteditacat.xyz/en/languagetool-plugin-as-smart-spell-checker/
+	public static void createPOSInfo(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
 			throws IOException{
 		final Collection<String> content = new ArrayList<>(Arrays.asList(
-			"fsa.dict.created=" + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
-			"fsa.dict.separator=" + Inflection.POS_FSA_SEPARATOR,
-			"fsa.dict.encoding=" + charset.name().toLowerCase(),
-			"fsa.dict.encoder=" + encoder));
+			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
+			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
+			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
 		if(affixData.getLanguage() != null)
-			content.add("fsa.dict.speller.locale=" + affixData.getLanguage());
+			content.add(DictionaryAttribute.LOCALE.propertyName + EQUALS + affixData.getLanguage());
 		final String replacementPairs = affixData.getReplacementPairs();
 		if(replacementPairs != null)
-			content.add("fsa.dict.speller.replacement-pairs=" + replacementPairs);
+			content.add(DictionaryAttribute.REPLACEMENT_PAIRS.propertyName + EQUALS + replacementPairs);
 		final String equivalentChars = affixData.getEquivalentChars();
 		if(equivalentChars != null)
-			content.add("fsa.dict.speller.equivalent-chars=" + equivalentChars);
+			content.add(DictionaryAttribute.EQUIVALENT_CHARS.propertyName + EQUALS + equivalentChars);
 		final String inputConversions = affixData.getInputConversions();
 		if(inputConversions != null)
-			content.add("fsa.dict.input-conversion=" + inputConversions);
+			content.add(DictionaryAttribute.INPUT_CONVERSION.propertyName + EQUALS + inputConversions);
+
+		FileHelper.saveFile(outputPath, StringUtils.CR, charset, content);
+	}
+
+	//https://www.posteditacat.xyz/en/languagetool-plugin-as-smart-spell-checker/
+	public static void createWordlistInfo(final AffixData affixData, final String encoder, final Path outputPath, final Charset charset)
+			throws IOException{
+		final Collection<String> content = new ArrayList<>(Arrays.asList(
+			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
+			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
+			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
+		if(affixData.getLanguage() != null)
+			content.add(DictionaryAttribute.LOCALE.propertyName + EQUALS + affixData.getLanguage());
+		final String replacementPairs = affixData.getReplacementPairs();
+		if(replacementPairs != null)
+			content.add(DictionaryAttribute.REPLACEMENT_PAIRS.propertyName + EQUALS + replacementPairs);
+		final String equivalentChars = affixData.getEquivalentChars();
+		if(equivalentChars != null)
+			content.add(DictionaryAttribute.EQUIVALENT_CHARS.propertyName + EQUALS + equivalentChars);
+		final String inputConversions = affixData.getInputConversions();
+		if(inputConversions != null)
+			content.add(DictionaryAttribute.INPUT_CONVERSION.propertyName + EQUALS + inputConversions);
 
 		FileHelper.saveFile(outputPath, StringUtils.CR, charset, content);
 	}

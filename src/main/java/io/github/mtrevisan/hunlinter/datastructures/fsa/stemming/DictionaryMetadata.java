@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.DictionaryAttribute;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 
 import java.io.IOException;

@@ -22,8 +22,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
+package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.EncoderType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -243,17 +246,15 @@ public enum DictionaryAttribute{
 			final Map<String, List<String>> replacementPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
 			for(final String stringPair : replacements){
-				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
-				if(twoStrings.length != 2)
-					throw new IllegalArgumentException("Attribute " + propertyName + " is not in the proper format: " + value);
-
+				final String[] twoStrings = StringUtils.split(stringPair.trim(), StringUtils.SPACE, 2);
+				final String replacement = StringUtils.replace(twoStrings[1], " ", "_");
 				if(!replacementPairs.containsKey(twoStrings[0])){
 					final List<String> strList = new ArrayList<>(1);
-					strList.add(twoStrings[1]);
+					strList.add(replacement);
 					replacementPairs.put(twoStrings[0], strList);
 				}
 				else
-					replacementPairs.get(twoStrings[0]).add(twoStrings[1]);
+					replacementPairs.get(twoStrings[0]).add(replacement);
 			}
 			return replacementPairs;
 		}

@@ -90,7 +90,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		try{
 			final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
 			if(!metadataPath.toFile().exists())
-				MetadataBuilder.create(affixData, "NONE", metadataPath, charset);
+				MetadataBuilder.createWordlistInfo(affixData, "none", metadataPath, charset);
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);
