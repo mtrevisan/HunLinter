@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.DictionaryAttribute;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
-import com.carrotsearch.hppc.IntIntHashMap;
+import com.carrotsearch.hppcrt.maps.IntIntHashMap;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 
 

@@ -36,6 +36,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -99,9 +100,13 @@ public class RelationTable{
 	}
 
 	public String extractAsList(){
-		return table.stream()
-			.map(list -> String.join(StringUtils.SPACE, list))
-			.collect(Collectors.joining(", "));
+		final StringJoiner sj = new StringJoiner(", ");
+		for(final String[] list : table){
+			final String base = list[0];
+			for(int i = 1; i < list.length; i ++)
+				sj.add(base + StringUtils.SPACE + list[i]);
+		}
+		return sj.toString();
 	}
 
 	@Override

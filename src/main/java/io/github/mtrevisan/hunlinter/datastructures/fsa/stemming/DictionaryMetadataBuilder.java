@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.DictionaryAttribute;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;

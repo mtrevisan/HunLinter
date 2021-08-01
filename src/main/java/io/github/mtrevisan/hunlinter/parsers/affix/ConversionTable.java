@@ -101,7 +101,7 @@ public class ConversionTable{
 
 				final String key = reduceKey(parts[1]);
 				table.computeIfAbsent(key, k -> new ArrayList<>(1))
-					.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
+					.add(Pair.of(parts[1], parts[2]));
 			}
 		}
 		catch(final IOException e){
@@ -139,12 +139,17 @@ public class ConversionTable{
 	public List<String> applyConversionTable(final String word){
 		final List<String> conversions = new ArrayList<>();
 		if(table != null){
-			conversions.addAll(applyConversionTable(word, KEY_WHOLE));
-			conversions.addAll(applyConversionTable(word, KEY_STARTS_WITH));
-			conversions.addAll(applyConversionTable(word, KEY_ENDS_WITH));
-			conversions.addAll(applyConversionTable(word, KEY_INSIDE));
+			final String inputWord = StringUtils.replace(word, StringUtils.SPACE, "_");
+			conversions.addAll(applyConversionTable(inputWord, KEY_WHOLE));
+			conversions.addAll(applyConversionTable(inputWord, KEY_STARTS_WITH));
+			conversions.addAll(applyConversionTable(inputWord, KEY_ENDS_WITH));
+			conversions.addAll(applyConversionTable(inputWord, KEY_INSIDE));
 		}
-		return conversions;
+
+		final List<String> list = new ArrayList<>(conversions.size());
+		for(final String s : conversions)
+			list.add(StringUtils.replace(s, "_", StringUtils.SPACE));
+		return list;
 	}
 
 	private List<String> applyConversionTable(final String word, final String key){

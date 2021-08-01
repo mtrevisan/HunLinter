@@ -220,7 +220,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			throws IOException{
 		final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
 		if(!metadataPath.toFile().exists())
-			MetadataBuilder.create(affixData, "prefix", metadataPath, charset);
+			MetadataBuilder.createPOSInfo(affixData, "prefix", metadataPath, charset);
 
 		return MetadataBuilder.read(metadataPath);
 	}
