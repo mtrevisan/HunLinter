@@ -3,7 +3,7 @@
 			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>unit731</groupId>
+	<groupId>io.github.mtrevisan</groupId>
 	<artifactId>HunLinter</artifactId>
 	<version>2.0.1-SNAPSHOT</version>
 
@@ -16,7 +16,6 @@
 	<developers>
 		<developer>
 			<name>Mauro Trevisan</name>
-			<email>851903+mtrevisan@users.noreply.github.com</email>
 			<url>https://github.com/mtrevisan/</url>
 			<roles>
 				<role>Developer</role>
@@ -36,7 +35,8 @@
 	</issueManagement>
 
 	<properties>
-		<main.class>unit731.hunlinter.MainFrame</main.class>
+		<main.class>io.github.mtrevisan.hunlinter.MainFrame</main.class>
+		<app.name>HunLinter</app.name>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -50,13 +50,26 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 
+		<!-- This property is used to specify the modules included in the (custom) JVM image. -->
+		<jvm.modules>java.desktop,logback.core,hppcrt,org.apache.commons.io,json.simple,slf4j.api,org.jfree.jfreechart,org.apache.commons.lang3,jcommander,logback.classic,org.apache.commons.text</jvm.modules>
+		<!-- This ID is used by the Windows installer system to know that an installer is intended to replace/upgrade an earlier version.
+			Grab a unique UUID via https://www.uuidgenerator.net -->
+		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
+		<!-- This is used to set many user-visible fields in the Windows Installer. See win-jpackage.txt -->
+		<windows.vendor>Mauro Trevisan's Tools</windows.vendor>
+
 		<!-- Profiles & Build -->
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
+		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+		<maven-jlink-plugin.version>3.1.0</maven-jlink-plugin.version>
+		<maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
+		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+		<codehaus.exec-maven-plugin.version>3.0.0</codehaus.exec-maven-plugin.version>
 
 		<!-- Apache -->
 		<apache.commons-text.version>1.9</apache.commons-text.version>
@@ -67,9 +80,6 @@
 
 		<!-- jFreeChart -->
 		<jfree.jfreechart.version>1.5.3</jfree.jfreechart.version>
-
-		<!-- Morfologik -->
-		<carrot2.morfologik-tools.version>2.1.7</carrot2.morfologik-tools.version>
 
 		<!-- JSON -->
 		<googlecode.json-simple.version>1.1.1</googlecode.json-simple.version>
@@ -85,6 +95,44 @@
 	</properties>
 
 	<profiles>
+		<!-- We use the built-in Maven profile activation system to set the platform property.
+        These properties are then use to build the directory paths to the platform specific resources.
+        It would be great if Maven automatically added the os family as a property by default
+        -->
+		<profile>
+			<id>installer-unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>linux</platform>
+			</properties>
+		</profile>
+		<profile>
+			<id>installer-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>win</platform>
+			</properties>
+		</profile>
+		<profile>
+			<id>installer-mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>mac</platform>
+			</properties>
+		</profile>
+
 		<profile>
 			<id>stage</id>
 			<activation>
@@ -161,7 +209,6 @@
 			</build>
 		</profile>
 	</profiles>
-
 	<build>
 		<plugins>
 			<!-- Compiler -->
@@ -194,73 +241,200 @@
 			</plugin>
 			<!-- Shade -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
+			<!-- NOTE: shade 3.3.0 does not support java 16 yet! -->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-shade-plugin</artifactId>-->
+<!--				<version>${maven-shade-plugin.version}</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						&lt;!&ndash; Run shade goal on package phase &ndash;&gt;-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>shade</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<minimizeJar>true</minimizeJar>-->
+<!--							<shadedArtifactAttached>true</shadedArtifactAttached>-->
+<!--							<shadedClassifierName>shaded</shadedClassifierName>-->
+<!--							<filters>-->
+<!--								&lt;!&ndash; FIXME: strengthen the inclusions &ndash;&gt;-->
+<!--								&lt;!&ndash; ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator&ndash;&gt;-->
+<!--								<filter>-->
+<!--									<artifact>ch.qos.logback:logback-classic</artifact>-->
+<!--									<includes>-->
+<!--										<include>**</include>-->
+<!--									</includes>-->
+<!--								</filter>-->
+<!--								<filter>-->
+<!--									<artifact>*:*</artifact>-->
+<!--									<excludes>-->
+<!--										<exclude>LICENSE.txt</exclude>-->
+<!--										<exclude>META-INF/LICENSE</exclude>-->
+<!--										<exclude>META-INF/LICENSE.txt</exclude>-->
+<!--										<exclude>META-INF/NOTICE</exclude>-->
+<!--										<exclude>META-INF/NOTICE.txt</exclude>-->
+<!--									</excludes>-->
+<!--								</filter>-->
+<!--							</filters>-->
+<!--							<transformers>-->
+<!--								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+<!--									<mainClass>${main.class}</mainClass>-->
+<!--									<manifestEntries>-->
+<!--										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>-->
+<!--										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>-->
+<!--										<Built-By>Mauro Trevisan</Built-By>-->
+<!--										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>-->
+<!--										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>-->
+<!--									</manifestEntries>-->
+<!--								</transformer>-->
+<!--							</transformers>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+			<!-- Dependency -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>${maven-shade-plugin.version}</version>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${maven-dependency-plugin.version}</version>
 				<executions>
 					<execution>
-						<!-- Run shade goal on package phase -->
+						<!-- This copies all of the jar files declared by the Maven build into a single directory.
+						This makes it easy to assemble the final installer package -->
+						<id>copy-dependencies</id>
 						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- JAR -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
+			<plugin>
+				<!-- Put the application jar generated by the project into the dependency folder - the default folder
+				for the maven-dependency-plugin output. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<outputDirectory>${project.build.directory}/dependency</outputDirectory>
+				</configuration>
+			</plugin>
+			<!-- Install -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${maven-install-plugin.version}</version>
+				<configuration>
+					<!-- This is an app, so we don't want to install it in the local Maven repository -->
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<!-- Jlink -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jlink-plugin</artifactId>
+				<version>${maven-jlink-plugin.version}</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>jlink-execution</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jlink</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>shaded</shadedClassifierName>
-							<filters>
-								<!-- FIXME: strengthen the inclusions -->
-								<!-- ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator-->
-								<filter>
-									<artifact>ch.qos.logback:logback-classic</artifact>
-									<includes>
-										<include>**</include>
-									</includes>
-								</filter>
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>LICENSE.txt</exclude>
-										<exclude>META-INF/LICENSE</exclude>
-										<exclude>META-INF/LICENSE.txt</exclude>
-										<exclude>META-INF/NOTICE</exclude>
-										<exclude>META-INF/NOTICE.txt</exclude>
-									</excludes>
-								</filter>
-							</filters>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>${main.class}</mainClass>
-									<manifestEntries>
-										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
-										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
-										<Built-By>Mauro Trevisan</Built-By>
-										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
-										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
-									</manifestEntries>
-								</transformer>
-							</transformers>
+							<!-- configuration elements goes here -->
+							<noHeaderFiles>true</noHeaderFiles>
+							<noManPages>true</noManPages>
+							<stripDebug>true</stripDebug>
+							<compress>2</compress>
+							<modulePaths>
+								<modulePath>${project.basedir}/${platform}/</modulePath>
+							</modulePaths>
+							<addModules>${jvm.modules}</addModules>
+							<outputDirectory>${project.build.directory}/jvm-image</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Vix -->
+			<!-- https://github.com/wiverson/jtoolprovider-plugin -->
+<!--			<plugin>-->
+<!--				<groupId>io.github.wiverson</groupId>-->
+<!--				<artifactId>jtoolprovider-plugin</artifactId>-->
+<!--				<version>1.0.34</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>jlink</id>-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>java-tool</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<toolName>jlink</toolName>-->
+<!--							<removeDirectories>${project.build.directory}/jvm-image/</removeDirectories>-->
+<!--							<modulePath>${project.basedir}/${platform}/</modulePath>-->
+<!--							<addModules>${jvm.modules}</addModules>-->
+<!--							<output>${project.build.directory}/jvm-image</output>-->
+<!--							<args>-->
+<!--								<arg>&#45;&#45;strip-native-commands</arg>-->
+<!--								<arg>&#45;&#45;no-header-files</arg>-->
+<!--								<arg>&#45;&#45;strip-debug</arg>-->
+<!--								<arg>&#45;&#45;no-man-pages</arg>-->
+<!--								<arg>&#45;&#45;compress=2</arg>-->
+<!--							</args>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--					&lt;!&ndash; The command that actually generates the installer. The options for each platform-->
+<!--					are found the /src/packaging directory. These files are copied into the target directory by-->
+<!--					the Maven resources plugin, which does the filtering to replace the original values with-->
+<!--					the actual Maven properties.-->
+<!--					https://github.com/wiverson/jtoolprovider-plugin/blob/main/java-tool-doc.md-->
+<!--					&ndash;&gt;-->
+<!--					<execution>-->
+<!--						<id>jpackage</id>-->
+<!--						<phase>install</phase>-->
+<!--						<goals>-->
+<!--							<goal>java-tool</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<toolName>jpackage</toolName>-->
+<!--							<removeDirectories>${project.build.directory}/installer-work</removeDirectories>-->
+<!--							<args>@${project.build.directory}/packaging/${platform}-jpackage.txt</args>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 		</plugins>
 
 		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>*.*</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
 			<!-- include non-java src files in the same place in the output jar -->
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>
-					<include>unit731/hunlinter/languages/*/rules.properties</include>
+					<include>io/github/mtrevisan/hunlinter/languages/*/rules.properties</include>
 				</includes>
+			</resource>
+			<resource>
+				<!-- Here we are processing the platform-specific jpackage command files, adding in Maven properties for configuration. -->
+				<directory>${project.basedir}/src/packaging</directory>
+				<filtering>true</filtering>
+				<targetPath>${project.build.directory}/packaging</targetPath>
+			</resource>
+			<!-- Add the default resource path back in - by overriding above it disables the default -->
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<includes>
+					<include>*.*</include>
+				</includes>
+				<filtering>true</filtering>
 			</resource>
 		</resources>
 	</build>
@@ -297,13 +471,23 @@
 			<version>${jfree.jfreechart.version}</version>
 		</dependency>
 
-		<!-- Morfologik -->
-		<!-- https://mvnrepository.com/artifact/org.carrot2/morfologik-tools -->
+		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<dependency>
-			<groupId>org.carrot2</groupId>
-			<artifactId>morfologik-tools</artifactId>
-			<version>${carrot2.morfologik-tools.version}</version>
+			<groupId>com.github.vsonnier</groupId>
+			<artifactId>hppcrt</artifactId>
+			<version>0.7.5</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.koloboke</groupId>-->
+<!--			<artifactId>koloboke-api-jdk8</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.koloboke</groupId>-->
+<!--			<artifactId>koloboke-impl-jdk8</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
 
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->

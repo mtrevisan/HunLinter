@@ -1,0 +1,71 @@
+/**
+ * Copyright (c) 2019-2020 Mauro Trevisan
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+package io.github.mtrevisan.hunlinter.parsers.hyphenation;
+
+
+public class HyphenationOptions{
+
+	private int leftMin;
+	private int rightMin;
+
+	private final int minDefault;
+
+
+	public HyphenationOptions(final int minDefault){
+		this.minDefault = Math.max(minDefault, 0);
+
+		clear();
+	}
+
+	public int getLeftMin(){
+		return leftMin;
+	}
+
+	public int getRightMin(){
+		return rightMin;
+	}
+
+	public int getMinDefault(){
+		return minDefault;
+	}
+
+	public final void clear(){
+		leftMin = minDefault;
+		rightMin = minDefault;
+	}
+
+	public void setLeftMin(final int value){
+		leftMin = Math.max(value, 0);
+	}
+
+	public void setRightMin(final int value){
+		rightMin = Math.max(value, 0);
+	}
+
+	public int getMinimumLength(){
+		return leftMin + rightMin;
+	}
+
+}
