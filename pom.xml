@@ -51,7 +51,7 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 
 		<!-- This property is used to specify the modules included in the (custom) JVM image. -->
-		<jvm.modules>java.desktop,logback.core,hppcrt,org.apache.commons.io,json.simple,slf4j.api,org.jfree.jfreechart,org.apache.commons.lang3,jcommander,logback.classic,org.apache.commons.text</jvm.modules>
+		<jvm.modules>java.desktop,logback.core,hppcrt,org.apache.commons.io,json.simple,slf4j.api,org.jfree.jfreechart,org.apache.commons.lang3,logback.classic,org.apache.commons.text</jvm.modules>
 		<!-- This ID is used by the Windows installer system to know that an installer is intended to replace/upgrade an earlier version.
 			Grab a unique UUID via https://www.uuidgenerator.net -->
 		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
@@ -355,10 +355,13 @@
 							<stripDebug>true</stripDebug>
 							<compress>2</compress>
 							<modulePaths>
+								<modulePath>%JAVA_HOME%\jmods</modulePath>
+								<modulePath>dependency</modulePath>
 								<modulePath>${project.basedir}/${platform}/</modulePath>
 							</modulePaths>
 							<addModules>${jvm.modules}</addModules>
 							<outputDirectory>${project.build.directory}/jvm-image</outputDirectory>
+							<launcher>run=io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.MainFrame</launcher>
 						</configuration>
 					</execution>
 				</executions>

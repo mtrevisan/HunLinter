@@ -9,6 +9,11 @@ module HunLinter{
 	jar uf .\json-simple-1.1.1.jar -C .\jars\json.simple module-info.class
 	*/
 	requires json.simple;
+	/*
+	jdeps --ignore-missing-deps --generate-module-info jars .\commons-lang3-3.11.jar
+	javac --patch-module org.apache.commons.lang3=commons-lang3-3.11.jar .\jars\org.apache.commons.lang3\module-info.java
+	jar uf .\commons-lang3-3.11.jar -C .\jars\org.apache.commons.lang3 module-info.class
+	*/
 	requires org.apache.commons.lang3;
 	requires org.apache.commons.io;
 	requires org.apache.commons.text;
