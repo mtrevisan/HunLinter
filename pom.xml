@@ -333,7 +333,6 @@
 			</plugin>
 			<!-- Jlink -->
 			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-			<!-- .\jvm-image\bin\java.exe -jar .\out\HunLinter-2.0.1-SNAPSHOT.jar -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -374,6 +373,33 @@
 					</arguments>
 				</configuration>
 			</plugin>
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>finish-building-executable</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/${jvm.temporaryFolder}</directory>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Execution -->
+			<!-- .\jvm-image\bin\java.exe -jar .\jvm-image\app\HunLinter-2.0.1-SNAPSHOT.jar -->
+
 			<!-- Install -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 			<plugin>
