@@ -51,7 +51,6 @@
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 
 		<!-- This property is used to specify the modules included in the (custom) JVM image. -->
-<!--		<jvm.modules>java.desktop,logback.core,hppcrt,org.apache.commons.io,json.simple,slf4j.api,org.jfree.jfreechart,org.apache.commons.lang3,logback.classic,org.apache.commons.text</jvm.modules>-->
 		<jvm.modules>java.desktop,java.naming,jdk.localedata,jdk.unsupported</jvm.modules>
 		<jvm.locales>en</jvm.locales>
 		<jvm.temporaryFolder>out</jvm.temporaryFolder>
@@ -325,12 +324,34 @@
 				<executions>
 					<execution>
 						<id>make-assembly</id>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<file>${project.build.directory}/packaging/run.bat</file>
+					<replacements>
+						<replacement>
+							<token>\\\\</token>
+							<value>\\</value>
+						</replacement>
+					</replacements>
+				</configuration>
 			</plugin>
 			<!-- Jlink -->
 			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
@@ -341,10 +362,44 @@
 				<executions>
 					<execution>
 						<id>jlink</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.directory}</workingDirectory>
+							<executable>${java.home}/bin/jlink.exe</executable>
+							<arguments>
+								<argument>--strip-debug</argument>
+								<argument>--compress</argument>
+									<argument>2</argument>
+								<argument>--no-header-files</argument>
+								<argument>--no-man-pages</argument>
+								<argument>--include-locales=${jvm.locales}</argument>
+								<argument>--module-path</argument>
+									<argument>./${jvm.temporaryFolder}</argument>
+								<argument>--add-modules</argument>
+									<argument>${jvm.modules}</argument>
+<!--							<argument>&#45;&#45;launcher</argument>-->
+<!--								<argument>run=io.github.mtrevisan.hunlinter/${main.class}</argument>-->
+							<argument>--output</argument>
+								<argument>${jvm.outputFolder}</argument>
+						</arguments>
+					</configuration>
+					</execution>
+					<execution>
+						<id>bat2exe</id>
 						<phase>package</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/ab2econv423/aB2Econv.exe</executable>
+							<arguments>
+								<argument>${project.build.directory}/packaging/run.bat</argument>
+								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
+							</arguments>
+						</configuration>
 					</execution>
 				</executions>
 				<configuration>
@@ -354,24 +409,6 @@
 							<value>${JAVA_HOME}</value>
 						</systemProperty>
 					</systemProperties>
-					<workingDirectory>${project.build.directory}</workingDirectory>
-					<executable>${java.home}/bin/jlink</executable>
-					<arguments>
-						<argument>--strip-debug</argument>
-						<argument>--compress</argument>
-							<argument>2</argument>
-						<argument>--no-header-files</argument>
-						<argument>--no-man-pages</argument>
-						<argument>--include-locales=${jvm.locales}</argument>
-						<argument>--module-path</argument>
-							<argument>./${jvm.temporaryFolder}</argument>
-						<argument>--add-modules</argument>
-							<argument>${jvm.modules}</argument>
-<!--						<argument>&#45;&#45;launcher</argument>-->
-<!--							<argument>run=io.github.mtrevisan.hunlinter/${main.class}</argument>-->
-						<argument>--output</argument>
-							<argument>${jvm.outputFolder}</argument>
-					</arguments>
 				</configuration>
 			</plugin>
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
@@ -381,7 +418,7 @@
 				<version>3.2.0</version>
 				<executions>
 					<execution>
-						<id>finish-building-executable</id>
+						<id>finish-building-package</id>
 						<phase>package</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -399,8 +436,9 @@
 			</plugin>
 
 			<!-- Execution -->
-			<!-- TODO: create exe, apply packaging/installer.iss to inno setup -->
-			<!-- .\jvm-image\bin\java.exe -jar .\jvm-image\app\HunLinter-2.0.1-SNAPSHOT.jar -->
+			<!-- TODO: apply packaging/installer.iss to inno setup -->
+			<!-- cd .\app -->
+			<!-- ..\bin\java.exe -jar .\HunLinter-2.0.1-SNAPSHOT.jar -->
 
 			<!-- Install -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
