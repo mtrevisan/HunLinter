@@ -60,7 +60,8 @@
 			Grab a unique UUID via https://www.uuidgenerator.net -->
 		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
 		<!-- This is used to set many user-visible fields in the Windows Installer. See win-jpackage.txt -->
-		<windows.vendor>Mauro Trevisan's Tools</windows.vendor>
+		<app.vendor>Mauro Trevisan</app.vendor>
+		<app.menu>Mauro Trevisan's Tools</app.menu>
 
 		<!-- Profiles & Build -->
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -398,6 +399,7 @@
 			</plugin>
 
 			<!-- Execution -->
+			<!-- TODO: create exe, apply packaging/installer.iss to inno setup -->
 			<!-- .\jvm-image\bin\java.exe -jar .\jvm-image\app\HunLinter-2.0.1-SNAPSHOT.jar -->
 
 			<!-- Install -->
