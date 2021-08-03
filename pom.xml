@@ -52,6 +52,7 @@
 
 		<!-- This property is used to specify the modules included in the (custom) JVM image. -->
 		<jvm.modules>java.desktop,logback.core,hppcrt,org.apache.commons.io,json.simple,slf4j.api,org.jfree.jfreechart,org.apache.commons.lang3,logback.classic,org.apache.commons.text</jvm.modules>
+<!--<jvm.modules>java.desktop</jvm.modules>-->
 		<!-- This ID is used by the Windows installer system to know that an installer is intended to replace/upgrade an earlier version.
 			Grab a unique UUID via https://www.uuidgenerator.net -->
 		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
@@ -335,6 +336,138 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<version>1.0.0.RC1</version>
+				<executions>
+					<execution>
+						<id>generate-module-info</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/dependency</outputDirectory>
+							<overwriteExistingFiles>true</overwriteExistingFiles>
+							<modules>
+								<module>
+									<artifact>
+										<groupId>ch.qos.logback</groupId>
+										<artifactId>logback-classic</artifactId>
+										<version>${logback.logback-classic.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module logback.classic{
+											exports ch.qos.logback.classic;
+											exports org.slf4j.impl;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>ch.qos.logback</groupId>
+										<artifactId>logback-core</artifactId>
+										<version>${logback.logback-classic.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module logback.core{
+											exports ch.qos.logback.core;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.slf4j</groupId>
+										<artifactId>slf4j-api</artifactId>
+										<version>1.7.25</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.slf4j{
+											exports org.slf4j;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.github.vsonnier</groupId>
+										<artifactId>hppcrt</artifactId>
+										<version>0.7.5</version>
+									</artifact>
+									<moduleInfoSource>
+										module hppcrt{
+										exports com.carrotsearch.hppcrt;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.googlecode.json-simple</groupId>
+										<artifactId>json-simple</artifactId>
+										<version>${googlecode.json-simple.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module json.simple{
+										exports org.json.simple;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>commons-io</groupId>
+										<artifactId>commons-io</artifactId>
+										<version>${apache.commons-io.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.io{
+										exports org.apache.commons.io;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.commons</groupId>
+										<artifactId>commons-lang3</artifactId>
+										<version>3.11</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.lang3{
+										exports org.apache.commons.lang3;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.commons</groupId>
+										<artifactId>commons-text</artifactId>
+										<version>${apache.commons-text.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.text{
+										exports org.apache.commons.text;
+										}
+									</moduleInfoSource>
+								</module>
+
+								<module>
+									<artifact>
+										<groupId>org.jfree</groupId>
+										<artifactId>jfreechart</artifactId>
+										<version>${jfree.jfreechart.version}</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.jfree.jfreechart{
+											exports org.jfree.chart;
+											exports org.jfree.data;
+										}
+									</moduleInfoSource>
+								</module>
+							</modules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Jlink -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -356,12 +489,12 @@
 							<compress>2</compress>
 							<modulePaths>
 								<modulePath>%JAVA_HOME%\jmods</modulePath>
-								<modulePath>dependency</modulePath>
-								<modulePath>${project.basedir}/${platform}/</modulePath>
+								<modulePath>${project.build.directory}/dependency</modulePath>
+<!--								<modulePath>${project.basedir}/${platform}/</modulePath>-->
 							</modulePaths>
 							<addModules>${jvm.modules}</addModules>
 							<outputDirectory>${project.build.directory}/jvm-image</outputDirectory>
-							<launcher>run=io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.MainFrame</launcher>
+<!--							<launcher>run=io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.MainFrame</launcher>-->
 						</configuration>
 					</execution>
 				</executions>
