@@ -334,22 +334,22 @@
 			</plugin>
 			<!-- Dependency -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>${maven-dependency-plugin.version}</version>
-				<executions>
-					<execution>
-						<!-- This copies all of the jar files declared by the Maven build into a single directory.
-						This makes it easy to assemble the final installer package -->
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-dependency-plugin</artifactId>-->
+<!--				<version>${maven-dependency-plugin.version}</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						&lt;!&ndash; This copies all of the jar files declared by the Maven build into a single directory.-->
+<!--						This makes it easy to assemble the final installer package &ndash;&gt;-->
+<!--						<id>copy-dependencies</id>-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>copy-dependencies</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 			<!-- JAR -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
 <!--			<plugin>-->

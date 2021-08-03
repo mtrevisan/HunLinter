@@ -34,10 +34,11 @@ import java.util.Random;
 
 class HeapSortTest{
 
+	@SuppressWarnings("unchecked")
 	private static final Comparator<Object> NATURAL_ORDER = (first, second) -> ((Comparable<Object>)first).compareTo(second);
 
-	private static BigInteger HUGE = BigInteger.ONE.shiftLeft(100);
-	private static Random RND = new Random(666);
+	private static final BigInteger HUGE = BigInteger.ONE.shiftLeft(100);
+	private static final Random RND = new Random(666);
 
 
 	@Test
