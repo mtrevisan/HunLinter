@@ -2,6 +2,7 @@ module HunLinter{
 	requires java.desktop;
 	requires java.management;
 	requires java.prefs;
+	requires java.naming;
 	requires jdk.unsupported;
 	/*
 	jdeps --ignore-missing-deps --generate-module-info jars .\json-simple-1.1.1.jar
