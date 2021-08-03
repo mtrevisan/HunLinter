@@ -396,7 +396,7 @@
 									</artifact>
 									<moduleInfoSource>
 										module hppcrt{
-										exports com.carrotsearch.hppcrt;
+											exports com.carrotsearch.hppcrt;
 										}
 									</moduleInfoSource>
 								</module>
@@ -408,10 +408,11 @@
 									</artifact>
 									<moduleInfoSource>
 										module json.simple{
-										exports org.json.simple;
+											exports org.json.simple;
 										}
 									</moduleInfoSource>
 								</module>
+
 								<module>
 									<artifact>
 										<groupId>commons-io</groupId>
@@ -420,7 +421,7 @@
 									</artifact>
 									<moduleInfoSource>
 										module org.apache.commons.io{
-										exports org.apache.commons.io;
+											exports org.apache.commons.io;
 										}
 									</moduleInfoSource>
 								</module>
@@ -432,7 +433,7 @@
 									</artifact>
 									<moduleInfoSource>
 										module org.apache.commons.lang3{
-										exports org.apache.commons.lang3;
+											exports org.apache.commons.lang3;
 										}
 									</moduleInfoSource>
 								</module>
@@ -444,11 +445,10 @@
 									</artifact>
 									<moduleInfoSource>
 										module org.apache.commons.text{
-										exports org.apache.commons.text;
+											exports org.apache.commons.text;
 										}
 									</moduleInfoSource>
 								</module>
-
 								<module>
 									<artifact>
 										<groupId>org.jfree</groupId>
