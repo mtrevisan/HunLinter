@@ -66,12 +66,13 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
+<!--		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>-->
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+<!-- to be revised -->
+		<maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
 		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 		<maven-jlink-plugin.version>3.1.0</maven-jlink-plugin.version>
-		<maven-dependency-plugin.version>2.8</maven-dependency-plugin.version>
-		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-		<codehaus.exec-maven-plugin.version>3.0.0</codehaus.exec-maven-plugin.version>
+<!--		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>-->
 
 		<!-- Apache -->
 		<apache.commons-text.version>1.9</apache.commons-text.version>
@@ -238,6 +239,10 @@
 						<goals>
 							<goal>filter-sources</goal>
 						</goals>
+						<configuration>
+							<sourceDirectory>${project.basedir}/aids</sourceDirectory>
+							<outputDirectory>${project.build.directory}/out/aids</outputDirectory>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -259,6 +264,7 @@
 <!--							<minimizeJar>true</minimizeJar>-->
 <!--							<shadedArtifactAttached>true</shadedArtifactAttached>-->
 <!--							<shadedClassifierName>shaded</shadedClassifierName>-->
+<!--							<outputDirectory>${project.build.directory}/out</outputDirectory>-->
 <!--							<filters>-->
 <!--								&lt;!&ndash; FIXME: strengthen the inclusions &ndash;&gt;-->
 <!--								&lt;!&ndash; ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator&ndash;&gt;-->
@@ -295,10 +301,12 @@
 <!--					</execution>-->
 <!--				</executions>-->
 <!--			</plugin>-->
+			<!-- Assembly -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>${maven-assembly-plugin.version}</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -371,141 +379,141 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.moditect</groupId>
-				<artifactId>moditect-maven-plugin</artifactId>
-				<version>1.0.0.RC1</version>
-				<executions>
-					<execution>
-						<id>generate-module-info</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-module-info</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/dependency</outputDirectory>
-							<overwriteExistingFiles>true</overwriteExistingFiles>
-							<modules>
-								<module>
-									<artifact>
-										<groupId>ch.qos.logback</groupId>
-										<artifactId>logback-classic</artifactId>
-										<version>${logback.logback-classic.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module logback.classic{
-											exports ch.qos.logback.classic;
-											exports org.slf4j.impl;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>ch.qos.logback</groupId>
-										<artifactId>logback-core</artifactId>
-										<version>${logback.logback-classic.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module logback.core{
-											exports ch.qos.logback.core;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>org.slf4j</groupId>
-										<artifactId>slf4j-api</artifactId>
-										<version>1.7.25</version>
-									</artifact>
-									<moduleInfoSource>
-										module org.slf4j{
-											exports org.slf4j;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>com.github.vsonnier</groupId>
-										<artifactId>hppcrt</artifactId>
-										<version>0.7.5</version>
-									</artifact>
-									<moduleInfoSource>
-										module hppcrt{
-											exports com.carrotsearch.hppcrt;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>com.googlecode.json-simple</groupId>
-										<artifactId>json-simple</artifactId>
-										<version>${googlecode.json-simple.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module json.simple{
-											exports org.json.simple;
-										}
-									</moduleInfoSource>
-								</module>
+<!--			<plugin>-->
+<!--				<groupId>org.moditect</groupId>-->
+<!--				<artifactId>moditect-maven-plugin</artifactId>-->
+<!--				<version>1.0.0.RC1</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>generate-module-info</id>-->
+<!--						<phase>generate-sources</phase>-->
+<!--						<goals>-->
+<!--							<goal>add-module-info</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<outputDirectory>${project.build.directory}/dependency</outputDirectory>-->
+<!--							<overwriteExistingFiles>true</overwriteExistingFiles>-->
+<!--							<modules>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>ch.qos.logback</groupId>-->
+<!--										<artifactId>logback-classic</artifactId>-->
+<!--										<version>${logback.logback-classic.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module logback.classic{-->
+<!--											exports ch.qos.logback.classic;-->
+<!--											exports org.slf4j.impl;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>ch.qos.logback</groupId>-->
+<!--										<artifactId>logback-core</artifactId>-->
+<!--										<version>${logback.logback-classic.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module logback.core{-->
+<!--											exports ch.qos.logback.core;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>org.slf4j</groupId>-->
+<!--										<artifactId>slf4j-api</artifactId>-->
+<!--										<version>1.7.25</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module org.slf4j{-->
+<!--											exports org.slf4j;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>com.github.vsonnier</groupId>-->
+<!--										<artifactId>hppcrt</artifactId>-->
+<!--										<version>0.7.5</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module hppcrt{-->
+<!--											exports com.carrotsearch.hppcrt;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>com.googlecode.json-simple</groupId>-->
+<!--										<artifactId>json-simple</artifactId>-->
+<!--										<version>${googlecode.json-simple.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module json.simple{-->
+<!--											exports org.json.simple;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
 
-								<module>
-									<artifact>
-										<groupId>commons-io</groupId>
-										<artifactId>commons-io</artifactId>
-										<version>${apache.commons-io.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module org.apache.commons.io{
-											exports org.apache.commons.io;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>org.apache.commons</groupId>
-										<artifactId>commons-lang3</artifactId>
-										<version>3.11</version>
-									</artifact>
-									<moduleInfoSource>
-										module org.apache.commons.lang3{
-											exports org.apache.commons.lang3;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>org.apache.commons</groupId>
-										<artifactId>commons-text</artifactId>
-										<version>${apache.commons-text.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module org.apache.commons.text{
-											exports org.apache.commons.text;
-										}
-									</moduleInfoSource>
-								</module>
-								<module>
-									<artifact>
-										<groupId>org.jfree</groupId>
-										<artifactId>jfreechart</artifactId>
-										<version>${jfree.jfreechart.version}</version>
-									</artifact>
-									<moduleInfoSource>
-										module org.jfree.jfreechart{
-											exports org.jfree.chart;
-											exports org.jfree.data;
-										}
-									</moduleInfoSource>
-								</module>
-							</modules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>commons-io</groupId>-->
+<!--										<artifactId>commons-io</artifactId>-->
+<!--										<version>${apache.commons-io.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module org.apache.commons.io{-->
+<!--											exports org.apache.commons.io;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>org.apache.commons</groupId>-->
+<!--										<artifactId>commons-lang3</artifactId>-->
+<!--										<version>3.11</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module org.apache.commons.lang3{-->
+<!--											exports org.apache.commons.lang3;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>org.apache.commons</groupId>-->
+<!--										<artifactId>commons-text</artifactId>-->
+<!--										<version>${apache.commons-text.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module org.apache.commons.text{-->
+<!--											exports org.apache.commons.text;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--								<module>-->
+<!--									<artifact>-->
+<!--										<groupId>org.jfree</groupId>-->
+<!--										<artifactId>jfreechart</artifactId>-->
+<!--										<version>${jfree.jfreechart.version}</version>-->
+<!--									</artifact>-->
+<!--									<moduleInfoSource>-->
+<!--										module org.jfree.jfreechart{-->
+<!--											exports org.jfree.chart;-->
+<!--											exports org.jfree.data;-->
+<!--										}-->
+<!--									</moduleInfoSource>-->
+<!--								</module>-->
+<!--							</modules>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 
 			<!-- Jlink -->
-			<!-- & 'C:\Program Files\Java\jdk-16\bin\jlink' - -strip-debug - -compress 2 - -module-path "%JAVA_HOME%\jmods;./out/HunLinter-2.0.1-SNAPSHOT-fat.jar" - -no-header-files - -no-man-pages - -add-modules java.desktop - -output jdk-image -->
-			<!-- .\jdk-image\bin\java.exe -jar .\out\HunLinter-2.0.1-SNAPSHOT.jar -->
+			<!-- & 'C:\Program Files\Java\jdk-16\bin\jlink' - -strip-debug - -compress 2 - -module-path ./out - -no-header-files - -no-man-pages - -add-modules java.desktop - -output jvm-image -->
+			<!-- .\jvm-image\bin\java.exe -jar .\out\HunLinter-2.0.1-SNAPSHOT.jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jlink-plugin</artifactId>
@@ -525,7 +533,7 @@
 							<stripDebug>true</stripDebug>
 							<compress>2</compress>
 							<modulePaths>
-								<modulePath>%JAVA_HOME%\jmods</modulePath>
+<!--								<modulePath>%JAVA_HOME%\jmods</modulePath>-->
 <!--								<modulePath>${project.build.directory}/dependency</modulePath>-->
 								<modulePath>${project.build.directory}/out</modulePath>
 <!--								<modulePath>${project.basedir}/${platform}/</modulePath>-->
