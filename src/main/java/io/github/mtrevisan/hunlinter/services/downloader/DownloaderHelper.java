@@ -78,6 +78,7 @@ public final class DownloaderHelper{
 	public static final String PROPERTY_KEY_BUILD_TIMESTAMP = "buildTimestamp";
 
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
+	private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
 	public static final Map<String, Object> APPLICATION_PROPERTIES;
 	static{
@@ -139,7 +140,7 @@ public final class DownloaderHelper{
 
 	public static GITFileData extractVersionData(final Version version) throws Exception{
 		//find last build by filename
-		final String filename = "-" + version + DEFAULT_PACKAGING_EXTENSION;
+		final String filename = "-" + version;
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).openStream()){
 			final byte[] dataBytes = is.readAllBytes();
 			final GITFileData fileData = extractData(filename, dataBytes);
@@ -171,9 +172,12 @@ public final class DownloaderHelper{
 		final String content = new String(directoryContent, StandardCharsets.UTF_8);
 		final JSONParser parser = new JSONParser();
 		final JSONArray array = (JSONArray)parser.parse(content);
-		for(final Object elem : array)
-			if(((String)((JSONObject)elem).get(PROPERTY_KEY_FILENAME)).endsWith(filename))
+		for(final Object elem : array){
+			final String repositoryFilename = (String)((JSONObject)elem).get(PROPERTY_KEY_FILENAME);
+			//either a jar or an exe
+			if(repositoryFilename.endsWith(filename + DEFAULT_PACKAGING_EXTENSION) || repositoryFilename.endsWith(filename + DEFAULT_EXECUTABLE_EXTENSION))
 				return new GITFileData((JSONObject)elem);
+		}
 		return null;
 	}
 

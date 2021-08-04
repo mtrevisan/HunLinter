@@ -41,6 +41,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -268,16 +269,25 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		statusLabel.setText("File has been downloaded and verified successfully!");
 
 		try{
-			final Path fileToMove = Path.of(localPath);
-			final String destinationFolder = FilenameUtils.getFullPath(
-				MainFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-			final Path destinationPath = Path.of(
-				(destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
-				FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
-			FileHelper.moveFile(fileToMove, destinationPath);
+			if(localPath.endsWith(".jar")){
+				final Path fileToMove = Path.of(localPath);
+				final String destinationFolder = FilenameUtils.getFullPath(
+					MainFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+				final Path destinationPath = Path.of(
+					(destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
+					FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
+				FileHelper.moveFile(fileToMove, destinationPath);
 
-			//exit current jar and start new one
-			JavaHelper.closeAndStartAnotherApplication(destinationPath.toString());
+				//exit current jar and start new one
+				JavaHelper.closeAndStartAnotherApplication(destinationPath.toString());
+			}
+			else{
+				//open downloaded setup
+				FileHelper.browse(new File(localPath));
+
+				//exit
+				System.exit(0);
+			}
 		}
 		catch(final Exception e){
 			e.printStackTrace();
