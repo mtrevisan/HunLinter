@@ -4,6 +4,7 @@
 #define MyAppName "${app.name}"
 #define MyAppVersion "${project.version}"
 #define MyAppPublisher "${app.vendor}"
+#define MyAppMenuName "${app.menu}"
 #define MyAppExeName "${app.name}.exe"
 
 [Setup]
@@ -15,7 +16,7 @@ AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
-DefaultGroupName={#MyAppName}
+DefaultGroupName={#MyAppMenuName}
 AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
@@ -23,8 +24,6 @@ PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=${project.build.directory}\installer
 OutputBaseFilename="${app.name} ${project.version} Setup"
 SetupIconFile=${project.basedir}\app-icon.ico
-Password=Anton! LaVey! 666!
-Encryption=yes
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
