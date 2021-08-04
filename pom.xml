@@ -257,7 +257,7 @@
 <!--									<manifestEntries>-->
 <!--										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>-->
 <!--										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>-->
-<!--										<Built-By>Mauro Trevisan</Built-By>-->
+<!--										<Built-By>${app.vendor}</Built-By>-->
 <!--										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>-->
 <!--										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>-->
 <!--									</manifestEntries>-->
@@ -288,7 +288,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifestEntries>
-							<Built-By>Mauro Trevisan</Built-By>
+							<Built-By>${app.vendor}</Built-By>
 						</manifestEntries>
 						<manifest>
 							<mainClass>${main.class}</mainClass>
