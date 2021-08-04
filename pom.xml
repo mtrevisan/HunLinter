@@ -364,10 +364,10 @@
 									<argument>${jvm.modules}</argument>
 <!--							<argument>&#45;&#45;launcher</argument>-->
 <!--								<argument>run=io.github.mtrevisan.hunlinter/${main.class}</argument>-->
-							<argument>--output</argument>
-								<argument>${jvm.outputFolder}</argument>
-						</arguments>
-					</configuration>
+								<argument>--output</argument>
+									<argument>${jvm.outputFolder}</argument>
+							</arguments>
+						</configuration>
 					</execution>
 					<execution>
 						<id>bat2exe</id>
@@ -380,6 +380,39 @@
 							<arguments>
 								<argument>${project.build.directory}/packaging/run.bat</argument>
 								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<!-- copy remaining resources into the jvm image folder -->
+					<execution>
+						<id>include-last-resources-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/cmd=move</argument>
+								<argument>"${project.build.directory}/${jvm.temporaryFolder}"</argument>
+								<argument>/to="${project.build.directory}/${jvm.outputFolder}/app"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>include-last-resources-aids</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/cmd=force_copy</argument>
+								<argument>"${project.basedir}/aids"</argument>
+								<argument>/to="${project.build.directory}/${jvm.outputFolder}/app/aids"</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -399,6 +432,24 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<!-- The command that actually generates the installer. The options for each platform
+					are found the /src/packaging directory. These files are copied into the target directory by
+					the Maven resources plugin, which does the filtering to replace the original values with
+					the actual Maven properties.
+					https://github.com/wiverson/jtoolprovider-plugin/blob/main/java-tool-doc.md
+					-->
+<!--					<execution>-->
+<!--						<id>jpackage</id>-->
+<!--						<phase>install</phase>-->
+<!--						<goals>-->
+<!--							<goal>java-tool</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<toolName>jpackage</toolName>-->
+<!--							<removeDirectories>${project.build.directory}/installer-work</removeDirectories>-->
+<!--							<args>@${project.build.directory}/packaging/${platform}-jpackage.txt</args>-->
+<!--						</configuration>-->
+<!--					</execution>-->
 				</executions>
 				<configuration>
 					<systemProperties>
@@ -409,44 +460,6 @@
 						</systemProperty>
 					</systemProperties>
 				</configuration>
-			</plugin>
-			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>finish-building-package</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${project.build.directory}/${jvm.temporaryFolder}</directory>
-								</resource>
-							</resources>
-							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>finish-building-package2</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/aids</directory>
-								</resource>
-							</resources>
-							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app/aids</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 
 			<!-- Install -->
