@@ -383,6 +383,22 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<!-- run inno setup to create installer -->
+					<execution>
+						<id>installer</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.directory}</workingDirectory>
+							<executable>iscc.exe</executable>
+							<arguments>
+								<argument>/Q</argument>
+								<argument>${project.build.directory}/packaging/installer.iss</argument>
+							</arguments>
+						</configuration>
+					</execution>
 				</executions>
 				<configuration>
 					<systemProperties>
@@ -429,9 +445,6 @@
 							</resources>
 							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app/aids</outputDirectory>
 						</configuration>
-					</execution>
-					<execution>
-						<!-- TODO: apply packaging/installer.iss to inno setup -->
 					</execution>
 				</executions>
 			</plugin>
