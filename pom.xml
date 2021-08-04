@@ -196,7 +196,7 @@
 				<version>${maven-replacer-plugin.version}</version>
 				<executions>
 					<execution>
-						<phase>prepare-package</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
