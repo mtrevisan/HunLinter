@@ -3,7 +3,7 @@
 			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>unit731</groupId>
+	<groupId>io.github.mtrevisan</groupId>
 	<artifactId>HunLinter</artifactId>
 	<version>2.0.1-SNAPSHOT</version>
 
@@ -16,7 +16,6 @@
 	<developers>
 		<developer>
 			<name>Mauro Trevisan</name>
-			<email>851903+mtrevisan@users.noreply.github.com</email>
 			<url>https://github.com/mtrevisan/</url>
 			<roles>
 				<role>Developer</role>
@@ -36,19 +35,33 @@
 	</issueManagement>
 
 	<properties>
-		<main.class>unit731.hunlinter.MainFrame</main.class>
+		<main.class>io.github.mtrevisan.hunlinter.MainFrame</main.class>
+		<app.name>HunLinter</app.name>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<java.version>1.14</java.version>
-		<maven.compiler.source>14</maven.compiler.source>
-		<maven.compiler.target>14</maven.compiler.target>
+		<java.version>1.16</java.version>
+		<maven.compiler.source>16</maven.compiler.source>
+		<maven.compiler.target>16</maven.compiler.target>
 
 		<javadoc.html.version>-html5</javadoc.html.version>
 
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+		<!-- This property is used to specify the modules included in the (custom) JVM image. -->
+		<jvm.modules>java.desktop,java.naming,jdk.localedata,jdk.unsupported</jvm.modules>
+		<jvm.locales>en</jvm.locales>
+		<jvm.temporaryFolder>out</jvm.temporaryFolder>
+		<jvm.outputFolder>jvm-image</jvm.outputFolder>
+		<!-- This ID is used by the Windows installer system to know that an installer is intended to replace/upgrade an earlier version.
+			Grab a unique UUID via https://www.uuidgenerator.net -->
+		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
+		<!-- This is used to set many user-visible fields in the Windows Installer. See win-jpackage.txt -->
+		<app.vendor>Mauro Trevisan</app.vendor>
+		<app.menu>Mauro Trevisan's Tools</app.menu>
+		<app.copyright>(c) 2020-2021 Mauro Trevisan</app.copyright>
 
 		<!-- Profiles & Build -->
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -56,7 +69,11 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
+<!--		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>-->
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+		<maven-install-plugin.version>2.5.2</maven-install-plugin.version>
 
 		<!-- Apache -->
 		<apache.commons-text.version>1.9</apache.commons-text.version>
@@ -66,10 +83,7 @@
 <!--		<unimi.fastutil.version>8.5.2</unimi.fastutil.version>-->
 
 		<!-- jFreeChart -->
-		<jfree.jfreechart.version>1.5.2</jfree.jfreechart.version>
-
-		<!-- Morfologik -->
-		<carrot2.morfologik-tools.version>2.1.7</carrot2.morfologik-tools.version>
+		<jfree.jfreechart.version>1.5.3</jfree.jfreechart.version>
 
 		<!-- JSON -->
 		<googlecode.json-simple.version>1.1.1</googlecode.json-simple.version>
@@ -161,7 +175,6 @@
 			</build>
 		</profile>
 	</profiles>
-
 	<build>
 		<plugins>
 			<!-- Compiler -->
@@ -177,90 +190,300 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
-			<!-- Templating -->
-			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/templating-maven-plugin -->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>templating-maven-plugin</artifactId>
-				<version>1.0.0</version>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>${maven-replacer-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>generate-version-class</id>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>filter-sources</goal>
+							<goal>replace</goal>
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<file>${project.build.directory}/packaging/run.bat</file>
+					<replacements>
+						<replacement>
+							<token>\\\\</token>
+							<value>\\</value>
+						</replacement>
+					</replacements>
+				</configuration>
 			</plugin>
+
 			<!-- Shade -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
+			<!-- NOTE: shade 3.3.0 does not support java 16 yet! -->
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-shade-plugin</artifactId>-->
+<!--				<version>${maven-shade-plugin.version}</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						&lt;!&ndash; Run shade goal on package phase &ndash;&gt;-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>shade</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<minimizeJar>true</minimizeJar>-->
+<!--							<shadedArtifactAttached>true</shadedArtifactAttached>-->
+<!--							<shadedClassifierName>shaded</shadedClassifierName>-->
+<!--							<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>-->
+<!--							<filters>-->
+<!--								&lt;!&ndash; FIXME: strengthen the inclusions &ndash;&gt;-->
+<!--								&lt;!&ndash; ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator&ndash;&gt;-->
+<!--								<filter>-->
+<!--									<artifact>ch.qos.logback:logback-classic</artifact>-->
+<!--									<includes>-->
+<!--										<include>**</include>-->
+<!--									</includes>-->
+<!--								</filter>-->
+<!--								<filter>-->
+<!--									<artifact>*:*</artifact>-->
+<!--									<excludes>-->
+<!--										<exclude>LICENSE.txt</exclude>-->
+<!--										<exclude>META-INF/LICENSE</exclude>-->
+<!--										<exclude>META-INF/LICENSE.txt</exclude>-->
+<!--										<exclude>META-INF/NOTICE</exclude>-->
+<!--										<exclude>META-INF/NOTICE.txt</exclude>-->
+<!--									</excludes>-->
+<!--								</filter>-->
+<!--							</filters>-->
+<!--							<transformers>-->
+<!--								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+<!--									<mainClass>${main.class}</mainClass>-->
+<!--									<manifestEntries>-->
+<!--										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>-->
+<!--										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>-->
+<!--										<Built-By>${app.vendor}</Built-By>-->
+<!--										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>-->
+<!--										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>-->
+<!--									</manifestEntries>-->
+<!--								</transformer>-->
+<!--							</transformers>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+			<!-- Assembly / Make fat jar -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>${maven-shade-plugin.version}</version>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
 				<executions>
 					<execution>
-						<!-- Run shade goal on package phase -->
-						<phase>package</phase>
+						<id>make-assembly</id>
+						<phase>prepare-package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifestEntries>
+							<Built-By>${app.vendor}</Built-By>
+						</manifestEntries>
+						<manifest>
+							<mainClass>${main.class}</mainClass>
+						</manifest>
+					</archive>
+					<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
+			</plugin>
+			<!-- Jlink -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-antrun-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
-							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<shadedClassifierName>shaded</shadedClassifierName>
-							<filters>
-								<!-- FIXME: strengthen the inclusions -->
-								<!-- ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator-->
-								<filter>
-									<artifact>ch.qos.logback:logback-classic</artifact>
-									<includes>
-										<include>**</include>
-									</includes>
-								</filter>
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>LICENSE.txt</exclude>
-										<exclude>META-INF/LICENSE</exclude>
-										<exclude>META-INF/LICENSE.txt</exclude>
-										<exclude>META-INF/NOTICE</exclude>
-										<exclude>META-INF/NOTICE.txt</exclude>
-									</excludes>
-								</filter>
-							</filters>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>${main.class}</mainClass>
-									<manifestEntries>
-										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
-										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
-										<Built-By>Mauro Trevisan</Built-By>
-										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
-										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
-									</manifestEntries>
-								</transformer>
-							</transformers>
+							<target>
+								<!-- trick used to prevent errors while removal of output folder if it doesn't exist yet -->
+								<mkdir dir="${project.build.directory}/${jvm.outputFolder}" />
+							</target>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${exec-maven-plugin.version}</version>
+				<executions>
+					<!-- clean jvm image folder -->
+					<execution>
+						<id>clean-jvm-folder</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/log=FALSE</argument>
+								<argument>/estimate=FALSE</argument>
+								<argument>/cmd=delete</argument>
+								<argument>"${project.build.directory}/${jvm.outputFolder}"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>jlink</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.directory}</workingDirectory>
+							<executable>${java.home}/bin/jlink.exe</executable>
+							<arguments>
+								<argument>--strip-debug</argument>
+								<argument>--compress</argument>
+									<argument>2</argument>
+								<argument>--no-header-files</argument>
+								<argument>--no-man-pages</argument>
+								<argument>--include-locales=${jvm.locales}</argument>
+								<argument>--module-path</argument>
+									<argument>./${jvm.temporaryFolder}</argument>
+								<argument>--add-modules</argument>
+									<argument>${jvm.modules}</argument>
+<!--							<argument>&#45;&#45;launcher</argument>-->
+<!--								<argument>run=io.github.mtrevisan.hunlinter/${main.class}</argument>-->
+								<argument>--output</argument>
+									<argument>${jvm.outputFolder}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>bat2exe</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/ab2econv423/aB2Econv.exe</executable>
+							<arguments>
+								<argument>${project.build.directory}/packaging/run.bat</argument>
+								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<!-- copy remaining resources into the jvm image folder -->
+					<execution>
+						<id>include-last-resources-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/log=FALSE</argument>
+								<argument>/estimate=FALSE</argument>
+								<argument>/cmd=move</argument>
+								<argument>"${project.build.directory}/${jvm.temporaryFolder}"</argument>
+								<argument>/to="${project.build.directory}/${jvm.outputFolder}/app"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>include-last-resources-aids</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/log=FALSE</argument>
+								<argument>/estimate=FALSE</argument>
+								<argument>/cmd=force_copy</argument>
+								<argument>"${project.basedir}/aids"</argument>
+								<argument>/to="${project.build.directory}/${jvm.outputFolder}/app/aids"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<!-- run inno setup to create installer -->
+					<execution>
+						<id>installer</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.directory}</workingDirectory>
+							<executable>iscc.exe</executable>
+							<arguments>
+								<argument>/Q</argument>
+								<argument>${project.build.directory}/packaging/installer.iss</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<systemProperties>
+						<systemProperty>
+							<key>java.home</key>
+							<!--suppress UnresolvedMavenProperty -->
+							<value>${JAVA_HOME}</value>
+						</systemProperty>
+					</systemProperties>
+				</configuration>
+			</plugin>
+
+			<!-- Install -->
+			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${maven-install-plugin.version}</version>
+				<configuration>
+					<!-- This is an app, so we don't want to install it in the local Maven repository -->
+					<skip>true</skip>
+				</configuration>
+			</plugin>
 		</plugins>
 
 		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>*.*</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
 			<!-- include non-java src files in the same place in the output jar -->
 			<resource>
 				<directory>${project.build.sourceDirectory}</directory>
 				<includes>
-					<include>unit731/hunlinter/languages/*/rules.properties</include>
+					<include>io/github/mtrevisan/hunlinter/languages/*/rules.properties</include>
 				</includes>
+			</resource>
+			<resource>
+				<!-- Here we are processing the platform-specific jpackage command files, adding in Maven properties for configuration. -->
+				<directory>${project.basedir}/src/packaging</directory>
+				<filtering>true</filtering>
+				<targetPath>${project.build.directory}/packaging</targetPath>
+			</resource>
+			<!-- Add the default resource path back in - by overriding above it disables the default -->
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<includes>
+					<include>*.*</include>
+				</includes>
+				<filtering>true</filtering>
 			</resource>
 		</resources>
 	</build>
@@ -297,13 +520,23 @@
 			<version>${jfree.jfreechart.version}</version>
 		</dependency>
 
-		<!-- Morfologik -->
-		<!-- https://mvnrepository.com/artifact/org.carrot2/morfologik-tools -->
+		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<dependency>
-			<groupId>org.carrot2</groupId>
-			<artifactId>morfologik-tools</artifactId>
-			<version>${carrot2.morfologik-tools.version}</version>
+			<groupId>com.github.vsonnier</groupId>
+			<artifactId>hppcrt</artifactId>
+			<version>0.7.5</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.koloboke</groupId>-->
+<!--			<artifactId>koloboke-api-jdk8</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.koloboke</groupId>-->
+<!--			<artifactId>koloboke-impl-jdk8</artifactId>-->
+<!--			<version>1.0.0</version>-->
+<!--			<scope>runtime</scope>-->
+<!--		</dependency>-->
 
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->

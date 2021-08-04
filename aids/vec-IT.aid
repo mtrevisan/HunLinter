@@ -10,9 +10,9 @@ tB/lB/7B: theme 9, 10 for stressed words (-àr: base/no vanishing el variant/van
 tC/lC/7C: theme 9, 10 for stressed words (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
 
 xA: irregular verb (re-?)andar
-xB/xC: irregular verb (re-?)av?er, (re-?)g(av)er, ‘(v)er
-xD : irregular verb (a(s)|apar|de|(in)kon|intra|man|(re)o|re|sos|tra)[ct][èé]ñer, (a(r)|ben|de(x)|(des|re)kon|in|inter|intr[ae]|kontra|mal|per|pre|(re)so|pro|rin|sko(n)|sora|x)v[èéí]ñer/‘ñer
-xE : irregular verb (des|re)(c|ti?)oler, (ben|mal|re)(vu?|‘)oler
+xB/xC: irregular verb (re-?)av?er, (re-?)g(av)er, ʼ(v)er
+xD : irregular verb (a(s)|apar|de|(in)kon|intra|man|(re)o|re|sos|tra)[ct][èé]ñer, (a(r)|ben|de(x)|(des|re)kon|in|inter|intr[ae]|kontra|mal|per|pre|(re)so|pro|rin|sko(n)|sora|x)v[èéí]ñer/ʼñer
+xE : irregular verb (des|re)(c|ti?)oler, (ben|mal|re)(vu?|ʼ)oler
 xF : irregular verb (dex)dar, ((dex)asue|des|kon(tra)|[lƚ]iku[ei]|putre|(ra)?re|sastu|sat[iu]s|sodis|sora|stra|stupe|tore|tume)far, (kon(tra)|mal|move|o|re|so(ra|to))star
 xG : irregular verb liku[ei]far senŧa èle vanesente
 xH : irregular verb ƚiku[ei]far ko èle vanesente
@@ -54,7 +54,7 @@ B1: feltrin-belumat transformation, plural with transformation '[aeou][ln] > 'Vi
 B2: feltrin-belumat transformation, plural with transformation '[aeou][^-]+[aeou][ln] > 'V[^-]+Vi (l>i|[aeouàèéòóú]l, n>i|[aeouàèéòóú]n)
 A5/A6: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, neve > neu / '-[ai]vo > '-Vu ([aiò]vo>[àíò]u|[aeiò]vo, ve>u|neve)
 V3/V4/V7: venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
-Vf: venetian transformation for femenine words (-l>-ƚe)
+Vf/Vm/Vx: venetian transformation for femenine/masculine/neuter words (-l>-ƚe)
 Vp: prefix for venetian transformation (lV->ƚV-, jV->ɉV-, ŧV->sV-, đV->xV-)
 Pd: paduan transformation: metaphonesis (-oxo>-uxi)
 Vs: prefix for vicentine transformation (re->ra-/ar-, se->sa-, per- > par-)
@@ -69,21 +69,22 @@ r0: denominal nominals (-[ae]ría)
 i0: denominal nominals (a>ist[aei]|l, [ae]>ist[aei], o>ist[aei]|[^i]o, o>st[aei]|io)
 w0: adverbs (-mente)
 y0/y1: collective nouns (duro>ur[oi], ada>à[ae], ida>í[ae], uda>ú[ae])
+y2: collective nouns (duro>ur[oi], ada>a[ae], ida>i[ae], uda>u[ae])
 Z0: ignore upper/lower case
 
-aT: altered nouns (-ato/a)
-aZ/aS: altered nouns (-aŧo/a, -aso/a)
+aT/a1: altered nouns (-ato/a, -ƚ-ato/a)
+aZ/aS/aL: altered nouns (-aŧo/a, -aso/a, -ƚ-aso/a)
 eL/e7: altered nouns (-èl/èla, -èƚo/a)
-eT/e1: altered nouns (-eto/a)
+eT/e1: altered nouns (-eto/a, -ƚ-eto/a)
 eZ/eS: deajectival nominals (-eŧa/e, -esa/e)
 iN: altered nouns (-in/-ina)
 iZ/iS: deajectival nominals (-iŧia/e, -isia/e)
-o0/o7: altered nouns (-on)
+o0/o7: altered nouns (-on, -ƚ-on)
 o1: altered nouns (-ona)
 o2/o3: altered nouns (-one masc., -one fem.)
 o4: altered nouns (-oni masc.)
-oT: altered nouns (-òto/a)
-uZ/uS: altered nouns (-uŧo/a)
+oT/oL: altered nouns (-òto/a, -ƚ-òto/a)
+uZ/uS/uL: altered nouns (-uŧo/a, -uso/a, -ƚ-uso/a)
 
 p2/p3: prefix for bi-/tr[ie]-
 ^0/^1/^2/^3/^4/^5/^6/^7/^8: prefix for altered nouns (anti-/tra-/pre-/kapo-/kontra-/kontro-/stra-/mal-/ben-)
@@ -95,7 +96,7 @@ p2/p3: prefix for bi-/tr[ie]-
 :0: prefix for union, participation, connection (kon-)
 gv: prefix for initial lenition gu[ae]>v[ae]
 N1..N6/|1..|6: composite numerals
-%0: numerals (collectives) (-exèna)
+%0: numerals (collectives) (-ex[eè]na)
 %1: altered numerals (collectives) (-ando)
 %a/%7: altered numerals (collectives) (-èx[ei]mo)
 %2/%3: latin numerals (I, II, III, ...)

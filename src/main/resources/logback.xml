@@ -5,7 +5,7 @@
 			<pattern>%date{HH:mm:ss} [%highlight(%5level)] %logger{0}:%line %msg%n</pattern>
 		</encoder>
 	</appender>
-	<appender name="application" class="unit731.hunlinter.services.log.ApplicationLogAppender">
+	<appender name="application" class="io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender">
 		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
 				<marker>application</marker>
@@ -18,7 +18,7 @@
 			<pattern>%date{HH:mm:ss} %msg%n</pattern>
 		</encoder>
 	</appender>
-	<appender name="rule-reducer" class="unit731.hunlinter.services.log.ApplicationLogAppender">
+	<appender name="rule-reducer" class="io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender">
 		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
 				<marker>rule-reducer</marker>
@@ -31,7 +31,7 @@
 			<pattern>%msg%n</pattern>
 		</encoder>
 	</appender>
-	<appender name="rule-reducer-status" class="unit731.hunlinter.services.log.ApplicationLogAppender">
+	<appender name="rule-reducer-status" class="io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender">
 		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
 				<marker>rule-reducer-status</marker>
@@ -45,7 +45,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="unit731.hunlinter" level="info" />
+	<logger name="io.github.mtrevisan.hunlinter" level="info" />
 
 	<logger name="sun.misc" level="off" />
 	<logger name="java.util" level="off" />
