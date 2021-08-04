@@ -195,7 +195,7 @@
 				<version>${maven-replacer-plugin.version}</version>
 				<executions>
 					<execution>
-						<phase>compile</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
@@ -306,7 +306,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<phase>initialize</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
