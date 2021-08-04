@@ -68,6 +68,7 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
 <!--		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>-->
 		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
 		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
@@ -226,24 +227,27 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
-			<!-- Templating -->
-			<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/templating-maven-plugin -->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>templating-maven-plugin</artifactId>
-				<version>1.0.0</version>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>${maven-replacer-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>generate-version-class</id>
+						<phase>compile</phase>
 						<goals>
-							<goal>filter-sources</goal>
+							<goal>replace</goal>
 						</goals>
-						<configuration>
-							<sourceDirectory>${project.basedir}/aids</sourceDirectory>
-							<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}/aids</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<file>${project.build.directory}/packaging/run.bat</file>
+					<replacements>
+						<replacement>
+							<token>\\\\</token>
+							<value>\\</value>
+						</replacement>
+					</replacements>
+				</configuration>
 			</plugin>
 			<!-- Shade -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
@@ -300,12 +304,21 @@
 <!--					</execution>-->
 <!--				</executions>-->
 <!--			</plugin>-->
-			<!-- Assembly -->
+			<!-- Assembly / Make fat jar -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>${maven-assembly-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
@@ -320,37 +333,6 @@
 					</archive>
 					<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>
 					<appendAssemblyId>false</appendAssemblyId>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>1.5.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<file>${project.build.directory}/packaging/run.bat</file>
-					<replacements>
-						<replacement>
-							<token>\\\\</token>
-							<value>\\</value>
-						</replacement>
-					</replacements>
 				</configuration>
 			</plugin>
 			<!-- Jlink -->
@@ -406,6 +388,7 @@
 					<systemProperties>
 						<systemProperty>
 							<key>java.home</key>
+							<!--suppress UnresolvedMavenProperty -->
 							<value>${JAVA_HOME}</value>
 						</systemProperty>
 					</systemProperties>
@@ -432,13 +415,26 @@
 							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app</outputDirectory>
 						</configuration>
 					</execution>
+					<execution>
+						<id>finish-building-package2</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/aids</directory>
+								</resource>
+							</resources>
+							<outputDirectory>${project.build.directory}/${jvm.outputFolder}/app/aids</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- TODO: apply packaging/installer.iss to inno setup -->
+					</execution>
 				</executions>
 			</plugin>
-
-			<!-- Execution -->
-			<!-- TODO: apply packaging/installer.iss to inno setup -->
-			<!-- cd .\app -->
-			<!-- ..\bin\java.exe -jar .\HunLinter-2.0.1-SNAPSHOT.jar -->
 
 			<!-- Install -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
