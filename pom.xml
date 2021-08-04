@@ -5,7 +5,7 @@
 
 	<groupId>io.github.mtrevisan</groupId>
 	<artifactId>HunLinter</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>2.0.1</version>
 
 	<packaging>jar</packaging>
 
@@ -372,6 +372,21 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>bat2exe-ocx-registration</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>cmd</executable>
+							<arguments>
+								<argument>/C</argument>
+								<argument>start</argument>
+								<argument>${project.basedir}/src/building/ab2econv423/reg</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
 						<id>bat2exe</id>
 						<phase>package</phase>
 						<goals>
@@ -431,7 +446,7 @@
 						</goals>
 						<configuration>
 							<workingDirectory>${project.build.directory}</workingDirectory>
-							<executable>iscc.exe</executable>
+							<executable>"C:\Program Files (x86)\Inno Setup 6\iscc.exe"</executable>
 							<arguments>
 								<argument>/Q</argument>
 								<argument>${project.build.directory}/packaging/installer.iss</argument>
