@@ -1,7 +1,7 @@
 HunLinter
 ==========
 
-![Java-14+](https://img.shields.io/badge/java-14%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java-16+](https://img.shields.io/badge/java-16%2B-orange.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 <a href="https://codeclimate.com/github/mtrevisan/HunLinter"><img src="https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability" /></a>
 
