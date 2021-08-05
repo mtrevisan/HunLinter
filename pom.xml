@@ -372,28 +372,13 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>bat2exe-ocx-registration</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>cmd</executable>
-							<arguments>
-								<argument>/C</argument>
-								<argument>start</argument>
-								<argument>${project.basedir}/src/building/ab2econv423/reg</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
 						<id>bat2exe</id>
 						<phase>package</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/building/ab2econv423/aB2Econv.exe</executable>
+							<executable>${project.basedir}/src/building/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
 							<arguments>
 								<argument>${project.build.directory}/packaging/run.bat</argument>
 								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
