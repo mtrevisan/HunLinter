@@ -309,11 +309,14 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
-<a name="changelog-2.0.0"></a>
-### version 2.0.1 - 2020????
+<a name="changelog-2.0.1"></a>
+### version 2.0.1 - 20210805
 - added warn for unused rules after dictionary linter
 - added the possibility to hide selected columns from dictionary table
+- (finally) added a windows installer
+- some minor improvements on speed and linting capabilities
 
+<a name="changelog-2.0.0"></a>
 ### version 2.0.0 - 20200524
 - made update process stoppable
 - added a linter for thesaurus
