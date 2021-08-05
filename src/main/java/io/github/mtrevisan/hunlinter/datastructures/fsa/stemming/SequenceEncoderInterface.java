@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2020 Mauro Trevisan
+ * Copyright (c) 2019-2021 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
