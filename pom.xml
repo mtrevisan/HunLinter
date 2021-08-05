@@ -334,7 +334,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -378,7 +378,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/building/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
+							<executable>${project.basedir}/src/tools/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
 							<arguments>
 								<argument>${project.build.directory}/packaging/run.bat</argument>
 								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
@@ -393,7 +393,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -411,7 +411,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/building/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
