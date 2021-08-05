@@ -61,7 +61,7 @@
 		<!-- This is used to set many user-visible fields in the Windows Installer. See win-jpackage.txt -->
 		<app.vendor>Mauro Trevisan</app.vendor>
 		<app.menu>Mauro Trevisan's Tools</app.menu>
-		<app.copyright>(c) 2020-2021 Mauro Trevisan</app.copyright>
+		<app.copyright>(c) 2019-2021 Mauro Trevisan</app.copyright>
 
 		<!-- Profiles & Build -->
 		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
