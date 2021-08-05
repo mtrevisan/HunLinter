@@ -6,12 +6,11 @@ HunLinter
 <a href="https://codeclimate.com/github/mtrevisan/HunLinter"><img src="https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/maintainability" /></a>
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-==========
 
 <br />
 
 ## Forewords
-Please, be aware that this application requires Java 14+!
+Please, be aware that this application requires Java 16+!
 
 You can download and install it for free from this [link](https://www.oracle.com/java/technologies/javase-downloads.html).
 

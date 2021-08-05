@@ -364,8 +364,6 @@
 									<argument>./${jvm.temporaryFolder}</argument>
 								<argument>--add-modules</argument>
 									<argument>${jvm.modules}</argument>
-<!--							<argument>&#45;&#45;launcher</argument>-->
-<!--								<argument>run=io.github.mtrevisan.hunlinter/${main.class}</argument>-->
 								<argument>--output</argument>
 									<argument>${jvm.outputFolder}</argument>
 							</arguments>
