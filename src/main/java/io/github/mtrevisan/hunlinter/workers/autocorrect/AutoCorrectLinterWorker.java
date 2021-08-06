@@ -86,12 +86,24 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			final String correctForm = data.getCorrectForm()
 				.toLowerCase(Locale.ROOT);
 
-			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(correctForm, " –");
-			for(final String word : words)
-				if(!bloomFilter.contains(word))
-					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
-						new Object[]{word, correctForm}));
+			boolean containsSpecialChars = false;
+			int bound = correctForm.length();
+			for(int i = 0; i < bound; i ++){
+				final char chr = correctForm.charAt(i);
+				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
+					containsSpecialChars = true;
+					break;
+				}
+			}
+
+			if(!containsSpecialChars){
+				//check if the word is present in the dictionary
+				final String[] words = StringUtils.split(correctForm, " –");
+				for(final String word : words)
+					if(!bloomFilter.contains(word))
+						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+							new Object[]{word, correctForm}));
+			}
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
