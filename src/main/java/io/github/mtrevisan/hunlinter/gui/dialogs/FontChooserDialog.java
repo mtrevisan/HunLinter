@@ -275,9 +275,9 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_familyNameListValueChanged
 
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
-		final List<String> fonts = (monospacedCheckBox.isSelected()?
-			FontHelper.getFamilyNamesMonospaced():
-			FontHelper.getFamilyNamesAll());
+		final List<String> fonts = (monospacedCheckBox.isSelected()
+			? FontHelper.getFamilyNamesMonospaced()
+			: FontHelper.getFamilyNamesAll());
 
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();

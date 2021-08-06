@@ -129,8 +129,9 @@ public class DictionaryEntry{
 	}
 
 	private static String expandAliases(final String part, final List<String> aliases){
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)?
-			aliases.get(Integer.parseInt(part) - 1): part);
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)
+			? aliases.get(Integer.parseInt(part) - 1)
+			: part);
 	}
 
 	private static boolean containsStem(final String[] mfs){

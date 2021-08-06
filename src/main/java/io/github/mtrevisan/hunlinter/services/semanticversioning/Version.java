@@ -288,9 +288,9 @@ public class Version implements Comparable<Version>{
 	}
 
 	private int compareIdentifiers(final String identifier1, final String identifier2){
-		return (StringUtils.isNumeric(identifier1) && StringUtils.isNumeric(identifier2)?
-			Integer.parseInt(identifier1) - Integer.parseInt(identifier2):
-			identifier1.compareTo(identifier2));
+		return (StringUtils.isNumeric(identifier1) && StringUtils.isNumeric(identifier2)
+			? Integer.parseInt(identifier1) - Integer.parseInt(identifier2)
+			: identifier1.compareTo(identifier2));
 	}
 
 	@Override

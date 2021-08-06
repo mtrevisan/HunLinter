@@ -266,9 +266,9 @@ public class AffixEntry{
 		if(condition.length() == 1 && condition.charAt(0) == '.')
 			return true;
 
-		return (parent.getType() == AffixType.PREFIX?
-			canApplyToPrefix(word):
-			canApplyToSuffix(word));
+		return (parent.getType() == AffixType.PREFIX
+			? canApplyToPrefix(word)
+			: canApplyToSuffix(word));
 	}
 
 	private boolean canApplyToPrefix(final String word){
@@ -336,16 +336,16 @@ public class AffixEntry{
 		if(!isFullstrip && word.length() == removing.length())
 			throw new LinterException(CANNOT_FULL_STRIP.format(new Object[]{word}));
 
-		return (parent.getType() == AffixType.SUFFIX?
-			word.substring(0, word.length() - removing.length()) + appending:
-			appending + word.substring(removing.length()));
+		return (parent.getType() == AffixType.SUFFIX
+			? word.substring(0, word.length() - removing.length()) + appending
+			: appending + word.substring(removing.length()));
 	}
 
 	//NOTE: {#canInverseApplyTo} should be called to verify applicability
 	public String undoRule(final String word){
-		return (parent.getType() == AffixType.SUFFIX?
-			word.substring(0, word.length() - appending.length()) + removing:
-			removing + word.substring(appending.length()));
+		return (parent.getType() == AffixType.SUFFIX
+			? word.substring(0, word.length() - appending.length()) + removing
+			: removing + word.substring(appending.length()));
 	}
 
 	public String toString(final FlagParsingStrategy strategy){

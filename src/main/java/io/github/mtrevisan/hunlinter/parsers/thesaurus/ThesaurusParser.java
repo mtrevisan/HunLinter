@@ -220,12 +220,12 @@ public class ThesaurusParser{
 
 	public static Pair<String, String> prepareTextForFilter(final String[] partOfSpeeches, final String[] synonyms){
 		//extract Part-of-Speech if present
-		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0?
-			"[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]":
-			".+");
-		final String synonymsFilter = (synonyms != null && synonyms.length > 0?
-			"(" + StringUtils.join(synonyms, PIPE) + ")":
-			".+");
+		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0
+			? "[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]"
+			: ".+");
+		final String synonymsFilter = (synonyms != null && synonyms.length > 0
+			? "(" + StringUtils.join(synonyms, PIPE) + ")"
+			: ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);

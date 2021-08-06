@@ -95,9 +95,9 @@ public class FixedArray<T>{
 	}
 
 	public synchronized int indexOf(final T elem, final int startIndex){
-		return (elem != null?
-			indexOfNonNull(elem, startIndex):
-			indexOfNull(startIndex));
+		return (elem != null
+			? indexOfNonNull(elem, startIndex)
+			: indexOfNull(startIndex));
 	}
 
 	private int indexOfNull(final int startIndex){
@@ -115,9 +115,9 @@ public class FixedArray<T>{
 	}
 
 	public synchronized int lastIndexOf(final T elem, final int startIndex){
-		return (elem != null?
-			lastIndexOfNonNull(elem, startIndex):
-			lastIndexOfNull(startIndex));
+		return (elem != null
+			? lastIndexOfNonNull(elem, startIndex)
+			: lastIndexOfNull(startIndex));
 	}
 
 	private int lastIndexOfNull(final int startIndex){

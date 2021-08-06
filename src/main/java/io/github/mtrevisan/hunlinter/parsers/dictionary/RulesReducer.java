@@ -445,9 +445,9 @@ public class RulesReducer{
 					}
 
 					//if intersection between notPresentConditions and overallLastGroup is not empty
-					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()?
-						RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition:
-						RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
+					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()
+						? RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition
+						: RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
 					final LineEntry newEntry = LineEntry.createFrom(parent, newCondition);
 					finalRules.add(newEntry);
 				}
@@ -464,12 +464,12 @@ public class RulesReducer{
 			groupsIntersection);
 		final Set<Character> overallLastGroup = overallLastGroups.get(parentConditionLength);
 		final Set<Character> baseGroup = (chooseRatifyingOverNegated? parentGroup: childrenGroup);
-		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated?
-			RegexHelper::makeGroup:
-			RegexHelper::makeNotGroup);
-		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated?
-			RegexHelper::makeNotGroup:
-			RegexHelper::makeGroup);
+		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated
+			? RegexHelper::makeGroup
+			: RegexHelper::makeNotGroup);
+		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated
+			? RegexHelper::makeNotGroup:
+			: RegexHelper::makeGroup);
 
 		final String preCondition;
 		if(overallLastGroup != null){
@@ -477,9 +477,9 @@ public class RulesReducer{
 			if(baseGroup.size() == overallLastGroup.size())
 				preCondition = (parentConditionLength == 0? StringUtils.EMPTY: DOT);
 			else
-				preCondition = (baseGroup.size() <= group.size()?
-					combineRatifying.apply(baseGroup, comparator):
-					combineNegated.apply(group, comparator));
+				preCondition = (baseGroup.size() <= group.size()
+					? combineRatifying.apply(baseGroup, comparator)
+					: combineNegated.apply(group, comparator));
 		}
 		else
 			preCondition = combineRatifying.apply(baseGroup, comparator);
@@ -673,10 +673,10 @@ public class RulesReducer{
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(final Collection<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
-			entry -> (entry.condition.contains(RegexHelper.GROUP_END)?
-			entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
-				+ RegexSequencer.splitSequence(entry.condition).length:
-			null));
+			entry -> (entry.condition.contains(RegexHelper.GROUP_END)
+			? entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
+				+ RegexSequencer.splitSequence(entry.condition).length
+			: null));
 		final Collection<Character> group = new HashSet<>();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){

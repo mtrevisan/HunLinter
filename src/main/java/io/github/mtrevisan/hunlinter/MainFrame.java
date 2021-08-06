@@ -205,9 +205,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				//choose the right icon for the folder
 				@Override
 				public Icon getIcon(final File file){
-					return (Packager.isProjectFolder(file)?
-						projectFolderIcon:
-						FileSystemView.getFileSystemView().getSystemIcon(file));
+					return (Packager.isProjectFolder(file)
+						? projectFolderIcon
+						: FileSystemView.getFileSystemView().getSystemIcon(file));
 				}
 			});
 		}
@@ -685,7 +685,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 			//load font for this language
-			loadLanguadeDependentFont();
+			loadLanguageDependentFont();
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
@@ -694,13 +694,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}
 
-	private void loadLanguadeDependentFont(){
+	private void loadLanguageDependentFont(){
 		final String language = parserManager.getLanguage();
 		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 		final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-			FontChooserDialog.getDefaultFont());
+		final Font lastUsedFont = (fontFamilyName != null && fontSize != null
+			? new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize))
+			: FontChooserDialog.getDefaultFont());
 		FontHelper.setCurrentFont(lastUsedFont, this);
 	}
 
