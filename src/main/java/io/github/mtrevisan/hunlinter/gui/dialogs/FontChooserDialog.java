@@ -305,6 +305,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();
+			//TODO read size from GUI
 			selectedFont = new Font(fontFamily, Font.PLAIN, 16);
 		}
 
