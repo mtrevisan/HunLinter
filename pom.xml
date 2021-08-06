@@ -383,7 +383,7 @@
 								<argument>/log=FALSE</argument>
 								<argument>/estimate=FALSE</argument>
 								<argument>/cmd=force_copy</argument>
-								<argument>"${project.basedir}/tools/RunNHide.exe"</argument>
+								<argument>"${project.basedir}/tools/BAT2EXE/RunNHide.exe"</argument>
 								<argument>/to="${project.build.directory}/packaging-launcher"</argument>
 							</arguments>
 						</configuration>
@@ -395,7 +395,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/tools/makesfx 5.6.exe</executable>
+							<executable>${project.basedir}/tools/BAT2EXE/makesfx 5.6.exe</executable>
 							<arguments>
 								<argument>-ic</argument>
 								<argument>-mf</argument>
