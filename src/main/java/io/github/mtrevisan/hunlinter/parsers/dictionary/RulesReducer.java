@@ -468,7 +468,7 @@ public class RulesReducer{
 			? RegexHelper::makeGroup
 			: RegexHelper::makeNotGroup);
 		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated
-			? RegexHelper::makeNotGroup:
+			? RegexHelper::makeNotGroup
 			: RegexHelper::makeGroup);
 
 		final String preCondition;
