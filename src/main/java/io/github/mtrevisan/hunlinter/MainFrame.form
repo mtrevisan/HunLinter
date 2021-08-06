@@ -13,7 +13,7 @@
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="final Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;final RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentProjectsMenu.setText(&quot;Recent projects&quot;);&#xa;recentProjectsMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentProjectsMenu, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="final RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentProjectsMenu.setText(&quot;Recent projects&quot;);&#xa;recentProjectsMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentProjectsMenu, 3);"/>
           </AuxValues>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="filOpenProjectMenuItem">
@@ -229,6 +229,24 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="116"/>
                 <Property name="text" type="java.lang.String" value="Statistics"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="acoMenu">
+          <Properties>
+            <Property name="mnemonic" type="int" value="65"/>
+            <Property name="text" type="java.lang.String" value="AutoCorrect tools"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="acoLinterMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new AutoCorrectLinterAction(workerManager, this)" type="code"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="67"/>
+                <Property name="text" type="java.lang.String" value="Check correctness"/>
               </Properties>
             </MenuItem>
           </SubComponents>
