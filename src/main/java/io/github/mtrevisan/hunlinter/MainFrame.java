@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter;
 
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.gui.panes.AutoCorrectLayeredPane;
@@ -271,6 +272,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
+		acoMenu = new javax.swing.JMenu();
+		acoLinterMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
@@ -437,12 +440,23 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(theMenu);
 
+		acoMenu.setMnemonic('A');
+		acoMenu.setText("AutoCorrect tools");
+		acoMenu.setEnabled(false);
+
+		acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
+		acoLinterMenuItem.setMnemonic('c');
+		acoLinterMenuItem.setText("Check correctness");
+		acoMenu.add(acoLinterMenuItem);
+
+		mainMenuBar.add(acoMenu);
+
       hypMenu.setMnemonic('y');
       hypMenu.setText("Hyphenation tools");
       hypMenu.setEnabled(false);
 
       hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
-      hypLinterMenuItem.setMnemonic('d');
+      hypLinterMenuItem.setMnemonic('c');
       hypLinterMenuItem.setText("Check correctness");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
@@ -658,6 +672,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
 			EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
 
+			//autocorrection file:
+			acoMenu.setEnabled(parserManager.getAcoParser().getCorrectionsCounter() > 0);
+			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+
 			//hyphenation file:
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
 			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
@@ -730,6 +748,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		dicMenu.setEnabled(false);
 		//thesaurus file:
 		theMenu.setEnabled(false);
+		//autocorrection file:
+		acoMenu.setEnabled(false);
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 
@@ -940,6 +960,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
    private javax.swing.JLayeredPane hypLayeredPane;
    private javax.swing.JMenuItem hypLinterMenuItem;
+	private javax.swing.JMenu acoMenu;
+	private javax.swing.JMenuItem acoLinterMenuItem;
    private javax.swing.JMenu hypMenu;
    private javax.swing.JMenuItem hypStatisticsMenuItem;
    private javax.swing.JMenuBar mainMenuBar;

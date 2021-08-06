@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.workers.autocorrect.AutoCorrectLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
@@ -134,6 +135,13 @@ public class WorkerManager{
 		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterWorker(parserManager.getTheParser(), parserManager.getLanguage(),
 			parserManager.getDicParser(), parserManager.getWordGenerator());
 		createWorker(ThesaurusLinterWorker.WORKER_NAME, creator, onStart, onEnd);
+	}
+
+	public void createAutoCorrectLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
+		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getTheParser(), parserManager.getLanguage(),
+			parserManager.getDicParser(), parserManager.getWordGenerator());
+		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart,
