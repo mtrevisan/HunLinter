@@ -25,10 +25,14 @@
 package io.github.mtrevisan.hunlinter.workers.core;
 
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 
 public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorrectParser>>{
@@ -37,23 +41,23 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		super(workerData);
 	}
 
-	protected void processLines(final Consumer<AutoCorrectEntry> dataProcessor){
+	protected void processLines(final Consumer<CorrectionEntry> dataProcessor){
 		Objects.requireNonNull(dataProcessor);
 
 		//load autocorrect
-		final List<AutoCorrectEntry> entries = loadAutoCorrect();
+		final List<CorrectionEntry> entries = loadAutoCorrect();
 
 		//process autocorrect
-		final Stream<AutoCorrectEntry> stream = (workerData.isParallelProcessing()
+		final Stream<CorrectionEntry> stream = (workerData.isParallelProcessing()
 			? entries.parallelStream()
 			: entries.stream());
 		processAutoCorrect(stream, entries.size(), dataProcessor);
 
-		AutoCorrectEntry data = null;
+		CorrectionEntry data = null;
 		try{
 			final AutoCorrectParser acoParser = workerData.getParser();
-			final List<AutoCorrectEntry> dictionary = acoParser.getSynonymsDictionary();
-			for(final AutoCorrectEntry acoEntry : dictionary){
+			final List<CorrectionEntry> dictionary = acoParser.getCorrectionsDictionary();
+			for(final CorrectionEntry acoEntry : dictionary){
 				data = acoEntry;
 				dataProcessor.accept(data);
 			}
@@ -63,15 +67,15 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		}
 	}
 
-	private List<AutoCorrectEntry> loadAutoCorrect(){
+	private List<CorrectionEntry> loadAutoCorrect(){
 		final AutoCorrectParser acoParser = workerData.getParser();
-		return acoParser.getSynonymsDictionary();
+		return acoParser.getCorrectionsDictionary();
 	}
 
-	private void processAutoCorrect(final Stream<AutoCorrectEntry> entries, final int totalEntries,
-			final Consumer<AutoCorrectEntry> dataProcessor){
+	private void processAutoCorrect(final Stream<CorrectionEntry> entries, final int totalEntries,
+			final Consumer<CorrectionEntry> dataProcessor){
 		try{
-			final Consumer<AutoCorrectEntry> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+			final Consumer<CorrectionEntry> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
 			entries.forEach(innerProcessor);
 		}
 		catch(final LinterException e){
@@ -81,7 +85,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		}
 	}
 
-	private Consumer<AutoCorrectEntry> createInnerProcessor(final Consumer<AutoCorrectEntry> dataProcessor, final int totalEntries){
+	private Consumer<CorrectionEntry> createInnerProcessor(final Consumer<CorrectionEntry> dataProcessor, final int totalEntries){
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{

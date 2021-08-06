@@ -30,12 +30,13 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemory
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
-import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAutoCorrect;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -46,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -61,8 +61,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter";
 
-	private static final MessageFormat MISSING_ENTRY = new MessageFormat("AutoCorrect doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
-	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain definition {0} (from entry {1})");
+	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -83,29 +82,15 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
-		final Consumer<AutoCorrectEntry> dataProcessor = data -> {
-			final String originalDefinition = data.getDefinition();
+		final Consumer<CorrectionEntry> dataProcessor = data -> {
+			final String correctForm = data.getCorrectForm();
 
 			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(originalDefinition, " –");
+			final String[] words = StringUtils.split(correctForm, " –");
 			for(final String word : words)
 				if(!bloomFilter.contains(word))
 					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
-						new Object[]{word, originalDefinition}));
-
-			//check if each part of `entry`, with appropriate PoS, exists
-			final List<SynonymsEntry> syns = data.getSynonyms();
-			for(final SynonymsEntry syn : syns){
-				final List<String> definitions = syn.getSynonyms();
-				final String[] partOfSpeeches = syn.getPartOfSpeeches();
-				for(String definition : definitions){
-					definition = AutoCorrectDictionary.removeSynonymUse(definition);
-					//check also that the found PoS has `originalDefinition` among its synonyms
-					if(!acoParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(
-							new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
-				}
-			}
+						new Object[]{word, correctForm}));
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
@@ -115,7 +100,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 			return null;
 		};
-		final Function<Void, List<IndexDataPair<AutoCorrectEntry>>> step2 = ignored -> {
+		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);

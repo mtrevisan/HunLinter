@@ -139,7 +139,7 @@ public class WorkerManager{
 
 	public void createAutoCorrectLinterWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd){
-		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getTheParser(), parserManager.getLanguage(),
+		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getAcoParser(), parserManager.getLanguage(),
 			parserManager.getDicParser(), parserManager.getWordGenerator());
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
