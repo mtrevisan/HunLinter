@@ -272,12 +272,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
-		acoMenu = new javax.swing.JMenu();
-		acoLinterMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
+      acoMenu = new javax.swing.JMenu();
+      acoLinterMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -362,7 +362,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(filMenu);
       final RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
@@ -440,23 +440,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(theMenu);
 
-		acoMenu.setMnemonic('A');
-		acoMenu.setText("AutoCorrect tools");
-		acoMenu.setEnabled(false);
-
-		acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
-		acoLinterMenuItem.setMnemonic('c');
-		acoLinterMenuItem.setText("Check correctness");
-		acoMenu.add(acoLinterMenuItem);
-
-		mainMenuBar.add(acoMenu);
-
       hypMenu.setMnemonic('y');
       hypMenu.setText("Hyphenation tools");
       hypMenu.setEnabled(false);
 
       hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
-      hypLinterMenuItem.setMnemonic('c');
+      hypLinterMenuItem.setMnemonic('d');
       hypLinterMenuItem.setText("Check correctness");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
@@ -467,6 +456,17 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.add(hypStatisticsMenuItem);
 
       mainMenuBar.add(hypMenu);
+
+      acoMenu.setMnemonic('A');
+      acoMenu.setText("AutoCorrect tools");
+      acoMenu.setEnabled(false);
+
+      acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
+      acoLinterMenuItem.setMnemonic('C');
+      acoLinterMenuItem.setText("Check correctness");
+      acoMenu.add(acoLinterMenuItem);
+
+      mainMenuBar.add(acoMenu);
 
       setMenu.setMnemonic('S');
       setMenu.setText("Settings");
@@ -924,6 +924,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLayeredPane acoLayeredPane;
+   private javax.swing.JMenuItem acoLinterMenuItem;
+   private javax.swing.JMenu acoMenu;
    private javax.swing.JLayeredPane cmpLayeredPane;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDictionaryFSAMenuItem;
@@ -960,8 +962,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
    private javax.swing.JLayeredPane hypLayeredPane;
    private javax.swing.JMenuItem hypLinterMenuItem;
-	private javax.swing.JMenu acoMenu;
-	private javax.swing.JMenuItem acoLinterMenuItem;
    private javax.swing.JMenu hypMenu;
    private javax.swing.JMenuItem hypStatisticsMenuItem;
    private javax.swing.JMenuBar mainMenuBar;
@@ -971,8 +971,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
-   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;
+   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;

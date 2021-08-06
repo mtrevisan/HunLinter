@@ -200,6 +200,10 @@
       <Events>
         <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="sizeTextFieldKeyReleased"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JFormattedTextField(formatter)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final NumberFormat format = NumberFormat.getInstance();&#xd;&#xa;final NumberFormatter formatter = new NumberFormatter(format);&#xd;&#xa;formatter.setValueClass(Integer.class);&#xd;&#xa;formatter.setMinimum(1);&#xd;&#xa;formatter.setAllowsInvalid(false);&#xd;&#xa;//if you want the value to be committed on each keystroke instead of focus lost&#xd;&#xa;formatter.setCommitsOnValidEdit(true);"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
