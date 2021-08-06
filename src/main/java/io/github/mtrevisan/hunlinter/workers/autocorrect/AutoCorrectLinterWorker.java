@@ -83,7 +83,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
 		final Consumer<CorrectionEntry> dataProcessor = data -> {
-			final String correctForm = data.getCorrectForm();
+			final String correctForm = data.getCorrectForm()
+				.toLowerCase(Locale.ROOT);
 
 			//check if the word is present in the dictionary
 			final String[] words = StringUtils.split(correctForm, " –");
