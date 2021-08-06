@@ -55,7 +55,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	@Serial
 	private static final long serialVersionUID = -4686780467476615109L;
 
-	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 16);
+	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 15);
 
 
 	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{
@@ -306,7 +306,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();
 			//TODO read size from GUI
-			selectedFont = new Font(fontFamily, Font.PLAIN, 16);
+			selectedFont = new Font(fontFamily, Font.PLAIN, 15);
 		}
 
 		final boolean fontChanged = !selectedFont.equals(previousFont);
