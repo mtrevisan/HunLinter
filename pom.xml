@@ -5,7 +5,7 @@
 
 	<groupId>io.github.mtrevisan</groupId>
 	<artifactId>HunLinter</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>2.0.2-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -203,7 +203,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<file>${project.build.directory}/packaging/run.bat</file>
+					<file>${project.build.directory}/packaging-launcher/launcher.bat</file>
 					<replacements>
 						<replacement>
 							<token>\\\\</token>
@@ -334,7 +334,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -369,6 +369,25 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<!-- Launcher -->
+					<execution>
+						<id>prepare-bat2exe</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
+							<arguments>
+								<argument>/no_ui</argument>
+								<argument>/log=FALSE</argument>
+								<argument>/estimate=FALSE</argument>
+								<argument>/cmd=force_copy</argument>
+								<argument>"${project.basedir}/tools/RunNHide.exe"</argument>
+								<argument>/to="${project.build.directory}/packaging-launcher"</argument>
+							</arguments>
+						</configuration>
+					</execution>
 					<execution>
 						<id>bat2exe</id>
 						<phase>package</phase>
@@ -376,10 +395,22 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
+							<executable>${project.basedir}/tools/makesfx 5.6.exe</executable>
 							<arguments>
-								<argument>${project.build.directory}/packaging/run.bat</argument>
-								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
+								<argument>-ic</argument>
+								<argument>-mf</argument>
+								<argument>-fc</argument>
+								<argument>-ws</argument>
+								<argument>-dn</argument>
+								<argument>-i</argument>
+								<argument>-s</argument>
+								<argument>-un</argument>
+								<argument>-oo</argument>
+								<argument>"${project.build.directory}/packaging-launcher/"</argument>
+								<argument>"${project.build.directory}/${jvm.outputFolder}/${app.name}.exe"</argument>
+								<argument>"${project.basedir}/app-icon.ico"</argument>
+								<argument>"${project.build.directory}/packaging-launcher/RunNHide.exe"</argument>
+								<argument>"launcher.bat"</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -391,7 +422,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -409,7 +440,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -470,10 +501,14 @@
 				</includes>
 			</resource>
 			<resource>
-				<!-- Here we are processing the platform-specific jpackage command files, adding in Maven properties for configuration. -->
 				<directory>${project.basedir}/src/packaging</directory>
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}/packaging</targetPath>
+			</resource>
+			<resource>
+				<directory>${project.basedir}/src/packaging-launcher</directory>
+				<filtering>true</filtering>
+				<targetPath>${project.build.directory}/packaging-launcher</targetPath>
 			</resource>
 			<!-- Add the default resource path back in - by overriding above it disables the default -->
 			<resource>

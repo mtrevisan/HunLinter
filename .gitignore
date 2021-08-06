@@ -6,4 +6,4 @@ nbactions-release-profile.xml
 nb-configuration.xml
 .idea/
 HunLinter.iml
-src/tools/FastCopy/FastCopy2.ini
+tools/FastCopy/FastCopy2.ini
