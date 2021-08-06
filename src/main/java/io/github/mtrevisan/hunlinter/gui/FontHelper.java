@@ -25,22 +25,18 @@
 package io.github.mtrevisan.hunlinter.gui;
 
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
@@ -82,53 +78,6 @@ public final class FontHelper{
 	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
 	private static Font CURRENT_FONT = FontChooserDialog.getDefaultFont();
 
-	private static final class WidthFontPair{
-		private final double width;
-		private final Font font;
-
-		public static WidthFontPair of(final double width, final Font font){
-			return new WidthFontPair(width, font);
-		}
-
-		private WidthFontPair(final double width, final Font font){
-			this.width = width;
-			this.font = font;
-		}
-
-		public double getWidth(){
-			return width;
-		}
-
-		public Font getFont(){
-			return font;
-		}
-
-		@Override
-		public String toString(){
-			return width + ": " + font.getName();
-		}
-
-		@Override
-		public boolean equals(final Object obj){
-			if(obj == this)
-				return true;
-			if(obj == null || obj.getClass() != getClass())
-				return false;
-
-			final WidthFontPair rhs = (WidthFontPair)obj;
-			return new EqualsBuilder()
-				.append(font, rhs.font)
-				.isEquals();
-		}
-
-		@Override
-		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(font)
-				.toHashCode();
-		}
-	}
-
 
 	private FontHelper(){}
 
@@ -136,32 +85,22 @@ public final class FontHelper{
 	public static Font chooseBestFont(final String languageSample){
 		extractFonts(languageSample);
 
-		final Function<Font, WidthFontPair> widthFontPair = font -> {
-			final double w = getStringBounds(font, languageSample)
-				.getWidth();
-			return WidthFontPair.of(w, font);
-		};
 		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
-
-		WidthFontPair bestPair = null;
-		for(final Font font : fonts){
-			final WidthFontPair doubleFontPair = widthFontPair.apply(font);
-			if(bestPair == null || doubleFontPair.getWidth() > bestPair.getWidth())
-				bestPair = doubleFontPair;
+		final Font defaultFont = FontChooserDialog.getDefaultFont();
+		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0));
+		if(!bestFont.equals(defaultFont)){
+			for(final Font f : fonts){
+				final String defaultFontName = defaultFont.getName();
+				if(f.getName().equals(defaultFontName)){
+					bestFont = defaultFont;
+					break;
+				}
+			}
 		}
-		Font bestFont = (bestPair != null? bestPair.getFont(): CURRENT_FONT);
-		bestFont = getDefaultHeightFont(bestFont);
+
 		LOGGER.info("Best font: '{}', size {}", bestFont.getFontName(), bestFont.getSize());
+
 		return bestFont;
-	}
-
-	public static Font getDefaultHeightFont(final Font font){
-		final Rectangle2D bounds = getStringBounds(font, "I");
-		return font.deriveFont(font.getSize() * 17.9f / (float)bounds.getHeight());
-	}
-
-	private static Rectangle2D getStringBounds(final Font font, final String text){
-		return font.getStringBounds(text, FRC);
 	}
 
 	public static void extractFonts(final String languageSample){
@@ -180,10 +119,6 @@ public final class FontHelper{
 						FAMILY_NAMES_MONOSPACED.add(font);
 				}
 		}
-	}
-
-	private static boolean canCurrentFontDisplay(final String languageSample){
-		return (CURRENT_FONT.canDisplayUpTo(languageSample) < 0);
 	}
 
 	private static boolean isMonospaced(final Font font){

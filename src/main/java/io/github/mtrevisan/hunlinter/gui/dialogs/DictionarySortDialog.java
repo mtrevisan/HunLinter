@@ -177,7 +177,7 @@ public class DictionarySortDialog extends JDialog{
 
 	private void setCurrentFont(){
 		final Font currentFont = FontHelper.getCurrentFont();
-		final Font font = currentFont.deriveFont(Math.round(currentFont.getSize() * FONT_SIZE_REDUCTION));
+		final Font font = currentFont.deriveFont((float)(currentFont.getSize() * FONT_SIZE_REDUCTION));
 		final ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex, font);
 		setCellRenderer(dicCellRenderer);
 	}

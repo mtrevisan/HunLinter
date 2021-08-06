@@ -358,7 +358,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
-      final Preferences preferences = Preferences.userNodeForPackage(getClass());
       final RecentItems recentItems = new RecentItems(5, preferences);
       recentProjectsMenu = new RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");

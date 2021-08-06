@@ -183,7 +183,7 @@ public class TagPanel extends JPanel{
 
 			final JLabel closeLabel = new JLabel(TEXT_CROSS_MARK);
 			final Font closeFont = closeLabel.getFont();
-			closeLabel.setFont(closeFont.deriveFont(closeFont.getSize() * 3.f / 4.f));
+			closeLabel.setFont(closeFont.deriveFont(closeFont.getSize() * 0.75f));
 			closeLabel.setForeground(COLOR_CLOSE);
 			closeLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			closeLabel.addMouseListener(new MouseAdapter(){
