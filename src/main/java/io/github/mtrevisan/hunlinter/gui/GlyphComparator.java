@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.gui;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 
 
 public final class GlyphComparator{
@@ -39,33 +40,9 @@ public final class GlyphComparator{
 	 * @param font	The font to render the character in
 	 * @param maxDifferenceThreshold	Maximum allowed difference
 	 * @param chrs	Characters to be check for equality
-	 * @return	Whether all the given characters are identical in theior glyph representation.
-	 */
-	public static boolean allIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
-		validateCharacters(chrs);
-
-		final BufferedImage glyph0 = renderImage(font, chrs[0]);
-
-		for(int i = 1; i < chrs.length; i ++){
-			final BufferedImage glyph = renderImage(font, chrs[i]);
-			if(visualSimilarity(glyph0, glyph) < maxDifferenceThreshold)
-				return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Perform glyph comparison, returning a list of matching codepoint tuples.
-	 * Stops prematurely (or never starts) if run == false.
-	 *
-	 * @param font	The font to render the character in
-	 * @param maxDifferenceThreshold	Maximum allowed difference
-	 * @param chrs	Characters to be check for equality
-	 * @return	Whether some of the given characters are identical in their glyph representation.
+	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
 	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
-		validateCharacters(chrs);
-
 		final BufferedImage[] glyphs = new BufferedImage[chrs.length];
 		glyphs[0] = renderImage(font, chrs[0]);
 		for(int i = 0; i < chrs.length - 1; i ++)
@@ -76,14 +53,7 @@ public final class GlyphComparator{
 				if(visualSimilarity(glyphs[i], glyphs[j]) < maxDifferenceThreshold)
 					return true;
 			}
-
 		return false;
-	}
-
-	private static void validateCharacters(final char[] chrs){
-		for(final char chr : chrs)
-			if(!Character.isLetterOrDigit(chr))
-				throw new IllegalArgumentException("Only letters or numbers chan be compared");
 	}
 
 	/**
@@ -105,14 +75,13 @@ public final class GlyphComparator{
 	}
 
 	private static float visualSimilarity(final BufferedImage img1, final BufferedImage img2){
+		final DataBuffer data1 = img1.getData().getDataBuffer();
+		final DataBuffer data2 = img2.getData().getDataBuffer();
+		final int size = data1.getSize();
 		int difference = 0;
-		final int width = img1.getWidth();
-		final int height = img1.getHeight();
-		for(int x = width - 1; x >= 0; x --)
-			for(int y = height - 1; y >= 0; y --)
-				if(img1.getRGB(x, y) != img2.getRGB(x, y))
-					difference ++;
-		return (float)difference / (width * height);
+		for(int i = 0; i < size; i ++)
+			difference += (data1.getElem(i) != data2.getElem(i)? 1: 0);
+		return (float)difference / size;
 	}
 
 }

@@ -347,11 +347,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filEmptyRecentProjectsMenuItem.setMnemonic('e');
       filEmptyRecentProjectsMenuItem.setText("Empty recent projects list");
       filEmptyRecentProjectsMenuItem.setEnabled(false);
-      filEmptyRecentProjectsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filEmptyRecentProjectsMenuItemActionPerformed(evt);
-         }
-      });
+      filEmptyRecentProjectsMenuItem.addActionListener(evt -> filEmptyRecentProjectsMenuItemActionPerformed(evt));
       filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
