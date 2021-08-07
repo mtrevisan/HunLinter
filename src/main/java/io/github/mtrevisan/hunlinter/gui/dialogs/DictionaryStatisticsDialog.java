@@ -95,11 +95,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		initComponents();
 
-		final Font currentFont = FontHelper.getCurrentFont();
-		mostCommonSyllabesValueLabel.setFont(currentFont);
-		longestWordCharactersValueLabel.setFont(currentFont);
-		longestWordSyllabesValueLabel.setFont(currentFont);
-
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
 			popupMenu.add(GUIHelper.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
@@ -187,7 +182,9 @@ public class DictionaryStatisticsDialog extends JDialog{
       mostCommonSyllabesLabel.setText("Most common syllabes:");
       mostCommonSyllabesLabel.setPreferredSize(new java.awt.Dimension(113, 17));
 
-      mostCommonSyllabesValueLabel.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		mostCommonSyllabesValueLabel.setFont(currentFont);
       mostCommonSyllabesValueLabel.setText("…");
       mostCommonSyllabesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
@@ -195,7 +192,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       longestWordCharactersLabel.setText("Longest word(s) (by characters):");
       longestWordCharactersLabel.setPreferredSize(new java.awt.Dimension(158, 17));
 
-      longestWordCharactersValueLabel.setFont(FontHelper.getCurrentFont());
+      longestWordCharactersValueLabel.setFont(currentFont);
       longestWordCharactersValueLabel.setText("…");
       longestWordCharactersValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
@@ -204,7 +201,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       longestWordSyllabesLabel.setPreferredSize(new java.awt.Dimension(146, 17));
       longestWordSyllabesLabel.setRequestFocusEnabled(false);
 
-      longestWordSyllabesValueLabel.setFont(FontHelper.getCurrentFont());
+      longestWordSyllabesValueLabel.setFont(currentFont);
       longestWordSyllabesValueLabel.setText("…");
       longestWordSyllabesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 

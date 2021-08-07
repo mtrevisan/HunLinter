@@ -52,6 +52,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -137,7 +138,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       incorrectLabel.setText("Incorrect form:");
 
-      incorrectTextField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		incorrectTextField.setFont(currentFont);
       incorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             incorrectTextFieldKeyReleased(evt);
@@ -148,7 +151,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       correctLabel.setText("Correct form:");
 
-      correctTextField.setFont(FontHelper.getCurrentFont());
+      correctTextField.setFont(currentFont);
       correctTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             correctTextFieldKeyReleased(evt);
@@ -164,7 +167,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          }
       });
 
-      table.setFont(FontHelper.getCurrentFont());
+      table.setFont(currentFont);
       table.setModel(new AutoCorrectTableModel());
       table.setRowHeight(24);
       table.setRowSorter(new TableRowSorter<>((AutoCorrectTableModel)table.getModel()));

@@ -155,7 +155,9 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
          }
       });
 
-      noHyphenationList.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		noHyphenationList.setFont(currentFont);
       //listen for row removal
       final KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       noHyphenationList.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);

@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,9 +38,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +56,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.Deflater;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
@@ -174,6 +175,8 @@ public class Packager{
 
 	private Path projectPath;
 	private Path mainManifestPath;
+	private Path autoCorrectPath;
+	private Path autoTextPath;
 	private final List<File> manifestFiles = new ArrayList<>();
 	private List<String> languages;
 
@@ -234,6 +237,23 @@ public class Packager{
 
 			processDictionariesConfigurationFile();
 			processPathsConfigurationFile();
+
+			//extract all .dat in autocorr folder
+			if(autoCorrectPath != null){
+				try(final Stream<Path> stream = Files.list(autoCorrectPath)){
+					stream.filter(file -> !Files.isDirectory(file))
+						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_DAT))
+						.forEach(path -> ZIPPER.unzipFile(path.toFile(), autoCorrectPath));
+				}
+			}
+			//extract all .bau in autotext folder
+			if(autoTextPath != null){
+				try(final Stream<Path> stream = Files.list(autoTextPath)){
+					stream.filter(file -> !Files.isDirectory(file))
+						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_BAU))
+						.forEach(path -> ZIPPER.unzipFile(path.toFile(), autoTextPath));
+				}
+			}
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
@@ -531,12 +551,17 @@ public class Packager{
 		final File file = absolutizeFolder(folder, basePath, originPath);
 		final Map<String, File> children = new HashMap<>();
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
+			autoCorrectPath = file.toPath();
+
 			children.put(FILENAME_AUTO_CORRECT, Path.of(file.toString(), FILENAME_AUTO_CORRECT).toFile());
 			children.put(FILENAME_SENTENCE_EXCEPTIONS, Path.of(file.toString(), FILENAME_SENTENCE_EXCEPTIONS).toFile());
 			children.put(FILENAME_WORD_EXCEPTIONS, Path.of(file.toString(), FILENAME_WORD_EXCEPTIONS).toFile());
 		}
-		else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue))
+		else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue)){
+			autoTextPath = file.toPath();
+
 			children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
+		}
 		else
 			LOGGER.info("Unknown configuration name: {}", nodeValue);
 		return children;

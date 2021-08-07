@@ -47,7 +47,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private final JFileChooser saveResultFileChooser;
+	private JFileChooser saveResultFileChooser;
 
 
 	public DictionaryExtractWordlistAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager,
@@ -62,10 +62,6 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		this.type = type;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
-
-		saveResultFileChooser = new JFileChooser();
-		saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	}
 
 	@Override
@@ -76,6 +72,12 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		workerManager.createWordlistWorker(
 			type,
 			() -> {
+				if(saveResultFileChooser == null){
+					saveResultFileChooser = new JFileChooser();
+					saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+					saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				}
+
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
 			},

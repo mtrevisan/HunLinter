@@ -231,7 +231,9 @@ final int iconSize = 17;
 
       inputLabel.setText("Dictionary entry:");
 
-      inputTextField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		inputTextField.setFont(currentFont);
       inputTextField.setEnabled(false);
       inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -242,9 +244,9 @@ final int iconSize = 17;
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
-      ruleFlagsAidComboBox.setFont(FontHelper.getCurrentFont());
+      ruleFlagsAidComboBox.setFont(currentFont);
 
-      table.setFont(FontHelper.getCurrentFont());
+      table.setFont(currentFont);
       table.setModel(new InflectionTableModel());
       table.setRowHeight(24);
       table.setShowHorizontalLines(false);

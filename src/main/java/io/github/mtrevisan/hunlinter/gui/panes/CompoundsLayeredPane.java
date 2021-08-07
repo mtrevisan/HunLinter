@@ -48,6 +48,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -134,8 +135,10 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
       inputLabel.setText("Compound rule:");
 
+		final Font currentFont = FontHelper.getCurrentFont();
+
       inputComboBox.setEditable(true);
-      inputComboBox.setFont(FontHelper.getCurrentFont());
+		inputComboBox.setFont(currentFont);
       inputComboBox.getEditor().getEditorComponent().addKeyListener(new KeyAdapter(){
          @Override
          public void keyReleased(final KeyEvent evt){
@@ -160,9 +163,9 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
-      ruleFlagsAidComboBox.setFont(FontHelper.getCurrentFont());
+      ruleFlagsAidComboBox.setFont(currentFont);
 
-      table.setFont(FontHelper.getCurrentFont());
+      table.setFont(currentFont);
       table.setModel(new CompoundTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
@@ -174,7 +177,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
       inputTextArea.setEditable(false);
       inputTextArea.setColumns(20);
-      inputTextArea.setFont(FontHelper.getCurrentFont());
+      inputTextArea.setFont(currentFont);
       inputScrollPane.setViewportView(inputTextArea);
 
       loadInputButton.setText("Load input from dictionary");

@@ -43,6 +43,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 
 import javax.swing.*;
 import javax.xml.transform.TransformerException;
+import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -116,7 +117,9 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
       inputLabel.setText("Exception:");
 
-      textField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {

@@ -47,7 +47,7 @@ public final class FontHelper{
 
 	private static final String CLIENT_PROPERTY_KEY_FONTABLE = "fontable";
 
-	private static final float SAME_FONT_MAX_THRESHOLD = 0.000_6f;
+//	private static final float SAME_FONT_MAX_THRESHOLD = 0.000_6f;
 
 	private static final String GRAPHEME_I = "i";
 	private static final String GRAPHEME_M = "m";
@@ -56,24 +56,41 @@ public final class FontHelper{
 
 
 	private static String LANGUAGE_SAMPLE;
-	private static final ArrayList<Font> ALL_FONTS;
+	private static final Font[] ALL_FONTS;
 	static{
-		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
-			.getAvailableFontFamilyNames();
-		ALL_FONTS = new ArrayList<>(familyNames.length);
-		for(final String familyName : familyNames){
-			final Font font = new Font(familyName, Font.PLAIN, 20);
-			//filter out non-plain fonts
-			//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
-			if(font.isPlain()
-					&& !GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
-					&& !GlyphComparator.allIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
-				ALL_FONTS.add(font);
-			else
-				LOGGER.trace("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
-		}
-		ALL_FONTS.trimToSize();
+		LOGGER.info("Load system fonts");
+		ALL_FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getAllFonts();
+		LOGGER.info("System fonts loaded");
 	}
+//	static{
+//final TimeWatch watch = TimeWatch.start();
+//		LOGGER.info("Load system fonts");
+//		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
+//			.getAvailableFontFamilyNames();
+//
+//		LOGGER.info("System fonts loaded");
+//watch.stop();
+//System.out.println("1: " + watch.toStringMillis());
+//watch.reset();
+//		ALL_FONTS = new ArrayList<>(familyNames.length);
+//		for(final String familyName : familyNames){
+//			final Font font = new Font(familyName, Font.PLAIN, 20);
+//			//filter out non-plain fonts
+//			//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
+//			if(font.isPlain()
+//				&& !GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+//				&& !GlyphComparator.someIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
+//				ALL_FONTS.add(font);
+//			else
+//				LOGGER.debug("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
+//		}
+//		LOGGER.info("System fonts filtered");
+//watch.stop();
+//System.out.println("2: " + watch.toStringMillis());
+//
+//		ALL_FONTS.trimToSize();
+//	}
 	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>();
 	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
 	private static Font CURRENT_FONT = FontChooserDialog.getDefaultFont();
@@ -86,7 +103,7 @@ public final class FontHelper{
 
 		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 		final Font defaultFont = FontChooserDialog.getDefaultFont();
-		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0));
+		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0).deriveFont(15.f));
 		if(!bestFont.equals(defaultFont)){
 			for(final Font f : fonts){
 				final String defaultFontName = defaultFont.getName();
