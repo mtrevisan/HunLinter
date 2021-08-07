@@ -103,7 +103,7 @@ public final class FontHelper{
 
 		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 		final Font defaultFont = FontChooserDialog.getDefaultFont();
-		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0));
+		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0).deriveFont(15.f));
 		if(!bestFont.equals(defaultFont)){
 			for(final Font f : fonts){
 				final String defaultFontName = defaultFont.getName();

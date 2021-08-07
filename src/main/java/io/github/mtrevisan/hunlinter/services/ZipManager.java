@@ -27,6 +27,8 @@ package io.github.mtrevisan.hunlinter.services;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,10 +43,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 
 public class ZipManager{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
+
 
 	public void zipDirectory(final Path dir, final int compressionLevel, final File zipFile) throws IOException{
 		zipDirectory(dir, compressionLevel, zipFile, new Path[0]);
@@ -127,6 +133,52 @@ public class ZipManager{
 				def.setLevel(compressionLevel);
 			}
 		};
+	}
+
+
+	public void unzipFile(final File zipFile, final Path destination){
+		final byte[] buffer = new byte[1024];
+		try(final ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))){
+			final File dest = destination.toFile();
+			ZipEntry zipEntry = zis.getNextEntry();
+			while(zipEntry != null){
+				final File newFile = createNewFile(dest, zipEntry);
+				if(zipEntry.isDirectory()){
+					if(!newFile.isDirectory() && ! newFile.mkdirs())
+						throw new IOException("Failed to create directory " + newFile);
+				}
+				else{
+					//fix for Windows-created archives
+					final File parent = newFile.getParentFile();
+					if(!parent.isDirectory() && !parent.mkdirs())
+						throw new IOException("Failed to create directory " + parent);
+
+					//write file content
+					final FileOutputStream fos = new FileOutputStream(newFile);
+					int len;
+					while((len = zis.read(buffer)) > 0)
+						fos.write(buffer, 0, len);
+					fos.close();
+				}
+				zipEntry = zis.getNextEntry();
+			}
+			zis.closeEntry();
+		}
+		catch(final IOException ioe){
+			LOGGER.warn("Cannot extract file", ioe);
+		}
+	}
+
+	//This method guards against writing files to the file system outside of the target folder.
+	//This vulnerability is called Zip Slip.
+	private File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
+		final File destFile = new File(destinationDir, zipEntry.getName());
+		final String destDirPath = destinationDir.getCanonicalPath();
+		final String destFilePath = destFile.getCanonicalPath();
+		if(!destFilePath.startsWith(destDirPath + File.separator))
+			throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+
+		return destFile;
 	}
 
 }
