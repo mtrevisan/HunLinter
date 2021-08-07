@@ -71,14 +71,15 @@ You can download and install it for free from this [link](https://www.oracle.com
     11. [Word exceptions](#screenshots-word-exceptions)
     12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
 7. [Changelog](#changelog)
-    1. [version 2.0.2](#changelog-2.0.2)
-    2. [version 2.0.1](#changelog-2.0.1)
-    3. [version 2.0.0](#changelog-2.0.0)
-    4. [version 1.10.0](#changelog-1.10.0)
-    5. [version 1.9.1](#changelog-1.9.1)
-    6. [version 1.9.0](#changelog-1.9.0)
-    7. [version 1.8.1](#changelog-1.8.1)
-    8. [version 1.8.0](#changelog-1.8.0)
+    1. [version 2.1.0](#changelog-2.1.0)
+    2. [version 2.0.2](#changelog-2.0.2)
+    3. [version 2.0.1](#changelog-2.0.1)
+    4. [version 2.0.0](#changelog-2.0.0)
+    5. [version 1.10.0](#changelog-1.10.0)
+    6. [version 1.9.1](#changelog-1.9.1)
+    7. [version 1.9.0](#changelog-1.9.0)
+    8. [version 1.8.1](#changelog-1.8.1)
+    9. [version 1.8.0](#changelog-1.8.0)
 
 
 <br/>
@@ -309,8 +310,14 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-2.1.0"></a>
+### version 2.1.0 - 20210807
+- fix bug on initial font size
+- automatically unzip `.dat` and `.bau` files (in `autocorr` and `autotext` folders)
+- startup time reduced
+
 <a name="changelog-2.0.2"></a>
-### version 2.0.2 - 20210808
+### version 2.0.2 - 20210806
 - added linter for auto-correct
 - corrected the size of the font
 - corrected the executable
