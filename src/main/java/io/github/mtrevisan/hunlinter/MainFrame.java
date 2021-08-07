@@ -113,6 +113,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
@@ -165,7 +166,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private static final String FONT_SIZE_PREFIX = "font.size.";
 
 
-	private final JFileChooser openProjectPathFileChooser;
+	private final FutureTask<JFileChooser> futureOpenProjectPathFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 	private final ParserManager parserManager;
@@ -194,25 +195,28 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
 
-		openProjectPathFileChooser = new JFileChooser();
-		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
-		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		//disable the "All files" option
-		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
-		try{
-			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
-			final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
-			openProjectPathFileChooser.setFileView(new FileView(){
-				//choose the right icon for the folder
-				@Override
-				public Icon getIcon(final File file){
-					return (Packager.isProjectFolder(file)
-						? projectFolderIcon
-						: FileSystemView.getFileSystemView().getSystemIcon(file));
-				}
-			});
-		}
-		catch(final IOException ignored){}
+		futureOpenProjectPathFileChooser = GUIHelper.createFileChooserFuture(() -> {
+			final JFileChooser openProjectPathFileChooser = new JFileChooser();
+			openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
+			openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			//disable the "All files" option
+			openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
+			try{
+				final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
+				final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
+				openProjectPathFileChooser.setFileView(new FileView(){
+					//choose the right icon for the folder
+					@Override
+					public Icon getIcon(final File file){
+						return (Packager.isProjectFolder(file)
+							? projectFolderIcon
+							: FileSystemView.getFileSystemView().getSystemIcon(file));
+					}
+				});
+			}
+			catch(final IOException ignored){}
+			return openProjectPathFileChooser;
+		});
 
 
 		//check for updates
@@ -542,6 +546,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		final JFileChooser openProjectPathFileChooser = GUIHelper.waitForFileChooser(futureOpenProjectPathFileChooser);
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();

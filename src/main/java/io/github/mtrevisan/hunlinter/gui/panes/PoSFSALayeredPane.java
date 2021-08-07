@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.FutureTask;
 
 
 public class PoSFSALayeredPane extends JLayeredPane{
@@ -76,7 +77,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private JFileChooser openPoSDictionaryFileChooser;
+	private final FutureTask<JFileChooser> futureOpenPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
@@ -91,6 +92,14 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 
 		initComponents();
+
+
+		futureOpenPoSDictionaryFileChooser = GUIHelper.createFileChooserFuture(() -> {
+			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
+			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return openPoSDictionaryFileChooser;
+		});
 
 
 		//add "fontable" property
@@ -177,12 +186,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
    private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
 
-		if(openPoSDictionaryFileChooser == null){
-			openPoSDictionaryFileChooser = new JFileChooser();
-			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
-			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		}
-
+		final JFileChooser openPoSDictionaryFileChooser = GUIHelper.waitForFileChooser(futureOpenPoSDictionaryFileChooser);
 		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();

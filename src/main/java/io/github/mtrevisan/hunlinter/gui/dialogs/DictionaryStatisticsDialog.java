@@ -68,6 +68,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 
@@ -83,7 +84,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private final DictionaryStatistics statistics;
 
-	private final JFileChooser saveTextFileFileChooser;
+	private final FutureTask<JFileChooser> futureSaveTextFileFileChooser;
 
 
 	public DictionaryStatisticsDialog(final DictionaryStatistics statistics, final Frame parent){
@@ -106,10 +107,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		addListenerOnClose();
 
-		saveTextFileFileChooser = new JFileChooser();
-		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		final File currentDir = new File(".");
-		saveTextFileFileChooser.setCurrentDirectory(currentDir);
+
+		futureSaveTextFileFileChooser = GUIHelper.createFileChooserFuture(() -> {
+			final JFileChooser saveTextFileFileChooser = new JFileChooser();
+			saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+			final File currentDir = new File(".");
+			saveTextFileFileChooser.setCurrentDirectory(currentDir);
+			return saveTextFileFileChooser;
+		});
 
 
 		fillStatisticData();
@@ -351,6 +356,7 @@ public class DictionaryStatisticsDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+		final JFileChooser saveTextFileFileChooser = GUIHelper.waitForFileChooser(futureSaveTextFileFileChooser);
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);

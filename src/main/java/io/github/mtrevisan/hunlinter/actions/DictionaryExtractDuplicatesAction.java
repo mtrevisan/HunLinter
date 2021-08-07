@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.concurrent.FutureTask;
 
 
 public class DictionaryExtractDuplicatesAction extends AbstractAction{
@@ -45,12 +46,7 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private static final JFileChooser SAVE_RESULT_FILE_CHOOSER;
-	static{
-		SAVE_RESULT_FILE_CHOOSER = new JFileChooser();
-		SAVE_RESULT_FILE_CHOOSER.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		SAVE_RESULT_FILE_CHOOSER.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	}
+	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
 
 
 	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
@@ -62,6 +58,13 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+
+		futureSaveResultFileChooser = GUIHelper.createFileChooserFuture(() -> {
+			final JFileChooser saveResultFileChooser = new JFileChooser();
+			saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return saveResultFileChooser;
+		});
 	}
 
 	@Override
@@ -71,8 +74,9 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createDuplicatesWorker(
 			() -> {
-				final int fileChosen = SAVE_RESULT_FILE_CHOOSER.showSaveDialog(parentFrame);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? SAVE_RESULT_FILE_CHOOSER.getSelectedFile(): null);
+				final JFileChooser saveResultFileChooser = GUIHelper.waitForFileChooser(futureSaveResultFileChooser);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
 			},
 			worker -> {
 				setEnabled(false);

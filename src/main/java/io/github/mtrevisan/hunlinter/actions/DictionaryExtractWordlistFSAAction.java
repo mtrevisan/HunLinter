@@ -35,6 +35,7 @@ import java.beans.PropertyChangeListener;
 import java.io.Serial;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.concurrent.FutureTask;
 
 
 public class DictionaryExtractWordlistFSAAction extends AbstractAction{
@@ -47,7 +48,7 @@ public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private JFileChooser saveResultFileChooser;
+	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
 
 
 	public DictionaryExtractWordlistFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
@@ -61,6 +62,12 @@ public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+
+		futureSaveResultFileChooser = GUIHelper.createFileChooserFuture(() -> {
+			final JFileChooser saveResultFileChooser = new JFileChooser();
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			return saveResultFileChooser;
+		});
 	}
 
 	@Override
@@ -70,11 +77,7 @@ public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createWordlistFSAWorker(
 			() -> {
-				if(saveResultFileChooser == null){
-					saveResultFileChooser = new JFileChooser();
-					saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				}
-
+				final JFileChooser saveResultFileChooser = GUIHelper.waitForFileChooser(futureSaveResultFileChooser);
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
 					parserManager.getLanguage() + "-wordlist.dict").toFile(): null);
