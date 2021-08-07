@@ -24,14 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.NumberFormatter;
 import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -40,6 +41,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -55,7 +57,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	@Serial
 	private static final long serialVersionUID = -4686780467476615109L;
 
-	private static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 13);
+	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 15);
 
 
 	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{
@@ -147,6 +149,15 @@ public class FontChooserDialog extends javax.swing.JDialog{
       sampleTextArea = new javax.swing.JTextArea();
       okButton = new javax.swing.JButton();
       cancelButton = new javax.swing.JButton();
+      sizeLabel = new javax.swing.JLabel();
+      final NumberFormat format = NumberFormat.getInstance();
+      final NumberFormatter formatter = new NumberFormatter(format);
+      formatter.setValueClass(Integer.class);
+      formatter.setMinimum(1);
+      formatter.setAllowsInvalid(false);
+      //if you want the value to be committed on each keystroke instead of focus lost
+      formatter.setCommitsOnValidEdit(true);
+      sizeTextField = new JFormattedTextField(formatter);
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
       setResizable(false);
@@ -206,6 +217,14 @@ public class FontChooserDialog extends javax.swing.JDialog{
          }
       });
 
+      sizeLabel.setText("Size:");
+
+      sizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            sizeTextFieldKeyReleased(evt);
+         }
+      });
+
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
@@ -224,9 +243,14 @@ public class FontChooserDialog extends javax.swing.JDialog{
                .addGroup(layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(familyNameLabel)
-                     .addComponent(monospacedCheckBox)
                      .addComponent(sampleLabel))
-                  .addGap(0, 0, Short.MAX_VALUE)))
+                  .addGap(0, 0, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(monospacedCheckBox)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addComponent(sizeLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(sizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -239,7 +263,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(familyNameScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addComponent(monospacedCheckBox)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(monospacedCheckBox)
+               .addComponent(sizeLabel)
+               .addComponent(sizeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGap(18, 18, 18)
             .addComponent(sampleLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -275,9 +302,9 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_familyNameListValueChanged
 
 	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
-		final List<String> fonts = (monospacedCheckBox.isSelected()?
-			FontHelper.getFamilyNamesMonospaced():
-			FontHelper.getFamilyNamesAll());
+		final List<String> fonts = (monospacedCheckBox.isSelected()
+			? FontHelper.getFamilyNamesMonospaced()
+			: FontHelper.getFamilyNamesAll());
 
 		final DefaultListModel<String> model = (DefaultListModel<String>)familyNameList.getModel();
 		model.clear();
@@ -296,6 +323,26 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		dispose();
    }//GEN-LAST:event_cancelButtonActionPerformed
 
+   private void sizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
+		final int code = evt.getKeyCode();
+		if(code == KeyEvent.VK_UP){
+			final int fontSize = Integer.parseInt(sizeTextField.getText()) + 1;
+			sizeTextField.setText(Integer.toString(fontSize));
+
+			selectedFont = selectedFont.deriveFont((float)fontSize);
+		}
+		else if(code == KeyEvent.VK_DOWN){
+			final int fontSize = Integer.parseInt(sizeTextField.getText()) - 1;
+			if(fontSize > 0){
+				sizeTextField.setText(Integer.toString(fontSize));
+
+				selectedFont = selectedFont.deriveFont((float)fontSize);
+			}
+		}
+
+		setSampleFont();
+   }//GEN-LAST:event_sizeTextFieldKeyReleased
+
 	public static Font getDefaultFont(){
 		return DEFAULT_FONT;
 	}
@@ -305,7 +352,8 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();
-			selectedFont = FontHelper.getDefaultHeightFont(new Font(fontFamily, Font.PLAIN, 20));
+			final int fontSize = (!sizeTextField.getText().isEmpty()? Integer.parseInt(sizeTextField.getText()): 15);
+			selectedFont = new Font(fontFamily, Font.PLAIN, fontSize);
 		}
 
 		final boolean fontChanged = !selectedFont.equals(previousFont);
@@ -316,25 +364,28 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 	/** Set the controls to display the initial font */
 	private void setSelectedFont(){
-		setSelectedFontFamily(selectedFont.getFamily());
+		setSelectedFontFamily();
 		setSampleFont();
 	}
 
 	/**
 	 * Set the family name of the selected font.
-	 *
-	 * @param name  the family name of the selected font.
 	 */
-	private void setSelectedFontFamily(final String name){
+	private void setSelectedFontFamily(){
 		SwingUtilities.invokeLater(() -> {
+			sizeTextField.setText(Integer.toString(selectedFont.getSize()));
+			final String name = selectedFont.getFamily();
 			familyNameTextField.setText(name);
 			familyNameList.setSelectedValue(name, true);
 		});
 	}
 
 	private void setSampleFont(){
-		final Font sampleFont = Font.decode(selectedFont.getFamily() + "-PLAIN-" + selectedFont.getSize());
-		sampleTextArea.setFont(sampleFont);
+		SwingUtilities.invokeLater(() -> {
+			final Font sampleFont = Font.decode(selectedFont.getFamily() + "-PLAIN-" + selectedFont.getSize());
+			final float size = (!sizeTextField.getText().isEmpty()? Float.parseFloat(sizeTextField.getText()): 15.f);
+			sampleTextArea.setFont(sampleFont.deriveFont(size));
+		});
 	}
 
 
@@ -362,6 +413,8 @@ public class FontChooserDialog extends javax.swing.JDialog{
    private javax.swing.JLabel sampleLabel;
    private javax.swing.JScrollPane sampleScrollPane;
    private javax.swing.JTextArea sampleTextArea;
+   private javax.swing.JLabel sizeLabel;
+   private javax.swing.JTextField sizeTextField;
    // End of variables declaration//GEN-END:variables
 
 }

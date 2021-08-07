@@ -298,9 +298,9 @@ public class HyphenationParser{
 
 	private void addDefaults(final Level level, final Charset charset){
 		//dash and apostrophe are added by default (retro-compatibility)
-		final List<String> retroCompatibilityNoHyphen = (charset == StandardCharsets.UTF_8?
-			Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(MODIFIER_LETTER_APOSTROPHE), EN_DASH):
-			Arrays.asList(APOSTROPHE, MINUS_SIGN));
+		final List<String> retroCompatibilityNoHyphen = (charset == StandardCharsets.UTF_8
+			? Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(MODIFIER_LETTER_APOSTROPHE), EN_DASH)
+			: Arrays.asList(APOSTROPHE, MINUS_SIGN));
 
 		patternNoHyphen = RegexHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
 
@@ -530,9 +530,9 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(final String rule, final Level level){
-		return (isCustomRule(rule)?
-			customHyphenations.get(level).containsValue(rule):
-			rules.get(level).containsKey(getKeyFromData(rule)));
+		return (isCustomRule(rule)
+			? customHyphenations.get(level).containsValue(rule)
+			: rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
 	public static String getKeyFromData(final CharSequence rule){

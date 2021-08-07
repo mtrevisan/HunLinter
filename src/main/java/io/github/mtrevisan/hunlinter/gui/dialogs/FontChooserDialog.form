@@ -39,10 +39,16 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="familyNameLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="monospacedCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="sampleLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="monospacedCheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="sizeLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="sizeTextField" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -59,7 +65,11 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="familyNameScrollPane" min="-2" pref="100" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="monospacedCheckBox" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="monospacedCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="sizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="sizeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="sampleLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -180,6 +190,20 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="sizeLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Size:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="sizeTextField">
+      <Events>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="sizeTextFieldKeyReleased"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JFormattedTextField(formatter)"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodePre" type="java.lang.String" value="final NumberFormat format = NumberFormat.getInstance();&#xd;&#xa;final NumberFormatter formatter = new NumberFormatter(format);&#xd;&#xa;formatter.setValueClass(Integer.class);&#xd;&#xa;formatter.setMinimum(1);&#xd;&#xa;formatter.setAllowsInvalid(false);&#xd;&#xa;//if you want the value to be committed on each keystroke instead of focus lost&#xd;&#xa;formatter.setCommitsOnValidEdit(true);"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

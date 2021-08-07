@@ -184,9 +184,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private Inflection[] limitResponse(final Set<Inflection> inflections, final int limit){
-		return (inflections.size() > limit?
-			new ArrayList<>(inflections).subList(0, limit).toArray(Inflection[]::new):
-			inflections.toArray(Inflection[]::new));
+		return (inflections.size() > limit
+			? new ArrayList<>(inflections).subList(0, limit).toArray(Inflection[]::new)
+			: inflections.toArray(Inflection[]::new));
 	}
 
 	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,

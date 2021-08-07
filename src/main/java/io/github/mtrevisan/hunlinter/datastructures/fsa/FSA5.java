@@ -292,11 +292,11 @@ public class FSA5 extends FSA{
 
 	/** Read the arc's layout and skip as many bytes, as needed */
 	private int skipArc(final int offset){
-		return offset + (isNextSet(offset)?
+		return offset + (isNextSet(offset)
 			//label + flags
-			1 + 1:
+			? 1 + 1
 			//label + flags/address
-			1 + gtl);
+			: 1 + gtl);
 	}
 
 }

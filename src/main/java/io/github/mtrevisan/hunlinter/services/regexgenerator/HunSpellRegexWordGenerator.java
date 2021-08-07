@@ -99,8 +99,9 @@ public class HunSpellRegexWordGenerator{
 		final int size = regexpParts.length;
 		for(int i = 0; i + offset < size; i ++){
 			final int operatorIndex = i + offset + 1;
-			final char next = (operatorIndex < size && regexpParts[operatorIndex].length() == 1?
-				regexpParts[operatorIndex].charAt(0): 0);
+			final char next = (operatorIndex < size && regexpParts[operatorIndex].length() == 1
+				? regexpParts[operatorIndex].charAt(0)
+				: 0);
 			//zero or more
 			//skip operator
 			//zero or one

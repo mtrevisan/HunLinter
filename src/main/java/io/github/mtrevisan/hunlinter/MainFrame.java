@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter;
 
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.gui.panes.AutoCorrectLayeredPane;
@@ -205,9 +206,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				//choose the right icon for the folder
 				@Override
 				public Icon getIcon(final File file){
-					return (Packager.isProjectFolder(file)?
-						projectFolderIcon:
-						FileSystemView.getFileSystemView().getSystemIcon(file));
+					return (Packager.isProjectFolder(file)
+						? projectFolderIcon
+						: FileSystemView.getFileSystemView().getSystemIcon(file));
 				}
 			});
 		}
@@ -275,6 +276,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
+      acoMenu = new javax.swing.JMenu();
+      acoLinterMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -358,9 +361,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.add(filExitMenuItem);
 
       mainMenuBar.add(filMenu);
-      final Preferences preferences = Preferences.userNodeForPackage(getClass());
       final RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
@@ -454,6 +456,17 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.add(hypStatisticsMenuItem);
 
       mainMenuBar.add(hypMenu);
+
+      acoMenu.setMnemonic('A');
+      acoMenu.setText("AutoCorrect tools");
+      acoMenu.setEnabled(false);
+
+      acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
+      acoLinterMenuItem.setMnemonic('C');
+      acoLinterMenuItem.setText("Check correctness");
+      acoMenu.add(acoLinterMenuItem);
+
+      mainMenuBar.add(acoMenu);
 
       setMenu.setMnemonic('S');
       setMenu.setText("Settings");
@@ -659,6 +672,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
 			EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
 
+			//autocorrection file:
+			acoMenu.setEnabled(parserManager.getAcoParser().getCorrectionsCounter() > 0);
+			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+
 			//hyphenation file:
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
 			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
@@ -685,7 +702,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 			//load font for this language
-			loadLanguadeDependentFont();
+			loadLanguageDependentFont();
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
@@ -694,13 +711,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}
 
-	private void loadLanguadeDependentFont(){
+	private void loadLanguageDependentFont(){
 		final String language = parserManager.getLanguage();
 		final String fontFamilyName = preferences.get(FONT_FAMILY_NAME_PREFIX + language, null);
 		final String fontSize = preferences.get(FONT_SIZE_PREFIX + language, null);
-		final Font lastUsedFont = (fontFamilyName != null && fontSize != null?
-			new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize)):
-			FontChooserDialog.getDefaultFont());
+		final Font lastUsedFont = (fontFamilyName != null && fontSize != null
+			? new Font(fontFamilyName, Font.PLAIN, Integer.parseInt(fontSize))
+			: FontChooserDialog.getDefaultFont());
 		FontHelper.setCurrentFont(lastUsedFont, this);
 	}
 
@@ -731,6 +748,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		dicMenu.setEnabled(false);
 		//thesaurus file:
 		theMenu.setEnabled(false);
+		//autocorrection file:
+		acoMenu.setEnabled(false);
 		//hyphenation file:
 		hypMenu.setEnabled(false);
 
@@ -905,6 +924,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLayeredPane acoLayeredPane;
+   private javax.swing.JMenuItem acoLinterMenuItem;
+   private javax.swing.JMenu acoMenu;
    private javax.swing.JLayeredPane cmpLayeredPane;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDictionaryFSAMenuItem;
@@ -950,8 +971,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
-   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;
+   private javax.swing.JCheckBoxMenuItem setReportWarningsCheckBoxMenuItem;
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;

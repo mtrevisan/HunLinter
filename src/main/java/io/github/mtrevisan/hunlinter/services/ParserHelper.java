@@ -44,6 +44,7 @@ public final class ParserHelper{
 
 	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was `{0}`");
 
+	//FIXME https://zverok.github.io/blog/2021-03-16-spellchecking-dictionaries.html #4
 	public static final char COMMENT_MARK_SHARP = '#';
 	public static final char COMMENT_MARK_SLASH = '/';
 	public static final char COMMENT_MARK_PERCENT = '%';

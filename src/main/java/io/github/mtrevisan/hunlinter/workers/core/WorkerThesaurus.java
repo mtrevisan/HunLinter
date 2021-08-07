@@ -48,8 +48,9 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		final List<ThesaurusEntry> entries = loadThesaurus();
 
 		//process thesaurus
-		final Stream<ThesaurusEntry> stream = (workerData.isParallelProcessing()?
-			entries.parallelStream(): entries.stream());
+		final Stream<ThesaurusEntry> stream = (workerData.isParallelProcessing()
+			? entries.parallelStream()
+			: entries.stream());
 		processThesaurus(stream, entries.size(), dataProcessor);
 
 		ThesaurusEntry data = null;

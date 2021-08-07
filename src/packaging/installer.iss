@@ -48,3 +48,7 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[UninstallDelete]
+Type: files; Name: "{app}\launcher.bat"
+Type: files; Name: "{app}\RunNHide.exe"
+Type: dirifempty; Name: "{app}"
