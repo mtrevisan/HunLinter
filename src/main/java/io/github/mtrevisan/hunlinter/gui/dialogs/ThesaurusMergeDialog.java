@@ -84,7 +84,9 @@ public class ThesaurusMergeDialog extends JDialog{
       lblMessage.setLabelFor(lineComboBox);
       lblMessage.setText("Select a line from the list:");
 
-      lineComboBox.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		lineComboBox.setFont(currentFont);
       lineComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             lineComboBoxActionPerformed(evt);
@@ -95,7 +97,7 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
       mergerTextArea.setColumns(20);
-      mergerTextArea.setFont(FontHelper.getCurrentFont());
+      mergerTextArea.setFont(currentFont);
       mergerTextArea.setLineWrap(true);
       mergerTextArea.setRows(5);
       mergerTextArea.setWrapStyleWord(true);

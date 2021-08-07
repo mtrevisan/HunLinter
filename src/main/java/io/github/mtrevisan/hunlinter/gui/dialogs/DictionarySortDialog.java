@@ -91,7 +91,9 @@ public class DictionarySortDialog extends JDialog{
 
       entriesScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
-      entriesList.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		entriesList.setFont(currentFont);
       entriesList.setModel(new SortableListModel());
       entriesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       entriesScrollPane.setViewportView(entriesList);

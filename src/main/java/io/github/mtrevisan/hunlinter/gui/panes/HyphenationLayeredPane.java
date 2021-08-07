@@ -45,6 +45,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -137,7 +138,9 @@ final int iconSize = 17;
 
       wordLabel.setText("Word:");
 
-      wordTextField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		wordTextField.setFont(currentFont);
       wordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             wordTextFieldKeyReleased(evt);
@@ -147,25 +150,25 @@ final int iconSize = 17;
       syllabationLabel.setText("Syllabation:");
       syllabationLabel.setPreferredSize(new java.awt.Dimension(58, 17));
 
-      syllabationValueLabel.setFont(FontHelper.getCurrentFont());
+      syllabationValueLabel.setFont(currentFont);
       syllabationValueLabel.setText("…");
       syllabationValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       syllabesCountLabel.setText("Syllabes:");
 
-      syllabesCountValueLabel.setFont(FontHelper.getCurrentFont());
+      syllabesCountValueLabel.setFont(currentFont);
       syllabesCountValueLabel.setText("…");
 
       rulesLabel.setText("Rules:");
       rulesLabel.setPreferredSize(new java.awt.Dimension(31, 17));
 
-      rulesValueLabel.setFont(FontHelper.getCurrentFont());
+      rulesValueLabel.setFont(currentFont);
       rulesValueLabel.setText("…");
       rulesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
       addRuleLabel.setText("Add rule:");
 
-      addRuleTextField.setFont(FontHelper.getCurrentFont());
+      addRuleTextField.setFont(currentFont);
       addRuleTextField.setEnabled(false);
       addRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -193,12 +196,12 @@ final int iconSize = 17;
       addRuleSyllabationLabel.setText("New syllabation:");
       addRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
 
-      addRuleSyllabationValueLabel.setFont(FontHelper.getCurrentFont());
+      addRuleSyllabationValueLabel.setFont(currentFont);
       addRuleSyllabationValueLabel.setText("…");
 
       addRuleSyllabesCountLabel.setText("New syllabes:");
 
-      addRuleSyllabesCountValueLabel.setFont(FontHelper.getCurrentFont());
+      addRuleSyllabesCountValueLabel.setFont(currentFont);
       addRuleSyllabesCountValueLabel.setText("…");
 
       optionsButton.setText("Options");

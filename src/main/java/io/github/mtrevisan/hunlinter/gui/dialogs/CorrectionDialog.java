@@ -62,9 +62,6 @@ public class CorrectionDialog extends JDialog{
 
 		initComponents();
 
-		incorrectTextField.setFont(FontHelper.getCurrentFont());
-		correctTextField.setFont(FontHelper.getCurrentFont());
-
 		this.correction = correction;
 		this.okButtonAction = okButtonAction;
 		incorrectTextField.setText(correction.getIncorrectForm());
@@ -89,13 +86,15 @@ public class CorrectionDialog extends JDialog{
       incorrectLabel.setText("Incorrect form:");
       incorrectLabel.setPreferredSize(new java.awt.Dimension(74, 17));
 
-      incorrectTextField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		incorrectTextField.setFont(currentFont);
 
       correctLabel.setLabelFor(correctTextField);
       correctLabel.setText("Correct form:");
       correctLabel.setPreferredSize(new java.awt.Dimension(66, 17));
 
-      correctTextField.setFont(FontHelper.getCurrentFont());
+      correctTextField.setFont(currentFont);
 
       buttonPanel.setPreferredSize(new java.awt.Dimension(600, 45));
 

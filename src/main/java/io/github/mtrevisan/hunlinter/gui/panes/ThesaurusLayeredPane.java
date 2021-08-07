@@ -153,7 +153,9 @@ final int iconSize = 17;
 
       synonymsLabel.setText("New definition:");
 
-      synonymsTextField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		synonymsTextField.setFont(currentFont);
       synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             synonymsTextFieldKeyReleased(evt);
@@ -169,7 +171,7 @@ final int iconSize = 17;
          }
       });
 
-      table.setFont(FontHelper.getCurrentFont());
+      table.setFont(currentFont);
       table.setModel(new ThesaurusTableModel());
       table.setRowHeight(24);
       table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));

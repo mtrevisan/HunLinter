@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.gui;
 
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
+import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +59,14 @@ public final class FontHelper{
 	private static String LANGUAGE_SAMPLE;
 	private static final ArrayList<Font> ALL_FONTS;
 	static{
+final TimeWatch watch = TimeWatch.start();
+		LOGGER.debug("Load system fonts");
 		final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 			.getAvailableFontFamilyNames();
+		LOGGER.debug("System fonts loaded");
+watch.stop();
+System.out.println("1: " + watch.toStringMillis());
+watch.reset();
 		ALL_FONTS = new ArrayList<>(familyNames.length);
 		for(final String familyName : familyNames){
 			final Font font = new Font(familyName, Font.PLAIN, 20);
@@ -72,6 +79,9 @@ public final class FontHelper{
 			else
 				LOGGER.trace("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
 		}
+		LOGGER.debug("System fonts filtered");
+watch.stop();
+System.out.println("2: " + watch.toStringMillis());
 		ALL_FONTS.trimToSize();
 	}
 	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>();

@@ -82,10 +82,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		initComponents();
 
-		final Font font = FontHelper.getCurrentFont();
-		currentSetTextArea.setFont(font);
-		reducedSetTextArea.setFont(font);
-
 		statusLabel.setText(null);
 
 		init();
@@ -125,7 +121,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       ruleLabel.setText("Rule:");
       ruleLabel.setPreferredSize(new java.awt.Dimension(26, 17));
 
-      ruleComboBox.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		ruleComboBox.setFont(currentFont);
       ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             ruleComboBoxActionPerformed(evt);
@@ -153,7 +151,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       currentSetTextArea.setEditable(false);
       currentSetTextArea.setColumns(20);
-      currentSetTextArea.setFont(FontHelper.getCurrentFont());
+      currentSetTextArea.setFont(currentFont);
       currentSetTextArea.setRows(1);
       currentSetTextArea.setTabSize(3);
       currentSetScrollPane.setViewportView(currentSetTextArea);
@@ -164,7 +162,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       reducedSetTextArea.setEditable(false);
       reducedSetTextArea.setColumns(20);
-      reducedSetTextArea.setFont(FontHelper.getCurrentFont());
+      reducedSetTextArea.setFont(currentFont);
       reducedSetTextArea.setRows(1);
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);

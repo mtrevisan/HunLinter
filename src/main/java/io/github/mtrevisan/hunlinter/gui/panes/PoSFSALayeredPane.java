@@ -44,6 +44,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -75,7 +76,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private final JFileChooser openPoSDictionaryFileChooser;
+	private JFileChooser openPoSDictionaryFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
@@ -87,11 +88,6 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
-
-
-		openPoSDictionaryFileChooser = new JFileChooser();
-		openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
-		openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 
 		initComponents();
@@ -116,7 +112,9 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
       inputLabel.setText("Sentence:");
 
-      textField.setFont(FontHelper.getCurrentFont());
+		final Font currentFont = FontHelper.getCurrentFont();
+
+		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -126,7 +124,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
       resultTextArea.setEditable(false);
       resultTextArea.setColumns(20);
-      resultTextArea.setFont(FontHelper.getCurrentFont());
+      resultTextArea.setFont(currentFont);
       resultTextArea.setRows(5);
       resultScrollPane.setViewportView(resultTextArea);
 
@@ -178,6 +176,12 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
    private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
+
+		if(openPoSDictionaryFileChooser == null){
+			openPoSDictionaryFileChooser = new JFileChooser();
+			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		}
 
 		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){

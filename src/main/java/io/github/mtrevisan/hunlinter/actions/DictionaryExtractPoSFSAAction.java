@@ -47,11 +47,11 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private final JFileChooser saveResultFileChooser;
+	private JFileChooser saveResultFileChooser;
 
 
 	public DictionaryExtractPoSFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
-													 final PropertyChangeListener propertyChangeListener){
+			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.posFSA");
 
 		Objects.requireNonNull(parserManager);
@@ -61,9 +61,6 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
-
-		saveResultFileChooser = new JFileChooser();
-		saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	}
 
 	@Override
@@ -73,6 +70,11 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createPoSFSAWorker(
 			() -> {
+				if(saveResultFileChooser == null){
+					saveResultFileChooser = new JFileChooser();
+					saveResultFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				}
+
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? Path.of(saveResultFileChooser.getSelectedFile().getAbsolutePath(),
 					parserManager.getLanguage() + "-PoS.dict").toFile(): null);
