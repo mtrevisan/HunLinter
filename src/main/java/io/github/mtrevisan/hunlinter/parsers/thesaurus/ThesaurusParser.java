@@ -63,8 +63,8 @@ public class ThesaurusParser{
 
 	private static final String PIPE = "|";
 
-	private static final String PART_OF_SPEECH_START = "(";
-	private static final String PART_OF_SPEECH_END = ")";
+	private static final String PART_OF_SPEECH_START = "([";
+	private static final String PART_OF_SPEECH_END = ")]";
 
 	private static final Pattern PART_OF_SPEECH_SPLITTER = RegexHelper.pattern("\\s*,\\s*");
 	private static final Pattern FILTER_SPLITTER = RegexHelper.pattern(", *");
@@ -136,8 +136,8 @@ public class ThesaurusParser{
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String partOfSpeech = posAndSyns[0].trim();
-		final int prefix = (partOfSpeech.startsWith(PART_OF_SPEECH_START)? 1: 0);
-		final int suffix = (partOfSpeech.endsWith(PART_OF_SPEECH_END)? 1: 0);
+		final int prefix = (StringUtils.startsWithAny(partOfSpeech, PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (StringUtils.endsWithAny(partOfSpeech, PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix), PART_OF_SPEECH_SPLITTER);
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);

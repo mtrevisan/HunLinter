@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -43,8 +44,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
@@ -57,34 +56,43 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 
 	private final String[] partOfSpeeches;
-	private final List<String> synonyms = new ArrayList<>();
+	private final List<String> synonyms;
 
 
-	public SynonymsEntry(final String partOfSpeechAndSynonyms){
+	public SynonymsEntry(String partOfSpeechAndSynonyms){
 		Objects.requireNonNull(partOfSpeechAndSynonyms, "Part-of-speech and synonyms cannot be null");
 
 		//all entries should be in lowercase
+		if(partOfSpeechAndSynonyms.charAt(0) == ThesaurusEntry.PIPE.charAt(0))
+			partOfSpeechAndSynonyms = HyphenationParser.MINUS_SIGN + partOfSpeechAndSynonyms;
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT),
 			ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
-		if(components.length < 2)
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+		if(components.length == 2){
+			final String partOfSpeech = components[0].trim();
+			final char firstChar = partOfSpeech.charAt(0);
+			final char lastChart = partOfSpeech.charAt(partOfSpeech.length() - 1);
+			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
+				throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		final String partOfSpeech = components[0].trim();
-		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')
-			throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
+			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
+			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
+			partOfSpeeches = StringUtils.split(pos, ',');
+			for(int i = 0; i < partOfSpeeches.length; i ++)
+				partOfSpeeches[i] = partOfSpeeches[i].trim();
 
-		partOfSpeeches = StringUtils.split(StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")"), ',');
-		for(int i = 0; i < partOfSpeeches.length; i ++)
-			partOfSpeeches[i] = partOfSpeeches[i].trim();
-
-		final Collection<String> uniqueValues = new HashSet<>();
-		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR)){
-			final String trim = synonym.trim();
-			if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
-				synonyms.add(trim);
+			final Collection<String> uniqueValues = new HashSet<>();
+			final String[] synonyms = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
+			this.synonyms = new ArrayList<>(synonyms.length);
+			for(final String synonym : synonyms){
+				final String trim = synonym.trim();
+				if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
+					this.synonyms.add(trim);
+			}
+			if(this.synonyms.isEmpty())
+				throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 		}
-		if(synonyms.isEmpty())
-			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+		else
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
 	public SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){

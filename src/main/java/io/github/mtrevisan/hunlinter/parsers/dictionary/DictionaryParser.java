@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,12 +125,12 @@ public class DictionaryParser{
 					if(startSection < 0)
 						startSection = lineIndex;
 
-					if(!needSorting && StringUtils.isNotBlank(prevLine))
+					if(!needSorting && prevLine != null)
 						needSorting = (comparator.compare(line, prevLine) < 0);
 					prevLine = line;
 				}
 				else if(startSection >= 0){
-					//filter out single word that doesn't need to be sorted
+					//filter out possible single lines that doesn't need to be sorted
 					if(lineIndex - startSection > 2 && needSorting)
 						boundaries.put(startSection, lineIndex - 1);
 
@@ -170,7 +169,6 @@ public class DictionaryParser{
 		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
-
 
 	public void clear(){
 		clearBoundaries();
