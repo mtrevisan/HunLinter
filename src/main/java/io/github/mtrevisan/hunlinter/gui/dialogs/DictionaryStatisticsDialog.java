@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -108,7 +109,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		addListenerOnClose();
 
 
-		futureSaveTextFileFileChooser = GUIHelper.createFileChooserFuture(() -> {
+		futureSaveTextFileFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser saveTextFileFileChooser = new JFileChooser();
 			saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 			final File currentDir = new File(".");
@@ -356,7 +357,7 @@ public class DictionaryStatisticsDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-		final JFileChooser saveTextFileFileChooser = GUIHelper.waitForFileChooser(futureSaveTextFileFileChooser);
+		final JFileChooser saveTextFileFileChooser = JavaHelper.waitForFuture(futureSaveTextFileFileChooser);
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);

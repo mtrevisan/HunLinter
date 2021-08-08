@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
@@ -58,7 +59,7 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
 
-		futureSaveResultFileChooser = GUIHelper.createFileChooserFuture(() -> {
+		futureSaveResultFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
 			saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -73,7 +74,7 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createMinimalPairsWorker(
 			() -> {
-				final JFileChooser saveResultFileChooser = GUIHelper.waitForFileChooser(futureSaveResultFileChooser);
+				final JFileChooser saveResultFileChooser = JavaHelper.waitForFuture(futureSaveResultFileChooser);
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
 			},

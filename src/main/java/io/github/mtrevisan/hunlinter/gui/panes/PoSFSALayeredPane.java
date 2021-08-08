@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
@@ -94,7 +95,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		initComponents();
 
 
-		futureOpenPoSDictionaryFileChooser = GUIHelper.createFileChooserFuture(() -> {
+		futureOpenPoSDictionaryFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
 			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
 			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -186,7 +187,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
    private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
 
-		final JFileChooser openPoSDictionaryFileChooser = GUIHelper.waitForFileChooser(futureOpenPoSDictionaryFileChooser);
+		final JFileChooser openPoSDictionaryFileChooser = JavaHelper.waitForFuture(futureOpenPoSDictionaryFileChooser);
 		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();

@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 
@@ -64,7 +65,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
 
-		futureSaveResultFileChooser = GUIHelper.createFileChooserFuture(() -> {
+		futureSaveResultFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
 			saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -80,7 +81,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		workerManager.createWordlistWorker(
 			type,
 			() -> {
-				final JFileChooser saveResultFileChooser = GUIHelper.waitForFileChooser(futureSaveResultFileChooser);
+				final JFileChooser saveResultFileChooser = JavaHelper.waitForFuture(futureSaveResultFileChooser);
 				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
 				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
 			},

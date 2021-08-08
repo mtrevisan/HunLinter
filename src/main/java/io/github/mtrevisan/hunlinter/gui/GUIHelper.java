@@ -54,10 +54,6 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -69,30 +65,8 @@ public final class GUIHelper{
 	private static final String KEY_UNDO = "Undo";
 	private static final String KEY_REDO = "Redo";
 
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(10);
-
 
 	private GUIHelper(){}
-
-	public static FutureTask<JFileChooser> createFileChooserFuture(final Callable<JFileChooser> callable){
-		final FutureTask<JFileChooser> futureTask = new FutureTask<>(callable);
-		EXECUTOR_SERVICE.execute(futureTask);
-		return futureTask;
-	}
-
-	public static JFileChooser waitForFileChooser(final FutureTask<JFileChooser> futureTask){
-		while(true){
-			try{
-				if(futureTask.isDone()){
-					//shut down executor service
-					EXECUTOR_SERVICE.shutdown();
-
-					return futureTask.get();
-				}
-			}
-			catch(final Exception ignored){}
-		}
-	}
 
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.

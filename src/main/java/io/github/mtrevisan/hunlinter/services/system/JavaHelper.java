@@ -27,18 +27,44 @@ package io.github.mtrevisan.hunlinter.services.system;
 import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 
 public final class JavaHelper{
 
 	private static final char QUOTATION_MARK = '"';
 
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(10);
+
 
 	private JavaHelper(){}
+
+	public static <T> FutureTask<T> createFuture(final Callable<T> callable){
+		final FutureTask<T> futureTask = new FutureTask<>(callable);
+		EXECUTOR_SERVICE.execute(futureTask);
+		return futureTask;
+	}
+
+	public static <T> T waitForFuture(final FutureTask<T> futureTask){
+		while(true){
+			try{
+				if(futureTask.isDone()){
+					//shut down executor service
+					EXECUTOR_SERVICE.shutdown();
+
+					return futureTask.get();
+				}
+			}
+			catch(final Exception ignored){}
+		}
+	}
 
 	/**
 	 * This method calls the garbage collector and then returns the free memory.

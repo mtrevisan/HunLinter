@@ -195,7 +195,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
 
-		futureOpenProjectPathFileChooser = GUIHelper.createFileChooserFuture(() -> {
+		futureOpenProjectPathFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser openProjectPathFileChooser = new JFileChooser();
 			openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
 			openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -546,7 +546,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		final JFileChooser openProjectPathFileChooser = GUIHelper.waitForFileChooser(futureOpenProjectPathFileChooser);
+		final JFileChooser openProjectPathFileChooser = JavaHelper.waitForFuture(futureOpenProjectPathFileChooser);
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
