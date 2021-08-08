@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
@@ -52,8 +53,15 @@ public final class ParserHelper{
 
 	private ParserHelper(){}
 
-	public static boolean isComment(final CharSequence line, final char... comment){
-		return (StringUtils.isBlank(line) || StringUtils.indexOfAny(line, comment) == 0);
+	public static boolean isComment(final String line, final char... comment){
+		if(StringUtils.isBlank(line))
+			return true;
+
+		final char chr = StringUtils.trim(line).charAt(0);
+		for(final char commentChar : comment)
+			if(chr == commentChar)
+				return true;
+		return false;
 	}
 
 	public static void assertNotEOF(final Scanner scanner) throws EOFException{

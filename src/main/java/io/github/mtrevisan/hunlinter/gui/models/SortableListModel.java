@@ -44,7 +44,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	/**
-	 * Adds all of the elements present in the collection to the list.
+	 * Adds all the elements present in the collection to the list.
 	 *
 	 * @param c	The collection which contains the elements to add
 	 * @throws NullPointerException	If {@code c} is {@code null}
