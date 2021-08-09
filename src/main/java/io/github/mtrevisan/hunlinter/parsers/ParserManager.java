@@ -82,7 +82,7 @@ public class ParserManager implements FileChangeListener{
 	private final AffixParser affParser;
 	private final AidParser aidParser;
 	private DictionaryParser dicParser;
-	private final ThesaurusParser theParser;
+	private ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
 	private HyphenatorInterface hyphenator;
@@ -103,7 +103,6 @@ public class ParserManager implements FileChangeListener{
 
 		affParser = new AffixParser();
 		aidParser = new AidParser();
-		theParser = new ThesaurusParser(packager.getLanguage());
 		acoParser = new AutoCorrectParser();
 		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
 		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);
@@ -254,6 +253,7 @@ public class ParserManager implements FileChangeListener{
 		if(theDataFile != null && theDataFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theDataFile.getName());
 
+			theParser = new ThesaurusParser(packager.getLanguage());
 			theParser.parse(theDataFile);
 
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Thesaurus file");

@@ -25,8 +25,6 @@
 package io.github.mtrevisan.hunlinter.languages.vec;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 
@@ -42,11 +40,7 @@ import java.util.stream.IntStream;
 
 public final class WordVEC{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
-
 	private static final String PIPE = "|";
-	private static final String TAB = "\t";
-	private static final String UNDERSCORE = "_";
 
 	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ";
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
@@ -65,16 +59,13 @@ public final class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
-	private static final String COLLATOR_RULE = "' '='\t' < ’=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
+	private static final String COLLATOR_RULE = "; ̿  < ' '='\t' < '-';\u00AD;‐;‑;‒;–;—;―;− < ’=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	private static Collator COLLATOR;
 	static{
 		try{
 			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
 		}
-		catch(final ParseException e){
-			//cannot happen
-			LOGGER.error(e.getMessage());
-		}
+		catch(final ParseException ignored){}
 	}
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
@@ -235,7 +226,7 @@ public final class WordVEC{
 	}
 
 	public static Comparator<String> sorterComparator(){
-		return (str1, str2) -> COLLATOR.compare(str1, str2);
+		return COLLATOR::compare;
 	}
 
 }

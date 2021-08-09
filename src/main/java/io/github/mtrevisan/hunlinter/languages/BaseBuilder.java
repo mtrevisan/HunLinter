@@ -25,12 +25,12 @@
 package io.github.mtrevisan.hunlinter.languages;
 
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import io.github.mtrevisan.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.OrthographyVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordTokenizerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 
@@ -38,8 +38,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.text.Collator;
+import java.text.ParseException;
+import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -83,8 +87,27 @@ public final class BaseBuilder{
 	private BaseBuilder(){}
 
 	public static Comparator<String> getComparator(final String language){
-		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
-			.comparator;
+		LanguageData languageData = DATA.get(language);
+		if(languageData == null){
+			languageData = LANGUAGE_DATA_DEFAULT;
+
+			if(language != null){
+				Collator collator = Collator.getInstance(Locale.forLanguageTag(language));
+
+				//make ordering per-word
+				if(collator instanceof RuleBasedCollator){
+					try{
+						//insert a collation rule to sort the space character before the underscore
+						String rules = ((RuleBasedCollator)collator).getRules();
+						collator = new RuleBasedCollator(rules.replaceAll("<'_'", "<' '='\t'<'_'"));
+					}
+					catch(ParseException ignored){}
+				}
+
+				languageData.comparator = collator::compare;
+			}
+		}
+		return languageData.comparator;
 	}
 
 	public static BloomFilterParameters getDictionaryBaseData(final String language){
