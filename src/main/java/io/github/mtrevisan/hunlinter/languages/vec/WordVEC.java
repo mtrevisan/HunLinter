@@ -65,7 +65,7 @@ public final class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
-	private static final String COLLATOR_RULE = ", ' ' < ’=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
+	private static final String COLLATOR_RULE = "' '='\t' < ’=''','-'='‒' & '-'='–' < '_' < ',' < ';' < ':' < '/' < '+' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	private static Collator COLLATOR;
 	static{
 		try{
@@ -180,7 +180,7 @@ public final class WordVEC{
 //	}
 
 	static String replaceCharAt(final String text, final int idx, final char chr){
-		final StringBuffer sb = new StringBuffer(text);
+		final StringBuilder sb = new StringBuilder(text);
 		sb.setCharAt(idx, chr);
 		return sb.toString();
 	}
@@ -235,9 +235,7 @@ public final class WordVEC{
 	}
 
 	public static Comparator<String> sorterComparator(){
-		return (str1, str2) -> COLLATOR.compare(
-			StringUtils.replace(str1, TAB, UNDERSCORE),
-			StringUtils.replace(str2, TAB, UNDERSCORE));
+		return (str1, str2) -> COLLATOR.compare(str1, str2);
 	}
 
 }
