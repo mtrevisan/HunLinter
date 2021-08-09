@@ -648,9 +648,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	private void loadFileCompleted(){
-		parserManager.registerFileListener();
-		parserManager.startFileListener();
-
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
 			filCreatePackageMenuItem.setEnabled(true);
@@ -710,6 +707,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			LOGGER.error("A bad error occurred", e);
 		}
+
+		parserManager.startFileListener();
 	}
 
 	private void loadLanguageDependentFont(){

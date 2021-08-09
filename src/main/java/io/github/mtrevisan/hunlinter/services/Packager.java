@@ -46,6 +46,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -280,8 +281,7 @@ public class Packager{
 		for(final Node child : children)
 			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
-				for(final String locale : locales)
-					languageSets.add(locale);
+				languageSets.addAll(Arrays.asList(locales));
 			}
 		final List<String> langs = new ArrayList<>(languageSets);
 		Collections.sort(langs);

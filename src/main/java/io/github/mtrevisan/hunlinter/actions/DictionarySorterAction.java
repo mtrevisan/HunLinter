@@ -86,9 +86,9 @@ public class DictionarySorterAction extends AbstractAction{
 						worker.execute();
 					},
 					worker -> {
-						parserManager.startFileListener();
-
 						dialog.setDictionaryEnabled(true);
+
+						parserManager.startFileListener();
 					}
 				);
 		});

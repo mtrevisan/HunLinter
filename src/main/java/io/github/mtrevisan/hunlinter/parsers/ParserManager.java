@@ -33,7 +33,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,7 +163,13 @@ public class ParserManager implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void registerFileListener(){
+	public void startFileListener(){
+		registerFileListener();
+
+		flm.start();
+	}
+
+	private void registerFileListener(){
 		flm.unregisterAll();
 
 		final File affFile = packager.getAffixFile();
@@ -173,17 +178,15 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = ArrayUtils.removeAllOccurrences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
-			null);
+		final File[] files = new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile};
 		for(final File file : files)
-			flm.register(this, file.getAbsolutePath());
-	}
-
-	public void startFileListener(){
-		flm.start();
+			if(file != null)
+				flm.register(this, file.getAbsolutePath());
 	}
 
 	public void stopFileListener(){
+		flm.unregisterAll();
+
 		flm.stop();
 	}
 
@@ -358,10 +361,9 @@ public class ParserManager implements FileChangeListener{
 
 	@Override
 	public void fileModified(final Path path){
-		if(path.toFile().toString().equals(packager.getDictionaryFile().toString())){
+		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
 			//cannot refresh file because on sorting the dictionary is changed, leading to a useless reloading
-//			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
-		}
+			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 		else{
 			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName());
 

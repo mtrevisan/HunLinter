@@ -200,7 +200,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	 * Instead, receive one ENTRY_MODIFY event with two counts
 	 */
 	private void preventMultipleEvents(){
-		try{ Thread.sleep(50l); }
+		try{ Thread.sleep(100l); }
 		catch(final InterruptedException e){
 			Thread.currentThread().interrupt();
 		}

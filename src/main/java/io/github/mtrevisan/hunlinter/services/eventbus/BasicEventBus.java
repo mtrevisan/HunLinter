@@ -282,7 +282,7 @@ public class BasicEventBus implements EventBusInterface{
 		}
 
 		private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
-												 final Collection<HandlerInfoCallable> regularHandlers){
+				final Collection<HandlerInfoCallable> regularHandlers){
 			for(final HandlerInfo info : handlers){
 				if(!info.matchesEvent(evt))
 					continue;
