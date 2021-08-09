@@ -156,7 +156,7 @@ public class DictionarySortDialog extends JDialog{
 			return;
 
 		try{
-			parserManager.getDicParser().clearBoundaries();
+			dicParser.clearBoundaries();
 
 			//reload text
 			final int lastVisibleIndex = getFirstVisibleIndex();
@@ -171,7 +171,8 @@ public class DictionarySortDialog extends JDialog{
 		final SortableListModel model = (SortableListModel)entriesList.getModel();
 		model.replaceAll(listData, 0);
 
-		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+		if(firstVisibleItemIndex >= 0)
+			entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 
 		//re-render sections
 		entriesList.repaint();

@@ -358,8 +358,10 @@ public class ParserManager implements FileChangeListener{
 
 	@Override
 	public void fileModified(final Path path){
-		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
-			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
+		if(path.toFile().toString().equals(packager.getDictionaryFile().toString())){
+			//cannot refresh file because on sorting the dictionary is changed, leading to a useless reloading
+//			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
+		}
 		else{
 			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName());
 
