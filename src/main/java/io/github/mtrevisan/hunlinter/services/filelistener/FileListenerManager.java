@@ -79,7 +79,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 
-	private final WatchService watcher;
+	private WatchService watcher;
 	private Future<?> watcherTask;
 	private final AtomicBoolean running;
 	private final ConcurrentMap<WatchKey, Path> watchKeyToDirPath;
@@ -117,6 +117,13 @@ public class FileListenerManager implements FileListener, Runnable{
 
 			watcherTask.cancel(true);
 			watcherTask = null;
+
+			//this piece of code prevents presenting a file as modified while the listener has been stopped and subsequently restarted
+			try{
+				watcher.close();
+			}
+			catch(final IOException ignored){}
+			watcher = createWatcher();
 		}
 	}
 
@@ -245,7 +252,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 			//overflow occurs when the watch event queue is overflown with events
 			if(eventKind.equals(StandardWatchEventKinds.OVERFLOW))
-				break;
+				continue;
 
 			final BiConsumer<FileChangeListener, Path> listenerMethod = FILE_CHANGE_LISTENER_BY_EVENT.get(eventKind);
 			if(listenerMethod != null){

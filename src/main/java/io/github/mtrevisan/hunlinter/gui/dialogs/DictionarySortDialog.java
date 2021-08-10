@@ -173,6 +173,8 @@ public class DictionarySortDialog extends JDialog{
 
 		if(firstVisibleItemIndex >= 0)
 			entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+
+		entriesList.updateUI();
 	}
 
 	private void setCurrentFont(){
