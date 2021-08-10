@@ -52,7 +52,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.StringJoiner;
@@ -64,6 +66,9 @@ import java.util.zip.GZIPOutputStream;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
+//TODO https://github.com/mtrevisan/hunspell-stemmer/blob/master/src/hunspell_stemmer/Dictionary.java
+//TODO https://stackoverflow.com/questions/5960482/how-to-define-a-new-charset-in-java-android
+//TODO https://www.javatips.net/api/jcodings-master/src/org/jcodings/specific/ISO8859_14Encoding.java
 public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
@@ -72,15 +77,22 @@ public final class FileHelper{
 
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
+	private static final Map<String, String> CHARSET_ALIASES = new HashMap<>(3);
 	static{
+		CHARSET_ALIASES.put("MICROSOFT-CP1251", "WINDOWS-1251");
+		CHARSET_ALIASES.put("TIS620-2533", "TIS-620");
+		CHARSET_ALIASES.put("ISCII-DEVANAGARI", "x-ISCII91");
+
 		HUNSPELL_CHARSETS = Stream.of(
-				"UTF-8", "ISO_8859_1", "ISO_8859_2", "ISO_8859_3", "ISO_8859_4", "ISO_8859_5",
-				"ISO_8859_6", "ISO_8859_7", "ISO_8859_8", "ISO_8859_9", "ISO_8859_10", "ISO_8859_13", "ISO_8859_14", "ISO_8859_15",
-				"KOI8_R", "KOI8_U", "MICROSOFT_CP1251", "ISCII_DEVANAGARI")
+				"UTF-8",
+				"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859_8", "ISO-8859-9",
+				/**/"ISO_8859_10", "ISO-8859-13", /**/"ISO_8859_14", "ISO-8859-15",
+				"KOI8-R", "KOI8-U", "MICROSOFT-CP1251", "ISCII_DEVANAGARI",
+				"TIS620-2533")
 			.map(name -> {
 				Charset cs = null;
 				try{
-					cs = Charset.forName(name);
+					cs = Charset.forName(CHARSET_ALIASES.getOrDefault(name, name));
 				}
 				catch(final Exception ignored){}
 				return cs;
@@ -119,7 +131,7 @@ public final class FileHelper{
 
 	public static Charset readCharset(final String charsetName){
 		try{
-			final Charset cs = Charset.forName(charsetName);
+			final Charset cs = Charset.forName(CHARSET_ALIASES.getOrDefault(charsetName, charsetName));
 
 			//line should be a valid charset
 			if(!HUNSPELL_CHARSETS.contains(cs))
@@ -189,6 +201,7 @@ public final class FileHelper{
 	private static Scanner createScanner(final InputStream is, final Charset charset){
 		final BOMInputStream bomis = new BOMInputStream(is, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
+		//TODO return new Scanner(bomis, charset.newDecoder().onMalformedInput(CodingErrorAction.REPLACE));
 		return new Scanner(bomis, charset);
 	}
 
