@@ -53,7 +53,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{
@@ -318,14 +317,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private boolean existsCompoundAsReplacement(final String word){
 		boolean exists = (LoopHelper.match(compoundAsReplacement, word::contains) != null);
 		if(!exists && word.length() >= 2){
-			final List<String> conversions = affixData.applyReplacementTable(word);
-			for(final String candidate : conversions)
-				if(dicInclusionTestWorker.isInDictionary(candidate)){
-					compoundAsReplacement.add(word);
+			final String convertedWord = affixData.applyReplacementTable(word);
+			if(dicInclusionTestWorker.isInDictionary(convertedWord)){
+				compoundAsReplacement.add(word);
 
-					exists = true;
-					break;
-				}
+				exists = true;
+			}
 		}
 		return exists;
 	}

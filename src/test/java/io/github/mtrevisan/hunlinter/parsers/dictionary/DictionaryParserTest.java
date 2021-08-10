@@ -33,9 +33,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 
 class DictionaryParserTest{
@@ -56,16 +53,16 @@ class DictionaryParserTest{
 		affParser.parse(affFile, language);
 
 		ConversionTable table = affParser.getAffixData().getData(AffixOption.REPLACEMENT_TABLE);
-		Assertions.assertEquals("[affixOption=REPLACEMENT_TABLE,table={  =[(ij,IJ), (alot,a lot)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
+		Assertions.assertEquals("[affixOption=REPLACEMENT_TABLE,table={  =[(alot,a_lot), (ij,IJ)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
 
-		List<String> replaced = affParser.getAffixData().applyReplacementTable("clea");
-		Assertions.assertTrue(replaced.isEmpty());
+		String replaced = affParser.getAffixData().applyReplacementTable("clea");
+		Assertions.assertEquals("clea", replaced);
 
 		replaced = affParser.getAffixData().applyReplacementTable("bcijde");
-		Assertions.assertEquals(Arrays.asList("bbcijde", "bcijdee", "bcIJde"), replaced);
+		Assertions.assertEquals("bcIJde", replaced);
 
 		replaced = affParser.getAffixData().applyReplacementTable("alot");
-		Assertions.assertEquals(Collections.singletonList("a lot"), replaced);
+		Assertions.assertEquals("a lot", replaced);
 	}
 
 	@Test
@@ -79,8 +76,8 @@ class DictionaryParserTest{
 			"REP ba 2");
 		affParser.parse(affFile, language);
 
-		List<String> replaced = affParser.getAffixData().applyReplacementTable("abacc");
-		Assertions.assertEquals(Arrays.asList("a1acc", "a3c", "a2cc"), replaced);
+		String replaced = affParser.getAffixData().applyReplacementTable("abacc");
+		Assertions.assertEquals("a3c", replaced);
 	}
 
 	@Test
@@ -94,8 +91,8 @@ class DictionaryParserTest{
 			"REP ^ba 2");
 		affParser.parse(affFile, language);
 
-		List<String> replaced = affParser.getAffixData().applyReplacementTable("bacc");
-		Assertions.assertEquals(Arrays.asList("1acc", "3c", "2cc"), replaced);
+		String replaced = affParser.getAffixData().applyReplacementTable("bacc");
+		Assertions.assertEquals("3c", replaced);
 	}
 
 	@Test
@@ -109,8 +106,8 @@ class DictionaryParserTest{
 			"REP ab$ 2");
 		affParser.parse(affFile, language);
 
-		List<String> replaced = affParser.getAffixData().applyReplacementTable("ccab");
-		Assertions.assertEquals(Arrays.asList("cca1", "c3", "cc2"), replaced);
+		String replaced = affParser.getAffixData().applyReplacementTable("ccab");
+		Assertions.assertEquals("c3", replaced);
 	}
 
 }

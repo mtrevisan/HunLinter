@@ -60,7 +60,6 @@ public class AffixData{
 	private static final String REPEATED_FLAG = "Same flags present in multiple options";
 	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
 	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: `{0}`");
-	private static final MessageFormat TOO_MANY_APPLICABLE_RULES = new MessageFormat("Cannot {0}-convert word `{1}`, too many applicable rules");
 
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
@@ -278,31 +277,23 @@ public class AffixData{
 			.extractAsList();
 	}
 
-	public List<String> applyReplacementTable(final String word){
+	public String applyReplacementTable(final String word){
 		final ConversionTable table = getData(AffixOption.REPLACEMENT_TABLE);
-		return (table != null? table.applyConversionTable(word): Collections.emptyList());
+		return (table != null? table.applyConversionTable(word): word);
 	}
 
 	public String applyInputConversionTable(final String word){
 		final ConversionTable table = getData(AffixOption.INPUT_CONVERSION_TABLE);
-		return applyConversionTable(word, table, "input");
+		return applyConversionTable(word, table);
 	}
 
 	public String applyOutputConversionTable(final String word){
 		final ConversionTable table = getData(AffixOption.OUTPUT_CONVERSION_TABLE);
-		return applyConversionTable(word, table, "output");
+		return applyConversionTable(word, table);
 	}
 
-	private String applyConversionTable(String word, final ConversionTable table, final String type){
-		if(table != null){
-			try{
-				word = table.applySingleConversionTable(word);
-			}
-			catch(final LinterException e){
-				throw new LinterException(TOO_MANY_APPLICABLE_RULES.format(new Object[]{type, word}));
-			}
-		}
-		return word;
+	private String applyConversionTable(String word, final ConversionTable table){
+		return (table != null? table.applyConversionTable(word): word);
 	}
 
 	/**
