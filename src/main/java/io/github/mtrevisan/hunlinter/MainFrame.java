@@ -682,7 +682,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final AutoCorrectParser acoParser = parserManager.getAcoParser();
 			if(acoParser != null){
 				acoMenu.setEnabled(acoParser.getCorrectionsCounter() > 0);
-				EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+				EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, acoMenu.isEnabled()));
 			}
 
 			//sentence exceptions file:
@@ -844,6 +844,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT);
 
+		acoMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, false));
 
 		final AutoCorrectParser acoParser = parserManager.getAcoParser();
