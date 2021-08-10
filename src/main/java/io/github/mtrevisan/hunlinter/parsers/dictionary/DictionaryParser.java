@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,7 @@ public class DictionaryParser{
 	private final Charset charset;
 
 	private final Comparator<String> comparator;
+	private boolean boundariesCalculated = false;
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
@@ -103,7 +105,7 @@ public class DictionaryParser{
 	}
 
 	public synchronized int getBoundaryIndex(final int lineIndex){
-		if(boundaries.isEmpty())
+		if(!boundariesCalculated)
 			calculateDictionaryBoundaries();
 
 		final Map.Entry<Integer, Integer> entry = searchBoundary(lineIndex);
@@ -149,6 +151,8 @@ public class DictionaryParser{
 		catch(final IOException e){
 			LOGGER.error(null, e);
 		}
+
+		boundariesCalculated = true;
 	}
 
 	public synchronized int getNextBoundaryIndex(final int lineIndex){
@@ -175,6 +179,7 @@ public class DictionaryParser{
 	}
 
 	public synchronized void clearBoundaries(){
+		boundariesCalculated = false;
 		boundaries.clear();
 	}
 
