@@ -257,12 +257,12 @@ final int iconSize = 17;
                JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);
          };
-         final DuplicationResult<ThesaurusEntry> duplicationResult = parserManager.getTheParser()
-         .insertSynonyms(synonyms, duplicatesDiscriminator);
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			final DuplicationResult<ThesaurusEntry> duplicationResult = theParser.insertSynonyms(synonyms, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
             final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
-            dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
+            dm.setSynonyms(theParser.getSynonymsDictionary());
             dm.fireTableDataChanged();
 
             formerFilterThesaurusText = null;
@@ -306,16 +306,13 @@ final int iconSize = 17;
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
-			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-
-
 			//thesaurus file:
-			if(parserManager.getTheParser().getSynonymsCount() > 0){
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			if(theParser != null && theParser.getSynonymsCount() > 0){
 				GUIHelper.addSorterToTable(table, comparator, null);
 
 				final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
-				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
+				dm.setSynonyms(theParser.getSynonymsDictionary());
 				updateSynonymsCounter();
 			}
 		}
@@ -406,10 +403,10 @@ final int iconSize = 17;
 			final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
 			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
-			parserManager.getTheParser()
-				.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			theParser.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
 
-			dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
+			dm.setSynonyms(theParser.getSynonymsDictionary());
 			updateSynonymsCounter();
 
 			//… and save the files
@@ -421,7 +418,7 @@ final int iconSize = 17;
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
 				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-				final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
+				final boolean alreadyContained = theParser.contains(pair.getLeft(), pair.getRight());
 				addButton.setEnabled(!alreadyContained);
 			}
 		}

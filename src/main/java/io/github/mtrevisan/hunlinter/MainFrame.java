@@ -664,31 +664,36 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			//dictionary file (compound):
 			final AffixData affixData = parserManager.getAffixData();
-			EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
+			if(affixData != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
 
 			//thesaurus file:
-			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
-			EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
-
-			//autocorrection file:
-			acoMenu.setEnabled(parserManager.getAcoParser().getCorrectionsCounter() > 0);
-			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			if(theParser != null){
+				theMenu.setEnabled(theParser.getSynonymsCount() > 0);
+				EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
+			}
 
 			//hyphenation file:
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
 			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
 
-			//auto-correct file:
-			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane,
-				(parserManager.getAcoParser().getCorrectionsCounter() > 0)));
+			//autocorrection file:
+			final AutoCorrectParser acoParser = parserManager.getAcoParser();
+			if(acoParser != null){
+				acoMenu.setEnabled(acoParser.getCorrectionsCounter() > 0);
+				EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+			}
 
 			//sentence exceptions file:
-			EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane,
-				(parserManager.getSexParser().getExceptionsCounter() > 0)));
+			final ExceptionsParser sexParser = parserManager.getSexParser();
+			if(sexParser != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane, (sexParser.getExceptionsCounter() > 0)));
 
 			//word exceptions file:
-			EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane,
-				(parserManager.getWexParser().getExceptionsCounter() > 0)));
+			final ExceptionsParser wexParser = parserManager.getWexParser();
+			if(wexParser != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane, (wexParser.getExceptionsCounter() > 0)));
 
 			//Part-of-Speech dictionary file:
 			EventBusService.publish(new TabbedPaneEnableEvent(pdcLayeredPane, true));
