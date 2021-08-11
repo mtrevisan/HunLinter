@@ -54,8 +54,8 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 		super("dictionary.extractDuplicates",
 			new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;

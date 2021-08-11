@@ -57,9 +57,9 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		super("dictionary.extractWordlist",
 			new ImageIcon(DictionaryExtractWordlistAction.class.getResource("/dictionary_wordlist.png")));
 
-		Objects.requireNonNull(type);
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(type, "Type cannot be null");
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.type = type;
 		this.workerManager = workerManager;

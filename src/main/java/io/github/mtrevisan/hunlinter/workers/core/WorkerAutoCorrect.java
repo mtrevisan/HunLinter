@@ -42,7 +42,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 	}
 
 	protected void processLines(final Consumer<CorrectionEntry> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load autocorrect
 		final List<CorrectionEntry> entries = loadAutoCorrect();

@@ -47,8 +47,8 @@ public class HyphenationLinterAction extends AbstractAction{
 		super("hyphenation.linter",
 			new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;

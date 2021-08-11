@@ -136,8 +136,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	protected BloomFilter(final Charset charset, final int expectedNumberOfElements, final double falsePositiveProbability,
 			final BitArrayBuilder.Type bitArrayType, final Decomposer<T> decomposer, final HashFunction hasher){
-		Objects.requireNonNull(charset);
-		Objects.requireNonNull(bitArrayType);
+		Objects.requireNonNull(charset, "Charset cannot be null");
+		Objects.requireNonNull(bitArrayType, "Bit array type cannot be null");
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException(WRONG_NUMBER_OF_ELEMENTS);
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)

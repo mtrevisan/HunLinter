@@ -55,7 +55,7 @@ public class SorterWorker extends WorkerDictionary{
 	public SorterWorker(final File dicFile, final ParserManager parserManager, final int lineIndex){
 		super(new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser()));
 
-		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(dicFile, "Dictionary file cannot be null");
 
 		getWorkerData()
 			.withParallelProcessing()

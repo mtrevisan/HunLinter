@@ -44,7 +44,7 @@ public class CreatePackageAction extends AbstractAction{
 	public CreatePackageAction(final ParserManager parserManager){
 		super("system.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 	}

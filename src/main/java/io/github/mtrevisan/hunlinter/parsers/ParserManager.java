@@ -98,7 +98,7 @@ public class ParserManager implements FileChangeListener{
 
 
 	public ParserManager(final Packager packager){
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		affParser = new AffixParser();
 		aidParser = new AidParser();

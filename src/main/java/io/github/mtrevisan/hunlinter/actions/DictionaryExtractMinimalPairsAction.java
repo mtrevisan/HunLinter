@@ -53,8 +53,8 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractMinimalPairs");
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;

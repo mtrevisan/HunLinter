@@ -54,8 +54,8 @@ public class OpenFileAction extends AbstractAction{
 	public OpenFileAction(final Supplier<File> fileSupplier, final Packager packager){
 		super("system.open");
 
-		Objects.requireNonNull(fileSupplier);
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(fileSupplier, "File supplier cannot be null");
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		this.fileSupplier = fileSupplier;
 		fileKey = null;
@@ -65,8 +65,8 @@ public class OpenFileAction extends AbstractAction{
 	public OpenFileAction(final String fileKey, final Packager packager){
 		super("system.open");
 
-		Objects.requireNonNull(fileKey);
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(fileKey, "File key cannot be null");
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		fileSupplier = null;
 		this.fileKey = fileKey;

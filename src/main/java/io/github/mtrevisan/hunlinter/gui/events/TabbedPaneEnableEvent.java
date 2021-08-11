@@ -40,7 +40,7 @@ public class TabbedPaneEnableEvent{
 	}
 
 	public TabbedPaneEnableEvent(final JLayeredPane pane, final boolean enable){
-		Objects.requireNonNull(pane);
+		Objects.requireNonNull(pane, "Pane cannot be null");
 
 		this.pane = pane;
 		this.enable = enable;

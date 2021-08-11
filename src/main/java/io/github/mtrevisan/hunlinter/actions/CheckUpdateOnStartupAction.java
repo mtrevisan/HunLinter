@@ -45,7 +45,7 @@ public class CheckUpdateOnStartupAction extends AbstractAction{
 	public CheckUpdateOnStartupAction(final Preferences preferences){
 		super("system.checkUpdateOnStartup");
 
-		Objects.requireNonNull(preferences);
+		Objects.requireNonNull(preferences, "Preferences cannot be null");
 
 		this.preferences = preferences;
 	}

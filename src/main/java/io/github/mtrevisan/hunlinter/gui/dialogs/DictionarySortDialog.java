@@ -60,7 +60,7 @@ public class DictionarySortDialog extends JDialog{
 	public DictionarySortDialog(final ParserManager parserManager, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 		dicParser = parserManager.getDicParser();

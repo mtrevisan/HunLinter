@@ -39,8 +39,8 @@ public class WorkerDataProject extends WorkerData{
 	public WorkerDataProject(final String workerName, final Packager packager, final ParserManager parserManager){
 		super(workerName);
 
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;

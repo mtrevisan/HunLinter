@@ -45,7 +45,7 @@ public class ReportWarningsAction extends AbstractAction{
 	public ReportWarningsAction(final Preferences preferences){
 		super("system.reportWarnings");
 
-		Objects.requireNonNull(preferences);
+		Objects.requireNonNull(preferences, "Preferences cannot be null");
 
 		this.preferences = preferences;
 	}

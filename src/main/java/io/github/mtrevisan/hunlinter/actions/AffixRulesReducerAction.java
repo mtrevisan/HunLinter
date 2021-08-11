@@ -49,7 +49,7 @@ public class AffixRulesReducerAction extends AbstractAction{
 	public AffixRulesReducerAction(final ParserManager parserManager){
 		super("affix.rulesReducer");
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 	}

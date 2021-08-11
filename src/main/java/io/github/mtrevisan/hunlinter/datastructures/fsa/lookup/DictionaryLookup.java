@@ -67,7 +67,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @throws IllegalArgumentException	If FSA's root node cannot be acquired (dictionary is empty).
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
-		Objects.requireNonNull(dictionary);
+		Objects.requireNonNull(dictionary, "Dictionary cannot be null");
 		final FSA fsa = dictionary.fsa;
 		final DictionaryMetadata metadata = dictionary.metadata;
 		Objects.requireNonNull(fsa);

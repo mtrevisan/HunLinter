@@ -96,7 +96,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param processor	A processor which handles the output
 	 */
 	public void searchInText(final String text, final HitProcessor<V> processor){
-		Objects.requireNonNull(processor);
+		Objects.requireNonNull(processor, "Processor cannot be null");
 
 		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			final int position = index + 1;

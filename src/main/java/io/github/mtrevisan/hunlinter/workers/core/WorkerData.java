@@ -43,7 +43,7 @@ public class WorkerData{
 
 
 	WorkerData(final String workerName){
-		Objects.requireNonNull(workerName);
+		Objects.requireNonNull(workerName, "Worker name cannot be null");
 
 		this.workerName = workerName;
 	}

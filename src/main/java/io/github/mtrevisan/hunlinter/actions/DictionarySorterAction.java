@@ -52,9 +52,9 @@ public class DictionarySorterAction extends AbstractAction{
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.sorter", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_sort.png")));
 
-		Objects.requireNonNull(parserManager);
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
