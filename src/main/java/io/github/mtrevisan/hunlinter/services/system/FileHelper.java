@@ -69,8 +69,6 @@ import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 //TODO https://github.com/mtrevisan/hunspell-stemmer/blob/master/src/hunspell_stemmer/Dictionary.java
-//TODO https://stackoverflow.com/questions/5960482/how-to-define-a-new-charset-in-java-android
-//TODO https://www.javatips.net/api/jcodings-master/src/org/jcodings/specific/ISO8859_14Encoding.java
 public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);

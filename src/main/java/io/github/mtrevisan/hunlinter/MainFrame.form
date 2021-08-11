@@ -87,7 +87,7 @@
                   <Connection code="new DictionaryLinterAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="99"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="text" type="java.lang.String" value="Spell check"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </MenuItem>
@@ -199,7 +199,7 @@
                   <Connection code="new ThesaurusLinterAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="99"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="text" type="java.lang.String" value="Spell check"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="theLinterFSAMenuItem">
@@ -208,7 +208,7 @@
                   <Connection code="new ThesaurusLinterFSAAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
-                <Property name="text" type="java.lang.String" value="Check correctness against dictionary FSA…"/>
+                <Property name="text" type="java.lang.String" value="Spell check using dictionary FSA…"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -226,7 +226,7 @@
                   <Connection code="new HyphenationLinterAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="100"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="text" type="java.lang.String" value="Spell check"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hypDuplicatesSeparator">
@@ -255,7 +255,7 @@
                   <Connection code="new AutoCorrectLinterAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="67"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="text" type="java.lang.String" value="Spell check"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="acoLinterFSAMenuItem">
@@ -264,7 +264,7 @@
                   <Connection code="new AutoCorrectLinterFSAAction(workerManager, this)" type="code"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
-                <Property name="text" type="java.lang.String" value="Check correctness against dictionary FSA…"/>
+                <Property name="text" type="java.lang.String" value="Spell check using dictionary FSA…"/>
               </Properties>
             </MenuItem>
           </SubComponents>

@@ -377,7 +377,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this));
       dicLinterMenuItem.setMnemonic('c');
-      dicLinterMenuItem.setText("Check correctness");
+      dicLinterMenuItem.setText("Spell check");
       dicLinterMenuItem.setToolTipText("");
       dicMenu.add(dicLinterMenuItem);
 
@@ -439,12 +439,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this));
       theLinterMenuItem.setMnemonic('c');
-      theLinterMenuItem.setText("Check correctness");
+      theLinterMenuItem.setText("Spell check");
       theMenu.add(theLinterMenuItem);
 
 		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
 		theLinterFSAMenuItem.setMnemonic('a');
-      theLinterFSAMenuItem.setText("Check correctness against dictionary FSA…");
+      theLinterFSAMenuItem.setText("Spell check using dictionary FSA…");
 		theMenu.add(theLinterFSAMenuItem);
 
       mainMenuBar.add(theMenu);
@@ -455,7 +455,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
       hypLinterMenuItem.setMnemonic('d');
-      hypLinterMenuItem.setText("Check correctness");
+      hypLinterMenuItem.setText("Spell check");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
@@ -472,12 +472,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
       acoLinterMenuItem.setMnemonic('C');
-      acoLinterMenuItem.setText("Check correctness");
+      acoLinterMenuItem.setText("Spell check");
       acoMenu.add(acoLinterMenuItem);
 
 		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
 		acoLinterFSAMenuItem.setMnemonic('a');
-		acoLinterFSAMenuItem.setText("Check correctness against dictionary FSA…");
+		acoLinterFSAMenuItem.setText("Spell check using dictionary FSA…");
 		acoMenu.add(acoLinterFSAMenuItem);
 
       mainMenuBar.add(acoMenu);
