@@ -58,7 +58,7 @@ public class WordBreakTableHandler implements Handler{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
-			final int numEntries = Integer.parseInt(Character.getNumericValue(context.getFirstParameter()));
+			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
 				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
 
