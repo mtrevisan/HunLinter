@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.workers;
 
-import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataProject;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerProject;
 

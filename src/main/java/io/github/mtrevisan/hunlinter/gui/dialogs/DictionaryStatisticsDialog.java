@@ -24,7 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
+import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryStatistics;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.Frequency;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartPanel;
@@ -41,13 +48,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.gui.GUIHelper;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryStatistics;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.Frequency;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

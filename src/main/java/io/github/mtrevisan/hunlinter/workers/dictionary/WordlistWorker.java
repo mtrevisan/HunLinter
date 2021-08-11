@@ -25,18 +25,18 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorter;
-import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorter;
+import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
+import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;

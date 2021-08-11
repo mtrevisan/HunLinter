@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.eventbus.events;
 
-import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 
 import java.io.Serial;
 import java.util.EventObject;

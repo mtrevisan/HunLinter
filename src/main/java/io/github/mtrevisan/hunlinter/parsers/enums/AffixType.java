@@ -26,8 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.enums;
 
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public enum AffixType{
 

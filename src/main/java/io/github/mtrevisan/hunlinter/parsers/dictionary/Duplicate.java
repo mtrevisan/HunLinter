@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 
 import java.util.Objects;
 

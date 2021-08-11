@@ -25,18 +25,16 @@
 package io.github.mtrevisan.hunlinter.workers;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.autocorrect.AutoCorrectLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
-import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryLinterWorker;
-import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
-import org.slf4j.Logger;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.dictionary.CompoundRulesWorker;
+import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DuplicatesWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.MinimalPairsWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.PoSFSAWorker;
@@ -45,6 +43,8 @@ import io.github.mtrevisan.hunlinter.workers.dictionary.WordCountWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.hyphenation.HyphenationLinterWorker;
+import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
+import org.slf4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;

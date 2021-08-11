@@ -26,14 +26,14 @@ package io.github.mtrevisan.hunlinter.datastructures.bloomfilter;
 
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core.BitArray;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core.BitArrayBuilder;
-import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.decompose.ByteSink;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.decompose.Decomposer;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.decompose.DefaultDecomposer;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.hash.HashFunction;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.hash.Murmur3HashFunction;
+import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

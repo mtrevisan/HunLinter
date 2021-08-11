@@ -50,8 +50,6 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class AffixEntry{
 

@@ -24,15 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import io.github.mtrevisan.hunlinter.languages.Orthography;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -223,7 +223,7 @@ public class HyphenationParser{
 
 			while(scanner.hasNextLine()){
 				line = scanner.nextLine();
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SLASH, ParserHelper.COMMENT_MARK_PERCENT))
+				if(ParserHelper.isHyphenationComment(line))
 					continue;
 
 				final boolean parsedLine = options.parseLine(line);

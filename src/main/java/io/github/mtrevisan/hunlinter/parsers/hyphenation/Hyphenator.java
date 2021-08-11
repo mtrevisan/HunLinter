@@ -24,14 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 
 import java.text.Normalizer;
 import java.util.Collections;

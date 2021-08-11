@@ -25,11 +25,11 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import org.apache.commons.lang3.ArrayUtils;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;

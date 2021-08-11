@@ -24,13 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.IntegerFilter;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptions;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;

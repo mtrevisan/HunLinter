@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +122,7 @@ public class DictionaryParser{
 			int lineIndex = 1;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
-				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
+				if(!ParserHelper.isDictionaryComment(line)){
 					if(startSection < 0)
 						startSection = lineIndex;
 

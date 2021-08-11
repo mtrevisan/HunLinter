@@ -24,13 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.JDialog;
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.io.NotSerializableException;

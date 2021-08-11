@@ -25,10 +25,10 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

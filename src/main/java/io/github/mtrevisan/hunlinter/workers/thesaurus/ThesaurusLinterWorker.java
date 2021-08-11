@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.thesaurus;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
@@ -45,6 +42,9 @@ import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerThesaurus;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -153,8 +153,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 		bloomFilter.close();
 

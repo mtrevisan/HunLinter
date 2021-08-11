@@ -24,10 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa;
 
+import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.ByteSequenceIterator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSAHeader;
-import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

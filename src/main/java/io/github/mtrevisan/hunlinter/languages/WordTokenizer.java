@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.languages;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

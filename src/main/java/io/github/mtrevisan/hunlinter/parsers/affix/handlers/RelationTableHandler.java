@@ -25,9 +25,9 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.RelationTable;
+import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 
 
 public class RelationTableHandler implements Handler{

@@ -24,15 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.LanguageChooserDialog;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LanguageNotChosenException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import java.awt.*;

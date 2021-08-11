@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.autocorrect;
 
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
@@ -35,7 +36,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;

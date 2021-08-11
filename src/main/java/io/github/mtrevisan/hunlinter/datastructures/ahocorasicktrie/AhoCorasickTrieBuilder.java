@@ -39,8 +39,6 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * A builder to build the AhoCorasickTrie

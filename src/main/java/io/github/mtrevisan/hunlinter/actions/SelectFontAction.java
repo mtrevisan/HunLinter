@@ -24,13 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import org.apache.commons.lang3.StringUtils;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
 
 import javax.swing.*;
 import java.awt.*;

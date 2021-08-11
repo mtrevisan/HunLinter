@@ -24,10 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;

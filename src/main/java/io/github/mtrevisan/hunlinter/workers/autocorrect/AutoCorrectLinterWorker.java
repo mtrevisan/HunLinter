@@ -148,8 +148,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 		bloomFilter.close();
 

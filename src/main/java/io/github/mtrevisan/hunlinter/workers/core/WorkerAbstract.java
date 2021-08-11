@@ -24,16 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
-import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import javax.swing.*;
 import java.util.Objects;

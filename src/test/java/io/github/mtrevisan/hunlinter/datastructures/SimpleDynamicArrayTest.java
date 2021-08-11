@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures;
 
+import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicArray;
 
 
 class SimpleDynamicArrayTest{

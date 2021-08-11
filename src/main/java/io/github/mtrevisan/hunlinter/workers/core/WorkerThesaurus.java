@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.util.List;
 import java.util.Objects;

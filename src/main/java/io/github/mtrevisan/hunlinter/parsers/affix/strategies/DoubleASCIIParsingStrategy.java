@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;

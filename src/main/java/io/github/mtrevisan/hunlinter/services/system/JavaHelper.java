@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.io.IOException;

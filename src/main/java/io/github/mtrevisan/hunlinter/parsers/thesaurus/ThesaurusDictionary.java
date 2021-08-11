@@ -42,10 +42,6 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class ThesaurusDictionary{
 

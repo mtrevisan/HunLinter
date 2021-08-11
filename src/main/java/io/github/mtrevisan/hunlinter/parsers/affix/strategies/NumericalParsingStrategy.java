@@ -33,8 +33,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded in its numerical form. In the case

@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 
 
 /** This class implements some common matching and scanning operations on a generic FSA */

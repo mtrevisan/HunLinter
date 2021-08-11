@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core;
 
+import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 
 import java.io.File;
 import java.io.IOException;

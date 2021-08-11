@@ -24,12 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.services.regexgenerator;
 
+import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
-import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

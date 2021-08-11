@@ -27,10 +27,10 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
-import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 
 import java.io.File;
 import java.io.IOException;

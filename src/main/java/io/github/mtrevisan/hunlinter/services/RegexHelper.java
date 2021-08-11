@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.services.system.Memoizer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import io.github.mtrevisan.hunlinter.services.system.Memoizer;
 
 import java.util.Arrays;
 import java.util.function.Function;

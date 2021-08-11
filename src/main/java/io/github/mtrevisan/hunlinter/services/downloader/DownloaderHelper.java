@@ -25,6 +25,9 @@
 package io.github.mtrevisan.hunlinter.services.downloader;
 
 import io.github.mtrevisan.hunlinter.gui.dialogs.HelpDialog;
+import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
+import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,9 +35,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
-import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
-import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -24,14 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
-import com.carrotsearch.hppcrt.maps.IntIntHashMap;
 import com.carrotsearch.hppcrt.cursors.IntIntCursor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.carrotsearch.hppcrt.maps.IntIntHashMap;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA2;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;

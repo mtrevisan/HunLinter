@@ -24,10 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
-import io.github.mtrevisan.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AffixHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AliasesHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CompoundRuleHandler;
@@ -36,12 +32,16 @@ import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CopyOverAsNumberHand
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CopyOverHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.Handler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.RelationTableHandler;
+import io.github.mtrevisan.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -191,7 +191,7 @@ public class AffixParser{
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				index ++;
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+				if(ParserHelper.isDictionaryComment(line))
 					continue;
 
 				if(!encodingRead && !line.startsWith(prefix))

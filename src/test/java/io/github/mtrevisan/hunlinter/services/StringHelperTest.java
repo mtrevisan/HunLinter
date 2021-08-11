@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -24,10 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
+import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 
 import java.util.Collections;
 import java.util.HashMap;

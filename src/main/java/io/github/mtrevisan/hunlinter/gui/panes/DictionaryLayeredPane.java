@@ -25,16 +25,13 @@
 package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
-import io.github.mtrevisan.hunlinter.gui.models.HunLinterTableModelInterface;
-import io.github.mtrevisan.hunlinter.gui.models.InflectionTableModel;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
 import io.github.mtrevisan.hunlinter.gui.components.LabeledPopupMenu;
+import io.github.mtrevisan.hunlinter.gui.models.HunLinterTableModelInterface;
+import io.github.mtrevisan.hunlinter.gui.models.InflectionTableModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -47,6 +44,9 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;

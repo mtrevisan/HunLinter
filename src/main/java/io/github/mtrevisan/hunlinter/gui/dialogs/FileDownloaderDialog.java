@@ -24,10 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadListenerInterface;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadTask;
@@ -35,7 +31,11 @@ import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.downloader.GITFileData;
 import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import java.awt.*;

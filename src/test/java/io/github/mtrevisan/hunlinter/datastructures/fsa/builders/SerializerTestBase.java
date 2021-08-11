@@ -25,12 +25,12 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

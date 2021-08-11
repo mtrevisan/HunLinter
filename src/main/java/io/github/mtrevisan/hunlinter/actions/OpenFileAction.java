@@ -25,9 +25,9 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

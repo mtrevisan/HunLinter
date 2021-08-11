@@ -24,12 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		final List<IndexDataPair<String>> entries = new ArrayList<>(lines.size());
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
-			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+			if(ParserHelper.isDictionaryComment(line))
 				continue;
 
 			entries.add(IndexDataPair.of(lineIndex, line));
@@ -124,7 +124,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
-			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+			if(ParserHelper.isDictionaryComment(line))
 				continue;
 
 			innerProcessor.accept(IndexDataPair.of(lineIndex, line));
@@ -147,7 +147,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				lineSize += StringHelper.rawBytesLength(line);
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+				if(ParserHelper.isDictionaryComment(line))
 					continue;
 
 				innerProcessor.accept(IndexDataPair.of(lineIndex ++, line), lineSize);

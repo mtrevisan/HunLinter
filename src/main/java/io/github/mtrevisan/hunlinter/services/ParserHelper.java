@@ -24,11 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.EOFException;
 import java.io.File;
@@ -47,13 +46,22 @@ public final class ParserHelper{
 
 	//FIXME https://zverok.github.io/blog/2021-03-16-spellchecking-dictionaries.html #4
 	public static final char COMMENT_MARK_SHARP = '#';
-	public static final char COMMENT_MARK_SLASH = '/';
-	public static final char COMMENT_MARK_PERCENT = '%';
+	private static final char COMMENT_MARK_SLASH = '/';
+	private static final char COMMENT_MARK_PERCENT = '%';
+	private static final char COMMENT_MARK_TAB = '\t';
 
 
 	private ParserHelper(){}
 
-	public static boolean isComment(final String line, final char... comment){
+	public static boolean isDictionaryComment(final String line){
+		return isComment(line, COMMENT_MARK_SHARP, COMMENT_MARK_SLASH, COMMENT_MARK_TAB);
+	}
+
+	public static boolean isHyphenationComment(final String line){
+		return isComment(line, COMMENT_MARK_SLASH, COMMENT_MARK_PERCENT);
+	}
+
+	private static boolean isComment(final String line, final char... comment){
 		if(StringUtils.isBlank(line))
 			return true;
 
@@ -69,8 +77,8 @@ public final class ParserHelper{
 			throw new EOFException("Unexpected EOF while reading file");
 	}
 
-	public static void forEachLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
-			final Consumer<Integer> progressCallback, final char... comment){
+	public static void forEachDictionaryLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
+			final Consumer<Integer> progressCallback){
 		final int totalLines = FileHelper.getLinesCount(file, charset);
 		int progress = 0;
 		int progressIndex = 0;
@@ -81,7 +89,7 @@ public final class ParserHelper{
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 
-				if(!isComment(line, comment))
+				if(!isDictionaryComment(line))
 					fun.accept(progress, line);
 
 				if(progressCallback != null && ++ progress % progressStep == 0)

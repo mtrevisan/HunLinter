@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.Collator;
 import java.text.ParseException;

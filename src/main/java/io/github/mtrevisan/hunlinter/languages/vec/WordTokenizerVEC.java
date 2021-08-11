@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
+import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import org.apache.commons.lang3.RegExUtils;
-import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 
 import java.util.List;
 import java.util.regex.Pattern;
