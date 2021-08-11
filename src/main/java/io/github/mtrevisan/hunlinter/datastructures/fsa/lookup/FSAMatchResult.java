@@ -29,6 +29,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
  * A matching result returned from {@link FSATraversal}.
  *
  * @see FSATraversal
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class FSAMatchResult{
 

@@ -38,9 +38,9 @@ import java.util.Objects;
 
 
 /**
- * This class implements a dictionary lookup of an inflected word over a
- * dictionary previously compiled using the
- * <code>dict_compile</code> tool.
+ * This class implements a dictionary lookup.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class DictionaryLookup implements Iterable<WordData>{
 
@@ -104,6 +104,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator: " + word);
 
+		//reset the output list
 		forms.reset();
 
 		//try to find a partial match in the dictionary

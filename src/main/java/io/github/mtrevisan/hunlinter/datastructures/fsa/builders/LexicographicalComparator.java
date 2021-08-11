@@ -45,6 +45,7 @@ import java.util.Comparator;
  * java.util.Arrays#equals(byte[], byte[])}.
  *
  * @see <a href="https://dzone.com/articles/understanding-sunmiscunsafe">Understanding sun.misc.Unsafe</a>
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public final class LexicographicalComparator{
 

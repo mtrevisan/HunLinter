@@ -47,6 +47,7 @@ import java.util.Collection;
 /**
  * @see <a href="http://wiki.languagetool.org/hunspell-support">LanguageTool - Spell check</a>
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public final class MetadataBuilder{
 

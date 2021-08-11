@@ -30,7 +30,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.nio.charset.StandardCharsets;
 
 
-/** Stem and tag data associated with a given word */
+/**
+ * Stem and tag data associated with a given word.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
+ */
 public class WordData{
 
 	/** inflected word form data */

@@ -36,6 +36,8 @@ import java.util.Iterator;
 /**
  * An iterator over {@link WordData} entries of a {@link Dictionary}.
  * The stems can be decoded from compressed format or preserved as compressed format.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 class DictionaryIterator implements Iterator<WordData>{
 

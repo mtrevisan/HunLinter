@@ -28,7 +28,11 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 
 
-/** This class implements some common matching and scanning operations on a generic FSA */
+/**
+ * This class implements some common matching and scanning operations on a generic FSA.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
+ */
 public final class FSATraversal{
 
 	/** target automaton */
