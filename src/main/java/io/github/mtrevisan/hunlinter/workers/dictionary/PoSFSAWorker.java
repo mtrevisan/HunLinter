@@ -67,6 +67,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -239,7 +240,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			if(pos == null || pos.size() != 1)
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
 
-			final String word = inflection.getWord();
+			final String word = inflection.getWord().toLowerCase(Locale.ROOT);
 			//target
 			final byte[] inflectedWord = StringHelper.getRawBytes(word);
 

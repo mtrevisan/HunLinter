@@ -55,6 +55,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -105,7 +106,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			final byte[][] words = new byte[inflections.length][];
 			for(int i = 0; i < inflections.length; i ++)
-				words[i] = StringHelper.getRawBytes(inflections[i].getWord());
+				words[i] = StringHelper.getRawBytes(inflections[i].getWord().toLowerCase(Locale.ROOT));
 			encodings.addAll(words);
 
 			sleepOnPause();

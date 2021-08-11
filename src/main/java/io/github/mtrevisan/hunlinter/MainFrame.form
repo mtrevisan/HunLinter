@@ -423,8 +423,8 @@
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Dictionary">
-                <Property name="tabTitle" type="java.lang.String" value="Dictionary"/>
+              <JTabbedPaneConstraints tabName="Inflections">
+                <Property name="tabTitle" type="java.lang.String" value="Inflections"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

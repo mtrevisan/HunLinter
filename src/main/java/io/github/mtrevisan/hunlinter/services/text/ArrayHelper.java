@@ -34,10 +34,13 @@ public final class ArrayHelper{
 		for(int i = 0; i < arrays.length; i ++)
 			size += arrays[i].length;
 
-		size = 0;
 		final byte[] joinedArray = new byte[size];
-		for(int i = 0; i < arrays.length; i ++, size += arrays[i].length)
-			System.arraycopy(arrays[i], 0, joinedArray, size, arrays[i].length);
+		size = 0;
+		for(int i = 0; i < arrays.length; i ++){
+			final int length = arrays[i].length;
+			System.arraycopy(arrays[i], 0, joinedArray, size, length);
+			size += length;
+		}
 		return joinedArray;
 	}
 

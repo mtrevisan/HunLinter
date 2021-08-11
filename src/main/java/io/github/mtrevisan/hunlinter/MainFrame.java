@@ -306,7 +306,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
-      mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+      mainTabbedPane.addTab("Inflections", dicLayeredPane);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);

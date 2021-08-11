@@ -190,7 +190,7 @@ public enum InflectionTag{
 	PLURAL_FEMENINE_LONGOBARDO("plural+femenine+longobardo", "p", "f", "lon"),
 
 	LONBARDO("lonbardo", "lob"),
-	FIRST_SINGULAR_LONBARDO("singular+masculine+lonbardo", "1", "s", "lob"),
+	FIRST_SINGULAR_LONBARDO("first+singular+lonbardo", "1", "s", "lob"),
 	MASCULINE_NON_ENUMERABLE_LONBARDO("masculine+non_enumerable+lonbardo", "m", "ne", "lob"),
 
 	BOLONHEXE("boloñexe", "bol"),
