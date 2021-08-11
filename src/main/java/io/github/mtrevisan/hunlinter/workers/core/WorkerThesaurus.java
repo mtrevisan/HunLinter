@@ -42,7 +42,7 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 	}
 
 	protected void processLines(final Consumer<ThesaurusEntry> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load thesaurus
 		final List<ThesaurusEntry> entries = loadThesaurus();
