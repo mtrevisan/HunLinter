@@ -33,13 +33,14 @@ You can download and install it for free from this [link](https://www.oracle.com
 1. [Motivation](#motivation)
 2. [What the application can do](#can-do)
 3. [How to enhance its capabilities](#enhancements)
-4. [Recognized flags](#recognized-flags)
+4. [Recognized charsets](#recognized-charsets)
+5. [Recognized flags](#recognized-flags)
     1. [General](#recognized-flags-general)
     2. [Suggestions](#recognized-flags-suggestions)
     3. [Compounding](#recognized-flags-compounding)
     4. [Affix creation](#recognized-flags-affix)
     5. [Others](#recognized-flags-others)
-5. [How to](#how-to)
+6. [How to](#how-to)
     1. [Open a project](#how-to-project)
     2. [Create an extension](#how-to-extension)
     3. [Linter dictionary](#how-to-linter-dictionary)
@@ -57,7 +58,7 @@ You can download and install it for free from this [link](https://www.oracle.com
     15. [Ordering table columns](#how-to-ordering)
     16. [Copying text](#how-to-copy)
     17. [Rule/dictionary insertion](#how-to-insertion)
-6. [Screenshots](#screenshots)
+7. [Screenshots](#screenshots)
     1. [Inflections](#screenshots-inflections)
     2. [Dictionary linter](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
@@ -70,7 +71,7 @@ You can download and install it for free from this [link](https://www.oracle.com
     10. [Sentence exceptions](#screenshots-sentence-exceptions)
     11. [Word exceptions](#screenshots-word-exceptions)
     12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
-7. [Changelog](#changelog)
+8. [Changelog](#changelog)
     1. [version 2.1.0](#changelog-2.1.1)
     2. [version 2.1.0](#changelog-2.1.0)
     3. [version 2.0.2](#changelog-2.0.2)
@@ -110,6 +111,18 @@ Along with these classes you can insert your `rules.properties`, a file that des
 After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/io/github/mtrevisan/hunlinter/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
+
+
+<br/>
+
+<a name="recognized-charsets"></a>
+## Recognized charsets
+- UTF-8
+- ISO-8859-1, ISO-8859-2, ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6, ISO-8859-7, ISO-8859-8, ISO-8859-9, ISO-8859-10, ISO-8859-13, ISO-8859-14, ISO-8859-15,
+- KOI8-R, KOI8-U
+- MICROSOFT-CP1251
+- ISCII-DEVANAGARI
+- TIS620-2533
 
 
 <br/>
@@ -319,6 +332,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - eliminated double reloading of dictionary in sort dialog when something changes
 - speed-up the loading of sorting dialog
 - understood how `ICON` and `OCONV` works
+- supported ISO-8859-10, ISO-8859-14, and ISCII-DEVANAGARI charsets
 
 <a name="changelog-2.1.0"></a>
 ### version 2.1.0 - 20210807
