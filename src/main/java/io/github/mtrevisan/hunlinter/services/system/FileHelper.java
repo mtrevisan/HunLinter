@@ -25,6 +25,8 @@
 package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
+import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_10Charset;
+import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_14Charset;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -78,6 +80,10 @@ public final class FileHelper{
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
 	private static final Map<String, String> CHARSET_ALIASES = new HashMap<>(3);
+
+	private static final String ISO_8859_10 = "ISO-8859-10";
+	private static final String ISO_8859_14 = "ISO-8859-14";
+
 	static{
 		CHARSET_ALIASES.put("MICROSOFT-CP1251", "WINDOWS-1251");
 		CHARSET_ALIASES.put("TIS620-2533", "TIS-620");
@@ -85,16 +91,20 @@ public final class FileHelper{
 
 		HUNSPELL_CHARSETS = Stream.of(
 				"UTF-8",
-				"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859_8", "ISO-8859-9",
-				/**/"ISO_8859_10", "ISO-8859-13", /**/"ISO_8859_14", "ISO-8859-15",
-				"KOI8-R", "KOI8-U", "MICROSOFT-CP1251", "ISCII_DEVANAGARI",
+				"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9",
+				ISO_8859_10, "ISO-8859-13", ISO_8859_14, "ISO-8859-15",
+				"KOI8-R", "KOI8-U", "MICROSOFT-CP1251", "ISCII-DEVANAGARI",
 				"TIS620-2533")
 			.map(name -> {
+				name = CHARSET_ALIASES.getOrDefault(name, name);
+
 				Charset cs = null;
-				try{
-					cs = Charset.forName(CHARSET_ALIASES.getOrDefault(name, name));
-				}
-				catch(final Exception ignored){}
+				if(Charset.isSupported(name))
+					cs = Charset.forName(name);
+				else if(ISO_8859_10.equals(name))
+					cs = new ISO8859_10Charset();
+				else if(ISO_8859_14.equals(name))
+					cs = new ISO8859_14Charset();
 				return cs;
 			})
 			.filter(Objects::nonNull)
@@ -201,7 +211,6 @@ public final class FileHelper{
 	private static Scanner createScanner(final InputStream is, final Charset charset){
 		final BOMInputStream bomis = new BOMInputStream(is, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
 			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
-		//TODO return new Scanner(bomis, charset.newDecoder().onMalformedInput(CodingErrorAction.REPLACE));
 		return new Scanner(bomis, charset);
 	}
 
