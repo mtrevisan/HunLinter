@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.workers.autocorrect.AutoCorrectLinterFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.autocorrect.AutoCorrectLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.CompoundRulesWorker;
@@ -150,6 +151,13 @@ public class WorkerManager{
 			final Consumer<WorkerAbstract<?>> onEnd){
 		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getAcoParser(), parserManager.getLanguage(),
 			parserManager.getDicParser(), parserManager.getWordGenerator());
+		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
+	}
+
+	public void createAutoCorrectLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd, final DictionaryLookup dictionaryLookup){
+		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterFSAWorker(parserManager.getAcoParser(),
+			parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 

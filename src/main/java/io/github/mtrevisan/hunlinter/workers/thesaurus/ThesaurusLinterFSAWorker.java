@@ -68,12 +68,14 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(dictionaryLookup, "Dictionary lookup cannot be null");
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
-			final String originalDefinition = data.getDefinition();
+			final String originalDefinition = data.getDefinition()
+				.toLowerCase(Locale.ROOT);
 
 			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
+			final String[] words = StringUtils.split(originalDefinition, " –");
 			for(final String word : words)
 				if(dictionaryLookup.lookup(word).length == 0)
 					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(

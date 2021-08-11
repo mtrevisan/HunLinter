@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter;
 import io.github.mtrevisan.hunlinter.actions.AboutAction;
 import io.github.mtrevisan.hunlinter.actions.AffixRulesReducerAction;
 import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterFSAAction;
 import io.github.mtrevisan.hunlinter.actions.CheckUpdateOnStartupAction;
 import io.github.mtrevisan.hunlinter.actions.CreatePackageAction;
 import io.github.mtrevisan.hunlinter.actions.DictionaryExtractDuplicatesAction;
@@ -284,6 +285,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       acoMenu = new javax.swing.JMenu();
       acoLinterMenuItem = new javax.swing.JMenuItem();
+      acoLinterFSAMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -472,6 +474,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoLinterMenuItem.setMnemonic('C');
       acoLinterMenuItem.setText("Check correctness");
       acoMenu.add(acoLinterMenuItem);
+
+		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
+		acoLinterFSAMenuItem.setMnemonic('a');
+		acoLinterFSAMenuItem.setText("Check correctness against dictionary FSA…");
+		acoMenu.add(acoLinterFSAMenuItem);
 
       mainMenuBar.add(acoMenu);
 
@@ -990,6 +997,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
    private javax.swing.JMenuItem theLinterFSAMenuItem;
+   private javax.swing.JMenuItem acoLinterFSAMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JLayeredPane wexLayeredPane;
    // End of variables declaration//GEN-END:variables

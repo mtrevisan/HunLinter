@@ -35,20 +35,20 @@ import java.io.Serial;
 import java.util.Objects;
 
 
-public class ThesaurusLinterFSAAction extends AbstractAction{
+public class AutoCorrectLinterFSAAction extends AbstractAction{
 
 	@Serial
-	private static final long serialVersionUID = 2607687961029515520L;
+	private static final long serialVersionUID = 9205026771573185502L;
 
 	private final WorkerManager workerManager;
 	private final ThesaurusLayeredPane theLayeredPane;
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public ThesaurusLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
+	public AutoCorrectLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
 			final PropertyChangeListener propertyChangeListener){
-		super("thesaurus.linter.fsa",
-			new ImageIcon(ThesaurusLinterFSAAction.class.getResource("/dictionary_correctness.png")));
+		super("autocorrect.linter.fsa",
+			new ImageIcon(AutoCorrectLinterFSAAction.class.getResource("/dictionary_correctness.png")));
 
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
 		Objects.requireNonNull(theLayeredPane, "Thesaurus layered pane cannot be null");
@@ -67,7 +67,7 @@ public class ThesaurusLinterFSAAction extends AbstractAction{
 		final DictionaryLookup dictionaryLookup = theLayeredPane.getDictionaryLookup();
 
 		if(dictionaryLookup != null)
-			workerManager.createThesaurusLinterFSAWorker(
+			workerManager.createAutoCorrectLinterFSAWorker(
 				worker -> {
 					setEnabled(false);
 
