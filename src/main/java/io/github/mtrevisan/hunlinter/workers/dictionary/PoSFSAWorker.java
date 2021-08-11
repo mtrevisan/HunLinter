@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
@@ -38,6 +39,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.BufferUtils;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
+import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -85,11 +87,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 	public PoSFSAWorker(final ParserManager parserManager, final File outputFile){
-		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), outputFile);
+		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), parserManager.getLanguage(),
+			outputFile);
 	}
 
 	public PoSFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final File outputFile){
+			final String language, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -99,6 +102,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(language, "Language cannot be null");
 		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
@@ -114,7 +118,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
+		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
+			1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);

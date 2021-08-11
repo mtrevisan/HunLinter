@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
@@ -34,6 +35,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
+import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -69,12 +71,12 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 
 	public WordlistFSAWorker(final ParserManager parserManager, final File outputFile){
-		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(),
+		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), parserManager.getLanguage(),
 			outputFile);
 	}
 
 	public WordlistFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final File outputFile){
+			final String language, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -84,6 +86,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(language, "Language cannot be null");
 		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
@@ -98,7 +101,9 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		}
 
 
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
+		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
+			1.2f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
