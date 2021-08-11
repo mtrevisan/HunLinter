@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import io.github.mtrevisan.hunlinter.gui.panes.ThesaurusLayeredPane;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
@@ -39,17 +41,21 @@ public class ThesaurusLinterFSAAction extends AbstractAction{
 	private static final long serialVersionUID = 2607687961029515520L;
 
 	private final WorkerManager workerManager;
+	private final ThesaurusLayeredPane theLayeredPane;
 	private final PropertyChangeListener propertyChangeListener;
 
 
-	public ThesaurusLinterFSAAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+	public ThesaurusLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
+			final PropertyChangeListener propertyChangeListener){
 		super("thesaurus.linter.fsa",
 			new ImageIcon(ThesaurusLinterFSAAction.class.getResource("/dictionary_correctness.png")));
 
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(theLayeredPane, "Thesaurus layered pane cannot be null");
 		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
+		this.theLayeredPane = theLayeredPane;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
@@ -57,15 +63,19 @@ public class ThesaurusLinterFSAAction extends AbstractAction{
 	public void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-//		workerManager.createThesaurusLinterFSAWorker(
-//			worker -> {
-//				setEnabled(false);
-//
-//				worker.addPropertyChangeListener(propertyChangeListener);
-//				worker.execute();
-//			},
-//			worker -> setEnabled(true)
-//		);
+		theLayeredPane.openDictionaryFSAActionPerformed(null);
+		final DictionaryLookup dictionaryLookup = theLayeredPane.getDictionaryLookup();
+
+		if(dictionaryLookup != null)
+			workerManager.createThesaurusLinterFSAWorker(
+				worker -> {
+					setEnabled(false);
+
+					worker.addPropertyChangeListener(propertyChangeListener);
+					worker.execute();
+				},
+				worker -> setEnabled(true), dictionaryLookup
+			);
 	}
 
 }

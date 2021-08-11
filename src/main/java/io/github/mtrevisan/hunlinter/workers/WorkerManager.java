@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
@@ -43,6 +44,7 @@ import io.github.mtrevisan.hunlinter.workers.dictionary.WordCountWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.hyphenation.HyphenationLinterWorker;
+import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
 import org.slf4j.Logger;
 
@@ -135,6 +137,13 @@ public class WorkerManager{
 		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterWorker(parserManager.getTheParser(), parserManager.getLanguage(),
 			parserManager.getDicParser(), parserManager.getWordGenerator());
 		createWorker(ThesaurusLinterWorker.WORKER_NAME, creator, onStart, onEnd);
+	}
+
+	public void createThesaurusLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd, final DictionaryLookup dictionaryLookup){
+		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterFSAWorker(parserManager.getTheParser(),
+			parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
+		createWorker(ThesaurusLinterFSAWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public void createAutoCorrectLinterWorker(final Consumer<WorkerAbstract<?>> onStart,

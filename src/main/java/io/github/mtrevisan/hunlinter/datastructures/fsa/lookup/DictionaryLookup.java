@@ -125,7 +125,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 					final byte[] bbArray = bb.array();
 					int separatorIndex = ArrayUtils.indexOf(bbArray, separator);
 
-					//now, expand the prefix/ suffix 'compression' and store the base form
+					//now, expand the prefix/suffix 'compression' and store the base form
 					final WordData wordData = new WordData();
 					final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
 					wordData.setWord((outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs))
@@ -152,9 +152,15 @@ public class DictionaryLookup implements Iterable<WordData>{
 			}
 		}
 		else if(match.kind == FSAMatchResult.EXACT_MATCH){
-			//this case is somewhat confusing: we should have hit the separator first...
-			//I don't really know how to deal with it at the time being.
-			throw new IllegalArgumentException("what?!?!");
+			//there is such a word in the dictionary (used for containment only!!), return its base form
+
+			//now, expand the prefix/suffix 'compression' and store the base form
+			final WordData wordData = new WordData();
+			final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
+			wordData.setWord((outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs))
+				.getBytes(dictionary.metadata.getCharset()));
+
+			forms.add(wordData);
 		}
 		return forms.extractCopy();
 	}

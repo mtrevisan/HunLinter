@@ -78,7 +78,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private final FutureTask<JFileChooser> futureOpenPoSDictionaryFileChooser;
+	private final FutureTask<JFileChooser> futureOpenPoSFSAFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
@@ -95,7 +95,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		initComponents();
 
 
-		futureOpenPoSDictionaryFileChooser = JavaHelper.createFuture(() -> {
+		futureOpenPoSFSAFileChooser = JavaHelper.createFuture(() -> {
 			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
 			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
 			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -187,10 +187,10 @@ public class PoSFSALayeredPane extends JLayeredPane{
    private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
 
-		final JFileChooser openPoSDictionaryFileChooser = JavaHelper.waitForFuture(futureOpenPoSDictionaryFileChooser);
-		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
+		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenPoSFSAFileChooser);
+		final int projectSelected = openPoSFSAFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();
+			final File baseFile = openPoSFSAFileChooser.getSelectedFile();
 			loadFSAFile(baseFile.toPath());
 		}
    }//GEN-LAST:event_openPoSFSAButtonActionPerformed
@@ -198,7 +198,6 @@ public class PoSFSALayeredPane extends JLayeredPane{
 	private void loadFSAFile(final Path basePath){
 		try{
 			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
-
 
 			textField.requestFocusInWindow();
 

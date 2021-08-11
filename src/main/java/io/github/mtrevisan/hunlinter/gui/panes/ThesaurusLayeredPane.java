@@ -25,6 +25,8 @@
 package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
@@ -41,6 +43,7 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -49,21 +52,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -84,6 +92,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
+	private final FutureTask<JFileChooser> futureOpenDictionaryFSAFileChooser;
+	private DictionaryLookup dictionaryLookup;
 	private String formerFilterThesaurusText;
 
 
@@ -94,6 +104,14 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 
 		initComponents();
+
+
+		futureOpenDictionaryFSAFileChooser = JavaHelper.createFuture(() -> {
+			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
+			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return openPoSDictionaryFileChooser;
+		});
 
 
 		//add "fontable" property
@@ -427,6 +445,32 @@ final int iconSize = 17;
 
 	private void updateSynonymsCounter(){
 		synonymsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getTheParser().getSynonymsCount()));
+	}
+
+
+	public void openDictionaryFSAActionPerformed(final ActionEvent evt){
+		dictionaryLookup = null;
+
+		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenDictionaryFSAFileChooser);
+		final int projectSelected = openPoSFSAFileChooser.showOpenDialog(this);
+		if(projectSelected == JFileChooser.APPROVE_OPTION){
+			final File baseFile = openPoSFSAFileChooser.getSelectedFile();
+			loadFSAFile(baseFile.toPath());
+		}
+	}
+
+	private void loadFSAFile(final Path basePath){
+		try{
+			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
+		}
+		catch(final Exception e){
+			JOptionPane.showMessageDialog(this, "Error while loading Dictionary FSA\n\n"
+				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public DictionaryLookup getDictionaryLookup(){
+		return dictionaryLookup;
 	}
 
 

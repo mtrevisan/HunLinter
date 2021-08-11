@@ -440,7 +440,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       theLinterMenuItem.setText("Check correctness");
       theMenu.add(theLinterMenuItem);
 
-		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, this));
+		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
 		theLinterFSAMenuItem.setMnemonic('a');
       theLinterFSAMenuItem.setText("Check correctness against dictionary FSA…");
 		theMenu.add(theLinterFSAMenuItem);
