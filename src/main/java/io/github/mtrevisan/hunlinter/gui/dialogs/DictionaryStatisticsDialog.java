@@ -76,7 +76,7 @@ import java.util.stream.Collectors;
 public class DictionaryStatisticsDialog extends JDialog{
 
 	@Serial
-	private static final long serialVersionUID = 5762751368059394067l;
+	private static final long serialVersionUID = 5762751368059394067L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
 

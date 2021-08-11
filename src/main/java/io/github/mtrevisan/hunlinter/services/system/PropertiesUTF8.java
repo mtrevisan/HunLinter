@@ -50,7 +50,7 @@ import java.util.Properties;
 public class PropertiesUTF8 extends Properties{
 
 	@Serial
-	private static final long serialVersionUID = -7320018209057349063l;
+	private static final long serialVersionUID = -7320018209057349063L;
 
 	/** Characters used to write comment lines in a property file. */
 	private static final String COMMENT = "#!";

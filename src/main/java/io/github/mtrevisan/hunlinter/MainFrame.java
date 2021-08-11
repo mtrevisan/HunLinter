@@ -46,6 +46,7 @@ import io.github.mtrevisan.hunlinter.actions.ProjectLoaderAction;
 import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
 import io.github.mtrevisan.hunlinter.actions.SelectFontAction;
 import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterAction;
+import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
 import io.github.mtrevisan.hunlinter.actions.UpdateAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
@@ -276,6 +277,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
+      theLinterFSAMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
@@ -437,6 +439,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       theLinterMenuItem.setMnemonic('c');
       theLinterMenuItem.setText("Check correctness");
       theMenu.add(theLinterMenuItem);
+
+		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, this));
+		theLinterFSAMenuItem.setMnemonic('a');
+      theLinterFSAMenuItem.setText("Check correctness against dictionary FSA…");
+		theMenu.add(theLinterFSAMenuItem);
 
       mainMenuBar.add(theMenu);
 
@@ -982,6 +989,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
+   private javax.swing.JMenuItem theLinterFSAMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JLayeredPane wexLayeredPane;
    // End of variables declaration//GEN-END:variables

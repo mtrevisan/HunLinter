@@ -26,7 +26,7 @@ The [Project Team](#join-the-project-team) looks forward to your contributions.
 
 
 <a name="toc"></a>
-## How do I...
+## How do I…
 
 * Ask or Say Something?
   * [Request support](#request-support)
