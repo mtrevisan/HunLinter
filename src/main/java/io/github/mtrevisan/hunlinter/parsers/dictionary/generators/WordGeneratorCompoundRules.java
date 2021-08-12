@@ -43,7 +43,7 @@ import java.util.Objects;
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
+	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: {0}");
 	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule {0} in compound rule {1}");
 
 

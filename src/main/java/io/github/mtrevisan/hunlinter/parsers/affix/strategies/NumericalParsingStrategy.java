@@ -40,9 +40,9 @@ import java.util.regex.Pattern;
  */
 final class NumericalParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was `{1}`");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was `{0}`");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was `{0}`");
+	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: `{1}`");
+	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: `{0}`");
+	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' or '?': `{0}`");
 
 
 	private static final int MAX_NUMERICAL_FLAG = 65_535;
@@ -63,17 +63,17 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 	private NumericalParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(final String flags){
-		if(StringUtils.isBlank(flags))
+	public String[] parseFlags(final String rawFlags){
+		if(StringUtils.isBlank(rawFlags))
 			return null;
 
-		final String[] singleFlags = extractFlags(flags);
+		final String[] flags = extractFlags(rawFlags);
 
-		checkForDuplicates(singleFlags);
+		checkForDuplicates(flags);
 
-		LoopHelper.forEach(singleFlags, this::validate);
+		LoopHelper.forEach(flags, this::validate);
 
-		return singleFlags;
+		return flags;
 	}
 
 	private String[] extractFlags(final String flags){

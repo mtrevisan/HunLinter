@@ -103,20 +103,16 @@ public class RulesLoader{
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
-			String letter = null;
 			rules = readPropertyAsArray("letterAndRulesNotCombinable", '/');
-			for(int i = 0; i < rules.length; i ++){
+			final String letter = String.valueOf(rules[0].charAt(0));
+			for(int i = 1; i < rules.length; i ++){
 				final String elem = rules[i];
-				if(elem.length() == 1)
-					letter = String.valueOf(elem.charAt(0));
-				else{
-					flags = strategy.parseFlags(elem);
-					final String correctRule = flags[flags.length - 1];
-					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
-						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
-							letter, wrongFlags, correctRule));
-				}
+				flags = strategy.parseFlags(elem);
+				final String correctRule = flags[flags.length - 1];
+				final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+				letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
+					.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
+						letter, wrongFlags, correctRule));
 			}
 		}
 	}

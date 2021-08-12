@@ -43,16 +43,17 @@ public abstract class FlagParsingStrategy{
 	/**
 	 * Parses the given String into multiple flags
 	 *
-	 * @param flags	String to parse into flags
+	 * @param rawFlags	String to parse into flags
 	 * @return Parsed flags
 	 */
-	public abstract String[] parseFlags(final String flags);
+	public abstract String[] parseFlags(final String rawFlags);
 
 	protected void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);
-			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{String.join(", ", duplicates)}));
+			if(!duplicates.isEmpty())
+				throw new LinterException(DUPLICATED_FLAG.format(new Object[]{String.join(", ", duplicates)}));
 		}
 	}
 
@@ -82,7 +83,7 @@ public abstract class FlagParsingStrategy{
 	}
 
 	/**
-	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])
+	 * Extract each rule from a compound rule ("a*bc?" into ["a", "*", "b", "c", "?"])
 	 *
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags

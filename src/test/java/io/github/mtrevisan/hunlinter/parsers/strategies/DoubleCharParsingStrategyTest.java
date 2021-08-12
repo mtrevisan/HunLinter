@@ -48,7 +48,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void notOk(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> strategy.parseFlags("abc"));
-		Assertions.assertEquals("Flag must be of length multiple of two: `abc`", exception.getMessage());
+		Assertions.assertEquals("Flag must be even number of characters: `abc`", exception.getMessage());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags(null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

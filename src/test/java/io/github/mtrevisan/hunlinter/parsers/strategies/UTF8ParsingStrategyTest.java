@@ -61,10 +61,10 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinFlags(){
-		String[] flags = new String[]{"è", "ŧ"};
+		String[] flags = new String[]{"è", "a"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assertions.assertEquals("èŧ", continuationFlags);
+		Assertions.assertEquals("èa", continuationFlags);
 	}
 
 	@Test
@@ -73,7 +73,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was `aŧ`", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `aŧ`", exception.getMessage());
 	}
 
 	@Test
@@ -82,7 +82,7 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"\\x{FFFD}"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was `\\x{FFFD}`", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `\\x{FFFD}`", exception.getMessage());
 	}
 
 	@Test
@@ -91,16 +91,16 @@ class UTF8ParsingStrategyTest{
 			String[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was ``", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: ``", exception.getMessage());
 	}
 
 	@Test
 	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ŧ", null};
+			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: was `null`", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `null`", exception.getMessage());
 	}
 
 	@Test
@@ -113,7 +113,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags(null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
