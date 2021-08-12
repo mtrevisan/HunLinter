@@ -168,13 +168,13 @@ Remember that the package will have the same name of the directory, but the dire
 
 <a name="how-to-linter-dictionary"></a>
 ### Linter dictionary
-To linter a dictionary just select `Dictionary tools|Spell check`/`Dictionary tools|Spell check using dictionary FSA`.
+To linter a dictionary just select `Dictionary tools|Correctness check`/`Dictionary tools|Correctness check using dictionary FSA`.
 
 Each line is then linted following the rules of a particular language (IF the corresponding files are present in the project, e.g. for Venetan). If no such file is present a general linter is applied.
 
 <a name="how-to-linter-thesaurus"></a>
 ### Linter thesaurus
-To linter the thesaurus just select `Thesaurus tools|Spell check`/`Thesaurus tools|Spell check using dictionary FSA`.
+To linter the thesaurus just select `Thesaurus tools|Correctness check`/`Thesaurus tools|Correctness check using dictionary FSA`.
 
 Each thesaurus entry is linted checking for the presence of each synonym as a definition (with same Part-of-Speech).
 
@@ -182,7 +182,7 @@ In case of error it is suggested to copy _all_ the synonyms for the indicated wo
 
 <a name="how-to-linter-hyphenation"></a>
 ### Linter hyphenation
-To linter the hyphenation just select `Hyphenation tools|Spell check`.
+To linter the hyphenation just select `Hyphenation tools|Correctness check`.
 
 Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc).
 

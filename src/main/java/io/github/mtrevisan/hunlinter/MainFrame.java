@@ -377,12 +377,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this));
       dicLinterMenuItem.setMnemonic('c');
-      dicLinterMenuItem.setText("Spell check");
+      dicLinterMenuItem.setText("Correctness check");
       dicLinterMenuItem.setToolTipText("");
       dicMenu.add(dicLinterMenuItem);
 
       dicSortDictionaryMenuItem.setAction(new DictionarySorterAction(parserManager, workerManager, this));
-      dicSortDictionaryMenuItem.setMnemonic('s');
+      dicSortDictionaryMenuItem.setMnemonic('o');
       dicSortDictionaryMenuItem.setText("Sort dictionary…");
       dicMenu.add(dicSortDictionaryMenuItem);
 
@@ -399,7 +399,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicMenu.add(dicWordCountMenuItem);
 
       dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this));
-      dicStatisticsMenuItem.setMnemonic('t');
+      dicStatisticsMenuItem.setMnemonic('S');
       dicStatisticsMenuItem.setText("Statistics");
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
@@ -418,7 +418,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
       dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
-      dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
       dicMenu.add(dicExtractMinimalPairsMenuItem);
       dicMenu.add(dicFSASeparator);
@@ -439,12 +438,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this));
       theLinterMenuItem.setMnemonic('c');
-      theLinterMenuItem.setText("Spell check");
+      theLinterMenuItem.setText("Correctness check");
       theMenu.add(theLinterMenuItem);
 
 		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
-		theLinterFSAMenuItem.setMnemonic('a');
-      theLinterFSAMenuItem.setText("Spell check using dictionary FSA…");
+		theLinterFSAMenuItem.setMnemonic('d');
+      theLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
 		theMenu.add(theLinterFSAMenuItem);
 
       mainMenuBar.add(theMenu);
@@ -454,13 +453,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.setEnabled(false);
 
       hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
-      hypLinterMenuItem.setMnemonic('d');
-      hypLinterMenuItem.setText("Spell check");
+      hypLinterMenuItem.setMnemonic('c');
+      hypLinterMenuItem.setText("Correctness check");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
       hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this));
-      hypStatisticsMenuItem.setMnemonic('t');
+      hypStatisticsMenuItem.setMnemonic('S');
       hypStatisticsMenuItem.setText("Statistics");
       hypMenu.add(hypStatisticsMenuItem);
 
@@ -471,13 +470,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoMenu.setEnabled(false);
 
       acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
-      acoLinterMenuItem.setMnemonic('C');
-      acoLinterMenuItem.setText("Spell check");
+      acoLinterMenuItem.setMnemonic('c');
+      acoLinterMenuItem.setText("Correctness check");
       acoMenu.add(acoLinterMenuItem);
 
 		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
-		acoLinterFSAMenuItem.setMnemonic('a');
-		acoLinterFSAMenuItem.setText("Spell check using dictionary FSA…");
+		acoLinterFSAMenuItem.setMnemonic('d');
+		acoLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
 		acoMenu.add(acoLinterFSAMenuItem);
 
       mainMenuBar.add(acoMenu);
