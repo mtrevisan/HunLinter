@@ -111,8 +111,8 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	}
 
 	private boolean raiseError(final Map<String, DictionaryEntry[]> inputs, final String component){
-		final char chr = (component.length() == 1? component.charAt(0): 0);
-		return (chr != '*' && chr != '?' && inputs.get(component) == null);
+		return (!FlagParsingStrategy.FLAG_ANY.equals(component) && !FlagParsingStrategy.FLAG_OPTIONAL.equals(component)
+			&& inputs.get(component) == null);
 	}
 
 }

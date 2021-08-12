@@ -42,7 +42,7 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: `{1}`");
 	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: `{0}`");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' or '?': `{0}`");
+	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{0}`");
 
 
 	private static final int MAX_NUMERICAL_FLAG = 65_535;
@@ -76,8 +76,8 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		return flags;
 	}
 
-	private String[] extractFlags(final String flags){
-		return StringUtils.split(flags, COMMA);
+	private String[] extractFlags(final String rawFlags){
+		return StringUtils.split(rawFlags, COMMA);
 	}
 
 	@Override
@@ -108,7 +108,8 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 
 	private void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
-			final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+			final boolean isNumber = (part.length() != 1
+				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(isNumber && !NumberUtils.isCreatable(part))
 				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
 		}

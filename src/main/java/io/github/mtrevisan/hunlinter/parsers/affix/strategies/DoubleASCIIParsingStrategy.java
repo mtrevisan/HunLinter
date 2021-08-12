@@ -102,7 +102,8 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	private void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
-			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+			final boolean isFlag = (size != 1
+				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(size != 2 && isFlag || !canEncode(compoundRule))
 				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{StandardCharsets.US_ASCII.displayName(), compoundRule}));
 		}

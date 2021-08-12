@@ -111,8 +111,10 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 	private boolean canEncode(final CharSequence cs){
 		//NOTE: encoder.canEncode is not thread-safe!
 		final CharsetEncoder encoder = charset.newEncoder();
+		if(!encoder.canEncode(cs))
+			return false;
 		for(int i = 0; i < cs.length(); i ++)
-			if(cs.charAt(0) > 0xFF || !encoder.canEncode(cs))
+			if(cs.charAt(i) > 0xFF)
 				return false;
 		return true;
 	}

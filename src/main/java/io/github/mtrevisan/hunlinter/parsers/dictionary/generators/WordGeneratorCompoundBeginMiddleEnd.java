@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
@@ -76,7 +77,10 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-		final String[] compoundRule = {compoundBeginFlag, "?", compoundMiddleFlag, "?", compoundEndFlag, "?"};
+		final String[] compoundRule = {
+			compoundBeginFlag, FlagParsingStrategy.FLAG_OPTIONAL,
+			compoundMiddleFlag, FlagParsingStrategy.FLAG_OPTIONAL,
+			compoundEndFlag, FlagParsingStrategy.FLAG_OPTIONAL};
 		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);

@@ -40,9 +40,9 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void ok(){
-		String[] flags = strategy.parseFlags("èŧ");
+		String[] flags = strategy.parseFlags("èa");
 
-		Assertions.assertEquals(Arrays.asList("è", "ŧ"), Arrays.asList(flags));
+		Assertions.assertEquals(Arrays.asList("è", "a"), Arrays.asList(flags));
 	}
 
 	@Test
@@ -79,10 +79,10 @@ class UTF8ParsingStrategyTest{
 	@Test
 	void joinFlagsWithNoUTF8(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"\\x{FFFD}"};
+			String[] flags = new String[]{"\uFFFD"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `\\x{FFFD}`", exception.getMessage());
+		Assertions.assertEquals("Each flag should be in UTF-8 encoding: `�`", exception.getMessage());
 	}
 
 	@Test

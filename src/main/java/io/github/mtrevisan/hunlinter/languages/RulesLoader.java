@@ -181,12 +181,12 @@ public class RulesLoader{
 		return multipleStressedWords.contains(word);
 	}
 
-	public boolean containsHasToContainStress(final String word){
-		return hasToContainStress.contains(word);
+	public boolean containsHasToContainStress(final String flag){
+		return hasToContainStress.contains(flag);
 	}
 
-	public boolean containsCannotContainStress(final String word){
-		return cannotContainStress.contains(word);
+	public boolean containsCannotContainStress(final String flag){
+		return cannotContainStress.contains(flag);
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
