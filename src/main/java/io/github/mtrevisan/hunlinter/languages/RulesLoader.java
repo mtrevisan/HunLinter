@@ -114,7 +114,9 @@ public class RulesLoader{
 					final String correctRule = flags[flags.length - 1];
 					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
 					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
-						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
+						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
+								? WORD_WITH_LETTER_CANNOT_HAVE_USE
+								: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
 				}
 			}
