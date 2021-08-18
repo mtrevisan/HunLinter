@@ -365,7 +365,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 		};
 		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		Assertions.assertTrue(words.length == 0);
+		Assertions.assertEquals(0, words.length);
 	}
 
 

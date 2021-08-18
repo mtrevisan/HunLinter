@@ -102,7 +102,6 @@ public class AffixHandler implements Handler{
 			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
 				aliasesMorphologicalField);
 			entry.setParent(parent);
-//com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
 
 
 			checkValidity(parentType, parentFlag, context, entry);

@@ -184,7 +184,7 @@ public class LineEntry implements Serializable{
 		}
 	}
 
-	public static String toHunspellHeader(final AffixType type, final CharSequence flag, final char combinableChar, final int size){
+	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)
