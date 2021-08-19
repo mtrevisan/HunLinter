@@ -93,10 +93,10 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //		Assertions.assertEquals(5, words.size());
 //		//base inflections
 //		Assertions.assertEquals(createInflection("Computer", "BC-", "st:Computer"), words.get(0));
-//		//suffix inflectionss
+//		//suffix inflections
 //		Assertions.assertEquals(createInflection("Computern", "DW-", "st:Computer"), words.get(1));
-//		//prefix inflectionss
-//		//twofold inflectionss
+//		//prefix inflections
+//		//twofold inflections
 //		Assertions.assertEquals(createInflection("-Computer", "PBC", "st:Computer"), words.get(2));
 //		Assertions.assertEquals(createInflection("-Computern", "P", "st:Computer"), words.get(3));
 //		Assertions.assertEquals(createInflection("computern", "P", "st:Computer"), words.get(4));

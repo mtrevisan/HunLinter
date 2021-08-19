@@ -90,7 +90,7 @@ class WordGeneratorAffixTest extends TestBase{
 		//prefix inflections
 		Assertions.assertEquals(createInflection("foosbar", "Ü", "st:foo"), words[2]);
 		Assertions.assertEquals(createInflection("foosbaz", "Ü", "st:foo"), words[3]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("unfoo", "A", "st:foo"), words[4]);
 		Assertions.assertEquals(createInflection("unfoos", "Öü", "st:foo"), words[5]);
 		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
@@ -120,12 +120,12 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(8, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("foo", "999,54321", "st:foo"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("foos", "54321,214,216", "st:foo"), words[1]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("foosbar", "54321", "st:foo"), words[2]);
 		Assertions.assertEquals(createInflection("foosbaz", "54321", "st:foo"), words[3]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("unfoo", "999", "st:foo"), words[4]);
 		Assertions.assertEquals(createInflection("unfoos", "214,216", "st:foo"), words[5]);
 		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
@@ -154,12 +154,12 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(8, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("foo", "A3", "st:foo"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("foos", "312", "st:foo"), words[1]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("foosbar", "3", "st:foo"), words[2]);
 		Assertions.assertEquals(createInflection("foosbaz", "3", "st:foo"), words[3]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("unfoo", "A", "st:foo"), words[4]);
 		Assertions.assertEquals(createInflection("unfoos", "12", "st:foo"), words[5]);
 		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
@@ -189,16 +189,16 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(8, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("foo", "zx09", "st:foo"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("foos", "09g?1G", "st:foo"), words[1]);
-		//prefix inflectionss
-		Assertions.assertEquals(createInflection("foosbar", "09", "st:foo"), words[2]);
-		Assertions.assertEquals(createInflection("foosbaz", "09", "st:foo"), words[3]);
-		//twofold inflectionss
+		//prefix inflections
+		Assertions.assertEquals(createInflection("foosbaz", "09", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosbar", "09", "st:foo"), words[3]);
+		//twofold inflections
 		Assertions.assertEquals(createInflection("unfoo", "zx", "st:foo"), words[4]);
 		Assertions.assertEquals(createInflection("unfoos", "g?1G", "st:foo"), words[5]);
-		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[6]);
-		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[7]);
+		Assertions.assertEquals(createInflection("unfoosbaz", null, "st:foo"), words[6]);
+		Assertions.assertEquals(createInflection("unfoosbar", null, "st:foo"), words[7]);
 	}
 
 
@@ -223,7 +223,7 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(4, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("a", "A", "st:a"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aa", null, "st:a"), words[1]);
 		Assertions.assertEquals(createInflection("ac", null, "st:a"), words[2]);
 		Assertions.assertEquals(createInflection("ae", null, "st:a"), words[3]);
@@ -251,11 +251,11 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(5, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("aa", "S1", "st:aa"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aas1", "S2P1", "st:aa"), words[1]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[3]);
 		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[4]);
 	}
@@ -281,10 +281,10 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(4, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("aa", "S1", "st:aa"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aas1", "S2", "st:aa"), words[1]);
-		//prefix inflectionss
-		//twofold inflectionss
+		//prefix inflections
+		//twofold inflections
 		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
 		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[3]);
 	}
@@ -310,11 +310,11 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(6, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("aa", "S1P1", "st:aa"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aas1", "P1S2", "st:aa"), words[1]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("p1aa", "S1", "st:aa"), words[3]);
 		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[4]);
 		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[5]);
@@ -341,11 +341,11 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(6, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("aa", "P1S1", "st:aa"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aas1", "P1S2", "st:aa"), words[1]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("aas1s2", "P1", "st:aa"), words[2]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("p1aa", "S1", "st:aa"), words[3]);
 		Assertions.assertEquals(createInflection("p1aas1", "S2", "st:aa"), words[4]);
 		Assertions.assertEquals(createInflection("p1aas1s2", null, "st:aa"), words[5]);
@@ -375,15 +375,15 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(14, words.length);
 		//base inflections
 		Assertions.assertEquals(createInflection("a", "ABCDE", "st:a"), words[0]);
-		//suffix inflectionss
+		//suffix inflections
 		Assertions.assertEquals(createInflection("aa", "E", "st:a"), words[1]);
 		Assertions.assertEquals(createInflection("ab", "EA", "st:a"), words[2]);
 		Assertions.assertEquals(createInflection("ac", "E", "st:a"), words[3]);
 		Assertions.assertEquals(createInflection("ad", "EA", "st:a"), words[4]);
-		//prefix inflectionss
+		//prefix inflections
 		Assertions.assertEquals(createInflection("aba", "E", "st:a"), words[5]);
 		Assertions.assertEquals(createInflection("ada", "E", "st:a"), words[6]);
-		//twofold inflectionss
+		//twofold inflections
 		Assertions.assertEquals(createInflection("ea", "ABCD", "st:a"), words[7]);
 		Assertions.assertEquals(createInflection("eaa", null, "st:a"), words[8]);
 		Assertions.assertEquals(createInflection("eab", "A", "st:a"), words[9]);
@@ -456,7 +456,7 @@ class WordGeneratorAffixTest extends TestBase{
 			DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			wordGenerator.applyAffixRules(dicEntry);
 		});
-		Assertions.assertEquals("Twofold rule violated for `p1aas1/S2,P2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1` (S1 > P1 still has rules P2)", exception.getMessage());
+		Assertions.assertEquals("Twofold rule violated for `p1aas1/P2,S2\tst:aa\tfrom\tSFX S1 0 s1/S2P1 . > PFX P1 0 p1/P2 . from S1 > P1` (S1 > P1 still has rules P2)", exception.getMessage());
 	}
 
 	@Test
@@ -831,8 +831,8 @@ class WordGeneratorAffixTest extends TestBase{
 		//base inflection
 		Assertions.assertEquals(createInflection("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words[0]);
 		//suffix inflections
-		Assertions.assertEquals(createInflection("drinkable", "PS", "st:drink po:verb al:drank al:drunk ds:der_able"), words[1]);
-		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[2]);
+		Assertions.assertEquals(createInflection("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words[1]);
+		Assertions.assertEquals(createInflection("drinkable", "PS", "st:drink po:verb al:drank al:drunk ds:der_able"), words[2]);
 		//prefix inflections
 		Assertions.assertEquals(createInflection("drinkables", "P", "st:drink po:verb al:drank al:drunk ds:der_able is:plur"),
 			words[3]);
