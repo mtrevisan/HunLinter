@@ -141,8 +141,8 @@ class WordGeneratorBase{
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
-			final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound,
+			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		@SuppressWarnings("rawtypes")
 		final FixedArray[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
@@ -261,7 +261,7 @@ class WordGeneratorBase{
 		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS].data, circumfixFlag))
 			postponedAffixes.add(circumfixFlag);
 
-		Inflection[] inflections = new Inflection[0];
+		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class);
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(int i = 0; i < appliedAffixes.limit; i ++){
 				final String affix = appliedAffixes.data[i];
@@ -276,9 +276,9 @@ class WordGeneratorBase{
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
 					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
 				final Inflection[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
-				inflections = ArrayUtils.addAll(inflections, prods);
+				inflections.addAll(prods);
 			}
-		return inflections;
+		return inflections.extractCopy();
 	}
 
 	private Inflection[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,

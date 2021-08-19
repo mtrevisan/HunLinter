@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
 public class AffixData{
@@ -191,18 +190,17 @@ public class AffixData{
 		return terminalAffixes.contains(flag);
 	}
 
-	public Set<String> getCompoundRules(){
+	public Set<String[]> getCompoundRules(){
 		return getDataOrDefault(AffixOption.COMPOUND_RULE, Collections.emptySet());
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
-		return (match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
-	}
-
-	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
-		final FlagParsingStrategy strategy = getFlagParsingStrategy();
-		final String[] flags = strategy.extractCompoundRule(compoundRule);
-		return ArrayUtils.contains(flags, flag);
+		final Set<String[]> collection = getCompoundRules();
+		if(collection != null)
+			for(final String[] rule : collection)
+				if(ArrayUtils.contains(rule, flag))
+					return true;
+		return false;
 	}
 
 	public Charset getCharset(){

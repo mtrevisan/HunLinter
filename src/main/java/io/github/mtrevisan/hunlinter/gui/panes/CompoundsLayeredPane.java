@@ -43,6 +43,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,13 +360,14 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		final AffixData affixData = parserManager.getAffixData();
-		final Set<String> compoundRules = affixData.getCompoundRules();
+		final Set<String[]> compoundRules = affixData.getCompoundRules();
 
 
 		//affix file:
 		if(!compoundRules.isEmpty()){
 			inputComboBox.removeAllItems();
-			forEach(compoundRules, inputComboBox::addItem);
+			for(final String[] compoundRule : compoundRules)
+				inputComboBox.addItem(StringUtils.join(compoundRule, StringUtils.SPACE));
 			final String compoundFlag = affixData.getCompoundFlag();
 			if(compoundFlag != null)
 				inputComboBox.addItem(compoundFlag);

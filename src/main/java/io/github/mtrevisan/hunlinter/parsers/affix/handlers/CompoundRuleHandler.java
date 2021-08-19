@@ -62,7 +62,7 @@ public class CompoundRuleHandler implements Handler{
 
 			final Scanner scanner = context.getScanner();
 
-			final Set<String> compoundRules = new HashSet<>(numEntries);
+			final Set<String[]> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				ParserHelper.assertNotEOF(scanner);
 
@@ -73,11 +73,12 @@ public class CompoundRuleHandler implements Handler{
 				if(option != AffixOption.COMPOUND_RULE)
 					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
-				final String rule = lineParts[1];
+				final String compoundRule = lineParts[1];
 
-				checkRuleValidity(rule, line, strategy);
+				checkRuleValidity(compoundRule, line, strategy);
 
-				final boolean inserted = compoundRules.add(rule);
+				final String[] expandedCompoundRule = strategy.extractCompoundRule(compoundRule);
+				final boolean inserted = compoundRules.add(expandedCompoundRule);
 				if(!inserted)
 					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line}), IndexDataPair.of(context.getIndex() + i, null)));
 			}
