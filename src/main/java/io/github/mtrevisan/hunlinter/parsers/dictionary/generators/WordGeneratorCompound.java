@@ -87,28 +87,27 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		this.wordGenerator = wordGenerator;
 	}
 
-	protected List<List<Inflection[]>> generateCompounds(final Iterable<List<String>> permutations,
+	protected List<List<SimpleDynamicArray<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
 			final Map<String, DictionaryEntry[]> inputs){
-		final List<List<Inflection[]>> entries = new ArrayList<>();
-		final Map<String, Inflection[]> dicEntries = new HashMap<>();
+		final List<List<SimpleDynamicArray<Inflection>>> entries = new ArrayList<>();
+		final Map<String, SimpleDynamicArray<Inflection>> dicEntries = new HashMap<>();
 		outer:
 		for(final List<String> permutation : permutations){
 			//expand permutation
-			final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
+			final List<SimpleDynamicArray<Inflection>> expandedPermutationEntries = new ArrayList<>();
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
-					Inflection[] dicEntriesPerFlag = new Inflection[0];
+					final SimpleDynamicArray<Inflection> dicEntriesPerFlag = new SimpleDynamicArray<>(Inflection.class);
 					for(final DictionaryEntry entry : inputs.get(flag)){
-						final Inflection[] inflections = applyAffixRules(entry, true, null);
-						final Inflection[] collect = LoopHelper.collectIf(inflections,
-							inflection -> inflection.hasContinuationFlag(flag));
-						dicEntriesPerFlag = ArrayUtils.addAll(dicEntriesPerFlag, collect);
+						final SimpleDynamicArray<Inflection> inflections = applyAffixRules(entry, true, null);
+						final SimpleDynamicArray<Inflection> collect = inflections.collectIf(inflection -> inflection.hasContinuationFlag(flag));
+						dicEntriesPerFlag.addAll(collect);
 					}
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
 
-				final Inflection[] dicEntriesPerFlag = dicEntries.get(flag);
-				if(dicEntriesPerFlag.length > 0)
+				final SimpleDynamicArray<Inflection> dicEntriesPerFlag = dicEntries.get(flag);
+				if(dicEntriesPerFlag.limit > 0)
 					expandedPermutationEntries.add(dicEntriesPerFlag);
 				else{
 					//it is not possible to compound some words, return empty list
@@ -123,7 +122,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Inflection[] applyCompound(final Iterable<List<Inflection[]>> entries, final int limit){
+	protected SimpleDynamicArray<Inflection> applyCompound(final Iterable<List<SimpleDynamicArray<Inflection>>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -134,7 +133,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final StringBuffer sb = new StringBuffer();
 		final ArraySet<Inflection> inflections = new ArraySet<>();
 		//generate compounds:
-		for(final List<Inflection[]> entry : entries){
+		for(final List<SimpleDynamicArray<Inflection>> entry : entries){
 			//compose compound:
 			boolean completed = false;
 			final int[] indexes = new int[entry.size()];
@@ -150,9 +149,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 							&& !continuationFlags[Affixes.INDEX_TERMINALS].contains(forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
 						@SuppressWarnings("unchecked")
-						final Inflection[] newInflections = generateInflections(compoundWord, compoundEntries, continuationFlags);
-						final Inflection[] subInflections = ArrayUtils.subarray(newInflections,
-							0, Math.min(limit - inflections.size(), newInflections.length));
+						final SimpleDynamicArray<Inflection> newInflections = generateInflections(compoundWord, compoundEntries,
+							continuationFlags);
+						final Inflection[] subInflections = ArrayUtils.subarray(newInflections.data,
+							0, Math.min(limit - inflections.size(), newInflections.limit));
 						inflections.addAll(subInflections);
 					}
 				}
@@ -182,36 +182,36 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		}
 	}
 
-	private Inflection[] limitResponse(final Set<Inflection> inflections, final int limit){
+	private SimpleDynamicArray<Inflection> limitResponse(final Set<Inflection> inflections, final int limit){
 		return (inflections.size() > limit
 			? new ArrayList<>(inflections).subList(0, limit).toArray(Inflection[]::new)
 			: inflections.toArray(Inflection[]::new));
 	}
 
-	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
+	private SimpleDynamicArray<Inflection> generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
 			final FixedArray<String>[] continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
-		Inflection[] inflections;
+		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class);
 		final SimpleDynamicArray<String> flags = new SimpleDynamicArray<>(String.class, continuationFlags.length);
 		LoopHelper.forEach(continuationFlags, continuationFlag -> LoopHelper.forEach(continuationFlag, flags::add));
 		final Inflection p = Inflection.createFromCompound(compoundWord, flags.extractCopyOrNull(), compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-			inflections = new Inflection[]{p};
+			inflections.add(p);
 		else{
 			//add boundary affixes
-			inflections = applyAffixRules(p, false, null);
+			inflections.addAll(applyAffixRules(p, false, null));
 
 			if(!allowTwofoldAffixesInCompound)
 				//remove twofold because they're not allowed in compounds
-				inflections = removeTwofolds(inflections);
+				removeTwofolds(inflections);
 		}
 		return inflections;
 	}
 
-	private DictionaryEntry[] composeCompound(final int[] indexes, final List<Inflection[]> entry, final StringBuffer sb){
+	private DictionaryEntry[] composeCompound(final int[] indexes, final List<SimpleDynamicArray<Inflection>> entry, final StringBuffer sb){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
 		final boolean forbidTriples = affixData.isForbidTriplesInCompound();
@@ -222,7 +222,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		sb.setLength(0);
 		StringHelper.Casing lastWordCasing = null;
 		for(int i = 0; i < indexes.length; i ++){
-			final Inflection next = entry.get(i)[indexes[i]];
+			final Inflection next = entry.get(i).data[indexes[i]];
 
 			//skip forbidden words
 			if(next.hasContinuationFlag(forbiddenWordFlag)){
@@ -306,11 +306,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return new FixedArray[]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals};
 	}
 
-	private Inflection[] removeTwofolds(Inflection[] prods){
+	private void removeTwofolds(final SimpleDynamicArray<Inflection> prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			prods = LoopHelper.removeIf(prods, prod -> prod.isTwofolded(circumfixFlag));
-		return prods;
+			prods.removeIf(prod -> prod.isTwofolded(circumfixFlag));
 	}
 
 	//is word a non-compound with a REP substitution (see checkcompoundrep)?
@@ -327,12 +326,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return exists;
 	}
 
-	private boolean getNextTuple(final int[] indexes, final List<Inflection[]> entry){
+	private boolean getNextTuple(final int[] indexes, final List<SimpleDynamicArray<Inflection>> entry){
 		//obtain next tuple
 		int i = indexes.length - 1;
 		while(i >= 0){
 			indexes[i] ++;
-			if(indexes[i] < entry.get(i).length)
+			if(indexes[i] < entry.get(i).limit)
 				break;
 
 			indexes[i --] = 0;

@@ -24,17 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -47,37 +46,37 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData, checker);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry){
+	SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
-		Inflection[] inflections = applyAffixRules(dicEntry, false, overriddenRule);
+	SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+		final SimpleDynamicArray<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
 
-		inflections = enforceOnlyInCompound(inflections);
+		enforceOnlyInCompound(inflections);
 
 		//convert using output table
-		forEach(inflections,
-			inflection -> inflection.applyOutputConversionTable(affixData::applyOutputConversionTable));
+		for(int i = 0; i < inflections.limit; i ++)
+			inflections.data[i].applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			forEach(inflections, inflection -> LOGGER.trace("Inflected word: {}", inflection));
+			for(int i = 0; i < inflections.limit; i ++)
+				LOGGER.trace("Inflected word: {}", inflections.data[i]);
 
 		return inflections;
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule */
-	private Inflection[] enforceOnlyInCompound(Inflection[] inflections){
+	private void enforceOnlyInCompound(final SimpleDynamicArray<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null)
-			inflections = LoopHelper.removeIf(inflections, inflection -> {
+			inflections.removeIf(inflection -> {
 				final boolean hasOnlyInCompoundFlag = inflection.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules,
 					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
 				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
 			});
-		return inflections;
 	}
 
 }

@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
@@ -61,6 +62,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -432,16 +434,19 @@ final int iconSize = 17;
 			try{
 				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(text,
 					parserManager.getAffixData());
-				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
+				final SimpleDynamicArray<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
 				final InflectionTableModel dm = (InflectionTableModel)table.getModel();
-				dm.setInflections(Arrays.asList(inflections));
+				final List<Inflection> inflectionList = new ArrayList<>(inflections.limit);
+				for(int i = 0; i < inflections.limit; i ++)
+					inflectionList.add(inflections.data[i]);
+				dm.setInflections(inflectionList);
 
 				//show first row
 				final Rectangle cellRect = table.getCellRect(0, 0, true);
 				table.scrollRectToVisible(cellRect);
 
-				totalInflectionsValueLabel.setText(Integer.toString(inflections.length));
+				totalInflectionsValueLabel.setText(Integer.toString(inflections.limit));
 
 				//check for correctness
 				int index = 0;
@@ -449,7 +454,8 @@ final int iconSize = 17;
 				final TableRenderer dicCellRenderer = (TableRenderer)table.getColumnModel().getColumn(0).getCellRenderer();
 				dicCellRenderer.clearErrors();
 				final StringBuilder sb = new StringBuilder();
-				for(final Inflection inflection : inflections){
+				for(int i = 0; i < inflections.limit; i ++){
+					final Inflection inflection = inflections.data[i];
 					try{
 						checker.checkInflection(inflection, index);
 					}

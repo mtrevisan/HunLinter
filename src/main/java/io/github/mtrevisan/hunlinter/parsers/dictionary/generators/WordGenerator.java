@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -57,11 +58,11 @@ public class WordGenerator{
 		return DictionaryEntry.createFromDictionaryLineNoStemTag(line, wordGeneratorAffixRules.affixData);
 	}
 
-	public Inflection[] applyAffixRules(final DictionaryEntry dicEntry){
+	public SimpleDynamicArray<Inflection>  applyAffixRules(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry);
 	}
 
-	public Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	public SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 
@@ -69,7 +70,7 @@ public class WordGenerator{
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
-	public Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	public SimpleDynamicArray<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 

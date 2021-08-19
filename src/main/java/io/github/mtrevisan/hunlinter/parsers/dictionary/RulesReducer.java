@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -39,7 +40,6 @@ import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,13 +102,14 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectInflectionsByFlag(Inflection[] inflections, final String flag, final AffixType type){
-		if(inflections.length > 0)
+	public List<LineEntry> collectInflectionsByFlag(final SimpleDynamicArray<Inflection> inflections, final String flag, final AffixType type){
+		if(inflections.limit > 0)
 			//remove base inflection
-			inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+			inflections.removeAtIndex(WordGenerator.BASE_INFLECTION_INDEX);
 		//collect all inflections that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>(inflections.length);
-		for(final Inflection inflection : inflections){
+		final List<LineEntry> filteredRules = new ArrayList<>(inflections.limit);
+		for(int i = 0; i < inflections.limit; i ++){
+			final Inflection inflection = inflections.data[i];
 			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
 				final String word = lastAppliedRule.undoRule(inflection.getWord());
@@ -765,8 +766,8 @@ public class RulesReducer{
 		overriddenRule.setEntries(entries);
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
-			final Inflection[] originalInflections = wordGenerator.applyAffixRules(dicEntry);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
+			final SimpleDynamicArray<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
 			final List<LineEntry> filteredOriginalRules = collectInflectionsByFlag(originalInflections, flag, type);
 			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);

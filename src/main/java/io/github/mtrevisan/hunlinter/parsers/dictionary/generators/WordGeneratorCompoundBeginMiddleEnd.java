@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -85,7 +86,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<SimpleDynamicArray<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -100,8 +101,9 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
 
-			final Inflection[] inflections = applyAffixRules(dicEntry, false, null);
-			for(final Inflection inflection : inflections){
+			final SimpleDynamicArray<Inflection> inflections = applyAffixRules(dicEntry, false, null);
+			for(int i = 0; i < inflections.limit; i ++){
+				final Inflection inflection = inflections.data[i];
 				final Map<String, DictionaryEntry[]> distribution = inflection.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
 				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);

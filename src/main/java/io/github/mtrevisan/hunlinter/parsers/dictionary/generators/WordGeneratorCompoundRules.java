@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -82,7 +83,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<SimpleDynamicArray<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}

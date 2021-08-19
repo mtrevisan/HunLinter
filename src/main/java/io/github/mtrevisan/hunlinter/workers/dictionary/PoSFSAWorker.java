@@ -124,7 +124,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			final SimpleDynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
 
@@ -232,12 +232,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return MetadataBuilder.read(metadataPath);
 	}
 
-	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
+	private SimpleDynamicArray<byte[]> encode(final SimpleDynamicArray<Inflection> inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		final SimpleDynamicArray<byte[]> out = new SimpleDynamicArray<>(byte[].class, inflections.length, 1.2f);
-		for(final Inflection inflection : inflections){
+		final SimpleDynamicArray<byte[]> out = SimpleDynamicArray.createExact(byte[].class, inflections.limit);
+		for(int i = 0; i < inflections.limit; i ++){
+			final Inflection inflection = inflections.data[i];
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
 

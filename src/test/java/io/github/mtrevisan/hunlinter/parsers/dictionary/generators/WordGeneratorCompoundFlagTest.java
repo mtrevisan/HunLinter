@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
@@ -196,16 +197,16 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.length);
+		Assertions.assertEquals(4, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "P", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "P", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words[2]);
-		Assertions.assertEquals(createInflection("prefoosuf", null, "st:foo"), words[3]);
+		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words.data[2]);
+		Assertions.assertEquals(createInflection("prefoosuf", null, "st:foo"), words.data[3]);
 		//lastfold inflections
 
 
@@ -255,17 +256,17 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(6, words.length);
+		Assertions.assertEquals(6, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "PT", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "PT", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("foosufsff", "P", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosufsff", "P", "st:foo"), words.data[2]);
 		//lastfold inflections
-		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words[3]);
-		Assertions.assertEquals(createInflection("prefoosuf", "T", "st:foo"), words[4]);
-		Assertions.assertEquals(createInflection("prefoosufsff", null, "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words.data[3]);
+		Assertions.assertEquals(createInflection("prefoosuf", "T", "st:foo"), words.data[4]);
+		Assertions.assertEquals(createInflection("prefoosufsff", null, "st:foo"), words.data[5]);
 
 
 		String[] inputCompounds = new String[]{
@@ -319,17 +320,17 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(6, words.length);
+		Assertions.assertEquals(6, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "PT", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "PT", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("foosufsff", "P", "st:foo"), words[2]);
+		Assertions.assertEquals(createInflection("foosufsff", "P", "st:foo"), words.data[2]);
 		//lastfold inflections
-		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words[3]);
-		Assertions.assertEquals(createInflection("prefoosuf", "T", "st:foo"), words[4]);
-		Assertions.assertEquals(createInflection("prefoosufsff", null, "st:foo"), words[5]);
+		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words.data[3]);
+		Assertions.assertEquals(createInflection("prefoosuf", "T", "st:foo"), words.data[4]);
+		Assertions.assertEquals(createInflection("prefoosufsff", null, "st:foo"), words.data[5]);
 
 
 		String[] inputCompounds = new String[]{
@@ -384,14 +385,14 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.length);
+		Assertions.assertEquals(4, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "P", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "P", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words[2]);
-		Assertions.assertEquals(createInflection("prefoosuf", "", "st:foo"), words[3]);
+		Assertions.assertEquals(createInflection("prefoo", "S", "st:foo"), words.data[2]);
+		Assertions.assertEquals(createInflection("prefoosuf", "", "st:foo"), words.data[3]);
 		//lastfold inflections
 
 
@@ -440,14 +441,14 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.length);
+		Assertions.assertEquals(4, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "PY", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "PY", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("prefoo", "SY", "st:foo"), words[2]);
-		Assertions.assertEquals(createInflection("prefoosuf", "Y", "st:foo"), words[3]);
+		Assertions.assertEquals(createInflection("prefoo", "SY", "st:foo"), words.data[2]);
+		Assertions.assertEquals(createInflection("prefoosuf", "Y", "st:foo"), words.data[3]);
 		//lastfold inflections
 
 
@@ -544,14 +545,14 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(4, words.length);
+		Assertions.assertEquals(4, words.limit);
 		//base inflection
-		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "XPS", "st:foo"), words.data[0]);
 		//onefold inflections
-		Assertions.assertEquals(createInflection("foosuf", "PZ", "st:foo"), words[1]);
+		Assertions.assertEquals(createInflection("foosuf", "PZ", "st:foo"), words.data[1]);
 		//twofold inflections
-		Assertions.assertEquals(createInflection("prefoo", "SZ", "st:foo"), words[2]);
-		Assertions.assertEquals(createInflection("prefoosuf", "Z", "st:foo"), words[3]);
+		Assertions.assertEquals(createInflection("prefoo", "SZ", "st:foo"), words.data[2]);
+		Assertions.assertEquals(createInflection("prefoosuf", "Z", "st:foo"), words.data[3]);
 		//lastfold inflections
 
 
@@ -853,10 +854,10 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(1, words.length);
+		Assertions.assertEquals(1, words.limit);
 		//base inflection
 		//suffix inflections
-		Assertions.assertEquals(createInflection("foo", "A", "st:foo"), words[0]);
+		Assertions.assertEquals(createInflection("foo", "A", "st:foo"), words.data[0]);
 		//prefix inflections
 		//twofold inflections
 
@@ -864,10 +865,10 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		dicEntry = wordGenerator.createFromDictionaryLine(line);
 		words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertEquals(1, words.length);
+		Assertions.assertEquals(1, words.limit);
 		//base inflection
 		//suffix inflections
-		Assertions.assertEquals(createInflection("pseudos", null, "st:pseudo"), words[0]);
+		Assertions.assertEquals(createInflection("pseudos", null, "st:pseudo"), words.data[0]);
 		//prefix inflections
 		//twofold inflections
 

@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
@@ -157,10 +158,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.toStringWithPartOfSpeechAndStem();
+				for(int i = 0; i < inflections.limit; i ++){
+					final String str = inflections.data[i].toStringWithPartOfSpeechAndStem();
 					if(!bloomFilter.add(str))
 						duplicatesBloomFilter.add(str);
 				}
@@ -202,12 +203,13 @@ public class DuplicatesWorker extends WorkerDictionary{
 			final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 				try{
 					final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-					final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+					final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-					if(inflections.length > 0){
-						final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
-						result.ensureCapacity(result.size() + inflections.length);
-						for(final Inflection inflection : inflections){
+					if(inflections.limit > 0){
+						final String word = inflections.data[WordGenerator.BASE_INFLECTION_INDEX].getWord();
+						result.ensureCapacity(result.size() + inflections.limit);
+						for(int i = 0; i < inflections.limit; i ++){
+							final Inflection inflection = inflections.data[i];
 							final String text = inflection.toStringWithPartOfSpeechAndStem();
 							if(duplicatesBloomFilter.contains(text))
 								result.add(new Duplicate(inflection, word, lineIndex));

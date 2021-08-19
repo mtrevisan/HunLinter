@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
@@ -44,8 +45,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DictionaryInclusionTestWorker extends WorkerDictionary{
@@ -73,9 +72,10 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, prod -> dictionary.add(prod.getWord()));
+			for(int i = 0; i < inflections.limit; i ++)
+				dictionary.add(inflections.data[i].getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
