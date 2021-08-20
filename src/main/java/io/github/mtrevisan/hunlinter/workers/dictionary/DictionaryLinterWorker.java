@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
@@ -41,10 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -80,7 +78,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
-			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry).extractCopy()));
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 //prefixes after suffixes
 //boolean prefix = false;
 //io.github.mtrevisan.hunlinter.parsers.affix.AffixData affixData = affParser.getAffixData();
@@ -97,10 +95,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //		}
 //	}
 
-			Iterator<Inflection> itr = inflections.iterator();
-			while(itr.hasNext()){
-				final Inflection inflection = itr.next();
-				itr.remove();
+			for(int i = 0; i < inflections.limit; i ++){
+				final Inflection inflection = inflections.data[i];
 				if(inflection.getContinuationFlags() != null)
 					flags.addAll(Arrays.asList(inflection.getContinuationFlags()));
 
@@ -114,7 +110,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 					//remove all inflections derived from this one
 					final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
 					if(lastAppliedRule != null)
-						itr = removeDerivedInflections(lastAppliedRule.getFlag(), inflections);
+						removeDerivedInflections(lastAppliedRule.getFlag(), inflections, i);
 				}
 			}
 		};
@@ -140,9 +136,9 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		setProcessor(step1);
 	}
 
-	private Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Collection<Inflection> inflections){
-		inflections.removeIf(inflection -> inflection.hasAppliedRule(lastAppliedRuleFlag));
-		return inflections.iterator();
+	private void removeDerivedInflections(final String lastAppliedRuleFlag, final SimpleDynamicArray<Inflection> inflections,
+			final int startIndex){
+		inflections.removeIf(inflection -> inflection.hasAppliedRule(lastAppliedRuleFlag), startIndex);
 	}
 
 	private LinterException wrapException(final Exception e, final Inflection inflection, final IndexDataPair<String> data){

@@ -175,7 +175,11 @@ public class SimpleDynamicArray<T>{
 	}
 
 	public void removeIf(final Predicate<T> filter){
-		int index = indexOf(filter, 0);
+		removeIf(filter, 0);
+	}
+
+	public void removeIf(final Predicate<T> filter, final int startIndex){
+		int index = indexOf(filter, startIndex);
 		if(index >= 0){
 			final int[] indices = new int[limit - index];
 			indices[0] = index;
