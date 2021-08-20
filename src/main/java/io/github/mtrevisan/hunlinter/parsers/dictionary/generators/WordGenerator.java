@@ -66,7 +66,7 @@ public class WordGenerator{
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 
-	public Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	public SimpleDynamicArray<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
@@ -74,7 +74,7 @@ public class WordGenerator{
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 
-	public Inflection[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
+	public SimpleDynamicArray<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		return wordGeneratorCompoundBeginMiddleEnd.applyCompoundBeginMiddleEnd(inputCompounds, limit);
 	}
 

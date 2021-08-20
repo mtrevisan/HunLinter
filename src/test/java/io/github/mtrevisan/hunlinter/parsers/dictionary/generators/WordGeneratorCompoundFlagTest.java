@@ -54,7 +54,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"xy/A",
 			"yz/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -68,7 +68,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("xyfoo", null, "pa:xy st:xy pa:foo st:foo"),
 			createInflection("xybar", null, "pa:xy st:xy pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -85,7 +85,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/A",
 			"yz/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -93,7 +93,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
 			createInflection("barbar", null, "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -111,7 +111,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"eel/A",
 			"bare/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -126,7 +126,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("eeleel", null, "pa:eel st:eel pa:eel st:eel"),
 			createInflection("eelbare", null, "pa:eel st:eel pa:bare st:bare")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -144,14 +144,14 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"glass/A",
 			"sko/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("glassglass", null, "pa:glass st:glass pa:glass st:glass"),
 			createInflection("glassko", null, "pa:glass st:glass pa:sko st:sko"),
 			createInflection("skoglass", null, "pa:sko st:sko pa:glass st:glass")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -169,7 +169,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/A",
 			"yz/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foobar", null, "pa:foo st:foo pa:bar st:bar"),
@@ -179,7 +179,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("yzfoo", null, "pa:yz st:yz pa:foo st:foo"),
 			createInflection("yzbar", null, "pa:yz st:yz pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -234,7 +234,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createInflection("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -254,7 +254,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.limit);
 		//base inflection
@@ -297,7 +297,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
 			createInflection("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -318,7 +318,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(6, words.limit);
 		//base inflection
@@ -365,7 +365,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar"),
 			createInflection("prebarbarsufsff", null, "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -383,7 +383,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.limit);
 		//base inflection
@@ -420,7 +420,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createInflection("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -439,7 +439,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.limit);
 		//base inflection
@@ -524,7 +524,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("prebarsufprebar", "SY", "pa:prebarsuf st:bar pa:prebar st:bar"),
 			createInflection("prebarsufprebarsuf", "Y", "pa:prebarsuf st:bar pa:prebarsuf st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -543,7 +543,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/XPS";
 		final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(4, words.limit);
 		//base inflection
@@ -568,7 +568,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
 			createInflection("barbar", "PS", "pa:bar st:bar pa:bar st:bar")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -589,7 +589,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"-/A"
 		};
 
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -673,7 +673,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("--BAZ", null, "pa:- st:- pa:- st:- pa:BAZ st:BAZ"),
 			createInflection("---", null, "pa:- st:- pa:- st:- pa:- st:-")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -699,7 +699,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"kocsi/A",
 			"szerviz"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("szerszer", null, "pa:szer st:szer pa:szer st:szer"),
@@ -736,7 +736,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("vízvízkocsi", null, "pa:víz st:víz pa:víz st:víz pa:kocsi st:kocsi"),
 			createInflection("vízvízszerviz", null, "pa:víz st:víz pa:víz st:víz pa:szerviz st:szerviz")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 
@@ -759,7 +759,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bars/X",
 			"foos/X"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
@@ -778,7 +778,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("barbar", "S", "pa:bar st:bar po:4 pa:bar st:bar po:4"),
 			createInflection("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 
@@ -796,7 +796,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			"bar/C",
 			"baz/CA"
 		};
-		Inflection[] words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -836,7 +836,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("bazbazbar", null, "pa:baz st:baz pa:baz st:baz pa:bar st:bar"),
 			createInflection("Bazbazbaz", null, "pa:baz st:baz pa:baz st:baz pa:baz st:baz")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -852,7 +852,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 
 		String line = "foo/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyAffixRules(dicEntry);
 
 		Assertions.assertEquals(1, words.limit);
 		//base inflection
@@ -887,7 +887,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 			createInflection("pseudopseudo", "BO", "pa:pseudo st:pseudo pa:pseudo st:pseudo"),
 			createInflection("pseudopseudos", null, "pa:pseudo st:pseudo pa:pseudo st:pseudo")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	//FIXME manage CHECKCOMPOUNDPATTERN

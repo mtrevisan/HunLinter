@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
-import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
 import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
@@ -51,8 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{
@@ -131,7 +128,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundAsReplacement.clear();
 
 		final StringBuffer sb = new StringBuffer();
-		final ArraySet<Inflection> inflections = new ArraySet<>();
+		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class);
 		//generate compounds:
 		for(final List<SimpleDynamicArray<Inflection>> entry : entries){
 			//compose compound:
@@ -151,14 +148,13 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 						@SuppressWarnings("unchecked")
 						final SimpleDynamicArray<Inflection> newInflections = generateInflections(compoundWord, compoundEntries,
 							continuationFlags);
-						final Inflection[] subInflections = ArrayUtils.subarray(newInflections.data,
-							0, Math.min(limit - inflections.size(), newInflections.limit));
-						inflections.addAll(subInflections);
+						newInflections.truncate(Math.min(limit - inflections.limit, newInflections.limit));
+						inflections.addAllUnique(newInflections);
 					}
 				}
 
 
-				completed = (inflections.size() == limit || getNextTuple(indexes, entry));
+				completed = (inflections.limit == limit || getNextTuple(indexes, entry));
 			}
 		}
 
@@ -167,25 +163,28 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		applyOutputConversions(inflections, forceCompoundUppercaseFlag);
 
 		if(LOGGER.isTraceEnabled())
-			forEach(inflections, inflection -> LOGGER.trace("Inflected word: {}", inflection));
+			for(int i = 0; i < inflections.limit; i ++)
+				LOGGER.trace("Inflected word: {}", inflections.data[i]);
 
 		return limitResponse(inflections, limit);
 	}
 
-	private void applyOutputConversions(final Iterable<Inflection> inflections, final String forceCompoundUppercaseFlag){
+	private void applyOutputConversions(final SimpleDynamicArray<Inflection> inflections, final String forceCompoundUppercaseFlag){
 		final Function<String, String> applyOutputConversionTable = affixData::applyOutputConversionTable;
 		//convert using output table
-		for(final Inflection inflection : inflections){
+		for(int i = 0; i < inflections.limit; i ++){
+			final Inflection inflection = inflections.data[i];
 			inflection.applyOutputConversionTable(applyOutputConversionTable);
 			inflection.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			inflection.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
 	}
 
-	private SimpleDynamicArray<Inflection> limitResponse(final Set<Inflection> inflections, final int limit){
-		return (inflections.size() > limit
-			? new ArrayList<>(inflections).subList(0, limit).toArray(Inflection[]::new)
-			: inflections.toArray(Inflection[]::new));
+	private SimpleDynamicArray<Inflection> limitResponse(final SimpleDynamicArray<Inflection> inflections, final int limit){
+		final SimpleDynamicArray<Inflection> result = SimpleDynamicArray.createExact(Inflection.class, Math.min(inflections.limit, limit));
+		for(int i = 0; i < Math.min(inflections.limit, limit); i ++)
+			result.add(inflections.data[i]);
+		return result;
 	}
 
 	private SimpleDynamicArray<Inflection> generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,

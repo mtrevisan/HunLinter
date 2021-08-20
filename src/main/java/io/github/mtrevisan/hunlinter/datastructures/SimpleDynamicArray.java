@@ -193,6 +193,10 @@ public class SimpleDynamicArray<T>{
 		return data.getClass().getComponentType();
 	}
 
+	public void truncate(final int size){
+		if(size > limit)
+			limit = size;
+	}
 
 	public SimpleDynamicArray<T> collectIf(final Predicate<T> condition){
 		@SuppressWarnings("unchecked")

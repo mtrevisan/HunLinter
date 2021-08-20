@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -58,7 +59,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
@@ -68,7 +69,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createInflection("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -87,13 +88,13 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -112,7 +113,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("aa", null, "pa:a st:a pa:a st:a"),
@@ -153,7 +154,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
 			createInflection("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -194,7 +195,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"9/#@",
 			"9th/}{"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("10th", null, "pa:1 st:1 pa:0th st:0th"),
@@ -235,7 +236,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("215th", null, "pa:2 st:2 pa:1 st:1 pa:5th st:5th"),
 			createInflection("216th", null, "pa:2 st:2 pa:1 st:1 pa:6th st:6th")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -254,7 +255,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -264,7 +265,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -284,7 +285,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/bb",
 			"c/bbcc"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -294,7 +295,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 	@Test
@@ -314,7 +315,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/2",
 			"c/2,3"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -324,7 +325,7 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createInflection("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 
@@ -363,9 +364,9 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
-		Assertions.assertEquals(0, words.length);
+		Assertions.assertEquals(0, words.limit);
 	}
 
 
@@ -384,12 +385,12 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		SimpleDynamicArray<Inflection> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		};
-		Assertions.assertArrayEquals(expected, words);
+		Assertions.assertArrayEquals(expected, words.extractCopy());
 	}
 
 }
