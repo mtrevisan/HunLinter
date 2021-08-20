@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.RulesReducer;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
@@ -78,6 +79,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		rulesReducer = new RulesReducer(affixData, wordGenerator);
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
@@ -88,7 +90,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final Collection<String> originalLines = new ArrayList<>();
 		final Collection<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);

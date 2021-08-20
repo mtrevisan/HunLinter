@@ -38,6 +38,7 @@ import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
@@ -98,6 +99,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	private final Packager packager;
 	private final ParserManager parserManager;
+	private final DictionaryEntryFactory dictionaryEntryFactory;
 
 	private String formerInputText;
 
@@ -108,6 +110,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 		this.packager = packager;
 		this.parserManager = parserManager;
+		dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
 
 
 		initComponents();
@@ -430,8 +433,7 @@ final int iconSize = 17;
 
 		if(StringUtils.isNotBlank(text)){
 			try{
-				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(text,
-					parserManager.getAffixData());
+				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
 				final InflectionTableModel dm = (InflectionTableModel)table.getModel();

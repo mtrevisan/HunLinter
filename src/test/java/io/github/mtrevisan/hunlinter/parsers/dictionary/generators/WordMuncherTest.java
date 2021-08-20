@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -162,7 +163,8 @@ class WordMuncherTest{
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser, null);
 		WordMuncher muncher = new WordMuncher(affixData, dicParser, wordGenerator);
-		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+		DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
+		final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 		return Pair.of(muncher, dicEntry);
 	}
 

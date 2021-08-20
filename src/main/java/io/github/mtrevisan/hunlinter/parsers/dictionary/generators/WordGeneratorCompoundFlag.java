@@ -94,7 +94,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		final SimpleDynamicArray<DictionaryEntry> result = new SimpleDynamicArray<>(DictionaryEntry.class, inputCompounds.length);
 		for(final String inputCompound : inputCompounds){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
 
 			//filter input set by minimum length and forbidden flag
 			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
