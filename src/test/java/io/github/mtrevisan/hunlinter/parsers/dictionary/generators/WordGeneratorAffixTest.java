@@ -916,7 +916,7 @@ class WordGeneratorAffixTest extends TestBase{
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
 
-		Assertions.assertTrue(words.length == 0);
+		Assertions.assertEquals(0, words.length);
 	}
 
 }

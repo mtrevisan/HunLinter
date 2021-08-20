@@ -24,11 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 
 public class SimpleDynamicArray<T>{
@@ -111,6 +113,32 @@ public class SimpleDynamicArray<T>{
 		}
 	}
 
+	public synchronized void removeAtIndex(final int index){
+		data = ArrayUtils.remove(data, index);
+		limit --;
+	}
+
+	public void removeIf(final Predicate<T> filter){
+		int index = indexOf(filter, 0);
+		if(index >= 0){
+			final int[] indices = new int[limit - index];
+			indices[0] = index;
+
+			int count;
+			for(count = 1; (index = indexOf(filter, indices[count - 1] + 1)) != -1; indices[count ++] = index){}
+
+			data = ArrayUtils.removeAll(data, Arrays.copyOf(indices, count));
+			limit -= count;
+		}
+	}
+
+	private int indexOf(final Predicate<T> filter, final int startIndex){
+		for(int i = startIndex; i < limit; i ++)
+			if(filter.test(data[i]))
+				return i;
+		return -1;
+	}
+
 	public int indexOf(final T elem){
 		return indexOf(elem, 0);
 	}
@@ -163,6 +191,22 @@ public class SimpleDynamicArray<T>{
 
 	private Class<?> getDataType(){
 		return data.getClass().getComponentType();
+	}
+
+	public void truncate(final int size){
+		if(size > limit)
+			limit = size;
+	}
+
+	public SimpleDynamicArray<T> collectIf(final Predicate<T> condition){
+		@SuppressWarnings("unchecked")
+		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<>((Class<T>)data.getClass().getComponentType(), limit);
+		for(int i = 0; i < limit; i ++){
+			final T elem = data[i];
+			if(condition.test(elem))
+				collect.add(elem);
+		}
+		return collect;
 	}
 
 	public synchronized boolean isEmpty(){

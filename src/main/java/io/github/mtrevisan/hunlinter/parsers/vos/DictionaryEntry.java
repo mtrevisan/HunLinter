@@ -42,6 +42,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,6 +122,8 @@ public class DictionaryEntry{
 
 		this.word = word;
 		this.continuationFlags = continuationFlags;
+		if(this.continuationFlags != null)
+			Arrays.sort(this.continuationFlags);
 		this.morphologicalFields = morphologicalFields;
 		this.combinable = combinable;
 	}
@@ -184,7 +187,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasContinuationFlag(final String flag){
-		return (continuationFlags != null && ArrayUtils.contains(continuationFlags, flag));
+		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
 	public boolean hasContinuationFlags(final String[] flags){
