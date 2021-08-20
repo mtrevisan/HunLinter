@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import org.apache.commons.lang3.ArrayUtils;
@@ -53,7 +54,7 @@ public class Inflection extends DictionaryEntry{
 	private final DictionaryEntry[] compoundEntries;
 
 
-	public static Inflection createFromCompound(final String word, final String[] continuationFlags,
+	public static Inflection createFromCompound(final String word, final SimpleDynamicArray<String> continuationFlags,
 			final DictionaryEntry[] compoundEntries){
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
@@ -65,8 +66,8 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
-			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
-		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+			final DictionaryEntry dicEntry, final SimpleDynamicArray<String> remainingContinuationFlags, final boolean combinable){
+		final SimpleDynamicArray<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
 		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
@@ -83,7 +84,7 @@ public class Inflection extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Inflection(final String word, final String[] continuationFlags, final String[] morphologicalFields,
+	private Inflection(final String word, final SimpleDynamicArray<String> continuationFlags, final String[] morphologicalFields,
 			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 

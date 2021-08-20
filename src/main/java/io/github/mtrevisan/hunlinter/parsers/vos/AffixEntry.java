@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
@@ -82,7 +81,7 @@ public class AffixEntry{
 	private final String removing;
 	/** string to append */
 	private final String appending;
-	final String[] continuationFlags;
+	final SimpleDynamicArray<String> continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	private final String condition;
 	final String[] morphologicalFields;
@@ -166,15 +165,15 @@ public class AffixEntry{
 		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
-		final int size = (otherContinuationFlags != null? otherContinuationFlags.length: 0)
+	public SimpleDynamicArray<String> combineContinuationFlags(final SimpleDynamicArray<String> otherContinuationFlags){
+		final int size = (otherContinuationFlags != null? otherContinuationFlags.limit: 0)
 			+ (continuationFlags != null? continuationFlags.length: 0);
-		final FixedArray<String> flags = new FixedArray<>(String.class, size);
-		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
+		final SimpleDynamicArray<String> flags = SimpleDynamicArray.create(String.class, size);
+		if(otherContinuationFlags != null && otherContinuationFlags.limit > 0)
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)
 			flags.addAllUnique(continuationFlags);
-		return flags.extractCopyOrNull();
+		return flags;
 	}
 
 	//FIXME is this documentation updated/true?

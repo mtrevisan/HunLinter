@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
+import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
@@ -35,7 +36,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +145,7 @@ class WordGeneratorBase{
 
 	protected SimpleDynamicArray<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound,
 			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final String[][] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		final SimpleDynamicArray<String>[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
@@ -172,10 +172,10 @@ class WordGeneratorBase{
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(int i = 0; i < twofoldInflections.limit; i ++){
 			final Inflection prod = twofoldInflections.data[i];
-			final String[][] affixes = prod.extractAllAffixes(affixData, false);
-			final String[] aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
-			if(aff != null && aff.length > 0){
-				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
+			final SimpleDynamicArray<String>[] affixes = prod.extractAllAffixes(affixData, false);
+			final SimpleDynamicArray<String> aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
+			if(aff != null && aff.limit > 0){
+				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff.extractCopyOrNull());
 				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(),
 					prod.getRulesSequence(), overabundantAffixes}));
 			}
@@ -250,31 +250,30 @@ class WordGeneratorBase{
 		return (hasNeedAffixFlag || inflection.hasContinuationFlag(needAffixFlag));
 	}
 
-	private SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes, final boolean isCompound,
-			final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final SimpleDynamicArray<String>[] allAffixes,
+			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final String[] appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
-		String[] postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
-		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS], circumfixFlag))
-			postponedAffixes = ArrayUtils.add(postponedAffixes, circumfixFlag);
+		final SimpleDynamicArray<String> appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
+		final SimpleDynamicArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
+		if(circumfixFlag != null && allAffixes[Affixes.INDEX_TERMINALS].contains(circumfixFlag))
+			postponedAffixes.add(circumfixFlag);
 
 		final SimpleDynamicArray<Inflection> inflections = SimpleDynamicArray.create(Inflection.class, 0);
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
-			for(int i = 0; i < appliedAffixes.length; i ++){
-				final String affix = appliedAffixes[i];
+			for(int i = 0; i < appliedAffixes.limit; i ++){
+				final String affix = appliedAffixes.data[i];
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);
 				//override with the given rule
 				if(overriddenRule != null && affix.equals(overriddenRule.getEntries()[0].getFlag()))
 					rule = overriddenRule;
 
-				String[] currentPostponedAffixes = ArrayUtils.clone(postponedAffixes);
 				if(dicEntry.getLastAppliedRule() != null
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
-					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
-				final SimpleDynamicArray<Inflection> prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound,
+					postponedAffixes.remove(circumfixFlag);
+				final SimpleDynamicArray<Inflection> prods = applyAffixRule(dicEntry, affix, postponedAffixes, isCompound,
 					overriddenRule);
 				inflections.addAll(prods);
 			}
@@ -282,7 +281,8 @@ class WordGeneratorBase{
 	}
 
 	private SimpleDynamicArray<Inflection> applyAffixRule(final DictionaryEntry dicEntry, final String affix,
-			final String[] postponedAffixes, final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final SimpleDynamicArray<String> postponedAffixes, final boolean isCompound, final RuleEntry overriddenRule)
+			throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
 		RuleEntry rule = affixData.getData(affix);
@@ -344,8 +344,9 @@ class WordGeneratorBase{
 		return false;
 	}
 
-	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final String[] appliedAffixes, final String forbiddenWordFlag){
-		return (appliedAffixes != null && appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
+	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final SimpleDynamicArray<String> appliedAffixes,
+			final String forbiddenWordFlag){
+		return (appliedAffixes != null && appliedAffixes.limit > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
 	private boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,

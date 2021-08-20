@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
@@ -104,7 +105,11 @@ class AffixEntryTest{
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
 
-		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
+		final SimpleDynamicArray<String> input = SimpleDynamicArray.create(String.class, 2);
+		input.add("B");
+		input.add("A");
+		String[] combinedFlags = entry.combineContinuationFlags(input)
+			.extractCopy();
 
 		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags);
 	}

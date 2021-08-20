@@ -62,7 +62,7 @@ public class DictionaryEntry{
 
 
 	protected String word;
-	protected String[] continuationFlags;
+	protected SimpleDynamicArray<String> continuationFlags;
 	protected final String[] morphologicalFields;
 	private final boolean combinable;
 
@@ -76,7 +76,8 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
+	DictionaryEntry(final String word, final SimpleDynamicArray<String> continuationFlags, final String[] morphologicalFields,
+			final boolean combinable){
 		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.word = word;
@@ -127,7 +128,7 @@ public class DictionaryEntry{
 		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
 	}
 
-	public String[] getContinuationFlags(){
+	public SimpleDynamicArray<String> getContinuationFlags(){
 		return continuationFlags;
 	}
 
@@ -172,10 +173,10 @@ public class DictionaryEntry{
 
 	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, DictionaryEntry[]> result = new HashMap<>();
-		final int size = (continuationFlags != null? continuationFlags.length: 0);
+		final int size = (continuationFlags != null? continuationFlags.limit: 0);
 		final SimpleDynamicArray<DictionaryEntry> vv = SimpleDynamicArray.create(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
-			final String cf = continuationFlags[i];
+			final String cf = continuationFlags.data[i];
 			if(affixData.isManagedByCompoundRule(cf)){
 				vv.reset();
 				final DictionaryEntry[] v = result.get(cf);
@@ -253,11 +254,11 @@ public class DictionaryEntry{
 	 * @param reverse   Whether the complex prefixes is used
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if COMPLEXPREFIXES is defined)
 	 */
-	public String[][] extractAllAffixes(final AffixData affixData, final boolean reverse){
-		final String[][] affixes = separateAffixes(affixData);
+	public SimpleDynamicArray<String>[] extractAllAffixes(final AffixData affixData, final boolean reverse){
+		final SimpleDynamicArray<String>[] affixes = separateAffixes(affixData);
 		if(reverse){
-			final String[] newPrefixes = affixes[INDEX_SUFFIXES];
-			final String[] newSuffixes = affixes[INDEX_PREFIXES];
+			final SimpleDynamicArray<String> newPrefixes = affixes[INDEX_SUFFIXES];
+			final SimpleDynamicArray<String> newSuffixes = affixes[INDEX_PREFIXES];
 			affixes[INDEX_PREFIXES] = newPrefixes;
 			affixes[INDEX_SUFFIXES] = newSuffixes;
 		}
@@ -270,11 +271,11 @@ public class DictionaryEntry{
 	 * @param affixData	The {@link AffixData}
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
-	private String[][] separateAffixes(final AffixData affixData){
+	private SimpleDynamicArray<String>[] separateAffixes(final AffixData affixData){
 		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
-		final FixedArray<String> terminals = new FixedArray<>(String.class, maxSize);
-		final FixedArray<String> prefixes = new FixedArray<>(String.class, maxSize);
-		final FixedArray<String> suffixes = new FixedArray<>(String.class, maxSize);
+		final SimpleDynamicArray<String> terminals = SimpleDynamicArray.create(String.class, maxSize);
+		final SimpleDynamicArray<String> prefixes = SimpleDynamicArray.create(String.class, maxSize);
+		final SimpleDynamicArray<String> suffixes = SimpleDynamicArray.create(String.class, maxSize);
 		if(continuationFlags != null)
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
@@ -303,7 +304,7 @@ public class DictionaryEntry{
 					terminals.add(affix);
 			}
 
-		return new String[][]{prefixes.extractCopyOrNull(), suffixes.extractCopyOrNull(), terminals.extractCopyOrNull()};
+		return new SimpleDynamicArray[]{prefixes, suffixes, terminals};
 	}
 
 	@Override
@@ -313,7 +314,7 @@ public class DictionaryEntry{
 
 	public String toString(final FlagParsingStrategy strategy){
 		final StringBuilder sb = new StringBuilder(word);
-		if(continuationFlags != null && continuationFlags.length > 0){
+		if(continuationFlags != null && continuationFlags.limit > 0){
 			sb.append(SLASH);
 			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
 		}
