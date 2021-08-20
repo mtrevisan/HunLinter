@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
+import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
@@ -31,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -47,6 +49,10 @@ import java.util.function.Predicate;
 
 
 public class DictionaryEntry{
+
+	public static final int INDEX_PREFIXES = 0;
+	public static final int INDEX_SUFFIXES = 1;
+	public static final int INDEX_TERMINALS = 2;
 
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
@@ -240,6 +246,64 @@ public class DictionaryEntry{
 
 	public boolean isCompound(){
 		return false;
+	}
+
+	/**
+	 * @param affixData   Affix data
+	 * @param reverse   Whether the complex prefixes is used
+	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if COMPLEXPREFIXES is defined)
+	 */
+	public String[][] extractAllAffixes(final AffixData affixData, final boolean reverse){
+		final String[][] affixes = separateAffixes(affixData);
+		if(reverse){
+			final String[] newPrefixes = affixes[INDEX_SUFFIXES];
+			final String[] newSuffixes = affixes[INDEX_PREFIXES];
+			affixes[INDEX_PREFIXES] = newPrefixes;
+			affixes[INDEX_SUFFIXES] = newSuffixes;
+		}
+		return affixes;
+	}
+
+	/**
+	 * Separate the prefixes from the suffixes and from the terminals
+	 *
+	 * @param affixData	The {@link AffixData}
+	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
+	 */
+	private String[][] separateAffixes(final AffixData affixData){
+		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
+		final FixedArray<String> terminals = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> prefixes = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> suffixes = new FixedArray<>(String.class, maxSize);
+		if(continuationFlags != null)
+			for(final String affix : continuationFlags){
+				if(affixData.isTerminalAffix(affix)){
+					terminals.add(affix);
+					continue;
+				}
+
+				final Object rule = affixData.getData(affix);
+				if(rule == null){
+					if(affixData.isManagedByCompoundRule(affix))
+						continue;
+
+					final AffixEntry[] appliedRules = getAppliedRules();
+					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
+					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
+						(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+				}
+
+				if(rule instanceof RuleEntry){
+					if(((RuleEntry)rule).getType() == AffixType.SUFFIX)
+						suffixes.add(affix);
+					else
+						prefixes.add(affix);
+				}
+				else
+					terminals.add(affix);
+			}
+
+		return new String[][]{prefixes.extractCopyOrNull(), suffixes.extractCopyOrNull(), terminals.extractCopyOrNull()};
 	}
 
 	@Override

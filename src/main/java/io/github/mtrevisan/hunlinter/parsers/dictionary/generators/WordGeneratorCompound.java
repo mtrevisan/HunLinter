@@ -289,9 +289,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
 	private String[][] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
-		final String[][] prefixes = dictionaryEntryFactory.extractAllAffixes(compoundEntries[0], affixData, false);
-		final String[][] suffixes = dictionaryEntryFactory.extractAllAffixes(compoundEntries[compoundEntries.length - 1], affixData,
-			false);
+		final String[][] prefixes = compoundEntries[0].extractAllAffixes(affixData, false);
+		final String[][] suffixes = compoundEntries[compoundEntries.length - 1].extractAllAffixes(affixData, false);
 		final SimpleDynamicArray<String> terminals = new SimpleDynamicArray<>(String.class);
 		if(prefixes[Affixes.INDEX_TERMINALS] != null)
 			terminals.addAllUnique(prefixes[Affixes.INDEX_TERMINALS]);
