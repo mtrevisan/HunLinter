@@ -106,7 +106,7 @@ public class ExceptionsParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Collection<String> map = new HashSet<>();
+		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final String s : dictionary){
 			if(!map.add(s))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));

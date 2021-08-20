@@ -70,7 +70,7 @@ public class ThesaurusDictionary{
 		LoopHelper.forEach(partOfSpeeches, sj::add);
 		final String wholePartOfSpeeches = sj.toString();
 		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Collection<String> uniqueValues = new HashSet<>();
+		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
 		LoopHelper.forEach(synonyms, synonym -> {
 			final String s = synonym.toLowerCase(Locale.ROOT);
 			if(uniqueValues.add(s))

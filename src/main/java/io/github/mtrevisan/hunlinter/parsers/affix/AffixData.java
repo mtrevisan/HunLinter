@@ -72,9 +72,9 @@ public class AffixData{
 		AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG/*, AffixOption.SUB_STANDARD_FLAG*/);
 
 
-	private final Map<String, Object> data = new HashMap<>();
-	private final Collection<String> terminalAffixes = new HashSet<>();
-	private final Set<String> productableFlags = new HashSet<>();
+	private final Map<String, Object> data = new HashMap<>(0);
+	private final Collection<String> terminalAffixes = new HashSet<>(0);
+	private final Set<String> productableFlags = new HashSet<>(0);
 	private boolean closed;
 
 

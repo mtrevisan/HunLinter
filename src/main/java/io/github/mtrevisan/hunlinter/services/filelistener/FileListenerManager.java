@@ -174,7 +174,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
 
-		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>())
+		listenerToFilePatterns.computeIfAbsent(listener, k -> new HashSet<>(1))
 			.addAll(filePatterns);
 	}
 

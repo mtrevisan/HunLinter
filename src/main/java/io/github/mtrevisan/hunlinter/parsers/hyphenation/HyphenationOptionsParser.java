@@ -53,7 +53,7 @@ public class HyphenationOptionsParser{
 
 	private final HyphenationOptions nonCompoundOptions = new HyphenationOptions(2);
 	private final HyphenationOptions compoundOptions = new HyphenationOptions(0);
-	private final Set<String> noHyphen = new HashSet<>();
+	private final Set<String> noHyphen = new HashSet<>(0);
 
 
 	public HyphenationOptions getNonCompoundOptions(){

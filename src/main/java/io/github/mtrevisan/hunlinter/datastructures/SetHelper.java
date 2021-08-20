@@ -278,8 +278,8 @@ public final class SetHelper{
 
 	@SafeVarargs
 	public static <V> Set<V> getDuplicates(final V... list){
-		final Collection<V> uniques = new HashSet<>();
-		final Set<V> duplicates = new HashSet<>();
+		final Collection<V> uniques = new HashSet<>(list.length);
+		final Set<V> duplicates = new HashSet<>(list.length);
 		for(final V elem : list)
 			if(!uniques.add(elem))
 				duplicates.add(elem);

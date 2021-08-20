@@ -110,7 +110,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	public Set<String> getSynonymsSet(){
-		final Set<String> set = new HashSet<>();
+		final Set<String> set = new HashSet<>(synonyms.size());
 		final Consumer<String> add = set::add;
 		for(final SynonymsEntry synonym : synonyms)
 			forEach(synonym.getSynonyms(), add);

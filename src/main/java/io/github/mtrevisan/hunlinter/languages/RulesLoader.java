@@ -60,10 +60,10 @@ public class RulesLoader{
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
 	private final Set<String> multipleStressedWords;
-	private final Collection<String> hasToContainStress = new HashSet<>();
-	private final Collection<String> cannotContainStress = new HashSet<>();
-	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
-	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
+	private final Collection<String> hasToContainStress = new HashSet<>(0);
+	private final Collection<String> cannotContainStress = new HashSet<>(0);
+	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
+	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
@@ -125,7 +125,7 @@ public class RulesLoader{
 
 	private void fillDataFields(final MorphologicalTag tag, final String property){
 		final String[] itr = readPropertyAsArray(property, ',');
-		final Set<String> set = new HashSet<>();
+		final Set<String> set = new HashSet<>(itr.length);
 		for(int i = 0; i < itr.length; i ++)
 			set.add(tag.getCode() + itr[i]);
 		dataFields.put(tag, set);

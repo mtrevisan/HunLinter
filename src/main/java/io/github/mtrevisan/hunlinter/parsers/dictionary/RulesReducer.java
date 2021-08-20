@@ -317,7 +317,7 @@ public class RulesReducer{
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
 		if(!plainRules.isEmpty()){
 			try{
-				final Set<String> overallFrom = new HashSet<>();
+				final Set<String> overallFrom = new HashSet<>(plainRules.size());
 				final Consumer<String> add = overallFrom::add;
 				for(final LineEntry entry : plainRules)
 					LoopHelper.forEach(entry.from, add);
@@ -374,7 +374,7 @@ public class RulesReducer{
 		rules.removeAll(sameCondition);
 
 		//separate conditions:
-		final Set<Character> childrenGroup = new HashSet<>();
+		final Set<Character> childrenGroup = new HashSet<>(children.size());
 		final Collection<Character> notPresentConditions = new HashSet<>();
 		//for each rule with same condition
 		for(final LineEntry parent : sameCondition){

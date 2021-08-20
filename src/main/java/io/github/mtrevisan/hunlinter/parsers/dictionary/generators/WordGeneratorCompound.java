@@ -76,7 +76,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private final WordGenerator wordGenerator;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
-	private final Collection<String> compoundAsReplacement = new HashSet<>();
+	private final Collection<String> compoundAsReplacement = new HashSet<>(0);
 
 
 	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,

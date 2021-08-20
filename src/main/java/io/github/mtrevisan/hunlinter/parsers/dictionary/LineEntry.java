@@ -107,7 +107,7 @@ public class LineEntry implements Serializable{
 		this.addition = addition;
 		this.condition = condition;
 
-		from = (words != null? new HashSet<>(words): new HashSet<>());
+		from = (words != null? new HashSet<>(words): new HashSet<>(0));
 	}
 
 	public List<String> extractFromEndingWith(final String suffix){

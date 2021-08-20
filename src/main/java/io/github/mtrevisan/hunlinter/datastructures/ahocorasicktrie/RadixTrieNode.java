@@ -93,7 +93,7 @@ public class RadixTrieNode{
 	 */
 	public void addChildrenId(final int key){
 		if(childrenIds == null)
-			childrenIds = new HashSet<>();
+			childrenIds = new HashSet<>(1);
 
 		childrenIds.add(key);
 	}

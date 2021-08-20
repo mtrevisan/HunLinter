@@ -136,8 +136,8 @@ public class SmithWatermanAlignment{
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		final Set<Trace> traces = new HashSet<>();
 		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Set<Trace> traces = new HashSet<>(maxScoreIndices.size());
 		//extract edit operations
 		LoopHelper.forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
 		return traces;

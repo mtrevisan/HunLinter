@@ -48,7 +48,7 @@ public final class SorterHelper{
 	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array, final int low, final int high){
 		//fetch all the duplicates
-		final Collection<T> set = new HashSet<>();
+		final Collection<T> set = new HashSet<>(high - low);
 		final int[] indexes = new int[high - low];
 		int offset = 0;
 		for(int i = low; i < high; i ++)

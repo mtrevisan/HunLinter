@@ -305,7 +305,7 @@ public class Packager{
 		final Node node = pair.getRight();
 		if(node != null){
 			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-			final Set<String> uniqueFolders = new HashSet<>();
+			final Set<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
 			forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "

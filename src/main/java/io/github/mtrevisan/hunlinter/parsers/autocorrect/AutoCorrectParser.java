@@ -103,7 +103,7 @@ public class AutoCorrectParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Collection<String> map = new HashSet<>();
+		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),

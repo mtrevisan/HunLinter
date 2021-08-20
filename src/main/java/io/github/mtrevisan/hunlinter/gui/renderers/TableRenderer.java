@@ -40,7 +40,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	private static final MatteBorder BORDER_ERROR = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED);
 
-	private final Collection<Integer> errors = new HashSet<>();
+	private final Collection<Integer> errors = new HashSet<>(0);
 
 
 	public void setErrorOnRow(final int line){

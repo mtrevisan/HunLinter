@@ -141,7 +141,7 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>()));
+		forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>(0)));
 	}
 
 	private final Comparator<String> comparator;
