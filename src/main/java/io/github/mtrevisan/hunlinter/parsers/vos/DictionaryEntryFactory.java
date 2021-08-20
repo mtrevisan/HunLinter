@@ -109,9 +109,9 @@ public class DictionaryEntryFactory{
 	private String[] extractMorphologicalFields(final Matcher m, final boolean addStemTag, final String word){
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs:
-			ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
-		return morphologicalFields;
+		return (!addStemTag || containsStem(mfs)
+			? mfs
+			: ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
 	}
 
 	private String expandAliases(final String part, final List<String> aliases){
