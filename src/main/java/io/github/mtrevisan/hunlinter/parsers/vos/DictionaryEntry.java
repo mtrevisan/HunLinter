@@ -173,7 +173,7 @@ public class DictionaryEntry{
 	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, DictionaryEntry[]> result = new HashMap<>();
 		final int size = (continuationFlags != null? continuationFlags.length: 0);
-		final SimpleDynamicArray<DictionaryEntry> vv = new SimpleDynamicArray<>(DictionaryEntry.class);
+		final SimpleDynamicArray<DictionaryEntry> vv = SimpleDynamicArray.create(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
 			final String cf = continuationFlags[i];
 			if(affixData.isManagedByCompoundRule(cf)){
@@ -233,7 +233,7 @@ public class DictionaryEntry{
 			return new String[0];
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, morphologicalFields.length);
+		final SimpleDynamicArray<String> list = SimpleDynamicArray.create(String.class, morphologicalFields.length);
 		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
 				list.add(mf);

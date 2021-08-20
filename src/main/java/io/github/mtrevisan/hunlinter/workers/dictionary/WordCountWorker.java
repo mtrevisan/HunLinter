@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
@@ -76,11 +77,11 @@ public class WordCountWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			totalInflections.addAndGet(inflections.length);
-			for(final Inflection inflection : inflections)
-				dictionary.add(inflection.getWord());
+			totalInflections.addAndGet(inflections.limit);
+			for(int i = 0; i < inflections.limit; i ++)
+				dictionary.add(inflections.data[i].getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 

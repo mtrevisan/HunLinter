@@ -25,8 +25,6 @@
 package io.github.mtrevisan.hunlinter.datastructures;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -35,59 +33,117 @@ import java.util.function.Predicate;
 
 public class SimpleDynamicArray<T>{
 
-	private static final float GROWTH_DEFAULT = 1.2f;
+	private static final float GROWTH_RATE_DEFAULT = 1.2f;
 
 
 	public T[] data;
 	public int limit;
+
 	private final float growthRate;
 
 
-	public static <T> SimpleDynamicArray<T> createExact(final Class<T> cl, final int size){
-		return new SimpleDynamicArray<>(cl, size, GROWTH_DEFAULT);
+	public static <T> SimpleDynamicArray<T> wrap(final T[] array){
+		final SimpleDynamicArray<T> wrapped = new SimpleDynamicArray<>(array, GROWTH_RATE_DEFAULT);
+		wrapped.limit = array.length;
+		return wrapped;
 	}
 
-	public SimpleDynamicArray(final Class<T> cl){
-		this(cl, 0, GROWTH_DEFAULT);
+	public static <T> SimpleDynamicArray<T> create(final Class<T> type){
+		return new SimpleDynamicArray<>(type, 0, GROWTH_RATE_DEFAULT);
 	}
 
-	public SimpleDynamicArray(final Class<T> cl, final float growthRate){
-		this(cl, 0, growthRate);
+	public static <T> SimpleDynamicArray<T> create(final Class<T> type, final int capacity){
+		return new SimpleDynamicArray<>(type, capacity, GROWTH_RATE_DEFAULT);
 	}
+
+	public static <T> SimpleDynamicArray<T> create(final Class<T> type, final int capacity, final float growthRate){
+		return new SimpleDynamicArray<>(type, capacity, growthRate);
+	}
+
 
 	@SuppressWarnings("unchecked")
-	public SimpleDynamicArray(final Class<T> cl, final int capacity, final float growthRate){
-		data = (T[])Array.newInstance(cl, capacity);
+	private SimpleDynamicArray(final Class<T> type, final int capacity, final float growthRate){
+		this((T[])Array.newInstance(type, capacity), growthRate);
+	}
+
+	private SimpleDynamicArray(final T[] array, final float growthRate){
+		data = array;
 
 		this.growthRate = growthRate;
 	}
 
-	public synchronized void add(final T elem){
+	/**
+	 * Appends the specified element to the end of this array.
+	 *
+	 * @param elem	Element to be appended to the internal array.
+	 */
+	public void add(final T elem){
 		grow(1);
 
 		data[limit ++] = elem;
 	}
 
-	public synchronized void addAll(final T[] array){
+	/**
+	 * Appends the specified element to the end of this array if not {@code null}.
+	 *
+	 * @param elem	Element to be appended to the internal array.
+	 */
+	public void addIfNotNull(final T elem){
+		if(elem != null)
+			add(elem);
+	}
+
+	public void addAll(final T[] array){
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final SimpleDynamicArray<T> array){
+	/**
+	 * Appends all the elements in the specified collection to the end of this array.
+	 *
+	 * @param array	Collection containing elements to be added to this array.
+	 */
+	public void addAll(final SimpleDynamicArray<T> array){
 		addAll(array.data, array.limit);
 	}
 
-	private void addAll(final T[] array, final int size){
-		grow(size);
+	/**
+	 * Inserts all the elements in the specified collection into this array at the specified position.
+	 * <p>Shifts the element currently at that position (if any) and any subsequent elements to the right
+	 * (increases their indices).</p>
+	 *
+	 * @param index	Index at which to insert the first element from the specified collection.
+	 * @param array	Collection containing elements to be added to this array.
+	 */
+	public void addAll(final int index, final SimpleDynamicArray<T> array){
+		final int addLength = array.limit;
+		if(addLength != 0){
+			grow(addLength);
 
-		System.arraycopy(array, 0, data, limit, size);
-		limit += size;
+			if(index < limit)
+				System.arraycopy(data, index, data, index + addLength, limit - index);
+			System.arraycopy(array.data, 0, data, index, addLength);
+			limit += addLength;
+		}
 	}
 
-	public synchronized void addAllUnique(final T[] array){
+	/**
+	 * Appends all the elements in the specified collection to the end of this array.
+	 *
+	 * @param array	Collection containing elements to be added to this array.
+	 * @param length	Length of the array.
+	 */
+	public void addAll(final T[] array, final int length){
+		grow(length);
+
+		System.arraycopy(array, 0, data, limit, length);
+		limit += length;
+	}
+
+	public void addAllUnique(final T[] array){
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final SimpleDynamicArray<T> array){
+	public void addAllUnique(final SimpleDynamicArray<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
@@ -103,7 +159,7 @@ public class SimpleDynamicArray<T>{
 		return (indexOf(elem) >= 0);
 	}
 
-	public synchronized void remove(final T elem){
+	public void remove(final T elem){
 		int index = limit;
 		while(limit > 0 && (index = lastIndexOf(elem, index)) >= 0){
 			final int delta = limit - index - 1;
@@ -113,7 +169,7 @@ public class SimpleDynamicArray<T>{
 		}
 	}
 
-	public synchronized void removeAtIndex(final int index){
+	public void removeAtIndex(final int index){
 		data = ArrayUtils.remove(data, index);
 		limit --;
 	}
@@ -132,6 +188,14 @@ public class SimpleDynamicArray<T>{
 		}
 	}
 
+	public void filter(final Predicate<? super T> filter){
+		reset();
+
+		for(final T elem : data)
+			if(filter.test(elem))
+				data[limit ++] = elem;
+	}
+
 	private int indexOf(final Predicate<T> filter, final int startIndex){
 		for(int i = startIndex; i < limit; i ++)
 			if(filter.test(data[i]))
@@ -143,7 +207,7 @@ public class SimpleDynamicArray<T>{
 		return indexOf(elem, 0);
 	}
 
-	public synchronized int indexOf(final T elem, final int startIndex){
+	public int indexOf(final T elem, final int startIndex){
 		return (elem != null
 			? indexOfNonNull(elem, startIndex)
 			: indexOfNull(startIndex));
@@ -163,7 +227,7 @@ public class SimpleDynamicArray<T>{
 		return -1;
 	}
 
-	public synchronized int lastIndexOf(final T elem, final int startIndex){
+	public int lastIndexOf(final T elem, final int startIndex){
 		return (elem != null
 			? lastIndexOfNonNull(elem, startIndex)
 			: lastIndexOfNull(startIndex));
@@ -185,22 +249,32 @@ public class SimpleDynamicArray<T>{
 
 	private void grow(final int size){
 		final int delta = limit - data.length + size;
-		if(delta > 0)
-			data = Arrays.copyOf(data, data.length + (int)Math.ceil(delta * growthRate));
+		if(delta > 0){
+			final int newLength = data.length + (int)Math.ceil(delta * growthRate);
+			final T[] copy = newInstance(newLength);
+			System.arraycopy(data, 0, copy, 0, Math.min(data.length, newLength));
+			data = copy;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private T[] newInstance(final int size){
+		final Class<?> type = getDataType();
+		return (T[])Array.newInstance(type, size);
 	}
 
 	private Class<?> getDataType(){
 		return data.getClass().getComponentType();
 	}
 
-	public void truncate(final int size){
-		if(size > limit)
+	public void truncate(int size){
+		if(size < limit)
 			limit = size;
 	}
 
 	public SimpleDynamicArray<T> collectIf(final Predicate<T> condition){
 		@SuppressWarnings("unchecked")
-		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<>((Class<T>)data.getClass().getComponentType(), limit);
+		final SimpleDynamicArray<T> collect = SimpleDynamicArray.create((Class<T>)getDataType(), limit, growthRate);
 		for(int i = 0; i < limit; i ++){
 			final T elem = data[i];
 			if(condition.test(elem))
@@ -209,7 +283,7 @@ public class SimpleDynamicArray<T>{
 		return collect;
 	}
 
-	public synchronized boolean isEmpty(){
+	public boolean isEmpty(){
 		return (limit == 0);
 	}
 
@@ -218,7 +292,7 @@ public class SimpleDynamicArray<T>{
 	 *
 	 * @return	A copy of the array
 	 */
-	public synchronized T[] extractCopyOrNull(){
+	public T[] extractCopyOrNull(){
 		if(isEmpty())
 			return null;
 
@@ -230,43 +304,35 @@ public class SimpleDynamicArray<T>{
 	 *
 	 * @return	A copy of the array
 	 */
-	public synchronized T[] extractCopy(){
-		final Class<?> type = getDataType();
-		@SuppressWarnings("unchecked")
-		final T[] reducedData = (T[])Array.newInstance(type, limit);
+	public T[] extractCopy(){
+		final T[] reducedData = newInstance(limit);
 		System.arraycopy(data, 0, reducedData, 0, limit);
 		return reducedData;
 	}
 
-	public synchronized void reset(){
+	public void reset(){
 		limit = 0;
 	}
 
-	public synchronized void clear(){
+	public void clear(){
 		data = null;
 		limit = -1;
 	}
 
 	@Override
-	public synchronized boolean equals(final Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
 		final SimpleDynamicArray<?> rhs = (SimpleDynamicArray<?>)obj;
-		return new EqualsBuilder()
-			.append(data, rhs.data)
-			.append(limit, rhs.limit)
-			.isEquals();
+		return (limit == rhs.limit && Arrays.equals(data, rhs.data));
 	}
 
 	@Override
-	public synchronized int hashCode(){
-		return new HashCodeBuilder()
-			.append(data)
-			.append(limit)
-			.toHashCode();
+	public int hashCode(){
+		return Integer.hashCode(limit) ^ Arrays.hashCode(data);
 	}
 
 }

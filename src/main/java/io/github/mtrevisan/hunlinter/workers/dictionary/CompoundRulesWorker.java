@@ -1,5 +1,6 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -45,9 +46,9 @@ public class CompoundRulesWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-			for(final Inflection inflection : inflections)
-				inflectionReader.accept(inflection, indexData.getIndex());
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+			for(int i = 0; i < inflections.limit; i ++)
+				inflectionReader.accept(inflections.data[i], indexData.getIndex());
 		};
 
 		getWorkerData()

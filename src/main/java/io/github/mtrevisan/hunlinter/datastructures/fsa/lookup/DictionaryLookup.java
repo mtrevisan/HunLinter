@@ -51,7 +51,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	private final ByteSequenceIterator finalStatesIterator;
 
 	/** Private internal array of reusable word data objects */
-	private final SimpleDynamicArray<WordData> forms = new SimpleDynamicArray<>(WordData.class);
+	private final SimpleDynamicArray<WordData> forms = SimpleDynamicArray.create(WordData.class);
 
 	/** The {@link Dictionary} this lookup is using */
 	private final Dictionary dictionary;

@@ -94,7 +94,7 @@ public final class RegexHelper{
 	}
 
 	private static String[] extractUnlimited(final Matcher matcher){
-		final SimpleDynamicArray<String> result = new SimpleDynamicArray<>(String.class);
+		final SimpleDynamicArray<String> result = SimpleDynamicArray.create(String.class);
 		while(matcher.find()){
 			final String component = getNextGroup(matcher);
 			result.add((component != null? component: matcher.group()));

@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
@@ -88,11 +89,11 @@ public class StatisticsWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
+				for(int i = 0; i < inflections.limit; i ++){
 					//collect statistics
-					final String word = inflection.getWord();
+					final String word = inflections.data[i].getWord();
 					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
 					if(subwords == null || subwords.length == 0)
 						dicStatistics.addData(word);

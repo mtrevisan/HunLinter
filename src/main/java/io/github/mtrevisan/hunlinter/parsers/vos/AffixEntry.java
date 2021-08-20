@@ -248,7 +248,7 @@ public class AffixEntry{
 	}
 
 	private String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		final SimpleDynamicArray<String> collector = new SimpleDynamicArray<>(String.class,
+		final SimpleDynamicArray<String> collector = SimpleDynamicArray.create(String.class,
 			(morphologicalFields != null? morphologicalFields.length: 0));
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();

@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -46,8 +47,6 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class WordlistWorker extends WorkerDictionary{
@@ -92,9 +91,10 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), NEW_LINE));
+			for(int i = 0; i < inflections.limit; i ++)
+				writeLine(writer, toString.apply(inflections.data[i]), NEW_LINE);
 		};
 
 		getWorkerData()

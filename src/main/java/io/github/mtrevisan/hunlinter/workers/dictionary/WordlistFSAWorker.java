@@ -102,16 +102,15 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
-			1.2f);
+		final SimpleDynamicArray<byte[]> encodings = SimpleDynamicArray.create(byte[].class, dictionaryBaseData.getExpectedNumberOfElements());
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final byte[][] words = new byte[inflections.length][];
-			for(int i = 0; i < inflections.length; i ++)
-				words[i] = StringHelper.getRawBytes(inflections[i].getWord().toLowerCase(Locale.ROOT));
+			final byte[][] words = new byte[inflections.limit][];
+			for(int i = 0; i < inflections.limit; i ++)
+				words[i] = StringHelper.getRawBytes(inflections.data[i].getWord().toLowerCase(Locale.ROOT));
 			encodings.addAll(words);
 
 			sleepOnPause();

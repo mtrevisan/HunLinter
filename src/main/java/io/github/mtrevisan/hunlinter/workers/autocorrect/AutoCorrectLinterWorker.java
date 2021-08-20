@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.autocorrect;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
@@ -132,10 +133,10 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.getWord().toLowerCase(Locale.ROOT);
+				for(int i = 0; i < inflections.limit; i ++){
+					final String str = inflections.data[i].getWord().toLowerCase(Locale.ROOT);
 					bloomFilter.add(str);
 				}
 			}

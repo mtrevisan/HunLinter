@@ -141,7 +141,7 @@ public class RulesLoader{
 	}
 
 	public final String[] readPropertyAsArray(final String key, final char separator){
-		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, rulesProperties.size());
+		final SimpleDynamicArray<String> list = SimpleDynamicArray.create(String.class, rulesProperties.size());
 		for(final Object o : rulesProperties.keySet()){
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){

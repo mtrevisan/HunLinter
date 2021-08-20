@@ -80,7 +80,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
-			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry)));
+			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry).extractCopy()));
 //prefixes after suffixes
 //boolean prefix = false;
 //io.github.mtrevisan.hunlinter.parsers.affix.AffixData affixData = affParser.getAffixData();

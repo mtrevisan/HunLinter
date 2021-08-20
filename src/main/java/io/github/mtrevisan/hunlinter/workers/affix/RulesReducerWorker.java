@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.affix;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -91,7 +92,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final Collection<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredRules.isEmpty()){

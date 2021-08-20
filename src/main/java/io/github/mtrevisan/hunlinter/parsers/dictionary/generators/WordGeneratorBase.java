@@ -34,7 +34,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,8 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.Objects;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 class WordGeneratorBase{
@@ -77,11 +74,11 @@ class WordGeneratorBase{
 	 * @return	The list of inflections for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
+	protected SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
 			final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-			return new Inflection[0];
+			return SimpleDynamicArray.create(Inflection.class);
 
 		//extract base inflection
 		final Inflection baseInflection = getBaseInflection(dicEntry);
@@ -91,11 +88,11 @@ class WordGeneratorBase{
 		}
 
 		//extract suffixed inflections
-		final Inflection[] suffixedInflections = getOnefoldInflections(baseInflection, isCompound, !affixData.isComplexPrefixes(),
-			overriddenRule);
+		final SimpleDynamicArray<Inflection> suffixedInflections = getOnefoldInflections(baseInflection, isCompound,
+			!affixData.isComplexPrefixes(), overriddenRule);
 		printInflections((affixData.isComplexPrefixes()? "Prefix inflections:": "Suffix inflections:"), suffixedInflections);
 
-		Inflection[] prefixedInflections = new Inflection[0];
+		SimpleDynamicArray<Inflection> prefixedInflections = SimpleDynamicArray.create(Inflection.class);
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
 			//extract prefixed inflections
 			prefixedInflections = getTwofoldInflections(suffixedInflections, isCompound, !affixData.isComplexPrefixes(),
@@ -104,36 +101,40 @@ class WordGeneratorBase{
 		}
 
 		//extract lastfold inflections
-		Inflection[] twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, null);
+		SimpleDynamicArray<Inflection> twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections,
+			null);
 		twofoldInflections = getTwofoldInflections(twofoldInflections, isCompound, affixData.isComplexPrefixes(), overriddenRule);
 		checkTwofoldCorrectness(twofoldInflections);
 		printInflections("Twofold inflections:", twofoldInflections);
 
-		final Inflection[] inflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, twofoldInflections);
-		return filterInflections(inflections);
+		final SimpleDynamicArray<Inflection> inflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections,
+			twofoldInflections);
+		filterInflections(inflections);
+		return inflections;
 	}
 
-	private Inflection[] collectInflections(final Inflection baseInflection, final Inflection[] onefoldInflections,
-			final Inflection[] twofoldInflections, final Inflection[] lastfoldInflections){
-		final int size = 1 + onefoldInflections.length + twofoldInflections.length
-			+ (lastfoldInflections != null? lastfoldInflections.length: 0);
-		final Inflection[] inflections = new Inflection[size];
-		inflections[0] = baseInflection;
-		System.arraycopy(onefoldInflections, 0, inflections, 1, onefoldInflections.length);
-		System.arraycopy(twofoldInflections, 0, inflections, 1 + onefoldInflections.length, twofoldInflections.length);
+	private SimpleDynamicArray<Inflection> collectInflections(final Inflection baseInflection,
+			final SimpleDynamicArray<Inflection> onefoldInflections, final SimpleDynamicArray<Inflection> twofoldInflections,
+			final SimpleDynamicArray<Inflection> lastfoldInflections){
+		final int size = 1 + onefoldInflections.limit + twofoldInflections.limit
+			+ (lastfoldInflections != null? lastfoldInflections.limit: 0);
+		final SimpleDynamicArray<Inflection> inflections = SimpleDynamicArray.create(Inflection.class, size);
+		inflections.add(baseInflection);
+		inflections.addAll(onefoldInflections);
+		inflections.addAll(twofoldInflections);
 		if(lastfoldInflections != null)
-			System.arraycopy(lastfoldInflections, 0, inflections, 1 + onefoldInflections.length + twofoldInflections.length,
-				lastfoldInflections.length);
+			inflections.addAll(lastfoldInflections);
 		return inflections;
 	}
 
 
-	private void printInflections(final String title, final Inflection[] inflections){
-		if(LOGGER.isDebugEnabled() && inflections.length > 0){
+	private void printInflections(final String title, final SimpleDynamicArray<Inflection> inflections){
+		if(LOGGER.isDebugEnabled() && inflections.limit > 0){
 			LOGGER.debug(title);
-			forEach(inflections,
-				inflection -> LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()),
-				inflection.getRulesSequence()));
+			for(int i = 0; i < inflections.limit; i ++){
+				final Inflection inflection = inflections.data[i];
+				LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()), inflection.getRulesSequence());
+			}
 		}
 	}
 
@@ -142,32 +143,35 @@ class WordGeneratorBase{
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
-	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
-			final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	protected SimpleDynamicArray<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound,
+			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String[][] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
-	private Inflection[] getTwofoldInflections(final Inflection[] onefoldInflections, final boolean isCompound,
-			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		Inflection[] twofoldInflections = new Inflection[0];
-		for(final Inflection inflection : onefoldInflections)
+	private SimpleDynamicArray<Inflection> getTwofoldInflections(final SimpleDynamicArray<Inflection> onefoldInflections,
+			final boolean isCompound, final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+		SimpleDynamicArray<Inflection> twofoldInflections = SimpleDynamicArray.create(Inflection.class);
+		for(int i = 0; i < onefoldInflections.limit; i ++){
+			final Inflection inflection = onefoldInflections.data[i];
 			if(inflection.isCombinable()){
-				final Inflection[] prods = getOnefoldInflections(inflection, isCompound, reverse, overriddenRule);
+				final SimpleDynamicArray<Inflection> prods = getOnefoldInflections(inflection, isCompound, reverse, overriddenRule);
 
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				//add parent derivations
-				for(final Inflection prod : prods)
-					prod.prependAppliedRules(appliedRules);
+				for(int j = 0; j < prods.limit; j ++)
+					prods.data[j].prependAppliedRules(appliedRules);
 
-				twofoldInflections = ArrayUtils.addAll(twofoldInflections, prods);
+				twofoldInflections.addAll(prods);
 			}
+		}
 		return twofoldInflections;
 	}
 
-	private void checkTwofoldCorrectness(final Inflection[] twofoldInflections){
+	private void checkTwofoldCorrectness(final SimpleDynamicArray<Inflection> twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
-		for(final Inflection prod : twofoldInflections){
+		for(int i = 0; i < twofoldInflections.limit; i ++){
+			final Inflection prod = twofoldInflections.data[i];
 			final String[][] affixes = prod.extractAllAffixes(affixData, false);
 			final String[] aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
 			if(aff != null && aff.length > 0){
@@ -178,10 +182,10 @@ class WordGeneratorBase{
 		}
 	}
 
-	private Inflection[] filterInflections(Inflection[] inflections){
-		inflections = enforceCircumfix(inflections);
+	private void filterInflections(final SimpleDynamicArray<Inflection> inflections){
+		enforceCircumfix(inflections);
 
-		return enforceNeedAffixFlag(inflections);
+		enforceNeedAffixFlag(inflections);
 	}
 
 	/**
@@ -202,20 +206,17 @@ class WordGeneratorBase{
 	 *    discard inflection
 	 * </pre></code>
 	 */
-	private Inflection[] enforceCircumfix(Inflection[] inflections){
+	private void enforceCircumfix(final SimpleDynamicArray<Inflection> inflections){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			inflections = LoopHelper.removeIf(inflections,
-				inflection -> inflection.hasContinuationFlag(circumfixFlag) && !inflection.isTwofolded(circumfixFlag));
-		return inflections;
+			inflections.removeIf(inflection -> inflection.hasContinuationFlag(circumfixFlag) && !inflection.isTwofolded(circumfixFlag));
 	}
 
 	/** Remove rules that invalidate the affix rule */
-	private Inflection[] enforceNeedAffixFlag(Inflection[] inflections){
+	private void enforceNeedAffixFlag(final SimpleDynamicArray<Inflection> inflections){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)
-			inflections = LoopHelper.removeIf(inflections, inflection -> hasNeedAffixFlag(inflection, needAffixFlag));
-		return inflections;
+			inflections.removeIf(inflection -> hasNeedAffixFlag(inflection, needAffixFlag));
 	}
 
 	private boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
@@ -249,7 +250,7 @@ class WordGeneratorBase{
 		return (hasNeedAffixFlag || inflection.hasContinuationFlag(needAffixFlag));
 	}
 
-	private Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes, final boolean isCompound,
+	private SimpleDynamicArray<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes, final boolean isCompound,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
@@ -259,7 +260,7 @@ class WordGeneratorBase{
 		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS], circumfixFlag))
 			postponedAffixes = ArrayUtils.add(postponedAffixes, circumfixFlag);
 
-		Inflection[] inflections = new Inflection[0];
+		final SimpleDynamicArray<Inflection> inflections = SimpleDynamicArray.create(Inflection.class, 0);
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(int i = 0; i < appliedAffixes.length; i ++){
 				final String affix = appliedAffixes[i];
@@ -273,14 +274,15 @@ class WordGeneratorBase{
 				if(dicEntry.getLastAppliedRule() != null
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
 					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
-				final Inflection[] prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
-				inflections = ArrayUtils.addAll(inflections, prods);
+				final SimpleDynamicArray<Inflection> prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound,
+					overriddenRule);
+				inflections.addAll(prods);
 			}
 		return inflections;
 	}
 
-	private Inflection[] applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
-			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private SimpleDynamicArray<Inflection> applyAffixRule(final DictionaryEntry dicEntry, final String affix,
+			final String[] postponedAffixes, final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
 		RuleEntry rule = affixData.getData(affix);
@@ -289,7 +291,7 @@ class WordGeneratorBase{
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))
-				return new Inflection[0];
+				return SimpleDynamicArray.create(Inflection.class, 0);
 
 			final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
@@ -307,7 +309,7 @@ class WordGeneratorBase{
 			throw new NoApplicableRuleException("No applicable rules found for flag `" + affix + "` via `"
 				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
 
-		final SimpleDynamicArray<Inflection> inflections = new SimpleDynamicArray<>(Inflection.class, applicableAffixes.length);
+		final SimpleDynamicArray<Inflection> inflections = SimpleDynamicArray.create(Inflection.class, applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
@@ -328,7 +330,7 @@ class WordGeneratorBase{
 					inflections.add(inflection);
 			}
 		}
-		return inflections.extractCopy();
+		return inflections;
 	}
 
 	private static boolean match(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){

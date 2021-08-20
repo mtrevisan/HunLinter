@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.models.CompoundTableModel;
@@ -289,7 +290,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
             //FIXME transfer into ParserManager
-            final Inflection[] words;
+            final SimpleDynamicArray<Inflection> words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
 				final String[] input = StringUtils.split(inputCompounds, '\n');
@@ -301,7 +302,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
             final CompoundTableModel dm = (CompoundTableModel)table.getModel();
-            dm.setInflections(Arrays.asList(words));
+            dm.setInflections(Arrays.asList(words.extractCopy()));
          }
          catch(final Exception e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);

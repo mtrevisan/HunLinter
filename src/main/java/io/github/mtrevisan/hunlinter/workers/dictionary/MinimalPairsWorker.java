@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
@@ -144,11 +145,13 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final SimpleDynamicArray<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				LoopHelper.applyIf(inflections,
-					checker::shouldBeProcessedForMinimalPair,
-					inflection -> list.add(inflection.getWord()));
+				for(int i = 0; i < inflections.limit; i ++){
+					final Inflection inflection = inflections.data[i];
+					if(checker.shouldBeProcessedForMinimalPair(inflection))
+						list.add(inflection.getWord());
+				}
 			}
 			catch(final LinterException e){
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
