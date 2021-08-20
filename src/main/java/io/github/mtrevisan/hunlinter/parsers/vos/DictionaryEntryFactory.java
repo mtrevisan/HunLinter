@@ -83,35 +83,69 @@ public class DictionaryEntryFactory{
 	private DictionaryEntry createFromDictionaryLine(final String line, final boolean addStemTag){
 		Objects.requireNonNull(line, "Line cannot be null");
 
-		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
-		if(!m.find())
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
+		//		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
+		final Matcher m = null;
+		//		if(!m.find())
+		//			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 
-		final String word = extractWord(m);
-		final String[] continuationFlags = extractContinuationFlags(m);
-		final String[] morphologicalFields = extractMorphologicalFields(m, addStemTag, word);
+		final String word = extractWord(line, m);
+		if(word == null)
+			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
+		final String[] continuationFlags = extractContinuationFlags(line, m);
+		final String[] morphologicalFields = extractMorphologicalFields(line, m, addStemTag, word);
 
 		final String convertedWord = affixData.applyInputConversionTable(word);
 		final boolean combinable = true;
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
-	private String extractWord(final Matcher m){
-		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+	private String extractWord(final String line, final Matcher m){
+		char prevChar = 0;
+		int endIndex;
+		final char[] chars = line.toCharArray();
+		for(endIndex = 0; endIndex < chars.length; endIndex ++){
+			final char chr = chars[endIndex];
+			if(chr == ' ' || chr == '\t' || chr == '/' && prevChar != '\\')
+				break;
+
+			prevChar = chr;
+		}
+		final String word = StringUtils.replace(line.substring(0, endIndex), SLASH_ESCAPED, SLASH);
+		//		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+		return word;
 	}
 
-	private String[] extractContinuationFlags(final Matcher m){
-		final String flagsGroup = m.group(PARAM_FLAGS);
+	private String[] extractContinuationFlags(final String line, final Matcher m){
+		char prevChar = 0;
+		int startIndex;
+		final char[] chars = line.toCharArray();
+		for(startIndex = 0; startIndex < chars.length; startIndex ++){
+			final char chr = chars[startIndex];
+			if(chr == '/' && prevChar != '\\')
+				break;
+
+			prevChar = chr;
+		}
+		if(startIndex == chars.length)
+			startIndex = -1;
+		final int endIndex = (startIndex > 0? StringUtils.indexOfAny(line, ' ', '\t'): 0);
+
+		final String flagsGroup = (startIndex > 0? line.substring(startIndex + 1, (endIndex < 0? chars.length: endIndex)): null);
+		//		final String flagsGroup = m.group(PARAM_FLAGS);
 		final String rawFlags = expandAliases(flagsGroup, aliasesFlag);
-		return strategy.parseFlags(rawFlags);
+		final String[] continuationFlags = strategy.parseFlags(rawFlags);
+		return continuationFlags;
 	}
 
-	private String[] extractMorphologicalFields(final Matcher m, final boolean addStemTag, final String word){
-		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
+	private String[] extractMorphologicalFields(final String line, final Matcher m, final boolean addStemTag, final String word){
+		final int startIndex = StringUtils.indexOfAny(line, ' ', '\t');
+		final String dicMorphologicalFields = (startIndex > 0? line.substring(startIndex + 1): null);
+		//		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		return (!addStemTag || containsStem(mfs)
+		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)
 			? mfs
 			: ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
+		return morphologicalFields;
 	}
 
 	private String expandAliases(final String part, final List<String> aliases){
