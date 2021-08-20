@@ -170,6 +170,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				sleepOnPause();
 			}
 			catch(final Exception e){
+				e.printStackTrace();
+
 				final LinterException le = new LinterException(e.getMessage(), e.getCause(), data);
 				manageException(le);
 

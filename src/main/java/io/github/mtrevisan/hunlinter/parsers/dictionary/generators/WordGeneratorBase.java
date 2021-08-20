@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
@@ -143,11 +142,9 @@ class WordGeneratorBase{
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected Inflection[] getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		@SuppressWarnings("rawtypes")
-		final FixedArray[] allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		final String[][] allAffixes = dictionaryEntryFactory.extractAllAffixes(dicEntry, affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
@@ -171,12 +168,10 @@ class WordGeneratorBase{
 	private void checkTwofoldCorrectness(final Inflection[] twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Inflection prod : twofoldInflections){
-			@SuppressWarnings("rawtypes")
-			final FixedArray[] affixes = prod.extractAllAffixes(affixData, false);
-			@SuppressWarnings("unchecked")
-			final FixedArray<String> aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
-			if(!aff.isEmpty()){
-				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff.data, aff.limit);
+			final String[][] affixes = dictionaryEntryFactory.extractAllAffixes(prod, affixData, false);
+			final String[] aff = affixes[complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES];
+			if(aff != null && aff.length > 0){
+				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
 				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(),
 					prod.getRulesSequence(), overabundantAffixes}));
 			}
@@ -254,27 +249,27 @@ class WordGeneratorBase{
 		return (hasNeedAffixFlag || inflection.hasContinuationFlag(needAffixFlag));
 	}
 
-	private Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final FixedArray<String>[] allAffixes,
-			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final String[][] allAffixes, final boolean isCompound,
+			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final FixedArray<String> appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
-		final FixedArray<String> postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
-		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS].data, circumfixFlag))
-			postponedAffixes.add(circumfixFlag);
+		final String[] appliedAffixes = allAffixes[Affixes.INDEX_PREFIXES];
+		String[] postponedAffixes = allAffixes[Affixes.INDEX_SUFFIXES];
+		if(circumfixFlag != null && ArrayUtils.contains(allAffixes[Affixes.INDEX_TERMINALS], circumfixFlag))
+			postponedAffixes = ArrayUtils.add(postponedAffixes, circumfixFlag);
 
 		Inflection[] inflections = new Inflection[0];
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
-			for(int i = 0; i < appliedAffixes.limit; i ++){
-				final String affix = appliedAffixes.data[i];
+			for(int i = 0; i < appliedAffixes.length; i ++){
+				final String affix = appliedAffixes[i];
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);
 				//override with the given rule
 				if(overriddenRule != null && affix.equals(overriddenRule.getEntries()[0].getFlag()))
 					rule = overriddenRule;
 
-				String[] currentPostponedAffixes = postponedAffixes.extractCopyOrNull();
+				String[] currentPostponedAffixes = ArrayUtils.clone(postponedAffixes);
 				if(dicEntry.getLastAppliedRule() != null
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
 					currentPostponedAffixes = ArrayUtils.removeElement(currentPostponedAffixes, circumfixFlag);
@@ -296,7 +291,7 @@ class WordGeneratorBase{
 			if(affixData.isManagedByCompoundRule(affix))
 				return new Inflection[0];
 
-			final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
+			final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
 			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
 				(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
@@ -347,9 +342,8 @@ class WordGeneratorBase{
 		return false;
 	}
 
-	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final FixedArray<String> appliedAffixes,
-			final String forbiddenWordFlag){
-		return (!appliedAffixes.isEmpty() && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
+	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final String[] appliedAffixes, final String forbiddenWordFlag){
+		return (appliedAffixes != null && appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
 	private boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,

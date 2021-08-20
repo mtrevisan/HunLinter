@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
@@ -142,12 +141,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(!sb.isEmpty() && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					@SuppressWarnings("rawtypes")
-					final FixedArray[] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
+					final String[][] continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
 					if(forbiddenWordFlag == null
-							|| !continuationFlags[Affixes.INDEX_PREFIXES].contains(forbiddenWordFlag)
-							&& !continuationFlags[Affixes.INDEX_SUFFIXES].contains(forbiddenWordFlag)
-							&& !continuationFlags[Affixes.INDEX_TERMINALS].contains(forbiddenWordFlag)){
+							|| !ArrayUtils.contains(continuationFlags[Affixes.INDEX_PREFIXES], forbiddenWordFlag)
+							&& !ArrayUtils.contains(continuationFlags[Affixes.INDEX_SUFFIXES], forbiddenWordFlag)
+							&& !ArrayUtils.contains(continuationFlags[Affixes.INDEX_TERMINALS], forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
 						@SuppressWarnings("unchecked")
 						final Inflection[] newInflections = generateInflections(compoundWord, compoundEntries, continuationFlags);
@@ -189,7 +187,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private Inflection[] generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
-			final FixedArray<String>[] continuationFlags){
+			final String[][] continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
@@ -289,21 +287,18 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	@SuppressWarnings("rawtypes")
-	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
+	private String[][] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
-		@SuppressWarnings("unchecked")
-		final FixedArray<String>[] prefixes = compoundEntries[0]
-			.extractAllAffixes(affixData, false);
-		@SuppressWarnings("unchecked")
-		final FixedArray<String>[] suffixes = compoundEntries[compoundEntries.length - 1]
-			.extractAllAffixes(affixData, false);
-		final FixedArray<String> terminals = new FixedArray<>(String.class, prefixes.length + suffixes.length);
-		terminals.addAll(prefixes[Affixes.INDEX_TERMINALS]);
-		terminals.addAllUnique(suffixes[Affixes.INDEX_TERMINALS]);
+		final String[][] prefixes = dictionaryEntryFactory.extractAllAffixes(compoundEntries[0], affixData, false);
+		final String[][] suffixes = dictionaryEntryFactory.extractAllAffixes(compoundEntries[compoundEntries.length - 1], affixData,
+			false);
+		final SimpleDynamicArray<String> terminals = new SimpleDynamicArray<>(String.class);
+		if(prefixes[Affixes.INDEX_TERMINALS] != null)
+			terminals.addAllUnique(prefixes[Affixes.INDEX_TERMINALS]);
+		if(suffixes[Affixes.INDEX_TERMINALS] != null)
+			terminals.addAllUnique(suffixes[Affixes.INDEX_TERMINALS]);
 		terminals.remove(compoundFlag);
-
-		return new FixedArray[]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals};
+		return new String[][]{prefixes[Affixes.INDEX_PREFIXES], suffixes[Affixes.INDEX_SUFFIXES], terminals.extractCopyOrNull()};
 	}
 
 	private Inflection[] removeTwofolds(Inflection[] prods){

@@ -24,14 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
+import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -44,6 +44,11 @@ import java.util.regex.Pattern;
 
 public class DictionaryEntryFactory{
 
+	public static final int INDEX_PREFIXES = 0;
+	public static final int INDEX_SUFFIXES = 1;
+	public static final int INDEX_TERMINALS = 2;
+
+	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line `{0}`");
 
 	private static final int PARAM_WORD = 1;
@@ -107,11 +112,18 @@ public class DictionaryEntryFactory{
 	}
 
 	private String[] extractMorphologicalFields(final Matcher m, final boolean addStemTag, final String word){
-		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		return (!addStemTag || containsStem(mfs)
-			? mfs
-			: ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
+		final String morphologicalFieldsGroup = m.group(PARAM_MORPHOLOGICAL_FIELDS);
+		final String rawMorphologicalFields = expandAliases(morphologicalFieldsGroup, aliasesMorphologicalField);
+		final String[] mfs = StringUtils.split(rawMorphologicalFields);
+		if(addStemTag && !containsStem(mfs)){
+			final int size = (mfs != null? mfs.length: 0);
+			final String[] augmentedMFs = new String[size + 1];
+			augmentedMFs[0] = MorphologicalTag.STEM.attachValue(word);
+			if(mfs != null)
+				System.arraycopy(mfs, 0, augmentedMFs, 1, size);
+			return augmentedMFs;
+		}
+		return mfs;
 	}
 
 	private String expandAliases(final String part, final List<String> aliases){
@@ -121,7 +133,70 @@ public class DictionaryEntryFactory{
 	}
 
 	private boolean containsStem(final String[] mfs){
-		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
+		final int size = (mfs != null? mfs.length: 0);
+		for(int i = 0; i < size; i ++)
+			if(mfs[i].startsWith(MorphologicalTag.STEM.getCode()))
+				return true;
+		return false;
+	}
+
+	/**
+	 * @param affixData   Affix data
+	 * @param reverse   Whether the complex prefixes is used
+	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if COMPLEXPREFIXES is defined)
+	 */
+	public String[][] extractAllAffixes(final DictionaryEntry entry, final AffixData affixData, final boolean reverse){
+		final String[][] affixes = separateAffixes(entry, affixData);
+		if(reverse){
+			final String[] newPrefixes = affixes[INDEX_SUFFIXES];
+			final String[] newSuffixes = affixes[INDEX_PREFIXES];
+			affixes[INDEX_PREFIXES] = newPrefixes;
+			affixes[INDEX_SUFFIXES] = newSuffixes;
+		}
+		return affixes;
+	}
+
+	/**
+	 * Separate the prefixes from the suffixes and from the terminals
+	 *
+	 * @param affixData	The {@link AffixData}
+	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
+	 */
+	private String[][] separateAffixes(final DictionaryEntry entry, final AffixData affixData){
+		final String[] continuationFlags = entry.getContinuationFlags();
+		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
+		final FixedArray<String> terminals = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> prefixes = new FixedArray<>(String.class, maxSize);
+		final FixedArray<String> suffixes = new FixedArray<>(String.class, maxSize);
+		if(continuationFlags != null)
+			for(final String affix : continuationFlags){
+				if(affixData.isTerminalAffix(affix)){
+					terminals.add(affix);
+					continue;
+				}
+
+				final Object rule = affixData.getData(affix);
+				if(rule == null){
+					if(affixData.isManagedByCompoundRule(affix))
+						continue;
+
+					final AffixEntry[] appliedRules = entry.getAppliedRules();
+					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
+					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
+						(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+				}
+
+				if(rule instanceof RuleEntry){
+					if(((RuleEntry)rule).getType() == AffixType.SUFFIX)
+						suffixes.add(affix);
+					else
+						prefixes.add(affix);
+				}
+				else
+					terminals.add(affix);
+			}
+
+		return new String[][]{prefixes.extractCopyOrNull(), suffixes.extractCopyOrNull(), terminals.extractCopyOrNull()};
 	}
 
 }
