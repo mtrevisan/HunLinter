@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 
@@ -36,6 +37,7 @@ public class WordGenerator{
 
 	public static final int BASE_INFLECTION_INDEX = 0;
 
+	private final DictionaryEntryFactory dictionaryEntryFactory;
 	private final WordGeneratorAffixRules wordGeneratorAffixRules;
 	private final WordGeneratorCompoundRules wordGeneratorCompoundRules;
 	private final WordGeneratorCompoundFlag wordGeneratorCompoundFlag;
@@ -43,6 +45,7 @@ public class WordGenerator{
 
 
 	public WordGenerator(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData, checker);
 		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, this, checker);
 		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, this, checker);
@@ -50,11 +53,11 @@ public class WordGenerator{
 	}
 
 	public DictionaryEntry createFromDictionaryLine(final String line){
-		return DictionaryEntry.createFromDictionaryLine(line, wordGeneratorAffixRules.affixData);
+		return dictionaryEntryFactory.createFromDictionaryLine(line);
 	}
 
 	public DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
-		return DictionaryEntry.createFromDictionaryLineNoStemTag(line, wordGeneratorAffixRules.affixData);
+		return dictionaryEntryFactory.createFromDictionaryLineNoStemTag(line);
 	}
 
 	public Inflection[] applyAffixRules(final DictionaryEntry dicEntry){

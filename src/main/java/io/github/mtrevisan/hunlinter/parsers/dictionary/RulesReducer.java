@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
@@ -78,6 +79,7 @@ public class RulesReducer{
 	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 
 	private final AffixData affixData;
+	protected final DictionaryEntryFactory dictionaryEntryFactory;
 	private final FlagParsingStrategy strategy;
 	private final WordGenerator wordGenerator;
 	private final Comparator<String> comparator;
@@ -88,6 +90,7 @@ public class RulesReducer{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
+		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		this.affixData = affixData;
 		strategy = affixData.getFlagParsingStrategy();
 		this.wordGenerator = wordGenerator;
@@ -764,7 +767,7 @@ public class RulesReducer{
 		final RuleEntry overriddenRule = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
 		overriddenRule.setEntries(entries);
 		for(final String line : originalLines){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 			final Inflection[] originalInflections = wordGenerator.applyAffixRules(dicEntry);
 			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 

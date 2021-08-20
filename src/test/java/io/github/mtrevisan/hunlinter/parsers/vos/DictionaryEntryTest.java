@@ -50,7 +50,8 @@ class DictionaryEntryTest{
 
 
 		String line = "abcdef";
-		DictionaryEntry entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affParser.getAffixData());
+		DictionaryEntry entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abcdef", entry.getWord());
 		Assertions.assertNull(entry.continuationFlags);
@@ -58,7 +59,7 @@ class DictionaryEntryTest{
 
 
 		line = "abcdef/ABC";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
@@ -66,7 +67,7 @@ class DictionaryEntryTest{
 
 
 		line = "abcdef	po:noun";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertNull(entry.continuationFlags);
@@ -74,7 +75,7 @@ class DictionaryEntryTest{
 
 
 		line = "abcdef/ABC	po:noun";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
@@ -82,7 +83,7 @@ class DictionaryEntryTest{
 
 
 		line = "abc\\/def";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abc/def", entry.getWord());
 		Assertions.assertNull(entry.continuationFlags);
@@ -90,7 +91,7 @@ class DictionaryEntryTest{
 
 
 		line = "abc\\/def/ABC";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
@@ -98,7 +99,7 @@ class DictionaryEntryTest{
 
 
 		line = "abc\\/def	po:noun";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertNull(entry.continuationFlags);
@@ -106,7 +107,7 @@ class DictionaryEntryTest{
 
 
 		line = "abc\\/def/ABC	po:noun";
-		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData());
+		entry = dictionaryEntryFactory.createFromDictionaryLine(line);
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);

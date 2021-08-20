@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Affixes;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
@@ -56,12 +57,14 @@ class WordGeneratorBase{
 
 
 	protected final AffixData affixData;
+	protected final DictionaryEntryFactory dictionaryEntryFactory;
 	private final DictionaryCorrectnessChecker checker;
 
 
 	protected WordGeneratorBase(final AffixData affixData, final DictionaryCorrectnessChecker checker){
 		Objects.requireNonNull(affixData);
 
+		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		this.affixData = affixData;
 		this.checker = checker;
 	}

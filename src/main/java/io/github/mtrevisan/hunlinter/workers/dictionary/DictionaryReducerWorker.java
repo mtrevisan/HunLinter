@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -56,9 +57,10 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 			.withCancelOnException();
 
 		Objects.requireNonNull(affixData);
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 
 //TODO
 //			for(final Inflection inflection : inflections){

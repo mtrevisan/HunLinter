@@ -38,6 +38,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -79,12 +80,13 @@ public class StatisticsWorker extends WorkerDictionary{
 
 
 		final AffixData affixData = affParser.getAffixData();
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		final String language = affixData.getLanguage();
 		dicStatistics = new DictionaryStatistics(language, affixData.getCharset());
 		orthography = BaseBuilder.getOrthography(language);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
 

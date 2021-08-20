@@ -29,43 +29,30 @@ import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
-import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
-import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class DictionaryEntry{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line `{0}`");
 	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
 
-	private static final int PARAM_WORD = 1;
-	private static final int PARAM_FLAGS = 2;
-	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	private static final Pattern PATTERN_ENTRY = RegexHelper.pattern("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
-
 	private static final String SLASH = "/";
-	private static final String SLASH_ESCAPED = "\\/";
 	private static final String TAB = "\t";
 	private static final String COMMA = ",";
 
@@ -75,38 +62,6 @@ public class DictionaryEntry{
 	protected final String[] morphologicalFields;
 	private final boolean combinable;
 
-
-	public static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData){
-		return createFromDictionaryLine(line, affixData, true);
-	}
-
-	public static DictionaryEntry createFromDictionaryLineNoStemTag(final String line, final AffixData affixData){
-		return createFromDictionaryLine(line, affixData, false);
-	}
-
-	private static DictionaryEntry createFromDictionaryLine(final String line, final AffixData affixData,
-			final boolean addStemTag){
-		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
-		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
-
-		Objects.requireNonNull(line, "Line cannot be null");
-		Objects.requireNonNull(strategy, "Strategy cannot be null");
-
-		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
-		if(!m.find())
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
-
-		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-		final String[] continuationFlags = strategy.parseFlags(expandAliases(m.group(PARAM_FLAGS), aliasesFlag));
-		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (!addStemTag || containsStem(mfs)? mfs:
-			ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
-		final boolean combinable = true;
-		final String convertedWord = affixData.applyInputConversionTable(word);
-		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
-	}
 
 	DictionaryEntry(final DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry, "Dictionary entry cannot be null");
@@ -126,16 +81,6 @@ public class DictionaryEntry{
 			Arrays.sort(this.continuationFlags);
 		this.morphologicalFields = morphologicalFields;
 		this.combinable = combinable;
-	}
-
-	private static String expandAliases(final String part, final List<String> aliases){
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)
-			? aliases.get(Integer.parseInt(part) - 1)
-			: part);
-	}
-
-	private static boolean containsStem(final String[] mfs){
-		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
 	}
 
 //	public static String extractWord(final String line){

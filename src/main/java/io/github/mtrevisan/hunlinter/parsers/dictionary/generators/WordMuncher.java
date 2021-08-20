@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
@@ -56,6 +57,7 @@ public class WordMuncher{
 
 
 	private final AffixData affixData;
+	protected final DictionaryEntryFactory dictionaryEntryFactory;
 //	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 
@@ -66,6 +68,7 @@ public class WordMuncher{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 //		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 
+		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		this.affixData = affixData;
 //		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
@@ -129,7 +132,7 @@ public class WordMuncher{
 
 	private List<Inflection> extractAllAffixes(final String word, final String partOfSpeech){
 		final List<Inflection> originatingRules = new ArrayList<>();
-		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, affixData);
+		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
 			final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>();
