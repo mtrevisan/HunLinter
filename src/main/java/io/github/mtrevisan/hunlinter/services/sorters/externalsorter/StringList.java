@@ -41,7 +41,7 @@ import java.util.function.Consumer;
  */
 public class StringList implements Iterable<String>{
 
-	/** Shared empty array instance used for empty instances */
+	/** Shared empty array instance used for empty instances. */
 	private static final String[] EMPTY_ELEMENTDATA = {};
 
 	/**
@@ -68,7 +68,7 @@ public class StringList implements Iterable<String>{
 	 */
 	private transient String[] elementData;
 
-	/** The size of the ArrayList (the number of elements it contains) */
+	/** The size of the ArrayList (the number of elements it contains). */
 	private int size;
 
 
@@ -259,7 +259,7 @@ public class StringList implements Iterable<String>{
 		return new StringIterator(this);
 	}
 
-	/** An optimized version of AbstractList.Itr */
+	/** An optimized version of AbstractList.Itr. */
 	public static class StringIterator implements Iterator<String>{
 
 		private final StringList self;

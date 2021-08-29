@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 
-/** Used to hold the subscriber details */
+/** Used to hold the subscriber details. */
 class HandlerInfo{
 
 	private final Class<?> eventClass;

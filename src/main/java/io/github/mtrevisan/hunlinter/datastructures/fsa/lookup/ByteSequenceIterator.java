@@ -50,7 +50,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	/** The FSA to which this iterator belongs. */
 	private final FSA fsa;
 
-	/** An internal cache for the next element in the FSA */
+	/** An internal cache for the next element in the FSA. */
 	private ByteBuffer nextElement;
 
 	/** A buffer for the current sequence of bytes from the current node to the root. */
@@ -58,7 +58,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** An arc stack for DFS when processing the automaton. */
 	private int[] arcs = new int[EXPECTED_MAX_STATES];
-	/** current processing depth in {@link #arcs} */
+	/** current processing depth in {@link #arcs}. */
 	private int arcLimit;
 
 
@@ -126,7 +126,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		return cache;
 	}
 
-	/** Advances to the next available final state */
+	/** Advances to the next available final state. */
 	private ByteBuffer advance(){
 		if(arcLimit == 0)
 			return null;
@@ -164,7 +164,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		return null;
 	}
 
-	/** Descends to a given node, adds its arcs to the stack to be traversed */
+	/** Descends to a given node, adds its arcs to the stack to be traversed. */
 	private void pushNode(final int node){
 		//expand buffers if needed
 		if(arcLimit == arcs.length)
@@ -173,7 +173,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		arcs[arcLimit ++] = fsa.getFirstArc(node);
 	}
 
-	/** Not implemented in this iterator */
+	/** Not implemented in this iterator. */
 	@Override
 	public void remove(){
 		throw new UnsupportedOperationException("Read-only iterator.");

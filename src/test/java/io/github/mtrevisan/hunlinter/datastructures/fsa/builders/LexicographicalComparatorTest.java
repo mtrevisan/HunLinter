@@ -84,7 +84,7 @@ class LexicographicalComparatorTest{
 		FSATestUtils.checkMinimal(fsa);
 	}
 
-	/** Generate a sorted list of random sequences */
+	/** Generate a sorted list of random sequences. */
 	private List<byte[]> generateRandom(int count, int lengthMin, int lengthMax, int alphabetMin, int alphabetMax){
 		final List<byte[]> input = new ArrayList<>();
 		final Random rnd = new Random(System.currentTimeMillis());
@@ -94,7 +94,7 @@ class LexicographicalComparatorTest{
 		return input;
 	}
 
-	/** Generate a random string */
+	/** Generate a random string. */
 	private byte[] randomByteSequence(Random rnd, int lengthMin, int lengthMax, int alphabetMin, int alphabetMax){
 		byte[] bytes = new byte[lengthMin + rnd.nextInt(lengthMax - lengthMin + 1)];
 		for(int i = 0; i < bytes.length; i ++)

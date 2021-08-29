@@ -92,7 +92,7 @@ public final class HeapSort{
 			progressCallback.accept(100);
 	}
 
-	/** Build the heap in array a so that largest value is at the root */
+	/** Build the heap in array a so that largest value is at the root. */
 	private static <T> void buildMaxHeap(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
 			final int progressStep, final Consumer<Integer> progressCallback){
 		int progress = 0;

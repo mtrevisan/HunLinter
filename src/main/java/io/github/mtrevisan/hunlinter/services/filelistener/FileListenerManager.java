@@ -226,7 +226,7 @@ public class FileListenerManager implements FileListener, Runnable{
 		return stopWatching;
 	}
 
-	/** Reset key to allow further events for this key to be processed */
+	/** Reset key to allow further events for this key to be processed. */
 	private boolean resetKey(final WatchKey key, final Path dir){
 		boolean stopWatching = false;
 		final boolean valid = key.reset();

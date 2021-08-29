@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
+/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a>. */
 class WordGeneratorCompoundFlagTest extends TestBase{
 
 	@Test

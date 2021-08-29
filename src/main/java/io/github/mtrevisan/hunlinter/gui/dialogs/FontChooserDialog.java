@@ -347,7 +347,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		return DEFAULT_FONT;
 	}
 
-	/** Create a new Font object to return as the selected font */
+	/** Create a new Font object to return as the selected font. */
 	private boolean createSelectedFont(){
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
@@ -362,7 +362,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		return fontChanged;
 	}
 
-	/** Set the controls to display the initial font */
+	/** Set the controls to display the initial font. */
 	private void setSelectedFont(){
 		setSelectedFontFamily();
 		setSampleFont();

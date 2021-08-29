@@ -52,7 +52,7 @@ import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
-/** Manages pairs of mistyped words and their correct spelling */
+/** Manages pairs of mistyped words and their correct spelling. */
 public class AutoCorrectParser{
 
 	private static final String QUOTATION_MARK = "\"";
@@ -151,7 +151,7 @@ public class AutoCorrectParser{
 		dictionary.remove(selectedRowID);
 	}
 
-	/* Find if there is a duplicate with the same incorrect and correct forms */
+	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
 		final ArrayList<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
 		applyIf(dictionary,
@@ -161,7 +161,7 @@ public class AutoCorrectParser{
 		return duplicates;
 	}
 
-	/* Find if there is a duplicate with the same incorrect and correct forms */
+	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	public boolean contains(final CharSequence incorrect, final CharSequence correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()

@@ -39,7 +39,7 @@ public class RuleEntry{
 
 
 	private final AffixType type;
-	/** ID used to represent the affix */
+	/** ID used to represent the affix. */
 	private final String flag;
 	//cross product flag
 	private final boolean combinable;

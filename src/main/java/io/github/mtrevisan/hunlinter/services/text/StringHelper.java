@@ -43,15 +43,15 @@ public final class StringHelper{
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
-		/** All lower case or neutral case, e.g. "hello java" */
+		/** All lower case or neutral case, e.g. "hello java". */
 		LOWER_CASE,
-		/** Start upper case, rest lower case, e.g. "Hello java" */
+		/** Start upper case, rest lower case, e.g. "Hello java". */
 		TITLE_CASE,
-		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA" */
+		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA". */
 		ALL_CAPS,
-		/** Camel case, start lower case, e.g. "helloJava" */
+		/** Camel case, start lower case, e.g. "helloJava". */
 		CAMEL_CASE,
-		/** Pascal case, start upper case, e.g. "HelloJava" */
+		/** Pascal case, start upper case, e.g. "HelloJava". */
 		PASCAL_CASE
 	}
 

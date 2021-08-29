@@ -34,7 +34,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 
-/** Execute file download in a background thread and update the progress */
+/** Execute file download in a background thread and update the progress. */
 public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperDelegate{
 
 	private final String localPath;

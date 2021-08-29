@@ -167,7 +167,7 @@ class FSATraversalTest{
 	}
 
 
-	/** Return all sequences reachable from a given node, as strings */
+	/** Return all sequences reachable from a given node, as strings. */
 	private HashSet<String> suffixes(FSA fsa, int node){
 		HashSet<String> result = new HashSet<>();
 		for(ByteBuffer bb : fsa.getSequences(node))

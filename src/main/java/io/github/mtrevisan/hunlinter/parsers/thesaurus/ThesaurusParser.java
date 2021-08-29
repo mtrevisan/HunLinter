@@ -166,17 +166,17 @@ public class ThesaurusParser{
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	/* Find if there is a duplicate with the same Part-of-Speech */
+	/** Find if there is a duplicate with the same Part-of-Speech. */
 	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
-	/* Find if there is a duplicate with the same definition and same Part-of-Speech (and also a synonym) */
+	/** Find if there is a duplicate with the same definition and same Part-of-Speech (and also a synonym). */
 	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
 		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 
-	/* Find if there is a duplicate with the same Part-of-Speech and same synonyms */
+	/** Find if there is a duplicate with the same Part-of-Speech and same synonyms. */
 	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}

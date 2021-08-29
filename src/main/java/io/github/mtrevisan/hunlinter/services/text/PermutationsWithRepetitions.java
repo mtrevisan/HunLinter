@@ -140,7 +140,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		return result;
 	}
 
-	/** In num = sum(i=0..k, a[i] * b^i), check if a[i] is equals to a[i - 1] for i = 1..k */
+	/** In {@code num = sum(i=0..k, a[i] * b^i)}, check if {@code a[i]} is equals to {@code a[i - 1] for i = 1..k}. */
 	private boolean hasConsecutiveDuplicates(long decimalNumber, final int radix){
 		int digit = -1;
 		while(decimalNumber != 0l){

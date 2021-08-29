@@ -180,7 +180,7 @@ public final class SmoothSort{
 			progressCallback.accept(100);
 	}
 
-	/** Rebalance the tree using the standard "bubble-down" approach */
+	/** Rebalance the tree using the standard "bubble-down" approach. */
 	private static <T> void sift(final T[] data, int pExponent, int root, final Comparator<? super T> comparator){
 		//loop until the current node has no children, which happens when the order of the tree is 0 or 1
 		while(pExponent > 1){

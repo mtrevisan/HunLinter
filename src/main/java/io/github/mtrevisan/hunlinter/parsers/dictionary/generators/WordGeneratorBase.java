@@ -215,7 +215,7 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	/** Remove rules that invalidate the affix rule */
+	/** Remove rules that invalidate the affix rule. */
 	private Inflection[] enforceNeedAffixFlag(Inflection[] inflections){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null)

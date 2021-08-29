@@ -51,13 +51,13 @@ public class MemoryMappedFileBitArray implements BitArray{
 	private static final String INVALID_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 
-	/** Underlying file that represents the state of the {@link BitArray} */
+	/** Underlying file that represents the state of the {@link BitArray}. */
 	private final RandomAccessFile backingFile;
-	/** The maximum number of elements this file will store */
+	/** The maximum number of elements this file will store. */
 	private final int maxElements;
-	/** The number of bytes being used for this byte-array */
+	/** The number of bytes being used for this byte-array. */
 	private final int numberOfBytes;
-	/** The memory-mapped byte-buffer */
+	/** The memory-mapped byte-buffer. */
 	private MappedByteBuffer buffer;
 
 

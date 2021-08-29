@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/** Default morphological fields */
+/** Default morphological fields. */
 public enum MorphologicalTag{
 
 	STEM("st:"),

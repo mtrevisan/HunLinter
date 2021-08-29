@@ -78,7 +78,7 @@ public class BasicEventBus implements EventBusInterface{
 	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<HandlerInfo> killQueue = new LinkedBlockingQueue<>();
 
-	/** The ExecutorService used to handle event delivery to the event handlers */
+	/** The ExecutorService used to handle event delivery to the event handlers. */
 	private final ExecutorService executorService;
 
 	/**

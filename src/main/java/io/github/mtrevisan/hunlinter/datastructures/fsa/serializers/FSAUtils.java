@@ -58,7 +58,7 @@ public final class FSAUtils{
 		return numbers;
 	}
 
-	/* Returns an n-byte integer encoded in byte-packed representation */
+	/** Returns an n-byte integer encoded in byte-packed representation. */
 	public static int decodeFromBytes(final byte[] arcs, final int start, final int n){
 		int r = 0;
 		for(int i = n; -- i >= 0; )

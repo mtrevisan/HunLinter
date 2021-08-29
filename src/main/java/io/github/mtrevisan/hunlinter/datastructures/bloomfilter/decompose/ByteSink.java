@@ -34,14 +34,14 @@ import java.io.IOException;
  */
 public class ByteSink{
 
-	/** The actual storage stream */
+	/** The actual storage stream. */
 	private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-	/** Wrapper over the byte stream */
+	/** Wrapper over the byte stream. */
 	private final DataOutputStream dataStream = new DataOutputStream(stream);
 
 
 	/**
-	 * Get the byte-array of bytes currently stored
+	 * Get the byte-array of bytes currently stored.
 	 *
 	 * @return	The byte array
 	 */

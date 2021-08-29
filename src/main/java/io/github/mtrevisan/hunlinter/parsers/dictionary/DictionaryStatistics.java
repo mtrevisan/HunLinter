@@ -84,12 +84,12 @@ public class DictionaryStatistics implements Closeable{
 		return longestWordCountBySyllabes;
 	}
 
-	/** @return	The count of unique words */
+	/** @return	The count of unique words. */
 	public int getUniqueWords(){
 		return bloomFilter.getAddedElements();
 	}
 
-	/** @return	The count of compound words */
+	/** @return	The count of compound words. */
 	public int getCompoundWords(){
 		return compoundWords;
 	}

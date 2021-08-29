@@ -288,7 +288,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return nextCompound;
 	}
 
-	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
+	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both. */
 	@SuppressWarnings("rawtypes")
 	private FixedArray[] extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
 			final String compoundFlag){
@@ -340,7 +340,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return (i == -1);
 	}
 
-	/** Merge the distribution with the others */
+	/** Merge the distribution with the others. */
 	protected Map<String, DictionaryEntry[]> mergeDistributions(final Map<String, DictionaryEntry[]> compoundRules,
 			final Map<String, DictionaryEntry[]> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
 		final Collection<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());

@@ -320,7 +320,7 @@ class HyphenationParserTest{
 	}
 
 
-	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
+	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt. */
 	@Test
 	void germanPreReform(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -340,7 +340,7 @@ class HyphenationParserTest{
 		check(parser, "teneriffa", "tenerif", "fa");
 	}
 
-	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
+	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny. */
 	@Test
 	void hungarianSimplifiedDoubleConsonants(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -357,7 +357,7 @@ class HyphenationParserTest{
 		check(parser, "asszonnyal", "asz", "szony", "nyal");
 	}
 
-	/** Dutch: omaatje -> oma-tje */
+	/** Dutch: omaatje -> oma-tje. */
 	@Test
 	void dutch1(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -373,7 +373,7 @@ class HyphenationParserTest{
 		check(parser, "omaatje", "oma", "tje");
 	}
 
-	/** Dutch: omaatje -> oma-tje */
+	/** Dutch: omaatje -> oma-tje. */
 	@Test
 	void dutch2(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -635,7 +635,7 @@ class HyphenationParserTest{
 		check(parser, "=foobara'foobarb-foo_barc\u2019foobard=", "=foobara'foobarb-foo", "_", "barc\u2019foobard=");
 	}
 
-	/** Unicode ligature hyphenation (ffi -> f=fi) */
+	/** Unicode ligature hyphenation (ffi -> f=fi). */
 	@Test
 	void ligature(){
 		Map<String, String> hyphenations = new HashMap<>();

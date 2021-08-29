@@ -35,34 +35,34 @@ import java.util.Comparator;
  */
 public final class ExternalSorterOptions{
 
-	/** Default maximal number of temporary files allowed */
+	/** Default maximal number of temporary files allowed. */
 	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
-	/** Default maximal size of temporary file allowed [B] */
+	/** Default maximal size of temporary file allowed [B]. */
 	public static final int MAX_TEMPORARY_FILE_SIZE_UNLIMITED = -1;
-	/** Default ZIP buffer size [B] */
+	/** Default ZIP buffer size [B]. */
 	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
 
 	private static final String LINE_SEPARATOR_DEFAULT = System.lineSeparator();
 
 
 	private final Charset charset;
-	/** String comparator */
+	/** String comparator. */
 	private final Comparator<String> comparator;
-	/** Whether the duplicate lines should be discarded */
+	/** Whether the duplicate lines should be discarded. */
 	private final boolean removeDuplicates;
-	/** Whether to make a parallel sort */
+	/** Whether to make a parallel sort. */
 	private final boolean sortInParallel;
-	/** Maximum number of temporary files allowed */
+	/** Maximum number of temporary files allowed. */
 	private final int maxTemporaryFiles;
-	/** Maximum size of temporary file allowed [B] */
+	/** Maximum size of temporary file allowed [B]. */
 	private final long maxTemporaryFileSize;
-	/** Whether to use ZIP for temporary files */
+	/** Whether to use ZIP for temporary files. */
 	private final boolean useTemporaryAsZip;
-	/** Whether to use ZIP for output file */
+	/** Whether to use ZIP for output file. */
 	private final boolean writeOutputAsZip;
-	/** ZIP buffer size [B] */
+	/** ZIP buffer size [B]. */
 	private final int zipBufferSize;
-	/** Line separator for output file */
+	/** Line separator for output file. */
 	private final String lineSeparator;
 
 

@@ -37,7 +37,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class WordData{
 
-	/** inflected word form data */
+	/** inflected word form data. */
 	private byte[] word;
 	private byte[] stem;
 	private byte[] tag;
