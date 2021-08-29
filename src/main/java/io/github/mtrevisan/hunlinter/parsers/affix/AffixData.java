@@ -101,6 +101,7 @@ public class AffixData{
 	void clear(){
 		data.clear();
 		terminalAffixes.clear();
+		productableFlags.clear();
 		closed = false;
 	}
 
