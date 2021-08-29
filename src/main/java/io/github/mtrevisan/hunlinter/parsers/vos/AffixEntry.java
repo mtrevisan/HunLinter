@@ -88,8 +88,8 @@ public class AffixEntry{
 	final String[] morphologicalFields;
 
 
-	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag, final FlagParsingStrategy strategy,
-			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
+	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag,
+			final FlagParsingStrategy strategy, final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line, "Line cannot be null");
 		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
@@ -99,7 +99,8 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(cleanedLine, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY), parentFlag}));
+			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY),
+				parentFlag}));
 
 		final AffixType type = AffixType.createFromCode(lineParts[0]);
 		final String flag = lineParts[1];
@@ -139,13 +140,15 @@ public class AffixEntry{
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}), IndexDataPair.of(index, null)));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}),
+						IndexDataPair.of(index, null)));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}), IndexDataPair.of(index, null)));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}),
+						IndexDataPair.of(index, null)));
 			}
 		}
 	}
@@ -206,11 +209,15 @@ public class AffixEntry{
 //			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
 //			|| !containsTerminalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
 		baseMorphFields = LoopHelper.removeIf(baseMorphFields, field ->
-			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-			|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
+			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field)
+				|| MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
+			|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field)
+				|| MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
 
 		//add morphological fields from the applied affix
-		return (parent.getType() == AffixType.SUFFIX? ArrayUtils.addAll(baseMorphFields, ruleMorphFields): ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
+		return (parent.getType() == AffixType.SUFFIX
+			? ArrayUtils.addAll(baseMorphFields, ruleMorphFields)
+			: ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
 	}
 
 	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
@@ -366,7 +373,9 @@ public class AffixEntry{
 			.add(parent.getFlag())
 			.add(removing.isEmpty()? ZERO: removing)
 			.add((appending.isEmpty()? ZERO: appending)
-				+ (continuationFlags != null && continuationFlags.length > 0? SLASH + String.join(StringUtils.EMPTY, continuationFlags): StringUtils.EMPTY))
+				+ (continuationFlags != null && continuationFlags.length > 0
+					? SLASH + String.join(StringUtils.EMPTY, continuationFlags)
+					: StringUtils.EMPTY))
 			.add(condition);
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sj.add(String.join(StringUtils.SPACE, morphologicalFields));
