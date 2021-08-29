@@ -35,7 +35,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
  */
 public final class FSATraversal{
 
-	/** target automaton */
+	/** target automaton. */
 	private final FSA fsa;
 
 

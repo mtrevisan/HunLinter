@@ -40,11 +40,11 @@ public class FSAHeader{
 	private static final int FSA_MAGIC2 = 'f';
 	private static final int FSA_MAGIC3 = 's';
 	private static final int FSA_MAGIC4 = 'a';
-	/** FSA magic (4 bytes) */
+	/** FSA magic (4 bytes). */
 	private static final int FSA_MAGIC = (FSA_MAGIC1 << 24) | (FSA_MAGIC2 << 16) | (FSA_MAGIC3 << 8) | FSA_MAGIC4;
 
 
-	/** FSA version number */
+	/** FSA version number. */
 	private final byte version;
 
 

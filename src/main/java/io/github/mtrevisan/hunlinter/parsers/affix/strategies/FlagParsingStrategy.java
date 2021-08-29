@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 
-/** Abstraction of the process of parsing flags taken from the affix and dic files */
+/** Abstraction of the process of parsing flags taken from the affix and dic files. */
 public abstract class FlagParsingStrategy{
 
 	/** Represents a '?' character in a compound rule. */

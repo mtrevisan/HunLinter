@@ -35,9 +35,9 @@ public class Murmur3HashFunction implements HashFunction{
 
 	private static final long SEED = 0x7F3A21EAl;
 
-	/** Helps convert a byte into its unsigned value */
+	/** Helps convert a byte into its unsigned value. */
 	private static final int UNSIGNED_MASK = 0xFF;
-	/** Helps convert integer to its unsigned value */
+	/** Helps convert integer to its unsigned value. */
 	private static final long UINT_MASK = 0xFFFFFFFFl;
 
 	private static final int X86_32_C1 = 0xCC9E2D51;
@@ -122,7 +122,7 @@ public class Murmur3HashFunction implements HashFunction{
 		return hash;
 	}
 
-	/** Rotate left (for 32 bits) */
+	/** Rotate left (for 32 bits). */
 	private static long rotl32(final long original, final int shift){
 		return ((original << shift) & UINT_MASK) | ((original >>> (32 - shift)) & UINT_MASK);
 	}

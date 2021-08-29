@@ -97,7 +97,7 @@ public final class XMLManager{
 		return doc;
 	}
 
-	/* Transform the DOM Object to an XML File */
+	/** Transform the DOM Object to an XML File. */
 	@SafeVarargs
 	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{

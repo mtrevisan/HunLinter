@@ -51,7 +51,7 @@ import java.util.Map;
  */
 public class DictionaryMetadata{
 
-	/** Default attribute values */
+	/** Default attribute values. */
 	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
 		.frequencyIncluded(false)
 		.ignorePunctuation()
@@ -63,7 +63,7 @@ public class DictionaryMetadata{
 		.supportRunOnWords()
 		.toMap();
 
-	/** Required attributes */
+	/** Required attributes. */
 	private static final EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES =
 		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
 
@@ -78,14 +78,14 @@ public class DictionaryMetadata{
 
 	private Charset charset;
 
-	/** All attributes */
+	/** All attributes. */
 	private final Map<DictionaryAttribute, String> attributes;
 
-	/** Replacement pairs for non-obvious candidate search in a speller dictionary */
+	/** Replacement pairs for non-obvious candidate search in a speller dictionary. */
 	private Map<String, List<String>> replacementPairs = new HashMap<>();
-	/** Conversion pairs for input conversion, for example to replace ligatures */
+	/** Conversion pairs for input conversion, for example to replace ligatures. */
 	private Map<String, String> inputConversion = new HashMap<>();
-	/** Conversion pairs for output conversion, for example to replace ligatures */
+	/** Conversion pairs for output conversion, for example to replace ligatures. */
 	private Map<String, String> outputConversion = new HashMap<>();
 	/**
 	 * Equivalent characters (treated similarly as equivalent chars with and without
@@ -95,13 +95,13 @@ public class DictionaryMetadata{
 	 */
 	private Map<Character, List<Character>> equivalentChars = new HashMap<>();
 
-	/** All "enabled" boolean attributes */
+	/** All "enabled" boolean attributes. */
 	private final EnumMap<DictionaryAttribute, Boolean> boolAttributes = new EnumMap<>(DictionaryAttribute.class);
 
-	/** Sequence encoder */
+	/** Sequence encoder. */
 	private EncoderType encoderType;
 
-	/** Expected metadata file extension */
+	/** Expected metadata file extension. */
 	private static final String METADATA_FILE_EXTENSION = "info";
 
 

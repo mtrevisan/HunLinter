@@ -43,12 +43,12 @@ class IntBlock{
 		return (limit == data.length);
 	}
 
-	/** Increase the space allocated for storing elements */
+	/** Increase the space allocated for storing elements. */
 	void grow(){
 		limit ++;
 	}
 
-	/** Set the last element to null and decrease the space allocated for storing elements */
+	/** Set the last element to null and decrease the space allocated for storing elements. */
 	void shrink(){
 		limit --;
 	}

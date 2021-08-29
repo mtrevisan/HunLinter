@@ -40,7 +40,7 @@ import java.nio.ByteBuffer;
  */
 public interface SequenceEncoderInterface{
 
-	/** Maximum encodable single-byte code */
+	/** Maximum encodable single-byte code. */
 	int REMOVE_EVERYTHING = 255;
 
 

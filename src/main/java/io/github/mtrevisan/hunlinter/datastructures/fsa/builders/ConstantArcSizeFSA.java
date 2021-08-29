@@ -38,27 +38,27 @@ import java.util.Set;
  */
 public class ConstantArcSizeFSA extends FSA{
 
-	/** Size of the target address field (constant for the builder) */
+	/** Size of the target address field (constant for the builder). */
 	public static final int TARGET_ADDRESS_SIZE = 4;
-	/** Size of the flags field (constant for the builder) */
+	/** Size of the flags field (constant for the builder). */
 	private static final int FLAGS_SIZE = 1;
-	/** Size of the label field (constant for the builder) */
+	/** Size of the label field (constant for the builder). */
 	private static final int LABEL_SIZE = 1;
-	/** Size of a single arc structure */
+	/** Size of a single arc structure. */
 	public static final int ARC_SIZE = FLAGS_SIZE + LABEL_SIZE + TARGET_ADDRESS_SIZE;
-	/** Offset of the flags field inside an arc */
+	/** Offset of the flags field inside an arc. */
 	public static final int FLAGS_OFFSET = 0;
-	/** Offset of the label field inside an arc */
+	/** Offset of the label field inside an arc. */
 	public static final int LABEL_OFFSET = FLAGS_SIZE;
-	/** Offset of the address field inside an arc */
+	/** Offset of the address field inside an arc. */
 	public static final int ADDRESS_OFFSET = LABEL_OFFSET + LABEL_SIZE;
 
-	/** A dummy address of the terminal state */
+	/** A dummy address of the terminal state. */
 	static final int TERMINAL_STATE = 0;
 
-	/** An arc flag indicating the arc is last within its state */
+	/** An arc flag indicating the arc is last within its state. */
 	public static final int BIT_ARC_LAST = 0x01;
-	/** An arc flag indicating the target node of an arc corresponds to a final state */
+	/** An arc flag indicating the target node of an arc corresponds to a final state. */
 	public static final int BIT_ARC_FINAL = 0x02;
 
 	/**
@@ -66,7 +66,7 @@ public class ConstantArcSizeFSA extends FSA{
 	 * root or to the terminal state, indicating an empty automaton.
 	 */
 	private final int epsilon;
-	/** FSA data, serialized as a byte array */
+	/** FSA data, serialized as a byte array. */
 	private final byte[] data;
 
 
@@ -101,7 +101,7 @@ public class ConstantArcSizeFSA extends FSA{
 		return data[arc + LABEL_OFFSET];
 	}
 
-	/** Returns the address of an arc */
+	/** Returns the address of an arc. */
 	private int getArcTarget(int arc){
 		arc += ADDRESS_OFFSET;
 		return (data[arc]) << 24

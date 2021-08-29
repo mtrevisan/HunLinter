@@ -41,11 +41,11 @@ import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
  * @see <a href="https://github.com/rupeshmane/scalable-bloom-filter">Scalable Bloom Filtre</a>
  * @see <a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf">DBloom</a>
  *
- * @param <T> the type of object to be stored in the filter
+ * @param <T> the type of object to be stored in the filter.
  */
 public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
-	/** The default {@link Charset} is the platform encoding charset */
+	/** The default {@link Charset} is the platform encoding charset. */
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 

@@ -59,11 +59,11 @@ public class CFSA2Serializer implements FSASerializer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
 
-	/** Supported flags */
+	/** Supported flags. */
 	private static final EnumSet<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
 		FSAFlags.NEXTBIT);
 
-	/** No-state id */
+	/** No-state id. */
 	private static final int NO_STATE = -1;
 
 	private static final Comparator<IntIntHolder> COMPARATOR = (o1, o2) -> {
@@ -79,15 +79,15 @@ public class CFSA2Serializer implements FSASerializer{
 	 */
 	private boolean serializeWithNumbers;
 
-	/** A hash map of [state, offset] pairs */
+	/** A hash map of [state, offset] pairs. */
 	private final IntIntHashMap offsets = new IntIntHashMap();
-	/** A hash map of [state, right-language-count] pairs */
+	/** A hash map of [state, right-language-count] pairs. */
 	private IntIntHashMap numbers;
-	/** The most frequent labels for integrating with the flags field */
+	/** The most frequent labels for integrating with the flags field. */
 	private byte[] labelsIndex;
 	/**
 	 * Inverted index of labels to be integrated with flags field. A label at index <code>i<code> has the index or zero
-	 * (no integration)
+	 * (no integration).
 	 */
 	private int[] invertedLabelsIndex;
 
@@ -156,7 +156,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return os;
 	}
 
-	/** Compute a set of labels to be integrated with the flags field */
+	/** Compute a set of labels to be integrated with the flags field. */
 	private void computeLabelsIndex(final FSA fsa){
 		//compute labels count
 		final int[] countByValue = new int[256];
@@ -181,13 +181,13 @@ public class CFSA2Serializer implements FSASerializer{
 		}
 	}
 
-	/** Return supported flags */
+	/** Return supported flags. */
 	@Override
 	public Set<FSAFlags> getFlags(){
 		return SUPPORTED_FLAGS;
 	}
 
-	/** Linearization of states */
+	/** Linearization of states. */
 	private DynamicIntArray linearize(final FSA fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
@@ -230,7 +230,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return linearized;
 	}
 
-	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets */
+	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets. */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
 			final IntIntHashMap offsets) throws IOException{
 		final BitSet visited = new BitSet();
@@ -263,7 +263,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return j;
 	}
 
-	/** Add a state to linearized list */
+	/** Add a state to linearized list. */
 	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
 										 final BitSet visited, final int node){
 		linearized.add(node);
@@ -276,7 +276,7 @@ public class CFSA2Serializer implements FSASerializer{
 			}
 	}
 
-	/** Compute the set of states that should be linearized first to minimize other states goto length */
+	/** Compute the set of states that should be linearized first to minimize other states goto length. */
 	private int[] computeFirstStates(final Iterable<IntIntCursor> inLinkCount, final int maxStates, final int minInLinkCount){
 		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
@@ -300,7 +300,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return states;
 	}
 
-	/** Compute in-link count for each state */
+	/** Compute in-link count for each state. */
 	private IntIntHashMap computeInLinkCount(final FSA fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
 		final BitSet visited = new BitSet();
@@ -326,7 +326,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return inLinkCount;
 	}
 
-	/** Update arc offsets assuming the given goto length */
+	/** Update arc offsets assuming the given goto length. */
 	private int emitNodes(final FSA fsa, final OutputStream os, final DynamicIntArray linearized) throws IOException{
 		int offset = 0;
 
@@ -357,7 +357,7 @@ public class CFSA2Serializer implements FSASerializer{
 		return (offsetsChanged? offset: 0);
 	}
 
-	/** Emit all arcs of a single node */
+	/** Emit all arcs of a single node. */
 	private int emitNodeArcs(final FSA fsa, final OutputStream os, final int state, final int nextState) throws IOException{
 		int offset = 0;
 		for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc)){
@@ -430,7 +430,7 @@ public class CFSA2Serializer implements FSASerializer{
 		throw new UnsupportedOperationException("CFSA2 does not support separator. Use .info file.");
 	}
 
-	/** Write a v-int to a byte array */
+	/** Write a v-int to a byte array. */
 	private int writeVInt(final byte[] array, int value){
 		if(value < 0)
 			throw new IllegalArgumentException("V-code can't be negative: " + value);

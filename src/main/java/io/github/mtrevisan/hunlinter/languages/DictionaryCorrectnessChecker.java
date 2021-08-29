@@ -73,7 +73,7 @@ public class DictionaryCorrectnessChecker{
 			throw new LinterException(INVALID_CIRCUMFIX_FLAG.format(new Object[]{dicEntry.getWord(), circumfixFlag}));
 	}
 
-	/** Used by the correctness check worker after calling {@link #loadRules()} */
+	/** Used by the correctness check worker after calling {@link #loadRules()}. */
 	public void checkInflection(final Inflection inflection, final int index){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))

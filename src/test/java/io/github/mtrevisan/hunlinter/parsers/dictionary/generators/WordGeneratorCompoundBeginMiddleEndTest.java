@@ -25,7 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 
-/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
+/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a>. */
 class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 
 //FIXME

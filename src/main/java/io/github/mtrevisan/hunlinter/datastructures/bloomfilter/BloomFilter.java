@@ -64,29 +64,29 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
 
-	/** The decomposer to use when there is none specified at construction */
+	/** The decomposer to use when there is none specified at construction. */
 	private final Decomposer<T> DECOMPOSER_DEFAULT = new DefaultDecomposer<>();
-	/** The default hasher to use if one is not specified */
+	/** The default hasher to use if one is not specified. */
 	private static final HashFunction HASHER_DEFAULT = new Murmur3HashFunction();
 
 
-	/** The default {@link Charset} is the platform encoding charset */
+	/** The default {@link Charset} is the platform encoding charset. */
 	private final Charset charset;
-	/** The {@link BitArray} instance that holds the entire data */
+	/** The {@link BitArray} instance that holds the entire data. */
 	private final BitArray bitArray;
-	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
+	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements. */
 	private final int hashFunctions;
 	private final Decomposer<T> decomposer;
-	/** The hashing method to be used for hashing */
+	/** The hashing method to be used for hashing. */
 	private final HashFunction hasher;
-	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
+	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability. */
 	private final int expectedElements;
-	/** The maximum false positive probability rate that the bloom filter can give */
+	/** The maximum false positive probability rate that the bloom filter can give. */
 	private final double falsePositiveProbability;
-	/** Number of bits required for the bloom filter */
+	/** Number of bits required for the bloom filter. */
 	private final int bitsRequired;
 
-	/** Number of elements actually added to the Bloom filter */
+	/** Number of elements actually added to the Bloom filter. */
 	private volatile int addedElements;
 
 

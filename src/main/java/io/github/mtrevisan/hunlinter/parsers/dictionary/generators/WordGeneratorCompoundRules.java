@@ -87,7 +87,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		return applyCompound(entries, limit);
 	}
 
-	/** Extract a map of flag > dictionary entry from input compounds */
+	/** Extract a map of flag > dictionary entry from input compounds. */
 	private Map<String, DictionaryEntry[]> extractCompoundRules(final String[] inputCompounds){
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();

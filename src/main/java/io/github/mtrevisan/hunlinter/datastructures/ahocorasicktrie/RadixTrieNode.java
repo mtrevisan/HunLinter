@@ -52,31 +52,31 @@ import java.util.TreeMap;
  */
 public class RadixTrieNode{
 
-	/** The length of the pattern string is also the depth of this node */
+	/** The length of the pattern string is also the depth of this node. */
 	private final int depth;
 
 	/** The fail function, if there is no match, jumps to this node. */
 	private RadixTrieNode failure;
 
-	/** Record mode string as long as this node is reachable */
+	/** Record mode string as long as this node is reachable. */
 	private Set<Integer> childrenIds;
 
-	/** The goto table, also known as the transfer function. Move to the next node according to the next character of the string */
+	/** The goto table, also known as the transfer function. Move to the next node according to the next character of the string. */
 	private final Map<Character, RadixTrieNode> success = new TreeMap<>();
 
-	/** Corresponding subscript in double array */
+	/** Corresponding subscript in double array. */
 	private int id;
 
 
-	/** Construct a node with a depth of 0 */
+	/** Construct a node with a depth of {@code 0}. */
 	public RadixTrieNode(){
 		this(0);
 	}
 
 	/**
-	 * Construct a node with a depth of depth
+	 * Construct a node with a depth of depth.
 	 *
-	 * @param depth	The depth of this node
+	 * @param depth	The depth of this node.
 	 */
 	public RadixTrieNode(final int depth){
 		this.depth = depth;

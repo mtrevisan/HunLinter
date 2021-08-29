@@ -38,15 +38,15 @@ import java.util.Arrays;
  */
 public class FSABuilder{
 
-	/** A megabyte */
+	/** A megabyte. */
 	private static final int MB = 1024 * 1024;
-	/** Internal serialized FSA buffer expand ratio */
+	/** Internal serialized FSA buffer expand ratio. */
 	private static final int BUFFER_GROWTH_SIZE = 5 * MB;
-	/** Maximum number of labels from a single state */
+	/** Maximum number of labels from a single state. */
 	private static final int MAX_LABELS = 256;
 
 
-	/** Internal serialized FSA buffer expand ratio */
+	/** Internal serialized FSA buffer expand ratio. */
 	private final int bufferGrowthSize;
 	/**
 	 * Holds serialized and mutable states.
@@ -64,12 +64,12 @@ public class FSABuilder{
 	 * Values are addresses of each state's first arc.
 	 */
 	private int[] activePath = new int[0];
-	/** Current length of the active path */
+	/** Current length of the active path. */
 	private int activePathLen;
 
-	/** The next offset at which an arc will be added to the given state on {@link #activePath} */
+	/** The next offset at which an arc will be added to the given state on {@link #activePath}. */
 	private int[] nextArcOffset = new int[0];
-	/** Root state (if negative, the automaton has been built already and cannot be extended) */
+	/** Root state (if negative, the automaton has been built already and cannot be extended). */
 	private int root;
 	/**
 	 * An epsilon state.
@@ -83,7 +83,7 @@ public class FSABuilder{
 	 * Zero reserved for an unoccupied slot.
 	 */
 	private int[] hashSet = new int[2];
-	/** Number of entries currently stored in {@link #hashSet} */
+	/** Number of entries currently stored in {@link #hashSet}. */
 	private int hashSize;
 
 
@@ -203,7 +203,7 @@ public class FSABuilder{
 		return serialized[arc + ConstantArcSizeFSA.LABEL_OFFSET];
 	}
 
-	/** Fills the target state address of an arc */
+	/** Fills the target state address of an arc. */
 	private void setArcTarget(int arc, int state){
 		arc += ConstantArcSizeFSA.ADDRESS_OFFSET + ConstantArcSizeFSA.TARGET_ADDRESS_SIZE;
 		for(int i = 0; i < ConstantArcSizeFSA.TARGET_ADDRESS_SIZE; i ++){
@@ -212,7 +212,7 @@ public class FSABuilder{
 		}
 	}
 
-	/** Returns the address of an arc */
+	/** Returns the address of an arc. */
 	private int getArcTarget(int arc){
 		arc += ConstantArcSizeFSA.ADDRESS_OFFSET;
 		return (serialized[arc]) << 24
@@ -269,7 +269,7 @@ public class FSABuilder{
 		}
 	}
 
-	/** Reallocate and rehash the hash set */
+	/** Reallocate and rehash the hash set. */
 	private void expandAndRehash(){
 		final int[] newHashSet = new int[hashSet.length * 2];
 		final int bucketMask = (newHashSet.length - 1);
@@ -283,7 +283,7 @@ public class FSABuilder{
 		hashSet = newHashSet;
 	}
 
-	/** The total length of the serialized state data (all arcs) */
+	/** The total length of the serialized state data (all arcs). */
 	private int stateLength(final int state){
 		int arc = state;
 		while(!isArcLast(arc))
@@ -291,7 +291,7 @@ public class FSABuilder{
 		return arc - state + ConstantArcSizeFSA.ARC_SIZE;
 	}
 
-	/** Return <code>true</code> if two regions in {@link #serialized} are identical */
+	/** Return <code>true</code> if two regions in {@link #serialized} are identical. */
 	private boolean equivalent(int start1, int start2, int len){
 		if(Math.max(start1, start2) + len > size)
 			return false;
@@ -302,7 +302,7 @@ public class FSABuilder{
 		return true;
 	}
 
-	/** Serialize a given state on the active path */
+	/** Serialize a given state on the active path. */
 	private int serialize(final int activePathIndex){
 		expandBuffers();
 
@@ -315,7 +315,7 @@ public class FSABuilder{
 		return newState;
 	}
 
-	/** Hash code of a fragment of {@link #serialized} array */
+	/** Hash code of a fragment of {@link #serialized} array. */
 	private int hash(int start, final int byteCount){
 		if(byteCount % ConstantArcSizeFSA.ARC_SIZE != 0)
 			throw new IllegalArgumentException("Not an arc multiply: " + byteCount + " mod " + ConstantArcSizeFSA.ARC_SIZE);
@@ -330,7 +330,7 @@ public class FSABuilder{
 		return h;
 	}
 
-	/** Append a new mutable state to the active path */
+	/** Append a new mutable state to the active path. */
 	private void expandActivePath(final int size){
 		if(activePath.length < size){
 			final int p = activePath.length;
@@ -356,7 +356,7 @@ public class FSABuilder{
 		return state;
 	}
 
-	/** Expand internal buffers for the next state */
+	/** Expand internal buffers for the next state. */
 	private void expandBuffers(){
 		if(serialized.length < size + ConstantArcSizeFSA.ARC_SIZE * MAX_LABELS)
 			serialized = Arrays.copyOf(serialized, serialized.length + bufferGrowthSize);

@@ -92,7 +92,7 @@ public class Inflection extends DictionaryEntry{
 		this.compoundEntries = compoundEntries;
 	}
 
-	/* NOTE: used for testing purposes */
+	/* NOTE: used for testing purposes. */
 	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
 			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
 		super(word, (strategy != null && StringUtils.isNotBlank(continuationFlags)

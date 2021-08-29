@@ -668,7 +668,7 @@ public class RulesReducer{
 		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
 	}
 
-	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
+	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
 	private void mergeSimilarRules(final Collection<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
 			entry -> (entry.condition.contains(RegexHelper.GROUP_END)

@@ -37,9 +37,9 @@ import java.util.StringTokenizer;
 public class Version implements Comparable<Version>{
 
 	private static final String DOT = ".";
-	/** A separator that separates the pre-release version from the normal version */
+	/** A separator that separates the pre-release version from the normal version. */
 	private static final String PRE_RELEASE_PREFIX = "-";
-	/** A separator that separates the build metadata from the normal version or the pre-release version */
+	/** A separator that separates the build metadata from the normal version or the pre-release version. */
 	private static final String BUILD_PREFIX = "+";
 
 

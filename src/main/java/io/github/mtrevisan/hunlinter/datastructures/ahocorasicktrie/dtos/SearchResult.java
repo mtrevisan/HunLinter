@@ -35,11 +35,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class SearchResult<V>{
 
-	/** the beginning index, inclusive */
+	/** the beginning index, inclusive. */
 	private final int begin;
-	/** the ending index, exclusive */
+	/** the ending index, exclusive. */
 	private final int end;
-	/** the value assigned to the keyword */
+	/** the value assigned to the keyword. */
 	private final V value;
 
 

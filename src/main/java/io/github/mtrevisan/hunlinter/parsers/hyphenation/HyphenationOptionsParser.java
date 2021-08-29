@@ -35,15 +35,15 @@ import java.util.Set;
 
 public class HyphenationOptionsParser{
 
-	/** minimal hyphenation distance from the left word end */
+	/** minimal hyphenation distance from the left word end. */
 	private static final String MIN_LEFT_HYPHENATION = "LEFTHYPHENMIN";
-	/** minimal hyphenation distance from the right word end */
+	/** minimal hyphenation distance from the right word end. */
 	private static final String MIN_RIGHT_HYPHENATION = "RIGHTHYPHENMIN";
-	/** minimal hyphenation distance from the left compound word boundary */
+	/** minimal hyphenation distance from the left compound word boundary. */
 	private static final String MIN_COMPOUND_LEFT_HYPHENATION = "COMPOUNDLEFTHYPHENMIN";
-	/** minimal hyphenation distance from the right compound word boundary */
+	/** minimal hyphenation distance from the right compound word boundary. */
 	private static final String MIN_COMPOUND_RIGHT_HYPHENATION = "COMPOUNDRIGHTHYPHENMIN";
-	/** comma separated list of characters or character sequences with forbidden hyphenation */
+	/** comma separated list of characters or character sequences with forbidden hyphenation. */
 	private static final String NO_HYPHEN = "NOHYPHEN";
 
 	private static final String NO_HYPHEN_SEPARATOR = ",";

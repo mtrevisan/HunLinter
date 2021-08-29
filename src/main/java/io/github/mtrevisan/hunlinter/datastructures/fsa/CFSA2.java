@@ -114,13 +114,13 @@ import java.util.Set;
  */
 public class CFSA2 extends FSA{
 
-	/** Automaton header version value */
+	/** Automaton header version value. */
 	public static final byte VERSION = (byte)0xC6;
 
-	/** The target node of this arc follows the last arc of the current state (no goto field) */
+	/** The target node of this arc follows the last arc of the current state (no goto field). */
 	public static final int BIT_TARGET_NEXT = 0x80;
 
-	/** The arc is the last one from the current node's arcs list */
+	/** The arc is the last one from the current node's arcs list. */
 	public static final int BIT_LAST_ARC = 0x40;
 
 	/**
@@ -129,16 +129,16 @@ public class CFSA2 extends FSA{
 	 */
 	public static final int BIT_FINAL_ARC = 0x20;
 
-	/** The count of bits assigned to storing an indexed label */
+	/** The count of bits assigned to storing an indexed label. */
 	private static final int LABEL_INDEX_BITS = 5;
 
-	/** Masks only the M bits of a flag byte */
+	/** Masks only the M bits of a flag byte. */
 	private static final int LABEL_INDEX_MASK = (1 << LABEL_INDEX_BITS) - 1;
 
-	/** Maximum size of the labels index */
+	/** Maximum size of the labels index. */
 	public static final int LABEL_INDEX_SIZE = (1 << LABEL_INDEX_BITS) - 1;
 
-	/** Epsilon node's offset */
+	/** Epsilon node's offset. */
 	private static final int EPSILON = 0;
 
 	/**
@@ -148,17 +148,17 @@ public class CFSA2 extends FSA{
 	 */
 	private final byte[] arcs;
 
-	/** Flags for this automaton version */
+	/** Flags for this automaton version. */
 	private final EnumSet<FSAFlags> flags;
 
-	/** Label mapping for M-indexed labels */
+	/** Label mapping for M-indexed labels. */
 	private final byte[] labelMapping;
 
-	/** If <code>true</code> states are prepended with numbers */
+	/** If <code>true</code> states are prepended with numbers. */
 	private final boolean hasNumbers;
 
 
-	/** Reads an automaton from a byte stream */
+	/** Reads an automaton from a byte stream. */
 	CFSA2(final InputStream stream) throws IOException{
 		final DataInputStream in = new DataInputStream(stream);
 
@@ -297,7 +297,7 @@ public class CFSA2 extends FSA{
 			return readVInt(arcs, arc + ((arcs[arc] & LABEL_INDEX_MASK) == 0? 2: 1));
 	}
 
-	/** Read the arc's layout and skip as many bytes, as needed, to skip it */
+	/** Read the arc's layout and skip as many bytes, as needed, to skip it. */
 	private int skipArc(int offset){
 		final int flag = arcs[offset ++];
 
@@ -314,7 +314,7 @@ public class CFSA2 extends FSA{
 		return offset;
 	}
 
-	/** Read a v-int */
+	/** Read a v-int. */
 	private static int readVInt(final byte[] array, int offset){
 		byte b = array[offset];
 		int value = b & 0x7F;
@@ -325,7 +325,7 @@ public class CFSA2 extends FSA{
 		return value;
 	}
 
-	/** Skip a v-int */
+	/** Skip a v-int. */
 	private int skipVInt(int offset){
 		//do nothing
 		while(arcs[offset ++] < 0){}

@@ -52,16 +52,16 @@ public interface DownloadListenerInterface{
 	 */
 	default void validatingFile(final GITFileData fileData, final String localPath){}
 
-	/** Called when the user blocks the downloading process */
+	/** Called when the user blocks the downloading process. */
 	default void stopped(){}
 
-	/** Called when the update process is complete */
+	/** Called when the update process is complete. */
 	default void succeeded(){}
 
 	/**
-	 * Called when the update process failed
+	 * Called when the update process failed.
 	 *
-	 * @param e	Exception that caused the failure
+	 * @param e	Exception that caused the failure.
 	 */
 	default void failed(final Exception e){}
 

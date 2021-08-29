@@ -27,7 +27,7 @@ package io.github.mtrevisan.hunlinter.gui;
 import java.awt.Color;
 
 
-/** @see <a href="http://www.easyrgb.com/en/create.php">Watercolors</a> */
+/** @see <a href="http://www.easyrgb.com/en/create.php">Watercolors</a>. */
 public enum Watercolors{
 	//http://www.color-hex.com/
 	//http://fabrizio.zellini.org/tabella-nomi-e-codici-html-rgb-dei-colori

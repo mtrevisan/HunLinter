@@ -90,7 +90,7 @@ public final class LexicographicalComparator{
 
 		static final Unsafe theUnsafe = getUnsafe();
 
-		/** The offset to the first element in a byte array */
+		/** The offset to the first element in a byte array. */
 		static final int BYTE_ARRAY_BASE_OFFSET = theUnsafe.arrayBaseOffset(byte[].class);
 		static{
 			//fall back to the safer pure java implementation unless we're in
@@ -197,7 +197,7 @@ public final class LexicographicalComparator{
 		}
 	}
 
-	/** Returns the Unsafe-using Comparator, or falls back to the pure-Java implementation if unable to do so */
+	/** Returns the Unsafe-using Comparator, or falls back to the pure-Java implementation if unable to do so. */
 	static Comparator<byte[]> getBestComparator(){
 		try{
 			final Class<?> theClass = Class.forName(UNSAFE_COMPARATOR_NAME);

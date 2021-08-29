@@ -33,14 +33,14 @@ public class JavaBitArray implements BitArray{
 	private static final String WRONG_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 
-	/** The data-set */
+	/** The data-set. */
 	private final long[] data;
 
 
 	/**
-	 * Construct an instance of the {@link JavaBitArray} that can hold the given number of bits
+	 * Construct an instance of the {@link JavaBitArray} that can hold the given number of bits.
 	 *
-	 * @param bits the number of bits this instance can hold
+	 * @param bits the number of bits this instance can hold.
 	 */
 	public JavaBitArray(final long bits){
 		if(bits <= 0)

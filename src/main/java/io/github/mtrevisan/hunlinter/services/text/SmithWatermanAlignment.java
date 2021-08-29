@@ -59,9 +59,9 @@ public class SmithWatermanAlignment{
 	private static final double COST_MISMATCH = -1.;
 	private static final double COST_DELETION = 0.;
 	private static final double COST_INSERTION = 0.;
-	/** must be GAP_OPENING_PENALTY < 0 */
+	/** must be GAP_OPENING_PENALTY < 0. */
 	private static final double GAP_OPENING_PENALTY = -1.;
-	/** must be GAP_OPENING_PENALTY < GAP_EXTENSION_PENALTY < 0*/
+	/** must be GAP_OPENING_PENALTY < GAP_EXTENSION_PENALTY < 0. */
 	private static final double GAP_EXTENSION_PENALTY = -1. / 3.;
 
 

@@ -218,7 +218,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		}
 	}
 
-	/** User cancelled worker */
+	/** User cancelled worker. */
 	public void cancel(){
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 

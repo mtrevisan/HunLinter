@@ -44,16 +44,16 @@ import java.util.Objects;
  */
 public class DictionaryLookup implements Iterable<WordData>{
 
-	/** An FSA used for lookups */
+	/** An FSA used for look-ups. */
 	private final FSATraversal matcher;
 
-	/** An iterator for walking along the final states of the given FSA */
+	/** An iterator for walking along the final states of the given FSA. */
 	private final ByteSequenceIterator finalStatesIterator;
 
-	/** Private internal array of reusable word data objects */
+	/** Private internal array of reusable word data objects. */
 	private final SimpleDynamicArray<WordData> forms = new SimpleDynamicArray<>(WordData.class);
 
-	/** The {@link Dictionary} this lookup is using */
+	/** The {@link Dictionary} this lookup is using. */
 	private final Dictionary dictionary;
 
 	private final SequenceEncoderInterface sequenceEncoder;
@@ -63,7 +63,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * Creates a new object of this class using the given FSA for word lookups
 	 * and encoding for converting characters to bytes.
 	 *
-	 * @param dictionary	The dictionary to use for lookups.
+	 * @param dictionary	The dictionary to use for look-ups.
 	 * @throws IllegalArgumentException	If FSA's root node cannot be acquired (dictionary is empty).
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
@@ -190,7 +190,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 		return sb.toString();
 	}
 
-	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary} */
+	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary}. */
 	@Override
 	public Iterator<WordData> iterator(){
 		return new DictionaryIterator(dictionary, true);

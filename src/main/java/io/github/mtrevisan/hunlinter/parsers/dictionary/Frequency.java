@@ -110,7 +110,7 @@ public class Frequency<T extends Comparable<?>>{
 		return getMode(mostPopular);
 	}
 
-	/** Get the max count first, so we avoid having to recreate the list each time */
+	/** Get the max count first, so we avoid having to recreate the list each time. */
 	private long calculateMostPopularFrequency(){
 		return frequencies.values().stream()
 			.mapToLong(frequency -> frequency)

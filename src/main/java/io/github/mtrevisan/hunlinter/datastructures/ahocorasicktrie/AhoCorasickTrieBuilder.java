@@ -50,17 +50,15 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	private final RadixTrieNode rootNode = new RadixTrieNode();
 	private AhoCorasickTrie<V> trie;
 
-	/**
-	 * Whether the position has been used
-	 */
+	/** Whether the position has been used. */
 	private boolean[] used;
-	/** The allocation size of the dynamic array */
+	/** The allocation size of the dynamic array. */
 	private int allocSize;
-	/** A parameter that controls the memory growth speed of the dynamic array */
+	/** A parameter that controls the memory growth speed of the dynamic array. */
 	private int memoryGrowthSpeed;
-	/** The next position to check for unused memory */
+	/** The next position to check for unused memory. */
 	private int nextCheckPos;
-	/** The size of the key-pair sets */
+	/** The size of the key-pair sets. */
 	private int keySize;
 
 
@@ -157,7 +155,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		}
 	}
 
-	/** Create a failure table for the node with depth > 1 (this is a BFS) */
+	/** Create a failure table for the node with depth {@code > 1} (this is a BFS). */
 	private void constructFailureTable(final Queue<RadixTrieNode> queue){
 		while(!queue.isEmpty()){
 			final RadixTrieNode currentNode = queue.remove();
@@ -207,7 +205,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		insert(siblings);
 	}
 
-	/** Allocate the memory of the dynamic array */
+	/** Allocate the memory of the dynamic array. */
 	private void resize(final int newSize){
 		trie.base = Arrays.copyOf(trie.base, newSize);
 		trie.check = Arrays.copyOf(trie.check, newSize);

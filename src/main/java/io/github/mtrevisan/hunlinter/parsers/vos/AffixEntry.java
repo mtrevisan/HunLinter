@@ -81,12 +81,12 @@ public class AffixEntry{
 
 	private RuleEntry parent;
 
-	/** string to strip */
+	/** string to strip. */
 	private final String removing;
-	/** string to append */
+	/** string to append. */
 	private final String appending;
 	final List<String> continuationFlags;
-	/** condition that must be met before the affix can be applied */
+	/** condition that must be met before the affix can be applied. */
 	private final String condition;
 	final String[] morphologicalFields;
 

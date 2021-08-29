@@ -33,7 +33,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
  */
 public class FSAMatchResult{
 
-	/** The automaton has exactly one match for the input sequence */
+	/** The automaton has exactly one match for the input sequence. */
 	public static final int EXACT_MATCH = 0;
 
 	/**
@@ -70,9 +70,9 @@ public class FSAMatchResult{
 	 * @see #PREFIX_MATCH
 	 */
 	public int kind;
-	/** Input sequence's index, interpretation depends on {@link #kind} */
+	/** Input sequence's index, interpretation depends on {@link #kind}. */
 	public int index;
-	/** Automaton node, interpretation depends on the {@link #kind} */
+	/** Automaton node, interpretation depends on the {@link #kind}. */
 	public int node;
 
 

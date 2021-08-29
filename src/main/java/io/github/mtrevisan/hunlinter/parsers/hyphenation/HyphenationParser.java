@@ -268,7 +268,7 @@ public class HyphenationParser{
 //106 800 B basic trie
 	}
 
-	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
+	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`). */
 	private String convertUnicode(final CharSequence line){
 		final String[] components = RegexHelper.extract(line, PATTERN_ESCAPED_UNICODE);
 		for(int i = 0; i < components.length; i ++)

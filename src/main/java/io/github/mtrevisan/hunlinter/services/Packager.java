@@ -443,7 +443,7 @@ public class Packager{
 		return getFile(KEY_FILE_AUTO_TEXT);
 	}
 
-	/** Go up directories until description.xml or manifest.json is found */
+	/** Go up directories until description.xml or manifest.json is found. */
 	private Path getPackageBaseDirectory(final File affFile){
 		Path parentPath = affFile.toPath().getParent();
 		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML)

@@ -59,7 +59,7 @@ public class FSATestUtils{
 		}
 	}
 
-	/** Check if the DFSA is correct with respect to the given input */
+	/** Check if the DFSA is correct with respect to the given input. */
 	public static void checkCorrect(final List<byte[]> input, final FSA fsa){
 		//(1) All input sequences are in the right language
 		final Set<ByteBuffer> rl = new HashSet<>();
@@ -81,7 +81,7 @@ public class FSATestUtils{
 		Assertions.assertEquals(0, rl.size());
 	}
 
-	/* Drain bytes from a byte buffer to a string */
+	/** Drain bytes from a byte buffer to a string. */
 	public static String toString(ByteBuffer sequence) {
 		byte [] bytes = new byte [sequence.remaining()];
 		sequence.get(bytes);

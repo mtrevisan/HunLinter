@@ -94,12 +94,12 @@ import java.util.Set;
  */
 public class FSA5 extends FSA{
 
-	/** Default filler byte */
+	/** Default filler byte. */
 	public static final byte DEFAULT_FILLER = '_';
-	/** Default annotation byte */
+	/** Default annotation byte. */
 	public static final byte DEFAULT_ANNOTATION = '+';
 
-	/** Automaton version as in the file header */
+	/** Automaton version as in the file header. */
 	public static final byte VERSION = 5;
 
 	/**
@@ -139,20 +139,20 @@ public class FSA5 extends FSA{
 	 */
 	public final int nodeDataLength;
 
-	/** Flags for this automaton version */
+	/** Flags for this automaton version. */
 	private Set<FSAFlags> flags;
 
-	/** Number of bytes each address takes in full, expanded form (goto length) */
+	/** Number of bytes each address takes in full, expanded form (goto length). */
 	public final int gtl;
 
-	/** Filler character */
+	/** Filler character. */
 	public final byte filler;
 
-	/** Annotation character */
+	/** Annotation character. */
 	public final byte annotation;
 
 
-	/** Read and wrap a binary automaton in FSA version 5 */
+	/** Read and wrap a binary automaton in FSA version 5. */
 	FSA5(final InputStream stream) throws IOException{
 		final DataInputStream in = new DataInputStream(stream);
 
@@ -280,7 +280,7 @@ public class FSA5 extends FSA{
 		return (arcs[arc + ADDRESS_OFFSET] & BIT_TARGET_NEXT) != 0;
 	}
 
-	/** Returns the address of the node pointed to by this arc */
+	/** Returns the address of the node pointed to by this . */
 	final int getDestinationNodeOffset(final int arc){
 		if(isNextSet(arc))
 			//the destination node follows this arc in the array
@@ -290,7 +290,7 @@ public class FSA5 extends FSA{
 			return FSAUtils.decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
 	}
 
-	/** Read the arc's layout and skip as many bytes, as needed */
+	/** Read the arc's layout and skip as many bytes, as needed. */
 	private int skipArc(final int offset){
 		return offset + (isNextSet(offset)
 			//label + flags
