@@ -62,7 +62,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -434,16 +433,16 @@ final int iconSize = 17;
 		if(StringUtils.isNotBlank(text)){
 			try{
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
-				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
+				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
 				final InflectionTableModel dm = (InflectionTableModel)table.getModel();
-				dm.setInflections(Arrays.asList(inflections));
+				dm.setInflections(inflections);
 
 				//show first row
 				final Rectangle cellRect = table.getCellRect(0, 0, true);
 				table.scrollRectToVisible(cellRect);
 
-				totalInflectionsValueLabel.setText(Integer.toString(inflections.length));
+				totalInflectionsValueLabel.setText(Integer.toString(inflections.size()));
 
 				//check for correctness
 				int index = 0;

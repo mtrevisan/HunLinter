@@ -57,6 +57,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -107,11 +108,11 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final byte[][] words = new byte[inflections.length][];
-			for(int i = 0; i < inflections.length; i ++)
-				words[i] = StringHelper.getRawBytes(inflections[i].getWord().toLowerCase(Locale.ROOT));
+			final byte[][] words = new byte[inflections.size()][];
+			for(int i = 0; i < inflections.size(); i ++)
+				words[i] = StringHelper.getRawBytes(inflections.get(i).getWord().toLowerCase(Locale.ROOT));
 			encodings.addAll(words);
 
 			sleepOnPause();

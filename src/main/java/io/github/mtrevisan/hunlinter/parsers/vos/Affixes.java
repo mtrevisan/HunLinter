@@ -24,9 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Affixes{
@@ -35,24 +37,23 @@ public class Affixes{
 	public static final int INDEX_SUFFIXES = 1;
 	public static final int INDEX_TERMINALS = 2;
 
-	private final FixedArray<String> prefixes;
-	private final FixedArray<String> suffixes;
-	private final FixedArray<String> terminals;
+	private final List<String> prefixes;
+	private final List<String> suffixes;
+	private final List<String> terminals;
 
 
-	public Affixes(final FixedArray<String> prefixes, final FixedArray<String> suffixes,
-			final FixedArray<String> terminals){
+	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminals){
 		this.prefixes = prefixes;
 		this.suffixes = suffixes;
 		this.terminals = terminals;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public FixedArray[] extractAllAffixes(final boolean reverseAffixes){
-		return new FixedArray[]{
-			(reverseAffixes? suffixes: prefixes),
-			(reverseAffixes? prefixes: suffixes),
-			terminals};
+	public List<List<String>> extractAllAffixes(final boolean reverseAffixes){
+		final List<List<String>> result = new ArrayList<>(3);
+		result.add(reverseAffixes? suffixes: prefixes);
+		result.add(reverseAffixes? prefixes: suffixes);
+		result.add(terminals);
+		return result;
 	}
 
 	@Override

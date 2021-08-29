@@ -31,6 +31,9 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 class AffixEntryTest{
 
@@ -104,9 +107,9 @@ class AffixEntryTest{
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
 
-		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
+		final List<String> combinedFlags = entry.combineContinuationFlags(Arrays.asList("B", "A"));
 
-		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags);
+		Assertions.assertEquals(Arrays.asList("B", "A"), combinedFlags);
 	}
 
 	@Test

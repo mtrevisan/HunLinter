@@ -30,9 +30,11 @@ import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
@@ -47,14 +49,14 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData, checker);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry){
+	List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
-		Inflection[] inflections = applyAffixRules(dicEntry, false, overriddenRule);
+	List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+		final List<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
 
-		inflections = enforceOnlyInCompound(inflections);
+		enforceOnlyInCompound(inflections);
 
 		//convert using output table
 		forEach(inflections,
@@ -67,17 +69,20 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule */
-	private Inflection[] enforceOnlyInCompound(Inflection[] inflections){
+	private void enforceOnlyInCompound(final List<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
-		if(onlyInCompoundFlag != null)
-			inflections = LoopHelper.removeIf(inflections, inflection -> {
+		if(onlyInCompoundFlag != null){
+			final Iterator<Inflection> itr = inflections.iterator();
+			while(itr.hasNext()){
+				final Inflection inflection = itr.next();
 				final boolean hasOnlyInCompoundFlag = inflection.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules,
 					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
-				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
-			});
-		return inflections;
+				if(hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules)
+					itr.remove();
+			}
+		}
 	}
 
 }

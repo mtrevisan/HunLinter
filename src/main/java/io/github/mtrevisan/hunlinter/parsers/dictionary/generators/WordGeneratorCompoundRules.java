@@ -61,7 +61,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @return	The list of inflections for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	List<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		Objects.requireNonNull(compoundRule, "Compound rule cannot be null");
 		if(limit <= 0)
@@ -82,7 +82,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}

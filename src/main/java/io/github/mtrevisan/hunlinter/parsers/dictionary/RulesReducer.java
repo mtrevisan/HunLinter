@@ -40,7 +40,6 @@ import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,12 +104,12 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectInflectionsByFlag(Inflection[] inflections, final String flag, final AffixType type){
-		if(inflections.length > 0)
+	public List<LineEntry> collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
+		if(!inflections.isEmpty())
 			//remove base inflection
-			inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+			inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
 		//collect all inflections that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>(inflections.length);
+		final List<LineEntry> filteredRules = new ArrayList<>(inflections.size());
 		for(final Inflection inflection : inflections){
 			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
@@ -768,8 +767,8 @@ public class RulesReducer{
 		overriddenRule.setEntries(entries);
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
-			final Inflection[] originalInflections = wordGenerator.applyAffixRules(dicEntry);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
+			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
 			final List<LineEntry> filteredOriginalRules = collectInflectionsByFlag(originalInflections, flag, type);
 			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);

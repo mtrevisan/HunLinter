@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -114,19 +113,6 @@ public final class LoopHelper{
 				if(condition.test(node))
 					fun.test(node);
 			}
-	}
-
-
-	public static <T> T[] collectIf(final T[] array, final Predicate<T> condition){
-		final int size = (array != null? array.length: 0);
-		@SuppressWarnings("unchecked")
-		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<T>((Class<T>)array.getClass().getComponentType(), size);
-		for(int i = 0; i < size; i ++){
-			final T elem = array[i];
-			if(condition.test(elem))
-				collect.add(elem);
-		}
-		return collect.extractCopy();
 	}
 
 

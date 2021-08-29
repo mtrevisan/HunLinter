@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -92,7 +93,7 @@ public class WordlistWorker extends WorkerDictionary{
 		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), NEW_LINE));
 		};

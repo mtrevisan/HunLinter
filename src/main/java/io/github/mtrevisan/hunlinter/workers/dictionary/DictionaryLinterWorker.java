@@ -41,8 +41,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +78,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
-			final Collection<Inflection> inflections = new ArrayList<>(Arrays.asList(wordGenerator.applyAffixRules(dicEntry)));
+			final Collection<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 //prefixes after suffixes
 //boolean prefix = false;
 //io.github.mtrevisan.hunlinter.parsers.affix.AffixData affixData = affParser.getAffixData();
@@ -102,7 +100,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 				final Inflection inflection = itr.next();
 				itr.remove();
 				if(inflection.getContinuationFlags() != null)
-					flags.addAll(Arrays.asList(inflection.getContinuationFlags()));
+					flags.addAll(inflection.getContinuationFlags());
 
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());

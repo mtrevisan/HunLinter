@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -39,8 +37,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -58,7 +60,7 @@ public class DictionaryEntry{
 
 
 	protected String word;
-	protected String[] continuationFlags;
+	protected List<String> continuationFlags;
 	protected final String[] morphologicalFields;
 	private final boolean combinable;
 
@@ -72,13 +74,13 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
+	DictionaryEntry(final String word, final List<String> continuationFlags, final String[] morphologicalFields, final boolean combinable){
 		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.word = word;
-		this.continuationFlags = continuationFlags;
+		this.continuationFlags = (continuationFlags != null && !continuationFlags.isEmpty()? continuationFlags: null);
 		if(this.continuationFlags != null)
-			Arrays.sort(this.continuationFlags);
+			this.continuationFlags.sort(Comparator.naturalOrder());
 		this.morphologicalFields = morphologicalFields;
 		this.combinable = combinable;
 	}
@@ -104,12 +106,12 @@ public class DictionaryEntry{
 	public boolean removeContinuationFlag(final String continuationFlagToRemove){
 		boolean removed = false;
 		if(continuationFlagToRemove != null && continuationFlags != null){
-			final int previousSize = continuationFlags.length;
-			continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(continuationFlags), continuationFlagToRemove);
+			final int previousSize = continuationFlags.size();
+			continuationFlags.remove(continuationFlagToRemove);
 
-			removed = (continuationFlags.length != previousSize);
+			removed = (continuationFlags.size() != previousSize);
 
-			if(continuationFlags.length == 0)
+			if(continuationFlags.isEmpty())
 				continuationFlags = null;
 		}
 		return removed;
@@ -123,21 +125,21 @@ public class DictionaryEntry{
 		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
 	}
 
-	public String[] getContinuationFlags(){
+	public List<String> getContinuationFlags(){
 		return continuationFlags;
 	}
 
 	public int getContinuationFlagCount(){
-		return (continuationFlags != null? continuationFlags.length: 0);
+		return (continuationFlags != null? continuationFlags.size(): 0);
 	}
 
 	public boolean hasContinuationFlag(final String flag){
-		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
+		return (continuationFlags != null && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
 	public boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
-			final Set<String> list = SetHelper.setOf(continuationFlags);
+			final Set<String> list = new HashSet<>(continuationFlags);
 			return (LoopHelper.match(flags, Predicate.not(list::add)) != null);
 		}
 		return false;
@@ -168,10 +170,10 @@ public class DictionaryEntry{
 
 	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
 		final Map<String, DictionaryEntry[]> result = new HashMap<>();
-		final int size = (continuationFlags != null? continuationFlags.length: 0);
+		final int size = (continuationFlags != null? continuationFlags.size(): 0);
 		final SimpleDynamicArray<DictionaryEntry> vv = new SimpleDynamicArray<>(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
-			final String cf = continuationFlags[i];
+			final String cf = continuationFlags.get(i);
 			if(affixData.isManagedByCompoundRule(cf)){
 				vv.reset();
 				final DictionaryEntry[] v = result.get(cf);
@@ -246,8 +248,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	@SuppressWarnings("rawtypes")
-	public FixedArray[] extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public List<List<String>> extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -259,10 +260,10 @@ public class DictionaryEntry{
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
-		final int maxSize = (continuationFlags != null? continuationFlags.length: 0);
-		final FixedArray<String> terminals = new FixedArray<>(String.class, maxSize);
-		final FixedArray<String> prefixes = new FixedArray<>(String.class, maxSize);
-		final FixedArray<String> suffixes = new FixedArray<>(String.class, maxSize);
+		final int maxSize = (continuationFlags != null? continuationFlags.size(): 0);
+		final List<String> terminals = new ArrayList<>(maxSize);
+		final List<String> prefixes = new ArrayList<>(maxSize);
+		final List<String> suffixes = new ArrayList<>(maxSize);
 		if(continuationFlags != null){
 			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
@@ -306,7 +307,7 @@ public class DictionaryEntry{
 
 	public String toString(final FlagParsingStrategy strategy){
 		final StringBuilder sb = new StringBuilder(word);
-		if(continuationFlags != null && continuationFlags.length > 0){
+		if(continuationFlags != null && !continuationFlags.isEmpty()){
 			sb.append(SLASH);
 			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
 		}

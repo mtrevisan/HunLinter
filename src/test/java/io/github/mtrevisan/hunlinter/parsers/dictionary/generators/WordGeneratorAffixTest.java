@@ -80,7 +80,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/AÜ";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(8, words.length);
 		//base inflection
@@ -115,7 +116,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/999,54321";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(8, words.length);
 		//base inflections
@@ -149,7 +151,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/A3";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(8, words.length);
 		//base inflections
@@ -184,7 +187,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/zx09";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(8, words.length);
 		//base inflections
@@ -218,7 +222,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(4, words.length);
 		//base inflections
@@ -246,7 +251,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(5, words.length);
 		//base inflections
@@ -276,7 +282,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(4, words.length);
 		//base inflections
@@ -305,7 +312,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/S1P1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(6, words.length);
 		//base inflections
@@ -336,7 +344,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "aa/P1S1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(6, words.length);
 		//base inflections
@@ -370,7 +379,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/ABCDE";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(14, words.length);
 		//base inflections
@@ -423,7 +433,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(2, words.length);
 		//base inflection
@@ -511,7 +522,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "a/ABCDE";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(14, words.length);
 		//base inflection
@@ -548,7 +560,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "ouro/B";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(3, words.length);
 		//base inflection
@@ -574,7 +587,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "ⲟⲩⲣⲟ/B";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(3, words.length);
 		//base inflection
@@ -633,7 +647,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/A";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(2, words.length);
 		//base inflection
@@ -662,7 +677,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/AC";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(9, words.length);
 		//base inflection
@@ -699,7 +715,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "nagy/C";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(4, words.length);
 		//base inflection
@@ -730,7 +747,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "nagy/CX";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(2, words.length);
 		//base inflection
@@ -769,7 +787,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "bark/abe";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(17, words.length);
 		//base inflection
@@ -812,7 +831,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "drink/S	po:noun";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(2, words.length);
 		//base inflection
@@ -825,7 +845,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
 		dicEntry = wordGenerator.createFromDictionaryLine(line);
-		words = wordGenerator.applyAffixRules(dicEntry);
+		words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(6, words.length);
 		//base inflection
@@ -861,7 +882,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo/1";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(4, words.length);
 		//base inflection
@@ -889,7 +911,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "foo\\/bar/AB";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(3, words.length);
 		//base inflection
@@ -914,7 +937,8 @@ class WordGeneratorAffixTest extends TestBase{
 
 		String line = "forbidden/!s";
 		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-		Inflection[] words = wordGenerator.applyAffixRules(dicEntry);
+		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(0, words.length);
 	}

@@ -83,7 +83,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			for(final Inflection inflection : inflections){
 				final String word = inflection.getWord();

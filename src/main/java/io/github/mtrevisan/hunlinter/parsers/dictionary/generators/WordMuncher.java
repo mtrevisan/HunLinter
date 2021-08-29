@@ -33,7 +33,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,15 +111,15 @@ public class WordMuncher{
 					if(originatingWord != null){
 						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-						Inflection[] inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+						final List<Inflection> inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
 						//remove base inflection
-						inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+						inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
 
 						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
-						if(inflections.length != 1)
+						if(inflections.size() != 1)
 							continue;
 
-						final String[] baseInflectionPartOfSpeech = inflections[0].getMorphologicalFieldPartOfSpeech();
+						final String[] baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
 						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
 								|| Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech)))
 							originators.add(originatorEntry);

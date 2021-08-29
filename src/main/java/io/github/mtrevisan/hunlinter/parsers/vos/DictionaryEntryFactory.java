@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -88,7 +89,7 @@ public class DictionaryEntryFactory{
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 
 		final String word = extractWord(m);
-		final String[] continuationFlags = extractContinuationFlags(m);
+		final List<String> continuationFlags = extractContinuationFlags(m);
 		final String[] morphologicalFields = extractMorphologicalFields(m, addStemTag, word);
 
 		final String convertedWord = affixData.applyInputConversionTable(word);
@@ -100,10 +101,11 @@ public class DictionaryEntryFactory{
 		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 	}
 
-	private String[] extractContinuationFlags(final Matcher m){
+	private List<String> extractContinuationFlags(final Matcher m){
 		final String flagsGroup = m.group(PARAM_FLAGS);
 		final String rawFlags = expandAliases(flagsGroup, aliasesFlag);
-		return strategy.parseFlags(rawFlags);
+		final String[] result = strategy.parseFlags(rawFlags);
+		return (result != null? Arrays.asList(result): null);
 	}
 
 	private String[] extractMorphologicalFields(final Matcher m, final boolean addStemTag, final String word){

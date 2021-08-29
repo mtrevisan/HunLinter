@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
+import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
 import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
@@ -43,9 +43,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,7 +85,7 @@ public class AffixEntry{
 	private final String removing;
 	/** string to append */
 	private final String appending;
-	final String[] continuationFlags;
+	final List<String> continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	private final String condition;
 	final String[] morphologicalFields;
@@ -114,7 +117,7 @@ public class AffixEntry{
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
-		continuationFlags = (classes != null && classes.length > 0? classes: null);
+		continuationFlags = (classes != null && classes.length > 0? new ArrayList<>(Arrays.asList(classes)): null);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
@@ -162,22 +165,20 @@ public class AffixEntry{
 	}
 
 	public boolean hasContinuationFlags(){
-		return (continuationFlags != null && continuationFlags.length > 0);
+		return (continuationFlags != null && !continuationFlags.isEmpty());
 	}
 
 	public boolean hasContinuationFlag(final String flag){
-		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
+		return (hasContinuationFlags() && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
-		final int size = (otherContinuationFlags != null? otherContinuationFlags.length: 0)
-			+ (continuationFlags != null? continuationFlags.length: 0);
-		final FixedArray<String> flags = new FixedArray<>(String.class, size);
-		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
+	public List<String> combineContinuationFlags(final List<String> otherContinuationFlags){
+		final Set<String> flags = new ArraySet<>();
+		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)
-			flags.addAllUnique(continuationFlags);
-		return flags.extractCopyOrNull();
+			flags.addAll(continuationFlags);
+		return new ArrayList<>(flags);
 	}
 
 	//FIXME is this documentation updated/true?
@@ -357,7 +358,7 @@ public class AffixEntry{
 		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final StringBuilder sb = new StringBuilder();
-		if(continuationFlags != null && continuationFlags.length > 0){
+		if(continuationFlags != null && !continuationFlags.isEmpty()){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));
 		}
@@ -373,7 +374,7 @@ public class AffixEntry{
 			.add(parent.getFlag())
 			.add(removing.isEmpty()? ZERO: removing)
 			.add((appending.isEmpty()? ZERO: appending)
-				+ (continuationFlags != null && continuationFlags.length > 0
+				+ (continuationFlags != null && !continuationFlags.isEmpty()
 					? SLASH + String.join(StringUtils.EMPTY, continuationFlags)
 					: StringUtils.EMPTY))
 			.add(condition);

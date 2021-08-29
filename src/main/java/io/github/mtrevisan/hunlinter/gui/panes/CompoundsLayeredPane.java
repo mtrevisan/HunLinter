@@ -61,7 +61,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -289,7 +288,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
             //FIXME transfer into ParserManager
-            final Inflection[] words;
+            final List<Inflection> words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
 				final String[] input = StringUtils.split(inputCompounds, '\n');
@@ -301,7 +300,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
             final CompoundTableModel dm = (CompoundTableModel)table.getModel();
-            dm.setInflections(Arrays.asList(words));
+            dm.setInflections(words);
          }
          catch(final Exception e){
             LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);

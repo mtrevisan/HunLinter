@@ -144,7 +144,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				LoopHelper.applyIf(inflections,
 					checker::shouldBeProcessedForMinimalPair,

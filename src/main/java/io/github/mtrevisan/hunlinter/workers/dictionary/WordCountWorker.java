@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -76,9 +77,9 @@ public class WordCountWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			totalInflections.addAndGet(inflections.length);
+			totalInflections.addAndGet(inflections.size());
 			for(final Inflection inflection : inflections)
 				dictionary.add(inflection.getWord());
 		};

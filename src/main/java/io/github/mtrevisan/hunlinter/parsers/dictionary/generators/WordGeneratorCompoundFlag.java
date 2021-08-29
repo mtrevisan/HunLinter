@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of inflections
 	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
 	 */
-	Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
@@ -78,12 +79,12 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		//check if it's possible to compound some words
 		if(inputs.length == 0)
-			return new Inflection[0];
+			return Collections.emptyList();
 
 		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.length, maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -103,24 +104,24 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result.extractCopy();
 	}
 
-	private List<List<Inflection[]>> generateCompounds(final Iterable<int[]> permutations, final DictionaryEntry[] inputs){
-		final Map<Integer, Inflection[]> dicEntries = new HashMap<>();
-		final List<List<Inflection[]>> list = new ArrayList<>();
+	private List<List<List<Inflection>>> generateCompounds(final Iterable<int[]> permutations, final DictionaryEntry[] inputs){
+		final Map<Integer, List<Inflection>> dicEntries = new HashMap<>();
+		final List<List<List<Inflection>>> list = new ArrayList<>();
 		for(final int[] permutation : permutations){
-			final List<Inflection[]> inflections = generateCompound(permutation, dicEntries, inputs);
+			final List<List<Inflection>> inflections = generateCompound(permutation, dicEntries, inputs);
 			if(inflections != null)
 				list.add(inflections);
 		}
 		return list;
 	}
 
-	private List<Inflection[]> generateCompound(final int[] permutation, final Map<Integer, Inflection[]> dicEntries,
+	private List<List<Inflection>> generateCompound(final int[] permutation, final Map<Integer, List<Inflection>> dicEntries,
 			final DictionaryEntry[] inputs){
-		final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
-		final Function<Integer, Inflection[]> integerFunction = idx -> applyAffixRules(inputs[idx], true, null);
+		final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>();
+		final Function<Integer, List<Inflection>> integerFunction = idx -> applyAffixRules(inputs[idx], true, null);
 		for(final int index : permutation){
-			final Inflection[] list = dicEntries.computeIfAbsent(index, integerFunction);
-			if(list.length > 0)
+			final List<Inflection> list = dicEntries.computeIfAbsent(index, integerFunction);
+			if(!list.isEmpty())
 				expandedPermutationEntries.add(list);
 		}
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);

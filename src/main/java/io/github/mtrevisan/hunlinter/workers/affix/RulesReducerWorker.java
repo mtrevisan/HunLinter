@@ -91,7 +91,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		final Collection<LineEntry> originalRules = new ArrayList<>();
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			final List<LineEntry> filteredRules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredRules.isEmpty()){

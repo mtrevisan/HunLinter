@@ -32,6 +32,8 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 
+import java.util.List;
+
 
 public class WordGenerator{
 
@@ -60,23 +62,23 @@ public class WordGenerator{
 		return dictionaryEntryFactory.createFromDictionaryLineNoStemTag(line);
 	}
 
-	public Inflection[] applyAffixRules(final DictionaryEntry dicEntry){
+	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry);
 	}
 
-	public Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 
-	public Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	public List<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
-	public Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	public List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 
-	public Inflection[] applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
+	public List<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		return wordGeneratorCompoundBeginMiddleEnd.applyCompoundBeginMiddleEnd(inputCompounds, limit);
 	}
 

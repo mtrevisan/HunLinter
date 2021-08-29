@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Set;
 
 
@@ -62,6 +63,16 @@ public abstract class FlagParsingStrategy{
 		}
 	}
 
+
+	public String joinFlags(final List<String> flags){
+		if(flags == null || flags.isEmpty())
+			return StringUtils.EMPTY;
+
+		for(int i = 0; i < flags.size(); i ++)
+			validate(flags.get(i));
+
+		return StringUtils.join(flags, StringUtils.EMPTY);
+	}
 
 	/**
 	 * Compose the given array of String into one flag stream

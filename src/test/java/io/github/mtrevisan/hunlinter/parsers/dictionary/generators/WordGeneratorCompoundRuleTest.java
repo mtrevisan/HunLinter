@@ -58,7 +58,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 10)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
@@ -87,7 +88,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
@@ -112,7 +114,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("aa", null, "pa:a st:a pa:a st:a"),
@@ -194,7 +197,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"9/#@",
 			"9th/}{"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("10th", null, "pa:1 st:1 pa:0th st:0th"),
@@ -254,7 +258,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/B",
 			"c/BC"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -284,7 +289,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/bb",
 			"c/bbcc"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -314,7 +320,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"b/2",
 			"c/2,3"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 37)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("bc", null, "pa:b st:b pa:c st:c"),
@@ -363,7 +370,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wX"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5)
+			.toArray(Inflection[]::new);
 
 		Assertions.assertEquals(0, words.length);
 	}
@@ -384,7 +392,8 @@ class WordGeneratorCompoundRuleTest extends TestBase{
 			"arbeits/v",
 			"scheu/wU"
 		};
-		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
+		Inflection[] words = wordGenerator.applyCompoundRules(inputCompounds, line, 5)
+			.toArray(Inflection[]::new);
 
 		Inflection[] expected = new Inflection[]{
 			createInflection("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")

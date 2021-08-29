@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -53,7 +54,7 @@ public class Inflection extends DictionaryEntry{
 	private final DictionaryEntry[] compoundEntries;
 
 
-	public static Inflection createFromCompound(final String word, final String[] continuationFlags,
+	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
 			final DictionaryEntry[] compoundEntries){
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
@@ -65,8 +66,8 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
-			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
-		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+			final DictionaryEntry dicEntry, final List<String> remainingContinuationFlags, final boolean combinable){
+		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
 		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
@@ -83,7 +84,7 @@ public class Inflection extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Inflection(final String word, final String[] continuationFlags, final String[] morphologicalFields,
+	private Inflection(final String word, final List<String> continuationFlags, final String[] morphologicalFields,
 			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
@@ -94,7 +95,7 @@ public class Inflection extends DictionaryEntry{
 	/* NOTE: used for testing purposes */
 	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
 			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
-		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
+		super(word, (strategy != null && continuationFlags != null? Arrays.asList(strategy.parseFlags(continuationFlags)): null),
 			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		this.compoundEntries = compoundEntries;
