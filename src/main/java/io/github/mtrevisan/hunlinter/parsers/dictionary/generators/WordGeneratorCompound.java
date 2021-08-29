@@ -49,6 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
@@ -151,14 +152,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 							&& !continuationFlags.get(Affixes.INDEX_TERMINALS).contains(forbiddenWordFlag)){
 						final String compoundWord = sb.toString();
 						final List<Inflection> newInflections = generateInflections(compoundWord, compoundEntries, continuationFlags);
-						final List<Inflection> subInflections = newInflections.subList(0, Math.min(limit - inflections.size(),
-							newInflections.size()));
-						inflections.addAll(subInflections);
+
+						inflections.addAll(newInflections);
+						if(inflections.size() > limit)
+							break;
 					}
 				}
 
 
-				completed = (inflections.size() == limit || getNextTuple(indexes, entry));
+				completed = (inflections.size() >= limit || getNextTuple(indexes, entry));
 			}
 		}
 
@@ -294,14 +296,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			.extractAllAffixes(affixData, false);
 		final List<List<String>> suffixes = compoundEntries[compoundEntries.length - 1]
 			.extractAllAffixes(affixData, false);
-		final Set<String> terminals = new ArraySet<>();
+		final Set<String> terminals = new TreeSet<>();
 		terminals.addAll(prefixes.get(Affixes.INDEX_TERMINALS));
 		terminals.addAll(suffixes.get(Affixes.INDEX_TERMINALS));
-		terminals.remove(compoundFlag);
+		if(compoundFlag != null)
+			terminals.remove(compoundFlag);
 
 		final List<List<String>> result = new ArrayList<>(3);
 		result.add(prefixes.get(Affixes.INDEX_PREFIXES));
-		result.add(prefixes.get(Affixes.INDEX_SUFFIXES));
+		result.add(suffixes.get(Affixes.INDEX_SUFFIXES));
 		result.add(new ArrayList<>(terminals));
 		return result;
 	}
