@@ -46,8 +46,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class DictionaryInclusionTestWorker extends WorkerDictionary{
 
@@ -76,7 +74,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, prod -> dictionary.add(prod.getWord()));
+			for(final Inflection prod : inflections)
+				dictionary.add(prod.getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 

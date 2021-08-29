@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * A simple data structure to store recent items (e.g. recent file in a menu or recent search text in a search dialog).
@@ -110,7 +108,8 @@ public class RecentItems{
 	}
 
 	private void update(){
-		forEach(observers, observer -> observer.onRecentItemChange(this));
+		for(final RecentItemsObserver observer : observers)
+			observer.onRecentItemChange(this);
 
 		storeToPreferences();
 	}

@@ -65,8 +65,6 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 //TODO https://github.com/mtrevisan/hunspell-stemmer/blob/master/src/hunspell_stemmer/Dictionary.java
 public final class FileHelper{
@@ -162,7 +160,8 @@ public final class FileHelper{
 		}
 
 		final StringJoiner sj = new StringJoiner(", ");
-		forEach(HUNSPELL_CHARSETS, charset -> sj.add(charset.name()));
+		for(final Charset charset : HUNSPELL_CHARSETS)
+			sj.add(charset.name());
 		final String charsets = sj.toString();
 		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
 	}

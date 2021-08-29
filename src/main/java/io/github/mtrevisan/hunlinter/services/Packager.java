@@ -47,6 +47,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +61,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -200,8 +200,9 @@ public class Packager{
 			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
 				+ ", cannot load project");
 
-		forEach(extractFileEntries(mainManifestPath.toFile()),
-			configurationFile -> manifestFiles.add(Paths.get(projectPath.toString(), RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile()));
+		final List<String> collection = extractFileEntries(mainManifestPath.toFile());
+		for(final String configurationFile : collection)
+			manifestFiles.add(Paths.get(projectPath.toString(), RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile());
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
@@ -306,7 +307,9 @@ public class Packager{
 		if(node != null){
 			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
 			final Set<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
-			forEach(configurationFiles.values(), f -> uniqueFolders.add(f.toString()));
+			final Collection<File> collection = configurationFiles.values();
+			for(final File f : collection)
+				uniqueFolders.add(f.toString());
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
 					+ StringUtils.join(configurationFiles));

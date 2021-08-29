@@ -42,9 +42,7 @@ import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.function.Consumer;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -111,9 +109,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public Set<String> getSynonymsSet(){
 		final Set<String> set = new HashSet<>(synonyms.size());
-		final Consumer<String> add = set::add;
 		for(final SynonymsEntry synonym : synonyms)
-			forEach(synonym.getSynonyms(), add);
+			set.addAll(synonym.getSynonyms());
 		return set;
 	}
 
@@ -167,7 +164,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	@Override
 	public String toString(){
 		final StringJoiner sj = new StringJoiner("\r\n");
-		forEach(synonyms, synonym -> sj.add(definition + ": " + String.join(", ", synonym.toString())));
+		for(final SynonymsEntry synonym : synonyms)
+			sj.add(definition + ": " + String.join(", ", synonym.toString()));
 		return sj.toString();
 	}
 

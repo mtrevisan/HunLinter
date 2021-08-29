@@ -69,9 +69,6 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.prefs.Preferences;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class DictionaryLayeredPane extends JLayeredPane{
 
@@ -212,16 +209,25 @@ final int iconSize = 17;
             final String inflection = (String)model.getValueAt(row, 0);
             final String morphologicalFields = (String)model.getValueAt(row, 1);
             final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
-            .map(AffixEntry::toString)
-            .orElse(null);
+					.map(AffixEntry::toString)
+					.orElse(null);
             final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
-            .map(AffixEntry::toString)
-            .orElse(null);
+					.map(AffixEntry::toString)
+					.orElse(null);
             final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
-            .map(AffixEntry::toString)
-            .orElse(null);
+					.map(AffixEntry::toString)
+					.orElse(null);
             final StringJoiner sj = new StringJoiner(TAB);
-            applyIf(new String[]{inflection, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
+				if(Objects.nonNull(inflection))
+					sj.add(inflection);
+				if(Objects.nonNull(morphologicalFields))
+					sj.add(morphologicalFields);
+				if(Objects.nonNull(rule1))
+					sj.add(rule1);
+				if(Objects.nonNull(rule2))
+					sj.add(rule2);
+				if(Objects.nonNull(rule3))
+					sj.add(rule3);
             return sj.toString();
          }
       };
@@ -369,7 +375,8 @@ final int iconSize = 17;
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			ruleFlagsAidComboBox.removeAllItems();
-			forEach(lines, ruleFlagsAidComboBox::addItem);
+			for(final String line : lines)
+				ruleFlagsAidComboBox.addItem(line);
 			//enable combo-box only if an AID file exists
 			final boolean aidLinesPresent = !lines.isEmpty();
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);

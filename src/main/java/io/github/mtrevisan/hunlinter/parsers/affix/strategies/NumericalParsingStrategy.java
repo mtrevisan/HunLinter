@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -71,7 +70,9 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 
 		checkForDuplicates(flags);
 
-		LoopHelper.forEach(flags, this::validate);
+		final int size = (flags != null? flags.length: 0);
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
 
 		return flags;
 	}

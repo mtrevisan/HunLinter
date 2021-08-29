@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -105,10 +104,12 @@ public class RadixTrieNode{
 	/**
 	 * Add some matching pattern strings
 	 *
-	 * @param childrenIds	Id of the children to add
+	 * @param childrenIds	Id of the children to add.
 	 */
 	public void addChildrenIds(final Iterable<Integer> childrenIds){
-		LoopHelper.forEach(childrenIds, this::addChildrenId);
+		if(childrenIds != null)
+			for(final Integer id : childrenIds)
+				addChildrenId(id);
 	}
 
 	/**

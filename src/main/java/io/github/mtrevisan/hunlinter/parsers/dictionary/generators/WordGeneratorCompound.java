@@ -52,8 +52,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{
 
@@ -169,7 +167,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		applyOutputConversions(inflections, forceCompoundUppercaseFlag);
 
 		if(LOGGER.isTraceEnabled())
-			forEach(inflections, inflection -> LOGGER.trace("Inflected word: {}", inflection));
+			for(final Inflection inflection : inflections)
+				LOGGER.trace("Inflected word: {}", inflection);
 
 		return limitResponse(inflections, limit);
 	}

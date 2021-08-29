@@ -32,7 +32,6 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.HammingDistance;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -145,10 +144,9 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
-
-				LoopHelper.applyIf(inflections,
-					checker::shouldBeProcessedForMinimalPair,
-					inflection -> list.add(inflection.getWord()));
+				for(final Inflection inflection : inflections)
+					if(checker.shouldBeProcessedForMinimalPair(inflection))
+						list.add(inflection.getWord());
 			}
 			catch(final LinterException e){
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
@@ -168,7 +166,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private void writeSupportFile(final File file, final Iterable<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
-			LoopHelper.forEach(list, line -> writeLine(writer, line, NEW_LINE));
+			for(final String line : list)
+				writeLine(writer, line, NEW_LINE);
 		}
 		catch(final Exception e){
 			throw new RuntimeException(e);

@@ -30,7 +30,6 @@ import java.util.Deque;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -135,12 +134,14 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized void clear(){
-		forEach(filters, BloomFilterInterface::clear);
+		for(final BloomFilterInterface<T> filter : filters)
+			filter.clear();
 	}
 
 	@Override
 	public synchronized void close(){
-		forEach(filters, BloomFilterInterface::close);
+		for(final BloomFilterInterface<T> filter : filters)
+			filter.close();
 	}
 
 }

@@ -57,8 +57,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
 
@@ -239,7 +237,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		JavaHelper.executeOnEventDispatchThread(() -> {
 			ruleComboBox.removeAllItems();
-			forEach(affixEntries, ruleComboBox::addItem);
+			for(final String elem : affixEntries)
+				ruleComboBox.addItem(elem);
 		});
 
 		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())

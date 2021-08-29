@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class Inflection extends DictionaryEntry{
 
@@ -184,7 +182,9 @@ public class Inflection extends DictionaryEntry{
 
 	public String getRulesSequence(){
 		final StringJoiner sj = new StringJoiner(LEADS_TO);
-		forEach(appliedRules, rule -> sj.add(rule.getFlag()));
+		if(appliedRules != null)
+			for(final AffixEntry rule : appliedRules)
+				sj.add(rule.getFlag());
 		return sj.toString();
 	}
 

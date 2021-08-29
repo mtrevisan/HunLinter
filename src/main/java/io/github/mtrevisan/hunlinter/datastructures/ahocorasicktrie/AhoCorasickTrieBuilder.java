@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
@@ -105,8 +103,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			fakeNode.addChildrenId(parent.getLargestChildrenId());
 			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 		}
-		LoopHelper.forEach(parent.getSuccess().entrySet(),
-			entry -> siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue())));
+		for(final Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
+			siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
 		return siblings.size();
 	}
 

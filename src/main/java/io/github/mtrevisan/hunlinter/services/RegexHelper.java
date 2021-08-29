@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public final class RegexHelper{
 
@@ -147,11 +145,13 @@ public final class RegexHelper{
 
 	public static <V> String mergeSet(final Collection<V> set, final Comparator<String> comparator){
 		final List<String> list = new ArrayList<>(set.size());
-		forEach(set, v -> list.add(String.valueOf(v)));
+		for(final V v : set)
+			list.add(String.valueOf(v));
 		list.sort(comparator);
 
 		final StringBuilder sb = new StringBuilder();
-		forEach(list, sb::append);
+		for(final String elem : list)
+			sb.append(elem);
 		return sb.toString();
 	}
 

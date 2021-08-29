@@ -52,8 +52,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -169,7 +167,9 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	private void addFilePatterns(final FileChangeListener listener, final String[] patterns){
 		final Set<PathMatcher> filePatterns = SetHelper.newConcurrentSet();
-		forEach(patterns, pattern -> filePatterns.add(matcherForExpression(pattern)));
+		if(patterns != null)
+			for(final String pattern : patterns)
+				filePatterns.add(matcherForExpression(pattern));
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
 			filePatterns.add(matcherForExpression(ASTERISK));
@@ -271,9 +271,11 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
 		final Set<FileChangeListener> set = new HashSet<>();
-		applyIf(getListeners(dir),
-			list -> matchesAny(file, getPatterns(list)),
-			set::add);
+		final Set<FileChangeListener> listeners = getListeners(dir);
+		for(final FileChangeListener listener : listeners){
+			if(matchesAny(file, getPatterns(listener)))
+				set.add(listener);
+		}
 		return set;
 	}
 

@@ -48,8 +48,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class WordlistWorker extends WorkerDictionary{
 
@@ -95,7 +93,8 @@ public class WordlistWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), NEW_LINE));
+			for(final Inflection inflection : inflections)
+				writeLine(writer, toString.apply(inflection), NEW_LINE);
 		};
 
 		getWorkerData()

@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -113,9 +112,9 @@ public class LineEntry implements Serializable{
 	public List<String> extractFromEndingWith(final String suffix){
 		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
 		final ArrayList<String> list = new ArrayList<>(from.size());
-		LoopHelper.applyIf(from,
-			word -> RegexHelper.find(word, conditionPattern),
-			list::add);
+		for(final String word : from)
+			if(RegexHelper.find(word, conditionPattern))
+				list.add(word);
 		list.trimToSize();
 		return list;
 	}
@@ -131,11 +130,11 @@ public class LineEntry implements Serializable{
 	public LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
 		final Set<String> reversedAddition = new HashSet<>(addition.size());
-		LoopHelper.forEach(addition, add -> {
+		for(final String add : addition){
 			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
-		});
+		}
 		final String reversedCondition = SEQUENCER_REGEXP
 			.toString(SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());

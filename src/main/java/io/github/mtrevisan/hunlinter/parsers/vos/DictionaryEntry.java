@@ -192,11 +192,12 @@ public class DictionaryEntry{
 		distribution.put(compoundBeginFlag, new DictionaryEntry[0]);
 		distribution.put(compoundMiddleFlag, new DictionaryEntry[0]);
 		distribution.put(compoundEndFlag, new DictionaryEntry[0]);
-		LoopHelper.forEach(continuationFlags, flag -> {
-			final DictionaryEntry[] entries = distribution.get(flag);
-			if(entries != null)
-				distribution.put(flag, ArrayUtils.add(entries, this));
-		});
+		if(continuationFlags != null)
+			for(final String flag : continuationFlags){
+				final DictionaryEntry[] entries = distribution.get(flag);
+				if(entries != null)
+					distribution.put(flag, ArrayUtils.add(entries, this));
+			}
 		return distribution;
 	}
 
@@ -239,7 +240,9 @@ public class DictionaryEntry{
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){
-		LoopHelper.forEach(morphologicalFields, fun);
+		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		for(int i = 0; i < size; i ++)
+			fun.accept(morphologicalFields[i]);
 	}
 
 	/**

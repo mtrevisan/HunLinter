@@ -55,8 +55,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public final class XMLManager{
 
@@ -103,7 +101,9 @@ public final class XMLManager{
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		forEach(properties, property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
+		if(properties != null)
+			for(final Pair<String, String> property : properties)
+				transformer.setOutputProperty(property.getKey(), property.getValue());
 		final Source domSource = new DOMSource(doc);
 		final Result streamResult = new StreamResult(xmlFile);
 		transformer.transform(domSource, streamResult);

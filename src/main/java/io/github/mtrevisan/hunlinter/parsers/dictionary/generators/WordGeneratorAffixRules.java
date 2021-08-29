@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.List;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -59,11 +58,12 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		enforceOnlyInCompound(inflections);
 
 		//convert using output table
-		forEach(inflections,
-			inflection -> inflection.applyOutputConversionTable(affixData::applyOutputConversionTable));
+		for(final Inflection inflection : inflections)
+			inflection.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			forEach(inflections, inflection -> LOGGER.trace("Inflected word: {}", inflection));
+			for(final Inflection inflection : inflections)
+				LOGGER.trace("Inflected word: {}", inflection);
 
 		return inflections;
 	}

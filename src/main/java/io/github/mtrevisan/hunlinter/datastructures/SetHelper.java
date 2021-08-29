@@ -42,8 +42,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public final class SetHelper{
 
@@ -113,7 +111,9 @@ public final class SetHelper{
 	 */
 	public static <T> Set<T> union(final Iterable<Set<T>> sets){
 		final Set<T> union = new HashSet<>();
-		forEach(sets, union::addAll);
+		if(sets != null)
+			for(final Set<T> elem : sets)
+				union.addAll(elem);
 		return union;
 	}
 

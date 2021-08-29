@@ -45,8 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 class WordGeneratorBase{
 
@@ -132,9 +130,8 @@ class WordGeneratorBase{
 	private void printInflections(final String title, final List<Inflection> inflections){
 		if(LOGGER.isDebugEnabled() && !inflections.isEmpty()){
 			LOGGER.debug(title);
-			forEach(inflections,
-				inflection -> LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()),
-				inflection.getRulesSequence()));
+			for(final Inflection inflection : inflections)
+				LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()), inflection.getRulesSequence());
 		}
 	}
 

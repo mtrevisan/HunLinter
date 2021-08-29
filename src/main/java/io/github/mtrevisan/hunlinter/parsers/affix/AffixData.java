@@ -50,8 +50,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -152,7 +150,8 @@ public class AffixData{
 
 	private List<String> getStringData(final Collection<AffixOption> keys){
 		final List<String> strings = new ArrayList<>(keys.size());
-		forEach(keys, key -> strings.add(getData(key)));
+		for(final AffixOption key : keys)
+			strings.add(getData(key));
 		return strings;
 	}
 
@@ -386,10 +385,9 @@ public class AffixData{
 
 	public List<RuleEntry> getRuleEntries(){
 		final ArrayList<RuleEntry> list = new ArrayList<>(data.size());
-		applyIf(data.values(),
-			entry -> RuleEntry.class.isAssignableFrom(entry.getClass()),
-			entry -> list.add((RuleEntry)entry));
-		list.trimToSize();
+		for(final Object entry : data.values())
+			if(RuleEntry.class.isAssignableFrom(entry.getClass()))
+				list.add((RuleEntry)entry);
 		return list;
 	}
 

@@ -39,8 +39,6 @@ import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class ThesaurusMergeDialog extends JDialog{
 
@@ -67,7 +65,8 @@ public class ThesaurusMergeDialog extends JDialog{
 
 		GUIHelper.addUndoManager(mergerTextArea);
 
-		forEach(synonymsEntries, entry -> lineComboBox.addItem(entry.toString()));
+		for(final SynonymsEntry entry : synonymsEntries)
+			lineComboBox.addItem(entry.toString());
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

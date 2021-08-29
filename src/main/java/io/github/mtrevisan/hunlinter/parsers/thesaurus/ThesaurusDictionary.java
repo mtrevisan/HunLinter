@@ -67,15 +67,17 @@ public class ThesaurusDictionary{
 
 	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
-		LoopHelper.forEach(partOfSpeeches, sj::add);
+		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
+		for(int i = 0; i < size; i ++)
+			sj.add(partOfSpeeches[i]);
 		final String wholePartOfSpeeches = sj.toString();
 		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
 		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
-		LoopHelper.forEach(synonyms, synonym -> {
-			final String s = synonym.toLowerCase(Locale.ROOT);
+		for(int i = 0; i < synonyms.length; i ++){
+			final String s = synonyms[i].toLowerCase(Locale.ROOT);
 			if(uniqueValues.add(s))
 				uniqueSynonyms.add(s);
-		});
+		}
 
 		boolean result = false;
 		for(String currentDefinition : uniqueSynonyms){
@@ -103,9 +105,9 @@ public class ThesaurusDictionary{
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		LoopHelper.applyIf(synonyms,
-			synonym -> !synonym.equals(definition),
-			sj::add);
+		for(final String synonym : synonyms)
+			if(!synonym.equals(definition))
+				sj.add(synonym);
 		return new SynonymsEntry(sj.toString());
 	}
 
@@ -175,9 +177,9 @@ public class ThesaurusDictionary{
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
-		LoopHelper.applyIf(dictionary.values(),
-			entry -> entry.intersects(pos, syns),
-			list::add);
+		for(final ThesaurusEntry entry : dictionary.values())
+			if(entry.intersects(pos, syns))
+				list.add(entry);
 		return list;
 	}
 

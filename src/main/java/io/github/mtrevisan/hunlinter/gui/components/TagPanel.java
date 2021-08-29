@@ -40,8 +40,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class TagPanel extends JPanel{
 
@@ -98,10 +96,10 @@ public class TagPanel extends JPanel{
 			if(tags == null)
 				removeAll();
 			else
-				forEach(tags, tag -> {
+				for(final String tag : tags){
 					final JTagComponent component = new JTagComponent(tag, this::removeTag);
 					add(component, BorderLayout.LINE_END);
-				});
+				}
 
 			forceRepaint();
 		}

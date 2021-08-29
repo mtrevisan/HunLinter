@@ -43,8 +43,6 @@ import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * @see <a href="https://github.com/Dgleish/ExternalSort/blob/master/src/uk/ac/cam/amd96/fjava/tick0/ExternalSort.java">DGleish External Sort</a>
@@ -196,7 +194,8 @@ public class ExternalSorter{
 		if(options.isWriteOutputAsZip())
 			out = new MyGZIPOutputStream(out, options);
 		mergeSortedFiles(out, options, queue);
-		forEach(files, File::delete);
+		for(final File file : files)
+			file.delete();
 	}
 
 	/**

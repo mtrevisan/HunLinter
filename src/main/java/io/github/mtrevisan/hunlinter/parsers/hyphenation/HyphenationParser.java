@@ -57,8 +57,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non-standard hyphenation extension.
@@ -141,7 +139,8 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>(0)));
+		for(final Level level : Level.values())
+			REDUCED_PATTERNS.put(level, new HashSet<>(0));
 	}
 
 	private final Comparator<String> comparator;
@@ -174,7 +173,8 @@ public class HyphenationParser{
 		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		forEach(Level.values(), level -> this.patterns.put(level, patterns.get(level)));
+		for(final Level level : Level.values())
+			this.patterns.put(level, patterns.get(level));
 		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new EnumMap<>(Level.class));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
@@ -260,7 +260,8 @@ public class HyphenationParser{
 		}
 
 		//build tries
-		forEach(Level.values(), lev -> buildTrie(lev, rules.get(lev)));
+		for(final Level lev : Level.values())
+			buildTrie(lev, rules.get(lev));
 
 		secondLevelPresent = (level == Level.COMPOUND);
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
@@ -338,10 +339,13 @@ public class HyphenationParser{
 	public void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
-		forEach(Level.values(), lev -> rules.get(lev).clear());
+		for(final Level lev : Level.values())
+			rules.get(lev).clear();
 		patterns.clear();
-		forEach(Level.values(), lev -> REDUCED_PATTERNS.get(lev).clear());
-		forEach(customHyphenations.values(), Map::clear);
+		for(final Level lev : Level.values())
+			REDUCED_PATTERNS.get(lev).clear();
+		for(final Map<String, String> elem : customHyphenations.values())
+			elem.clear();
 		options.clear();
 	}
 

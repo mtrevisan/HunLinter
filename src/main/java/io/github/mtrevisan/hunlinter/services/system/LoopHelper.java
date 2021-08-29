@@ -24,39 +24,18 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 
 public final class LoopHelper{
 
 	private LoopHelper(){}
-
-
-	public static <T> void forEach(final FixedArray<T> array, final Consumer<T> fun){
-		final int size = (array != null? array.limit: 0);
-		for(int i = 0; i < size; i ++)
-			fun.accept(array.data[i]);
-	}
-
-	public static <T> void forEach(final T[] array, final Consumer<T> fun){
-		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i ++)
-			fun.accept(array[i]);
-	}
-
-	public static <T> void forEach(final Iterable<T> collection, final Consumer<T> fun){
-		if(collection != null)
-			for(final T elem : collection)
-				fun.accept(elem);
-	}
 
 
 	public static <T> T match(final T[] array, final Predicate<T> condition){
@@ -89,22 +68,6 @@ public final class LoopHelper{
 		return result;
 	}
 
-
-	public static <T> void applyIf(final T[] array, final Predicate<T> condition, final Consumer<T> fun){
-		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i ++){
-			final T elem = array[i];
-			if(condition.test(elem))
-				fun.accept(elem);
-		}
-	}
-
-	public static <T> void applyIf(final Iterable<T> collection, final Predicate<T> condition, final Consumer<T> fun){
-		if(collection != null)
-			for(final T elem : collection)
-				if(condition.test(elem))
-					fun.accept(elem);
-	}
 
 	public static void applyIf(final NodeList nodes, final Predicate<Node> condition, final Predicate<Node> fun){
 		if(nodes != null)

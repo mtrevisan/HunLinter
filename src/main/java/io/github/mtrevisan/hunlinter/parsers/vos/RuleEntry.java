@@ -59,7 +59,10 @@ public class RuleEntry{
 
 	public void setEntries(final AffixEntry... entries){
 		this.entries = entries;
-		LoopHelper.forEach(entries, entry -> entry.setParent(this));
+
+		final int size = (entries != null? entries.length: 0);
+		for(int i = 0; i < size; i ++)
+			entries[i].setParent(this);
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){

@@ -67,8 +67,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
 
@@ -327,7 +325,9 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          },
          compounds -> {
             final StringJoiner sj = new StringJoiner(StringUtils.LF);
-				forEach(compounds, compound -> sj.add(compound.toString(strategy)));
+				if(compounds != null)
+					for(final Inflection compound : compounds)
+						sj.add(compound.toString(strategy));
             inputTextArea.setText(sj.toString());
             inputTextArea.setCaretPosition(0);
          },
@@ -364,7 +364,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//affix file:
 		if(!compoundRules.isEmpty()){
 			inputComboBox.removeAllItems();
-			forEach(compoundRules, inputComboBox::addItem);
+			for(final String rule : compoundRules)
+				inputComboBox.addItem(rule);
 			final String compoundFlag = affixData.getCompoundFlag();
 			if(compoundFlag != null)
 				inputComboBox.addItem(compoundFlag);
@@ -378,7 +379,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//aid file:
 		final List<String> lines = parserManager.getAidParser().getLines();
 		ruleFlagsAidComboBox.removeAllItems();
-		forEach(lines, ruleFlagsAidComboBox::addItem);
+		for(final String line : lines)
+			ruleFlagsAidComboBox.addItem(line);
 		final boolean aidLinesPresent = !lines.isEmpty();
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(aidLinesPresent);

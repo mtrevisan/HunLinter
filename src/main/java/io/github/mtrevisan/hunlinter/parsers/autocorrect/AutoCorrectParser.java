@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
@@ -154,15 +153,15 @@ public class AutoCorrectParser{
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
 		final ArrayList<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
-		applyIf(dictionary,
-			correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct),
-			duplicates::add);
-		duplicates.trimToSize();
+		for(final CorrectionEntry correction : dictionary){
+			if(correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
+				duplicates.add(correction);
+		}
 		return duplicates;
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public boolean contains(final CharSequence incorrect, final CharSequence correct){
+	public boolean contains(final String incorrect, final String correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);

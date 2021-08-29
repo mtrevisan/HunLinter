@@ -48,8 +48,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class HyphenationOptionsDialog extends javax.swing.JDialog implements ActionListener{
 
@@ -81,7 +79,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 		final List<String> list = new ArrayList<>(options.getNoHyphen());
 		list.sort(Comparator.naturalOrder());
 		final DefaultListModel<String> model = new DefaultListModel<>();
-		forEach(list, model::addElement);
+		for(final String elem : list)
+			model.addElement(elem);
 		noHyphenationList.setModel(model);
 	}
 

@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
@@ -66,8 +64,9 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	private static <T> void addComponent(final Map<Marker, List<T>> map, final T component, final Marker... markers){
 		Objects.requireNonNull(component, "Component cannot be null");
 
-		forEach(markers,
-			marker -> map.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(component));
+		if(markers != null)
+			for(final Marker marker : markers)
+				map.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(component);
 	}
 
 	public void setEncoder(final Encoder<ILoggingEvent> encoder){
@@ -86,11 +85,16 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() -> {
-				forEach(TEXT_AREAS.get(marker), textArea -> {
-					textArea.append(message);
-					textArea.setCaretPosition(textArea.getDocument().getLength());
-				});
-				forEach(LABELS.get(marker), label -> label.setText(message));
+				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
+				if(textAreas != null)
+					for(final JTextArea textArea : textAreas){
+						textArea.append(message);
+						textArea.setCaretPosition(textArea.getDocument().getLength());
+					}
+				final List<JLabel> labels = LABELS.get(marker);
+				if(labels != null)
+					for(final JLabel label : labels)
+						label.setText(message);
 			});
 		}
 	}

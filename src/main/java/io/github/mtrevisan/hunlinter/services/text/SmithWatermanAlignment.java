@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services.text;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -139,7 +138,8 @@ public class SmithWatermanAlignment{
 		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
 		final Set<Trace> traces = new HashSet<>(maxScoreIndices.size());
 		//extract edit operations
-		LoopHelper.forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
+		for(final Pair<Integer, Integer> score : maxScoreIndices)
+			traces.add(traceback(score.getLeft(), score.getRight()));
 		return traces;
 	}
 

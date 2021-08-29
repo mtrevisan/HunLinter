@@ -35,7 +35,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -135,7 +134,9 @@ public class RulesReducerWorker extends WorkerDictionary{
 				sleepOnPause();
 			});
 
-			LoopHelper.forEach(reducedRules, rule -> LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule));
+			if(reducedRules != null)
+				for(final String rule : reducedRules)
+					LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Successfully processed");

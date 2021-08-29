@@ -38,9 +38,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.FutureTask;
-import java.util.function.Consumer;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public final class FontHelper{
@@ -156,21 +153,24 @@ public final class FontHelper{
 	}
 
 	public static void addFontableProperty(final JComponent... components){
-		forEach(components, component -> component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true));
+		if(components != null)
+			for(final JComponent component : components)
+				component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true);
 	}
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
 		if(!font.equals(CURRENT_FONT)){
 			CURRENT_FONT = font;
 
-			forEach(parentFrames, parentFrame -> updateComponent(parentFrame, font));
+			if(parentFrames != null)
+				for(final Component parentFrame : parentFrames)
+					updateComponent(parentFrame, font);
 		}
 	}
 
 	private static void updateComponent(final Component component, final Font font){
 		final Deque<Component> stack = new ArrayDeque<>();
 		stack.push(component);
-		final Consumer<Component> push = stack::push;
 		while(!stack.isEmpty()){
 			final Component comp = stack.pop();
 
@@ -180,7 +180,8 @@ public final class FontHelper{
 				comp.setFont(font);
 
 			if(comp instanceof Container)
-				forEach(((Container)comp).getComponents(), push);
+				for(final Component c : ((Container)comp).getComponents())
+					stack.push(c);
 		}
 	}
 
