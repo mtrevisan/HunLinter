@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -73,31 +72,32 @@ public final class RegexHelper{
 	}
 
 	public static String[] extract(final CharSequence text, final Pattern pattern){
-		return extract(text, pattern, -1);
+		final List<String> result = extract(text, pattern, - 1);
+		return result.toArray(new String[result.size()]);
 	}
 
-	public static String[] extract(final CharSequence text, final Pattern pattern, final int limit){
+	public static List<String> extract(final CharSequence text, final Pattern pattern, final int limit){
 		final Matcher matcher = matcher(text, pattern);
 		return (limit >= 0? extractWithLimit(matcher, limit): extractUnlimited(matcher));
 	}
 
-	private static String[] extractWithLimit(final Matcher matcher, final int limit){
+	private static List<String> extractWithLimit(final Matcher matcher, final int limit){
 		int index = 0;
-		final String[] result = new String[limit];
-		while(matcher.find() && index < limit){
+		final List<String> result = new ArrayList<>(limit);
+		while(matcher.find() && index ++ < limit){
 			final String component = getNextGroup(matcher);
-			result[index ++] = (component != null? component: matcher.group());
+			result.add(component != null? component: matcher.group());
 		}
 		return result;
 	}
 
-	private static String[] extractUnlimited(final Matcher matcher){
-		final SimpleDynamicArray<String> result = new SimpleDynamicArray<>(String.class);
+	private static List<String> extractUnlimited(final Matcher matcher){
+		final List<String> result = new ArrayList<>();
 		while(matcher.find()){
 			final String component = getNextGroup(matcher);
-			result.add((component != null? component: matcher.group()));
+			result.add(component != null? component: matcher.group());
 		}
-		return result.extractCopy();
+		return result;
 	}
 
 	private static String getNextGroup(final Matcher matcher){

@@ -86,7 +86,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	protected List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
-			final Map<String, DictionaryEntry[]> inputs){
+			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>();
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>();
 		outer:
@@ -348,24 +348,27 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others. */
-	protected Map<String, DictionaryEntry[]> mergeDistributions(final Map<String, DictionaryEntry[]> compoundRules,
-			final Map<String, DictionaryEntry[]> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
-		final Collection<Map.Entry<String, DictionaryEntry[]>> list = new ArrayList<>(compoundRules.entrySet());
+	protected Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
+			final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
+		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
-		final Map<String, DictionaryEntry[]> map = new HashMap<>();
-		for(final Map.Entry<String, DictionaryEntry[]> m : list){
-			final DictionaryEntry[] entries = m.getValue();
-			DictionaryEntry[] value = new DictionaryEntry[0];
-			final int size = (entries != null? entries.length: 0);
+		final Map<String, List<DictionaryEntry>> map = new HashMap<>();
+		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
+			final List<DictionaryEntry> entries = m.getValue();
+			final List<DictionaryEntry> value = new ArrayList<>(0);
+			final int size = (entries != null? entries.size(): 0);
 			for(int i = 0; i < size; i ++){
-				final DictionaryEntry entry = entries[i];
+				final DictionaryEntry entry = entries.get(i);
 				if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-					value = ArrayUtils.add(value, entry);
+					value.add(entry);
 			}
 			final String key = m.getKey();
-			final DictionaryEntry[] v = map.get(key);
-			map.put(key, (v != null? ArrayUtils.addAll(v, value): value));
+			final List<DictionaryEntry> v = map.get(key);
+			if(v != null)
+				v.addAll(value);
+			else
+				map.put(key, value);
 		}
 		return map;
 	}

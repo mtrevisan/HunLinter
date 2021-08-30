@@ -77,7 +77,7 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 			//check if the word is present in the dictionary
 			final String[] words = StringUtils.split(originalDefinition, " –");
 			for(final String word : words)
-				if(dictionaryLookup.lookup(word).length == 0)
+				if(dictionaryLookup.lookup(word).isEmpty())
 					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
 						new Object[]{word, originalDefinition}));
 

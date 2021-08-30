@@ -157,7 +157,7 @@ public class WorkerManager{
 	public void createAutoCorrectLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd, final DictionaryLookup dictionaryLookup){
 		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterFSAWorker(parserManager.getAcoParser(),
-			parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
+			parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 

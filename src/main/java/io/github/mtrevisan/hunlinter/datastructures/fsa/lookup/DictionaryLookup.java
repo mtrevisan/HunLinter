@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
@@ -32,7 +31,9 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoder
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,7 +52,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	private final ByteSequenceIterator finalStatesIterator;
 
 	/** Private internal array of reusable word data objects. */
-	private final SimpleDynamicArray<WordData> forms = new SimpleDynamicArray<>(WordData.class);
+	private final List<WordData> forms = new ArrayList<>();
 
 	/** The {@link Dictionary} this lookup is using. */
 	private final Dictionary dictionary;
@@ -93,7 +94,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @param word	The word (typically inflected) to look up base forms for.
 	 * @return	A list of {@link WordData} entries (possibly empty).
 	 */
-	public WordData[] lookup(String word){
+	public List<WordData> lookup(String word){
 		final byte separator = dictionary.metadata.getSeparator();
 
 		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
@@ -104,8 +105,8 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator: " + word);
 
-		//reset the output list
-		forms.reset();
+		//clear the output list
+		forms.clear();
 
 		//try to find a partial match in the dictionary
 		final FSAMatchResult match = matcher.match(wordAsByteArray, dictionary.fsa.getRootNode());
@@ -163,7 +164,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 			forms.add(wordData);
 		}
-		return forms.extractCopy();
+		return forms;
 	}
 
 	/**

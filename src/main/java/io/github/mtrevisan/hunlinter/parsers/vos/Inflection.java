@@ -202,10 +202,10 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public String toStringWithPartOfSpeechAndStem(){
-		final String[] pos = getMorphologicalFieldPartOfSpeech();
+		final List<String> pos = getMorphologicalFieldPartOfSpeech();
 		final String stem = getMorphologicalFieldStem();
-		if(pos.length > 0){
-			Arrays.sort(pos, Comparator.naturalOrder());
+		if(!pos.isEmpty()){
+			pos.sort(Comparator.naturalOrder());
 			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA)
 				+ StringUtils.SPACE + stem;
 		}

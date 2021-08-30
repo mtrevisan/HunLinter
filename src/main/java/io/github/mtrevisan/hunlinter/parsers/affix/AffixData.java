@@ -250,12 +250,12 @@ public class AffixData{
 		return productive;
 	}
 
-	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final AffixEntry[] entries){
+	public static AffixEntry[] extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
 		int limit = 0;
-		final int size = (entries != null? entries.length: 0);
+		final int size = (entries != null? entries.size(): 0);
 		final AffixEntry[] list = new AffixEntry[size];
 		for(int i = 0; i < size; i ++){
-			final AffixEntry entry = entries[i];
+			final AffixEntry entry = entries.get(i);
 			if(entry.canApplyTo(word))
 				list[limit ++] = entry;
 		}
@@ -310,7 +310,7 @@ public class AffixData{
 			sortedSample = Arrays.asList(StringUtils.split(sample, StringUtils.EMPTY));
 		else
 			sortedSample = getRuleEntries().parallelStream()
-				.flatMap(entry -> Arrays.stream(entry.getEntries()))
+				.flatMap(entry -> entry.getEntries().stream())
 				.flatMap(entry -> Arrays.stream(StringUtils.split(entry.getAppending(), StringUtils.EMPTY)))
 				.distinct()
 				.collect(Collectors.toList());

@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
@@ -37,11 +36,11 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -65,7 +64,7 @@ public class AffixHandler implements Handler{
 				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
-			final AffixEntry[] entries = readEntries(context, parent, affixData);
+			final List<AffixEntry> entries = readEntries(context, parent, affixData);
 			parent.setEntries(entries);
 
 			affixData.addData(ruleFlag, parent);
@@ -77,7 +76,7 @@ public class AffixHandler implements Handler{
 		}
 	}
 
-	private AffixEntry[] readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
+	private List<AffixEntry> readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
 			throws IOException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
@@ -94,7 +93,7 @@ public class AffixHandler implements Handler{
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
-		final FixedArray<AffixEntry> entries = new FixedArray<>(AffixEntry.class, numEntries);
+		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			ParserHelper.assertNotEOF(scanner);
 
@@ -107,7 +106,7 @@ public class AffixHandler implements Handler{
 			checkValidity(parentType, parentFlag, context, entry);
 
 
-			if(ArrayUtils.contains(entries.data, entry))
+			if(entries.contains(entry))
 				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}),
 					IndexDataPair.of(context.getIndex() + i, null)));
 			else
@@ -124,7 +123,7 @@ public class AffixHandler implements Handler{
 //else
 //	prefixEntries.put(arr, lst);
 		}
-		return entries.extractCopyOrNull();
+		return entries;
 	}
 
 	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){

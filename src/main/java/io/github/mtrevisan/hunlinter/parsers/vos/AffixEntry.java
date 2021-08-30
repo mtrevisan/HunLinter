@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
 import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
@@ -242,8 +241,8 @@ public class AffixEntry{
 	}
 
 	public void validate(){
-		final String[] filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
-		if(filteredFields.length > 0)
+		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
+		if(!filteredFields.isEmpty())
 			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
 	}
 
@@ -255,9 +254,8 @@ public class AffixEntry{
 		return parent.getFlag();
 	}
 
-	private String[] getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		final SimpleDynamicArray<String> collector = new SimpleDynamicArray<>(String.class,
-			(morphologicalFields != null? morphologicalFields.length: 0));
+	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.length: 0);
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();
 			final int purgeTag = tag.length();
@@ -265,7 +263,7 @@ public class AffixEntry{
 				if(mf.startsWith(tag))
 					collector.add(mf.substring(purgeTag));
 		}
-		return collector.extractCopy();
+		return collector;
 	}
 
 	public boolean canApplyTo(final String word){

@@ -97,7 +97,7 @@ public class WordMuncher{
 
 	private List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
 		final String word = dicEntry.getWord();
-		final String[] partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
+		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
 		final List<DictionaryEntry> originators = new ArrayList<>();
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
@@ -118,9 +118,9 @@ public class WordMuncher{
 						if(inflections.size() != 1)
 							continue;
 
-						final String[] baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
-						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
-								|| Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech)))
+						final List<String> baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
+						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty()
+								|| baseInflectionPartOfSpeech.equals(partOfSpeech)))
 							originators.add(originatorEntry);
 					}
 				}

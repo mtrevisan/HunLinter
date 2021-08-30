@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
@@ -168,36 +167,33 @@ public class DictionaryEntry{
 		return null;
 	}
 
-	public Map<String, DictionaryEntry[]> distributeByCompoundRule(final AffixData affixData){
-		final Map<String, DictionaryEntry[]> result = new HashMap<>();
+	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
+		final Map<String, List<DictionaryEntry>> result = new HashMap<>();
 		final int size = (continuationFlags != null? continuationFlags.size(): 0);
-		final SimpleDynamicArray<DictionaryEntry> vv = new SimpleDynamicArray<>(DictionaryEntry.class);
 		for(int i = 0; i < size; i ++){
 			final String cf = continuationFlags.get(i);
 			if(affixData.isManagedByCompoundRule(cf)){
-				vv.reset();
-				final DictionaryEntry[] v = result.get(cf);
+				final List<DictionaryEntry> vv = new ArrayList<>();
+				final List<DictionaryEntry> v = result.get(cf);
 				if(v != null)
 					vv.addAll(v);
 				vv.add(this);
-				result.put(cf, vv.extractCopy());
+				result.put(cf, vv);
 			}
 		}
 		return result;
 	}
 
-	public Map<String, DictionaryEntry[]> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
+	public Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
-		final Map<String, DictionaryEntry[]> distribution = new HashMap<>(3);
-		distribution.put(compoundBeginFlag, new DictionaryEntry[0]);
-		distribution.put(compoundMiddleFlag, new DictionaryEntry[0]);
-		distribution.put(compoundEndFlag, new DictionaryEntry[0]);
+		final Map<String, List<DictionaryEntry>> distribution = new HashMap<>(3);
+		distribution.put(compoundBeginFlag, new ArrayList<>(0));
+		distribution.put(compoundMiddleFlag, new ArrayList<>(0));
+		distribution.put(compoundEndFlag, new ArrayList<>(0));
 		if(continuationFlags != null)
-			for(final String flag : continuationFlags){
-				final DictionaryEntry[] entries = distribution.get(flag);
-				if(entries != null)
-					distribution.put(flag, ArrayUtils.add(entries, this));
-			}
+			for(final String flag : continuationFlags)
+				distribution.get(flag)
+					.add(this);
 		return distribution;
 	}
 
@@ -227,16 +223,16 @@ public class DictionaryEntry{
 		return word;
 	}
 
-	public String[] getMorphologicalFieldPartOfSpeech(){
+	public List<String> getMorphologicalFieldPartOfSpeech(){
 		if(morphologicalFields == null)
-			return new String[0];
+			return Collections.emptyList();
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		final SimpleDynamicArray<String> list = new SimpleDynamicArray<>(String.class, morphologicalFields.length);
+		final List<String> list = new ArrayList<>(morphologicalFields.length);
 		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
 				list.add(mf);
-		return list.extractCopy();
+		return list;
 	}
 
 	public void forEachMorphologicalField(final Consumer<String> fun){

@@ -392,7 +392,7 @@ public class Packager{
 		if(affFile != null){
 			try{
 				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
-				final String[] extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
+				final List<String> extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 					.mapToObj(Character::toString)
 					.collect(Collectors.toSet()));

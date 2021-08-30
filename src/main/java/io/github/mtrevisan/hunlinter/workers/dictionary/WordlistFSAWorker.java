@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.AccessibleList;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
@@ -103,8 +103,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
-			1.2f);
+		final AccessibleList<byte[]> encodings = new AccessibleList<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements());
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
@@ -120,7 +119,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final FSABuilder builder = new FSABuilder();
 		final Consumer<byte[]> fsaProcessor = builder::add;
 
-		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
+		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
 
 			final Path dicPath = dicParser.getDicFile().toPath();
@@ -128,7 +127,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			return encodings;
 		};
-		final Function<SimpleDynamicArray<byte[]>, SimpleDynamicArray<byte[]>> step2 = list -> {
+		final Function<AccessibleList<byte[]>, AccessibleList<byte[]>> step2 = list -> {
 			resetProcessing("Sorting (step 2/5)");
 
 			//sort list
@@ -141,7 +140,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			return list;
 		};
-		final Function<SimpleDynamicArray<byte[]>, FSA> step3 = list -> {
+		final Function<AccessibleList<byte[]>, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/5)");
 
 			getWorkerData()

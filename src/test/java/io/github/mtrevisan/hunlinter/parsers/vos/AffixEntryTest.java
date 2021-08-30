@@ -117,7 +117,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		AffixType type = entry.getType();
 
@@ -129,7 +129,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("PFX M 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		AffixType type = entry.getType();
 
@@ -141,7 +141,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		boolean matches = entry.canApplyTo("man");
 
@@ -153,7 +153,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		boolean matches = entry.canApplyTo("mano");
 
@@ -165,7 +165,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.applyRule("man\\/man", true);
 
@@ -188,7 +188,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
 		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.applyRule("ŧinkue", true);
 
@@ -200,7 +200,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
 		AffixEntry entry = createAffixEntry("SFX M 0 i [^oaie]	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.undoRule("mani");
 
@@ -212,7 +212,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
 		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.undoRule("sinkue");
 
@@ -224,7 +224,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
 		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		parent.setEntries(Arrays.asList(entry));
 
 		String representation = entry.toString();
 

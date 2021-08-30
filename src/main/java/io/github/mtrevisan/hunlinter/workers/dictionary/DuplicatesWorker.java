@@ -252,15 +252,14 @@ public class DuplicatesWorker extends WorkerDictionary{
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Inflection prod = entries.get(0).getInflection();
 					String origin = prod.getWord();
-					if(prod.getMorphologicalFieldPartOfSpeech().length > 0)
+					if(!prod.getMorphologicalFieldPartOfSpeech().isEmpty())
 						origin += "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech()) + ")";
 					writer.write(origin + ": ");
 					final StringJoiner sj = new StringJoiner(", ");
-					if(entries != null)
-						for(final Duplicate duplicate : entries)
-							sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-								(duplicate.getInflection().hasInflectionRules()?
-								" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
+					for(final Duplicate duplicate : entries)
+						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+							(duplicate.getInflection().hasInflectionRules()?
+							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
 					writer.write(sj.toString());
 					writer.newLine();
 

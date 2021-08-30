@@ -756,10 +756,10 @@ public class RulesReducer{
 		final AffixType type = ruleToBeReduced.getType();
 
 		//extract rules (skip the header)
-		final AffixEntry[] entries = new AffixEntry[reducedRules.size() - 1];
-		for(int i = 0; i < reducedRules.size() - 1; i ++){
-			final String reducedRule = reducedRules.get(i + 1);
-			entries[i] = new AffixEntry(reducedRule, i, type, flag, strategy, null, null);
+		final List<AffixEntry> entries = new ArrayList<>(reducedRules.size() - 1);
+		for(int i = 1; i < reducedRules.size(); i ++){
+			final String reducedRule = reducedRules.get(i);
+			entries.add(new AffixEntry(reducedRule, i - 1, type, flag, strategy, null, null));
 		}
 
 		int progress = 0;

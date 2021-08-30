@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 
 
-public class SimpleDynamicArray<T>{
+public class AccessibleList<T>{
 
 	private static final float GROWTH_DEFAULT = 1.2f;
 
@@ -43,20 +43,20 @@ public class SimpleDynamicArray<T>{
 	private final float growthRate;
 
 
-	public static <T> SimpleDynamicArray<T> createExact(final Class<T> cl, final int size){
-		return new SimpleDynamicArray<>(cl, size, GROWTH_DEFAULT);
+	public static <T> AccessibleList<T> createExact(final Class<T> cl, final int size){
+		return new AccessibleList<>(cl, size, GROWTH_DEFAULT);
 	}
 
-	public SimpleDynamicArray(final Class<T> cl){
+	public AccessibleList(final Class<T> cl){
 		this(cl, 0, GROWTH_DEFAULT);
 	}
 
-	public SimpleDynamicArray(final Class<T> cl, final float growthRate){
+	public AccessibleList(final Class<T> cl, final float growthRate){
 		this(cl, 0, growthRate);
 	}
 
 	@SuppressWarnings("unchecked")
-	public SimpleDynamicArray(final Class<T> cl, final int capacity, final float growthRate){
+	public AccessibleList(final Class<T> cl, final int capacity, final float growthRate){
 		data = (T[])Array.newInstance(cl, capacity);
 
 		this.growthRate = growthRate;
@@ -72,7 +72,7 @@ public class SimpleDynamicArray<T>{
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final SimpleDynamicArray<T> array){
+	public synchronized void addAll(final AccessibleList<T> array){
 		addAll(array.data, array.limit);
 	}
 
@@ -87,7 +87,7 @@ public class SimpleDynamicArray<T>{
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final SimpleDynamicArray<T> array){
+	public synchronized void addAllUnique(final AccessibleList<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
@@ -198,9 +198,9 @@ public class SimpleDynamicArray<T>{
 			limit = size;
 	}
 
-	public SimpleDynamicArray<T> collectIf(final Predicate<T> condition){
+	public AccessibleList<T> collectIf(final Predicate<T> condition){
 		@SuppressWarnings("unchecked")
-		final SimpleDynamicArray<T> collect = new SimpleDynamicArray<>((Class<T>)data.getClass().getComponentType(), limit);
+		final AccessibleList<T> collect = new AccessibleList<>((Class<T>)data.getClass().getComponentType(), limit);
 		for(int i = 0; i < limit; i ++){
 			final T elem = data[i];
 			if(condition.test(elem))
@@ -254,7 +254,7 @@ public class SimpleDynamicArray<T>{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		final SimpleDynamicArray<?> rhs = (SimpleDynamicArray<?>)obj;
+		final AccessibleList<?> rhs = (AccessibleList<?>)obj;
 		return new EqualsBuilder()
 			.append(data, rhs.data)
 			.append(limit, rhs.limit)

@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -184,8 +185,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void incompatibilityCheck(final Inflection inflection, final int index){
-		final String[] pos = inflection.getMorphologicalFieldPartOfSpeech();
-		if(pos.length > 1)
+		final List<String> pos = inflection.getMorphologicalFieldPartOfSpeech();
+		if(pos.size() > 1)
 			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT, IndexDataPair.of(index, null)));
 	}
 

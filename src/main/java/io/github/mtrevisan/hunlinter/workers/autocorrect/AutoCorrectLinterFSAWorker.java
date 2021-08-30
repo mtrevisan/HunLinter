@@ -54,8 +54,8 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
 
 
-	public AutoCorrectLinterFSAWorker(final AutoCorrectParser acoParser, final String language, final DictionaryParser dicParser,
-			final WordGenerator wordGenerator, final DictionaryLookup dictionaryLookup){
+	public AutoCorrectLinterFSAWorker(final AutoCorrectParser acoParser, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final DictionaryLookup dictionaryLookup){
 		super(new WorkerDataParser<>(WORKER_NAME, acoParser));
 
 		getWorkerData()
@@ -84,7 +84,7 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 				//check if the word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(final String word : words)
-					if(dictionaryLookup.lookup(word).length == 0)
+					if(dictionaryLookup.lookup(word).isEmpty())
 						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
 							new Object[]{word, correctForm}));
 			}

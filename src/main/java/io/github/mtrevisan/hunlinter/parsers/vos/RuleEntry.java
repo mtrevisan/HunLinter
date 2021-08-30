@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -43,7 +44,7 @@ public class RuleEntry{
 	private final String flag;
 	//cross product flag
 	private final boolean combinable;
-	private AffixEntry[] entries;
+	private List<AffixEntry> entries;
 //private final List<AffixEntry> prefixEntries;
 //private final List<AffixEntry> suffixEntries;
 
@@ -57,12 +58,12 @@ public class RuleEntry{
 		this.combinable = (combinable == COMBINABLE);
 	}
 
-	public void setEntries(final AffixEntry... entries){
+	public void setEntries(final List<AffixEntry> entries){
 		this.entries = entries;
 
-		final int size = (entries != null? entries.length: 0);
+		final int size = (entries != null? entries.size(): 0);
 		for(int i = 0; i < size; i ++)
-			entries[i].setParent(this);
+			entries.get(i).setParent(this);
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
@@ -93,7 +94,7 @@ public class RuleEntry{
 		return (combinable? COMBINABLE: NOT_COMBINABLE);
 	}
 
-	public AffixEntry[] getEntries(){
+	public List<AffixEntry> getEntries(){
 		return entries;
 	}
 
