@@ -140,7 +140,6 @@ class WordGeneratorBase{
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
@@ -262,7 +261,6 @@ class WordGeneratorBase{
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		ArrayList<String> a;
 		final List<String> appliedAffixes = allAffixes.get(Affixes.INDEX_PREFIXES);
 		final List<String> postponedAffixes = allAffixes.get(Affixes.INDEX_SUFFIXES);
 		if(circumfixFlag != null && allAffixes.get(Affixes.INDEX_TERMINALS).contains(circumfixFlag))
