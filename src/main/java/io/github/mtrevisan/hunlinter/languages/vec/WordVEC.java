@@ -93,10 +93,8 @@ public final class WordVEC{
 			+ "(?:m(al|ove)|soto)?st"
 		+ ")à(?:g[oaie]?|[lƚ][oaie])?$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|[lƚ][oiea]|ne?|stu|t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(?:re|stra|x)?v[àé][–-]?(?:g[–-]?i?[oaie]?|[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
-//	private static final String NO_STRESS_ANDAR = "^"
-//		+ "$";
-	private static final String NO_STRESS_TRAER = "^(as?|des?|es|kon|pro|re|s(o|ub?))?trà([gmstv]e|ne?|r)$";
+	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:[lƚ][oiea]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?))$";
+	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[gmstv]e|ne?|r)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		final StringJoiner sj = (new StringJoiner(PIPE))
@@ -105,8 +103,7 @@ public final class WordVEC{
 			.add(NO_STRESS_DAR_FAR_STAR)
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
-			.add(NO_STRESS_TRAER)
-			;
+			.add(NO_STRESS_TRAER);
 		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 
