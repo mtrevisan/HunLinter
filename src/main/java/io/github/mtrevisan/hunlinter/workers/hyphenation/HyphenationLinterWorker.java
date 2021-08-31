@@ -60,7 +60,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
-	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
+	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("{0} ({1}) is not syllabable");
 
 
 	public HyphenationLinterWorker(final ParserManager parserManager){

@@ -70,8 +70,23 @@ public final class WordVEC{
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
-	private static final String NO_STRESS_AVER = "^(?:r[eiï])?(?:[‘’g]émo|éb(?:e|ia)|g?(?:[àé](?:[pb]i[ae]?|[bd]e)|(?:ar)?(?:à|é(?:mo))[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|[bp]i)))$";
-	private static final String NO_STRESS_ESER = "^(?:r[eiï])?(?:[sx][éí]|só([jɉ]o|n[ie])|sén[ie]|si?ón(m?i|[jɉ]o|nt?[ei]|t[ei]|e)|stà|ér[aei]|(?:s[ae]r)?[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]|d[oiae])?|erísi[ou]$";
+	//https://www.rexegg.com/regex-optimizations.html
+	private static final String NO_STRESS_AVER = "^(?:re-?)?(?:"
+		+ "g(?:à(?:b[ei](?:-(?:[mstv]e(?:l[aeio]?|ƚ[aeio]|ne?)|g(?:e(?:l[aeio]?|ƚ[aeio]|ne?)|ine?)|l[aeio]?|ƚ[aeio]|ne?))?|(?:[bp]i[ae]?|[gmv]e|s(?:tu|e)|t[euo]||[lƚ][aeio]|ne?))"
+			+ "|"
+			+ "é(?:mo(?:-(?:[eo]|nt?[ei]))?|(?:b(?:ia|e)|de)))"
+		+ "|"
+		+ "à(?:b(?:[ei]|i[ae]?)|[gmv]e|s(?:tu|e)|t[euo]|[lƚ][aeio]|ne?|pi[ae]?)"
+		+ "|"
+		+ "é(?:b(?:ia|e)|de)"
+		+ ")$";
+	private static final String NO_STRESS_ESER = "^(?:r[ei]-?)?(?:" +
+		"s(?:er(?:à[lƚ][aeio]|é(?:stu|t[ou]))|aré(?:stu|t[ou])|ión(?:[ei]|[jɉ]o|mi|t[ei])|ó(?:[jɉ]o|n(?:[ei]|[jɉ]o|mi|t[ei]))|é(?:[lƚ][aeio]|n[ei]|stu|t[ou])|í(?:stu|t[ou]))"
+		+ "|"
+		+ "xé(?:[lƚ][aeio]|stu|t[ou])"
+		+ "|"
+		+ "é(?:[lƚ][aeio]|stu|t[ou]|r(?:a(?:-(?:[ei]|[jɉ]o|mi|nt?[ei]))?|e|i(?:-(?:[lƚ][ei]|[ou]|stu|t[ou]))?))"
+		+ ")$";
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:(?:dex|re)?d|(?:(?:dex)?asue|des|kon(?:tra[–-]?)?|[lƚ]iku[ei]|mal[–-]?|putre|rare|re|ar|sastu|sat[iu]s|so[dt]is|sosti|(sora|stra)[–-]?|st[ou]pe|tore|tume)?f|(?:kon(?:tra)?|mal[–-]?|move|o|re|so(?:ra|to))?st)(?:à[aeoi]|àgi?[aeoi]|(?:[ae]rà|[àé])[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou]))|(d|f|st)àg$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|ar|stra[–-]?)?(?:sà|sav?arà)[–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(?:re|stra|x)?v[àé][–-]?(?:g[–-]?i?[oaie]?|[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
@@ -84,7 +99,8 @@ public final class WordVEC{
 			.add(NO_STRESS_DAR_FAR_STAR)
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
-			.add(NO_STRESS_TRAER);
+			.add(NO_STRESS_TRAER)
+			;
 		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
 	}
 

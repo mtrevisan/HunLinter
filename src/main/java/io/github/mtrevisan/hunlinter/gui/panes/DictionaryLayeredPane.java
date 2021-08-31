@@ -95,7 +95,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	private final Packager packager;
 	private final ParserManager parserManager;
-	private final DictionaryEntryFactory dictionaryEntryFactory;
+	private DictionaryEntryFactory dictionaryEntryFactory;
 
 	private String formerInputText;
 
@@ -106,7 +106,6 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 		this.packager = packager;
 		this.parserManager = parserManager;
-		dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
 
 
 		initComponents();
@@ -439,6 +438,8 @@ final int iconSize = 17;
 
 		if(StringUtils.isNotBlank(text)){
 			try{
+				if(dictionaryEntryFactory == null)
+					dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
