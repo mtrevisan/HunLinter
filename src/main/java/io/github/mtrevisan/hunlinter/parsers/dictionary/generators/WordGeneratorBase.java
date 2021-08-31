@@ -319,11 +319,9 @@ class WordGeneratorBase{
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
-				if(circumfixFlag != null && appliedRules != null){
-					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = match(appliedRules, entry, circumfixFlag);
-					removeCircumfixFlag = (entryContainsCircumfix && (entry.getType() == AffixType.SUFFIX ^ appliedRuleContainsCircumfix));
-				}
+				if(circumfixFlag != null && appliedRules != null)
+					removeCircumfixFlag = (entry.hasContinuationFlag(circumfixFlag)
+						&& (entry.getType() == AffixType.SUFFIX ^ match(appliedRules, entry, circumfixFlag)));
 
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
