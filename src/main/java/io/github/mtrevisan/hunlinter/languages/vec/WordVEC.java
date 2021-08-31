@@ -93,7 +93,7 @@ public final class WordVEC{
 			+ "(?:m(al|ove)|soto)?st"
 		+ ")à(?:g[oaie]?|[lƚ][oaie])?$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|[lƚ][oiea]|ne?|stu|t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:[lƚ][oiea]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?))$";
+	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:[lƚ][oiea]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
 	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[gmstv]e|ne?|r)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
