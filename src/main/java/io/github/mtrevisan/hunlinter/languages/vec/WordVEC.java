@@ -72,9 +72,7 @@ public final class WordVEC{
 
 	//https://www.rexegg.com/regex-optimizations.html
 	private static final String NO_STRESS_AVER = "^(?:re)?(?:"
-		+ "g(?:à(?:b[ei]|(?:[bp]i[ae]?|[gmv]e|s(?:tu|e)|t[euo]||[lƚ][aeio]|ne?))"
-			+ "|"
-			+ "é(?:mo|(?:b(?:ia|e)|de)))"
+		+ "g(?:à(?:b[ei]|(?:[bp]i[ae]?|[gmv]e|s(?:tu|e)|t[euo]||[lƚ][aeio]|ne?))|é(?:mo|(?:b(?:ia|e)|de)))"
 		+ "|"
 		+ "à(?:b(?:[ei]|i[ae]?)|[gmv]e|s(?:tu|e)|t[euo]|[lƚ][aeio]|ne?|pi[ae]?)"
 		+ "|"
@@ -90,7 +88,7 @@ public final class WordVEC{
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:"
 			+ "(?:dex|re)?d"
 			+ "|"
-			+ "(?:asue|de(s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t[ou]pe)|t(?:(?:or|um)e|ra))?f"
+			+ "(?:asue|de(s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
 			+ "(?:m(al|ove)|soto)?st"
 		+ ")à(?:g[oaie]?|[lƚ][oaie])?$";
@@ -98,10 +96,7 @@ public final class WordVEC{
 	private static final String NO_STRESS_ANDAR = "^(?:re|stra|x)?v[àé][–-]?(?:g[–-]?i?[oaie]?|[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
 //	private static final String NO_STRESS_ANDAR = "^"
 //		+ "$";
-//	private static final String NO_STRESS_TRAER = "^(?:|as?|des?|es|kon|pro|re|so|sub?)?tr[àé][–-]?(?:[lƚ][oaie]|[gmstv]e|ne?|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_TRAER = "^(as?|des?|es|kon|pro|re|s(o|ub?))?"
-		+ "trà([gmstv]e|ne?|r)"
-		+ "$";
+	private static final String NO_STRESS_TRAER = "^(as?|des?|es|kon|pro|re|s(o|ub?))?trà([gmstv]e|ne?|r)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		final StringJoiner sj = (new StringJoiner(PIPE))
