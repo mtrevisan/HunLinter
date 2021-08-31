@@ -485,6 +485,10 @@ final int iconSize = 17;
 			totalInflectionsValueLabel.setText(null);
 	}
 
+	public void clear(){
+		dictionaryEntryFactory = null;
+	}
+
 	private void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
