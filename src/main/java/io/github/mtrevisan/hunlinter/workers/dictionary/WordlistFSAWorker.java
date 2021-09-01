@@ -169,7 +169,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return builder.complete();
 		};
 		final Function<FSA, File> step4 = fsa -> {
-			resetProcessing("Compress FSA (step 4/5)");
+			resetProcessing("Compressing FSA (step 4/5)");
 
 			final FSASerializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){

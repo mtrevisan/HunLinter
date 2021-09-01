@@ -195,18 +195,18 @@ public class DynamicArray<T>{
 	@SuppressWarnings("unchecked")
 	public synchronized void remove(){
 		set(size - 1, null);
+
 		final Block<T> lastNonEmptyDataBlock = (Block<T>)blocks[indexOfLastNonEmptyDataBlock];
 		lastNonEmptyDataBlock.shrink();
 		size --;
 
 		if(lastNonEmptyDataBlock.size() == 0){
-			// The lastNonEmptyDataBlock is empty now after shrinking,
-			// we have to update fields below.
+			//the lastNonEmptyDataBlock is empty now after shrinking, we have to update fields below
 			numberOfEmptyDataBlocks ++;
 			indexOfLastNonEmptyDataBlock --;
 		}
 
-		//if we have two empty Blocks, we have to delete the last one.
+		//if we have two empty Blocks, we have to delete the last one
 		if(numberOfEmptyDataBlocks == 2){
 			//set the last empty Block to null
 			//-- sizeOfBlocks gives us the index of last Block, also decrement sizeOfBlocks
@@ -221,8 +221,8 @@ public class DynamicArray<T>{
 				//need to shrink
 				shrinkArray();
 
-			// If the lastSuperBlock has no Blocks in it,
-			// we need to change lastSuperBlock to the previous superBlock and decrement numberOfSuperBlocks
+			//if the lastSuperBlock has no Blocks in it, we need to change lastSuperBlock to the previous superBlock and decrement
+			//numberOfSuperBlocks
 			if(lastSuperBlock.isEmpty()){
 				if(lastSuperBlock.isEven())
 					// If the number of the current empty lastSuperBlock is even,

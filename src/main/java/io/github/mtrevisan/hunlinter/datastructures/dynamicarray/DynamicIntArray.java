@@ -26,7 +26,7 @@ package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
 
 /**
- * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays</a>
+ * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays in optimal time and space</a>
  * @see <a href="https://github.com/LHongy/DynamicArray">DynamicArray</a>
  */
 public class DynamicIntArray{
@@ -104,10 +104,10 @@ public class DynamicIntArray{
 	private void grow(){
 		IntBlock lastDataBlock = blocks[indexOfLastDataBlock];
 
-		// If the last Block is full, we need to make a new Block.
+		//if the last Block is full, we need to make a new Block
 		if(lastDataBlock.isFull()){
 			if(sizeOfBlocks == blocks.length)
-				//`blocks` is full, need to expand.
+				//`blocks` is full, need to expand
 				expandArray();
 
 			//if the lastSuperBlock is full of Blocks, we need to create a new SuperBlock and increment numberOfSuperBlocks
