@@ -57,7 +57,7 @@ public class DictionaryCorrectnessChecker{
 
 
 	public DictionaryCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator){
-		Objects.requireNonNull(affixData);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
 
 		this.affixData = affixData;
 		this.hyphenator = hyphenator;

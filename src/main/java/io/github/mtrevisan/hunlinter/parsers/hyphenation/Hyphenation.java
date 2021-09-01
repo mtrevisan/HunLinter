@@ -39,10 +39,10 @@ public class Hyphenation{
 
 
 	public Hyphenation(final String[] syllabes, final String[] compounds, final String[] rules, final String breakCharacter){
-		Objects.requireNonNull(syllabes);
-		Objects.requireNonNull(compounds);
-		Objects.requireNonNull(rules);
-		Objects.requireNonNull(breakCharacter);
+		Objects.requireNonNull(syllabes, "Syllabes cannot be null");
+		Objects.requireNonNull(compounds, "Compounds cannot be null");
+		Objects.requireNonNull(rules, "Rules cannot be null");
+		Objects.requireNonNull(breakCharacter, "Break character cannot be null");
 
 		this.syllabes = syllabes;
 		this.compounds = compounds;

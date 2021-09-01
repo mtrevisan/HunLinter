@@ -66,8 +66,8 @@ public final class HammingDistance{
 	 * @throws IllegalArgumentException	if either input is {@code null} or if they do not have the same length
 	 */
 	public static int getDistance(final CharSequence left, final CharSequence right){
-		Objects.requireNonNull(left);
-		Objects.requireNonNull(right);
+		Objects.requireNonNull(left, "Left cannot be null");
+		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
 			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
 
@@ -81,8 +81,8 @@ public final class HammingDistance{
 	}
 
 	public static Pair<Character, Character> findFirstDifference(final CharSequence left, final CharSequence right, final int offset){
-		Objects.requireNonNull(left);
-		Objects.requireNonNull(right);
+		Objects.requireNonNull(left, "Left cannot be null");
+		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
 			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
 

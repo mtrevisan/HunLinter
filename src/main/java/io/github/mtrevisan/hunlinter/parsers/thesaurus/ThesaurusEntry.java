@@ -66,16 +66,16 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	private ThesaurusEntry(final String definition, final List<SynonymsEntry> synonyms){
-		Objects.requireNonNull(definition);
-		Objects.requireNonNull(synonyms);
+		Objects.requireNonNull(definition, "Definition cannot be null");
+		Objects.requireNonNull(synonyms, "Synonyms cannot be null");
 
 		this.definition = definition.toLowerCase(Locale.ROOT);
 		this.synonyms = synonyms;
 	}
 
 	public ThesaurusEntry(final String line, final Scanner scanner) throws IOException{
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(scanner);
+		Objects.requireNonNull(line, "Line cannot be null");
+		Objects.requireNonNull(scanner, "Scanner cannot be null");
 
 		//all entries should be in lowercase
 		final String[] components = StringUtils.split(line.toLowerCase(Locale.ROOT), PART_OF_SPEECH_SEPARATOR);

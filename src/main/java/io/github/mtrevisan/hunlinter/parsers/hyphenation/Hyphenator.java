@@ -50,8 +50,8 @@ public class Hyphenator implements HyphenatorInterface{
 
 
 	public Hyphenator(final HyphenationParser hypParser, final String breakCharacter){
-		Objects.requireNonNull(hypParser);
-		Objects.requireNonNull(breakCharacter);
+		Objects.requireNonNull(hypParser, "Hyphenation parser cannot be null");
+		Objects.requireNonNull(breakCharacter, "Break character cannot be null");
 
 		this.hypParser = hypParser;
 		this.breakCharacter = breakCharacter;

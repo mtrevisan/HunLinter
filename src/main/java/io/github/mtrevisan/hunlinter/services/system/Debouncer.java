@@ -44,7 +44,7 @@ public class Debouncer<T>{
 
 
 	public Debouncer(final Runnable callback, final int interval){
-		Objects.requireNonNull(callback);
+		Objects.requireNonNull(callback, "Callback cannot be null");
 
 		this.callback = callback;
 		this.interval = interval;

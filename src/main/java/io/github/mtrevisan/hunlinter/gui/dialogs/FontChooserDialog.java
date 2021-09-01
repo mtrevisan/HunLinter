@@ -112,9 +112,9 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	public FontChooserDialog(final Supplier<String> sampleExtractor, final Consumer<Font> onSelection, final Frame parent){
 		super(parent, "Font chooser", true);
 
-		Objects.requireNonNull(sampleExtractor);
-		Objects.requireNonNull(onSelection);
-		Objects.requireNonNull(parent);
+		Objects.requireNonNull(sampleExtractor, "Sample extractor cannot be null");
+		Objects.requireNonNull(onSelection, "On selection cannot be null");
+		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		sampleText = sampleExtractor.get();
 		FontHelper.extractFonts(sampleText);

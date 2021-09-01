@@ -186,7 +186,7 @@ public class Packager{
 
 
 	public void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
-		Objects.requireNonNull(projectPath);
+		Objects.requireNonNull(projectPath, "Project path cannot be null");
 
 		this.projectPath = projectPath;
 
@@ -549,7 +549,7 @@ public class Packager{
 	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
 			final Path originPath) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
-		Objects.requireNonNull(folder);
+		Objects.requireNonNull(folder, "Folder cannot be null");
 
 		final File file = absolutizeFolder(folder, basePath, originPath);
 		final Map<String, File> children = new HashMap<>();

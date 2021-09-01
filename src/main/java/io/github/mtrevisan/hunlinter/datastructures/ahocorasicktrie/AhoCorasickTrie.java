@@ -127,7 +127,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param hitConsumer	The consumer called in case of a hit
 	 */
 	private boolean searchInText(final String text, final BiFunction<int[], Integer, Boolean> hitConsumer){
-		Objects.requireNonNull(text);
+		Objects.requireNonNull(text, "Text cannot be null");
 
 		boolean found = false;
 		if(isInitialized()){
@@ -211,7 +211,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
 	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
-		Objects.requireNonNull(key);
+		Objects.requireNonNull(key, "Key cannot be null");
 
 		int result = -1;
 		if(isInitialized()){

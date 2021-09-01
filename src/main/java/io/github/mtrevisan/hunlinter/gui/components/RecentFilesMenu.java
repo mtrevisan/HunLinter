@@ -51,8 +51,8 @@ public class RecentFilesMenu extends JMenu{
 
 
 	public RecentFilesMenu(final RecentItems recentItems, final Consumer<Path> onSelectFile){
-		Objects.requireNonNull(recentItems);
-		Objects.requireNonNull(onSelectFile);
+		Objects.requireNonNull(recentItems, "Recent items cannot be null");
+		Objects.requireNonNull(onSelectFile, "On select file cannot be null");
 
 		this.recentItems = recentItems;
 		this.onSelectFile = onSelectFile;

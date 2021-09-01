@@ -68,7 +68,7 @@ public class RulesLoader{
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
-		Objects.requireNonNull(language);
+		Objects.requireNonNull(language, "Language cannot be null");
 
 		rulesProperties = BaseBuilder.getRulesProperties(language);
 

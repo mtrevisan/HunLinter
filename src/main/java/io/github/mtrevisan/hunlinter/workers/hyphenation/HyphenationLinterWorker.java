@@ -74,8 +74,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		getWorkerData()
 			.withParallelProcessing();
 
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(hyphenator);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(hyphenator, "Hyphenator cannot be null");
 
 
 		final Orthography orthography = BaseBuilder.getOrthography(language);

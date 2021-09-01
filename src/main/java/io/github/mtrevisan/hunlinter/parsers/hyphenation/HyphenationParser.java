@@ -154,7 +154,7 @@ public class HyphenationParser{
 
 
 	public HyphenationParser(final Comparator<String> comparator){
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 
 		this.comparator = comparator;
 
@@ -167,8 +167,8 @@ public class HyphenationParser{
 
 	HyphenationParser(final Comparator<String> comparator, final Map<Level, AhoCorasickTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, final HyphenationOptionsParser options){
-		Objects.requireNonNull(patterns);
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(patterns, "Patterns cannot be null");
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 
 		this.comparator = comparator;
 

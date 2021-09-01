@@ -38,8 +38,8 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 
 
 	public CorrectionEntry(final String incorrectForm, final String correctForm){
-		Objects.requireNonNull(incorrectForm);
-		Objects.requireNonNull(correctForm);
+		Objects.requireNonNull(incorrectForm, "Incorrect form cannot be null");
+		Objects.requireNonNull(correctForm, "Correct form cannot be null");
 
 		this.incorrectForm = incorrectForm;
 		this.correctForm = correctForm;

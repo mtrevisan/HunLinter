@@ -57,7 +57,7 @@ public class HyphenationBreak{
 
 
 	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules){
-		Objects.requireNonNull(indexesAndRules);
+		Objects.requireNonNull(indexesAndRules, "Indexes and rules cannot be null");
 
 		this.indexesAndRules = indexesAndRules;
 	}

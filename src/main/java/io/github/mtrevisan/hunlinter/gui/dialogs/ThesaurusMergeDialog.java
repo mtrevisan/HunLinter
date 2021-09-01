@@ -55,7 +55,7 @@ public class ThesaurusMergeDialog extends JDialog{
 	public ThesaurusMergeDialog(final String definition, final SynonymsEntry baseSynonyms, final List<SynonymsEntry> synonymsEntries, final Frame parent){
 		super(parent, "Thesaurus merger", true);
 
-		Objects.requireNonNull(synonymsEntries);
+		Objects.requireNonNull(synonymsEntries, "Synonyms entries cannot be null");
 
 		this.baseSynonyms = baseSynonyms;
 		this.definition = definition;

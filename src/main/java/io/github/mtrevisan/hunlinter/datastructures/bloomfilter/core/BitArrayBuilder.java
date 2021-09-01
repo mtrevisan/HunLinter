@@ -44,7 +44,7 @@ public final class BitArrayBuilder{
 	private BitArrayBuilder(){}
 
 	public static BitArray getBitArray(final Type type, final int bits){
-		Objects.requireNonNull(type);
+		Objects.requireNonNull(type, "Type cannot be null");
 
 		BitArray ba = null;
 		switch(type){

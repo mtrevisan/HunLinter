@@ -71,8 +71,8 @@ public class DictionaryLookup implements Iterable<WordData>{
 		Objects.requireNonNull(dictionary, "Dictionary cannot be null");
 		final FSA fsa = dictionary.fsa;
 		final DictionaryMetadata metadata = dictionary.metadata;
-		Objects.requireNonNull(fsa);
-		Objects.requireNonNull(metadata);
+		Objects.requireNonNull(fsa, "FSA cannot be null");
+		Objects.requireNonNull(metadata, "Metadata cannot be null");
 
 		this.dictionary = dictionary;
 

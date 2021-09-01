@@ -92,11 +92,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(language);
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(checker);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(language, "Language cannot be null");
+		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
+		Objects.requireNonNull(checker, "Checker cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		this.dicParser = dicParser;

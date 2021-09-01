@@ -37,7 +37,7 @@ public class WorkerDataParser<P> extends WorkerData{
 	public WorkerDataParser(final String workerName, final P parser){
 		super(workerName);
 
-		Objects.requireNonNull(parser);
+		Objects.requireNonNull(parser, "Parser cannot be null");
 
 		this.parser = parser;
 	}

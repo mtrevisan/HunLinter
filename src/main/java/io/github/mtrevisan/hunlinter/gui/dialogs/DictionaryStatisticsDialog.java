@@ -91,7 +91,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	public DictionaryStatisticsDialog(final DictionaryStatistics statistics, final Frame parent){
 		super(parent, "Dictionary statistics", false);
 
-		Objects.requireNonNull(statistics);
+		Objects.requireNonNull(statistics, "Statistics cannot be null");
 
 		this.statistics = statistics;
 

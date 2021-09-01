@@ -222,7 +222,7 @@ public class ParserManager implements FileChangeListener{
 	}
 
 	public void getCorrectnessChecker(){
-		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(affParser, "Affix parser cannot be null");
 
 		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
 	}

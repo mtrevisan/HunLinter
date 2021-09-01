@@ -62,8 +62,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 	public HyphenationOptionsDialog(final HyphenationOptionsParser options, final Consumer<HyphenationOptionsParser> acceptButtonAction, final java.awt.Frame parent){
 		super(parent, true);
 
-		Objects.requireNonNull(options);
-		Objects.requireNonNull(acceptButtonAction);
+		Objects.requireNonNull(options, "Options cannot be null");
+		Objects.requireNonNull(acceptButtonAction, "Accept button action cannot be null");
 
 		this.acceptButtonAction = acceptButtonAction;
 
