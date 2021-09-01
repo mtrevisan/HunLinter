@@ -47,10 +47,10 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] NB_NP = {"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüïo` to be valid
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiïouàéèíóòúü])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiïouàéèíóòúü])");
+	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü])");
 
-	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
+	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)");
 
 	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéíïòóúüh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");

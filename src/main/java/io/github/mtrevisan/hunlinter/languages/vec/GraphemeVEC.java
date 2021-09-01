@@ -54,14 +54,14 @@ final class GraphemeVEC{
 
 	private static final Pattern DIPHTONG1 = RegexHelper.pattern("[àèéíòóú][aeoiu]");
 	private static final Pattern DIPHTONG2 = RegexHelper.pattern("[aeo][aeo]");
-	private static final Pattern HYATUS = RegexHelper.pattern("[aeïoü][aàeèéiíoòóuú]|[iu][íú]");
+	private static final Pattern HYATUS = RegexHelper.pattern("[aeïoü][aeiouàèéíòóú]|[iu][íú]");
 
 	private static final Pattern ETEROPHONIC_SEQUENCE = RegexHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Pattern ETEROPHONIC_SEQUENCE_W = RegexHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Pattern ETEROPHONIC_SEQUENCE_J = RegexHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 
-	private static final Pattern SINGLE_SYLLABE_IU = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+[iu][aeiou]$");
-	private static final Pattern SINGLE_SYLLABE_IU_UMLAUT = RegexHelper.pattern("^[^aàeéèiïíoóòuüú]+[ïü][aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_IU = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[iu][aeiou]$");
+	private static final Pattern SINGLE_SYLLABE_IU_UMLAUT = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[ïü][aeiou]$");
 	private static final Map<Character, Character> IU_UMLAUT = new HashMap<>();
 	static{
 		IU_UMLAUT.put('i', 'ï');
