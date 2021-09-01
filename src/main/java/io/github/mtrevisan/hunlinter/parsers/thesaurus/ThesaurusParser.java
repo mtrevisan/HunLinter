@@ -149,7 +149,7 @@ public class ThesaurusParser{
 		if(list.size() < 2)
 			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 
-		final String[] synonyms = list.toArray(new String[0]);
+		final String[] synonyms = list.toArray(new String[list.size()]);
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
 		boolean forceInsertion = duplicates.isEmpty();
 		if(!forceInsertion){

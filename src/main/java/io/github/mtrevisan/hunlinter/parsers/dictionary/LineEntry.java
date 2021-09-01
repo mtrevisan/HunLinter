@@ -174,7 +174,7 @@ public class LineEntry implements Serializable{
 	}
 
 	public void expandConditionToMaxLength(final Comparator<String> comparator){
-		final String lcs = StringHelper.longestCommonSuffix(from.toArray(String[]::new));
+		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[from.size()]));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
