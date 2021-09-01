@@ -71,6 +71,9 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 
+	private static final String SYLLABATION_PREFIX = "<html>";
+	private final String SYLLABATION_SUFFIX = "</html>";
+
 
 	private final Debouncer<HyphenationLayeredPane> debouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HyphenationLayeredPane> addRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
@@ -423,8 +426,7 @@ final int iconSize = 17;
 		if(StringUtils.isNotBlank(text)){
 			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 
-			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
-				"</html>");
+			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, SYLLABATION_PREFIX, SYLLABATION_SUFFIX);
 			final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 				.toString();
