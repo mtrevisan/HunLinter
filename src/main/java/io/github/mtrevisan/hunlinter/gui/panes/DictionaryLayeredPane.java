@@ -364,6 +364,8 @@ final int iconSize = 17;
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
+			dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
+
 			//affix file:
 			inputTextField.setEnabled(true);
 			inputTextField.requestFocusInWindow();
@@ -438,8 +440,6 @@ final int iconSize = 17;
 
 		if(StringUtils.isNotBlank(text)){
 			try{
-				if(dictionaryEntryFactory == null)
-					dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
@@ -483,10 +483,6 @@ final int iconSize = 17;
 		}
 		else
 			totalInflectionsValueLabel.setText(null);
-	}
-
-	public void clear(){
-		dictionaryEntryFactory = null;
 	}
 
 	private void clearOutputTable(final JTable table){

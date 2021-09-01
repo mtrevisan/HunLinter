@@ -614,7 +614,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		final Consumer<Font> initialize = temporaryFont -> {
 			FontHelper.setCurrentFont(temporaryFont, this);
 
-			((DictionaryLayeredPane)dicLayeredPane).clear();
 			filOpenProjectMenuItem.setEnabled(false);
 		};
 		final ActionListener projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
