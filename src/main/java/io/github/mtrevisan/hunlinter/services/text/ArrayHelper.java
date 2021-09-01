@@ -32,15 +32,16 @@ public final class ArrayHelper{
 	public static byte[] concatenate(final byte[]... arrays){
 		int size = 0;
 		for(int i = 0; i < arrays.length; i ++)
-			size += arrays[i].length;
+			size += (arrays[i] != null? arrays[i].length: 0);
 
 		final byte[] joinedArray = new byte[size];
 		size = 0;
-		for(int i = 0; i < arrays.length; i ++){
-			final int length = arrays[i].length;
-			System.arraycopy(arrays[i], 0, joinedArray, size, length);
-			size += length;
-		}
+		for(int i = 0; i < arrays.length; i ++)
+			if(arrays[i] != null){
+				final int length = arrays[i].length;
+				System.arraycopy(arrays[i], 0, joinedArray, size, length);
+				size += length;
+			}
 		return joinedArray;
 	}
 

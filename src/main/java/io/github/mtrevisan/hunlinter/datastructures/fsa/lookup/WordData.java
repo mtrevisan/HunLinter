@@ -109,9 +109,10 @@ public class WordData{
 
 	@Override
 	public String toString(){
-		return "WordData[" + new String(word, StandardCharsets.UTF_8)
-			+ "," + new String(stem, StandardCharsets.UTF_8)
-			+ "," + new String(tag, StandardCharsets.UTF_8) + "]";
+		return "WordData[word:" + new String(word, StandardCharsets.UTF_8)
+			+ ", stem:" + (stem != null? new String(stem, StandardCharsets.UTF_8): "null")
+			+ ", tag:" + (tag != null? new String(tag, StandardCharsets.UTF_8): "null")
+			+ "]";
 	}
 
 }
